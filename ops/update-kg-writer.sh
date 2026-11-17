@@ -13,8 +13,10 @@
 #   1. pré-voo: a worktree de código é worktree DO CORE (mesmo git-common-dir), está limpa, e o /health
 #      responde UP — não se atualiza serviço já doente
 #   2. fetch do core e SHA de origin/main; NOOP se a worktree já está nele (serviço intocado)
-#   3. backup tar da raiz de dados (cada área é um repo git: o estado que não se refaz) em
-#      ~/backups/onion-chat-kg/, modo 0600, com o artefato NOMEADO e o tamanho conferido
+#   3. backup CIFRADO da raiz de dados (cada área é um repo git: o estado que não se refaz) em
+#      ~/backups/onion-chat-kg/, modo 0600, com o artefato NOMEADO e o tamanho conferido. Desde 2026-11-17
+#      quem faz é o ops/kg-writer-backup.sh, com o rótulo pre-<sha>: o mesmo caminho do backup diário
+#      (tar listado e conferido, cifra para a chave do cofre, `pubkey enc packet` conferido). Antes saía em claro.
 #   4. checkout --detach da worktree de código no SHA
 #   5. restart da unidade — o armazém (kg_store) e o leitor do contrato são importados NO BOOT; sem
 #      reiniciar, o served_commit mostraria o SHA novo julgando com o contrato velho (README do servidor)
@@ -36,6 +38,8 @@ UNIT=onion-vps-mcp-kg-writer
 DEST="${HOME}/backups/onion-chat-kg"
 HEALTH="http://172.23.0.1:3037/health"
 SERVER_REL=ops/mcp-onion-kg-writer/server.py
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKUP="${SELF_DIR}/kg-writer-backup.sh"
 
 exec 9>"/tmp/onion-update-kg-writer.lock"
 flock -n 9 || { echo "[update-kg-writer] outra execução em andamento — saindo." >&2; exit 0; }
@@ -48,7 +52,8 @@ print_rollback() {
   git -C ${CODE} checkout -q --detach ${OLD_SHA:-<sha-anterior>}
   sudo systemctl restart ${UNIT}
   curl -s ${HEALTH}
-  # dados: restaurável do backup nomeado acima, em ${DEST} (tar -xzf <arquivo> -C $(dirname "${DATA}"), com o serviço parado)
+  # dados: restaurável do backup nomeado acima, em ${DEST}, com o serviço parado:
+  #   gpg -d <arquivo>.tar.gz.gpg | sudo tar -xzf - -C $(dirname "${DATA}")
 EOF
 }
 die() { printf '[update-kg-writer] ERRO: %s\n' "$*" >&2; [ -n "${OLD_SHA}" ] && print_rollback; exit 1; }
@@ -77,6 +82,7 @@ else: sys.exit(1)' || true
 
 # ── 1. pré-voo ────────────────────────────────────────────────────────────────────────────────
 [ -d "${CODE}" ] || die "worktree de código ausente: ${CODE}"
+[ -f "${BACKUP}" ] || die "script de backup ausente: ${BACKUP}"
 cd_core="$(git -C "${CORE}" rev-parse --path-format=absolute --git-common-dir)" || die "rev-parse do core falhou"
 cd_code="$(git -C "${CODE}" rev-parse --path-format=absolute --git-common-dir)" || die "rev-parse da worktree falhou"
 [ "$(realpath "${cd_core}")" = "$(realpath "${cd_code}")" ] \
@@ -101,13 +107,16 @@ log "alvo ${SHA:0:12} — o código novo declara ${EXPECTED} tools"
 
 # ── 3. backup da raiz de dados (estado irreversível), artefato NOMEADO ────────────────────────
 install -d -m 0700 "${DEST}"
-BK="${DEST}/onion-chat-kg-$(date +%Y%m%d-%H%M%S)-pre-${SHA:0:12}.tar.gz"
-( umask 077; sudo tar -C "$(dirname "${DATA}")" -czf "${BK}" "$(basename "${DATA}")" ) || die "backup falhou — sem rede de segurança não se atualiza"
-sudo chown "$(id -un):$(id -gn)" "${BK}"; chmod 600 "${BK}"
+# o tar, a listagem, a cifra e a conferência do pacote são do kg-writer-backup.sh (o caminho do diário); o caminho
+# do .gpg volta sozinho no stdout, e o que se confere aqui é o ARQUIVO (existe, 0600, não vazio), não a prosa dele
+BK="$(ONION_KG_BACKUP_DATA="${DATA}" ONION_KG_BACKUP_DEST="${DEST}" bash "${BACKUP}" "pre-${SHA:0:12}")" \
+  || die "backup falhou — sem rede de segurança não se atualiza"
+case "${BK}" in "${DEST}"/onion-chat-kg-pre-"${SHA:0:12}"-*.tar.gz.gpg) ;; *) die "backup sem artefato nomeado no destino" ;; esac
+[ -f "${BK}" ] || die "backup ausente (${BK})"
+[ "$(stat -c %a "${BK}")" = 600 ] || die "backup fora do modo 0600 (${BK})"
 BK_BYTES="$(stat -c %s "${BK}")"
 [ "${BK_BYTES}" -gt 0 ] || die "backup VAZIO (${BK})"
-sudo tar -tzf "${BK}" >/dev/null || die "backup ilegível (${BK})"
-log "backup: ${BK} (${BK_BYTES} bytes, 0600)"
+log "backup: ${BK} (${BK_BYTES} bytes, 0600, cifrado)"
 
 # ── 4. troca do código ────────────────────────────────────────────────────────────────────────
 git -C "${CODE}" checkout -q --detach "${SHA}" || die "checkout --detach ${SHA:0:12} falhou"

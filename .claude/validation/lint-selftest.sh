@@ -56639,6 +56639,384 @@ EOF_MUT
 }
 _family run_mcp_onion_kg_writer_selftests
 
+# KG-WRITER-BACKUP — o backup cifrado da raiz de dados do onion-kg-writer (ops/kg-writer-backup.sh, 2026-11-17).
+# A bancada roda o script DE VERDADE numa raiz de dados falsa em temporário, com dublês de tar, gpg, sudo, shred e
+# id (sem root, sem chave, sem tocar o dado real nem a home de ninguém). O dublê de id é o que deixa exercitar o
+# caminho de root (tar direto, cifra e destino como o dono) sem ser root. Casos: (a) caminho feliz · (b) tar sem
+# .git/HEAD · (c) gpg que falha · (d) .gpg sem `pubkey enc packet` · (e) retenção 16 → 14 com os rotulados intactos ·
+# (f) zero diários · (g) rótulo inválido · (h) dono não derivável · (h2) root com SUDO_USER e caminhos derivados da
+# home · (i) symlink com nome de diário no destino · (j) destino symlink · (k) shred que falha · (l) raiz de dados
+# symlink · (m) arquivo de destinatários vazio ou com opção · (p) tar que falha · (q) rótulo pre-* não roda retenção ·
+# (u1/u2) o passo 3 do update-kg-writer.sh, extraído do script e rodado contra o backup de verdade · (r1/r2) gpg e tar
+# REAIS com chave descartável: a string `pubkey enc packet` sai do gpg instalado, e o .gpg decifra e passa no git fsck.
+# Um mutante por garantia central (8), cada âncora casando exatamente uma linha, cada um morto por um caso nomeado.
+_kwb_doubles() {  # _kwb_doubles <dir>
+  local b="$1"; mkdir -p "${b}"
+  cat > "${b}/tar" <<'DBL'
+#!/bin/sh
+echo "tar $*" >> "${KWB_LOG}"
+if [ "$1" = -C ]; then
+  if [ -n "${KWB_TAR_FAIL:-}" ]; then printf 'parcial'; echo 'tar: area-secreta: file changed as we read it' >&2; exit 1; fi
+  if [ -n "${KWB_TAR_NO_GIT:-}" ]; then exec "${KWB_REAL_TAR}" --exclude=.git "$@"; fi
+fi
+exec "${KWB_REAL_TAR}" "$@"
+DBL
+  cat > "${b}/gpg" <<'DBL'
+#!/bin/sh
+echo "gpg $*" >> "${KWB_LOG}"
+mode=enc; out=; prev=; last=
+for a in "$@"; do
+  [ "${prev}" = -o ] && out="${a}"
+  [ "${a}" = --list-packets ] && mode=list
+  prev="${a}"; last="${a}"
+done
+if [ "${mode}" = list ]; then
+  [ -f "${last}" ] || exit 2
+  if [ -n "${KWB_GPG_NO_PACKET:-}" ]; then echo ':literal data packet:'; exit 0; fi
+  echo ':pubkey enc packet: version 3, algo 18, keyid 0000000000000000'
+  echo 'gpg: decryption failed: No secret key' >&2
+  exit 2
+fi
+if [ -n "${KWB_GPG_FAIL:-}" ]; then
+  printf 'lixo' > "${out}"; cat > /dev/null
+  echo 'gpg: KWB-RECIPIENT-0123: skipped: No public key' >&2; exit 2
+fi
+{ printf 'FAKE-OPENPGP\n'; cksum; } > "${out}"
+DBL
+  cat > "${b}/sudo" <<'DBL'
+#!/bin/sh
+echo "sudo $*" >> "${KWB_LOG}"
+while [ "$#" -gt 0 ]; do
+  case "$1" in -n|-H) shift ;; -u) shift 2 ;; --) shift; break ;; *) break ;; esac
+done
+exec "$@"
+DBL
+  cat > "${b}/shred" <<'DBL'
+#!/bin/sh
+echo "shred $*" >> "${KWB_LOG}"
+[ -z "${KWB_SHRED_FAIL:-}" ] || exit 1
+for a in "$@"; do case "${a}" in -*) ;; *) rm -f -- "${a}" ;; esac; done
+DBL
+  cat > "${b}/id" <<'DBL'
+#!/bin/sh
+if [ -n "${KWB_ID_ROOT:-}" ]; then
+  case "$1" in -u) echo 0; exit 0 ;; -un) echo root; exit 0 ;; esac
+fi
+exec id "$@"
+DBL
+  chmod +x "${b}/tar" "${b}/gpg" "${b}/sudo" "${b}/shred" "${b}/id"
+}
+
+# _kwb_cases <script> <base> <bin>: roda os casos e imprime `OK <caso>` ou `FAIL <caso> <motivo>`, um por linha
+_kwb_cases() {
+  local script="$1" base="$2" bin="$3" s="" rc=0 why="" real_tar f i
+  real_tar="$(command -v tar)"
+  local dre='onion-chat-kg-daily-[0-9]{8}-[0-9]{6}\.tar\.gz\.gpg'
+  _kwb_new() {
+    s="$(mktemp -d "${base}/c.XXXXXX")"; why=""
+    mkdir -p "${s}/data/onion-chat-kg/area-secreta/.git" "${s}/tmp"
+    echo 'ref: refs/heads/main' > "${s}/data/onion-chat-kg/area-secreta/.git/HEAD"
+    echo 'meta: {}' > "${s}/data/onion-chat-kg/area-secreta/g.kg.yaml"
+    echo 'KWB-RECIPIENT-0123' > "${s}/gpgid"; : > "${s}/log"
+  }
+  _kwb_run() {  # _kwb_run [VAR=valor ...] -- [argumentos do script]
+    local envs=()
+    while [ "$#" -gt 0 ] && [ "$1" != -- ]; do envs+=("$1"); shift; done
+    [ "$#" -gt 0 ] && shift
+    env -u SUDO_USER -u ONION_KG_BACKUP_OWNER -u ONION_KG_BACKUP_OWNER_HOME -u ONION_KG_WRITER_ROOT -u ONION_KG_BACKUP_KEEP \
+      -u KWB_TAR_FAIL -u KWB_TAR_NO_GIT -u KWB_GPG_FAIL -u KWB_GPG_NO_PACKET -u KWB_SHRED_FAIL -u KWB_ID_ROOT \
+      TMPDIR="${s}/tmp" KWB_LOG="${s}/log" KWB_REAL_TAR="${real_tar}" \
+      ONION_KG_BACKUP_TAR="${bin}/tar" ONION_KG_BACKUP_GPG="${bin}/gpg" ONION_KG_BACKUP_SUDO="${bin}/sudo" \
+      ONION_KG_BACKUP_SHRED="${bin}/shred" ONION_KG_BACKUP_ID="${bin}/id" \
+      ONION_KG_BACKUP_DATA="${s}/data/onion-chat-kg" ONION_KG_BACKUP_DEST="${s}/dest" ONION_KG_BACKUP_GPG_ID_FILE="${s}/gpgid" \
+      "${envs[@]}" bash "${script}" "$@" > "${s}/out" 2> "${s}/err"
+    rc=$?
+  }
+  _kwb_empty() { [ -z "$(ls -A "$1" 2>/dev/null)" ]; }
+  _kwb_end() { if [ -z "${why}" ]; then echo "OK $1"; else echo "FAIL $1 ${why}"; fi; }
+  _kwb_plant() { : > "${s}/dest/$1"; }
+  _kwb_dailies() { find "${s}/dest" -maxdepth 1 -type f 2>/dev/null | grep -cE "/${dre}\$" || true; }
+  # nada escrito: destino não criado, temporário vazio, nenhum binário chamado
+  _kwb_untouched() {
+    [ ! -e "${s}/dest" ] || why="${why} destino-criado"
+    _kwb_empty "${s}/tmp" || why="${why} tmp-sobrou"
+    [ ! -s "${s}/log" ] || why="${why} binario-chamado"
+  }
+  # falhou sem rastro: rc ≠ 0, nada no destino, temporário vazio, sem destinatário nem nome de área na saída
+  _kwb_failed_clean() {
+    [ "${rc}" -ne 0 ] || why="${why} rc=0"
+    _kwb_empty "${s}/dest" || why="${why} sobrou-no-destino"
+    _kwb_empty "${s}/tmp" || why="${why} tmp-sobrou"
+    ! grep -qE 'KWB-RECIPIENT|area-secreta' "${s}/err" "${s}/out" || why="${why} saida-vaza"
+  }
+
+  # (a) caminho feliz, rótulo padrão, dono derivado de quem roda
+  _kwb_new; _kwb_run --
+  [ "${rc}" -eq 0 ] || why="${why} rc=${rc}"
+  f="$(cat "${s}/out")"
+  [[ "${f}" =~ ^${s}/dest/${dre}$ ]] || why="${why} stdout-nao-e-so-o-caminho"
+  [ -f "${f}" ] && [ "$(stat -c %a "${f}" 2>/dev/null)" = 600 ] || why="${why} gpg-nao-600"
+  [ "$(stat -c %a "${s}/dest" 2>/dev/null)" = 700 ] || why="${why} destino-nao-700"
+  [ "$(ls -A "${s}/dest" | wc -l)" = 1 ] || why="${why} sobra-no-destino"
+  _kwb_empty "${s}/tmp" || why="${why} claro-sobrou"
+  grep -qE "^shred -u -- ${s}/tmp/[^ ]+/onion-chat-kg\.tar\.gz\$" "${s}/log" || why="${why} claro-nao-triturado"
+  grep -qE '^gpg .* -r KWB-RECIPIENT-0123 -o ' "${s}/log" || why="${why} destinatario-nao-passado"
+  grep -qE "^sudo -- ${bin}/tar -C " "${s}/log" || why="${why} tar-sem-sudo"
+  ! grep -q 'KWB-RECIPIENT' "${s}/err" "${s}/out" || why="${why} saida-vaza"
+  _kwb_end feliz-gpg-600-destino-700-sem-claro
+
+  # (b) tar sem nenhum .git/HEAD
+  _kwb_new; _kwb_run KWB_TAR_NO_GIT=1 --
+  _kwb_failed_clean; _kwb_end tar-sem-git-head-recusa
+
+  # (c) gpg que falha (e deixa lixo no nome provisório)
+  _kwb_new; _kwb_run KWB_GPG_FAIL=1 --
+  _kwb_failed_clean
+  grep -qE "^shred -u -- ${s}/tmp/" "${s}/log" || why="${why} claro-nao-triturado"
+  _kwb_end gpg-falha-nada-no-destino-claro-triturado
+
+  # (d) .gpg cuja listagem não traz `pubkey enc packet`
+  _kwb_new; _kwb_run KWB_GPG_NO_PACKET=1 --
+  _kwb_failed_clean; _kwb_end gpg-sem-pacote-apagado
+
+  # (e) retenção: 15 plantados + 1 novo = 16 → 14; rotulados e estranhos ficam todos
+  local keepers="onion-chat-kg-pre-abc123-20200101-000000.tar.gz.gpg onion-chat-kg-pre-def456-20200102-000000.tar.gz.gpg onion-chat-kg-pre-py315-20200103-000000.tar.gz.gpg onion-chat-kg-adhoc-20200101-000000.tar.gz.gpg onion-chat-kg-20200101-000000-pre-abc123.tar.gz onion-chat-kg-daily-20200101-000000.tar.gz.gpg.bak xonion-chat-kg-daily-20200101-000000.tar.gz.gpg notas.txt"
+  _kwb_new; mkdir -m 700 "${s}/dest"
+  for i in 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15; do _kwb_plant "onion-chat-kg-daily-202001${i}-000000.tar.gz.gpg"; done
+  for f in ${keepers}; do _kwb_plant "${f}"; done
+  _kwb_run --
+  [ "${rc}" -eq 0 ] || why="${why} rc=${rc}"
+  [ "$(_kwb_dailies)" = 14 ] || why="${why} diarios=$(_kwb_dailies)"
+  [ ! -e "${s}/dest/onion-chat-kg-daily-20200101-000000.tar.gz.gpg" ] && [ ! -e "${s}/dest/onion-chat-kg-daily-20200102-000000.tar.gz.gpg" ] || why="${why} mais-antigos-ficaram"
+  [ -e "${s}/dest/onion-chat-kg-daily-20200103-000000.tar.gz.gpg" ] || why="${why} apagou-o-terceiro"
+  [ -f "$(cat "${s}/out")" ] || why="${why} novo-apagado"
+  for f in ${keepers}; do [ -e "${s}/dest/${f}" ] || why="${why} apagou:${f}"; done
+  _kwb_end retencao-16-ficam-14-rotulados-intactos
+
+  # (f) zero diários antes: só rotulados no destino
+  _kwb_new; mkdir -m 700 "${s}/dest"; _kwb_plant onion-chat-kg-pre-abc123-20200101-000000.tar.gz.gpg
+  _kwb_run --
+  [ "${rc}" -eq 0 ] || why="${why} rc=${rc}"
+  [ "$(_kwb_dailies)" = 1 ] || why="${why} diarios=$(_kwb_dailies)"
+  [ -e "${s}/dest/onion-chat-kg-pre-abc123-20200101-000000.tar.gz.gpg" ] || why="${why} apagou-o-rotulado"
+  _kwb_end zero-diarios-nao-falha
+
+  # (g) rótulo inválido: recusado antes de qualquer escrita
+  for f in '../x' 'a b' '' '-x' 'x-' 'Pre-x' 'a/b' 'a.b' 'abcdefghijklmnopqrstuvwxyz0123456' $'a\nb'; do
+    _kwb_new; _kwb_run -- "${f}"
+    [ "${rc}" -ne 0 ] || why="${why} aceitou:[${f}]"
+    _kwb_untouched
+    [ -z "${why}" ] || break
+  done
+  if [ -z "${why}" ]; then _kwb_new; _kwb_run -- daily extra; [ "${rc}" -ne 0 ] || why="${why} aceitou-2-argumentos"; _kwb_untouched; fi
+  _kwb_end rotulo-invalido-recusa-antes-de-escrever
+
+  # (h) dono ausente e não derivável: root sem SUDO_USER, e root com SUDO_USER=root
+  _kwb_new; _kwb_run KWB_ID_ROOT=1 --
+  [ "${rc}" -ne 0 ] || why="${why} rc=0"
+  grep -q 'ONION_KG_BACKUP_OWNER' "${s}/err" || why="${why} erro-nao-nomeia-a-variavel"
+  _kwb_untouched
+  if [ -z "${why}" ]; then
+    _kwb_new; _kwb_run KWB_ID_ROOT=1 SUDO_USER=root --
+    [ "${rc}" -ne 0 ] || why="${why} aceitou-sudo-user-root"
+    _kwb_untouched
+  fi
+  _kwb_end dono-nao-derivavel-recusa
+
+  # (h2) root com SUDO_USER: tar direto, cifra e destino COMO o dono, caminhos derivados da home do dono
+  _kwb_new; mkdir -p "${s}/home/.password-store"; cp "${s}/gpgid" "${s}/home/.password-store/.gpg-id"
+  _kwb_run KWB_ID_ROOT=1 SUDO_USER=kwbowner ONION_KG_BACKUP_OWNER_HOME="${s}/home" ONION_KG_BACKUP_DEST= ONION_KG_BACKUP_GPG_ID_FILE= --
+  [ "${rc}" -eq 0 ] || why="${why} rc=${rc}"
+  f="$(cat "${s}/out")"
+  [[ "${f}" =~ ^${s}/home/backups/onion-chat-kg/${dre}$ ]] && [ -f "${f}" ] || why="${why} destino-nao-derivado-da-home"
+  ! grep -qE "^sudo -- ${bin}/tar" "${s}/log" || why="${why} root-usou-sudo-no-tar"
+  grep -qE "^sudo -n -u kwbowner -H -- ${bin}/gpg .* -e\$" "${s}/log" || why="${why} cifra-nao-rodou-como-o-dono"
+  grep -qE "^sudo -n -u kwbowner -H -- install -d -m 700 -- ${s}/home/backups/onion-chat-kg\$" "${s}/log" || why="${why} destino-nao-criado-como-o-dono"
+  grep -qE "^sudo -n -u kwbowner -H -- cat -- ${s}/home/\.password-store/\.gpg-id\$" "${s}/log" || why="${why} destinatarios-nao-lidos-como-o-dono"
+  grep -qE "^sudo -n -u kwbowner -H -- mv -n -- " "${s}/log" || why="${why} nome-final-nao-dado-como-o-dono"
+  _kwb_end root-com-sudo-user-escreve-como-o-dono
+
+  # (i) symlink com nome de diário, o mais antigo, apontando para fora do destino
+  _kwb_new; mkdir -m 700 "${s}/dest"; echo 'alvo de fora' > "${s}/fora.txt"
+  ln -s "${s}/fora.txt" "${s}/dest/onion-chat-kg-daily-20190101-000000.tar.gz.gpg"
+  for i in 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15; do _kwb_plant "onion-chat-kg-daily-202001${i}-000000.tar.gz.gpg"; done
+  _kwb_run --
+  [ "${rc}" -eq 0 ] || why="${why} rc=${rc}"
+  [ "$(cat "${s}/fora.txt" 2>/dev/null)" = 'alvo de fora' ] || why="${why} alvo-de-fora-tocado"
+  [ -L "${s}/dest/onion-chat-kg-daily-20190101-000000.tar.gz.gpg" ] || why="${why} symlink-mexido"
+  [ "$(_kwb_dailies)" = 14 ] || why="${why} diarios=$(_kwb_dailies)"
+  _kwb_end symlink-no-destino-nao-alcanca-fora
+
+  # (j) o próprio destino é symlink
+  _kwb_new; mkdir "${s}/alhures"; ln -s "${s}/alhures" "${s}/dest"
+  _kwb_run --
+  [ "${rc}" -ne 0 ] || why="${why} rc=0"
+  _kwb_empty "${s}/alhures" || why="${why} escreveu-pelo-symlink"
+  _kwb_empty "${s}/tmp" || why="${why} tmp-sobrou"
+  _kwb_end destino-symlink-recusa
+
+  # (k) shred que falha: o claro some mesmo assim, com aviso
+  _kwb_new; _kwb_run KWB_SHRED_FAIL=1 --
+  [ "${rc}" -eq 0 ] || why="${why} rc=${rc}"
+  _kwb_empty "${s}/tmp" || why="${why} claro-sobrou"
+  grep -q 'AVISO' "${s}/err" || why="${why} sem-aviso"
+  _kwb_end shred-falha-claro-removido-com-aviso
+
+  # (l) raiz de dados symlink
+  _kwb_new; mv "${s}/data/onion-chat-kg" "${s}/data/real"; ln -s "${s}/data/real" "${s}/data/onion-chat-kg"
+  _kwb_run --
+  [ "${rc}" -ne 0 ] || why="${why} rc=0"
+  _kwb_untouched; _kwb_end raiz-de-dados-symlink-recusa
+
+  # (m) arquivo de destinatários vazio, ausente, ou com linha que é opção
+  _kwb_new; : > "${s}/gpgid"; _kwb_run --
+  [ "${rc}" -ne 0 ] || why="${why} aceitou-vazio"
+  [ ! -e "${s}/dest" ] && _kwb_empty "${s}/tmp" || why="${why} escreveu-com-vazio"
+  _kwb_new; rm -f "${s}/gpgid"; _kwb_run --
+  [ "${rc}" -ne 0 ] || why="${why} aceitou-ausente"
+  _kwb_new; printf '%s\n' '--output=/tmp/x' > "${s}/gpgid"; _kwb_run --
+  [ "${rc}" -ne 0 ] || why="${why} aceitou-opcao"
+  ! grep -q '^gpg ' "${s}/log" || why="${why} gpg-chamado-com-opcao"
+  _kwb_end destinatarios-vazio-ou-opcao-recusa
+
+  # (p) tar que falha (rc 1, saída parcial)
+  _kwb_new; _kwb_run KWB_TAR_FAIL=1 --
+  _kwb_failed_clean; _kwb_end tar-falha-nada-no-destino
+
+  # (q) rótulo pre-*: nome com o rótulo, sem retenção
+  _kwb_new; mkdir -m 700 "${s}/dest"
+  for i in 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18; do _kwb_plant "onion-chat-kg-daily-202001${i}-000000.tar.gz.gpg"; done
+  _kwb_run -- pre-0123456789ab
+  [ "${rc}" -eq 0 ] || why="${why} rc=${rc}"
+  [[ "$(cat "${s}/out")" =~ ^${s}/dest/onion-chat-kg-pre-0123456789ab-[0-9]{8}-[0-9]{6}\.tar\.gz\.gpg$ ]] || why="${why} nome-sem-o-rotulo"
+  [ "$(_kwb_dailies)" = 18 ] || why="${why} retencao-rodou-com-rotulo"
+  _kwb_end rotulo-pre-sem-retencao
+}
+
+run_kg_writer_backup_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/kg-writer-backup.sh" up="${REPO_ROOT}/ops/update-kg-writer.sh"
+  if [ ! -f "${wr}" ]; then record_skip "kg-writer-backup: sem ops/kg-writer-backup.sh (core-only) — nada a testar"; return; fi
+  command -v tar >/dev/null 2>&1 || { record_skip "kg-writer-backup: tar ausente → pulado"; return; }
+  local d; d="$(mktemp -d /tmp/kwb-lint.XXXXXX)"
+  local bin="${d}/bin" o c n
+  _kwb_doubles "${bin}"; mkdir "${d}/base"
+  # ── os casos sobre o script de verdade ──
+  o="$(_kwb_cases "${wr}" "${d}/base" "${bin}" 2>&1)"
+  local cases="feliz-gpg-600-destino-700-sem-claro tar-sem-git-head-recusa gpg-falha-nada-no-destino-claro-triturado gpg-sem-pacote-apagado retencao-16-ficam-14-rotulados-intactos zero-diarios-nao-falha rotulo-invalido-recusa-antes-de-escrever dono-nao-derivavel-recusa root-com-sudo-user-escreve-como-o-dono symlink-no-destino-nao-alcanca-fora destino-symlink-recusa shred-falha-claro-removido-com-aviso raiz-de-dados-symlink-recusa destinatarios-vazio-ou-opcao-recusa tar-falha-nada-no-destino rotulo-pre-sem-retencao"
+  local baseline=1
+  for c in ${cases}; do
+    if grep -qx "OK ${c}" <<< "${o}"; then record_pass "kg-writer-backup: ${c}"
+    else baseline=0; record_fail "kg-writer-backup: ${c}" "$(grep -E "^FAIL ${c}( |\$)" <<< "${o}" | head -1 | cut -c1-200) $(grep -vE '^(OK|FAIL) ' <<< "${o}" | head -2 | tr '\n' '|' | cut -c1-200)"; fi
+  done
+  n="$(grep -cE '^(OK|FAIL) ' <<< "${o}" || true)"
+  if [ "${n}" = 16 ]; then record_pass "kg-writer-backup: a bancada emitiu os 16 casos, nem mais nem menos"
+  else baseline=0; record_fail "kg-writer-backup: contagem de casos" "esperava 16, vieram ${n}"; fi
+  # ── (m) um mutante por garantia central: âncora@@troca@@caso que tem de reprovar ──
+  local m from to want rest mo
+  while IFS= read -r m; do
+    [ -n "${m}" ] || continue
+    from="${m%%@@*}"; rest="${m#*@@}"; to="${rest%%@@*}"; want="${rest#*@@}"
+    if [ "${baseline}" != 1 ]; then record_fail "kg-writer-backup: (m) ${want}" "linha de base vermelha: mutante não julgado"; continue; fi
+    n="$(grep -cF -- "${from}" "${wr}" || true)"
+    if [ "${n}" != 1 ]; then record_fail "kg-writer-backup: (m) ${want}" "âncora aparece ${n}× (tem de ser 1): ${from:0:70}"; continue; fi
+    FROM="${from}" TO="${to}" perl -pe 's/\Q$ENV{FROM}\E/$ENV{TO}/' "${wr}" > "${d}/mutant.sh"
+    if cmp -s "${wr}" "${d}/mutant.sh" || ! bash -n "${d}/mutant.sh" 2>/dev/null; then
+      record_fail "kg-writer-backup: (m) ${want}" "o mutante não foi plantado (cópia igual ao original, ou não é bash válido)"; continue
+    fi
+    rm -rf "${d}/base"; mkdir "${d}/base"
+    mo="$(_kwb_cases "${d}/mutant.sh" "${d}/base" "${bin}" 2>&1)"
+    if grep -qE "^FAIL ${want} " <<< "${mo}"; then record_pass "kg-writer-backup: (m) mutante reprova ${want}"
+    else record_fail "kg-writer-backup: (m) ${want}" "o mutante SOBREVIVEU: ${from:0:70}"; fi
+  done <<'MUT'
+grep -qE '^[^/]+/[^/]+/\.git/HEAD$' <<< "${list}" || die@@true || die@@tar-sem-git-head-recusa
+    *"pubkey enc packet"*) return 0 ;;@@    *) return 0 ;;@@gpg-sem-pacote-apagado
+DAILY_RE="^${PREFIX}-daily-[0-9]{8}-[0-9]{6}\.tar\.gz\.gpg$"@@DAILY_RE="^${PREFIX}-.*\.tar\.gz\.gpg\$"@@retencao-16-ficam-14-rotulados-intactos
+trap cleanup EXIT@@: ONION_MUTANTE sem trap@@gpg-falha-nada-no-destino-claro-triturado
+-maxdepth 1 -type f -printf@@-maxdepth 1 -printf@@symlink-no-destino-nao-alcanca-fora
+  ''|-*|*-|*[!a-z0-9-]*) die "rótulo inválido@@  '') die "rótulo inválido@@rotulo-invalido-recusa-antes-de-escrever
+  else die "sem dono da chave: como root e sem SUDO_USER, defina ONION_KG_BACKUP_OWNER"; fi@@  else OWNER=root; fi@@dono-nao-derivavel-recusa
+if as_owner test -L "${DEST}"; then die@@if false; then die@@destino-symlink-recusa
+MUT
+  # ── (u) o passo 3 do update-kg-writer.sh, extraído do script e rodado contra o backup de verdade ──
+  if [ ! -f "${up}" ]; then record_skip "kg-writer-backup: (u) sem ops/update-kg-writer.sh nesta árvore"
+  else
+    local blk us uo urc bk
+    blk="$(sed -n '/^# ── 3\. backup da raiz de dados/,/^# ── 4\. troca do código/p' "${up}" | sed '$d')"
+    if ! grep -qF 'bash "${BACKUP}" "pre-${SHA:0:12}"' <<< "${blk}" || grep -qE 'tar +-C|-czf' <<< "${blk}"; then
+      record_fail "kg-writer-backup: (u) o passo 3 do update" "o bloco não chama o backup com pre-<sha>, ou voltou a fazer tar por conta própria"
+    else
+      _kwb_step3() {  # _kwb_step3 <sandbox> [VAR=valor]: imprime BK=<caminho> ou DIE <mensagem>
+        local s="$1"; shift
+        mkdir -p "${s}/data/onion-chat-kg/area-secreta/.git" "${s}/tmp"
+        echo 'ref: refs/heads/main' > "${s}/data/onion-chat-kg/area-secreta/.git/HEAD"
+        echo 'KWB-RECIPIENT-0123' > "${s}/gpgid"
+        env -u SUDO_USER -u ONION_KG_BACKUP_OWNER -u ONION_KG_BACKUP_OWNER_HOME -u ONION_KG_BACKUP_KEEP -u KWB_GPG_FAIL \
+          TMPDIR="${s}/tmp" KWB_LOG="${s}/log" KWB_REAL_TAR="$(command -v tar)" \
+          ONION_KG_BACKUP_TAR="${bin}/tar" ONION_KG_BACKUP_GPG="${bin}/gpg" ONION_KG_BACKUP_SUDO="${bin}/sudo" \
+          ONION_KG_BACKUP_SHRED="${bin}/shred" ONION_KG_BACKUP_ID="${bin}/id" ONION_KG_BACKUP_GPG_ID_FILE="${s}/gpgid" \
+          KWB_S="${s}" KWB_WR="${wr}" KWB_BLK="${blk}" "$@" bash -c '
+            set -euo pipefail
+            DATA="${KWB_S}/data/onion-chat-kg"; DEST="${KWB_S}/dest"; SHA=0123456789abcdef0123456789abcdef01234567; BACKUP="${KWB_WR}"
+            die() { echo "DIE $*"; exit 1; }; log() { echo "LOG $*"; }
+            eval "${KWB_BLK}"
+            echo "BK=${BK}"' 2>/dev/null
+      }
+      us="${d}/u1"; mkdir "${us}"
+      if uo="$(_kwb_step3 "${us}")"; then urc=0; else urc=$?; fi
+      bk="$(sed -n 's/^BK=//p' <<< "${uo}")"
+      if [ "${urc}" -eq 0 ] && [[ "${bk}" =~ ^${us}/dest/onion-chat-kg-pre-0123456789ab-[0-9]{8}-[0-9]{6}\.tar\.gz\.gpg$ ]] \
+         && [ "$(stat -c %a "${bk}" 2>/dev/null)" = 600 ] && [ "$(ls -A "${us}/dest" | wc -l)" = 1 ] && grep -q '^LOG backup: .*cifrado' <<< "${uo}"; then
+        record_pass "kg-writer-backup: (u1) o passo 3 do update sai cifrado, rotulado pre-<sha>, 0600, pelo script de backup"
+      else record_fail "kg-writer-backup: (u1) o passo 3 do update" "rc=${urc}: $(head -2 <<< "${uo}" | tr '\n' '|' | cut -c1-200)"; fi
+      us="${d}/u2"; mkdir "${us}"
+      if uo="$(_kwb_step3 "${us}" KWB_GPG_FAIL=1)"; then urc=0; else urc=$?; fi
+      if [ "${urc}" -ne 0 ] && grep -q '^DIE backup falhou' <<< "${uo}" && ! grep -q '^BK=' <<< "${uo}" && [ -z "$(ls -A "${us}/dest" 2>/dev/null)" ]; then
+        record_pass "kg-writer-backup: (u2) backup que falha para o update antes da troca do código, sem nada no destino"
+      else record_fail "kg-writer-backup: (u2) backup que falha" "rc=${urc}: $(head -2 <<< "${uo}" | tr '\n' '|' | cut -c1-200)"; fi
+    fi
+  fi
+  # ── (r) gpg, tar e git REAIS, chave descartável em GNUPGHOME temporário (nunca o chaveiro de quem roda) ──
+  if ! command -v gpg >/dev/null 2>&1 || ! command -v git >/dev/null 2>&1 || ! command -v gpgconf >/dev/null 2>&1; then
+    record_skip "kg-writer-backup: (r) gpg ou git ausente → a prova com o gpg real não rodou"
+  else
+    local r="${d}/r" fpr ro rrc pk
+    mkdir -p "${r}/sec" "${r}/pub" "${r}/data/onion-chat-kg/area-a" "${r}/tmp" "${r}/restore"; chmod 700 "${r}/sec" "${r}/pub"
+    (
+      cd "${r}/data/onion-chat-kg/area-a" && git init -q . && echo 'meta: {}' > g.kg.yaml && git add g.kg.yaml \
+        && git -c user.name=kwb -c user.email=kwb@example.invalid -c commit.gpgsign=false commit -q -m bancada
+    ) >/dev/null 2>&1
+    GNUPGHOME="${r}/sec" gpg --batch --quiet --passphrase '' --quick-generate-key 'kwb <kwb@example.invalid>' ed25519 cert never >/dev/null 2>&1
+    fpr="$(GNUPGHOME="${r}/sec" gpg --batch --with-colons --list-keys 2>/dev/null | awk -F: '/^fpr/{print $10; exit}')"
+    [ -n "${fpr}" ] && GNUPGHOME="${r}/sec" gpg --batch --quiet --passphrase '' --quick-add-key "${fpr}" cv25519 encr never >/dev/null 2>&1 \
+      && GNUPGHOME="${r}/sec" gpg --batch --export "${fpr}" 2>/dev/null | GNUPGHOME="${r}/pub" gpg --batch --quiet --import >/dev/null 2>&1
+    if [ -z "${fpr}" ] || ! GNUPGHOME="${r}/pub" gpg --batch --with-colons --list-keys 2>/dev/null | grep -q '^sub:'; then
+      record_skip "kg-writer-backup: (r) o gpg desta máquina não gerou a chave descartável → a prova com o gpg real não rodou"
+    else
+      echo "${fpr}" > "${r}/gpgid"
+      # só o sudo é dublê (a bancada não é root); o chaveiro do script tem só a chave PÚBLICA, como o backup real
+      if ro="$(env -u SUDO_USER -u ONION_KG_BACKUP_OWNER -u ONION_KG_BACKUP_OWNER_HOME -u ONION_KG_BACKUP_KEEP -u ONION_KG_BACKUP_TAR \
+                 -u ONION_KG_BACKUP_GPG -u ONION_KG_BACKUP_SHRED -u ONION_KG_BACKUP_ID \
+                 GNUPGHOME="${r}/pub" TMPDIR="${r}/tmp" KWB_LOG="${r}/log" ONION_KG_BACKUP_SUDO="${bin}/sudo" \
+                 ONION_KG_BACKUP_DATA="${r}/data/onion-chat-kg" ONION_KG_BACKUP_DEST="${r}/dest" ONION_KG_BACKUP_GPG_ID_FILE="${r}/gpgid" \
+                 bash "${wr}" pre-real 2>"${r}/err")"; then rrc=0; else rrc=$?; fi
+      pk="$(GNUPGHOME="${r}/pub" gpg --batch --list-packets "${ro}" 2>/dev/null; echo "rc=$?")"
+      if [ "${rrc}" -eq 0 ] && [ -f "${ro}" ] && [ "$(stat -c %a "${ro}")" = 600 ] && [ -z "$(ls -A "${r}/tmp")" ] \
+         && grep -q 'pubkey enc packet' <<< "${pk}" && grep -qx 'rc=2' <<< "${pk}" && ! grep -qF "${fpr}" "${r}/err"; then
+        record_pass "kg-writer-backup: (r1) gpg real, só com a chave pública: .gpg 0600, sem claro, e a listagem traz o pacote com rc 2"
+      else record_fail "kg-writer-backup: (r1) gpg real" "rc=${rrc}: $(head -2 "${r}/err" | tr '\n' '|' | cut -c1-200)"; fi
+      if GNUPGHOME="${r}/sec" gpg --batch --quiet -d "${ro}" 2>/dev/null | tar -xzf - -C "${r}/restore" 2>/dev/null \
+         && git -C "${r}/restore/onion-chat-kg/area-a" fsck --strict >/dev/null 2>&1 \
+         && [ "$(git -C "${r}/restore/onion-chat-kg/area-a" rev-parse HEAD 2>/dev/null)" = "$(git -C "${r}/data/onion-chat-kg/area-a" rev-parse HEAD 2>/dev/null)" ]; then
+        record_pass "kg-writer-backup: (r2) restauração de ensaio: decifra com a chave privada, extrai, git fsck passa e o HEAD é o da origem"
+      else record_fail "kg-writer-backup: (r2) restauração de ensaio" "decifrar, extrair ou git fsck falhou"; fi
+    fi
+    GNUPGHOME="${r}/sec" gpgconf --kill all >/dev/null 2>&1; GNUPGHOME="${r}/pub" gpgconf --kill all >/dev/null 2>&1
+  fi
+  rm -rf "${d}"
+}
+_family run_kg_writer_backup_selftests
+
 # GRAFO DE REUNIÃO — SAC-157 (passo zero do core, 2026-10-16). O /product:extract-meeting passou a gravar o
 # `.kg.yaml` da reunião, e o gate dele é o meeting-graph-check.sh: trace ao trecho da transcrição e o modelo
 # aviso ≠ consentimento (tentativa de aviso, resposta por participante, parada na recusa, nunca consentimento

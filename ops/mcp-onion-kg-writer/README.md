@@ -155,6 +155,99 @@ O Python precisa ter PyYAML e jsonschema (o do venv). Sem um dos dois o servidor
 8. **Reversão.** Remover o bloco e `up -d`, `systemctl disable --now` da unidade e fechar a regra de
    firewall. As áreas ficam em `/var/lib/onion-chat-kg`, cada uma um repo git.
 
+## Backup da raiz de dados
+
+`ops/kg-writer-backup.sh [rótulo]` faz o backup **cifrado** da raiz de dados. Cada área é um repositório git
+local, sem remoto: o que não está num backup não está em lugar nenhum. É o caminho único dos dois usos: o diário
+(rótulo `daily`, agendado pelo maestro) e o pré-deploy (o `ops/update-kg-writer.sh` o chama com `pre-<sha>`; até
+2026-11-17 esse tar saía em claro).
+
+**O que ele pega.** A raiz inteira: todas as áreas, cada uma com o seu `.git` (histórico, refs, a trava). O tar é
+listado e conferido antes da cifra (a raiz presente e ao menos uma área com `.git/HEAD`), cifrado para os
+destinatários do cofre de senhas rodando o `gpg` como o dono da chave, e o `.gpg` é conferido pela saída do
+`--list-packets` (`pubkey enc packet`), sem decifrar. Sai com modo `0600` num destino `0700`, com o nome
+`onion-chat-kg-<rótulo>-<AAAAMMDD-HHMMSS>.tar.gz.gpg`. O temporário em claro é triturado na saída, também na falha.
+
+**O que ele NÃO pega, e os tetos.**
+
+- **Mesmo disco.** O destino mora na mesma máquina: protege de erro de deploy e de área estragada, não da perda do
+  disco ou da VPS. Não é cópia fora da máquina.
+- **Roda com o serviço de pé, e o tar não é instantâneo atômico.** Os objetos do git são imutáveis e as refs mudam
+  por rename, então uma gravação que acontece durante o tar tem dois desfechos: o tar percebe o arquivo mudando e sai
+  com rc 1 (o script recusa e nada fica no destino: rode de novo), ou a cópia daquela área sai com a ref um commit à
+  frente dos objetos. No segundo caso o histórico anterior está inteiro e o `git fsck` da restauração acusa; a
+  perda é a gravação daquele instante, não o repositório. Isto é lido do modelo de dados do git, não medido aqui.
+- **Não pega** o token, a unidade do systemd nem a worktree de código: o código é o core versionado, e o token mora
+  no cofre.
+- **Decifrar exige a chave privada do cofre.** Sem ela o backup não abre. A cópia da chave é assunto do cofre.
+- **As mensagens não trazem** conteúdo, destinatário nem a saída do `tar` e do `gpg` (os nomes das áreas derivam de
+  e-mail). Para diagnosticar uma falha, rode o passo à mão.
+- **Os `.tar.gz` em claro de deploys anteriores** continuam no destino: a retenção não os toca. Decidir o que fazer
+  com eles (cifrar ou triturar) é do maestro.
+
+**Retenção.** Só o rótulo `daily` envelhece: ficam os 14 mais novos. Os rotulados (`pre-*` e qualquer outro) ficam
+todos. A retenção só apaga arquivo regular, dentro do destino, cujo nome casa exatamente o padrão do diário; link
+simbólico não conta e não é seguido.
+
+**Quem escreve onde.** Como root, o root só lê a raiz de dados. O destino (criar, cifrar, conferir, renomear,
+apagar na retenção) e o arquivo de destinatários são tocados como o dono da chave, por `sudo -u`.
+
+| Env | Padrão | Efeito |
+|---|---|---|
+| `ONION_KG_BACKUP_OWNER` | quem roda; como root, o `SUDO_USER` | dono da chave e do destino. Como root e sem `SUDO_USER` (o cron do root), é **obrigatória**: sem ela o script recusa. |
+| `ONION_KG_BACKUP_OWNER_HOME` | a home do dono no passwd | de onde saem os dois padrões abaixo. |
+| `ONION_KG_BACKUP_DATA` | `ONION_KG_WRITER_ROOT`, senão `/var/lib/onion-chat-kg` | a raiz de dados. Não pode ser symlink. |
+| `ONION_KG_BACKUP_DEST` | `<home do dono>/backups/onion-chat-kg` | o destino. Não pode ser symlink. |
+| `ONION_KG_BACKUP_GPG_ID_FILE` | `<home do dono>/.password-store/.gpg-id` | os destinatários, um por linha. |
+| `ONION_KG_BACKUP_KEEP` | `14` | diários mantidos. |
+| `ONION_KG_BACKUP_TAR`, `_GPG`, `_SUDO`, `_SHRED`, `_ID` | os do `PATH` | os binários. Existem para a bancada trocar por dublês. |
+
+### Passos do maestro
+
+> Os passos abaixo são **do maestro**. O PR que trouxe o script não rodou o backup contra o dado real, não agendou
+> nada e não tocou em serviço.
+
+1. **Primeira execução, manual e rotulada** (como o operador dono da chave; o `tar` pede `sudo`):
+   ```bash
+   bash ops/kg-writer-backup.sh first-run
+   ```
+   O stdout traz só o caminho do `.gpg`. rc ≠ 0 = nada ficou no destino.
+2. **O que conferir** no arquivo que saiu:
+   ```bash
+   stat -c '%a %s %n' <arquivo>.tar.gz.gpg                      # 600, tamanho coerente com a raiz
+   stat -c '%a' "$(dirname <arquivo>.tar.gz.gpg)"               # 700
+   gpg --batch --list-packets <arquivo>.tar.gz.gpg | head -3    # traz ":pubkey enc packet:"
+   ls -A "${TMPDIR:-/tmp}" | grep onion-kg-backup               # nada: o claro foi triturado
+   ```
+3. **Ensaio de restauração**, num diretório de ensaio, sem tocar a raiz viva:
+   ```bash
+   R="$(mktemp -d)"
+   gpg -d <arquivo>.tar.gz.gpg | tar -tzf - | head              # lista (pede a passphrase da chave)
+   gpg -d <arquivo>.tar.gz.gpg | tar -xzf - -C "$R"
+   for a in "$R"/onion-chat-kg/*/; do git -C "$a" fsck --strict >/dev/null || echo "FSCK FALHOU: $a"; done
+   find "$R" -type f -exec shred -u {} + ; rm -rf "$R"          # o ensaio é claro: apague
+   ```
+   Área que falhar no `fsck` com a ref à frente dos objetos se recupera pelo reflog daquela área
+   (`git -C <área> reflog`, e `git -C <área> reset --hard <commit anterior>`), na cópia restaurada.
+4. **Agendamento sugerido** (texto; nada foi instalado). O cron do root não deve executar script de um checkout que o
+   operador escreve (quem edita o script vira root): instale uma cópia do root e agende a cópia.
+   ```bash
+   sudo install -o root -g root -m 0755 ops/kg-writer-backup.sh /usr/local/sbin/onion-kg-writer-backup
+   # linha para o crontab do root (sudo crontab -e), com o operador dono da chave no lugar de <operador>:
+   17 3 * * * ONION_KG_BACKUP_OWNER=<operador> /usr/local/sbin/onion-kg-writer-backup >> /var/log/onion-kg-writer-backup.log 2>&1
+   ```
+   A cópia não se atualiza sozinha: reinstale depois de um merge que mude o script. No dia seguinte, confira que
+   nasceu um `onion-chat-kg-daily-*.tar.gz.gpg` e que o log não traz `ERRO`.
+5. **Restauração de verdade** (com o serviço parado): `gpg -d <arquivo>.tar.gz.gpg | sudo tar -xzf - -C /var/lib`,
+   conferir dono e modo da raiz (`0700`, o usuário do serviço) e subir a unidade.
+6. **Como desfazer.** Tirar a linha do crontab do root e remover `/usr/local/sbin/onion-kg-writer-backup`. Os
+   backups já feitos ficam no destino (para apagar: `shred -u`). Para o pré-deploy voltar ao que era, reverter o
+   commit que trocou o passo 3 do `ops/update-kg-writer.sh`.
+
+A bancada do backup é a família `kg_writer_backup` do `lint-selftest.sh`: dublês de `tar`, `gpg`, `sudo`, `shred` e
+`id` sobre uma raiz falsa em temporário, um mutante por garantia central, e uma prova com o `gpg` real e chave
+descartável (decifra e `git fsck`).
+
 ## Bancada
 
 `python3 -I -B ops/mcp-onion-kg-writer/selftest.py` sobe o servidor de verdade (65 casos). A família
