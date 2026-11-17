@@ -2,7 +2,8 @@
 branch: fix/guard-bench-flake-and-session-cap
 pr: pendente
 date: 2026-11-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3f1431eae2b49723451762a854add5316aa7089fb85afb4b3bd7b04a486ccd6c
+reviewed_code_sha256: 49d028ae7edc61c15a817c56f6bceef707f63439e0494ba7d1535535f81d3d7a
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
