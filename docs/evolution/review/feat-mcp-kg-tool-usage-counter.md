@@ -10,8 +10,9 @@ tokens: 0
 duration_min: 0
 findings_fixed: 2
 verdict: FIXED
-elenxo: false
-reviewer: "agente de execução, releitura do próprio diff contra os seis requisitos e a bancada da família mcp_onion_kg (sem refutador separado)"
+elenxo: true
+elenxo_isolado: true
+reviewer: "1ª passada: o agente de execução, releitura do próprio diff. 2ª passada, independente (2026-11-17): agente revisor separado, só leitura do repositório, mandato de refutar em seis eixos (vazamento, disponibilidade, arquivo, encerramento, bancada, README); veredito NO_FINDINGS. A sessão do core leu o diff do servidor inteiro."
 nota: "tokens 0 e duration_min 0 = não medidos: a passada foi feita pelo mesmo agente que escreveu o código, dentro da execução, sem agente separado e sem cronômetro. Nada foi empurrado nem subido em produção."
 ---
 
@@ -86,3 +87,21 @@ diferentes. O harness lê o arquivo depois de cada chamada, porque a linha fora 
 - O diretório que já existe com permissão para grupo ou outros desliga o contador; o servidor não muda o modo de
   diretório que não criou. ACL não é lida.
 - Nada foi medido em produção: o serviço real roda de outro checkout e a subida é ato do maestro.
+
+## Revisão independente (2026-11-17)
+
+Agente revisor separado, só leitura, com mandato de refutar. Veredito: **NO_FINDINGS**.
+
+- **Medido por ele:** com a trava do contador presa por 8 s num processo à parte, a chamada respondeu em 0,11 s e
+  0,21 s (a resposta sai antes da contagem; a contagem daquela chamada se perde e o contador de falhas sobe). O
+  servidor fala HTTP/1.0, então não há conexão persistente para atrasar a requisição seguinte. O harness limpo deu
+  54 casos, saída 0. Dois mutantes de privacidade aplicados à mão (argumento na chave; e-mail na chave) reprovaram
+  nos casos que os miram.
+- **Lido por ele:** a chave gravada é só o nome registrado ou `unknown`; o motivo de desligado expõe só o nome da
+  classe da exceção; o temporário usa criação exclusiva; a resposta e o status das ferramentas são os da main.
+- **Não verificado por ele:** a família completa da bancada (35 mutantes de uma vez), por carga da máquina acima da
+  régua durante a revisão. Fica com o CI.
+- **Limite que ele aponta e que fica declarado:** um arquivo de contagem adulterado por quem já escreve no diretório
+  do operador pode trazer um nome de ferramenta arbitrário (só minúsculas, dígitos e sublinhado) que a leitura
+  imprime. Exige acesso de escrita ao diretório de modo 700; não é caminho de quem chama o servidor.
+
