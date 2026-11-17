@@ -11,8 +11,9 @@ tokens: 0
 duration_min: 0
 findings_fixed: 0
 verdict: APPROVED
-elenxo: false
-reviewer: "o próprio agente que escreveu a cura, relendo o diff contra o código do leitor da fila (onion-messaging, origin/main 5667402)"
+elenxo: true
+elenxo_isolado: true
+reviewer: "2ª passada, independente (2026-11-17): a sessão dona da régua de referência (a fila de mensagens), só leitura do repositório do core, mandato de refutar; nenhum achado bloqueante. 1ª passada: o próprio agente que escreveu a cura, relendo o diff contra o código do leitor da fila (onion-messaging, origin/main 5667402)"
 nota: "tokens 0 e duration_min 0 = não medidos: a passada foi a releitura do diff pelo agente que o escreveu, sem agente separado e sem cronômetro. Não houve refutador independente."
 ---
 
@@ -87,3 +88,26 @@ Família `a2a_accept` sob `LC_ALL=C`: 238 passaram, 0 falharam, 0 pularam.
 - Nada garante mecanicamente que os dois repos andem juntos daqui em diante: o vínculo é o comentário e a lista de
   casos repetida nas duas bancadas. Uma guarda que compare os dois blocos não existe.
 - O achado 1 (o leitor da fila viva) fica aberto.
+
+## Revisão independente (2026-11-17)
+
+Feita pela sessão dona da régua de referência, só leitura deste repositório, com mandato de refutar. **Nenhum achado
+bloqueante.**
+
+- **Medido por ela:** o bloco da expressão regular é byte a byte o do leitor da fila na main dela (o mesmo commit que o
+  comentário cita), com o mesmo padrão compilado e as mesmas flags; a limpeza do atributo é o mesmo código. As 32
+  entradas dão o mesmo veredito nos dois leitores. Os dois mutantes de forma da bancada dela, aplicados à função do
+  core, morrem (cada um deixa passar 12 das 16 recusas). Em 20.000 cadeias ASCII geradas (1 a 24 caracteres, com peso
+  nos caracteres da gramática), os dois leitores aceitaram as mesmas 4.793: zero divergência.
+- **Diferenças deixadas de propósito, julgadas por ela:** chave repetida no JSON (medido: o core fica com a última, a
+  fila recusa; só em corpo forjado à mão), fração do `time` com dez casas (medido: muda só o metadado), o que não é
+  evento (lido: caminhos diferentes por desenho) e a chave de deduplicação (lido: a mesma). Nenhuma faz um leitor
+  aceitar o que o outro recusa num caso que acontece de verdade.
+- **Correção ao achado não curado deste resíduo** (o terceiro leitor, `ops/a2a-queue-live.sh` (core-only)), lida por
+  ela e não medida: a afirmação «só erraria a contagem num registro sem identificador de tarefa» é imprecisa. Na
+  contagem, a chave do evento tem precedência sobre o identificador de tarefa quando o registro é verificado; dois
+  registros verificados do mesmo remetente, com o mesmo `source` fora da forma e o mesmo `id`, e identificadores de
+  tarefa diferentes, contam uma vez, onde a régua nova contaria dois. O erro acontece também com identificador de
+  tarefa. Efeito real hoje: nenhum na entrega (não há remetente com `source` fora da forma, e essa fila não conversa
+  com a de mensagens); é correção de contagem. Fica como item próprio: alinhar esse leitor ou declarar a diferença.
+
