@@ -366,6 +366,18 @@ function trabalhoPendente(s) { return (s != "confirmed" && s != "done" && s != "
 
 function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
 
+# VALOR DE ENUM, POR IGUALDADE (2026-11-17). Os cinco enums da INTEGRIDADE eram conferidos com
+# index(lista, valor), que casa SUBSTRING: `edge_type: SUPPORT`, `node_type: clai`, `plane: D` e
+# `layer: aud` passavam com exit 0, e um valor com espaço que atravessa dois itens da lista
+# ("REFUTES SUPERSEDES") também, inclusive em external_edges, que já cercava o valor com espaços.
+# Vazio nunca pertence: campo obrigatório ausente continua reprovando.
+function enumHas(list, v,   n, a, k) {
+  if (v == "") return 0
+  n = split(list, a, " ")
+  for (k = 1; k <= n; k++) if (a[k] == v) return 1
+  return 0
+}
+
 # MISPLANED, sentido da palavra: `commit` em verified_against só é LEITURA DE FONTE quando nomeia
 # o commit lido. Quando nomeia o commit que o gate BARROU (commit-sonda, commit recusado/bloqueado,
 # hook que bloqueia o commit), é EXECUÇÃO ao vivo, e PROD ali é legítimo.
@@ -1351,7 +1363,7 @@ END {
       if (!(eto[i]   in nodeSeen)) {
         if (isProposal) { dangling++ } else { print "  ✗ aresta " i ": to aponta nó inexistente: " eto[i]; problems++ }
       }
-      if (index(VE, etype[i]) == 0 || etype[i] == "") { print "  ✗ aresta " i ": edge_type inválido: [" etype[i] "]"; problems++ }
+      if (!enumHas(VE, etype[i])) { print "  ✗ aresta " i ": edge_type inválido: [" etype[i] "]"; problems++ }
       if (eon[i] != "" && !(eon[i] in nodeSeen)) {
         if (isProposal) { dangling++ } else { print "  ✗ aresta " i ": trigger aponta evento inexistente: " eon[i]; problems++ }
       }
@@ -1363,16 +1375,16 @@ END {
       if (xlocal[i] != "" && !(xlocal[i] in nodeSeen)) {
         if (isProposal) { dangling++ } else { print "  ✗ external_edges " i ": " xlocalKey[i] " aponta nó inexistente: " xlocal[i]; problems++ }
       }
-      if (index(VX, " " xtype[i] " ") == 0 || xtype[i] == "") { print "  ✗ external_edges " i ": edge_type fora da lista do contrato v4.3: [" xtype[i] "]"; problems++ }
+      if (!enumHas(VX, xtype[i])) { print "  ✗ external_edges " i ": edge_type fora da lista do contrato v4.3: [" xtype[i] "]"; problems++ }
     }
     for (i = 1; i <= nn; i++) {
       id = order[i]
       if (deg[id] == 0) {
         if (isProposal) { orphan++ } else { print "  ✗ nó órfão (grau 0): " id; problems++ }
       }
-      if (index(VN, ntype[id]) == 0 || ntype[id] == "") { print "  ✗ " id ": node_type inválido: [" ntype[id] "]"; problems++ }
-      if (index(VP, plane[id]) == 0 || plane[id] == "") { print "  ✗ " id ": plane inválido: [" plane[id] "]"; problems++ }
-      if (index(VL, layer[id]) == 0) { print "  ✗ " id ": layer inválido: [" layer[id] "]"; problems++ }
+      if (!enumHas(VN, ntype[id])) { print "  ✗ " id ": node_type inválido: [" ntype[id] "]"; problems++ }
+      if (!enumHas(VP, plane[id])) { print "  ✗ " id ": plane inválido: [" plane[id] "]"; problems++ }
+      if (!enumHas(VL, layer[id])) { print "  ✗ " id ": layer inválido: [" layer[id] "]"; problems++ }
       if (statusFactor(nstatus[id]) < 0) { print "  ✗ " id ": status inválido: [" nstatus[id] "]"; problems++ }
       if (impact[id] < 1 || impact[id] > 5) { print "  ✗ " id ": impact fora de 1-5: " impact[id]; problems++ }
       if (conf[id] < 0 || conf[id] > 1) { print "  ✗ " id ": confidence fora de 0-1: " conf[id]; problems++ }

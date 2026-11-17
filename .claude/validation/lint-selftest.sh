@@ -23928,6 +23928,58 @@ run_kg_radar_integrity_selftests() {
   else record_fail "kg-integridade: (l)" "falso-positivo com texto em bloco: ${out}"; fi
   rm -rf "$d"
 
+  # (q)–(u) ENUM POR VALOR INTEIRO (2026-11-17). A INTEGRIDADE conferia os enums com index(lista, valor),
+  #     que casa SUBSTRING: `edge_type: SUPPORT`, `node_type: clai`, `plane: D` e `layer: aud` saíam com
+  #     exit 0, e um valor com espaço atravessando dois itens da lista também. Aqui o radar roda DIRETO
+  #     (a cópia do sandbox, com a lib ao lado): o defeito é do motor, não do helper.
+  local rc g rad ecase eline emsg
+  d="$(mktemp -d)"; _mki "$d" sao
+  rad="$d/.claude/validation/kg-radar.sh"; g="$d/docs/onion/graph/t.kg.yaml"
+  # (q) NEGATIVO primeiro: o grafo com os valores inteiros passa (a cura não reprova o que é válido).
+  rc=0; out="$(bash "${rad}" "${g}" --integrity 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'inválido' <<< "${out}"; then
+    record_pass "kg-integridade: (q) enums com o valor inteiro (REFUTES, claim, DEV) → exit 0, nada inválido"
+  else record_fail "kg-integridade: (q)" "grafo válido reprovou: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
+  # (r) POSITIVO: pedaço de um edge_type válido (SUPPORT ⊂ SUPPORTS) → exit 1 nomeando o valor.
+  sed 's/edge_type: REFUTES/edge_type: SUPPORT/' "${g}" > "$d/edge-sub.kg.yaml"
+  rc=0; out="$(bash "${rad}" "$d/edge-sub.kg.yaml" --integrity 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -qF 'edge_type inválido: [SUPPORT]' <<< "${out}"; then
+    record_pass "kg-integridade: (r) edge_type: SUPPORT (pedaço de SUPPORTS) → exit 1 'edge_type inválido'"
+  else record_fail "kg-integridade: (r)" "substring de edge_type passou: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
+  # (s) a MESMA classe nos outros enums e no valor que atravessa dois itens da lista. Cada um com o seu caso.
+  for ecase in 'edge-span|s/edge_type: REFUTES/edge_type: "REFUTES SUPERSEDES"/|edge_type inválido: [REFUTES SUPERSEDES]' \
+               'node-sub|s/node_type: claim/node_type: clai/|node_type inválido: [clai]' \
+               'plane-sub|0,/plane: DEV/s//plane: D/|plane inválido: [D]' \
+               'layer-sub|/- id: C_alvo/a\    layer: aud|layer inválido: [aud]'; do
+    eline="${ecase#*|}"; emsg="${eline#*|}"; eline="${eline%%|*}"; ecase="${ecase%%|*}"
+    sed "${eline}" "${g}" > "$d/${ecase}.kg.yaml"
+    rc=0; out="$(bash "${rad}" "$d/${ecase}.kg.yaml" --integrity 2>&1)" || rc=$?
+    if [ "${rc}" -eq 1 ] && grep -qF "${emsg}" <<< "${out}"; then
+      record_pass "kg-integridade: (s) ${ecase} → exit 1 '${emsg}'"
+    else record_fail "kg-integridade: (s) ${ecase}" "valor parcial passou: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
+  done
+  # (t) MUTANTE 1: a linha do edge_type volta ao index() → o caso (r) passa a sair 0. Âncora = 1 linha.
+  if [ "$(grep -cF 'if (!enumHas(VE, etype[i])) {' "${rad}")" -ne 1 ]; then
+    record_fail "kg-integridade: (t)" "âncora do mutante não casa exatamente 1 linha (enumHas(VE, etype[i]))"
+  else
+    sed 's/if (!enumHas(VE, etype\[i\])) {/if (index(VE, etype[i]) == 0 || etype[i] == "") {/' "${rad}" > "$d/.claude/validation/mut-edge-index.sh"
+    rc=0; out="$(bash "$d/.claude/validation/mut-edge-index.sh" "$d/edge-sub.kg.yaml" --integrity 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] && grep -q 'sem contradições estruturais' <<< "${out}"; then
+      record_pass "kg-integridade: (t) (MUT) edge_type de volta ao index() → SUPPORT passa com exit 0 — o caso (r) morde"
+    else record_fail "kg-integridade: (t) (MUT)" "mutante sobreviveu: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
+  fi
+  # (u) MUTANTE 2: a igualdade DENTRO do enumHas vira index() → os casos (s) de pedaço voltam a passar.
+  if [ "$(grep -cF 'if (a[k] == v) return 1' "${rad}")" -ne 1 ]; then
+    record_fail "kg-integridade: (u)" "âncora do mutante não casa exatamente 1 linha (a[k] == v)"
+  else
+    sed 's/if (a\[k\] == v) return 1/if (index(a[k], v) > 0) return 1/' "${rad}" > "$d/.claude/validation/mut-enum-index.sh"
+    rc=0; out="$(bash "$d/.claude/validation/mut-enum-index.sh" "$d/node-sub.kg.yaml" --integrity 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] && grep -q 'sem contradições estruturais' <<< "${out}"; then
+      record_pass "kg-integridade: (u) (MUT) igualdade do enumHas trocada por index() → node_type: clai passa — os casos (s) mordem"
+    else record_fail "kg-integridade: (u) (MUT)" "mutante sobreviveu: rc=${rc} out=$(head -c 300 <<< "${out}")"; fi
+  fi
+  rm -rf "$d"
+
   # (m)–(p) CAMINHO DO CONTRATO (D_RADAR_CONSOME_INTEGRIDADE_DO_CONTRATO_1023). Os casos acima rodam num
   #     sandbox SEM vendor, logo exercitam o radar próprio (o caminho de quem não tem o leitor). Aqui o
   #     vendor está ao lado e a integridade vem dos códigos do kg_validate.
