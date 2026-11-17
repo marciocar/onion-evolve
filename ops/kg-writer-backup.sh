@@ -11,13 +11,15 @@
 # O QUE ELE FAZ (nesta ordem; qualquer falha sai com rc ≠ 0 e não deixa nada com o nome final no destino):
 #   1. valida o rótulo, resolve o dono da chave e lê os destinatários (antes de qualquer escrita)
 #   2. tar da raiz inteira (as áreas e o .git de cada uma) para um temporário 0600 num diretório 0700
-#   3. conferência do tar: lista inteira, a raiz presente e ao menos um <área>/.git/HEAD
+#   3. conferência do tar: lista inteira, a raiz presente e ao menos um <área>/.git/HEAD. Raiz VAZIA de verdade
+#      (serviço recém-instalado, nenhuma entrada além dela) é estado válido: o backup sai vazio, com aviso
 #   4. cifra COMO o dono da chave (o chaveiro do root é vazio), para um nome provisório dentro do destino
 #   5. conferência do .gpg pela SAÍDA do --list-packets (`pubkey enc packet`), nunca pelo rc: sem a chave privada
 #      destravada o rc é 2, e isso é o esperado
 #   6. modo 0600 conferido, e só então o arquivo ganha o nome final
 #   7. retenção: só o rótulo `daily`, os ONION_KG_BACKUP_KEEP mais novos; os rotulados (pre-*) ficam todos
-# O temporário em claro é triturado na saída, também quando o script falha no meio (trap de EXIT).
+# O temporário em claro é triturado na saída, também quando o script falha no meio ou recebe HUP, INT ou TERM
+# (trap de EXIT). A retenção nunca apaga o arquivo que esta execução acabou de publicar (relógio que recuou).
 #
 # QUEM ESCREVE ONDE (a lição do bridge-backup.sh, 2026-11-13): como root, o root só LÊ a origem. Tudo o que toca o
 # destino (criar, cifrar, conferir, renomear, apagar na retenção) e a leitura do arquivo de destinatários roda como
@@ -136,6 +138,7 @@ done <<< "${ids}"
 
 # ── a partir daqui há escrita: o trap tritura o claro em qualquer saída ───────────────────────
 trap cleanup EXIT
+trap 'exit 129' HUP
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
@@ -162,6 +165,9 @@ verify_clear() {
   local list
   list="$("${TAR}" -tzf "${CLEAR}" 2>/dev/null)" || die "o tar não se lista (ilegível)"
   grep -qxF -- "${DATA_BASE}/" <<< "${list}" || die "o tar não tem a raiz de dados"
+  # raiz vazia de verdade (só ela na listagem): serviço antes da primeira área. Com QUALQUER outra entrada e nenhuma
+  # área com .git/HEAD, algo sumiu, e aí é recusa.
+  if [ "${list}" = "${DATA_BASE}/" ]; then say "raiz de dados sem área: backup vazio"; return 0; fi
   grep -qE '^[^/]+/[^/]+/\.git/HEAD$' <<< "${list}" || die "o tar não tem nenhuma área com .git/HEAD: recuso cifrar"
 }
 
@@ -204,9 +210,11 @@ rotate() {
   local names="${WORK}/names" n i drop daily=()
   as_owner find "${DEST}" -maxdepth 1 -type f -printf '%f\0' > "${names}" 2>/dev/null || die "backup pronto, mas a listagem da retenção falhou"
   while IFS= read -r -d '' n; do
+    # o recém-publicado nunca é candidato: com o relógio recuado ele ordenaria como o mais antigo
+    [ "${n}" != "${OUT##*/}" ] || continue
     if [[ "${n}" =~ ${DAILY_RE} ]]; then daily+=("${n}"); fi
   done < <(sort -z -- "${names}")
-  drop=$(( ${#daily[@]} - KEEP ))
+  drop=$(( ${#daily[@]} - KEEP + 1 ))   # os outros diários; o recém-publicado ocupa uma das KEEP vagas
   for (( i = 0; i < drop; i++ )); do
     as_owner rm -f -- "${DEST}/${daily[i]}" || die "backup pronto, mas a retenção não conseguiu apagar um diário antigo"
   done
