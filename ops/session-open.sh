@@ -26,6 +26,10 @@ STATE_DIR="${BATON_STATE_DIR:-${HOME_DIR}/.local/state/onion/baton}"
 PROC_DIR="${SESSION_OPEN_PROC:-/proc}"
 TMUX_BIN="${SESSION_OPEN_TMUX:-tmux}"
 CLAUDE_BIN="${SESSION_OPEN_CLAUDE:-claude}"
+# «meu uid» para comparar o DONO de /proc/<pid>: um claude de OUTRA conta (cwd/environ ilegível por permissão) não pode
+# ser a sessão desta conta naquela pasta, então é ignorado — sem isto o abridor travava (rc 3) por causa do processo
+# alheio. SESSION_OPEN_UID é o substituto de teste (o /proc falso da bancada é todo do usuário do teste).
+MY_UID="${SESSION_OPEN_UID:-$(id -u)}"
 
 say() { printf '%s\n' "$*"; }
 die() { printf 'session-open: %s\n' "$1" >&2; exit "${2:-2}"; }
@@ -53,18 +57,28 @@ dir_of() {
 }
 valid_name() { [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]; }
 
-# pids de `claude` cujo cwd é a pasta. $2 = "out" (fora de tmux) | "any". Erro de leitura NÃO vira «nenhum»: rc 2.
+# pids de `claude` cujo cwd é a pasta. $2 = "out" (fora de tmux) | "any". Erro de leitura NÃO vira «nenhum»: rc 2 —
+# MAS só quando o processo é do MESMO dono (falha fechada real). Se o cwd/environ não se lê e o processo é de OUTRA
+# conta (uid de /proc/<pid> ≠ MY_UID), ele é IGNORADO: não pode ser a sessão desta conta naquela pasta, e não deve
+# travar o abridor. Dono indeterminado (stat falhou) também é falha fechada (rc 2).
 claude_pids() {
-  local dir="$1" want="$2" p comm cwd env out=""
+  local dir="$1" want="$2" p comm cwd env puid out=""
   [ -d "${PROC_DIR}" ] || return 2
   for p in "${PROC_DIR}"/[0-9]*; do
     [ -r "${p}/comm" ] || continue
     comm="$(cat "${p}/comm" 2>/dev/null)" || continue
     [ "${comm}" = "claude" ] || continue
-    cwd="$(readlink "${p}/cwd" 2>/dev/null)" || return 2
+    puid="$(stat -c '%u' "${p}" 2>/dev/null)" || puid=""
+    if ! cwd="$(readlink "${p}/cwd" 2>/dev/null)"; then
+      [ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && continue  # cwd ilegível de OUTRO dono → ignora
+      return 2  # cwd ilegível do mesmo dono (ou dono indeterminado) → não mede às cegas
+    fi
     [ "${cwd}" = "${dir}" ] || continue
     if [ "${want}" = "out" ]; then
-      env="$(tr '\0' '\n' < "${p}/environ" 2>/dev/null)" || return 2
+      if ! env="$(tr '\0' '\n' < "${p}/environ" 2>/dev/null)"; then
+        [ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && continue  # environ ilegível de OUTRO dono → ignora
+        return 2  # environ ilegível do mesmo dono → não mede às cegas
+      fi
       grep -q '^TMUX=' <<< "${env}" && continue
     fi
     out="${out}${p##*/} "
@@ -83,9 +97,14 @@ open_one() {  # $1 = nome, $2 = anexar (1|0)
 
   if has_tmux_session "${n}"; then
     say "session-open: a sessão tmux «${n}» já existe — anexo, não crio outra."
-    # a sessão tmux existe, mas pode haver OUTRA cópia fora dela (aberta à mão num terminal): avisa, não mata
-    out="$(claude_pids "${dir}" out)" || out=""
-    [ -z "${out}" ] || say "session-open: ⚠️ há também um claude em ${dir} FORA do tmux (pid ${out}): se for a mesma sessão, dê /exit lá e fique só com a do tmux."
+    # a sessão tmux existe, mas pode haver OUTRA cópia fora dela (aberta à mão num terminal): avisa, não mata. Lacuna
+    # NOMEADA se não deu para medir um processo do MESMO dono (rc 2), em vez de engolir o erro em silêncio.
+    out="$(claude_pids "${dir}" out)"; rc=$?
+    if [ "${rc}" -ne 0 ]; then
+      say "session-open: ⚠️ não deu para medir se há um claude do mesmo dono em ${dir} fora do tmux (${PROC_DIR} ilegível) — confira à mão."
+    elif [ -n "${out}" ]; then
+      say "session-open: ⚠️ há também um claude em ${dir} FORA do tmux (pid ${out}): se for a mesma sessão, dê /exit lá e fique só com a do tmux."
+    fi
   else
     out="$(claude_pids "${dir}" out)"; rc=$?
     [ "${rc}" -eq 0 ] || die "não li ${PROC_DIR} para saber se já há um claude em ${dir}: não abro às cegas" 3

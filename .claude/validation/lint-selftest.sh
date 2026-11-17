@@ -59847,7 +59847,7 @@ SO_TMUX
   _so_run() {  # $1=SUT, resto=args → "rc<TAB>saída-numa-linha"; SO_TSESS/SO_PROC/SO_STATE do ambiente de chamada
     local w="$1" o rc; shift; : > "${sb}/tlog"
     if o="$(SESSION_OPEN_HOME="${HM}" SESSION_OPEN_PROC="${SO_PROC:-${sb}/proc-empty}" SESSION_OPEN_TMUX="${sb}/tmux" \
-            SESSION_OPEN_CLAUDE="${sb}/claude" BATON_STATE_DIR="${SO_STATE:-${sb}/state}" SO_TLOG="${sb}/tlog" SO_TSESS="${SO_TSESS:-}" \
+            SESSION_OPEN_CLAUDE="${sb}/claude" BATON_STATE_DIR="${SO_STATE:-${sb}/state}" SO_TLOG="${sb}/tlog" SO_TSESS="${SO_TSESS:-}" SESSION_OPEN_UID="${SO_UID:-}" \
             LC_ALL=C bash "${w}" "$@" 2>&1)"; then rc=0; else rc=$?; fi
     printf '%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")"
   }
@@ -59885,7 +59885,7 @@ SO_TMUX
   _so_c() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-out" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'já há um claude vivo' <<< "${r}" && grep -qF 'FORA do tmux' <<< "${r}"; }
   _so_case "(c) claude vivo fora do tmux na pasta: RECUSA rc 3" _so_c \
-    'if [ -n "${out}" ]; then' 'if false; then'
+    '    if [ -n "${out}" ]; then' '    if false; then'
   # (d) claude vivo DENTRO do tmux (chave TMUX no environ): NÃO recusa, cria normal (rc 0)
   _so_proc "${sb}/proc-in" "${HM}/myrepo" in
   _so_d() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-in" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
@@ -59899,13 +59899,39 @@ SO_TMUX
   _so_case "(e) nome que não é repo git: rc 2" _so_e \
     '[ -d "${dir}/.git" ] || [ -f "${dir}/.git" ] || die "«${dir}» não é um repositório git: o nome da sessão é o nome do repo em ${HOME_DIR}"' \
     ': # mutante: não confere o .git'
-  # (f) /proc ILEGÍVEL (cwd irresolúvel) NÃO vira «nenhum processo»: recusa rc 3 (fail-closed)
+  # (f) cwd ILEGÍVEL de um claude do MESMO dono NÃO vira «nenhum processo»: recusa rc 3 (fail-closed). O /proc falso é
+  #     do usuário do teste, então SEM SO_UID o dono do processo == MY_UID (mesmo dono). (achado F1 da revisão: a recusa
+  #     só vale para o mesmo dono)
   _so_proc "${sb}/proc-broken" "${HM}/myrepo" broken
   _so_f() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-broken" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não li' <<< "${r}" && grep -qF 'às cegas' <<< "${r}"; }
-  _so_case "(f) /proc ilegível não vira «nenhum processo»: recusa rc 3 (fail-closed)" _so_f \
-    'cwd="$(readlink "${p}/cwd" 2>/dev/null)" || return 2' \
-    'cwd="$(readlink "${p}/cwd" 2>/dev/null)" || continue'
+  _so_case "(f) cwd ilegível de claude do MESMO dono: recusa rc 3 (fail-closed)" _so_f \
+    'return 2  # cwd ilegível do mesmo dono (ou dono indeterminado) → não mede às cegas' \
+    'continue  # mutante: fail-open no cwd ilegível do mesmo dono'
+  # (f2) environ ILEGÍVEL de claude do MESMO dono na pasta: recusa rc 3 (fail-closed)
+  _so_proc "${sb}/proc-noenv" "${HM}/myrepo" noenv
+  _so_f2() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-noenv" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'às cegas' <<< "${r}"; }
+  _so_case "(f2) environ ilegível de claude do MESMO dono: recusa rc 3 (fail-closed)" _so_f2 \
+    'return 2  # environ ilegível do mesmo dono → não mede às cegas' \
+    'continue  # mutante: fail-open no environ ilegível do mesmo dono'
+  # (i) cwd ILEGÍVEL de claude de OUTRO dono (SO_UID ≠ dono do /proc): IGNORA — não é a sessão desta conta → cria normal
+  _so_i() { local r; r="$(SO_TSESS="" SO_UID=999999 SO_PROC="${sb}/proc-broken" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'ensaio:' <<< "${r}" && ! grep -q 'às cegas' <<< "${r}"; }
+  _so_case "(i) cwd ilegível de claude de OUTRO dono: ignora e cria normal (não trava para todo mundo)" _so_i \
+    '[ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && continue  # cwd ilegível de OUTRO dono → ignora' \
+    '[ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && :  # cwd ilegível de OUTRO dono → ignora'
+  # (i2) environ ILEGÍVEL de claude de OUTRO dono na pasta: IGNORA → cria normal
+  _so_i2() { local r; r="$(SO_TSESS="" SO_UID=999999 SO_PROC="${sb}/proc-noenv" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'ensaio:' <<< "${r}" && ! grep -q 'às cegas' <<< "${r}"; }
+  _so_case "(i2) environ ilegível de claude de OUTRO dono: ignora e cria normal" _so_i2 \
+    '[ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && continue  # environ ilegível de OUTRO dono → ignora' \
+    '[ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && :  # environ ilegível de OUTRO dono → ignora'
+  # (h) no caminho de ANEXAR (sessão tmux já existe), cwd ilegível do MESMO dono vira LACUNA NOMEADA, nunca silêncio
+  _so_h() { local r; r="$(SO_TSESS="myrepo" SO_PROC="${sb}/proc-broken" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'já existe' <<< "${r}" && grep -qF 'não deu para medir' <<< "${r}"; }
+  _so_case "(h) anexar com cwd ilegível do mesmo dono: lacuna nomeada, não silêncio" _so_h \
+    'if [ "${rc}" -ne 0 ]; then' 'if false; then'
   # (g) --all percorre só os nomes com concessão «sim» (repoB «não» fica fora)
   _so_repo repoA; _so_repo repoB  # repoC: concessão sim, SEM pasta
   mkdir -p "${sb}/state-all"
