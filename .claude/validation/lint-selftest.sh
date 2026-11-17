@@ -20011,6 +20011,82 @@ PY
   else record_pass "a2a-accept: (sh23) mutante: o 'já aceito' que não grava a linha faltante reprova"; fi
   cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
 
+  # (ce-src) o `source` do CloudEvent só vale como URI-reference (RFC 3986), por casamento INTEIRO: a mesma régua do
+  # parse_cloudevent da fila (onion-messaging, queue/onion_queue/daemon.py). As duas listas são as que a sessão dona
+  # da fila relatou; os dois leitores têm de dar o mesmo veredito para cada item. Um item por caso, para a falha
+  # nomear o valor. Recusado = os quatro ce_* saem null (o evento passa a ser identificado pelo jti)
+  cat > "${d}/ce-src.py" <<'PY'
+import importlib.util, json, sys
+ACCEPT = ["urn:onion:member:alice", "/onion-watcher/main/github", "https://example.com/a/b?x=1#f", "mailto:a@b.c",
+          "urn:uuid:123e4567-e89b-12d3-a456-426614174000", "tag:onion,2026:x", "x:y", "relative/path", "./x", "../up",
+          "//host:8080/p", "?q=1", "#frag", "http://[::1]:80/", "%41bc", "a%2Fb"]
+REJECT = ["", "a\x00b", "a\tb", "a" * 257, "não é uri", "a b", "http://x/%zz", "1http:x", "café", "http://x/<y>",
+          'a"b', "http://x/{y}", "a|b", "a\\b", "http://x/^", "http://x/`"]
+spec = importlib.util.spec_from_file_location("a2a_metrics_under_test", sys.argv[1])
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+which = sys.argv[2]                                    # accept:<n> | reject:<n> | count | suffix
+if which == "count":
+    print(len(ACCEPT), len(REJECT)); sys.exit(0)
+def parse(v):
+    return m.parse_cloudevent(json.dumps({"specversion": "1.0", "id": "ev-1", "type": "t", "source": v}))
+if which == "suffix":
+    # o caso do casamento inteiro: prefixo válido + sufixo inválido. Com `match` no lugar de `fullmatch` o prefixo basta
+    bad = [v for v in ("http://x/<y>", "urn:onion:member:alice b", "/vigia/x{", "a%2Fb%zz") if parse(v)["ce_source"] is not None]
+    print("sufixo invalido aceito: " + ascii(bad) if bad else "ok"); sys.exit(1 if bad else 0)
+kind, n = which.split(":"); v = (ACCEPT if kind == "accept" else REJECT)[int(n)]
+got = parse(v)
+if kind == "accept":
+    ok = got == {"ce_source": v, "ce_id": "ev-1", "ce_type": "t", "ce_time": None}
+else:
+    ok = got == {"ce_source": None, "ce_id": None, "ce_type": None, "ce_time": None}
+print(("ok " if ok else "DIVERGE ") + ascii(v[:48]) + " -> " + json.dumps(got, ensure_ascii=True)); sys.exit(0 if ok else 1)
+PY
+  local ce_na ce_nr ce_i ce_o ce_fail
+  read -r ce_na ce_nr <<< "$(python3 -I "${d}/ce-src.py" "${met}" count 2>/dev/null)"
+  if [ "${ce_na:-0}" = 16 ] && [ "${ce_nr:-0}" = 16 ]; then record_pass "a2a-accept: (ce-src.0) a lista da régua tem 16 aceitos e 16 recusados (a que a sessão dona da fila relatou)"
+  else record_fail "a2a-accept: (ce-src.0) tamanho da lista da régua" "aceitos=${ce_na:-?} recusados=${ce_nr:-?}"; fi
+  for ((ce_i = 0; ce_i < ${ce_na:-0}; ce_i++)); do
+    if ce_o="$(python3 -I "${d}/ce-src.py" "${met}" "accept:${ce_i}" 2>&1)"; then record_pass "a2a-accept: (ce-src.a${ce_i}) source URI-reference válido é ACEITO (item ${ce_i} da lista de aceita)"
+    else record_fail "a2a-accept: (ce-src.a${ce_i}) source válido recusado" "${ce_o}"; fi
+  done
+  for ((ce_i = 0; ce_i < ${ce_nr:-0}; ce_i++)); do
+    if ce_o="$(python3 -I "${d}/ce-src.py" "${met}" "reject:${ce_i}" 2>&1)"; then record_pass "a2a-accept: (ce-src.r${ce_i}) source fora da forma é RECUSADO (os quatro ce_* null; item ${ce_i} da lista de recusa)"
+    else record_fail "a2a-accept: (ce-src.r${ce_i}) source inválido aceito" "${ce_o}"; fi
+  done
+  _ce_all() {  # $1 = a2a-metrics.py → 0 se TODOS os itens das duas listas dão o veredito da régua
+    local i
+    for ((i = 0; i < 16; i++)); do
+      python3 -I "${d}/ce-src.py" "$1" "accept:${i}" >/dev/null 2>&1 || return 1
+      python3 -I "${d}/ce-src.py" "$1" "reject:${i}" >/dev/null 2>&1 || return 1
+    done
+  }
+  _ce_suffix() { python3 -I "${d}/ce-src.py" "$1" suffix >/dev/null 2>&1; }
+  if ce_o="$(python3 -I "${d}/ce-src.py" "${met}" suffix 2>&1)"; then record_pass "a2a-accept: (ce-src.s) prefixo válido com sufixo inválido é recusado (o casamento é INTEIRO)"
+  else record_fail "a2a-accept: (ce-src.s) sufixo inválido" "${ce_o}"; fi
+  # (ce-src.cli) o mesmo pelo subcomando que o aceite chama (`ce --body-file`): o caminho de produção, não só o import
+  printf '%s' '{"specversion":"1.0","id":"ev-1","type":"t","source":"http://x/{y}"}' > "${d}/ce-bad.json"
+  printf '%s' '{"specversion":"1.0","id":"ev-1","type":"t","source":"urn:onion:member:alice"}' > "${d}/ce-good.json"
+  _ce_cli() { [ "$(python3 -I "$1" ce --body-file "${d}/ce-bad.json" 2>/dev/null | jq -c '[.ce_source,.ce_id]')" = '[null,null]' ] \
+    && [ "$(python3 -I "$1" ce --body-file "${d}/ce-good.json" 2>/dev/null | jq -r '.ce_source')" = 'urn:onion:member:alice' ]; }
+  if _ce_cli "${met}"; then record_pass "a2a-accept: (ce-src.cli) o subcomando ce (o que o aceite chama) recusa o source fora da forma e aceita o válido"
+  else record_fail "a2a-accept: (ce-src.cli) subcomando ce" "bad=$(python3 -I "${met}" ce --body-file "${d}/ce-bad.json" 2>&1 | head -c 200)"; fi
+  # mutantes: (m1) sem a conferência da forma; (m2) `match` no lugar de `fullmatch`. Âncora = exatamente UMA linha
+  for _pair in "ce-src.m1|_ce_all| or not URI_REFERENCE_RE.fullmatch(src):|:|sem a conferência da forma do source, a lista de recusa deixa de reprovar" \
+               "ce-src.m2|_ce_suffix|URI_REFERENCE_RE.fullmatch(src)|URI_REFERENCE_RE.match(src)|com match no lugar de fullmatch, o sufixo inválido passa" \
+               "ce-src.m3|_ce_cli| or not URI_REFERENCE_RE.fullmatch(src):|:|sem a conferência, o subcomando ce devolve o source fora da forma"; do
+    IFS='|' read -r _id _fn _old _new _nm <<< "${_pair}"
+    cp "${met}" "${mfm}"; rc_ai=1; rc_am=1; "${_fn}" "${met}" && rc_ai=0
+    OLD="${_old}" NEW="${_new}" python3 - "${met}" "${mfm}" <<'PY'
+import os, sys
+s = open(sys.argv[1], encoding="utf-8").read(); o = os.environ["OLD"]
+n = sum(1 for ln in s.split("\n") if o in ln)          # a âncora casa exatamente UMA linha, senão o mutante não nasce
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1) if n == 1 and s.count(o) == 1 else s)
+PY
+    "${_fn}" "${mfm}" && rc_am=0
+    _prove_mutation "a2a-accept: (${_id}) mutante: ${_nm}" "${met}" "${mfm}" "${rc_ai}" "${rc_am}"
+  done
+  cp "${met}" "${mfm}"
+
   rm -rf "${d}"
 }
 
