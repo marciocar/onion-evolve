@@ -222,6 +222,38 @@ nodes:
       locator: "pergunta com opções de 2026-11-17: «As três sessões do Delphi dizem que hoje não dá para abrir leitura a quem não é dev: o servidor de produção não lê nível nem teto. Como seguimos?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-17"
       locality: "pessoa"
+  - id: D_BATON_PASSES_OWN_REPO_MERGE_NON_GUARD_1117
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-17"
+    verified_against: "decisão do maestro em 2026-11-17, por pergunta com opções (/meta:decide): escolhida «Sim, para PR que não toca guarda»"
+    label: "A batuta do core cobre autorizar a sessão com batuta de projeto a merjar os PRs do próprio repo quando o PR não toca guarda; PR de guarda, deploy, produção e firewall seguem só do maestro"
+    narrative: "Selado por /meta:decide em 2026-11-17: escolhida «Sim, para PR que não toca guarda»; descartadas: «Sim, mas só para a slm agora» · «Não: merge é sempre meu» · «Caso a caso, me pergunte»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-17: «A batuta que você me deu cobre autorizar uma sessão com batuta de projeto a merjar os PRs do próprio repo?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-17"
+      locality: "pessoa"
+  - id: D_BRIDGE_DM_ONLY_WINDOW_ACCEPTED_1117
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-17"
+    verified_against: "decisão do maestro em 2026-11-17, por pergunta com opções (/meta:decide): escolhida «Aceito a janela, só mensagem direta»"
+    label: "O maestro aceitou ligar só a rota de mensagem direta do agente na ponte, com a janela em que o pedinte não é autenticado, até o portão por identidade entrar; arquivo, enquete e leitura ficam desligados"
+    narrative: "Selado por /meta:decide em 2026-11-17: escolhida «Aceito a janela, só mensagem direta»; descartadas: «Estreitar o grupo antes» · «Esperar o portão por identidade» · «Quero ler a revisão antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-17: «A revisão independente da rota de mensagem direta diz que pode merjar com ressalvas; a fronteira de confiança é quem alcança o socket, e o grupo com acesso inclui a conta de todas as sessões. Como seguimos?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-17"
+      locality: "pessoa"
 edges:
   - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
     to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
@@ -242,5 +274,11 @@ edges:
     to: D_ISOLATION_PHASE2_AMENDMENT_AUTHORIZED_1116
     edge_type: TRACES_TO
   - from: D_NONDEV_READING_PLAN_AS_DOCUMENT_FIRST_1117
+    to: D_ISOLATION_PHASE2_AMENDMENT_AUTHORIZED_1116
+    edge_type: TRACES_TO
+  - from: D_BATON_PASSES_OWN_REPO_MERGE_NON_GUARD_1117
+    to: D_ISOLATION_PHASE2_AMENDMENT_AUTHORIZED_1116
+    edge_type: TRACES_TO
+  - from: D_BRIDGE_DM_ONLY_WINDOW_ACCEPTED_1117
     to: D_ISOLATION_PHASE2_AMENDMENT_AUTHORIZED_1116
     edge_type: TRACES_TO
