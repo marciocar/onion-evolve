@@ -59722,7 +59722,9 @@ MUT
     fpr="$(GNUPGHOME="${r}/sec" gpg --batch --with-colons --list-keys 2>/dev/null | awk -F: '/^fpr/{print $10; exit}')"
     [ -n "${fpr}" ] && GNUPGHOME="${r}/sec" gpg --batch --quiet --passphrase '' --quick-add-key "${fpr}" cv25519 encr never >/dev/null 2>&1 \
       && GNUPGHOME="${r}/sec" gpg --batch --export "${fpr}" 2>/dev/null | GNUPGHOME="${r}/pub" gpg --batch --quiet --import >/dev/null 2>&1
-    if [ -z "${fpr}" ] || ! GNUPGHOME="${r}/pub" gpg --batch --with-colons --list-keys 2>/dev/null | grep -q '^sub:'; then
+    # here-string, não pipe: com pipefail, o `grep -q` que sai cedo mata o gpg por SIGPIPE e o rc mente
+    local keys_listing; keys_listing="$(GNUPGHOME="${r}/pub" gpg --batch --with-colons --list-keys 2>/dev/null || true)"
+    if [ -z "${fpr}" ] || ! grep -q '^sub:' <<< "${keys_listing}"; then
       record_skip "kg-writer-backup: (r) o gpg desta máquina não gerou a chave descartável → a prova com o gpg real não rodou"
     else
       echo "${fpr}" > "${r}/gpgid"
