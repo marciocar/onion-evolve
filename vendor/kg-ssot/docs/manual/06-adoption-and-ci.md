@@ -21,7 +21,7 @@ Run this at the root of your repository, with Python 3.12 or later (the floor si
 ```bash
 # 1. bring in the release, by tag, from the public repository
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.54.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.55.0 --dest vendor/kg-ssot
 
 # 2. the dependencies in a venv, then the baseline (the gate only measures tracked files: git add first)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -423,6 +423,73 @@ merge the new digest, update the file and the clone, and restart; reading stays 
 
 The server listens on `127.0.0.1` by default, which serves a proxy on the same machine. A proxy on another machine
 needs `--host` with an address it can reach and `--allow-remote`, on a private network, with TLS at the proxy.
+
+#### Serve only what was published: a signed tag, as a service
+
+For readers who are not developers, serve the release of the repository, not the clone. With `--serve-ref` and
+`--read-only`, each area is read from the tree of a ref, never from the working tree ([chapter 5](05-tools.md), "The
+served ref"); with a tag pattern and `--verify-signers`, only the highest `hub-v<semver>` tag with a valid SSH
+signature of a key in the `allowed_signers` file is served. Cut the tag signed (`git -c gpg.format=ssh -c
+user.signingkey=KEY tag -s hub-v1.4.0 -m ...`), and list the keys that may cut it, one per line
+(`release@x.org ssh-ed25519 AAAA...`), in a file outside `--root`.
+
+On systemd, `LoadCredential=` hands the four files to the service in a private directory (`%d` in the unit), readable
+only by it, so none of them goes on the command line or in the environment, and `StateDirectory=` gives it
+`/var/lib/kg-mcp` (`%S/kg-mcp`), outside the clone, for the version floor of the pattern:
+
+```ini
+# /etc/systemd/system/kg-mcp.service
+[Unit]
+Description=kg-mcp, read-only, the signed hub tag
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=kg-mcp
+StateDirectory=kg-mcp
+LoadCredential=area-policy.json:/etc/kg-mcp/area-policy.json
+LoadCredential=area-policy.digest:/etc/kg-mcp/area-policy.digest
+LoadCredential=secret:/etc/kg-mcp/secret
+LoadCredential=allowed_signers:/etc/kg-mcp/allowed_signers
+ExecStart=/opt/kg-mcp/bin/kg-mcp --root /srv/kg-areas --backend git --read-only --http 8765 \
+  --identity-header X-User-Email --secret-file @%d/secret \
+  --area-policy %d/area-policy.json --area-policy-digest @%d/area-policy.digest \
+  --serve-ref refs/tags/hub-v* --verify-signers @%d/allowed_signers --serve-state %S/kg-mcp
+ReadOnlyPaths=/srv/kg-areas
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- **The credentials are a copy made at startup:** with `LoadCredential=`, a change to the files under `/etc/kg-mcp/`
+  takes effect on `systemctl restart kg-mcp`, which is also how the pinned policy changes (above). The rereading of
+  the secret and of the signers file serves a file the operator changes in place, without systemd.
+- **The server fetches nothing:** it needs git 2.45.1 or later (or 2.39.4, 2.40.2, 2.41.1, 2.42.2, 2.43.4, 2.44.1),
+  proved at startup, runs it with no transport and without the lazy fetch of a partial clone, and refuses a partial
+  clone, a shallow one, grafts, borrowed objects, a linked worktree, and symbolic links in `.git`
+  ([chapter 5](05-tools.md), "What the clone cannot be"). A timer of the same user brings the new tags into the clone, with
+  `git -C /srv/kg-areas/c-company fetch origin 'refs/tags/*:refs/tags/*'`: no `--prune`, no `--prune-tags`, and no `+`
+  in the refspec. A new signed tag is served on the next request; a new highest tag that does not verify closes the area
+  until it is removed or replaced, and the server does not fall back to the previous tag.
+- **The rollback, and what stops it:** whoever can push to the remote could delete the highest tag there; with
+  `--prune-tags` (or `--prune` with a tag refspec) the fetch deletes it here too, and without the floor the pattern would
+  serve the previous tag, validly signed, with content that was withdrawn. The same goes for a tag moved on the remote
+  and forced in with `+`. The fetch above keeps the tags it already has, and `--serve-state` keeps the highest version
+  served even if the clone loses it: a lower version closes the area, with the reason on stderr, until a higher signed
+  tag is cut. A withdrawn version is undone by cutting a new, higher one, never by deleting the tag. The floor is trust
+  on first use: the first start without a state file accepts the highest valid tag the clone has, and deleting the
+  state file resets it, so keep `/var/lib/kg-mcp` with the service (`StateDirectory=` creates it with mode 0755,
+  so no one else writes to it) and in its backup.
+- **The owner of the clone:** git refuses a repository owned by another user ("dubious ownership"), and the server
+  reads git with no global configuration, so `safe.directory` does not apply. Keep the clone owned by the user of the
+  service and of the timer, and let `ReadOnlyPaths=` keep the server from writing to it.
+- **Without systemd:** the same options, with each file readable only by the service (`chmod 600`) and passed with
+  `@`; a variable with the secret (`--secret-env`) shows in `/proc/<pid>/environ` to whoever can read it.
 
 With the policy above and a graph at each level in `g-compliance`, each audience gets this:
 

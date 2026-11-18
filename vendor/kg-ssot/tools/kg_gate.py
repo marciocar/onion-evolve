@@ -1772,6 +1772,32 @@ def run_touched(args):
                  or lowered_failed) else 0
 
 
+def rituals_check(items, as_of, runs, grace):
+    """O gate opcional do ritmo (--rituals-overdue): reprova quando algum ritual passou do prazo, pela cadência ou pelo
+    calendário (o atrasado, e o nunca executado cuja primeira ocorrência já passou). A falha aberta e o só por evento
+    saem no relatório, não no gate. Sem --as-of, o instante é o relógio da máquina, em UTC."""
+    if __package__:
+        from . import kg_rituals  # noqa: PLC0415
+    else:
+        import kg_rituals  # noqa: PLC0415
+    when = as_of or datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()
+    try:
+        rep = kg_rituals.rituals_report(list(items), when, runs, kg_rituals.parse_grace(grace) if grace else None,
+                                        kg=kg_validate)
+    except kg_rituals.Broken as exc:
+        raise Broken(str(exc)) from None
+    late = [e for g in rep["owners"] for e in g["rituals"] if kg_rituals.is_overdue(e)]
+    out = [_("· rituals at {when}: {late} overdue of {total}").format(
+        when=when, late=len(late), total=sum(len(g["rituals"]) for g in rep["owners"]))]
+    for e in late:
+        out.append(_("✗ ritual overdue: {file} {id} (owner {owner})").format(
+            file=e["file"], id=e["id"], owner=e["owner"] or "-"))
+    if rep["expander"] is None:
+        out.append(_("· the calendars were not expanded: without the rituals extra (python-dateutil), lateness is "
+                     "measured by the cadence only, per day"))
+    return out, bool(late)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=_(HELP), formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--repo", default=".", help=_("the repository whose graphs are measured (default: .)"))
@@ -1840,8 +1866,28 @@ def main(argv=None):
                     help=_("only with --area-policy: the digest that the policy must have (kg_policy.py digest FILE), as "
                            "a value or as @FILE, a committed file that holds it; a policy with another digest, or a "
                            "malformed value, is broken input (rc 2). Pin the same value in the kg-mcp"))
+    ap.add_argument("--rituals-overdue", action="store_true",
+                    help=_("fails (rc 1) when a ritual (a node with x_ritual) is overdue, by the cadence or by the "
+                           "calendar. Off by default: the clock makes the same commit pass today and fail tomorrow, so "
+                           "it stays out of the verdict and the baseline"))
+    ap.add_argument("--as-of", metavar=_("WHEN"),
+                    help=_("only with --rituals-overdue: the date YYYY-MM-DD or RFC 3339 date-time to measure at "
+                           "(default: now, from the machine clock)"))
+    ap.add_argument("--runs", action="append", default=[], metavar="FILE",
+                    help=_("only with --rituals-overdue: the executor's run log, CloudEvents 1.0; repeatable"))
+    ap.add_argument("--grace", metavar="PT30M",
+                    help=_("only with --rituals-overdue: the executor's slack, an ISO 8601 duration with time only"))
     args = ap.parse_args(argv)
     _utf8_stdio()
+    if (args.as_of is not None or args.runs or args.grace is not None) and not args.rituals_overdue:
+        print(_("GATE BROKEN  --as-of, --runs, and --grace only go with --rituals-overdue"))
+        return 2
+    if args.rituals_overdue and args.update:
+        print(_("GATE BROKEN  --rituals-overdue does not go with --update (the check is not part of the baseline)"))
+        return 2
+    if args.rituals_overdue and args.touched is not None:
+        print(_("GATE BROKEN  --rituals-overdue does not go with --touched (an overdue ritual is not a change)"))
+        return 2
     if args.area_policy_digest is not None and args.area_policy is None:
         print(_("GATE BROKEN  --area-policy-digest only goes with --area-policy"))
         return 2
@@ -1940,6 +1986,8 @@ def main(argv=None):
         lowered, lowered_failed = (downgrade_check(args.repo, _common_ancestor(args.repo, args.base), floor,
                                                    tuple(args.exclude), from_index=False)
                                    if args.classification_downgrade else ([], False))
+        overdue, overdue_failed = (rituals_check(items, args.as_of, args.runs, args.grace)
+                                   if args.rituals_overdue else ([], False))
     except (Broken, OSError, ValueError) as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
@@ -1960,9 +2008,10 @@ def main(argv=None):
         if args.update:  # contrato adulterado não vira base, nem com --accept-regression
             print("\n".join(lines + [_("✗ --update refused: the vendor does not pass its stamp (see above)")]))
             return 1
-    print("\n".join(lines + detail(base, now) + sources + private + classified + cited + lowered))
+    print("\n".join(lines + detail(base, now) + sources + private + classified + cited + lowered + overdue))
     if not args.update:
-        return 1 if sources_failed or private_failed or classified_failed or cited_failed or lowered_failed else rc
+        return 1 if (sources_failed or private_failed or classified_failed or cited_failed or lowered_failed
+                     or overdue_failed) else rc
     if worse and not args.accept_regression:
         print(_("✗ --update refused: something got worse. Fix it, or accept it with --accept-regression \"<reason>\""
                 " (it stays in the baseline)"))

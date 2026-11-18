@@ -45,9 +45,20 @@ Com --area-policy-digest (sha256:<hex> ou @ARQ, o valor que kg_policy.py digest 
 digest: com outro, o servidor não sobe (rc 2), e a política trocada por outra com ele de pé fecha a leitura. O gate
 (kg_gate.py --area-policy-digest) confere o mesmo valor, e as duas pontas leem a mesma política.
 
+A ref servida (--serve-ref REF, só com --backend git e --read-only): o armazém serve exatamente a árvore do commit de
+uma ref, nunca a árvore de trabalho do clone. A branch (refs/heads/X ou X) vale enquanto o HEAD do clone descende
+dela; a tag (refs/tags/N, ou um padrão com um * que casa a versão semver, do qual vale a maior) só com --verify-signers
+@ARQ, o allowed_signers do git: a tag anotada tem de ter assinatura SSH válida (e, na branch, com a opção, o commit da
+ponta). O padrão pede --serve-state DIR, fora do clone e de --root, onde fica a maior versão já servida: uma versão
+abaixo dela nunca é servida. A ref é relida quando os arquivos de ref mudam; cada requisição lê um retrato só; a que deixa de verificar fecha a leitura, como a política
+inválida, e reabre quando volta a verificar. No perfil, vale para cada área aberta. O segredo pode vir de arquivo
+(--secret-file @ARQ, no lugar de --secret-env): uma linha, relida quando o arquivo muda, e o valor nunca sai em
+mensagem.
+
 Uso:
   kg_mcp.py --root DIR [--backend disk|git|versioned] [--init] [--author "Nome <email>"] [--read-only]
-            [--http PORTA [--host 127.0.0.1] [--allow-remote] [--secret-env VAR [--secret-header H]]
+            [--serve-ref REF [--verify-signers @ARQ] [--serve-state DIR]]
+            [--http PORTA [--host 127.0.0.1] [--allow-remote] [--secret-env VAR|--secret-file @ARQ [--secret-header H]]
                           [--identity-header H [--area-policy ARQUIVO [--area-policy-digest D]]] [--max-concurrent N]] [--max-bytes N]
             [--max-graphs N]
 Sem --root, só kg_validate e kg_schema_help ficam disponíveis. Com --store-optional, uma raiz que não abre não derruba o
@@ -563,6 +574,12 @@ class AreaPolicy:
                                    f"gives a higher ceiling")
         return out
 
+    def shared_areas(self):
+        """Todas as áreas compartilhadas da política carregada: a canônica e os grupos (os papéis só leem essas)."""
+        with self._lock:
+            doc = self._doc
+            return ([doc.canonical] if doc.canonical else []) + sorted(doc.groups)
+
     def areas(self, identity):
         """As áreas compartilhadas que a identidade lê agora: a canônica, os grupos de que é membro e as dos papéis."""
         return self.access(identity)[0]
@@ -819,17 +836,84 @@ class AreaView:
             raise self._missing(name) from None
 
 
+SECRET_FILE_MAX = 4096  # bytes: um segredo de proxy cabe com folga; o arquivo maior não é um segredo de uma linha
+
+
+def read_secret_file(path):
+    """O segredo de um arquivo (--secret-file @ARQ), com as regras do @ARQ do --area-policy-digest: uma linha, os brancos
+    das pontas não contam, nem o BOM do UTF-8; até SECRET_FILE_MAX bytes; o UTF-16 ganha a dica de gravar em UTF-8.
+    ValueError com o motivo, que nunca traz o valor nem um pedaço dele."""
+    try:
+        with open(path, "rb") as fh:
+            data = fh.read(SECRET_FILE_MAX + 1)
+    except OSError as exc:
+        raise ValueError(P_("the secret file {path} cannot be read ({error})").format(
+            path=path, error=exc.strerror or type(exc).__name__)) from None
+    if len(data) > SECRET_FILE_MAX:
+        raise ValueError(P_("the secret file {path} is larger than {limit} bytes").format(path=path,
+                                                                                       limit=SECRET_FILE_MAX))
+    if data.startswith((b"\xff\xfe", b"\xfe\xff")):
+        raise ValueError(P_("the secret file {path} is UTF-16: save it as UTF-8").format(path=path))
+    try:
+        value = data.decode("utf-8").removeprefix("\ufeff").strip()
+    except UnicodeDecodeError:
+        raise ValueError(P_("the secret file {path} is not UTF-8").format(path=path)) from None
+    if not value:
+        raise ValueError(P_("the secret file {path} is empty").format(path=path))
+    if any(c in "\r\n" for c in value):
+        raise ValueError(P_("the secret file {path} has more than one line").format(path=path))
+    if any(ord(c) < 0x20 or ord(c) == 0x7f for c in value):
+        raise ValueError(P_("the secret file {path} has a control character").format(path=path))
+    return value
+
+
+class SecretFile:
+    """O segredo de --secret-file, relido quando o carimbo do arquivo (mtime, tamanho, inode) muda: a rotação vale na
+    requisição seguinte, sem reiniciar. Um arquivo que some ou quebra com o servidor de pé fecha: toda requisição é 401
+    até ele voltar a valer. O motivo sai uma vez no stderr, sem o valor."""
+
+    def __init__(self, path):
+        self.path = str(path)
+        self._lock = threading.Lock()
+        self._closed_reason = None
+        self._stamp, self._value = self._load()
+
+    def _load(self):
+        st = os.stat(self.path)
+        return (st.st_mtime_ns, st.st_size, st.st_ino), read_secret_file(self.path)
+
+    def value(self):
+        """O segredo agora, ou None quando o arquivo fechou."""
+        with self._lock:
+            try:
+                st = os.stat(self.path)
+                if (st.st_mtime_ns, st.st_size, st.st_ino) != self._stamp:
+                    self._stamp, self._value = self._load()
+                    self._closed_reason = None
+            except (OSError, ValueError) as exc:
+                self._stamp, self._value = None, None  # fecha; tenta de novo na próxima
+                reason = str(exc) if isinstance(exc, ValueError) else P_(
+                    "the secret file {path} cannot be read ({error})").format(path=self.path,
+                                                                            error=exc.strerror or type(exc).__name__)
+                if reason != self._closed_reason:
+                    self._closed_reason = reason
+                    print(f"kg_mcp: secret file closed: {reason}", file=sys.stderr)
+            return self._value
+
+
 class Profile:
     """O perfil 'atrás de proxy' do HTTP: identidade por header que recusa por padrão, segredo compartilhado comparado
     por hmac, uma área por identidade sob a raiz e os limites. É configuração imutável; o estado mutável é só o cache
     das áreas abertas, protegido por trava, chaveado pela identidade e nunca 'a identidade atual'."""
 
     def __init__(self, identity_header, secret, secret_header, root, backend, read_only=False, root_error=None,
-                 gate=None, policy=None):
+                 gate=None, policy=None, serve=None):
+        # secret: o texto, ou um SecretFile (--secret-file), lido a cada requisição
         self.identity_header, self.secret, self.secret_header = identity_header, secret, secret_header
         self.root, self.backend = pathlib.Path(root) if root is not None else None, backend
         self.read_only, self.root_error, self.gate = read_only, root_error, gate
         self.policy = policy
+        self.serve = serve  # a ref servida (kg_store.ServeRef) em cada área aberta, ou None
         self._areas = {}
         self._shared = {}
         self._lock = threading.Lock()
@@ -838,7 +922,15 @@ class Profile:
         """O segredo do header confere com o da configuração (hmac.compare_digest, sem vazar por tempo)."""
         if self.secret is None:
             return True
-        return hmac.compare_digest((given or "").encode("utf-8"), self.secret.encode("utf-8"))
+        secret = self.secret.value() if isinstance(self.secret, SecretFile) else self.secret
+        if secret is None:  # o arquivo do segredo fechou: ninguém passa
+            return False
+        return hmac.compare_digest((given or "").encode("utf-8"), secret.encode("utf-8"))
+
+    def open_area(self, path, init=False, gate=None):
+        """O armazém de uma área, com a ref servida quando há uma."""
+        extra = {"serve": self.serve} if self.serve is not None else {}
+        return kg_store.open_store(self.backend, path, init=init, gate=gate, **extra)
 
     def context(self, identity, need_store=True):
         """O contexto de uma requisição autenticada. need_store=False (initialize, ping) não abre nem cria a área; e,
@@ -860,8 +952,8 @@ class Profile:
             if cached is None:
                 try:
                     with kg_i18n.machine():  # o erro da área vai ao modelo: em inglês, como o resto do protocolo
-                        cached = (kg_store.open_store(self.backend, self.root / area_name(identity),
-                                                      init=not self.read_only and writes, gate=self.gate), None)
+                        cached = (self.open_area(self.root / area_name(identity),
+                                                 init=not self.read_only and writes, gate=self.gate), None)
                 except (kg_store.StoreError, OSError, ValueError, RuntimeError) as exc:
                     # não fica em cache: tenta de novo
                     cached = (None, P_("the area of {identity} did not open ({error})").format(identity=identity,
@@ -869,7 +961,8 @@ class Profile:
                 else:
                     self._areas[identity] = cached
         if cached[0] is None:
-            if not writes:
+            # com a ref servida, a própria área que não a serve fica fora, e as compartilhadas seguem
+            if not writes or (self.serve is not None and access is not None):
                 # quem só tem papéis sem escrita e cuja pasta própria não abre (sem .git, por exemplo) lê as
                 # compartilhadas como quem nunca gravou: nada de git init, e a leitura segue (fora da trava, porque
                 # _view abre as compartilhadas sob ela)
@@ -887,7 +980,7 @@ class Profile:
             if store is None and (self.root / area).is_dir():
                 try:
                     with kg_i18n.machine():
-                        store = self._shared[area] = kg_store.open_store(self.backend, self.root / area, init=False)
+                        store = self._shared[area] = self.open_area(self.root / area)
                 except (kg_store.StoreError, OSError, ValueError, RuntimeError) as exc:
                     print(f"kg_mcp: shared area did not open: {exc}", file=sys.stderr)
             return store
@@ -1052,6 +1145,23 @@ class Server:
         except (OSError, ValueError):
             return "?"
 
+    @staticmethod
+    def _served_stores(store):
+        """Os armazéns de ref servida por trás do armazém de uma requisição (o próprio, as áreas da visão, os tetos)."""
+        out = []
+
+        def walk(s):
+            if isinstance(s, AreaView):
+                walk(s._own)
+                for reader in s._readers.values():
+                    walk(reader)
+            elif isinstance(s, CeilingStore):
+                walk(s._store)
+            elif getattr(s, "serve", None) is not None:
+                out.append(s)
+        walk(store)
+        return out
+
     def _call(self, params, ctx):
         name, args = params.get("name"), params.get("arguments", {})
         if not isinstance(name, str):
@@ -1062,7 +1172,11 @@ class Server:
             raise _RpcError(-32602, P_("arguments must be an object"))
         try:
             _check_args(name, args)
-            payload, is_error = self._run(name, args, ctx)
+            # um retrato só por requisição em cada ref servida: nada mistura duas tags, e a ref é conferida uma vez
+            with contextlib.ExitStack() as pins:
+                for served in self._served_stores(ctx.store):
+                    pins.enter_context(served.pinned())
+                payload, is_error = self._run(name, args, ctx)
         except ToolError as exc:
             payload, is_error = {"error": str(exc)}, True
         except kg_store.NotFound as exc:
@@ -1545,10 +1659,13 @@ def main(argv=None):
     ap.add_argument("--identity-header", metavar="HEADER",
                     help=_("behind-proxy profile (HTTP only): the identity of each request comes from this header (an "
                            "email, e.g. X-User-Email); each identity writes in its own area under --root and signs the "
-                           "writes. Requires --secret-env"))
+                           "writes. Requires --secret-env or --secret-file"))
     ap.add_argument("--secret-env", metavar="VAR",
                     help=_("the environment variable with the shared secret that each HTTP request carries in "
                            "--secret-header (compared by hmac); required by --identity-header and by --allow-remote"))
+    ap.add_argument("--secret-file", metavar="@FILE",
+                    help=_("instead of --secret-env: the file with the shared secret, on one line (UTF-8), reread when it "
+                           "changes; the value never shows in output or errors"))
     ap.add_argument("--secret-header", default="X-Api-Key", metavar="HEADER")
     ap.add_argument("--max-graphs", type=int, metavar="N", help=_("graphs per store (per area, in the profile)"))
     ap.add_argument("--area-policy", metavar="FILE",
@@ -1559,6 +1676,20 @@ def main(argv=None):
                            "a value or as @FILE, read once at startup; with another digest the server does not start, "
                            "and a policy changed to another digest while it runs closes reading"))
     ap.add_argument("--max-concurrent", type=int, metavar="N", help=_("HTTP requests at the same time (503 beyond that)"))
+    ap.add_argument("--serve-ref", metavar="REF",
+                    help=_("only with --backend git and --read-only: serves exactly the tree of a ref, not the working "
+                           "tree of the clone: refs/heads/NAME (or NAME), while the HEAD of the clone descends from it, "
+                           "or refs/tags/NAME, or a pattern such as refs/tags/hub-v* (the highest semver version), with "
+                           "--verify-signers; the ref is reread when it changes, and one that no longer verifies closes "
+                           "reading"))
+    ap.add_argument("--verify-signers", metavar="@FILE",
+                    help=_("only with --serve-ref: the allowed_signers file of git (gpg.ssh.allowedSignersFile); the tag "
+                           "(required) or the tip commit of the branch must carry a valid SSH signature, at startup and "
+                           "at every change of the ref"))
+    ap.add_argument("--serve-state", metavar="DIR",
+                    help=_("required with a tag pattern of --serve-ref: a directory outside the clone and outside --root "
+                           "where the highest version already served is kept; a lower version is never served, also "
+                           "after a restart"))
     ap.add_argument("--gate-cmd", metavar="CMD",
                     help=_("an external gate, after the contract, on every write and removal: the command (no shell) "
                            "gets the text on stdin and returns a kg-ssot.verdict/1; it is how an adopter plugs in its "
@@ -1576,13 +1707,27 @@ def main(argv=None):
             return broken(_("--{option} must be 1 or more").format(option=opt.replace("_", "-")))
     if args.http is None and (args.identity_header or args.secret_env or args.max_concurrent):
         return broken(_("--identity-header, --secret-env and --max-concurrent only apply with --http"))
+    if args.secret_file is not None and args.secret_env is not None:
+        return broken(_("--secret-file and --secret-env are exclusive: give the secret one way"))
+    if args.secret_file is not None and args.http is None:
+        return broken(_("--secret-file only applies with --http"))
     secret = None
+    if args.secret_file is not None:
+        if not args.secret_file.startswith("@"):
+            return broken(_("--secret-file takes @FILE, the path of the file with the secret"))
+        try:
+            secret = SecretFile(args.secret_file[1:])
+        except (OSError, ValueError) as exc:  # o motivo nunca traz o valor
+            return broken(_("--secret-file: {error}").format(error=exc if isinstance(exc, ValueError) else P_(
+                "the secret file {path} cannot be read ({error})").format(
+                path=args.secret_file[1:], error=exc.strerror or type(exc).__name__)))
     if args.secret_env:
         secret = os.environ.get(args.secret_env) or None
         if secret is None:
             return broken(_("the variable {var} (the --secret-env secret) is missing or empty").format(var=args.secret_env))
     if args.identity_header and secret is None:
-        return broken(_("--identity-header without --secret-env: a header identity is never enough on its own"))
+        return broken(_("--identity-header without --secret-env or --secret-file: a header identity is never enough on "
+                        "its own"))
     if args.area_policy is not None and not args.identity_header:
         return broken(_("--area-policy only applies with --identity-header"))
     if args.area_policy_digest is not None and args.area_policy is None:
@@ -1600,11 +1745,44 @@ def main(argv=None):
             return broken(_("--area-policy did not load: {error}").format(error=exc))
     if args.identity_header and args.author:
         return broken(_("with --identity-header, the authenticated identity signs: remove --author"))
+    serve = None
+    if args.verify_signers is not None and args.serve_ref is None:
+        return broken(_("--verify-signers only goes with --serve-ref"))
+    if args.serve_state is not None and args.serve_ref is None:
+        return broken(_("--serve-state only goes with --serve-ref"))
+    if args.serve_ref is not None:
+        if args.backend != "git":
+            return broken(_("--serve-ref only applies with --backend git"))
+        if args.root is None:
+            return broken(_("--serve-ref without --root: there is no clone to serve"))
+        if not args.read_only:
+            return broken(_("--serve-ref serves a ref, which takes no writes: add --read-only"))
+        if args.init:
+            return broken(_("--serve-ref with --init: a new repository has no ref to serve"))
+        signers = None
+        if args.verify_signers is not None:
+            if not args.verify_signers.startswith("@"):
+                return broken(_("--verify-signers takes @FILE, the allowed_signers file"))
+            signers = args.verify_signers[1:]
+            real, base = pathlib.Path(signers).resolve(), pathlib.Path(args.root).resolve()
+            if real == base or base in real.parents:
+                return broken(_("--verify-signers: the signers file must stay outside --root"))
+        if args.serve_state is not None:
+            real, base = pathlib.Path(args.serve_state).resolve(), pathlib.Path(args.root).resolve()
+            if real == base or base in real.parents:
+                return broken(_("--serve-state: the state directory must stay outside --root"))
+            if os.path.isdir(args.serve_state) and not os.access(args.serve_state, os.W_OK | os.X_OK):
+                return broken(_("--serve-state: the directory {path} is not writable").format(path=args.serve_state))
+        try:
+            serve = kg_store.ServeRef(args.serve_ref, signers, args.serve_state)
+        except kg_store.StoreError as exc:
+            return broken(_("--serve-ref: {error}").format(error=exc))
     if args.http is not None and args.host not in LOOPBACK and not args.allow_remote:
         return broken(_("--host {host} leaves the loopback: use --allow-remote, with --secret-env, behind a proxy "
                         "with TLS").format(host=args.host))
     if args.allow_remote and secret is None:
-        return broken(_("--allow-remote without --secret-env: outside the loopback, every request must carry the secret"))
+        return broken(_("--allow-remote without --secret-env or --secret-file: outside the loopback, every request must "
+                        "carry the secret"))
     try:
         kg_store.check_author(args.author)
     except kg_store.StoreError as exc:
@@ -1629,9 +1807,12 @@ def main(argv=None):
         # --root "" é raiz vazia, recusada pelo armazém, não "sem armazém" calado
         try:
             # com --store-optional o erro vai ao modelo (protocolo, em inglês); sem ele, à pessoa (na língua do ambiente)
-            with kg_i18n.machine() if args.store_optional else contextlib.nullcontext():
-                store = kg_store.open_store(args.backend, args.root, init=args.init, gate=gate)
+            with kg_i18n.machine() if args.store_optional and serve is None else contextlib.nullcontext():
+                store = kg_store.open_store(args.backend, args.root, init=args.init, gate=gate,
+                                            **({"serve": serve} if serve is not None else {}))
         except (kg_store.StoreError, OSError, ValueError, RuntimeError) as exc:  # sem permissão, NUL, laço de link
+            if serve is not None:  # a ref que não verifica nunca sobe, nem com --store-optional
+                return broken(_("--serve-ref: {error}").format(error=exc))
             if not args.store_optional:
                 return broken(str(exc))
             store_error = P_("the root {root} did not open ({error})").format(root=args.root, error=exc)
@@ -1668,7 +1849,16 @@ def main(argv=None):
                 print(_("kg-ssot: {error}; the server starts with only kg_validate and kg_schema_help").format(
                     error=root_error), file=sys.stderr)
         profile = Profile(args.identity_header, secret, args.secret_header, root, args.backend,
-                          read_only=args.read_only, root_error=root_error, gate=gate, policy=policy)
+                          read_only=args.read_only, root_error=root_error, gate=gate, policy=policy, serve=serve)
+        if serve is not None and root is not None and policy is not None:
+            # na partida, cada área compartilhada que já existe tem de servir a ref: a que não serve não deixa subir
+            for area in policy.shared_areas():
+                if (pathlib.Path(root) / area).is_dir():
+                    try:
+                        profile._shared[area] = profile.open_area(pathlib.Path(root) / area)
+                    except (kg_store.StoreError, OSError, ValueError, RuntimeError) as exc:
+                        return broken(_("--serve-ref: the area {area} does not serve the ref: {error}").format(
+                            area=area, error=exc))
     httpd = HTTPServer((args.host, args.http),
                                             make_http_handler(server, profile, args.max_concurrent))
     print(_("kg-ssot MCP at http://{host}:{port}/mcp").format(host=args.host, port=args.http), file=sys.stderr)

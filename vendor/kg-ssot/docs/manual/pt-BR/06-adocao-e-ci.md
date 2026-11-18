@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:377ce6255dbfb7c5 -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:3baa77979c57280a -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ Rode isto na raiz do seu repositório, com Python 3.12 ou mais (o piso desde a 4
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.54.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.55.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -425,6 +425,73 @@ política, faça o merge do digest novo, atualize o arquivo e o clone e reinicie
 
 O servidor escuta em `127.0.0.1` por padrão, o que serve a um proxy na mesma máquina. Um proxy em outra máquina pede
 `--host` com um endereço que ele alcance e `--allow-remote`, numa rede privada, com TLS no proxy.
+
+#### Servir só o que foi publicado: uma tag assinada, como serviço
+
+Para quem não é desenvolvedor, sirva a release do repositório, não o clone. Com `--serve-ref` e `--read-only`, cada
+área é lida da árvore de uma ref, nunca da árvore de trabalho ([capítulo 5](05-ferramentas.md), "A ref servida"); com
+um padrão de tag e `--verify-signers`, só a tag `hub-v<semver>` mais alta com assinatura SSH válida de uma chave do
+arquivo `allowed_signers` é servida. Corte a tag assinada (`git -c gpg.format=ssh -c user.signingkey=CHAVE tag -s
+hub-v1.4.0 -m ...`) e liste as chaves que podem cortá-la, uma por linha (`release@x.org ssh-ed25519 AAAA...`), num
+arquivo fora de `--root`.
+
+No systemd, o `LoadCredential=` entrega os quatro arquivos ao serviço numa pasta privada (`%d` na unit), legível só por
+ele, e nenhum deles vai para a linha de comando nem para o ambiente; e o `StateDirectory=` lhe dá o `/var/lib/kg-mcp`
+(`%S/kg-mcp`), fora do clone, para o piso de versão do padrão:
+
+```ini
+# /etc/systemd/system/kg-mcp.service
+[Unit]
+Description=kg-mcp, read-only, the signed hub tag
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=kg-mcp
+StateDirectory=kg-mcp
+LoadCredential=area-policy.json:/etc/kg-mcp/area-policy.json
+LoadCredential=area-policy.digest:/etc/kg-mcp/area-policy.digest
+LoadCredential=secret:/etc/kg-mcp/secret
+LoadCredential=allowed_signers:/etc/kg-mcp/allowed_signers
+ExecStart=/opt/kg-mcp/bin/kg-mcp --root /srv/kg-areas --backend git --read-only --http 8765 \
+  --identity-header X-User-Email --secret-file @%d/secret \
+  --area-policy %d/area-policy.json --area-policy-digest @%d/area-policy.digest \
+  --serve-ref refs/tags/hub-v* --verify-signers @%d/allowed_signers --serve-state %S/kg-mcp
+ReadOnlyPaths=/srv/kg-areas
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- **As credenciais são uma cópia feita na partida:** com `LoadCredential=`, a mudança nos arquivos de `/etc/kg-mcp/`
+  vale no `systemctl restart kg-mcp`, que é também como a política fixada muda (acima). A releitura do segredo e do
+  arquivo de signatários serve ao arquivo que o operador troca no lugar, sem o systemd.
+- **O servidor não busca nada:** ele pede o git 2.45.1 ou mais novo (ou 2.39.4, 2.40.2, 2.41.1, 2.42.2, 2.43.4,
+  2.44.1), provado na partida, o roda sem transporte e sem o lazy fetch do clone parcial, e recusa o clone parcial, o
+  raso, os enxertos, os objetos emprestados, a worktree ligada e os links simbólicos em `.git`
+  ([capítulo 5](05-ferramentas.md), "O que o clone não pode ser"). Um timer do mesmo usuário traz as tags novas para o
+  clone, com
+  `git -C /srv/kg-areas/c-company fetch origin 'refs/tags/*:refs/tags/*'`: sem `--prune`, sem `--prune-tags` e sem `+`
+  no refspec. Uma tag nova assinada é servida na requisição seguinte; uma tag nova mais alta que não verifica fecha a
+  área até ser removida ou trocada, e o servidor não volta para a tag anterior.
+- **O rollback, e o que o barra:** quem pode dar push no remoto poderia apagar lá a tag mais alta; com `--prune-tags`
+  (ou `--prune` com um refspec de tags) o fetch a apaga aqui também, e sem o piso o padrão serviria a tag anterior,
+  assinada e válida, com um conteúdo que foi retirado. O mesmo vale para uma tag movida no remoto e forçada com `+`. O
+  fetch acima guarda as tags que já tem, e o `--serve-state` guarda a maior versão servida mesmo que o clone a perca:
+  uma versão menor fecha a área, com o motivo no stderr, até que se corte uma tag assinada mais alta. Uma versão
+  retirada se desfaz cortando uma nova, mais alta, nunca apagando a tag. O piso é confiança no primeiro uso: a primeira
+  partida sem arquivo de estado aceita a maior tag válida que o clone tem, e apagar o arquivo de estado o zera; mantenha
+  o `/var/lib/kg-mcp` com o serviço (o `StateDirectory=` o cria com modo 0755, e ninguém mais grava nele) e no backup dele.
+- **O dono do clone:** o git recusa um repositório de outro usuário ("dubious ownership"), e o servidor roda o git sem
+  configuração global, então o `safe.directory` não vale. Mantenha o clone com o usuário do serviço e do timer, e deixe
+  o `ReadOnlyPaths=` impedir o servidor de escrever nele.
+- **Sem systemd:** as mesmas opções, com cada arquivo legível só pelo serviço (`chmod 600`) e passado com `@`; a
+  variável com o segredo (`--secret-env`) aparece em `/proc/<pid>/environ` para quem pode lê-lo.
 
 Com a política acima e um grafo de cada nível em `g-compliance`, cada audiência recebe isto:
 

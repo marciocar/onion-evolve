@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/08-recipes.md sha256:a19ddda1c69860b8 -->
+<!-- translation-of: docs/manual/08-recipes.md sha256:9b7b50d424d097d1 -->
 # 8. Receitas
 
 [English](../08-recipes.md) | **Português (Brasil)**
@@ -368,3 +368,115 @@ integrity.trace-sha256-mismatch  docs/events.kg.yaml#E_INVOICE_4512_PAID  → do
 Um nó sozinho reprova como `integrity.orphan-node`: um evento sempre serve a uma pergunta ou a uma decisão, então
 ligue-o. A forma recomendada do `x_event`, e quando ela vira perfil canônico, está no
 [capítulo 3](03-formato.md#registrar-um-evento-externo-forma-recomendada-não-normativa).
+
+## Atender um pedido pequeno de uma pessoa a um agente
+
+Uma pessoa pede um serviço pequeno a um agente: um resumo pessoal a cada dia útil. O pedido está feito quando quem pediu
+o aceita, depois de um teste real. Registre-o com o que o contrato já tem, sem tipo de nó novo e sem perfil novo. Um
+pedido pequeno e novo pede **dois nós**:
+
+- **O pedido**, uma `question` com `owner` (o papel que responde por ele). A narrativa guarda o que foi combinado com a
+  pessoa: quando, o quê e de quais fontes, com o acesso a elas conferido. Faça o commit deste nó **antes** do teste: o
+  com `status: open`; ele passa a `done` no commit que acrescenta o aceite. O histórico do git mostra então que o
+  combinado veio primeiro. O contrato não confere essa ordem hoje.
+- **O aceite**, uma `evidence` com `provenance.method` da classe `testimony`: quem pediu, com um `locator` que aponta a
+  resposta. Ele vem depois de um teste real, nunca antes. O agente não atesta o próprio aceite: `testimony` vem de
+  parte externa, e o agente que fez o trabalho não é uma (veja
+  [quem fez](03-formato.md#quem-fez-a-regra-do-subagente-v423)). Aqui o teste é um resumo real enviado em 2026-11-18,
+  antes da primeira execução agendada.
+
+Mais dois nós aparecem só quando precisam:
+
+- **Quando o pedido se repete**, o próprio serviço é um ritual: uma `rule` com
+  [`x_ritual`](03-formato.md#x_ritual-v425) e uma aresta `TRACES_TO` para o pedido. O contrato julga o
+  `x_ritual` a partir do v4.25; com um contrato anterior, a chave é livre e não é julgada.
+- **Quando algo bloqueia o pedido**, o bloqueio é uma `question` com aresta `CONSTRAINS` para o pedido, e `x_essential`
+  diz se ele é essencial ao mínimo combinado. Um bloqueio que não é essencial não para o serviço: o agente entrega o
+  mínimo combinado, ou pergunta à pessoa, e nunca espera em silêncio. `x_essential` é uma chave `x_` livre: o contrato
+  não a julga.
+
+Um pedido maior acrescenta o que precisa: um critério pré-registrado à parte
+([`x_criterion`](03-formato.md#x_criterion-e-x_measured_under-v412)), um
+[`x_questionnaire`](03-formato.md#x_mirror-x_doc_cycle-e-x_questionnaire) com vários pedidos de evidência, estados de
+domínio, um teste separado do aceite e mais de um aprovador.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: requests
+nodes:
+  - id: Q_REQUEST_DAILY_SUMMARY
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.8
+    owner: assistant-operator
+    label: "The finance lead asked for a personal summary every working day: is it agreed, tested and accepted?"
+    narrative: "Agreed with the finance lead on 2026-11-17, before any test: every working day at 08:00 (America/Sao_Paulo), by direct message; content: overdue invoices, payments received the day before and open approvals; sources: the billing system and the approval queue, read with the lead's own access, checked on 2026-11-17."
+  - id: R_DAILY_SUMMARY_FINANCE
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    owner: assistant-operator
+    label: "Every working day at 08:00 (America/Sao_Paulo), the finance lead gets the personal summary by direct message."
+    reverify_every: P3D
+    x_ritual:
+      purpose: "the finance lead starts the day knowing what is overdue, paid and waiting for approval"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.finance-summary.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=8;BYMINUTE=0;BYSECOND=0"
+        dtstart: "20261119T080000"
+        tz: America/Sao_Paulo
+  - id: Q_BLOCKER_PAYMENTS_CHART
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.5
+    label: "Drawing the payments chart as an image needs a library that is not installed yet."
+    narrative: "Not essential to the agreed minimum: the summary goes as text now, and the chart comes later."
+    x_essential: false
+  - id: E_ACCEPTED_DAILY_SUMMARY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    label: "The finance lead got a real test summary on 2026-11-18 and accepted it as agreed."
+    verified_at: "2026-11-18"
+    verified_against: "the reply of the finance lead to the test summary"
+    provenance:
+      source: "the finance lead, by direct message"
+      locator: "reply of 2026-11-18 09:12 to the test summary, in the direct-message thread"
+      method: "testimony: acceptance by the person who asked, after a real test"
+      locality: pessoa
+edges:
+  - from: R_DAILY_SUMMARY_FINANCE
+    to: Q_REQUEST_DAILY_SUMMARY
+    edge_type: TRACES_TO
+  - from: Q_BLOCKER_PAYMENTS_CHART
+    to: Q_REQUEST_DAILY_SUMMARY
+    edge_type: CONSTRAINS
+  - from: E_ACCEPTED_DAILY_SUMMARY
+    to: Q_REQUEST_DAILY_SUMMARY
+    edge_type: SUPPORTS
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/requests.kg.yaml
+```
+
+```text
+PASSA   docs/requests.kg.yaml
+· 1 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+O contrato confere a forma, as arestas e a proveniência. Ele não confere que o teste foi real, que a resposta veio
+daquela pessoa nem que o agente não esperou por um bloqueio que não era essencial. O grafo guarda esses fatos onde uma
+pessoa os lê, com data. Esta receita é guia, não regra do contrato: os avisos de pedido fechado sem aceite de parte
+externa só virão se o uso mostrar que fazem falta.

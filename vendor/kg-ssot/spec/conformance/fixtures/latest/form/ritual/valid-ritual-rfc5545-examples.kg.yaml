@@ -1,0 +1,1126 @@
+meta:
+  schema_version: "1"
+  id: valid-ritual-rfc5545-examples
+  layer: domain
+nodes:
+  - id: R_RFC_01
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 1 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;INTERVAL=2;BYMONTH=1;BYDAY=SU;BYHOUR=8,9;BYMINUTE=30"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_02
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 2 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_03
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 3 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYMONTH=4;BYDAY=-1SU;UNTIL=19730429T070000Z"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_04
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 4 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU;UNTIL=20061029T060000Z"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_05
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 5 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYMONTH=4;BYDAY=-1SU;UNTIL=19860427T070000Z"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_06
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 6 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYMONTH=4;BYDAY=1SU;UNTIL=20060402T070000Z"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_07
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 7 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYMONTH=3;BYDAY=2SU"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_08
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 8 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYMONTH=11;BYDAY=1SU"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_09
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 9 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_10
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 10 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYDAY=1SU;BYMONTH=4;UNTIL=19980404T070000Z"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_11
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 11 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=4"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_12
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 12 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=DAILY;COUNT=10"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_13
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 13 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=DAILY;UNTIL=19971224T000000Z"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_14
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 14 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=DAILY;INTERVAL=2"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_15
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 15 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=DAILY;INTERVAL=10;COUNT=5"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_16
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 16 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;UNTIL=20000131T140000Z;BYMONTH=1;BYDAY=SU,MO,TU,WE,TH,FR,SA"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_17
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 17 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=DAILY;UNTIL=20000131T140000Z;BYMONTH=1"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_18
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 18 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;COUNT=10"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_19
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 19 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;UNTIL=19971224T000000Z"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_20
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 20 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;INTERVAL=2;WKST=SU"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_21
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 21 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;UNTIL=19971007T000000Z;WKST=SU;BYDAY=TU,TH"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_22
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 22 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;COUNT=10;WKST=SU;BYDAY=TU,TH"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_23
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 23 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;INTERVAL=2;UNTIL=19971224T000000Z;WKST=SU;BYDAY=MO,WE,FR"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_24
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 24 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;INTERVAL=2;COUNT=8;WKST=SU;BYDAY=TU,TH"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_25
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 25 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;COUNT=10;BYDAY=1FR"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_26
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 26 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;UNTIL=19971224T000000Z;BYDAY=1FR"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_27
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 27 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;INTERVAL=2;COUNT=10;BYDAY=1SU,-1SU"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_28
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 28 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;COUNT=6;BYDAY=-2MO"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_29
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 29 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;BYMONTHDAY=-3"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_30
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 30 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;COUNT=10;BYMONTHDAY=2,15"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_31
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 31 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;COUNT=10;BYMONTHDAY=1,-1"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_32
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 32 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;INTERVAL=18;COUNT=10;BYMONTHDAY=10,11,12,13,14,15"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_33
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 33 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;INTERVAL=2;BYDAY=TU"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_34
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 34 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;COUNT=10;BYMONTH=6,7"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_35
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 35 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;INTERVAL=2;COUNT=10;BYMONTH=1,2,3"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_36
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 36 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;INTERVAL=3;COUNT=10;BYYEARDAY=1,100,200"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_37
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 37 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYDAY=20MO"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_38
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 38 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYWEEKNO=20;BYDAY=MO"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_39
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 39 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYMONTH=3;BYDAY=TH"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_40
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 40 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;BYDAY=TH;BYMONTH=6,7,8"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_41
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 41 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_42
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 42 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;BYDAY=SA;BYMONTHDAY=7,8,9,10,11,12,13"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_43
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 43 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;INTERVAL=4;BYMONTH=11;BYDAY=TU;BYMONTHDAY=2,3,4,5,6,7,8"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_44
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 44 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,TH;BYSETPOS=3"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_45
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 45 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-2"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_46
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 46 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=HOURLY;INTERVAL=3;UNTIL=19970902T210000Z"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_47
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 47 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MINUTELY;INTERVAL=15;COUNT=6"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_48
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 48 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MINUTELY;INTERVAL=90;COUNT=4"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_49
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 49 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=DAILY;BYHOUR=9,10,11,12,13,14,15,16;BYMINUTE=0,20,40"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_50
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 50 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MINUTELY;INTERVAL=20;BYHOUR=9,10,11,12,13,14,15,16"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_51
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 51 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=MO"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_52
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 52 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=SU"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: R_RFC_53
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O exemplo 53 da RFC 5545, que tem de passar na forma."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=MONTHLY;BYMONTHDAY=15,30;COUNT=5"
+        dtstart: "19970902T090000"
+        tz: "America/New_York"
+  - id: A_RUNNER
+    node_type: artifact
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "O executor sintético dos rituais, que emite um CloudEvents por execução."
+edges:
+  - from: R_RFC_01
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_02
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_03
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_04
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_05
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_06
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_07
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_08
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_09
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_10
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_11
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_12
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_13
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_14
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_15
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_16
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_17
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_18
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_19
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_20
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_21
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_22
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_23
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_24
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_25
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_26
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_27
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_28
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_29
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_30
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_31
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_32
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_33
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_34
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_35
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_36
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_37
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_38
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_39
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_40
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_41
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_42
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_43
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_44
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_45
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_46
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_47
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_48
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_49
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_50
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_51
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_52
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_RFC_53
+    to: A_RUNNER
+    edge_type: TRACES_TO

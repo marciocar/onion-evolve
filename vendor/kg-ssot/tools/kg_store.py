@@ -4,6 +4,8 @@
 Biblioteca primeiro, CLI por cima. Três armazéns com a mesma interface (read, list, write, delete, history):
   DiskStore(root)       a cabeça em disco, sem histórico;
   GitStore(root)        um commit por gravação ou remoção, com o git isolado na raiz (nunca sobe para um repo pai);
+                        com serve=ServeRef(ref, signers), só de leitura: a árvore do commit de uma ref (branch que o
+                        HEAD contém, ou tag SSH assinada), nunca a árvore de trabalho, relida quando a ref muda;
   VersionedStore(root)  a cabeça em disco mais um registro de eventos e as versões em `.kg-store/`, sem git.
 
 O gate (o que nenhum dos três pula):
@@ -61,6 +63,7 @@ CLI (saída JSON no stdout):
 rc: 0 ok · 1 recusado (gate, conflict, missing, nome inexistente) · 2 entrada quebrada ou not_judged.
 """
 import argparse
+import contextlib
 import datetime
 import hashlib
 import json
@@ -69,6 +72,7 @@ import pathlib
 import re
 import secrets
 import shlex
+import shutil
 import stat
 import subprocess
 import sys
@@ -1093,22 +1097,403 @@ class DiskStore:
         return None
 
 
+# o nome de uma ref servida, depois de refs/heads/ ou refs/tags/: segmentos de letra, dígito, ponto, traço e _, sem
+# começar por ponto ou traço (o git recusaria, e o traço viraria opção), sem .. e sem terminar em .lock ou ponto
+REF_SEGMENT = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*")
+# a versão semântica (semver.org 2.0.0) que o * de um padrão de tag tem de casar; ASCII: o \d não casa outro dígito
+SEMVER = re.compile(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+                    r"(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?"
+                    r"(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?", re.ASCII)
+SIGNERS_MAX_BYTES = 1 << 20  # o allowed_signers é escrito pelo operador: 1 MiB sobra para milhares de chaves
+SSH_SIGNATURE = b"-----BEGIN SSH SIGNATURE-----"
+SERVE_TIMEOUT = 30  # segundos de cada git (e do ssh-keygen que ele chama) no modo servido
+# a config que o modo servido fixa na linha de comando, que vence a do repo (.git/config, e o que ela inclui): o
+# programa que verifica é o ssh-keygen achado na partida (ServeRef.ssh_keygen), GPG e X.509 nunca rodam, nenhum
+# protocolo de transporte vale (nada se busca) e nada da config local executa código
+SERVED_CONFIG = ("gpg.format=ssh", "gpg.program=" + os.devnull,
+                 "gpg.openpgp.program=" + os.devnull, "gpg.x509.program=" + os.devnull, "gpg.minTrustLevel=fully",
+                 "gpg.ssh.revocationFile=" + os.devnull, "log.showSignature=false", "core.pager=cat",
+                 "diff.external=", "core.sshCommand=" + os.devnull, "core.alternateRefsCommand=",
+                 "core.hooksPath=" + os.devnull, "core.fsmonitor=false", "protocol.allow=never",
+                 # cada protocolo pelo nome: protocol.<nome>.allow é mais específica e venceria o protocol.allow
+                 "protocol.ext.allow=never", "protocol.fd.allow=never", "protocol.file.allow=never",
+                 "protocol.git.allow=never", "protocol.http.allow=never", "protocol.https.allow=never",
+                 "protocol.ftp.allow=never", "protocol.ftps.allow=never", "protocol.ssh.allow=never",
+                 "protocol.git+ssh.allow=never", "protocol.ssh+git.allow=never", "protocol.rsync.allow=never",
+                 "credential.helper=", "core.gitProxy=", "core.askPass=")
+# o ambiente que desliga o lazy fetch do clone parcial (git 2.45.1, e as correções 2.39.4, 2.40.2, 2.41.1, 2.42.2,
+# 2.43.4 e 2.44.1); a partida prova que o git em uso o respeita (no_lazy_fetch_honored)
+NO_LAZY_ENV = {"GIT_NO_LAZY_FETCH": "1"}
+GIT_MIN_LAZY = "2.45.1 (or 2.39.4, 2.40.2, 2.41.1, 2.42.2, 2.43.4, 2.44.1)"
+_LAZY_PROBE = {}
+
+
+def no_lazy_fetch_honored(git_bin):
+    """(respeita, versão): o git desliga o lazy fetch com NO_LAZY_ENV? A prova, uma vez por processo e por git: um repo
+    temporário com um remoto promisor cujo uploadpack deixaria um marcador, e um objeto que falta. Se o git não respeita
+    a variável, o comando que roda é o desta prova, inofensivo, numa pasta temporária."""
+    if git_bin in _LAZY_PROBE:
+        return _LAZY_PROBE[git_bin]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    env.update({"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "XDG_CONFIG_HOME": "",
+                "GIT_TERMINAL_PROMPT": "0"})
+    version = "?"
+    try:
+        out = subprocess.run([git_bin, "--version"], capture_output=True, env=env, timeout=SERVE_TIMEOUT)
+        version = out.stdout.decode("utf-8", "replace").strip().removeprefix("git version ") or "?"
+        with tempfile.TemporaryDirectory(prefix="kg-lazy-probe-") as tmp:
+            repo, marker = os.path.join(tmp, "r"), os.path.join(tmp, "fetched")
+            subprocess.run([git_bin, "init", "-q", repo], capture_output=True, env=env, timeout=SERVE_TIMEOUT,
+                           check=True)
+            for key, value in (("core.repositoryformatversion", "1"), ("extensions.partialClone", "probe"),
+                               ("remote.probe.promisor", "true"), ("remote.probe.url", os.path.join(tmp, "nowhere")),
+                               ("remote.probe.uploadpack", f"touch '{marker}'; false")):
+                subprocess.run([git_bin, "-C", repo, "config", key, value], capture_output=True, env=env,
+                               timeout=SERVE_TIMEOUT, check=True)
+            subprocess.run([git_bin, "-C", repo, "rev-parse", "-q", "--verify", "12" * 20 + "^{commit}"],
+                           capture_output=True, env=dict(env, **NO_LAZY_ENV), timeout=SERVE_TIMEOUT)
+            ok = not os.path.exists(marker)
+    except (OSError, subprocess.SubprocessError):
+        ok = False
+    _LAZY_PROBE[git_bin] = (ok, version)
+    return ok, version
+
+
+def trusted_which(name):
+    """O caminho absoluto de um programa, achado só nas pastas ABSOLUTAS do PATH (nunca o diretório atual nem uma entrada
+    relativa, que seria a pasta do clone quando o git roda nela), ou None."""
+    dirs = [d for d in os.environ.get("PATH", "").split(os.pathsep) if d and os.path.isabs(d)]
+    found = shutil.which(name, path=os.pathsep.join(dirs)) if dirs else None
+    return os.path.abspath(found) if found else None
+
+
+def _loose_writable(st):
+    """O modo deixa o grupo ou os outros gravarem (g+w ou o+w)? No Windows, o modo não diz isso: nunca."""
+    return os.name != "nt" and bool(st.st_mode & (stat.S_IWGRP | stat.S_IWOTH))
+
+
+class TransientError(StoreError):
+    """A falha de execução (o git não rodou, morreu por sinal, passou do tempo, o estado não se leu ou gravou): fecha a
+    resposta, mas não carimba a ref, e a próxima requisição tenta de novo."""
+
+
+def semver_key(version):
+    """A chave de ordem da precedência do semver 2.0.0: a versão sem pré-lançamento vence a com, os identificadores
+    numéricos se comparam como números e vêm antes dos alfanuméricos, e o build (+...) não conta."""
+    m = SEMVER.fullmatch(version)
+    pre = m.group(4)
+    ids = () if pre is None else tuple((0, int(x), "") if x.isdigit() else (1, 0, x) for x in pre.split("."))
+    return (int(m.group(1)), int(m.group(2)), int(m.group(3)), pre is None, ids)
+
+
+def check_signers(path):
+    """O caminho absoluto de um allowed_signers do git (o formato de gpg.ssh.allowedSignersFile), conferido: legível,
+    até SIGNERS_MAX_BYTES, em UTF-8 (o UTF-16 ganha a dica de salvar em UTF-8) e com ao menos uma linha de
+    signatário. StoreError com o motivo, sem o conteúdo do arquivo."""
+    path = os.path.abspath(path)
+    try:
+        with open(path, "rb") as fh:
+            data = fh.read(SIGNERS_MAX_BYTES + 1)
+    except OSError as exc:
+        raise StoreError(_("the signers file {path} cannot be read ({error})").format(
+            path=path, error=exc.strerror or type(exc).__name__)) from None
+    if len(data) > SIGNERS_MAX_BYTES:
+        raise StoreError(_("the signers file {path} is larger than {limit} bytes").format(
+            path=path, limit=SIGNERS_MAX_BYTES))
+    if data.startswith((b"\xff\xfe", b"\xfe\xff")):
+        raise StoreError(_("the signers file {path} is UTF-16: save it as UTF-8").format(path=path))
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        raise StoreError(_("the signers file {path} is not UTF-8").format(path=path)) from None
+    if text.startswith("﻿"):  # o ssh-keygen lê o arquivo como está: o BOM estragaria a primeira linha
+        raise StoreError(_("the signers file {path} starts with a BOM: save it as UTF-8 without BOM").format(path=path))
+    if not any(line.strip() and not line.lstrip().startswith("#") for line in text.splitlines()):
+        raise StoreError(_("the signers file {path} has no signer line").format(path=path))
+    return path
+
+
+def _last_signature_is_ssh(body, kind):
+    """A assinatura que o git verifica é SSH? Na tag, o bloco que começa na ÚLTIMA linha -----BEGIN (é a que o git toma
+    como assinatura; um marcador SSH na mensagem não conta). No commit, todo cabeçalho gpgsig começa pelo bloco SSH."""
+    if kind == "tag":
+        starts = [line for line in body.split(b"\n") if line.startswith(b"-----BEGIN ")]
+        return bool(starts) and starts[-1].rstrip(b"\r") == SSH_SIGNATURE
+    header = body.split(b"\n\n", 1)[0].split(b"\n")
+    sigs = [line.split(b" ", 1)[1] if b" " in line else b"" for line in header
+            if line.startswith((b"gpgsig ", b"gpgsig-sha256 "))]
+    return bool(sigs) and all(sig.rstrip(b"\r") == SSH_SIGNATURE for sig in sigs)
+
+
+class ServeRef:
+    """A ref que um GitStore serve (kg_mcp --serve-ref), já conferida na forma; resolve() a resolve num repo.
+
+    - refs/heads/X, ou X: a árvore do commit da ponta da branch, e só enquanto o HEAD do clone descende dela (git
+      merge-base --is-ancestor); com signers, o commit da ponta tem de ter assinatura SSH válida (git verify-commit);
+    - refs/tags/N: a árvore exata de N^{commit}, só com signers e uma tag anotada com assinatura SSH válida (git
+      verify-tag), cujo cabeçalho tag é o próprio N (a tag assinada de outra versão, copiada para este nome, não passa);
+    - refs/tags/P*S: um * só, que casa uma versão semver sem pré-lançamento; vale a maior pela precedência do semver, e
+      a tag fora de semver não conta. Só com state (um diretório fora do clone): a maior versão já servida fica gravada
+      lá (o piso), e uma versão abaixo dela fecha a leitura, também depois de reiniciar (apagar a tag mais alta no
+      remoto, e buscar com prune, faria servir a anterior). A maior que não verifica fecha: nunca se cai para outra.
+    A GPG fica fora desta versão: a assinatura que não é SSH é recusada antes de o git a verificar."""
+
+    def __init__(self, ref, signers=None, state=None):
+        ref = str(ref)
+        self.ref, self.signers = ref, None if signers is None else check_signers(signers)
+        if ref.startswith("refs/tags/"):
+            self.name = ref[len("refs/tags/"):]
+            self.kind = "pattern" if "*" in self.name else "tag"
+        elif ref.startswith("refs/heads/") or not ref.startswith("refs/"):
+            self.name, self.kind = ref.removeprefix("refs/heads/"), "branch"
+        else:
+            raise StoreError(_("the served ref is refs/heads/<name>, <name> or refs/tags/<name or pattern>, not "
+                               "{ref!r}").format(ref=ref))
+        if self.kind == "pattern" and self.name.count("*") != 1:
+            raise StoreError(_("the tag pattern {ref!r} has one * only, where the semver version goes").format(ref=ref))
+        if self.kind == "branch" and "*" in self.name:
+            raise StoreError(_("a branch is served by its exact name, without *: {ref!r}").format(ref=ref))
+        segs = self.name.replace("*", "0").split("/")
+        if not all(REF_SEGMENT.fullmatch(x) and not x.endswith((".lock", ".")) for x in segs) or ".." in self.name:
+            raise StoreError(_("invalid ref name: {ref!r}").format(ref=ref))
+        if self.kind != "branch" and self.signers is None:
+            raise StoreError(_("a tag is served only with --verify-signers: without it nothing proves who cut it"))
+        if self.kind == "pattern" and state is None:
+            raise StoreError(_("a tag pattern is served only with --serve-state: without the highest version already "
+                               "served, removing a tag would serve an earlier one"))
+        if state is not None and self.kind != "pattern":
+            raise StoreError(_("--serve-state only applies with a tag pattern"))
+        if state is not None and not os.path.isdir(state):
+            raise StoreError(_("the serve state {path} is not a directory").format(path=state))
+        if state is not None and _loose_writable(os.stat(state)):
+            raise StoreError(_("the serve state {path} is writable by the group or by others: chmod go-w").format(
+                path=state))
+        self.state = None if state is None else os.path.abspath(state)
+        # o git e o ssh-keygen por caminho absoluto, achados agora fora da pasta do clone, e fixos daqui em diante
+        self.git_bin = trusted_which("git")
+        if self.git_bin is None:
+            raise StoreError(_("git was not found in the absolute folders of PATH"))
+        honored, version = no_lazy_fetch_honored(self.git_bin)
+        if not honored:
+            raise StoreError(_("git {version} does not honor GIT_NO_LAZY_FETCH, and a partial clone could run a "
+                               "command of its configuration: the served mode needs git {minimum}").format(
+                version=version, minimum=GIT_MIN_LAZY))
+        self.ssh_keygen = None
+        if self.signers is not None:
+            self.ssh_keygen = trusted_which("ssh-keygen")
+            if self.ssh_keygen is None:
+                raise StoreError(_("ssh-keygen was not found in the absolute folders of PATH: --verify-signers needs it"))
+
+    def _signature_args(self):
+        return ["-c", f"gpg.ssh.allowedSignersFile={self.signers}", "-c", f"gpg.ssh.program={self.ssh_keygen}"]
+
+    def _verify(self, store, kind, sha, label):
+        """A assinatura SSH do objeto (tag ou commit) contra o allowed_signers; StoreError quando falta ou não vale."""
+        check_signers(self.signers)  # o arquivo que sumiu ou quebrou fecha, com o motivo
+        body = store._git("cat-file", kind, sha, check=False).stdout
+        if not _last_signature_is_ssh(body, kind):
+            raise StoreError(_("{ref} has no SSH signature (GPG is out of this version)").format(ref=label))
+        out = store._git(*self._signature_args(), f"verify-{kind}", sha, check=False)
+        if out.returncode != 0:
+            why = out.stderr.decode("utf-8", "replace").strip().splitlines()
+            raise StoreError(_("the signature of {ref} does not verify against the signers file ({error})").format(
+                ref=label, error=why[-1] if why else out.returncode))
+        return body
+
+    def _tags(self, store):
+        """[(nome curto, sha do objeto)] das tags do repo."""
+        out = store._git("for-each-ref", "--format=%(refname)%00%(objectname)", "refs/tags/", check=False)
+        pairs = []
+        for line in out.stdout.decode("utf-8", "replace").splitlines():
+            refname, _sep, sha = line.partition("\0")
+            pairs.append((refname[len("refs/tags/"):], sha))
+        return pairs
+
+    def _pick(self, store):
+        """A tag de maior versão semver (sem pré-lançamento) que o padrão casa, ou StoreError (nenhuma casa, ou duas
+        empatam). Devolve (nome, sha, versão)."""
+        prefix, suffix = self.name.split("*")
+        found = []
+        for name, sha in self._tags(store):
+            if name.startswith(prefix) and name.endswith(suffix) and len(name) >= len(prefix) + len(suffix):
+                version = name[len(prefix):len(name) - len(suffix)]
+                m = SEMVER.fullmatch(version)
+                if m and m.group(4) is None:  # o pré-lançamento não conta (fora desta versão)
+                    found.append((semver_key(version), name, sha, version))
+        if not found:
+            raise StoreError(_("no semver tag matches {ref}").format(ref=self.ref))
+        found.sort(reverse=True)
+        if len(found) > 1 and found[0][0] == found[1][0]:
+            raise StoreError(_("the tags {a} and {b} have the same version: the pattern {ref} does not choose").format(
+                a=found[1][1], b=found[0][1], ref=self.ref))
+        return found[0][1], found[0][2], found[0][3]
+
+    # --- o piso de versão (o padrão): a maior versão já servida, num arquivo fora do clone ----------------------
+    def state_path(self, store):
+        key = hashlib.sha256(f"{store.root}\0{self.ref}".encode("utf-8", "surrogateescape")).hexdigest()[:16]
+        return os.path.join(self.state, f"serve-floor-{key}.json")
+
+    def floor(self, store):
+        """O piso gravado ({version, tag, sha}) desta raiz com este padrão, ou None. O arquivo que não se lê é passageiro
+        (tenta de novo); o que se lê fora da forma, ou que o grupo e os outros podem gravar, fecha, com o motivo."""
+        path = self.state_path(store)
+        try:
+            with open(path, "rb") as fh:
+                if _loose_writable(os.fstat(fh.fileno())):
+                    raise StoreError(_("the serve state {path} is writable by the group or by others: chmod go-w")
+                                     .format(path=path))
+                data = fh.read(65536)
+        except FileNotFoundError:
+            return None
+        except OSError as exc:
+            raise TransientError(_("the serve state {path} cannot be read ({error})").format(
+                path=path, error=exc.strerror or type(exc).__name__)) from None
+        try:
+            doc = json.loads(data.decode("utf-8"))
+            ok = (isinstance(doc, dict) and doc.get("schema_version") == 1 and doc.get("ref") == self.ref
+                  and isinstance(doc.get("version"), str) and SEMVER.fullmatch(doc["version"])
+                  and isinstance(doc.get("tag"), str) and isinstance(doc.get("sha"), str)
+                  and re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", doc["sha"]))
+        except (UnicodeDecodeError, ValueError):
+            ok = False
+        if not ok:
+            raise StoreError(_("the serve state {path} is not valid: fix it or remove it to start a new floor").format(
+                path=path))
+        return doc
+
+    def _check_floor(self, name, sha, version, floor):
+        """StoreError quando a versão está abaixo do piso, ou na mesma precedência dele com outra tag ou outro objeto."""
+        if floor is None:
+            return
+        key, top = semver_key(version), semver_key(floor["version"])
+        if key < top:
+            raise StoreError(_("the highest tag {tag} is below the version already served, {floor}: a higher tag "
+                               "was removed (a rollback is never served)").format(tag="refs/tags/" + name,
+                                                                                  floor=floor["version"]))
+        if key == top and (floor["tag"], floor["sha"]) != (name, sha):
+            raise StoreError(_("the tag {tag} has the version already served, {floor}, but not the tag object that was "
+                               "served ({served}): a tag was moved or cut again").format(
+                tag="refs/tags/" + name, floor=floor["version"], served=floor["tag"]))
+
+    @contextlib.contextmanager
+    def _state_lock(self):
+        """A trava do diretório de estado entre processos (flock no POSIX, msvcrt no Windows)."""
+        try:
+            fd = os.open(os.path.join(self.state, ".serve-floor.lock"), os.O_RDWR | os.O_CREAT, 0o600)
+        except OSError as exc:
+            raise TransientError(_("the serve state {path} cannot be written ({error})").format(
+                path=self.state, error=exc.strerror or type(exc).__name__)) from None
+        try:
+            try:
+                if fcntl is not None:
+                    fcntl.flock(fd, fcntl.LOCK_EX)
+                elif msvcrt is not None:  # no Windows, LK_LOCK desiste depois de 10 tentativas com OSError
+                    msvcrt.locking(fd, msvcrt.LK_LOCK, 1)
+            except OSError as exc:
+                raise TransientError(_("the serve state {path} cannot be locked ({error})").format(
+                    path=self.state, error=exc.strerror or type(exc).__name__)) from None
+            yield
+        finally:
+            os.close(fd)
+
+    def record(self, store, name, sha, version):
+        """Grava a versão servida como o piso, sob a trava do diretório e relendo o arquivo antes: fica o máximo entre o
+        que está lá e a versão nova. A versão abaixo do que outro processo gravou, ou a mesma com outra tag, é recusada.
+        A gravação é atômica (arquivo temporário e replace)."""
+        path = self.state_path(store)
+        with self._state_lock():
+            current = self.floor(store)
+            self._check_floor(name, sha, version, current)
+            if current is not None and semver_key(version) == semver_key(current["version"]):
+                return  # o mesmo piso, a mesma tag: nada a gravar
+            doc = {"schema_version": 1, "ref": self.ref, "root": str(store.root), "tag": name, "sha": sha,
+                   "version": version}
+            try:
+                fd, tmp = tempfile.mkstemp(dir=self.state, prefix=".serve-floor-")
+                try:
+                    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                        json.dump(doc, fh)
+                        fh.flush()
+                        os.fsync(fh.fileno())
+                    os.replace(tmp, path)
+                except BaseException:
+                    with contextlib.suppress(OSError):
+                        os.unlink(tmp)
+                    raise
+            except OSError as exc:
+                raise TransientError(_("the serve state {path} cannot be written ({error})").format(
+                    path=path, error=exc.strerror or type(exc).__name__)) from None
+
+    def resolve(self, store):
+        """O sha do commit cuja árvore se serve, ou StoreError com o motivo (que fecha a leitura ou impede a partida)."""
+        store._check_served_shape()
+        if self.kind == "branch":
+            full = "refs/heads/" + self.name
+            found = store._git("rev-parse", "-q", "--verify", f"{full}^{{commit}}", check=False)
+            if found.returncode != 0:
+                raise StoreError(_("the branch {ref} does not exist").format(ref=full))
+            commit = found.stdout.decode().strip()
+            head = store._git("rev-parse", "-q", "--verify", "HEAD^{commit}", check=False)
+            if head.returncode != 0 or store._git("merge-base", "--is-ancestor", commit, head.stdout.decode().strip(),
+                                                  check=False).returncode != 0:
+                raise StoreError(_("the HEAD of the clone does not descend from {ref}").format(ref=full))
+            if self.signers is not None:
+                self._verify(store, "commit", commit, full)
+            return commit
+        version = None
+        if self.kind == "pattern":
+            name, sha, version = self._pick(store)
+            self._check_floor(name, sha, version, self.floor(store))  # cedo, antes de verificar a assinatura
+        else:
+            name = self.name
+            sha = dict(self._tags(store)).get(name)
+            if sha is None:
+                raise StoreError(_("the tag {ref} does not exist").format(ref=self.ref))
+        full = "refs/tags/" + name
+        kind = store._git("cat-file", "-t", sha, check=False).stdout.decode().strip()
+        if kind != "tag":
+            raise StoreError(_("{ref} is a lightweight tag: only an annotated, signed tag is served").format(ref=full))
+        body = self._verify(store, "tag", sha, full)
+        header = body.split(b"\n\n", 1)[0].split(b"\n")
+        if b"tag " + name.encode("utf-8") not in header:
+            raise StoreError(_("the tag object of {ref} was cut under another name").format(ref=full))
+        found = store._git("rev-parse", "-q", "--verify", f"{sha}^{{commit}}", check=False)
+        if found.returncode != 0:
+            raise StoreError(_("{ref} does not point to a commit").format(ref=full))
+        if version is not None:
+            self.record(store, name, sha, version)
+        return found.stdout.decode().strip()
+
+
 class GitStore(DiskStore):
     """Um commit por gravação ou remoção. O git roda com GIT_DIR e GIT_WORK_TREE na raiz e GIT_CEILING_DIRECTORIES no
     pai dela: nunca sobe para um repo de fora. author vai no --author; o committer é fixo do serviço (committer=)."""
     backend = "git"
 
-    def __init__(self, root, schema=None, init=False, committer=("kg-store", "kg-store@localhost"), gate=None):
+    def __init__(self, root, schema=None, init=False, committer=("kg-store", "kg-store@localhost"), gate=None,
+                 serve=None):
         super().__init__(root, schema, init, gate)
         self.committer = committer
+        # serve (ServeRef): o armazém serve só o conteúdo de uma ref, só de leitura; None é a árvore de trabalho
+        self.serve = serve
         git = self.root / ".git"
         if not os.path.lexists(git):
-            if not init:
+            if not init or serve is not None:
                 raise StoreError(_("{root} has no .git (use init=True to create it)").format(root=self.root))
             self._git("init", "-q", setup=True)
         st = os.lstat(git)
         if _is_link(st) or not stat.S_ISDIR(st.st_mode):
             raise StoreError(_("{path} must be a directory, not a symlink or a gitfile").format(path=git))
+        if serve is not None:
+            # nada se escreve no clone servido (nem o .git/info/exclude): o serviço pode lê-lo sem permissão de escrita.
+            # A ref é conferida já na partida, e a falha aqui é a recusa de subir
+            # _serve_lock guarda só o estado (curto); _resolve_lock deixa um resolve por vez, com cada git sob tempo
+            self._serve_lock, self._resolve_lock = threading.Lock(), threading.Lock()
+            self._local = threading.local()  # o retrato fixado numa operação (pinned), por thread
+            self._snap, self._blobs, self._closed_reason = None, {}, None
+            self._serve_stamp = self._ref_stamp()
+            self._snap = self._snapshot(serve.resolve(self))
+            return
         exclude = git / "info" / "exclude"  # a trava do armazém não é conteúdo: fica fora do status
         try:
             for p in (git / "info", exclude):
@@ -1125,12 +1510,17 @@ class GitStore(DiskStore):
     def _check_root(self, path):
         """O GitStore é o armazém que mora num repo: o próprio, na raiz (o __init__ confere o .git)."""
 
-    def _git(self, *args, setup=False, check=True):
+    def _git(self, *args, setup=False, check=True, input=None):
         env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
         env.update({"GIT_CEILING_DIRECTORIES": str(self.root.parent), "GIT_CONFIG_NOSYSTEM": "1",
                     "GIT_CONFIG_GLOBAL": os.devnull, "XDG_CONFIG_HOME": "", "GIT_TERMINAL_PROMPT": "0"})
         if not setup:
             env.update({"GIT_DIR": str(self.root / ".git"), "GIT_WORK_TREE": str(self.root)})
+        served = getattr(self, "serve", None) is not None
+        if served:  # o objeto substituído (git replace) e o enxerto não trocam o conteúdo depois da verificação
+            # e o clone parcial não busca o objeto que falta (o lazy fetch rodaria o uploadpack da config do clone)
+            env.update({"GIT_NO_REPLACE_OBJECTS": "1", "GIT_GRAFT_FILE": os.devnull, "GIT_OPTIONAL_LOCKS": "0",
+                        "GIT_PROTOCOL_FROM_USER": "0", **NO_LAZY_ENV})
         name, email = self.committer
         env.update({"GIT_COMMITTER_NAME": name, "GIT_COMMITTER_EMAIL": email,
                     "GIT_AUTHOR_NAME": name, "GIT_AUTHOR_EMAIL": email})
@@ -1139,8 +1529,12 @@ class GitStore(DiskStore):
                    "core.safecrlf=false", "core.excludesFile=" + os.devnull, "core.attributesFile=" + os.devnull,
                    "core.fsmonitor=false", "core.symlinks=false"):
             hardening += ["-c", kv]
+        if served:
+            for kv in SERVED_CONFIG:
+                hardening += ["-c", kv]
+            return self._served_git([self.serve.git_bin, "--no-pager", *hardening, *args], env, check, input)
         try:
-            out = subprocess.run(["git", *hardening, *args], cwd=self.root, env=env, capture_output=True)
+            out = subprocess.run(["git", *hardening, *args], cwd=self.root, env=env, capture_output=True, input=input)
         except (OSError, ValueError) as exc:
             raise StoreError(_("git {cmd} did not run: {error}").format(cmd=args[0], error=exc)) from exc
         if check and out.returncode != 0:
@@ -1148,8 +1542,300 @@ class GitStore(DiskStore):
                                                                   error=out.stderr.decode('utf-8', 'replace').strip()))
         return out
 
+    def _served_git(self, argv, env, check, input):
+        """O git do modo servido: sob SERVE_TIMEOUT, num grupo de processos próprio (o ssh-keygen que ele chama morre
+        junto). Não rodar, morrer por sinal ou passar do tempo é TransientError: nada disso diz algo sobre a ref."""
+        cmd = next(a for a in argv[1:] if not a.startswith("-") and "=" not in a)
+        group = ({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt"
+                 else {"start_new_session": True})
+        try:
+            p = subprocess.Popen(argv, cwd=self.root, env=env, stdin=subprocess.PIPE if input is not None else
+                                 subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **group)
+        except (OSError, ValueError) as exc:
+            raise TransientError(_("git {cmd} did not run: {error}").format(cmd=cmd, error=exc)) from exc
+        try:
+            stdout, stderr = p.communicate(input, timeout=SERVE_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            CommandGate._kill(p)
+            try:  # o que sobrou nos canos, sob tempo também: um neto que segure o cano não trava o servidor
+                p.communicate(timeout=SERVE_TIMEOUT)
+            except (subprocess.TimeoutExpired, OSError, ValueError):
+                pass
+            finally:
+                for pipe in (p.stdin, p.stdout, p.stderr):
+                    if pipe is not None:
+                        with contextlib.suppress(OSError):
+                            pipe.close()
+            raise TransientError(_("git {cmd} did not finish within {seconds} s").format(cmd=cmd,
+                                                                                        seconds=SERVE_TIMEOUT)) from None
+        if p.returncode < 0:
+            raise TransientError(_("git {cmd} was killed by signal {signal}").format(cmd=cmd, signal=-p.returncode))
+        out = subprocess.CompletedProcess(argv, p.returncode, stdout, stderr)
+        if check and out.returncode != 0:
+            raise StoreError(_("git {cmd} failed: {error}").format(cmd=cmd, error=stderr.decode("utf-8", "replace").strip()))
+        return out
+
+    # --- a ref servida (serve): a árvore do commit da ref, nunca a árvore de trabalho --------------------------
+    def _check_served_shape(self):
+        """O repo que se serve não tem enxerto (.git/info/grafts), clone raso (.git/shallow) nem objetos emprestados de
+        fora dele (objects/info/alternates): os três trocam o histórico ou o conteúdo por fora da ref assinada."""
+        git = self.root / ".git"
+        if os.path.lexists(git / "commondir"):
+            raise StoreError(_("the clone has .git/commondir (a linked worktree): its objects and refs live elsewhere"))
+        for rel in ("HEAD", "config", "packed-refs", "objects", "refs"):
+            if os.path.islink(git / rel):
+                raise StoreError(_("the clone has a symbolic link in .git ({path}): it is refused").format(path=rel))
+        for sub in ("objects", "refs"):
+            for dirpath, dirnames, filenames in os.walk(git / sub):
+                for entry in dirnames + filenames:
+                    if os.path.islink(os.path.join(dirpath, entry)):
+                        rel = os.path.relpath(os.path.join(dirpath, entry), git)
+                        raise StoreError(_("the clone has a symbolic link in .git ({path}): it is refused").format(
+                            path=rel))
+        self._check_promisor()
+        if os.path.lexists(git / "info" / "grafts"):
+            raise StoreError(_("the clone has .git/info/grafts, which rewrites the history outside the signed ref: "
+                               "remove it"))
+        if os.path.lexists(git / "shallow"):
+            raise StoreError(_("the clone is shallow (.git/shallow): the history up to the ref is incomplete, and "
+                               "descent and history are not checked; clone it in full"))
+        alternates = git / "objects" / "info" / "alternates"
+        try:
+            lines = alternates.read_text(encoding="utf-8", errors="replace").splitlines()
+        except FileNotFoundError:
+            lines = []
+        except OSError as exc:
+            raise TransientError(_("{path} cannot be read ({error})").format(path=alternates,
+                                                                             error=exc.strerror or exc)) from None
+        base = os.path.realpath(git)
+        for line in lines:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            real = os.path.realpath(os.path.join(git / "objects", line))
+            if real != base and not real.startswith(base + os.sep):
+                raise StoreError(_("the clone borrows objects from outside it (objects/info/alternates): "
+                                   "clone it without --shared or --reference"))
+
+    def _check_promisor(self):
+        """O clone parcial (extensions.partialClone, ou um remote.*.promisor) é recusado. A consulta é a config que o git
+        do modo servido lê (o .git/config, o config.worktree e o que include.path e includeIf incluem), e ela roda a
+        cada requisição, não só quando o carimbo muda: um include trocado não muda o carimbo."""
+        promisor = self._git("config", "--get-regexp", r"^(extensions\.partialclone|remote\..*\.promisor)$",
+                             check=False)
+        if promisor.returncode == 0 and promisor.stdout.strip():
+            raise StoreError(_("the clone is a partial clone (extensions.partialClone or a promisor remote): a missing "
+                               "object would be fetched by a command of its config; clone it in full"))
+
+    def _ref_stamp(self):
+        """O carimbo do que decide a ref: HEAD (o conteúdo também), packed-refs, a tabela do reftable, cada ref solta de
+        refs/heads e refs/tags e o arquivo de signatários. Só stat e uma leitura curta: nenhum git roda quando nada
+        mudou."""
+        git = self.root / ".git"
+        out = []
+        for rel in ("HEAD", "packed-refs", "reftable/tables.list", "config", "info/grafts", "shallow",
+                    "objects/info/alternates", "commondir", "config.worktree"):
+            try:
+                st = os.stat(git / rel)
+                out.append((rel, st.st_mtime_ns, st.st_size, st.st_ino))
+            except OSError:
+                out.append((rel, None))
+        try:
+            out.append(("HEAD:", (git / "HEAD").read_bytes()[:4096]))
+        except OSError:
+            out.append(("HEAD:", None))
+        for sub in ("refs/heads", "refs/tags", "refs/replace"):
+            for dirpath, dirnames, filenames in os.walk(git / sub):
+                dirnames.sort()
+                for f in sorted(filenames):
+                    try:
+                        st = os.stat(os.path.join(dirpath, f))
+                    except OSError:
+                        continue
+                    out.append((os.path.join(dirpath, f), st.st_mtime_ns, st.st_size, st.st_ino))
+        if self.serve.signers is not None:
+            try:
+                st = os.stat(self.serve.signers)
+                out.append(("signers", st.st_mtime_ns, st.st_size, st.st_ino))
+            except OSError:
+                out.append(("signers", None))
+        return tuple(out)
+
+    def _snapshot(self, commit):
+        """(commit, {caminho: sha do blob}) dos arquivos regulares da árvore do commit (sem link nem submódulo)."""
+        out = self._git("ls-tree", "-r", "-z", "--full-tree", commit)
+        blobs = {}
+        for entry in out.stdout.split(b"\0"):
+            if not entry:
+                continue
+            meta, _tab, path = entry.partition(b"\t")
+            mode, kind, sha = meta.decode("ascii").split(" ")
+            if kind == "blob" and mode in ("100644", "100755"):
+                blobs[path.decode("utf-8", "surrogateescape")] = sha
+        return commit, blobs
+
+    _UNPINNED = object()
+
+    def served(self):
+        """O retrato da ref servida ((commit, blobs)) ou None quando a leitura está fechada. Dentro de pinned(), o retrato
+        fixado no começo da operação; fora, o de agora."""
+        pinned = getattr(self._local, "snap", self._UNPINNED)
+        return self._refresh() if pinned is self._UNPINNED else pinned
+
+    @contextlib.contextmanager
+    def pinned(self):
+        """Um retrato só para a operação inteira (uma requisição do kg-mcp, uma consulta): nada mistura duas refs, a
+        ref é conferida uma vez, e fechar no meio fecha a resposta inteira. Reentrante; sem a ref servida, não faz nada."""
+        if self.serve is None or getattr(self._local, "snap", self._UNPINNED) is not self._UNPINNED:
+            yield
+            return
+        self._local.snap = self._refresh()
+        try:
+            yield
+        finally:
+            del self._local.snap
+
+    def _refresh(self):
+        """A ref é relida quando o carimbo muda; se ela não verifica mais, a leitura fecha (como a política inválida no
+        kg-mcp) e reabre quando voltar a verificar. O motivo sai uma vez no stderr, que é do operador. A falha de
+        execução (TransientError) fecha sem carimbar: a próxima chamada tenta de novo. A recusa do clone parcial roda a
+        cada chamada (um include trocado não muda o carimbo) e fecha só aquela resposta."""
+        try:
+            with kg_i18n.machine():
+                self._check_promisor()
+        except StoreError as exc:
+            with self._serve_lock:
+                if str(exc) != self._closed_reason:
+                    self._closed_reason = str(exc)
+                    print(f"kg_store: served ref {self.serve.ref} closed in {self.root.name}: {exc}", file=sys.stderr)
+            return None
+        stamp = self._ref_stamp()
+        with self._serve_lock:
+            if stamp == self._serve_stamp:
+                if self._snap is not None and self._closed_reason is not None:
+                    print(f"kg_store: served ref {self.serve.ref} reopened in {self.root.name} at {self._snap[0]}",
+                          file=sys.stderr)
+                    self._closed_reason = None
+                return self._snap
+        with self._resolve_lock:  # um resolve por vez; quem chega durante ele espera e lê o resultado
+            stamp = self._ref_stamp()
+            with self._serve_lock:
+                if stamp == self._serve_stamp:
+                    return self._snap
+                current = self._snap
+            try:
+                with kg_i18n.machine():
+                    commit = self.serve.resolve(self)
+                    snap = current if current is not None and current[0] == commit else self._snapshot(commit)
+            except StoreError as exc:
+                with self._serve_lock:
+                    self._snap, self._blobs = None, {}
+                    if not isinstance(exc, TransientError):
+                        self._serve_stamp = stamp
+                    if str(exc) != self._closed_reason:
+                        self._closed_reason = str(exc)
+                        print(f"kg_store: served ref {self.serve.ref} closed in {self.root.name}: {exc}", file=sys.stderr)
+                return None
+            with self._serve_lock:
+                if current is None or current[0] != commit:
+                    self._blobs = {}
+                if self._closed_reason is not None:
+                    print(f"kg_store: served ref {self.serve.ref} reopened in {self.root.name} at {commit}",
+                          file=sys.stderr)
+                self._snap, self._closed_reason, self._serve_stamp = snap, None, stamp
+            return snap
+
+    def _served_text(self, snap, name):
+        """O texto de um nome no retrato, ou None quando ele não está lá. Não UTF-8 é StoreError, como no disco."""
+        sha = snap[1].get(name)
+        if sha is None:
+            return None
+        data = self._blobs.get(sha)
+        if data is None:
+            data = self._blobs[sha] = self._git("cat-file", "blob", sha).stdout
+        try:
+            return data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise StoreError(_("{name} is not UTF-8").format(name=name)) from exc
+
+    def _prefetch(self, snap, names):
+        """Os blobs que faltam, de uma vez só (git cat-file --batch): o corpus inteiro não custa um git por grafo."""
+        want = sorted({snap[1][n] for n in names if n in snap[1]} - set(self._blobs))
+        if not want:
+            return
+        out = self._git("cat-file", "--batch", input=("\n".join(want) + "\n").encode("ascii")).stdout
+        pos = 0
+        for sha in want:
+            nl = out.index(b"\n", pos)
+            head = out[pos:nl].split(b" ")
+            if len(head) != 3 or head[1] != b"blob":
+                raise StoreError(_("git cat-file did not return the blob {sha}").format(sha=sha))
+            size = int(head[2])
+            self._blobs[sha] = out[nl + 1:nl + 1 + size]
+            pos = nl + 1 + size + 1
+
+    def _served_names(self, pattern):
+        snap = self.served()
+        return [] if snap is None else sorted(n for n in snap[1] if pattern.fullmatch(n))
+
+    def read(self, name, ref=None):
+        with self.pinned() if self.serve is not None else contextlib.nullcontext():
+            return super().read(name, ref)
+
+    def list_texts(self):
+        with self.pinned() if self.serve is not None else contextlib.nullcontext():
+            return super().list_texts()
+
+    def _lock(self):
+        if self.serve is not None:
+            raise StoreError(_("this store serves the ref {ref}: it does not write").format(ref=self.serve.ref))
+        return super()._lock()
+
+    def _read_head(self, name):
+        if self.serve is None:
+            return super()._read_head(name)
+        snap = self.served()
+        return None if snap is None else self._served_text(snap, check_name(name))
+
+    def _read_corpus(self, name):
+        if self.serve is None:
+            return super()._read_corpus(name)
+        snap = self.served()
+        return None if snap is None else self._served_text(snap, name)
+
+    def _texts(self, skip=None, names=None):
+        if self.serve is None:
+            return super()._texts(skip, names)
+        with self.pinned():
+            snap = self.served()
+            if snap is None:
+                return []
+            self._prefetch(snap, self._corpus_names() if names is None else names)
+            return super()._texts(skip, names)
+
+    def _case_clash(self, name):
+        """No retrato, a mesma régua do disco, sobre as pastas e os arquivos da árvore do commit."""
+        if self.serve is None:
+            return super()._case_clash(name)
+        snap = self.served()
+        if snap is None:
+            return None
+        segs = name.split("/")
+        for k, seg in enumerate(segs):
+            prefix = "/".join(segs[:k])
+            entries = {p[len(prefix) + 1 if prefix else 0:].split("/")[0] for p in snap[1]
+                       if not prefix or p.startswith(prefix + "/")}
+            if seg in entries:
+                continue
+            other = next((e for e in sorted(entries) if e.casefold() == seg.casefold()), None)
+            return None if other is None else "/".join(segs[:k] + [other])
+        return None
+
     def list(self):
-        """Os nomes RASTREADOS (o mesmo corpus do gate do repo, que lê git ls-files), regulares e na forma do nome."""
+        """Os nomes RASTREADOS (o mesmo corpus do gate do repo, que lê git ls-files), regulares e na forma do nome. Com a
+        ref servida, os arquivos regulares da árvore do commit dela."""
+        if self.serve is not None:
+            return self._served_names(NAME)
         out = self._git("ls-files", "-z", "--", "*.kg.yaml", "*.kg.json", check=False)
         if out.returncode != 0:
             return []
@@ -1159,6 +1845,8 @@ class GitStore(DiskStore):
     def _corpus_names(self):
         """Os rastreados, como o gate do repo: os do armazém e, desde o contrato v4.15, os de pasta com ponto (fora
         .git/), que o armazém lê para julgar a ponta externa e nunca escreve."""
+        if self.serve is not None:
+            return [n for n in self._served_names(CORPUS_NAME) if n.split("/")[0] != ".git"]
         names = set(self.list())
         out = self._git("ls-files", "-z", "--", "*.kg.yaml", "*.kg.json", check=False)
         if out.returncode == 0:
@@ -1172,6 +1860,8 @@ class GitStore(DiskStore):
 
     def _visible(self, name, head):
         """No GitStore, o que não está rastreado não existe para o armazém (como para list() e para o gate)."""
+        if self.serve is not None:  # o _read_head já leu do retrato: o que está nele está rastreado no commit
+            return head
         return head if head is not None and name in self.list() else None
 
     def _unstage(self, name):
@@ -1215,15 +1905,50 @@ class GitStore(DiskStore):
 
     def _read_ref(self, name, ref):
         self.check_ref(ref)
+        if self.serve is not None:
+            # só o histórico da ref servida: um commit fora dele (a ponta do clone à frente da tag, um commit sem
+            # assinatura) responde como o nome que não existe naquele ref
+            snap = self.served()
+            if snap is None:  # fechado: nenhum git roda por um ref de fora
+                raise NotFound(_("{name} does not exist at {ref}").format(name=name, ref=ref))
+            found = self._git("rev-parse", "-q", "--verify", f"{ref}^{{commit}}", check=False)
+            commit = found.stdout.decode().strip()
+            if found.returncode != 0 or self._git(
+                    "merge-base", "--is-ancestor", commit, snap[0], check=False).returncode != 0:
+                raise NotFound(_("{name} does not exist at {ref}").format(name=name, ref=ref))
+            # só o arquivo regular (blob 100644 ou 100755), como no retrato: nem link simbólico nem submódulo
+            entry = self._git("ls-tree", "-z", "--full-tree", commit, "--", name, check=False).stdout.split(b"\0")[0]
+            meta, _tab, path = entry.partition(b"\t")
+            parts = meta.decode("ascii", "replace").split(" ")
+            if path.decode("utf-8", "surrogateescape") != name or len(parts) != 3 or parts[1] != "blob" or \
+                    parts[0] not in ("100644", "100755"):
+                raise NotFound(_("{name} does not exist at {ref}").format(name=name, ref=ref))
+            out = self._git("cat-file", "blob", parts[2], check=False)
+            if out.returncode != 0:
+                raise NotFound(_("{name} does not exist at {ref}").format(name=name, ref=ref))
+            return out.stdout.decode("utf-8")
         out = self._git("show", f"{ref}:{name}", check=False)
         if out.returncode != 0:
             raise NotFound(_("{name} does not exist at {ref}").format(name=name, ref=ref))
         return out.stdout.decode("utf-8")
 
     def history(self, name):
+        if self.serve is not None:
+            with self.pinned():
+                return self._history(name)
+        return self._history(name)
+
+    def _history(self, name):
         check_name(name)
         self._check_case(name)
-        out = self._git("log", "--format=%H%x1f%an <%ae>%x1f%aI%x1f%s", "--name-status", "--", name, check=False)
+        tip = []
+        if self.serve is not None:  # o histórico até a ref servida, nunca o que veio depois dela no clone
+            snap = self.served()
+            if snap is None:
+                return []
+            tip = ["--no-ext-diff", "--no-textconv", "--no-show-signature", snap[0]]
+        out = self._git("log", "--format=%H%x1f%an <%ae>%x1f%aI%x1f%s", "--name-status", *tip, "--", name,
+                        check=False)
         if out.returncode != 0:  # repo sem commit ainda
             return []
         events, cur = [], None

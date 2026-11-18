@@ -1,0 +1,54 @@
+meta:
+  schema_version: "1"
+  id: valid-ritual-calendar-leap-day
+  layer: domain
+nodes:
+  - id: R_A
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A regra sintética R_A, cumprida por um ritual do agente."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY;COUNT=3"
+        dtstart: "20280229T080000"
+        tz: "America/Sao_Paulo"
+  - id: R_B
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A regra sintética R_B, cumprida por um ritual do agente."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=YEARLY"
+        dtstart: "20000229T080000Z"
+  - id: A_RUNNER
+    node_type: artifact
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "O executor sintético dos rituais, que emite um CloudEvents por execução."
+edges:
+  - from: R_A
+    to: A_RUNNER
+    edge_type: TRACES_TO
+  - from: R_B
+    to: A_RUNNER
+    edge_type: TRACES_TO

@@ -96,12 +96,12 @@ The published tags are listed by `git ls-remote --tags https://github.com/marcio
   - a vendor that differs from its stamp, unless you pass `--force`. This keeps a local edit from vanishing
     silently.
 - **Minimal profile:** if you only run the gate and the check, you can vendor the `gate` profile with
-  `--profile gate`. It has 19 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the reader of
+  `--profile gate`. It has 21 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the reader of
   the kg-mcp area policy that the gate's `--classification-floor` uses (`tools/kg_policy.py`, since 4.52.0), the
   vocabulary lint that the house-codes check of an Onion-adopted repository imports (`tools/kg_vocab.py`, since
   4.53.0), the vendor tool, the trace check with the query module it imports and its output schema (`tools/kg_trace.py`,
   `tools/kg_query.py`, and `spec/trace.schema.json`, since 4.25.1), the vector module the query imports only for
-  `--semantic` and its pinned requirements (`tools/kg_vector.py` and `tools/requirements-vector.txt`, since 4.26.0), the language module and its catalog (`tools/kg_i18n.py` and `locale/pt_BR/LC_MESSAGES/kg-ssot.po`),
+  `--semantic` and its pinned requirements (`tools/kg_vector.py` and `tools/requirements-vector.txt`, since 4.26.0), the rhythm report that the reader's `--rituals` and the gate's `--rituals-overdue` import, with the pinned extra that expands its calendars (`tools/kg_rituals.py` and `tools/requirements-rituals.txt`, since 4.55.0), the language module and its catalog (`tools/kg_i18n.py` and `locale/pt_BR/LC_MESSAGES/kg-ssot.po`),
   `requirements.txt`, this guide, `LICENSE`, and `NOTICE`. The conformance suite stays out, so `kg_conformance.py` and
   the `spec/conformance/README.md` that this guide cites do not come along. The stamp records the profile, `check`
   verifies only what the profile brought, and the next update **inherits** the profile from the stamp
@@ -418,11 +418,28 @@ fix the form (manual, chapter 3), or record it with the reason, `python3 -I -B v
 --accept-regression "contract v4.24: the downgrade trail, debt that already existed"`. A graph without the key sees
 nothing new. One check is tighter: `kg_trace.py` (and so `kg_gate.py --sources`) now reads a trace or a
 `provenance.source` without the `<>` around it and without the `kg-node://` prefix, and stops at a `?`, so such a value
-that names a missing file is now `missing` (rc 1) where before it went unjudged. The vendor brings no new file, and the
-`gate` profile keeps its 19 files. If you classify by sensitivity, read the rule that chapter 6 now declares ("Who
+that names a missing file is now `missing` (rc 1) where before it went unjudged. The vendor brings no new tool: the full
+release adds the 25 conformance cases of `spec/conformance/fixtures/latest/form/downgrade/`, and the `gate` profile keeps its 19 files. If you classify by sensitivity, read the rule that chapter 6 now declares ("Who
 reads through what"): a reader who is not a developer reads only through the `kg-mcp` over HTTP behind an
 authenticating proxy, and the command-line tools, `kg_audit.py`, and the `kg-mcp` over stdio or with a single store
 read every level, so give them only to developers.
+
+From `kg-ssot-v4.54.0` to `kg-ssot-v4.55.0`, contract v4.25 comes in, SHOULD only: no graph that passed fails, and no MUST
+verdict changes. The new canonical profile is `x_ritual`, the agent ritual, on a `rule` or `policy` node, with its
+calendar (an RFC 5545 RRULE in a strict subset, `dtstart`, and an IANA time zone), judged only by its form (manual,
+chapter 3). The SHOULD schema changes, so the gate prints the `· identity` notice on the first run and passes (unless
+`--strict-identity`), and `kg_gate.py --update` records the new identity. A graph that already carries an `x_ritual` out
+of form, or on another node type, gets a SHOULD warning that a baseline per graph or per node sees as new debt: fix the
+form, or record it with the reason, `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression
+"contract v4.25: the agent ritual, debt that already existed"`. A graph without the key sees nothing new. Two tools are
+new and change no verdict: `kg_validate.py --rituals WHEN` lists the rituals per owner (open failure, never run, late,
+by event, on time), reading the graph and, with `--runs`, the executor's run log in CloudEvents; and `kg_gate.py
+--rituals-overdue`, off by default, fails an overdue ritual (run it in a scheduled job, since it reads the clock). The
+calendar is expanded only with the new `rituals` extra (`tools/requirements-rituals.txt`, with hashes, or `pip install
+"kg-ssot[rituals]"`). So the `gate` profile goes from 19 to 21 files (`tools/kg_rituals.py` and
+`tools/requirements-rituals.txt`), and `update` brings them. The `kg-mcp` gains `--serve-ref` (serve exactly the tree
+of a branch or a signed tag, with `--verify-signers` and `--serve-state`) and `--secret-file`. The full release adds
+the 124 conformance cases of `spec/conformance/fixtures/latest/form/ritual/` (the suite goes from 621 to 745).
 
 From `kg-ssot-v4.52.0` to `kg-ssot-v4.53.0`, nothing is required: the contract (v4.23) and the verdicts are the same, and
 the full release brings no new file. The `gate` profile now carries `tools/kg_vocab.py`, which was already in the full
