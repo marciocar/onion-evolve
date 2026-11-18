@@ -1,0 +1,128 @@
+# kg-backlog-guard: on
+# Forja de guarda (/meta:forge-guard): o «pode rodar», a autorização de um toque nível 1 do maestro pelo prompt da sessão.
+# Este grafo guarda o defeito medido, o que distingue o prompt humano do peer, o substrato escolhido e os tetos.
+meta:
+  id: guard-one-touch-approval-2026-11
+  schema_version: "1"
+  baseline: "2026-11-18"
+  review_after: "2026-12-18"   # 30d: guarda nova
+  # ═══ TETO: 10 NÓS ═══  (7 da forja + folga para os achados da passada adversarial e do 1º uso real)
+nodes:
+  - id: E_MAESTRO_COPIA_COMANDO_PARA_O_TERMINAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-18"
+    verified_against: "ops/pr-merge-verified.sh de origin/main 17eabb99a: o PR que toca a própria catraca morre com «Peça: ! bash ops/pr-merge-verified.sh N --maestro», e o veto do MOAT barra --maestro na linha da sessão"
+    trace: "ops/pr-merge-verified.sh"
+    label: "medido: o ato que só o maestro roda exigia que ele copiasse o comando para o terminal ou para o `!`, sem caminho de autorizar pela sessão"
+    narrative: "A dor que o maestro nomeou em 18/11: dizer «pode rodar» no prompt e o ato preparado rodar ali. Ele aprovou o desenho no mesmo dia com a ressalva de nível por ato («pode virar até 2fa no futuro»)."
+    provenance:
+      source: "docs/evolution/research/guard-one-touch-approval-2026-11/one-touch-approval-2026-11.kg.yaml"
+      locator: "leitura do script e do pretooluse-moat-gate.sh em origin/main"
+      method: "measurement: leitura do código e do veto vigente"
+      locality: "repo"
+  - id: E_HUMANO_VERSUS_PEER_NO_TRANSCRIPT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-18"
+    verified_against: "40 transcripts recentes do core, só os campos: prompt humano = origin.kind human, promptSource typed|queued|suggestion_accepted, turnOrigin human, sem isMeta; peer = origin.kind peer, promptSource system, turnOrigin peer, isMeta true, corpo em <cross-session-message>; task-notification = origin.kind task-notification, promptSource system"
+    label: "medido: origin.kind=human com promptSource typed|queued distingue o prompt digitado; suggestion_accepted é texto do modelo e não autoriza"
+    narrative: "Nenhum corpo foi copiado para o repo. A UserPromptSubmit dispara também para peer e para notificação de tarefa (anexos de hook após 111 entradas de peer), então o hook sozinho não sabe a origem."
+    provenance:
+      source: "docs/evolution/research/guard-one-touch-approval-2026-11/one-touch-approval-2026-11.kg.yaml"
+      locator: "⟨transcripts do projeto do core no diretório de config do Claude Code⟩, campos type/isMeta/origin/promptSource/turnOrigin"
+      method: "measurement: contagem de assinaturas de campo por entrada type=user"
+      locality: "repo"
+  - id: E_HOOK_RODA_ANTES_DA_ENTRADA_NO_TRANSCRIPT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-18"
+    verified_against: "Claude Code 2.1.327, diretório temporário com hook UserPromptSubmit que despeja o stdin e o fim do transcript: payload = session_id, transcript_path, cwd, prompt_id, permission_mode, hook_event_name, prompt; o transcript ainda não existia; depois, a entrada type=user tem promptId igual ao prompt_id do payload"
+    label: "medido: o hook não vê a entrada da mensagem atual; o prompt_id do payload casa o promptId da entrada gravada depois"
+    narrative: "Por isso a origem é conferida pelo EXECUTOR, na hora do ato, relendo o transcript pelo prompt_id. Medido em -p (sdk); a ordem no modo interativo é suposta igual e fica como teto."
+    provenance:
+      source: "docs/evolution/research/guard-one-touch-approval-2026-11/one-touch-approval-2026-11.kg.yaml"
+      locator: "sonda num diretório temporário do scratchpad"
+      method: "measurement: hook real com o binário instalado"
+      locality: "repo"
+  - id: D_PEDIDO_PALAVRA_EXECUTOR
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-18"
+    verified_against: "bancada pr_merge_verified, casos ot0-ot11 com mutante por cura, 0 falhas"
+    trace: ".claude/utils/approval/one_touch.py"
+    label: "decisão: pedido canônico pelo executor depois dos gates, aprovação pelo hook UserPromptSubmit, uso único no livro do executor, flag --one-touch e não --maestro"
+    narrative: "Substrato: hook UserPromptSubmit (o único que vê o prompt digitado) + o executor existente (ops/pr-merge-verified.sh). Molde do hook: o aside-router-hook.sh (additionalContext, exit 0, nunca bloqueia). A autorização entra por --one-touch e não pelo --maestro: o veto do hook ao --maestro segue intacto, e um arquivo forjado destrava só o nível 1 (sem dispensa, sem repo alheio). Sem 'ask': relatado como auto-aprovado em bypassPermissions."
+    provenance:
+      source: "docs/evolution/research/guard-one-touch-approval-2026-11/one-touch-approval-2026-11.kg.yaml"
+      locator: "guard-census.sh de 2026-11-18 e o desenho aprovado pelo maestro"
+      method: "testimony: decisão do maestro de 18/11 sobre o desenho, forjado pelo /meta:forge-guard"
+      locality: "repo"
+  - id: C_TETO_CONFORMIDADE_NAO_FRONTEIRA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-18"
+    verified_against: "leitura do desenho: estado, livro e transcript no mesmo usuário Unix do agente"
+    label: "teto: no mesmo usuário Unix o agente pode forjar a aprovação, o livro e o transcript; a camada impede autoautorização por engano, não um agente hostil"
+    narrative: "A fronteira é o nível 2: aprovação fora da banda numa identidade que o agente não controla (DM assinada pela ponte da onion-messaging, ou review no forge por conta humana com os agentes em identidade própria; RFC 9470, CIBA, NIST 800-63-4 AAL2). Nível 3: passkey/2FA (AAL3). Os dois estão declarados no esquema e são recusados na v1."
+  - id: C_TETO_ORDEM_INTERATIVA_SUPOSTA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-18"
+    verified_against: "a sonda mediu em -p; o modo interativo não foi medido nesta forja"
+    label: "teto: se o harness interativo gravar a entrada com outro promptId, ou mudar os campos origin/promptSource, o executor recusa (falha fechada) e a palavra para de funcionar"
+    narrative: "Gatilho nomeado: o 1º uso real do maestro. Recusa com «o prompt da palavra não está no transcript» é o sinal; re-medir os campos e ajustar o motor no mesmo laço."
+  - id: C_TETO_PALAVRA_SEM_IDENTIDADE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-18"
+    verified_against: "o payload e o transcript não carregam identidade de quem digitou"
+    label: "teto: o nível 1 prova que a frase foi DIGITADA na sessão, não QUEM digitou; approver_id é prompt:<sessão>"
+    narrative: "Quem tem o terminal da sessão autoriza. É o mesmo poder do `!`, que já era dele."
+edges:
+  - from: E_MAESTRO_COPIA_COMANDO_PARA_O_TERMINAL
+    to: D_PEDIDO_PALAVRA_EXECUTOR
+    edge_type: SUPPORTS
+  - from: E_HUMANO_VERSUS_PEER_NO_TRANSCRIPT
+    to: D_PEDIDO_PALAVRA_EXECUTOR
+    edge_type: SUPPORTS
+  - from: E_HOOK_RODA_ANTES_DA_ENTRADA_NO_TRANSCRIPT
+    to: D_PEDIDO_PALAVRA_EXECUTOR
+    edge_type: SUPPORTS
+  - from: C_TETO_CONFORMIDADE_NAO_FRONTEIRA
+    to: D_PEDIDO_PALAVRA_EXECUTOR
+    edge_type: CONSTRAINS
+  - from: C_TETO_ORDEM_INTERATIVA_SUPOSTA
+    to: E_HOOK_RODA_ANTES_DA_ENTRADA_NO_TRANSCRIPT
+    edge_type: CONSTRAINS
+  - from: C_TETO_PALAVRA_SEM_IDENTIDADE
+    to: D_PEDIDO_PALAVRA_EXECUTOR
+    edge_type: CONSTRAINS

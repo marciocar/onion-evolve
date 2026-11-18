@@ -102,6 +102,26 @@
 #           estar verde no head; (4) SEM CONFLITO: PR CONFLICTING ou atrás da base é recusado, nunca rebaseado (o
 #           caminho delegado não reescreve a branch alheia); (5) o RESÍDUO da REGRA 56 no PR,
 #           docs/evolution/review/<branch>.md, lido no head, com verdict aprovado e reviewed_diff_sha256 carimbado.
+#   --one-touch-request / --one-touch: o «PODE RODAR», autorização de um toque NÍVEL 1 (2026-11-18, desenho aprovado
+#           pelo maestro: «Opção 1 para começar, mas isso pode virar até 2fa no futuro»). O ato que só o maestro roda
+#           (o PR de GUARDA da sessão do core, inclusive o que toca a própria catraca, que antes exigia --maestro no
+#           terminal dele) passa a sair da sessão quando o maestro digita a frase no prompt DAQUELA sessão:
+#             1. a sessão roda com --one-touch-request: TODOS os gates de sempre rodam (CI verde no head, ponta da base,
+#                rascunho, provenance, catraca do repo próprio); no lugar do merge, grava o PEDIDO canônico
+#                (.claude/utils/approval/act-request.schema.json) e imprime UMA linha «… responda: pode rodar»;
+#             2. o hook UserPromptSubmit grava a aprovação quando o prompt é a frase sozinha (10 min, uso único);
+#             3. a sessão roda com --one-touch: os mesmos gates; a autorização viva tem de casar repo, ref, PR e o sha
+#                RECALCULADO na hora (o hash bate), estar no TTL, sem uso no livro do executor e com o prompt humano no
+#                transcript (origin.kind=human, promptSource typed|queued). Ela substitui só a exigência do --maestro
+#                no PR de guarda (o _guard_pr_gate); não dispensa check, não declara CI inoperante, não abre repo alheio.
+#           Com autorização viva NÃO há auto-rebase: precisar de rebase, ou o sha ter mudado, GASTA a autorização e
+#           recusa em uma linha. Repo de OUTRO DONO (cliente) segue recusado SEMPRE pela catraca, autorizado ou não.
+#           Sem as flags, nada muda. Deploy, firewall, segredo e publicação externa ficam fora da v1.
+#           TETO HONESTO: é camada de CONFORMIDADE, não fronteira de segurança. No mesmo usuário Unix o agente pode
+#           forjar o arquivo de aprovação; o que se impede é a sessão se autoautorizar por engano ou por mensagem de
+#           outra sessão. A fronteira é o nível 2 (aprovação fora da banda, numa identidade que o agente não controla:
+#           DM assinada pela ponte da onion-messaging, ou review no forge por conta humana; RFC 9470, CIBA, NIST
+#           800-63-4 AAL2/AAL3), declarado no esquema e recusado na v1, como o nível 3 (passkey/2FA).
 set -uo pipefail
 
 PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--allow-draft] [--dispensa <check> --motivo <texto>]}"; shift || true
@@ -135,6 +155,7 @@ DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""; NO_CI_PROVADO
 MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0; WAIT_CI_AFTER_REBASE=0; ALLOW_DRAFT=0
 DELEGATED_FOREIGN=0   # --foreign-repo: o merge alheio delegado (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113)
 MAESTRO=0             # --maestro: o merge alheio do maestro, fora do caminho delegado
+OT_REQUEST=0; OT_USE=0; OT_LIVE=0   # --one-touch-request / --one-touch: o «pode rodar», nível 1 (2026-11-18)
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
@@ -157,6 +178,8 @@ while [ $# -gt 0 ]; do
     # o escape do MAESTRO para o merge alheio sem o caminho delegado (pelo terminal dele, ou pelo `!` com esta flag); a
     # sessão não o usa: `--maestro` é palavra da assinatura do ato no ops/moat-targets.tsv, e o veto barra
     --maestro) MAESTRO=1; shift ;;
+    --one-touch-request) OT_REQUEST=1; shift ;;
+    --one-touch) OT_USE=1; shift ;;
     --assert-ancestor) ASSERT_ANCESTOR="${2:?--assert-ancestor exige a ref (ex.: onion/vendor)}"; shift 2 ;;
     *) shift ;;
   esac
@@ -348,6 +371,19 @@ _own_repo_gate() {
   if [ "${#REPO_ARG[@]}" -lt 2 ] && [ "${_CORE_SESSION}" != 1 ]; then GH_REPO="${_t}"; export GH_REPO; fi
 }
 _own_repo_gate
+# ══ «PODE RODAR» (nível 1, 2026-11-18): as formas que a autorização de um toque não aceita, antes de qualquer efeito ══
+_OT_ENGINE="${_PMV_DIR}/.claude/utils/approval/one_touch.py"
+_OT_SID="${CLAUDE_CODE_SESSION_ID:-}"
+if [ "${OT_REQUEST}" -eq 1 ] || [ "${OT_USE}" -eq 1 ]; then
+  [ "${OT_REQUEST}" -eq 1 ] && [ "${OT_USE}" -eq 1 ] && die "--one-touch-request pede e --one-touch usa: uma de cada vez. Nada foi feito."
+  { [ "${MAESTRO}" -eq 0 ] && [ "${DELEGATED_FOREIGN}" -eq 0 ] && [ "${#DISPENSA[@]}" -eq 0 ] && [ "${CI_INOPERANTE}" -eq 0 ] && [ "${ALLOW_DRAFT}" -eq 0 ]; } \
+    || die "o «pode rodar» vale só para o merge verificado puro: sem --maestro, --foreign-repo, --dispensa, --ci-inoperante e --allow-draft. Nada foi feito."
+  [ -n "${_SESSION_CWD}" ] || die "o «pode rodar» é da sessão do Claude Code; fora dela (o seu terminal), rode com --maestro. Nada foi feito."
+  [ -n "${_OT_SID}" ] || die "sem CLAUDE_CODE_SESSION_ID não sei qual sessão pediu: a palavra só vale na sessão que pediu. Nada foi feito."
+  command -v python3 >/dev/null 2>&1 && [ -f "${_OT_ENGINE}" ] \
+    || die "sem python3 ou sem .claude/utils/approval/one_touch.py não confiro a autorização (falha fechada). Nada foi feito."
+fi
+_ot_engine() { python3 -I "${_OT_ENGINE}" "$@"; }
 
 
 
@@ -570,6 +606,9 @@ _isolated_residue_ok() {
 }
 _guard_pr_gate() {
   [ "${_CORE_SESSION}" = 1 ] && [ "${MAESTRO}" -eq 0 ] || return 0
+  # «pode rodar»: o pedido nasce aqui (o que ele destrava é este gate), e a autorização viva o substitui
+  [ "${OT_REQUEST}" -eq 1 ] && return 0
+  [ "${OT_LIVE}" -eq 1 ] && { say "✓ PR de guarda pelo «pode rodar» (nível 1): a autorização viva substitui o --maestro"; return 0; }
   if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(_slug_norm "${REPO_ARG[1]}")" != "${_PMV_CORE_SLUG}" ]; then return 0; fi
   local _g; _g="$(_guard_hits <<< "${_PR_FILES}" | head -5 | tr '\n' ' ')"
   [ -z "${_g}" ] && return 0
@@ -583,6 +622,22 @@ _guard_pr_gate() {
   _isolated_residue_ok "${_PMV_CORE_SLUG}" "o PR #${PR} toca GUARDA (${_g% }): a sessão o mergeia só com o resíduo da branch declarando refutador independente (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118); sem ele, o merge é do maestro (! bash ops/pr-merge-verified.sh ${PR} --maestro)"
   say "✓ PR de GUARDA pela sessão: resíduo ${_IR_REL} com refutador independente (elenxo_isolado: true), verdict ${_IR_V}, diff ${_IR_H:0:12} (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)"
 }
+# o «pode rodar» confere a autorização ANTES do gate de guarda: repo, ref, PR e o sha lido agora; o sha que mudou GASTA
+# a autorização (ela valia para o merge do sha X, não para a sequência) e recusa em uma linha
+_ot_target_args() { printf '%s\n' --act merge --repo "${_OT_REPO}" --ref "refs/heads/${HEAD_REF}" --sha "${HEAD_SHA}" --pr "${PR}" --session "${_OT_SID}"; }
+_one_touch_gate() {
+  [ "${OT_USE}" -eq 1 ] || return 0
+  local _o _rc; _o="$(_ot_engine verify $(_ot_target_args))"; _rc=$?
+  case "${_rc}" in
+    0) say "${_o}"; OT_LIVE=1 ;;
+    3) _ot_engine consume --session "${_OT_SID}" --outcome "refused: sha changed" >/dev/null; die "${_o#✗ } Nada foi mergeado." ;;
+    *) die "«pode rodar» recusado: ${_o#✗ } Nada foi mergeado." ;;
+  esac
+}
+_OT_REPO="${_PMV_TARGET:-${_PMV_CORE_SLUG}}"
+[ "${#REPO_ARG[@]}" -ge 2 ] && _OT_REPO="$(_slug_norm "${REPO_ARG[1]}")"
+[ "${_CORE_SESSION}" = 1 ] && [ "${#REPO_ARG[@]}" -lt 2 ] && _OT_REPO="${_PMV_CORE_SLUG}"
+_one_touch_gate
 _guard_pr_gate
 # ══ MERGE ALHEIO DELEGADO (--foreign-repo, D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113, 2026-11-13) ══════════════════
 # O selo delega à sessão o merge de PR num repo da família, só por este caminho, com CI verde, sem conflito e com
@@ -1023,6 +1078,12 @@ _RB_REASON_TEXT=""
 _RB_ENGINE_TEXT="O rebase rodou na worktree local da branch por \`ops/pr-finalize.sh --rebase --push\`, que resolve só conflito de projeção gerada (e, pelo driver das famílias, o acréscimo lado a lado de famílias da bancada) e regenera as projeções na árvore combinada."
 _FOREIGN_RB=0
 while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
+  # «pode rodar»: sem auto-rebase. O pedido só nasce na ponta; a autorização viva se GASTA e recusa (o sha mudaria)
+  [ "${OT_REQUEST}" -eq 1 ] && die "o PR precisa de rebase antes do pedido: rode ops/pr-finalize.sh --rebase --push, espere o verde e peça de novo. Nada foi feito."
+  if [ "${OT_LIVE}" -eq 1 ]; then
+    _ot_engine consume --session "${_OT_SID}" --outcome "refused: rebase needed" >/dev/null
+    die "o PR precisa de rebase e o sha vai mudar: a autorização foi gasta; rebaseie, espere o verde e peça de novo. Nada foi mergeado."
+  fi
   # merge alheio delegado: SEM CONFLITO é condição do selo, e o caminho delegado não reescreve a branch alheia
   [ "${DELEGATED_FOREIGN}" -eq 1 ] \
     && die "PR #${PR} está $([ "$_mg" = CONFLICTING ] && echo CONFLICTING || echo "${_behind} commit(s) atrás de '${_BASE_REF}'") — o merge alheio delegado (--foreign-repo) exige o PR sem conflito e na ponta da base, e não rebaseia a branch de outro repo. Rebaseie na sessão do repo, espere o CI e rode de novo. Nada foi mergeado."
@@ -1743,6 +1804,22 @@ t0="$(date -u +%s)"
 # O bypass do ruleset (--admin) continua SÓ no caminho sem o CI do head novo: nos demais o ruleset vale.
 [ -n "${HEAD_SHA}" ] || die "não tenho o head julgado (HEAD_SHA vazio) logo antes do merge — sem ele o forge não pode amarrar o merge ao head que o CI julgou. Nada foi mergeado."
 JUDGED_HEAD="${HEAD_SHA}"
+# «pode rodar»: o PEDIDO nasce aqui, depois de TODOS os gates (CI verde no head julgado), no lugar do merge
+if [ "${OT_REQUEST}" -eq 1 ]; then
+  _o="$(_ot_engine request $(_ot_target_args) --run "bash ops/pr-merge-verified.sh ${PR}$([ "${#REPO_ARG[@]}" -ge 2 ] && printf ' --repo %s' "${REPO_ARG[1]}") --one-touch")" \
+    || die "não gravei o pedido: ${_o#✗ } Nada foi feito."
+  printf '%s\n' "${_o}"; exit 0
+fi
+# a autorização viva se GASTA no livro do executor ANTES do merge; o head julgado tem de ser o sha autorizado
+if [ "${OT_LIVE}" -eq 1 ]; then
+  _o="$(_ot_engine verify $(_ot_target_args))"; _rc=$?
+  if [ "${_rc}" -ne 0 ]; then
+    _ot_engine consume --session "${_OT_SID}" --outcome "refused: changed before merge" >/dev/null
+    die "${_o#✗ } Nada foi mergeado."
+  fi
+  _o="$(_ot_engine consume --session "${_OT_SID}" --outcome used)" || die "«pode rodar»: ${_o#✗ } Nada foi mergeado."
+  say "${_o}"
+fi
 MERGE_EXTRA=(--match-head-commit "${JUDGED_HEAD}")
 [ "${SKIP_CI}" -eq 1 ] && MERGE_EXTRA=(--admin --match-head-commit "${JUDGED_HEAD}")
 # o forge recusou e o head do PR já não é o julgado: um push caiu entre o julgamento e o merge.
