@@ -59,7 +59,7 @@
     {
       "alvo": "E_HOST_NA_2_1_327_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1118",
       "veredito": "SUSTENTA",
-      "nota": "CU2: claude --version → 2.1.327; cc-delta-census → bridge 2.1.323 (SDK 0.3.323); currency-census → agent-sdk:bridge 0.3.323→0.3.327 defasada e action 1.0.272→1.0.282 defasada; o pin d5f7970a está em onion-review.yml l.329 e l.493. O revisor também não tem a 2.1.323, o que o label não nega."
+      "nota": "CU2: claude --version → 2.1.327; cc-delta-census → bridge 2.1.323 (SDK 0.3.323); currency-census → agent-sdk:bridge 0.3.323→0.3.327 defasada e action 1.0.272→1.0.282 defasada; o pin anthropics/claude-code-action@d5f7970a está em onion-review.yml l.329 e l.493. O revisor também não tem a 2.1.323, o que o label não nega."
     },
     {
       "alvo": "Q_SUBIR_SDK_DO_BRIDGE_0_3_327_E_PIN_DO_REVISOR_V1_0_282_1118",
@@ -130,7 +130,7 @@
         "classe": "entrega",
         "achada": true,
         "o_que": "o agente isolado recusa git na forma `...; echo rc=$?` (inclusive o inofensivo git status) e já recusava assim na baseline 2.1.322; `git ... && echo ok` passa, e git branch -f e rebase em forma simples passam. Os itens 2.1.325 l.104 e 2.1.326 l.315 não são a causa. O brief deve pedir git simples e ler o rc numa chamada à parte.",
-        "medida": "bancada do juiz na 2.1.327: recusados 1 e 3 com «names git in a form too complex to verify that it stays inside the worktree»; rodaram 2 (5ef1e06 init / ok), 4 (sem saída) e 5 (up to date). Na 2.1.322: recusados git status ...; echo rc=$? e o composto de branch, e echo hi; echo rc=$? rodou. O texto da recusa está nos dois binários (2 ocorrências em cada)."
+        "medida": "bancada do juiz na 2.1.327: recusados 1 e 3 com «names git in a form too complex to verify that it stays inside the worktree»; rodaram 2 (o commit do repositório descartável / ok), 4 (sem saída) e 5 (up to date). Na 2.1.322: recusados git status ...; echo rc=$? e o composto de branch, e echo hi; echo rc=$? rodou. O texto da recusa está nos dois binários (2 ocorrências em cada)."
       }
     },
     {
@@ -196,7 +196,7 @@
     {
       "no_r24": "E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110",
       "cai": true,
-      "razao": "o estado mudou nos três: host 2.1.327 (não 2.1.322), revisor no pin d5f7970a v1.0.272 defasado contra v1.0.282 (não «em dia»), bridge 2.1.323 / SDK 0.3.323 (não 2.1.319). Quem supera é E_HOST_NA_2_1_327_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1118."
+      "razao": "o estado mudou nos três: host 2.1.327 (não 2.1.322), revisor no pin anthropics/claude-code-action@d5f7970a v1.0.272 defasado contra v1.0.282 (não «em dia»), bridge 2.1.323 / SDK 0.3.323 (não 2.1.319). Quem supera é E_HOST_NA_2_1_327_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1118."
     },
     {
       "no_r24": "Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110",
