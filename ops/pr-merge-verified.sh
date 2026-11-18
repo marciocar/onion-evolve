@@ -181,7 +181,8 @@ _dispensado() { [ "${#DISPENSA[@]}" -eq 0 ] && return 1; _em "$1" "${DISPENSA[@]
 # A sessão de OUTRO repo da família (o adotante que mergeia o próprio repo por este script, com --repo) não é a do core,
 # e segue como sempre. TETO: um processo desligado da árvore (setsid/nohup com o pai morto) perde o ancestral; o hook
 # barra essas formas na linha.
-_slug_norm() { sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)##; s#\.git$##; s#/+$##' <<< "$1" | tr '[:upper:]' '[:lower:]'; }
+# (B1 da revisão de 2026-11-18) minúsculas ANTES do sed: `HTTPS://github.com/x/y` virava dono "https:"
+_slug_norm() { tr '[:upper:]' '[:lower:]' <<< "$1" | sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)##; s#\.git$##; s#/+$##'; }
 _claude_ancestor_cwd() { # o cwd do processo do Claude Code mais próximo entre os ancestrais; vazio se não há
   local pid="$PPID" exe n=0
   while [ -n "${pid}" ] && [ "${pid}" -gt 1 ] && [ "${n}" -lt 64 ]; do
@@ -197,8 +198,9 @@ _CORE_SESSION=0
 # a BANCADA (lint-selftest.sh) roda este script sob a sessão de quem a dispara, com --repo de sandbox: ela exporta
 # ONION_PR_MERGE_VERIFIED_TEST=1. Na linha de comando da sessão o hook do MOAT veta a variável (como os modos de teste
 # dos outros wrappers), então ela não é um escape para a sessão. TETO: um script não versionado que a exporte por dentro
-# segue julgado pelo corpo, e o corpo a cita.
-[ "${ONION_PR_MERGE_VERIFIED_TEST:-0}" = 1 ] && _SESSION_CWD=""
+# segue julgado pelo corpo, e o corpo a cita. (A2 da revisão de 2026-11-18) a variável só vale adiante, depois da
+# constante: na sessão do CORE (cujo hook a veta na linha) ou numa cópia de bancada (constante trocada); numa sessão de
+# outro repo com o script versionado ela é IGNORADA, porque o moat-judge que a veta é só do core.
 [ -n "${_SESSION_CWD}" ] && [ -n "${_PMV_COMMON}" ] \
   && [ "$(git -C "${_SESSION_CWD}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" = "${_PMV_COMMON}" ] && _CORE_SESSION=1
 # O SLUG DO CORE é uma CONSTANTE (4ª passada do refutador do #1647): nem a config do git (GIT_DIR, insteadOf, include,
@@ -206,6 +208,15 @@ _CORE_SESSION=0
 # o core. O members.yaml só se CONFERE contra a constante: o `remote:` do membro `kind: source` que diverge dela recusa,
 # na sessão do core e no caminho delegado.
 _PMV_CORE_CONST=marciocar/onion-evolve
+if [ "${ONION_PR_MERGE_VERIFIED_TEST:-0}" = 1 ]; then
+  # sessão do core = a do checkout deste script OU a de um checkout cujo origin é o core (a bancada roda cópias do script
+  # em sandbox, sob a sessão do core). TETO: uma sessão que reaponta o próprio origin para o core passa; o veto de forja
+  # (`git remote set-url`) é do hook do core.
+  if [ "${_CORE_SESSION}" = 1 ] || [ "${_PMV_CORE_CONST}" != "marciocar/onion-evolve" ] \
+     || { [ -n "${_SESSION_CWD}" ] && [ "$(_slug_norm "$(git -C "${_SESSION_CWD}" remote get-url origin 2>/dev/null)")" = "marciocar/onion-evolve" ]; }; then
+    _SESSION_CWD=""; _CORE_SESSION=0
+  elif [ -n "${_SESSION_CWD}" ]; then printf '  %s\n' "ℹ️  ONION_PR_MERGE_VERIFIED_TEST ignorada: é modo de bancada, e esta sessão não é a do core (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)"; fi
+fi
 _PMV_MEMBERS_SRC="$(awk '
   /^[[:space:]]*-[[:space:]]+id:/ { if (src && rem != "") { print rem; exit } src = 0; rem = "" }
   /^[[:space:]]+kind:[[:space:]]*source([[:space:]#]|$)/ { src = 1 }
@@ -292,7 +303,11 @@ _delegated_env_guard() {
 # TETO: o registro é lido de origin/main sem buscar (o que a última busca trouxe); o dono do alvo é o do slug, não o do
 # host. O maestro, pelo terminal dele (sem ancestral) ou pelo `!` com --maestro, fica fora da catraca.
 _own_repo_gate() {
-  [ -n "${_SESSION_CWD}" ] && [ "${MAESTRO}" -eq 0 ] || return 0
+  [ -n "${_SESSION_CWD}" ] || return 0
+  # (A1 da revisão de 2026-11-18) --maestro só pula a catraca na sessão do CORE, cujo hook veta a flag na linha (o maestro
+  # a usa pelo `!`). Em sessão de OUTRO repo nenhum hook a barra (o moat-judge vendorizado não a cita): lá ela não vale,
+  # e o maestro de verdade roda no terminal dele, sem ancestral Claude.
+  [ "${_CORE_SESSION}" = 1 ] && [ "${MAESTRO}" -eq 1 ] && return 0
   local _t _own _m _row _corown="${_PMV_CORE_SLUG%%/*}"
   _t="${_PMV_TARGET}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _t="$(_slug_norm "${REPO_ARG[1]}")"
   [ "${_CORE_SESSION}" = 1 ] && [ "${#REPO_ARG[@]}" -lt 2 ] && _t="${_PMV_CORE_SLUG}"
@@ -318,11 +333,19 @@ _own_repo_gate() {
   esac
   if [ "${_CORE_SESSION}" = 1 ]; then _own="${_PMV_CORE_SLUG}"
   else _own="$(_slug_norm "$(git -C "${_SESSION_CWD}" remote get-url origin 2>/dev/null)")"; fi
+  # (A3 da revisão de 2026-11-18) sem --repo, o gh resolve por GH_REPO ou pelo gh-resolved, não pelo 1º remote: mais de um
+  # slug não-core distinto entre remotes, gh-resolved e GH_REPO é alvo ambíguo, e recusa
+  if [ "${#REPO_ARG[@]}" -lt 2 ] && [ "${_CORE_SESSION}" != 1 ]; then
+    local _nc; _nc="$(_pmv_remote_slugs | awk -v c="${_PMV_CORE_SLUG}" 'NF && $0 != c && !seen[$0]++' | wc -l)"
+    [ "${_nc}" -le 1 ] || die "sem --repo, os remotes, o gh-resolved e o GH_REPO apontam ${_nc} repos distintos: o gh poderia mirar outro que não '${_t}'. Diga o alvo com --repo. Nada foi feito."
+  fi
   if [ "${_t}" != "${_own}" ]; then
     [ "${_CORE_SESSION}" = 1 ] && [ "${DELEGATED_FOREIGN}" -eq 1 ] \
       || die "'${_t}' não é o repo desta sessão ('${_own:-ilegível}'): cada sessão mergeia só o próprio repo; em outro, só a coordenação do core pelo --foreign-repo. Nada foi feito."
   fi
   say "✓ catraca do repo próprio: '${_t}' é da família e está na lista fechada (${_k}$([ "${_o}" != "-" ] && printf ', sessão dona %s' "${_o}"))"
+  # (A3) e o gh mira o que a catraca julgou: sem --repo, GH_REPO explícito
+  if [ "${#REPO_ARG[@]}" -lt 2 ] && [ "${_CORE_SESSION}" != 1 ]; then GH_REPO="${_t}"; export GH_REPO; fi
 }
 _own_repo_gate
 
@@ -550,6 +573,10 @@ _guard_pr_gate() {
   if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(_slug_norm "${REPO_ARG[1]}")" != "${_PMV_CORE_SLUG}" ]; then return 0; fi
   local _g; _g="$(_guard_hits <<< "${_PR_FILES}" | head -5 | tr '\n' ' ')"
   [ -z "${_g}" ] && return 0
+  # (M1 da revisão de 2026-11-18) os três arquivos que SÃO a catraca: com o resíduo auto-atestado a sessão poderia se dar
+  # `owner_session:` num repo de cliente sob o dono do core, ou abrir o script. PR que toca qualquer um segue do maestro.
+  local _cat; _cat="$(grep -xE 'docs/evolution/federation/members\.yaml|ops/pr-merge-verified\.sh|ops/moat-targets\.tsv' <<< "${_PR_FILES}" | head -3 | tr '\n' ' ')"
+  [ -z "${_cat}" ] || die "o PR #${PR} toca GUARDA e a própria catraca (${_cat% }): esse merge segue do maestro mesmo com resíduo isolado (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118). Peça: ! bash ops/pr-merge-verified.sh ${PR} --maestro. Nada foi feito."
   _isolated_residue_ok "${_PMV_CORE_SLUG}" "o PR #${PR} toca GUARDA (${_g% }): a sessão o mergeia só com o resíduo da branch declarando refutador independente (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118); sem ele, o merge é do maestro (! bash ops/pr-merge-verified.sh ${PR} --maestro)"
   say "✓ PR de GUARDA pela sessão: resíduo ${_IR_REL} com refutador independente (elenxo_isolado: true), verdict ${_IR_V}, diff ${_IR_H:0:12} (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)"
 }

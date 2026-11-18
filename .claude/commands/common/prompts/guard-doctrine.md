@@ -106,6 +106,12 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   do repo próprio listado (core ou `owner_session:` no `members.yaml` de origin/main, dono da família); o veto `exit 2`
   dos atos do maestro NÃO vira `ask`: a doc não garante que o `ask` do hook sobreviva ao `bypassPermissions`, que é o
   modo desta casa.
+  Depois da revisão separada (REJECTED do cf2729c53): `--maestro` e `ONION_PR_MERGE_VERIFIED_TEST` só valem na sessão
+  do core, cujo hook os veta; sem `--repo` o gh recebe `GH_REPO` do alvo julgado e alvo ambíguo recusa; e o PR que toca
+  `members.yaml`, `ops/pr-merge-verified.sh` ou `ops/moat-targets.tsv` (a própria catraca) segue do maestro. **Tetos
+  declarados:** host GitHub Enterprise (o slug não carrega o host), chave do `members.yaml` entre aspas, processo
+  desligado da árvore (`setsid`/`nohup` com o pai morto perde o ancestral Claude), Claude instalado por npm (o
+  executável não casa `*/claude/versions/*` nem `*/bin/claude`) e sessão que reaponta o próprio origin para o core.
 - **`Read(...)` de caminho do home vira bloqueio do sistema sob sandbox.** O Claude Code a aplica como negação de leitura
   do sandbox: o processo do Bash não lê aquele caminho, inclusive quando o leitor é a maquinaria. Com a regra do
   `hosts.yml` do `gh`, `gh auth status` e o credential helper do git quebram (medido). A exceção
