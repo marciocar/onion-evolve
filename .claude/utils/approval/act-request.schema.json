@@ -1,0 +1,325 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/marciocar/onion-evolve/.claude/utils/approval/act-request.schema.json",
+  "title": "onion.act-request/1 e onion.act-approval/1",
+  "description": "Esquema de ATO compartilhado do «pode rodar» (autorização de um toque). O PEDIDO nasce na sessão que preparou o ato; a APROVAÇÃO nasce do canal do aprovador; o EXECUTOR confere os dois contra o vivo e grava o uso único no livro dele. O hash é sha256 da forma canônica: JSON com chaves ordenadas, sem espaços, UTF-8 (estilo JCS; só inteiros, sem ponto flutuante), calculado sobre o objeto SEM o campo hash. A v1 implementa só role=maestro, scope=execution, channel=prompt (nível 1); o resto está declarado e é recusado com mensagem clara. Camada de CONFORMIDADE, não fronteira de segurança: no mesmo usuário Unix o agente pode forjar os arquivos.",
+  "$defs": {
+    "iso_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "level": {
+      "type": "integer",
+      "enum": [
+        1,
+        2,
+        3
+      ],
+      "description": "1 = frase digitada pelo humano no prompt da sessão que pediu (implementado). 2 = aprovação FORA DA BANDA, numa identidade que o agente não controla: DM assinada no Slack pela ponte (onion-messaging/onion-bridge, portão por identidade) ou WhatsApp ao celular do maestro; ou review no forge por conta humana enquanto os agentes usam identidade própria (bot/App). Declarado, não implementado. 3 = passkey/2FA (step-up RFC 9470; NIST 800-63-4 AAL3). Declarado, não implementado."
+    },
+    "required_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "scope",
+        "min_level"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "maestro (implementado) ou o dono da área (coo, cmo, ceo…: declarado)."
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "content",
+            "execution"
+          ],
+          "description": "content = o QUÊ (dono da área); execution = o COMO, quando toca produção, segurança ou credencial (maestro)."
+        },
+        "min_level": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "received_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "approver_id",
+        "channel",
+        "level",
+        "at"
+      ],
+      "properties": {
+        "role": {
+          "type": "string"
+        },
+        "approver_id": {
+          "type": "string",
+          "description": "No nível 1 é só o canal da sessão (prompt:<session_id>): o prompt não prova QUEM digitou, só que foi digitado."
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "prompt",
+            "slack-signed",
+            "passkey"
+          ],
+          "description": "prompt = nível 1 (implementado); slack-signed = nível 2; passkey = nível 3."
+        },
+        "level": {
+          "$ref": "#/$defs/level"
+        },
+        "at": {
+          "$ref": "#/$defs/iso_utc"
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "act",
+        "target",
+        "level",
+        "approvals_required",
+        "requested_by",
+        "created_at",
+        "nonce",
+        "executor",
+        "hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "onion.act-request/1"
+        },
+        "act": {
+          "type": "string",
+          "description": "v1: merge. Os atos da vps-ops (tools/acts/<ato>.sh) cabem aqui com o nome do ato. `plan` está DECLARADO e não implementado na v1 (o motor o recusa)."
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "repo",
+            "ref",
+            "sha"
+          ],
+          "properties": {
+            "repo": {
+              "type": "string",
+              "pattern": "^[a-z0-9._-]+/[a-z0-9._-]+$"
+            },
+            "ref": {
+              "type": "string",
+              "description": "ref completo (refs/heads/<branch> do head do PR)."
+            },
+            "sha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "pr": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "level": {
+          "$ref": "#/$defs/level"
+        },
+        "approvals_required": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/required_approval"
+          }
+        },
+        "requested_by": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "id"
+          ],
+          "properties": {
+            "kind": {
+              "const": "claude-session"
+            },
+            "id": {
+              "type": "string",
+              "minLength": 8
+            }
+          }
+        },
+        "created_at": {
+          "$ref": "#/$defs/iso_utc"
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "executor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "run"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "run": {
+              "type": "string",
+              "description": "o comando que a sessão roda depois da palavra"
+            }
+          }
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "external"
+          ],
+          "description": "o que o ato faz: read = leitura pura, que NUNCA pede aprovação (não nasce pedido); write = escreve no estado local ou no repo; external = age fora da máquina (forge, rede, terceiro). O merge é external."
+        },
+        "plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "deadline",
+            "steps"
+          ],
+          "description": "APROVAÇÃO POR PLANO (declarada, não implementada na v1; o hub mediu que aprovar passo a passo é «terrível»): um pedido act=plan com N passos. Um único «pode rodar» vale para o LOTE, dentro do escopo e do prazo; cada passo executado ainda confere o hash dele contra o plano (o executor recalcula o passo vivo e exige que o hash esteja entre os steps).",
+          "properties": {
+            "scope": {
+              "type": "string",
+              "description": "a tarefa a que o lote pertence"
+            },
+            "deadline": {
+              "$ref": "#/$defs/iso_utc",
+              "description": "prazo do lote (ex.: 30 min depois da palavra)"
+            },
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "effect_text",
+                  "effect",
+                  "act",
+                  "target",
+                  "hash"
+                ],
+                "properties": {
+                  "effect_text": {
+                    "type": "string",
+                    "description": "o efeito do passo em linguagem simples, para o maestro ler antes da palavra"
+                  },
+                  "effect": {
+                    "type": "string",
+                    "enum": [
+                      "read",
+                      "write",
+                      "external"
+                    ]
+                  },
+                  "act": {
+                    "type": "string"
+                  },
+                  "target": {
+                    "type": "object"
+                  },
+                  "hash": {
+                    "$ref": "#/$defs/sha256",
+                    "description": "hash canônico do passo (sem este campo)"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "request_hash",
+        "request",
+        "approvals",
+        "evidence",
+        "expires_at",
+        "nonce",
+        "hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "onion.act-approval/1"
+        },
+        "request_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "request": {
+          "$ref": "#/$defs/request"
+        },
+        "approvals": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/received_approval"
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "description": "channel=prompt: o prompt_id do payload do hook e o transcript, que o executor relê para confirmar origin.kind=human e promptSource typed|queued.",
+          "properties": {
+            "prompt_id": {
+              "type": "string"
+            },
+            "transcript_path": {
+              "type": "string"
+            },
+            "phrase": {
+              "type": "string"
+            }
+          }
+        },
+        "expires_at": {
+          "$ref": "#/$defs/iso_utc"
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "hash": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/approval"
+    }
+  ]
+}

@@ -212,6 +212,15 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/userprompt-one-touch-approval.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionEnd": [

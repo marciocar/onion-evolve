@@ -26921,6 +26921,184 @@ STUB
   [ "${o}" = "cliente/repo" ] && record_pass "pr-merge-verified: (b1) HTTPS://GitHub.com/Cliente/Repo.git normaliza para cliente/repo" || record_fail "pr-merge-verified: (b1)" "veio '${o}'"
   o="$(bash -c "$(sed "s/tr '\[:upper:\]' '\[:lower:\]' <<< \"\$1\" | sed -E/sed -E/; s/; s#\/+\$##'; }/; s#\/+\$##' <<< \"\$1\"; }/" <<< "${_sn}")"$'\n_slug_norm HTTPS://GitHub.com/Cliente/Repo.git' 2>&1)"
   [ "${o}" != "cliente/repo" ] && record_pass "pr-merge-verified: (b1-MUT) sem as minúsculas antes, o esquema maiúsculo escapa ('${o}') — a ordem é a causa" || record_fail "pr-merge-verified: (b1-MUT)" "o mutante também normalizou"
+  # ── «PODE RODAR», nível 1 (2026-11-18): a autorização de um toque. A sessão pede (--one-touch-request, depois de todos
+  # os gates), o hook UserPromptSubmit grava a aprovação quando o prompt é a frase sozinha, e o executor (--one-touch)
+  # confere repo/ref/PR/sha vivos, TTL, o livro de uso único DELE e o prompt humano no transcript. O hook roda como o
+  # runner o invoca (payload no stdin); o script roda sob o "claude" falso, como a sessão do core.
+  mkdir -p "${fc}/.claude/hooks" "${fc}/.claude/utils/approval"
+  cp "${REPO_ROOT}/.claude/hooks/userprompt-one-touch-approval.sh" "${fc}/.claude/hooks/"
+  cp "${REPO_ROOT}/.claude/utils/approval/one_touch.py" "${fc}/.claude/utils/approval/"
+  local _ote="${fc}/.claude/utils/approval/one_touch.py" _otx="${d}/ot-engine-intacto.py" _oth="${fc}/.claude/hooks/userprompt-one-touch-approval.sh"
+  cp "${_ote}" "${_otx}"
+  local _otsid="0123abcd-0000-4000-8000-00000000aaaa" _otst="${d}/otstate" _otcc="${d}/otcc" _otn=0 _otpid="" _oto="" _otrc=0
+  local _ottp="${_otcc}/projects/p/${_otsid}.jsonl" _otappr="${d}/otstate/onion/approvals/approvals/0123abcd-0000-4000-8000-00000000aaaa.json"
+  mkdir -p "$(dirname "${_ottp}")"; : > "${_ottp}"
+  local _otm1=".claude/settings.json docs/evolution/review/feat-x.md" _otc40="cccccccccccccccccccccccccccccccccccccccc"
+  _otrun() { # $1=cwd $2=script ; resto = args → _oto, _otrc (o merge fica em ${d}/merge-args)
+    local cwd="$1" scr="$2"; shift 2
+    echo 0 > "${d}/n"; : > "${d}/merge-args"
+    _oto="$(cd "${cwd}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="OPEN|null" \
+      GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x GH_WF_COUNT=5 \
+      GH_PR_FILES="${OT_FILES-${_otm1}}" GH_RESIDUE="" GH_BEHIND_BY="${OT_BEHIND:-0}" STUB_HEAD_SHA="${OT_SHA:-}" ONION_MERGE_POLL_SECS=0 \
+      XDG_STATE_HOME="${_otst}" CLAUDE_CONFIG_DIR="${_otcc}" CLAUDE_CODE_SESSION_ID="${_otsid}" \
+      env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${scr}' 999 $*; exit \$?" 2>&1)"; _otrc=$?
+  }
+  _othook() { # $1=prompt $2=prompt_id → a saída do hook, invocado como o runner (payload JSON no stdin)
+    python3 -I -c 'import json,sys;print(json.dumps({"session_id":sys.argv[1],"transcript_path":sys.argv[2],"prompt_id":sys.argv[3],"prompt":sys.argv[4],"hook_event_name":"UserPromptSubmit","cwd":"/x","permission_mode":"bypassPermissions"}))' \
+      "${_otsid}" "${_ottp}" "$2" "$1" | XDG_STATE_HOME="${_otst}" CLAUDE_CONFIG_DIR="${_otcc}" bash "${_oth}" 2>&1 \
+      | python3 -I -c 'import json,sys
+t=sys.stdin.read()
+try: print(json.loads(t)["hookSpecificOutput"]["additionalContext"])
+except Exception: print(t)'
+  }
+  _ottr() { # $1=prompt_id $2=origin.kind $3=promptSource $4=isMeta(0|1) $5=texto [$6=segundos no passado] → a entrada do transcript
+    python3 -I -c 'import json,sys,time
+e={"type":"user","promptId":sys.argv[1],"promptSource":sys.argv[3],"timestamp":time.strftime("%Y-%m-%dT%H:%M:%S.000Z",time.gmtime(time.time()-int(sys.argv[6] if len(sys.argv)>6 else 0))),"message":{"role":"user","content":sys.argv[5]}}
+if sys.argv[2]!="-": e["origin"]={"kind":sys.argv[2]}
+if sys.argv[4]=="1": e["isMeta"]=True
+print(json.dumps(e))' "$@" >> "${_ottp}"
+  }
+  _otarm() { # [kind source meta] → o pedido pelo script, a palavra pelo hook e a entrada no transcript; deixa _otpid
+    _otn=$((_otn+1)); _otpid="pid-${_otn}"
+    _otrun "${fc}" "${_pi}" --one-touch-request
+    [ "${_otrc}" -eq 0 ] || record_fail "pr-merge-verified: (ot-arm ${_otn})" "o pedido falhou: $(tail -1 <<< "${_oto}")"
+    _othook "pode rodar" "${_otpid}" >/dev/null
+    _ottr "${_otpid}" "${1:-human}" "${2:-typed}" "${3:-0}" "pode rodar"
+  }
+  _otcase() { # $1=rótulo $2=rc esperado (0 mergeia | 1 recusa sem merge) $3=trecho da saída
+    if { [ "$2" = 0 ] && [ "${_otrc}" -eq 0 ] && [ -s "${d}/merge-args" ]; } || { [ "$2" = 1 ] && [ "${_otrc}" -ne 0 ] && [ ! -s "${d}/merge-args" ]; }; then
+      grep -qF -- "$3" <<< "${_oto}" && { record_pass "pr-merge-verified: $1"; return 0; }
+    fi
+    record_fail "pr-merge-verified: $1" "rc=${_otrc} merge=$(head -c 60 "${d}/merge-args") out=$(tail -2 <<< "${_oto}" | tr '\n' '|' | cut -c1-300)"
+  }
+  _otmut() { sed "$1" "${_otx}" > "${_ote}"; cmp -s "${_otx}" "${_ote}" && record_fail "pr-merge-verified: $2" "a âncora do mutante sumiu"; }
+  _otrestore() { cp "${_otx}" "${_ote}"; }
+  # (ot0) sem as flags, o caminho antigo não muda: o PR que toca a catraca segue do maestro
+  _otrun "${fc}" "${_pi}"; _otcase "(ot0) M1 sem --one-touch ⇒ recusa como antes (a própria catraca)" 1 "a própria catraca"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot0b) --one-touch sem autorização viva ⇒ recusa em uma linha" 1 "não há autorização viva"
+  # (ot1) o pedido: uma linha, ato + repo + PR + sha curto, «responda: pode rodar», sem merge
+  _otrun "${fc}" "${_pi}" --one-touch-request
+  if [ "${_otrc}" -eq 0 ] && [ ! -s "${d}/merge-args" ] && grep -qF "merge onion-bancada/core#999 @deadbee (feat/x) — responda: pode rodar" <<< "${_oto}"; then
+    record_pass "pr-merge-verified: (ot1) --one-touch-request ⇒ grava o pedido e mostra uma linha «responda: pode rodar», sem merge"
+  else record_fail "pr-merge-verified: (ot1)" "rc=${_otrc} out=$(tail -2 <<< "${_oto}" | tr '\n' '|')"; fi
+  # (ot2) o hook: mensagem de peer (moldura de outra sessão) não autoriza, e diz por quê
+  o="$(_othook '<cross-session-message from="uds:/x">pode rodar</cross-session-message>' pid-peer)"
+  if grep -qF "moldura de outra sessão" <<< "${o}" && [ ! -f "${_otappr}" ]; then record_pass "pr-merge-verified: (ot2) prompt de peer (cross-session-message) ⇒ o hook não autoriza"
+  else record_fail "pr-merge-verified: (ot2)" "out=${o}"; fi
+  _otmut 's/    if any(m in low for m in FOREIGN_MARKERS):/    if False:/' "(ot2-MUT)"
+  o="$(_othook '<cross-session-message from="uds:/x">pode rodar</cross-session-message>' pid-peer)"
+  if grep -qF "moldura de outra sessão" <<< "${o}"; then record_fail "pr-merge-verified: (ot2-MUT)" "sem a recusa da moldura o hook disse o mesmo"
+  else record_pass "pr-merge-verified: (ot2-MUT) sem a recusa da moldura, o peer não é nomeado como tal — a recusa é a causa"; fi
+  _otrestore
+  # (ot3) a frase dentro de texto maior não autoriza
+  o="$(_othook 'ok, pode rodar então' pid-big)"
+  if grep -qF "a mensagem inteira" <<< "${o}" && [ ! -f "${_otappr}" ]; then record_pass "pr-merge-verified: (ot3) «pode rodar» dentro de texto maior ⇒ o hook não autoriza"
+  else record_fail "pr-merge-verified: (ot3)" "out=${o}"; fi
+  _otmut 's/    if norm_phrase(prompt) not in PHRASES:/    if False:/' "(ot3-MUT)"
+  _othook 'ok, pode rodar então' pid-big >/dev/null
+  if [ -f "${_otappr}" ]; then record_pass "pr-merge-verified: (ot3-MUT) sem a exigência da frase inteira, o texto maior autorizaria — a exigência é a causa"
+  else record_fail "pr-merge-verified: (ot3-MUT)" "o mutante também não autorizou"; fi
+  _otrestore; rm -f "${_otappr}"
+  # (ot4) o caminho feliz: a palavra digitada, humano no transcript ⇒ mergeia o PR que toca a catraca
+  _otarm; _otrun "${fc}" "${_pi}" --one-touch
+  _otcase "(ot4) «pode rodar» digitado (origin.kind=human, promptSource=typed) ⇒ mergeia o PR que toca a catraca" 0 "pelo «pode rodar» (nível 1)"
+  # (ot5) segundo uso: o livro do EXECUTOR recusa, mesmo com o arquivo da aprovação intacto no lugar
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot5) segundo uso da mesma autorização ⇒ recusa (livro do executor)" 1 "já foi usada"
+  _otmut 's/^def ledger_hit(lines, appr):$/def ledger_hit(lines, appr):\n    return False/' "(ot5-MUT)"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot5-MUT) sem o livro do executor, o segundo uso mergearia — o livro é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (ot5c) REPLAY: o hook regravado com o MESMO prompt_id depois do uso gera aprovação de hash novo; o livro guarda o
+  # prompt_id e recusa (revisão separada de 18/11, achado 1)
+  _othook "pode rodar" "${_otpid}" >/dev/null
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot5c) aprovação regravada para a mesma palavra (hash novo, mesmo prompt_id) ⇒ recusa" 1 "já foi usada"
+  _otmut 's/        if cols\[0\] == appr\["hash"\] or (len(cols) > 1 and cols\[1\] == pid):/        if cols[0] == appr["hash"]:/' "(ot5c-MUT)"
+  _othook "pode rodar" "${_otpid}" >/dev/null
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot5c-MUT) com o livro só pelo hash, a palavra se reusaria — o prompt_id no livro é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (ot12) auto-compactação no envio: o resumo entra ANTES com o MESMO promptId (medido na revisão); julga-se a entrada
+  # que traz a frase
+  _otn=$((_otn+1)); _otpid="pid-${_otn}"
+  _otrun "${fc}" "${_pi}" --one-touch-request; _othook "pode rodar" "${_otpid}" >/dev/null
+  _ottr "${_otpid}" - - 0 "This session is being continued from a previous conversation."; _ottr "${_otpid}" human typed 0 "pode rodar"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot12) resumo da compactação com o mesmo promptId antes do prompt humano ⇒ mergeia" 0 "pelo «pode rodar»"
+  _otn=$((_otn+1)); _otpid="pid-${_otn}"
+  _otrun "${fc}" "${_pi}" --one-touch-request; _othook "pode rodar" "${_otpid}" >/dev/null
+  _ottr "${_otpid}" - - 0 "This session is being continued from a previous conversation."; _ottr "${_otpid}" human typed 0 "pode rodar"
+  _otmut 's/            if norm_phrase(text) in PHRASES and not any(m in text.casefold() for m in FOREIGN_MARKERS):/            if True:/' "(ot12-MUT)"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot12-MUT) julgando a 1ª entrada do promptId, o resumo recusaria a palavra — a escolha pela frase é a causa" 1 "não é humano digitado"
+  _otrestore
+  # (ot13) sugestão aceita (promptSource suggestion_accepted) é texto do modelo: não autoriza
+  _otarm human suggestion_accepted 0; _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot13) «pode rodar» por sugestão aceita ⇒ recusa" 1 "sugestão aceita nunca autoriza"
+  # (ot6) prompt de peer que chegou a ter aprovação: o transcript diz origin.kind=peer, isMeta ⇒ recusa
+  _otarm peer system 1; _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot6) palavra vinda de peer no transcript (origin.kind=peer, isMeta) ⇒ recusa" 1 "não é humano digitado"
+  _otmut 's/    if origin.get("kind") != "human" or found.get("promptSource") not in HUMAN_PROMPT_SOURCES or found.get("isMeta"):/    if False:/' "(ot6-MUT)"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot6-MUT) sem conferir a origem no transcript, o peer mergearia — a conferência é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (ot7) TTL vencido ⇒ recusa
+  _otarm
+  python3 -I -c 'import json,sys;sys.path.insert(0,sys.argv[1]);import one_touch as o
+p=sys.argv[2];a=json.load(open(p));a["expires_at"]=o.utc(o.time.time()-5);a["hash"]=o.digest(a);json.dump(a,open(p,"w"))' "$(dirname "${_ote}")" "${_otappr}"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot7) autorização com o TTL vencido ⇒ recusa" 1 "venceu"
+  _otmut 's/        if time.time() > parse_utc(appr\["expires_at"\]):/        if False:/' "(ot7-MUT)"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot7-MUT) sem o TTL, a vencida mergearia — o TTL é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (ot7b) o TTL conta da PALAVRA no transcript: aprovação regravada agora para uma palavra de 11 min atrás ⇒ recusa
+  _otarm
+  local _otpid2="${_otpid}-velho"
+  python3 -I -c 'import json,sys;sys.path.insert(0,sys.argv[1]);import one_touch as o
+p=sys.argv[2];a=json.load(open(p));r=a["request"];r["created_at"]=o.utc(o.time.time()-1200);r["hash"]=o.digest(r);a["request_hash"]=r["hash"];a["evidence"]["prompt_id"]=sys.argv[3];a["hash"]=o.digest(a);json.dump(a,open(p,"w"))' "$(dirname "${_ote}")" "${_otappr}" "${_otpid2}"
+  _ottr "${_otpid2}" human typed 0 "pode rodar" 660
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot7b) palavra de 11 min atrás com aprovação regravada agora ⇒ recusa (o prazo é da palavra)" 1 "desde a palavra"
+  _otmut 's/    if time.time() > when + APPROVAL_TTL_S:/    if False:/' "(ot7b-MUT)"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot7b-MUT) com o prazo da gravação, a palavra velha valeria — o prazo da palavra é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (ot8) o sha mudou depois da palavra ⇒ recusa em uma linha E gasta a autorização (a palavra valia para o sha X)
+  _otarm; OT_SHA="${_otc40}" _otrun "${fc}" "${_pi}" --one-touch
+  _otcase "(ot8) sha mudou depois da palavra ⇒ recusa «o sha mudou: peça de novo depois do verde»" 1 "o sha mudou"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot8b) a autorização do sha que mudou foi GASTA: de volta ao sha antigo, recusa" 1 "já foi usada"
+  _otarm
+  _otmut 's/        if t.get("sha") != a.get("sha") or t.get("ref") != a.get("ref"):/        if False:/' "(ot8-MUT)"
+  OT_SHA="${_otc40}" _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot8-MUT) sem conferir o sha, o head novo mergearia — a conferência é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (ot9) com autorização viva NÃO há auto-rebase: precisar de rebase recusa e gasta a autorização
+  _otarm; OT_BEHIND=2 _otrun "${fc}" "${_pi}" --one-touch
+  _otcase "(ot9) autorização viva + PR atrás da base ⇒ recusa sem rebasear, e gasta a autorização" 1 "a autorização foi gasta"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot9b) depois da recusa por rebase, a autorização não vale mais" 1 "já foi usada"
+  _otarm
+  sed 's/^  if \[ "\${OT_LIVE}" -eq 1 \]; then$/  if false; then/' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (ot9-MUT)" "a âncora da recusa do rebase sumiu"
+  else
+    OT_BEHIND=2 _otrun "${fc}" "${fc}/ops/pmv-mut.sh" --one-touch
+    if [ "${_otrc}" -ne 0 ] && ! grep -qF "a autorização foi gasta" <<< "${_oto}"; then record_pass "pr-merge-verified: (ot9-MUT) sem a recusa, o script tentaria o auto-rebase com a autorização viva — a recusa é a causa"
+    else record_fail "pr-merge-verified: (ot9-MUT)" "rc=${_otrc} out=$(tail -1 <<< "${_oto}")"; fi
+  fi
+  rm -f "${fc}/ops/pmv-mut.sh"
+  # (ot1b) o pedido só nasce com o CI verde no head: check falho ⇒ nenhum pedido
+  rm -f "${_otst}/onion/approvals/requests/${_otsid}.json"
+  GH_VERDICT_FAIL=1 _otrun "${fc}" "${_pi}" --one-touch-request
+  if [ "${_otrc}" -ne 0 ] && [ ! -f "${_otst}/onion/approvals/requests/${_otsid}.json" ]; then record_pass "pr-merge-verified: (ot1b) check falho no head ⇒ o pedido não nasce (a palavra só vale com o verde)"
+  else record_fail "pr-merge-verified: (ot1b)" "rc=${_otrc} out=$(tail -1 <<< "${_oto}")"; fi
+  # (ot10) repo de CLIENTE é recusado mesmo com autorização viva para ele (pedido gravado direto no motor)
+  _otn=$((_otn+1)); _otpid="pid-${_otn}"
+  XDG_STATE_HOME="${_otst}" python3 -I "${_ote}" request --act merge --repo cliente/repo --ref refs/heads/feat/x \
+    --sha deadbeefdeadbeefdeadbeefdeadbeefdeadbeef --pr 999 --session "${_otsid}" --run x >/dev/null
+  _othook "pode rodar" "${_otpid}" >/dev/null; _ottr "${_otpid}" human typed 0 "pode rodar"
+  OT_FILES="a.txt" _otrun "${_cr_cli}" "${_pi}" --repo cliente/repo --one-touch
+  _otcase "(ot10) repo de cliente com autorização viva ⇒ recusa pelo dono, sempre" 1 "repo de cliente ou de empresa"
+  sed 's/^  \[ -n "\${_corown}" \] && \[ "\${_t%%\/\*}" = "\${_corown}" \] \\$/  true \\/' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (ot10-MUT)" "a âncora da recusa pelo dono sumiu"
+  else
+    OT_FILES="a.txt" _otrun "${_cr_cli}" "${fc}/ops/pmv-mut.sh" --repo cliente/repo --one-touch
+    _otcase "(ot10-MUT) sem a recusa pelo dono, o cliente autorizado mergearia — a recusa é a causa" 0 "autorização viva"
+  fi
+  rm -f "${fc}/ops/pmv-mut.sh"
+  # (ot11) o log de uso no formato dos atos da vps-ops: última linha «✓ RESULTADO», com o nível e a espera
+  o=""; for _f in "${_otst}/onion/approvals/acts/"approval-grant-*.log; do
+    [ -f "${_f}" ] && head -1 "${_f}" | grep -q '^── ato approval-grant · início ' && tail -1 "${_f}" | grep -qE '^✓ RESULTADO autorizado · act=merge level=1 wait_s=[0-9]+' && { o="${_f}"; break; }
+  done
+  if [ -n "${o}" ] && grep -qE $'^[0-9TZ:-]+\tgrant\tmerge\t1\t[0-9]+\t' "${_otst}/onion/approvals/usage.tsv"; then record_pass "pr-merge-verified: (ot11) o log da autorização segue o formato dos atos («── ato …» e «✓ RESULTADO … level=1 wait_s=N») e o usage.tsv mede a espera"
+  else record_fail "pr-merge-verified: (ot11)" "logs=$(ls "${_otst}/onion/approvals/acts/" 2>/dev/null | tr '\n' ' ')"; fi
+  unset -f _otrun _othook _ottr _otarm _otcase _otmut _otrestore
   cp "${d}/members-pre-1118" "${_mfy}"; git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm registro-volta
   git -C "${fc}" update-ref refs/remotes/origin/main "${_om}"
   rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote set-url origin "${d}/sem-remoto.git"
