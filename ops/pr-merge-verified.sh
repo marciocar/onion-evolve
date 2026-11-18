@@ -278,6 +278,53 @@ _delegated_env_guard() {
   HOME="${h}"; GH_CONFIG_DIR="${h}/.config/gh"; export HOME GH_CONFIG_DIR
 }
 [ "${DELEGATED_FOREIGN}" -eq 1 ] && _delegated_env_guard
+# ══ CATRACA DO REPO PRÓPRIO (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118, 2026-11-18) ════════════════════════════════
+# O dono selou que cada sessão do ecossistema merja o PRÓPRIO PR (inclusive o de guarda) e, no mesmo dia: «ainda assim
+# precisamos ter uma catraca com regra, para evitar casos de merge na master da granaai». A regra, antes de qualquer
+# efeito, para QUALQUER sessão do Claude Code entre os ancestrais (não só a do core) e sem --maestro:
+#   (1) o alvo é de quem é dono do core (o dono da constante _PMV_CORE_CONST): repo de cliente ou de empresa (outro dono
+#       no host) é SEMPRE recusado, mesmo listado, com resíduo isolado e CI verde. Só o dono mergeia lá;
+#   (2) LISTA FECHADA, a do members.yaml de origin/main do core (o registro que já existe; nenhuma lista nova): entra o
+#       membro `kind: source` (o core) e o que declara `owner_session:` (a sessão dona, D_BACKBONE_OWNER_1112), nunca o
+#       `kind: door` (porta é publicação, D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113). O que não está nela é recusado;
+#   (3) o alvo é o repo da própria sessão (o do cwd dela; a do core é dona do core), salvo a COORDENAÇÃO: a sessão do core
+#       com --foreign-repo (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113), que segue com as condições dela e agora também (1)+(2).
+# TETO: o registro é lido de origin/main sem buscar (o que a última busca trouxe); o dono do alvo é o do slug, não o do
+# host. O maestro, pelo terminal dele (sem ancestral) ou pelo `!` com --maestro, fica fora da catraca.
+_own_repo_gate() {
+  [ -n "${_SESSION_CWD}" ] && [ "${MAESTRO}" -eq 0 ] || return 0
+  local _t _own _m _row _corown="${_PMV_CORE_SLUG%%/*}"
+  _t="${_PMV_TARGET}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _t="$(_slug_norm "${REPO_ARG[1]}")"
+  [ "${_CORE_SESSION}" = 1 ] && [ "${#REPO_ARG[@]}" -lt 2 ] && _t="${_PMV_CORE_SLUG}"
+  [ -n "${_t}" ] || die "não sei em que repo este merge cairia (sem --repo e sem remote legível): a sessão só mergeia no repo próprio, listado. Nada foi feito."
+  [ -n "${_corown}" ] && [ "${_t%%/*}" = "${_corown}" ] \
+    || die "'${_t}' é de outro dono (${_t%%/*}), não da família Onion de ${_corown}: repo de cliente ou de empresa só o dono mergeia, nunca a sessão, nem com resíduo isolado e CI verde (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118). Nada foi feito."
+  _m="$(git -C "${_PMV_DIR}" show origin/main:docs/evolution/federation/members.yaml 2>/dev/null)" \
+    || die "não li docs/evolution/federation/members.yaml de origin/main do core: sem a lista fechada não sei se '${_t}' é repo que a sessão pode mergear. Nada foi feito."
+  _row="$(awk -v want="${_t}" '
+    function norm(v) { sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]*\(.*$/, "", v); gsub(/["'"'"' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v); sub(/\.git$/, "", v); sub(/\/+$/, "", v); return tolower(v) }
+    function flush() { if (rem != "" && rem == want && out == "") out = (kind == "" ? "?" : kind) "\t" (own == "" ? "-" : own); rem = ""; kind = ""; own = "" }
+    /^[[:space:]]*-[[:space:]]+id:/ { flush() }
+    /^[[:space:]]+kind:/ { k = $0; sub(/^[[:space:]]+kind:[[:space:]]*/, "", k); sub(/[[:space:]#].*$/, "", k); kind = k }
+    /^[[:space:]]+owner_session:/ { o = $0; sub(/^[[:space:]]+owner_session:[[:space:]]*/, "", o); sub(/[[:space:]#].*$/, "", o); gsub(/["'"'"']/, "", o); own = o }
+    /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
+    END { flush(); print out }' <<< "${_m}")"
+  local _k="${_row%%$'\t'*}" _o="${_row#*$'\t'}"
+  case "${_k}" in
+    "") die "'${_t}' não está na lista fechada (members.yaml de origin/main do core): a sessão só mergeia repo registrado como o core ou com sessão dona declarada (owner_session). Registre por PR, ou o dono roda com --maestro. Nada foi feito." ;;
+    door) die "'${_t}' é PORTA (kind: door): merge nela publica, e a publicação segue com o dono (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113). Nada foi feito." ;;
+    source) : ;;
+    *) [ "${_o}" != "-" ] || die "'${_t}' está no registro (kind: ${_k}) mas sem owner_session: fora da lista fechada, a sessão não mergeia lá. Declarar a sessão dona é PR no members.yaml; até lá, o dono roda com --maestro. Nada foi feito." ;;
+  esac
+  if [ "${_CORE_SESSION}" = 1 ]; then _own="${_PMV_CORE_SLUG}"
+  else _own="$(_slug_norm "$(git -C "${_SESSION_CWD}" remote get-url origin 2>/dev/null)")"; fi
+  if [ "${_t}" != "${_own}" ]; then
+    [ "${_CORE_SESSION}" = 1 ] && [ "${DELEGATED_FOREIGN}" -eq 1 ] \
+      || die "'${_t}' não é o repo desta sessão ('${_own:-ilegível}'): cada sessão mergeia só o próprio repo; em outro, só a coordenação do core pelo --foreign-repo. Nada foi feito."
+  fi
+  say "✓ catraca do repo próprio: '${_t}' é da família e está na lista fechada (${_k}$([ "${_o}" != "-" ] && printf ', sessão dona %s' "${_o}"))"
+}
+_own_repo_gate
 
 
 
@@ -436,7 +483,8 @@ _kg_guard_post() { # depois do merge PROVADO: cada sha da branch tem de ser ance
 _kg_guard_pre
 # (5ª passada, item 3 da decisão do maestro de 2026-11-13) PR do CORE que toca GUARDA (os hooks e o settings.json que os
 # registra, o moat-targets.tsv, os scripts delegados e o fecho deles, o sudoers) não é mergeado pela sessão: quem muda a
-# cerca não a atravessa sozinho. O merge desse PR é do maestro (--maestro, que o hook veta à sessão).
+# cerca não a atravessa sozinho. Desde 2026-11-18 (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118) a sessão o atravessa
+# com o resíduo de refutador independente (o _guard_pr_gate abaixo); sem ele, segue do maestro (--maestro).
 # A LISTA DE GUARDA é DERIVADA do moat-targets.tsv (o desta árvore e o de origin/main, somados: mais caminho é mais
 # estrito), nunca escrita à mão (6ª passada: a regex deixava de fora o publish-door.sh e os outros scripts de ato):
 # os scripts das linhas `ato` e `delega` e os wrappers das linhas de deploy/relógio. Somam-se os fixos: o próprio tsv, o
@@ -459,11 +507,51 @@ _guard_hits() { # stdin = os arquivos do PR; imprime os que são guarda
     done
   done
 }
+# (2026-11-18, D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118) o dono selou que a sessão merja o PRÓPRIO PR, inclusive o de
+# guarda. A troca: o que antes era «é do maestro» agora é «é da sessão, com o resíduo da REGRA 56 (PR aberto carrega
+# RESÍDUO da passada adversarial) declarando refutador INDEPENDENTE» — `elenxo: true`, `elenxo_isolado: true`, verdict
+# aceito e o diff carimbado, lidos no head. Sem isso, recusa como antes, dizendo o que falta. Tudo o mais do caminho
+# verificado segue adiante (CI verde no head, ponta da main, rascunho, provenance). O deploy, a produção, o firewall, o
+# segredo e a publicação externa NÃO mudam: são outras linhas do moat-targets.tsv, que o hook segue vetando à sessão.
+# TETO DECLARADO (o mesmo do fallback do revisor): `elenxo_isolado: true` é AUTO-ATESTADO no resíduo.
+# _isolated_residue_ok <slug> <por-quê> — lê o resíduo da branch no head e morre com o que falta; ao passar, deixa
+# _IR_REL, _IR_V e _IR_H (o caminho, o verdict e o sha do diff revisado). Usado aqui e no fallback do revisor.
+_FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
+_isolated_residue_ok() {
+  local _slug="$1" _why="$2" _rel _body _fm _dup _v _h _e _ei
+  [ -n "${HEAD_REF}" ] || die "${_why}, e não li a branch do PR para achar o resíduo. Nada foi mergeado."
+  _rel="docs/evolution/review/${HEAD_REF//\//-}.md"
+  grep -qxF -- "${_rel}" <<< "${_PR_FILES}" \
+    || die "${_why}; o PR não traz ${_rel}. Nada foi mergeado."
+  _body="$(gh api -H 'Accept: application/vnd.github.raw+json' "repos/${_slug}/contents/${_rel}?ref=${HEAD_SHA}" 2>/dev/null)" \
+    || die "${_why}; não li ${_rel} no head ${HEAD_SHA:0:8}. Nada foi mergeado."
+  _fm="$(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' <<< "${_body}")"
+  [ -n "${_fm}" ] || die "${_why}; ${_rel} sem frontmatter. Nada foi mergeado."
+  _dup="$(awk '/^[A-Za-z_][A-Za-z0-9_]*:/{k=$0; sub(/:.*/,"",k); if (c[k]++==1) printf "%s ", k}' <<< "${_fm}")"
+  [ -z "${_dup}" ] || die "${_why}; ${_rel} repete chave no frontmatter (${_dup}): o bash lê a 1ª e o YAML a última. Nada foi mergeado."
+  _fmv() { sed -n "s/^$1:[[:space:]]*//p" <<< "${_fm}" | head -1 | tr -d '"'"'"'[:space:]'; }
+  _e="$(_fmv elenxo | tr '[:upper:]' '[:lower:]')"; _ei="$(_fmv elenxo_isolado | tr '[:upper:]' '[:lower:]')"
+  [ "${_e}" = "true" ] || die "${_why}; ${_rel} declara elenxo: '${_e:-ausente}' (exige true). Nada foi mergeado."
+  [ "${_ei}" = "true" ] \
+    || die "${_why}; ${_rel} não declara elenxo_isolado: true (veio '${_ei:-ausente}'): Elenxo do mesmo agente é uma voz só. Nada foi mergeado."
+  _v="$(_fmv verdict | tr 'a-z-' 'A-Z_')"
+  case " ${_FB_OK_VERDICTS} " in
+    *" ${_v} "*) [ -n "${_v}" ] || die "${_why}; ${_rel} sem verdict. Nada foi mergeado." ;;
+    *) die "${_why}; ${_rel} tem verdict '${_v:-ausente}' (aceitos: ${_FB_OK_VERDICTS}). Nada foi mergeado." ;;
+  esac
+  _h="$(_fmv reviewed_diff_sha256)"
+  grep -qE '^[0-9a-f]{64}$' <<< "${_h}" \
+    || die "${_why}; ${_rel} tem reviewed_diff_sha256 '${_h:-ausente}': o resíduo não foi carimbado (o pr-finalize carimba). Nada foi mergeado."
+  unset -f _fmv
+  _IR_REL="${_rel}"; _IR_V="${_v}"; _IR_H="${_h}"
+}
 _guard_pr_gate() {
   [ "${_CORE_SESSION}" = 1 ] && [ "${MAESTRO}" -eq 0 ] || return 0
   if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(_slug_norm "${REPO_ARG[1]}")" != "${_PMV_CORE_SLUG}" ]; then return 0; fi
   local _g; _g="$(_guard_hits <<< "${_PR_FILES}" | head -5 | tr '\n' ' ')"
-  [ -z "${_g}" ] || die "o PR #${PR} toca GUARDA (${_g}): o merge dele é do maestro, não da sessão (decisão de 2026-11-13). Peça: ! bash ops/pr-merge-verified.sh ${PR} --maestro. Nada foi feito."
+  [ -z "${_g}" ] && return 0
+  _isolated_residue_ok "${_PMV_CORE_SLUG}" "o PR #${PR} toca GUARDA (${_g% }): a sessão o mergeia só com o resíduo da branch declarando refutador independente (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118); sem ele, o merge é do maestro (! bash ops/pr-merge-verified.sh ${PR} --maestro)"
+  say "✓ PR de GUARDA pela sessão: resíduo ${_IR_REL} com refutador independente (elenxo_isolado: true), verdict ${_IR_V}, diff ${_IR_H:0:12} (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)"
 }
 _guard_pr_gate
 # ══ MERGE ALHEIO DELEGADO (--foreign-repo, D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113, 2026-11-13) ══════════════════
@@ -1317,7 +1405,6 @@ fi
 # antigo do rename. Vale no CORE (a lista é dele); em repo alheio, dito e pulado. Veredito vermelho segue o caminho
 # de sempre (dispensa nomeada). Leitura que falha = recusa (fail-closed): "não medi" não vira "não toca".
 # TETO DECLARADO: `elenxo_isolado: true` é AUTO-ATESTADO no resíduo; o script exige a declaração, não a prova.
-_FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
 # A MAQUINARIA do revisor (3ª passada do refutador do #1652, N2): além do workflow e dos scripts do veredito, o que o CLI
 # do revisor CARREGA do head do PR — os hooks e o settings que os registra (o próprio onion-review.yml o registra:
 # "settings e 14 hooks presentes"), o CLAUDE.md, os agentes, as skills e o .mcp.json. Um hook do PR roda dentro do job
@@ -1369,34 +1456,10 @@ _fallback_guard_gate() {
   elif [ "${_RV_STATE}" = "none" ]; then _reason="não li veredito do revisor neste head"
   elif [ -n "${_POS_PROV}" ]; then _reason="a marca positiva não vale: ${_POS_PROV}"
   else _reason="o veredito verde não traz a marca positiva do juiz da base para o head ${GATE_SHA:0:8}"; fi
-  local _paths _why _rel _body _fm _dup _v _h _e _ei
+  local _paths
   _paths="$(head -5 <<< "${_gout}" | paste -sd' ' -)"
-  _why="o PR #${PR} toca GUARDA (${_paths}) e ${_reason}: o merge exige o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) com refutador independente (D_REVIEW_AUTO_WITH_FALLBACK_1113)"
-  [ -n "${HEAD_REF}" ] || die "${_why}, e não li a branch do PR para achar o resíduo. Nada foi mergeado."
-  _rel="docs/evolution/review/${HEAD_REF//\//-}.md"
-  grep -qxF -- "${_rel}" <<< "${_PR_FILES}" \
-    || die "${_why}; o PR não traz ${_rel}. Nada foi mergeado."
-  _body="$(gh api -H 'Accept: application/vnd.github.raw+json' "repos/${_slug}/contents/${_rel}?ref=${HEAD_SHA}" 2>/dev/null)" \
-    || die "${_why}; não li ${_rel} no head ${HEAD_SHA:0:8}. Nada foi mergeado."
-  _fm="$(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' <<< "${_body}")"
-  [ -n "${_fm}" ] || die "${_why}; ${_rel} sem frontmatter. Nada foi mergeado."
-  _dup="$(awk '/^[A-Za-z_][A-Za-z0-9_]*:/{k=$0; sub(/:.*/,"",k); if (c[k]++==1) printf "%s ", k}' <<< "${_fm}")"
-  [ -z "${_dup}" ] || die "${_why}; ${_rel} repete chave no frontmatter (${_dup}): o bash lê a 1ª e o YAML a última. Nada foi mergeado."
-  _fmv() { sed -n "s/^$1:[[:space:]]*//p" <<< "${_fm}" | head -1 | tr -d '"'"'"'[:space:]'; }
-  _e="$(_fmv elenxo | tr '[:upper:]' '[:lower:]')"; _ei="$(_fmv elenxo_isolado | tr '[:upper:]' '[:lower:]')"
-  [ "${_e}" = "true" ] || die "${_why}; ${_rel} declara elenxo: '${_e:-ausente}' (exige true). Nada foi mergeado."
-  [ "${_ei}" = "true" ] \
-    || die "${_why}; ${_rel} não declara elenxo_isolado: true (veio '${_ei:-ausente}'): Elenxo do mesmo agente é uma voz só. Nada foi mergeado."
-  _v="$(_fmv verdict | tr 'a-z-' 'A-Z_')"
-  case " ${_FB_OK_VERDICTS} " in
-    *" ${_v} "*) [ -n "${_v}" ] || die "${_why}; ${_rel} sem verdict. Nada foi mergeado." ;;
-    *) die "${_why}; ${_rel} tem verdict '${_v:-ausente}' (aceitos: ${_FB_OK_VERDICTS}). Nada foi mergeado." ;;
-  esac
-  _h="$(_fmv reviewed_diff_sha256)"
-  grep -qE '^[0-9a-f]{64}$' <<< "${_h}" \
-    || die "${_why}; ${_rel} tem reviewed_diff_sha256 '${_h:-ausente}': o resíduo não foi carimbado (o pr-finalize carimba). Nada foi mergeado."
-  unset -f _fmv
-  say "✓ PR de GUARDA sem revisão válida do CI (${_reason}): resíduo ${_rel} com refutador independente (elenxo_isolado: true), verdict ${_v}, diff ${_h:0:12}"
+  _isolated_residue_ok "${_slug}" "o PR #${PR} toca GUARDA (${_paths}) e ${_reason}: o merge exige o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) com refutador independente (D_REVIEW_AUTO_WITH_FALLBACK_1113)"
+  say "✓ PR de GUARDA sem revisão válida do CI (${_reason}): resíduo ${_IR_REL} com refutador independente (elenxo_isolado: true), verdict ${_IR_V}, diff ${_IR_H:0:12}"
 }
 _fallback_guard_gate
 # Falhos do head, um por linha — e a dispensa é aplicada NOME A NOME, nunca em bloco.
