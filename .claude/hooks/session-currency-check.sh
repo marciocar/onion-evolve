@@ -40,7 +40,22 @@
 # o censo (não depende de rede nem de registro).
 # TETO: o conserto sugerido escreve no `--local`; se o absoluto vier de config por worktree
 # (extensions.worktreeConfig), o lugar certo é `--worktree`, e o texto não distingue.
+#
+# ── AUTO-REVERSÃO (2026-11-18) ─────────────────────────────────────────────────────────────────────
+# Pedido do dono: «resolver o que causa, ou saber que quando acontece tem de ser revertido». A causa a
+# montante é do Claude Code e não está ao alcance da casa; então, quando o valor é EXATAMENTE a forma que
+# o Claude Code grava, `<raiz do checkout principal>/.githooks` no escopo `local` (o .git/config comum),
+# o hook roda `git config --local core.hooksPath .githooks` e diz que reverteu, de onde para onde e a
+# causa. É o mesmo diretório que o relativo resolve no checkout principal, então ali nada muda; nas
+# worktrees, cada branch volta a rodar o próprio .githooks/. QUALQUER outra forma (barra final, `~/`, o
+# .githooks da worktree, escopo worktree/global) segue só no aviso: não se adivinha intenção alheia.
+# Falha do `git config` (lock, permissão) ou valor que não ficou relativo ⇒ o aviso antigo volta.
+# GATILHO MAIS CEDO: com `--hookspath-only` o hook roda SÓ esta função e responde em JSON de
+# PostToolUse; o settings.json o liga ao PostToolUse da ferramenta Agent (a worktree de agente nasce no
+# meio do turno). O WorktreeCreate do Claude Code SUBSTITUI a criação (docs de hooks), não a observa:
+# parqueado com gatilho em D_WORKTREECREATE_PROPRIO_PARQUEADO_1026.
 set -uo pipefail
+mode="${1:-}"
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 census="${ONION_CURRENCY_CENSUS:-${here}/../validation/currency-census.sh}"
 repo="${CLAUDE_PROJECT_DIR:-$(pwd)}"
@@ -72,11 +87,32 @@ hookspath_reminder() {
     *) abs="" ;;
   esac
   if [ -z "${abs}" ]; then [ -z "${mark}" ] || rm -f "${mark}" 2>/dev/null; return 0; fi
+  # AUTO-REVERSÃO: só a forma EXATA que o Claude Code grava, e só no escopo `local` (o .git/config comum)
+  local root scope
+  root=""; [ -z "${common}" ] || root="$(dirname "${common}")"
+  scope="$(git -C "${repo}" config --show-scope --get core.hooksPath 2>/dev/null | cut -f1)" || scope=""
+  if [ -n "${root}" ] && [ "${hp}" = "${root}/.githooks" ] && [ "${scope}" = "local" ]; then
+    if git -C "${repo}" config --local core.hooksPath .githooks 2>/dev/null \
+      && [ "$(git -C "${repo}" config --get core.hooksPath 2>/dev/null)" = ".githooks" ]; then
+      [ -z "${mark}" ] || rm -f "${mark}" 2>/dev/null
+      echo "🔧 Onion — core.hooksPath REVERTIDO de '${hp}' para '.githooks' (relativo, no .git/config comum): com o absoluto toda worktree rodava o .githooks/ do checkout principal, não o da própria branch. Causa conhecida: o Claude Code grava o caminho absoluto ao criar worktree de agente."
+      echo "  (Repasse ao maestro com a fonte: esta reversão é do hook session-currency-check.sh; nada foi bloqueado.)"
+      return 0
+    fi
+  fi
   [ -n "${mark}" ] && [ "$(cat "${mark}" 2>/dev/null)" = "${hp}" ] && return 0
   [ -z "${mark}" ] || printf '%s' "${hp}" > "${mark}" 2>/dev/null
   echo "⚠️ Onion — core.hooksPath está ABSOLUTO ('${hp}'): toda worktree roda o .githooks/ do checkout principal, não o da própria branch, e um PR que muda o pre-commit não é provado por ele mesmo. Conserto: git config core.hooksPath .githooks (causa conhecida: o Claude Code grava o caminho absoluto ao criar worktree de agente)."
   echo "  (Repasse ao maestro com a fonte: este lembrete é do hook session-currency-check.sh; nada foi bloqueado.)"
 }
+if [ "${mode}" = "--hookspath-only" ]; then
+  # PostToolUse: stdout puro não chega ao modelo; o texto vai como additionalContext (JSON escapado à mão)
+  msg="$(hookspath_reminder)"
+  [ -n "${msg}" ] || exit 0
+  msg="${msg//\\/\\\\}"; msg="${msg//\"/\\\"}"; msg="${msg//$'\n'/\\n}"; msg="${msg//$'\t'/\\t}"
+  printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "${msg}"
+  exit 0
+fi
 hookspath_reminder
 [ -f "${census}" ] || exit 0
 tsv="$(bash "${census}" "${repo}" --tsv </dev/null 2>/dev/null)" || exit 0
