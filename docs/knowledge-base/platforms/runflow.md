@@ -1,31 +1,37 @@
 ---
 title: Runflow
 category: platforms
-verified_at: 2026-07-23
-source: docs.runflow.ai
+verified_at: 2026-11-18
+source: "https://docs.runflow.ai/llms-full.txt"
 # `version:` REMOVIDO em 2026-09-30: significava a versão do ALVO (não da KB), que é exatamente a
 # ambiguidade que `applies_to:` existe para desfazer. Manter os dois gravaria a ambiguidade em dobro.
 created: 2025-11-18T21:19:48Z
-updated: 2026-07-23
+updated: 2026-11-18
 sources:
   - type: official-docs
-    url: https://docs.runflow.ai/
-    consulted_at: 2026-07-23
-    description: Documentação oficial Runflow (re-verificada via WebFetch)
+    url: https://docs.runflow.ai/llms-full.txt
+    consulted_at: 2026-11-18
+    description: Documentação oficial Runflow, texto integral (HTTP 200, 720 KB); blocos e citações desta KB conferidos contra ele por script
   - type: link
     url: https://registry.npmjs.org/@runflow-ai/sdk/latest
-    consulted_at: 2026-07-23
-    description: Registry npm — versão do pacote @runflow-ai/sdk (1.6.2)
+    consulted_at: 2026-11-18
+    description: Registry npm — versão do pacote @runflow-ai/sdk (1.10.7, publicada em 2026-11-13; engines node >=22.0.0)
+  - type: link
+    url: https://registry.npmjs.org/@runflow-ai/cli/latest
+    consulted_at: 2026-11-18
+    description: Registry npm — versão do pacote @runflow-ai/cli (0.5.6)
   - type: official-docs
     url: https://www.npmjs.com/package/@runflow-ai/sdk
     consulted_at: 2026-07-23
     description: Pacote npm oficial
-applies_to: "@runflow-ai/sdk 1.6.2 — ⚠️ DRIFT INTERNO: o corpo ainda cita SDK 1.3 em dois lugares; não resolvido, declarado. O campo `version:` desta KB já significava a versão do ALVO, que é a ambiguidade que o `applies_to` desfaz"
+applies_to: "@runflow-ai/sdk 1.10.7 (registry npm, 2026-11-18). As duas menções a SDK 1.3.2 no corpo NÃO são drift: são o mínimo que a própria doc declara para `Knowledge.ingestFile` ('Available since SDK 1.3.2'), conferido em 2026-11-18. O campo `version:` desta KB já significava a versão do ALVO, que é a ambiguidade que o `applies_to` desfaz"
 ---
 
 # Runflow
 
-> **KB re-verificado contra `docs.runflow.ai` em 2026-07-23; Runflow é spin-off do IFTL.**
+> **KB re-verificado contra `docs.runflow.ai` em 2026-07-23 e de novo em 2026-11-18; Runflow é spin-off do IFTL.**
+>
+> **Reverificação de 2026-11-18 (como foi feita):** o texto integral `docs.runflow.ai/llms-full.txt` (HTTP 200) foi baixado e um script conferiu cada bloco de código e cada citação `*"…"*` desta KB contra ele. Resultado: as APIs, imports e exemplos seguem presentes; três citações tinham mudado de redação e foram corrigidas (retorno do `main()`, frase de abertura de Memory, contagem de providers); o quickstart trocou `rf login --api-key` pelo login no navegador; o SDK foi de 1.6.2 a **1.10.7** (registry npm, 2026-11-13). As linhas que o script não achou literalmente são **resumos de assinatura** escritos por esta KB a partir das páginas (createTool, Memory, identify, observabilidade), não blocos copiados; os nomes de função de cada uma foram achados na doc. A doc cresceu além do que esta KB cobre: ver §Superfície nova.
 > Todo bloco de código e assinatura de API abaixo foi extraído VERBATIM das páginas oficiais consultadas
 > nessa data. Onde a doc não cobre um ponto, está marcado explicitamente — nada foi preenchido de memória.
 > O pin anterior deste KB (`@runflow-ai/sdk` 1.0.56, nov/2025) estava ~8 meses defasado; o SDK saltou para
@@ -69,7 +75,7 @@ Parâmetros de entrada de `main()` (verbatim):
 - `input.email`, `input.phone` — identificadores de usuário
 - Campos adicionais vindos da integração
 
-Retorno (verbatim): *"An object containing at least `message` (agent's response) plus optional metadata."*
+Retorno (verbatim, redação de 2026-11-18): *"An object with at least `message` — the agent's response"*. (A redação de jul/2026 era "An object containing at least `message` (agent's response) plus optional metadata".)
 
 ```typescript
 import { Agent, openai } from '@runflow-ai/sdk';
@@ -156,10 +162,12 @@ npm install @runflow-ai/sdk
 
 ```bash
 npm i -g @runflow-ai/cli
-rf login --api-key YOUR_API_KEY
+rf login   # opens your browser to sign in
 rf create --name my-agent --template starter --yes
 cd my-agent/
 ```
+
+> Reverificado em 2026-11-18: o quickstart trocou `rf login --api-key YOUR_API_KEY` pelo login no navegador. A chave de API segue para automação e CI (`rf login --api-key sk-xxx --profile prod`, ver §CLI).
 
 ### Exemplo mínimo (quickstart, verbatim)
 
@@ -227,7 +235,7 @@ NODE_ENV=development
 ```
 
 Ordem de prioridade (verbatim): *"Explicit code config → `.runflow/rf.json` → Environment variables →
-Defaults."* Nota: *"existing environment variables are **never overwritten**."*
+Defaults."* Nota: *"Existing environment variables are **never overwritten**"* (a doc completa: *"— explicit env vars always take priority over rf.json values."*)
 
 ## 🤖 Agents — construtor completo
 
@@ -288,9 +296,7 @@ const response = await agent.generate(input: string | Message[]): Promise<{ text
 
 ## 🧠 Providers / Modelos
 
-Lista real de providers suportados (verbatim, `providers/llm-provider.md`): *"Runflow supports eight
-provider types: OpenAI, Anthropic, AWS Bedrock, Groq, Google Gemini, xAI, Azure OpenAI, and custom
-OpenAI-compatible providers."*
+Lista real de providers suportados (`providers/llm-provider.md`; redação de 2026-11-18: *"Runflow supports 8 LLM provider types out of the box."*): OpenAI, Anthropic, AWS Bedrock, Groq, Google Gemini, xAI, Azure OpenAI e custom OpenAI-compatible. ⚠️ A lista de tools do conector MCP (`get_available_provider_types`) enumera **sete**, sem xAI; inconsistência da própria doc, não resolvida aqui.
 
 ```typescript
 import { openai, anthropic, bedrock, groq, gemini, xai, custom } from '@runflow-ai/sdk';
@@ -564,12 +570,12 @@ Parâmetros (verbatim): `provider` (`'tavily'|'exa'|'serper'`, default `tavily`)
 
 ## 🧵 Memory
 
-Verbatim: *"Memory system provides intelligent conversation history management"* — com trimming automático
+Verbatim (redação de 2026-11-18): *"Intelligent conversation history management"* — com trimming automático
 por `maxTurns`/`maxTokens` e compaction via summarization. Distinção citada: *"Appending fake messages to
 conversation history to persist arbitrary data is unreliable."* — memória é para contexto de conversa; para
 persistir valores JSON exatos, use o **KV Store**.
 
-APIs — Standalone Memory (métodos estáticos, *"99% dos casos"*): `Memory.append()`, `Memory.getFormatted()`,
+APIs — Standalone Memory (métodos estáticos, "most common - 99% of cases" na doc): `Memory.append()`, `Memory.getFormatted()`,
 `Memory.getRecent(n)`, `Memory.search()`, `Memory.exists()`, `Memory.get()`, `Memory.clear()`.
 
 Instance-based:
@@ -967,8 +973,8 @@ Comandos principais (tabela verbatim):
 | Comando | Descrição |
 |---------|-----------|
 | `rf create` | Gerar novos agentes a partir de templates |
-| `rf login` | Autenticar com a API RunFlow |
-| `rf switch` | Alternar entre perfis salvos |
+| `rf login` | Login pelo navegador (ou chave de API para automação) |
+| `rf switch` | Alternar entre tenants/perfis |
 | `rf agents` | Gerenciar agentes (deploy, clone, duplicar) |
 | `rf kb` | Gerenciar bases de conhecimento para RAG |
 | `rf prompts` | Gerenciar templates de prompts (CRUD) |
@@ -1228,10 +1234,10 @@ export async function main(input: any) {
 
 ### Pontos não cobertos pela doc consultada (não inventar)
 
-- **Número de versão dentro da doc**: nenhuma página cita literalmente "1.6.2". O `1.6.2` deste KB vem do
-  **registry npm** (verificado 2026-07-23). A doc só cita mínimos pontuais: cross-agent exige
-  `@runflow-ai/sdk >= 1.2.0`; `Knowledge.ingestFile` requer **SDK 1.3.2+**. Confirmar com a IFTL a versão
-  contra a qual a doc pública está escrita.
+- **Número de versão dentro da doc**: nenhuma página cita a versão corrente. O `1.10.7` deste KB vem do
+  **registry npm** (verificado 2026-11-18; era 1.6.2 em 2026-07-23). A doc só cita mínimos pontuais: cross-agent exige
+  `@runflow-ai/sdk >= 1.2.0`; `Knowledge.ingestFile` requer **SDK 1.3.2+**; algumas APIs de observabilidade
+  dizem "Available since `@runflow-ai/sdk@1.1.10`". Confirmar com a IFTL a versão contra a qual a doc pública está escrita.
 - **Forma dos chunks de `processStream`** (`ChunkType`): não detalhada.
 
 - **Sinks de observabilidade externos** (Langfuse/Datadog/etc.): não listados.
@@ -1239,9 +1245,19 @@ export async function main(input: any) {
   portal ou schemas dinâmicos do backend — não há catálogo fechado nas páginas consultadas.
 - **Payloads de retorno** (JSON exato) dos métodos de RAG/KV/cross-agent: não mostrados na íntegra.
 
+### Superfície nova (doc de 2026-11-18, ainda não coberta por esta KB)
+
+O índice `docs.runflow.ai/llms.txt` hoje lista seções que não existiam na verificação de julho. Esta KB **não** as detalha; consulte a doc antes de usar:
+
+- **Automations** (`automations/*`): processos orientados a evento com blocos reutilizáveis, histórico persistente de execução, webhook, roteamento e gestão por MCP.
+- **Runflow connector for Claude** (`mcp/claude-connector.md`, `mcp/scopes.md`, `mcp/public-tools.md`): o workspace Runflow acessível de dentro do Claude, com escopos OAuth.
+- **HTTP Routing** (`core-concepts/http-routing.md`): vários endpoints num agente pelo path e método da URL da Agent API.
+- **Dynamic Data** (`dynamic-data.md`): datas, dados do usuário e contexto de runtime injetados no agente.
+- **Self-hosted e múltiplos ambientes** (`cli/self-hosted.md`) e **perfis** (`rf profiles`).
+
 ---
 
-**Última verificação**: 2026-07-23 (docs.runflow.ai via WebFetch + registry npm)
-**Versão documentada**: `@runflow-ai/sdk` 1.6.2 (registry) · doc pública cita mínimos 1.2.0 / 1.3.2+
+**Última verificação**: 2026-11-18 (docs.runflow.ai/llms-full.txt conferido por script + registry npm); anterior 2026-07-23
+**Versão documentada**: `@runflow-ai/sdk` 1.10.7 (registry, 2026-11-13) · `@runflow-ai/cli` 0.5.6 · doc pública cita mínimos 1.1.10 / 1.2.0 / 1.3.2+
 **Status**: Re-verificado; corpo alinhado à doc atual. Antes de tratar como referência definitiva (ex.: Tech
 Sync com a IFTL), fechar os "pontos não cobertos" acima.
