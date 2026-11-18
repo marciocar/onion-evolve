@@ -8,12 +8,12 @@ findings_total: 0
 findings_real: 0
 findings_blocking: 0
 tokens: 0
-duration_min: 5
+duration_min: 7
 findings_fixed: 0
-verdict: NO_FINDINGS
+verdict: APPROVED
 elenxo: true
-elenxo_isolado: false
-reviewer: "Passada da própria sessão do core, só leitura, mandato de refutar: a catraca lê owner_session pelo awk de ops/pr-merge-verified.sh (l.324), que tira comentário e aspas; o membro onion-slm já casava pelo remote (a recusa do PR #15 da slm o achou como kind: adopter); a bancada cr1/cr4 do lint-selftest cobre aceita com owner_session e recusa sem. Não é isolada: o PR toca a catraca e o merge é do maestro, com --maestro."
+elenxo_isolado: true
+reviewer: "Agente revisor separado (code-reviewer), só leitura, mandato de refutar, ~2 min: APPROVED. Conferiu o awk da catraca na linha real (sai onion-slm), o remote normalizado (marciocar/onion-slm), o dono igual ao do core, kind adopter e não door, members-validate rc 0 no head, baton-pulse só lê piece:true, REGRA 36 lê só id/remote/local_path. Ressalva sem bloqueio: a catraca lê origin/main sem buscar, então a slm só merja depois do merge e de um fetch no core."
 nota: "tokens 0 = não medido."
 ---
 
@@ -33,4 +33,4 @@ PR do próprio repo pelo caminho verificado. Sem elas, o PR #15 da slm (CI verde
 
 ## Veredito
 
-NO_FINDINGS. O merge é do maestro, porque o PR toca a lista da catraca (M1).
+APPROVED pelo revisor separado (a 1ª passada, da própria sessão, foi NO_FINDINGS). O merge é do maestro, porque o PR toca a lista da catraca (M1).
