@@ -1,0 +1,227 @@
+{
+  "criteria": [
+    {
+      "id": "CU1_CITACAO_DIVERGE",
+      "when": "data/<versão>.txt não bate byte a byte com a seção do CHANGELOG oficial, ou um nó cita entre «» texto ou linha (l.N) que não está lá",
+      "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk '$0==\"## <versão>\"{f=1;print;next} /^## /{f=0} f') data/<versão>.txt para 2.1.323, 2.1.325, 2.1.326 e 2.1.327; grep -n -F de cada trecho citado em data/"
+    },
+    {
+      "id": "CU2_MEDICAO_NAO_REPRODUZ",
+      "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+      "check": "re-executar: claude --version; cc-delta-census.sh --markdown; currency-census.sh; LC_ALL=C lint-selftest.sh --families cited_directive e channel_session; extração do parser de injeção do binário; grep -l '^allowed-tools:' .claude/commands/meta/baton.md; grep -n '\"decision\"' .claude/hooks/*"
+    },
+    {
+      "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+      "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+      "check": "ler label e verified_against e conferir no core por grep -n ou leitura do hook, do comando, do motor .claude/utils/approval (quando existir na árvore) e do settings"
+    },
+    {
+      "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+      "when": "a rodada supera nó da r24 que não existe ou cujo estado ainda vale, ou deixa de superar nó cujo estado a medição de hoje derrubou",
+      "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-11-10-r24/radar-E3-2026-11-10-r24.kg.yaml e comparar o estado afirmado com a medição de hoje"
+    },
+    {
+      "id": "CU5_OMISSAO_DO_DELTA",
+      "when": "um item do delta toca superfície real do core e a rodada não o mediu nem o declarou em NÃO-VERIFICADOS",
+      "check": "ler data/*.txt e, para cada candidato ausente, medir a superfície no core (hooks em .claude/settings.json, comandos, agentes, ops/)"
+    },
+    {
+      "id": "CU6_VAZAMENTO_EM_REPO_PUBLICO",
+      "when": "o grafo ou a SYNTHESIS trazem nome de cliente ou de pessoa, caminho de máquina, IP, hostname ou e-mail",
+      "check": "grep -rnE '/home/|/tmp/|~/' docs/evolution/research/radar-E3-2026-11-18-r25 fora de data/2.1.*.txt; kg-contract-check.sh"
+    },
+    {
+      "id": "CU7_EFEITO_AFIRMADO_SEM_MEDIR_O_MODO",
+      "when": "o nó afirma efeito de comportamento num modo de permissão (bypass interativo, -p, default, /loop, agente isolado) que a medição não exercitou",
+      "check": "conferir que o label ou o narrative declara o modo não medido; onde possível e barato, repetir a medição no modo afirmado"
+    }
+  ],
+  "verdicts": [
+    {
+      "alvo": "E_DELTA_DA_RODADA",
+      "veredito": "SUSTENTA",
+      "nota": "CU1: as quatro cópias data/2.1.32{3,5,6,7}.txt batem byte a byte com as seções do CHANGELOG oficial baixado em 2026-11-18 (diff vazio nas quatro); CU2: cc-delta-census.sh --markdown repete 297/294, 142/139, 370/367, 176/173, disco e processo 2.1.327, bridge 2.1.323 (SDK 0.3.323). Não há seção 2.1.324 no CHANGELOG, então «4 versões» está certo."
+    },
+    {
+      "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+      "veredito": "EXAGERA",
+      "criterio": {
+        "id": "CU5_OMISSAO_DO_DELTA",
+        "comando": "grep -n -E 'background agent|sibling|mods folder|no one can answer|bypass' data/*.txt; sed -n 1,30p .claude/hooks/pretooluse-subagent-background-wait.sh (o cabeçalho manda re-rodar a sonda do agent_id no /meta:cc-update); ls docs/evolution/research/radar-E3-2026-11-18-r25 (sem SYNTHESIS.md)"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "fechar a pergunta só depois de medir ou declarar as omissões listadas em `omissoes` deste arquivo: a sonda do agent_id da guarda de fundo em subagente, a bancada do permissions.deny na 2.1.327, o subagente retomado por mensagem de irmão, a pasta de mods que pergunta mais e as recusas sem quem responda que chegam ao revisor e ao bridge quando subirem",
+        "medida": "medido pelo juiz na 2.1.327: sonda do agent_id verde (Bash de subagente traz agent_id e agent_type=general-purpose, o da sessão principal não traz; a guarda real sai rc 2 com run_in_background true vindo de subagente); permissions-deny-bench.py --only default,bypass rc 0, 74 regras, 340 casos, 0 divergentes; os outros três itens seguem sem medida e vão como NÃO-VERIFICADOS. A SYNTHESIS.md com NÃO-VERIFICADOS que a pergunta cita ainda não existe no diretório da rodada."
+      }
+    },
+    {
+      "alvo": "E_HOST_NA_2_1_327_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1118",
+      "veredito": "SUSTENTA",
+      "nota": "CU2: claude --version → 2.1.327; cc-delta-census → bridge 2.1.323 (SDK 0.3.323); currency-census → agent-sdk:bridge 0.3.323→0.3.327 defasada e action 1.0.272→1.0.282 defasada; o pin d5f7970a está em onion-review.yml l.329 e l.493. O revisor também não tem a 2.1.323, o que o label não nega."
+    },
+    {
+      "alvo": "Q_SUBIR_SDK_DO_BRIDGE_0_3_327_E_PIN_DO_REVISOR_V1_0_282_1118",
+      "veredito": "SUSTENTA",
+      "nota": "Pergunta bem formada; o currency-census repete as duas defasagens. Ver a omissão sobre as recusas «sem quem responda» que a subida leva ao revisor e ao bridge."
+    },
+    {
+      "alvo": "E_DERIVA_DO_CITED_DIRECTIVE_E_SO_RENOMEACAO_DE_LOCAIS_1118",
+      "veredito": "SUSTENTA",
+      "nota": "CU2: LC_ALL=C lint-selftest.sh --families cited_directive → rc 1, mesmo texto do caso (f). Extração do binário 2.1.327: (n,o)=>{let u=e[o-1];return u===\"!\"||u===\"`\"?n:...} e let n=e.matchAll(wOr),o=e.includes(\"!`\")?Jst(e).matchAll(bOr):[],u=[];for(let h of[...n,...o]){let y=eUs(h[1]??\"\");if(y)u.push(...)}return u; as duas regex iguais ao molde. Só r→o e s→u."
+    },
+    {
+      "alvo": "Q_CURINGA_DAS_LOCAIS_R_S_NO_MOLDE_DO_CITED_DIRECTIVE_1118",
+      "veredito": "SUSTENTA",
+      "nota": "Decorre da evidência acima; o molde em lint-selftest.sh fixa r e s literalmente no 1º e no 3º trecho."
+    },
+    {
+      "alvo": "E_CHANNEL_SESSION_VERDE_NA_2_1_327_1118",
+      "veredito": "SUSTENTA",
+      "nota": "CU2: LC_ALL=C lint-selftest.sh --families channel_session → «OK ✓ — todas as guardas reagiram conforme esperado» na 2.1.327."
+    },
+    {
+      "alvo": "E_CAMPOS_DE_ORIGEM_DO_PROMPT_SEGUEM_NA_2_1_327_1118",
+      "veredito": "SUSTENTA",
+      "nota": "CU2: no transcript da própria sessão do core, entradas user fora de sidechain na 2.1.327 → human/typed 9, peer/system/isMeta 11, task-notification/system 4, human/suggestion_accepted 1 (a sessão cresceu desde a medição; a forma é a mesma, e na 2.1.319 e 2.1.325 também). CU1: grep promptSource|isMeta|origin nos data/ só casa «original» (2.1.326 l.305). CU3: o motor (fora da main) recusa o que não é human com typed|queued (one_touch.py l.53 e l.371). Medido a mais pelo juiz: em claude -p o payload do UserPromptSubmit traz prompt_id e a entrada do transcript vem com promptSource=sdk e sem origin, logo o motor recusa por falha fechada; e na main quem já lê origin.kind é o house-code-gloss.sh (l.112-130), superfície que o nó não nomeia mas que a conclusão também cobre."
+    },
+    {
+      "alvo": "E_ASK_DE_HOOK_SEM_QUEM_RESPONDA_E_RECUSADO_EM_BYPASS_1118",
+      "veredito": "EXAGERA",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "<binário 2.1.322 instalado> -p --model sonnet --settings <hook PreToolUse Bash que devolve permissionDecision ask> --permission-mode bypassPermissions --output-format json 'Run exactly this bash command and nothing else: touch marker' (e o mesmo com o binário 2.1.325), num diretório descartável"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "o ask de hook PreToolUse sem ninguém para responder já era recusado em bypassPermissions no modo -p na baseline 2.1.322 e na 2.1.325, igual à 2.1.327: o comportamento não vem do delta, e o item 2.1.326 l.313 não é a sua causa; o nó deve dizer «invariante de 2.1.322 a 2.1.327 em -p; interativo não medido»",
+        "medida": "bancada repetida pelo juiz em diretório descartável: 2.1.327 bypass e default, 2.1.325 bypass e 2.1.322 bypass → marker ausente nas quatro e permission_denials com a chamada Bash; controle sem hook na 2.1.327 em bypass → marker criado e permission_denials vazio"
+      }
+    },
+    {
+      "alvo": "E_MENSAGEM_ENTRE_SESSOES_PERDEU_O_TETO_HUMANO_1118",
+      "veredito": "EXAGERA",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "grep -rln -E 'promptSource|origin\\.kind|\"origin\"' .claude/hooks .claude/utils ops; sed -n 1,40p .claude/hooks/pretooluse-moat-gate.sh; grep -n 'maestro roda fora da sessão' .claude/hooks/pretooluse-merge-gate.sh"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "a 2.1.323 tira o freio de volume (cerca de 20 para 100.000 mensagens entre sessões da mesma máquina sem prompt). Ela não muda o que separa a palavra do maestro da de um par: na main os atos do MOAT e o merge são barrados por alvo (pretooluse-moat-gate.sh e pretooluse-merge-gate.sh, exit 2), sem ler a origem, e só o maestro os executa fora da sessão. A origem marcada é lida pelo house-code-gloss.sh na main e pelo motor de um toque, que ainda não está na main. O freio de 20 nunca foi separador de autoria.",
+        "medida": "grep do juiz na árvore da rodada: nenhum leitor de promptSource em .claude/hooks, .claude/utils ou ops; origin.kind lido só por house-code-gloss.sh (is_human e queued, l.112-130); os dois vetos de ato julgam o comando por alvo e mandam o maestro rodar fora da sessão, sem consultar o transcript"
+      }
+    },
+    {
+      "alvo": "E_HOOKSPATH_ABSOLUTO_AO_CRIAR_WORKTREE_DE_AGENTE_SEGUE_NA_2_1_327_1118",
+      "veredito": "SUSTENTA",
+      "nota": "CU2 reproduzido num repositório descartável e limpo, sem outra sessão concorrente: core.hooksPath .githooks antes; claude -p 2.1.327 em bypass lança um Agent com isolation worktree; depois, o .git/config tem <raiz>/.githooks absoluto. O mesmo acontece na 2.1.322. CU1: grep hooksPath nos data/ → nada."
+    },
+    {
+      "alvo": "E_AGENTE_ISOLADO_RECUSA_GIT_EM_FORMA_COMPOSTA_1118",
+      "veredito": "EXAGERA",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "num repositório descartável, claude -p --permission-mode bypassPermissions com um Agent isolation worktree rodando: `git status --short; echo rc=$?` · `git log -1 --oneline && echo ok` · `git branch benchx && git branch -f benchx HEAD; echo rc=$?` · `git branch -f benchy HEAD` · `git rebase --onto HEAD~0 HEAD~0`; o mesmo com o binário 2.1.322; grep -c -a 'too complex to verify that it stays inside the worktree' nos binários 2.1.322 e 2.1.327"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "o agente isolado recusa git na forma `...; echo rc=$?` (inclusive o inofensivo git status) e já recusava assim na baseline 2.1.322; `git ... && echo ok` passa, e git branch -f e rebase em forma simples passam. Os itens 2.1.325 l.104 e 2.1.326 l.315 não são a causa. O brief deve pedir git simples e ler o rc numa chamada à parte.",
+        "medida": "bancada do juiz na 2.1.327: recusados 1 e 3 com «names git in a form too complex to verify that it stays inside the worktree»; rodaram 2 (5ef1e06 init / ok), 4 (sem saída) e 5 (up to date). Na 2.1.322: recusados git status ...; echo rc=$? e o composto de branch, e echo hi; echo rc=$? rodou. O texto da recusa está nos dois binários (2 ocorrências em cada)."
+      }
+    },
+    {
+      "alvo": "Q_BRIEF_DE_AGENTE_ISOLADO_USA_GIT_SIMPLES_1118",
+      "veredito": "SUSTENTA",
+      "nota": "Segue aberta, mas parte já foi medida pelo juiz na 2.1.327: git branch -f e git rebase em forma simples passam no agente isolado. Faltam push --force-with-lease e o ops/pr-finalize.sh."
+    },
+    {
+      "alvo": "E_LOOP_PEDE_ANTES_DE_SKILL_COM_ALLOWED_TOOLS_E_O_BATON_DECLARA_1118",
+      "veredito": "SUSTENTA",
+      "nota": "CU2: baton.md l.18 declara allowed-tools; nenhum Skill(...) em permissions.allow no settings do projeto nem no do usuário, que tem defaultMode bypassPermissions; CU7: o label declara que o efeito em bypass não foi medido. CU1: 2.1.325 l.101 bate. Nota: 122 comandos em .claude/commands declaram allowed-tools; o baton é o que a casa arma no /loop."
+    },
+    {
+      "alvo": "Q_PULSO_DO_BATON_NO_LOOP_SOB_A_2_1_327_1118",
+      "veredito": "SUSTENTA",
+      "nota": "Pergunta bem formada a partir da evidência."
+    },
+    {
+      "alvo": "E_ITENS_SEM_SUPERFICIE_NO_CORE_1118",
+      "veredito": "SUSTENTA",
+      "nota": "CU2: grep de \"decision\" nos hooks → só o log do premodelswitch-guard.sh e a leitura do session-degraded-notice.sh; nenhum hook com permissionDecision allow nem updatedInput; nenhum hook não-command; settings.json sem sandbox; ANTHROPIC_API_KEY ausente do ambiente. CU1: l.298, l.250, l.336, l.218, l.216, l.79-80 batem."
+    }
+  ],
+  "omissoes": [
+    {
+      "item": "re-sonda do agent_id exigida pela guarda de fundo em subagente: itens de agente de fundo e de agent_id em hook",
+      "linha": "2.1.326 l.109; 2.1.327 l.60 e l.62; 2.1.323 l.142",
+      "superficie": ".claude/hooks/pretooluse-subagent-background-wait.sh (o cabeçalho manda re-rodar a sonda no /meta:cc-update: medida só na 2.1.322)",
+      "medida": "medido pelo juiz na 2.1.327, claude -p em repositório descartável com PreToolUse que grava a entrada: o Bash do subagente traz agent_id e agent_type=general-purpose, o da sessão principal não traz; a guarda real, com essa entrada e run_in_background true, sai rc 2. Verde, mas a rodada não mediu nem declarou."
+    },
+    {
+      "item": "permissions.deny sob as mudanças de permissão do delta em bypass e auto",
+      "linha": "2.1.326 l.233, l.313 e l.314; 2.1.327 l.138",
+      "superficie": "permissions.deny de .claude/settings.json e a bancada ops/testing/permissions-deny-bench.py (nó E_BANCADA_DO_DENY_VERDE_NA_2_1_322_1110 da r24)",
+      "medida": "medido pelo juiz: python3 -I ops/testing/permissions-deny-bench.py --settings .claude/settings.json --only default,bypass → rc 0, binário 2.1.327, 74 regras, 340 casos, 0 divergentes, sentinela ok"
+    },
+    {
+      "item": "subagente retomado por mensagem de irmão passa a seguir as permissões da sessão e pode perguntar ou ser recusado sem quem responda; e retomava no modelo e esforço do irmão",
+      "linha": "2.1.327 l.145 e l.59",
+      "superficie": "orquestração por SendMessage: baton.md l.18 (allowed-tools com SendMessage) e execution-agent-preamble.md l.22 (agente pede à sessão principal por SendMessage)",
+      "medida": "não medido pelo juiz nem pela rodada; sob o bypass do host a regra deve deixar passar, mas o modo de um subagente retomado por irmão não foi exercitado: vai a NÃO-VERIFICADOS"
+    },
+    {
+      "item": "edições na pasta de mods da sessão passam a perguntar mais; mods não reescrevem mais as perguntas de confirmação do Claude Code",
+      "linha": "2.1.326 l.237; 2.1.323 l.78",
+      "superficie": "pretooluse-plugin-write-guard.sh e os nós da r24 E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110 e Q_RERODAR_O_LAB_DE_MODS_NA_2_1_322_1110",
+      "medida": "grep dos itens de mod nos data/ (15 linhas) e nenhum nó da r25 os cita; o laboratório de mods não foi re-rodado: vai a NÃO-VERIFICADOS, e a Q da r24 segue aberta com a versão-alvo vencida"
+    },
+    {
+      "item": "chamadas de Bash e de ferramenta recusadas onde ninguém pode responder: chegam ao revisor do CI (-p) e ao bridge (SDK) quando a Q de subida for executada",
+      "linha": "2.1.326 l.233, l.313 e l.314; 2.1.323 l.219",
+      "superficie": ".github/workflows/onion-review.yml l.329 e l.493 (pin v1.0.272, CLI 2.1.322) e o SDK do bridge 0.3.323; a Q_SUBIR_SDK_DO_BRIDGE_0_3_327_E_PIN_DO_REVISOR_V1_0_282_1118 não nomeia o risco",
+      "medida": "não medido: o revisor e o bridge ainda não têm a 2.1.326. A prova do PR seguinte à subida deve olhar permission_denials_count no log do revisor (onion-review.yml já registra esse campo)"
+    },
+    {
+      "item": "hook PreToolUse que sai 127 ganha mensagem própria",
+      "linha": "2.1.326 l.251",
+      "superficie": "os 10 PreToolUse de veto do core com onFailure=block e os 2 sem (kg-read-leg.sh, house-code-gloss.sh)",
+      "medida": "medido pelo juiz na 2.1.327 em -p bypass: hook inexistente com onFailure block → touch não roda; o mesmo sem onFailure → marker criado (falha aberta). Confirma a doutrina do CLAUDE.md; a rodada não declarou."
+    }
+  ],
+  "supersedes": [
+    {
+      "no_r24": "E_HOST_NA_2_1_322_REVISOR_EM_DIA_BRIDGE_NA_2_1_319_1110",
+      "cai": true,
+      "razao": "o estado mudou nos três: host 2.1.327 (não 2.1.322), revisor no pin d5f7970a v1.0.272 defasado contra v1.0.282 (não «em dia»), bridge 2.1.323 / SDK 0.3.323 (não 2.1.319). Quem supera é E_HOST_NA_2_1_327_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1118."
+    },
+    {
+      "no_r24": "Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_322_1110",
+      "cai": true,
+      "razao": "o alvo foi ultrapassado: o currency-census mede o bridge em 0.3.323, acima de 0.3.322, e a publicada é 0.3.327. Quem supera é Q_SUBIR_SDK_DO_BRIDGE_0_3_327_E_PIN_DO_REVISOR_V1_0_282_1118."
+    },
+    {
+      "no_r24": "E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_322_1110",
+      "cai": true,
+      "razao": "na 2.1.327 a família cited_directive sai rc 1 (caso f, DERIVA) e a channel_session segue verde, então «ambas verdes» não vale mais. Quem supera são E_DERIVA_DO_CITED_DIRECTIVE_E_SO_RENOMEACAO_DE_LOCAIS_1118 e E_CHANNEL_SESSION_VERDE_NA_2_1_327_1118."
+    },
+    {
+      "no_r24": "E_BANCADA_DO_DENY_VERDE_NA_2_1_322_1110",
+      "cai": false,
+      "razao": "re-medido pelo juiz na 2.1.327: rc 0, 340 casos, 0 divergentes. O estado vale; se a rodada gravar a medida nova como nó, ela o supera por data, não por mudança."
+    },
+    {
+      "no_r24": "E_MODS_LIGAM_SEM_PERGUNTAR_EM_BYPASS_E_O_HOST_ESTA_EM_BYPASS_1110",
+      "cai": false,
+      "razao": "nada medido hoje o derruba; 2.1.326 l.237 pode mudar o efeito, mas sem medida não cai (ver omissões)."
+    },
+    {
+      "no_r24": "E_SESSOES_LONGAS_NAO_RECEBEM_AS_CORRECOES_DE_SEGURANCA_1110",
+      "cai": false,
+      "razao": "é uma contagem de processos de 2026-11-10 que a r25 não repetiu; o retrato está velho, mas sem medida de hoje não há derrubada, só idade"
+    }
+  ]
+}
