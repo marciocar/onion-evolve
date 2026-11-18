@@ -100,6 +100,12 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   `grep`, `rg`, `sed`, `base64`), e também inspeção (`ls` e `stat` do arquivo: use `test -f`). Vale em
   `bypassPermissions`. Script chamado pela linha **não** é visto, e é assim que o merge verificado e a publicação de
   porta seguem andando.
+- **PR de guarda e a catraca do repo próprio (2026-11-18, `D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118`):** o
+  `ops/pr-merge-verified.sh` deixa a sessão mergear o PR que toca guarda sem `--maestro` quando o resíduo declara
+  refutador independente (`elenxo_isolado: true`, verdict aceito, diff carimbado), e recusa qualquer merge da sessão fora
+  do repo próprio listado (core ou `owner_session:` no `members.yaml` de origin/main, dono da família); o veto `exit 2`
+  dos atos do maestro NÃO vira `ask`: a doc não garante que o `ask` do hook sobreviva ao `bypassPermissions`, que é o
+  modo desta casa.
 - **`Read(...)` de caminho do home vira bloqueio do sistema sob sandbox.** O Claude Code a aplica como negação de leitura
   do sandbox: o processo do Bash não lê aquele caminho, inclusive quando o leitor é a maquinaria. Com a regra do
   `hosts.yml` do `gh`, `gh auth status` e o credential helper do git quebram (medido). A exceção

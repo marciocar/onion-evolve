@@ -28,6 +28,9 @@
 # Onion própria que a defende (molde do kg-ssot) e um patrocinador humano. Campo NOVO, não um `kind:` novo: o kind é a
 # natureza (enum do members-validate.sh, lido pela paridade de porta e pelos pins), e a peça segue sendo adotante. O
 # baton-pulse.sh avisa (nunca bloqueia) PIECE_UNOWNED e PIECE_OWNER_NAME_MISMATCH com o card de arranque.
+# `owner_session` também é a LISTA FECHADA do merge pela sessão (2026-11-18, D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118):
+# o ops/pr-merge-verified.sh só deixa uma sessão mergear no repo dela quando ele é o `kind: source` ou declara
+# `owner_session`, e o dono do remote é o dono do core; repo de cliente (outro dono) fica sempre fora.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1

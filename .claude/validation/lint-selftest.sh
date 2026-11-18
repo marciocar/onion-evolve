@@ -26798,6 +26798,67 @@ STUB
   FRG_FILES=".claude/utils/marketplace/assemble-plugin.sh" _frx "(rf29) PR que só toca o assemble-plugin.sh (executado por bash \"\${ASM}\") ⇒ a sessão não mergeia" "${_pi}" ""
   FRG_FILES=".claude/utils/marketplace/assemble-plugin.sh" _frx "(rf29-MUT) sem as linhas fecho na lista, ele passaria — o fecho é a causa" "" \
     's#(\$1 == "ato" || \$1 == "delega" || \$1 == "fecho")#($1 == "ato" || $1 == "delega")#'
+  # ── 2026-11-18 (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118): a sessão merja o PRÓPRIO PR, inclusive o de guarda, com o
+  # resíduo de refutador independente; e a CATRACA do repo próprio: lista fechada (core + owner_session no members.yaml
+  # de origin/main), dono da família, repo da própria sessão. O registro de sandbox ganha a peça, um cliente listado (a
+  # catraca recusa pelo dono, não pela lista), um membro sem owner_session e outra peça.
+  cp "${_mfy}" "${d}/members-pre-1118"; local _om; _om="$(git -C "${fc}" rev-parse refs/remotes/origin/main)"
+  printf '  - id: peca\n    kind: adopter\n    owner_session: peca\n    remote: https://github.com/onion-bancada/peca (privado)\n  - id: peca2\n    kind: adopter\n    owner_session: peca2\n    remote: github.com/onion-bancada/peca2\n  - id: cliente\n    kind: adopter\n    owner_session: cliente\n    remote: github.com/cliente/repo   # cliente\n  - id: solto\n    kind: adopter\n    remote: github.com/onion-bancada/solto\n  - id: porta2\n    kind: door\n    owner_session: porta2\n    remote: github.com/onion-bancada/porta2\n' >> "${_mfy}"
+  git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm registro-1118
+  git -C "${fc}" update-ref refs/remotes/origin/main HEAD
+  local _cr_peca="${d}/s-peca" _cr_cli="${d}/s-cliente" _cr_h1118 _cr_ok
+  git init -q "${_cr_peca}"; git -C "${_cr_peca}" remote add origin https://github.com/onion-bancada/peca.git
+  git init -q "${_cr_cli}"; git -C "${_cr_cli}" remote add origin git@github.com:cliente/repo.git
+  git init -q "${d}/s-nada"; git -C "${d}/s-nada" remote add origin https://github.com/onion-bancada/nada.git
+  _cr_h1118="$(printf 'b%.0s' {1..64})"
+  _cr_ok="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\nelenxo_isolado: true\\n---\\n' "${_cr_h1118}")"
+  _crs() { # $1=rótulo $2=esperado (0 mergeia | 1 recusa sem merge) $3=trecho $4=cwd da sessão $5=script ; resto=args
+    local lbl="$1" want="$2" txt="$3" cwd="$4" scr="$5" o rc=0; shift 5
+    echo 0 > "${d}/n"; : > "${d}/merge-args"
+    o="$(cd "${cwd}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="OPEN|null" \
+      GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x GH_WF_COUNT=5 \
+      GH_PR_FILES="${CR_FILES:-docs/evolution/review/feat-x.md a.txt}" GH_RESIDUE="${CR_RESIDUE-${_cr_ok}}" ONION_MERGE_POLL_SECS=0 \
+      env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${scr}' 999 $*; exit \$?" 2>&1)" || rc=$?
+    if { [ "${want}" = 0 ] && [ "${rc}" -eq 0 ] && [ -s "${d}/merge-args" ]; } \
+       || { [ "${want}" = 1 ] && [ "${rc}" -ne 0 ] && [ ! -s "${d}/merge-args" ]; }; then
+      grep -qF -- "${txt}" <<< "${o}" && { record_pass "pr-merge-verified: ${lbl}"; return 0; }
+    fi
+    record_fail "pr-merge-verified: ${lbl}" "rc=${rc} merge=$(head -c 60 "${d}/merge-args") out=$(tail -3 <<< "${o}" | tr '\n' '|' | cut -c1-300)"
+  }
+  # PARTE 1: PR de guarda do core pela sessão do core
+  CR_FILES=".claude/hooks/lib/moat-judge.py docs/evolution/review/feat-x.md" \
+    _crs "(gs1) PR de GUARDA + resíduo com elenxo_isolado: true ⇒ a sessão mergeia sem --maestro" 0 "PR de GUARDA pela sessão" "${fc}" "${_pi}"
+  CR_FILES=".claude/hooks/lib/moat-judge.py docs/evolution/review/feat-x.md" \
+  CR_RESIDUE="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_cr_h1118}")" \
+    _crs "(gs2) PR de GUARDA + resíduo SEM elenxo_isolado ⇒ recusa e diz o que falta" 1 "não declara elenxo_isolado: true" "${fc}" "${_pi}"
+  CR_FILES=".claude/hooks/lib/moat-judge.py a.txt" \
+    _crs "(gs3) PR de GUARDA sem resíduo nenhum ⇒ recusa (o merge segue do maestro)" 1 "toca GUARDA" "${fc}" "${_pi}"
+  CR_FILES="a.txt" CR_RESIDUE="" _crs "(gs4) PR que não toca guarda ⇒ como antes, sem exigir resíduo" 0 "catraca do repo próprio" "${fc}" "${_pi}"
+  # MUTANTE: sem a exigência do resíduo, o PR de guarda do gs2 mergearia
+  sed 's/^  _isolated_residue_ok "\${_PMV_CORE_SLUG}" /  _IR_REL=x _IR_V=x _IR_H=x; : _isolated_residue_ok "${_PMV_CORE_SLUG}" /' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (gs-MUT)" "a âncora da exigência do resíduo sumiu"
+  else
+    CR_FILES=".claude/hooks/lib/moat-judge.py docs/evolution/review/feat-x.md" \
+    CR_RESIDUE="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_cr_h1118}")" \
+      _crs "(gs-MUT) sem a exigência do resíduo isolado, o PR de guarda do gs2 mergearia — a exigência é a causa" 0 "catraca do repo próprio" "${fc}" "${fc}/ops/pmv-mut.sh"
+  fi
+  # A CATRACA: sessão de outro repo da família, chamando o script do core com --repo
+  _crs "(cr1) sessão da peça listada (owner_session) mergeia o PRÓPRIO repo ⇒ aceita" 0 "sessão dona peca" "${_cr_peca}" "${_pi}" --repo onion-bancada/peca
+  _crs "(cr2) repo de CLIENTE listado, com resíduo isolado e CI verde ⇒ recusa pelo dono" 1 "repo de cliente ou de empresa" "${_cr_cli}" "${_pi}" --repo cliente/repo
+  _crs "(cr3) repo da família fora do registro ⇒ recusa (lista fechada)" 1 "não está na lista fechada" "${d}/s-nada" "${_pi}" --repo onion-bancada/nada
+  _crs "(cr4) registrado sem owner_session ⇒ recusa" 1 "sem owner_session" "${_cr_peca}" "${_pi}" --repo onion-bancada/solto
+  _crs "(cr5) a peça mergeando OUTRA peça listada ⇒ recusa (só o próprio repo)" 1 "não é o repo desta sessão" "${_cr_peca}" "${_pi}" --repo onion-bancada/peca2
+  _crs "(cr6) PORTA da família, mesmo com owner_session ⇒ recusa" 1 "PORTA" "${_cr_peca}" "${_pi}" --repo onion-bancada/porta2
+  # MUTANTE que ABRE a lista: o ausente do registro passa a valer, e o cr3 mergearia
+  sed "s/^    \"\") die \"'\${_t}' não está na lista fechada/    \"\") : ;; #/" "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (cr3-MUT)" "a âncora da lista fechada sumiu"
+  else _crs "(cr3-MUT) com a lista aberta, o repo fora do registro mergearia — a lista fechada é a causa" 0 "catraca do repo próprio" "${d}/s-nada" "${fc}/ops/pmv-mut.sh" --repo onion-bancada/nada; fi
+  # MUTANTE sem a recusa pelo dono: o cliente listado do cr2 mergearia
+  sed 's/^  \[ -n "\${_corown}" \] && \[ "\${_t%%\/\*}" = "\${_corown}" \] \\$/  true \\/' "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (cr2-MUT)" "a âncora da recusa pelo dono sumiu"
+  else _crs "(cr2-MUT) sem a recusa pelo dono, o cliente listado mergearia — o dono é a causa" 0 "sessão dona cliente" "${_cr_cli}" "${fc}/ops/pmv-mut.sh" --repo cliente/repo; fi
+  cp "${d}/members-pre-1118" "${_mfy}"; git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm registro-volta
+  git -C "${fc}" update-ref refs/remotes/origin/main "${_om}"
   rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote set-url origin "${d}/sem-remoto.git"
   # item 1 (no script): o delegado roda o pr-merge-verified.sh de origin/main, byte a byte
   cp "${fc}/ops/pr-merge-verified.sh" "${d}/pmv-5p"; echo '# editado na árvore' >> "${fc}/ops/pr-merge-verified.sh"
