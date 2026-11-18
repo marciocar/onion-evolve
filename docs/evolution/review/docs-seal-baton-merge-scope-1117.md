@@ -2,7 +2,8 @@
 branch: docs/seal-baton-merge-scope-1117
 pr: pendente
 date: 2026-11-18
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ddfc55706cdf19fe4b57dbec09581eb373cb4edc7d260b18d510c64518457f08
+reviewed_code_sha256: 45ddd14e277bf3a0b661a95df542296c185500ec82422d711c02c9332bcf93a3
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
