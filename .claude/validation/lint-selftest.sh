@@ -26429,6 +26429,8 @@ run_pr_merge_verified_selftests() {
   cat > "${d}/gh" <<'STUB'
 #!/usr/bin/env bash
 args="$*"
+# o GH_REPO que cada chamada recebeu (A3 da revisão de 2026-11-18: o gh mira o que a catraca julgou)
+[ -n "${STUB_GHREPO_LOG:-}" ] && printf '%s\n' "${GH_REPO:-}" >> "${STUB_GHREPO_LOG}"
 case "$args" in
   # o aviso de serialização (repo alheio): os PRs abertos, e os arquivos de cada um por arquivo em STUB_PRFILES_DIR/<n>
   *"pr list"*) [ -n "${GH_OPEN_PRS:-}" ] && printf '%s\n' ${GH_OPEN_PRS}; exit 0 ;;
@@ -26818,7 +26820,7 @@ STUB
     o="$(cd "${cwd}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="OPEN|null" \
       GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x GH_WF_COUNT=5 \
       GH_PR_FILES="${CR_FILES:-docs/evolution/review/feat-x.md a.txt}" GH_RESIDUE="${CR_RESIDUE-${_cr_ok}}" ONION_MERGE_POLL_SECS=0 \
-      env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${scr}' 999 $*; exit \$?" 2>&1)" || rc=$?
+      STUB_GHREPO_LOG="${d}/ghrepo-cr.log" env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "${CR_PREFIX:-} bash '${scr}' 999 $*; exit \$?" 2>&1)" || rc=$?
     if { [ "${want}" = 0 ] && [ "${rc}" -eq 0 ] && [ -s "${d}/merge-args" ]; } \
        || { [ "${want}" = 1 ] && [ "${rc}" -ne 0 ] && [ ! -s "${d}/merge-args" ]; }; then
       grep -qF -- "${txt}" <<< "${o}" && { record_pass "pr-merge-verified: ${lbl}"; return 0; }
@@ -26857,6 +26859,54 @@ STUB
   sed 's/^  \[ -n "\${_corown}" \] && \[ "\${_t%%\/\*}" = "\${_corown}" \] \\$/  true \\/' "${_pi}" > "${fc}/ops/pmv-mut.sh"
   if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (cr2-MUT)" "a âncora da recusa pelo dono sumiu"
   else _crs "(cr2-MUT) sem a recusa pelo dono, o cliente listado mergearia — o dono é a causa" 0 "sessão dona cliente" "${_cr_cli}" "${fc}/ops/pmv-mut.sh" --repo cliente/repo; fi
+  # ── a revisão separada do cf2729c53 (REJECTED, 2026-11-18): A1, A2, A3, M1 e B1, cada um com caso e mutante ──────
+  _crm() { # $1=rótulo $2=sed do mutante (sobre $3) $3=script base ; resto = os args do _crs (esperado trecho cwd -- args)
+    local lbl="$1" mut="$2" base="$3"; shift 3
+    sed "${mut}" "${base}" > "${fc}/ops/pmv-mut.sh"
+    if cmp -s "${base}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: ${lbl}" "a âncora do mutante sumiu"; return; fi
+    local w="$1" t="$2" c="$3"; shift 3
+    _crs "${lbl}" "${w}" "${t}" "${c}" "${fc}/ops/pmv-mut.sh" "$@"
+  }
+  # A1: --maestro numa sessão de OUTRO repo não pula a catraca
+  _crs "(a1) sessão da peça com --repo cliente/repo --maestro ⇒ recusa (o --maestro só vale na sessão do core)" 1 "repo de cliente ou de empresa" "${_cr_peca}" "${_pi}" --repo cliente/repo --maestro
+  _crm "(a1-MUT) com o --maestro pulando a catraca em qualquer sessão, o cliente mergearia" \
+    's/^  \[ -n "\${_SESSION_CWD}" \] || return 0$/  [ -n "${_SESSION_CWD}" ] \&\& [ "${MAESTRO}" -eq 0 ] || return 0/' "${_pi}" \
+    0 "merged" "${_cr_peca}" --repo cliente/repo --maestro
+  # A2: o modo de bancada no script VERSIONADO (constante real) numa sessão de outro repo é ignorado
+  sed 's#^_PMV_CORE_CONST=onion-bancada/core$#_PMV_CORE_CONST=marciocar/onion-evolve#' "${_pi}" > "${fc}/ops/pmv-real.sh"
+  if cmp -s "${_pi}" "${fc}/ops/pmv-real.sh"; then record_fail "pr-merge-verified: (a2)" "a âncora da constante sumiu"
+  else
+    CR_PREFIX="ONION_PR_MERGE_VERIFIED_TEST=1" _crs "(a2) sessão de cliente com ONION_PR_MERGE_VERIFIED_TEST=1 no script de constante real ⇒ recusa" 1 "repo de cliente ou de empresa" "${_cr_cli}" "${fc}/ops/pmv-real.sh" --repo cliente/repo
+    CR_PREFIX="ONION_PR_MERGE_VERIFIED_TEST=1" _crm "(a2-MUT) com a variável honrada em qualquer sessão, a catraca some e o cliente mergearia" \
+      's/^  if \[ "\${_CORE_SESSION}" = 1 \] || \[ "\${_PMV_CORE_CONST}" != "marciocar\/onion-evolve" \] \\$/  if true || false \\/' "${fc}/ops/pmv-real.sh" \
+      0 "merged" "${_cr_cli}" --repo cliente/repo
+  fi
+  rm -f "${fc}/ops/pmv-real.sh"
+  # A3: sem --repo, GH_REPO de cliente ao lado do origin da peça é alvo ambíguo; sem ambiguidade, o gh recebe o julgado
+  CR_PREFIX="GH_REPO=cliente/repo" _crs "(a3) sessão da peça sem --repo e GH_REPO=cliente/repo ⇒ recusa (alvo ambíguo)" 1 "repos distintos" "${_cr_peca}" "${_pi}"
+  CR_PREFIX="GH_REPO=cliente/repo" _crm "(a3-MUT) sem a recusa do alvo ambíguo, o merge seguiria" \
+    's/^    \[ "\${_nc}" -le 1 \] || die/    true || die/' "${_pi}" 0 "merged" "${_cr_peca}"
+  : > "${d}/ghrepo-cr.log"
+  _crs "(a3b) sessão da peça sem --repo ⇒ mergeia, e o gh recebe GH_REPO=<o repo julgado>" 0 "sessão dona peca" "${_cr_peca}" "${_pi}"
+  if grep -qx 'onion-bancada/peca' "${d}/ghrepo-cr.log" && ! grep -qvx 'onion-bancada/peca' "${d}/ghrepo-cr.log"; then record_pass "pr-merge-verified: (a3b) todo gh da execução recebeu GH_REPO=onion-bancada/peca"
+  else record_fail "pr-merge-verified: (a3b) GH_REPO" "o gh recebeu: $(sort -u "${d}/ghrepo-cr.log" | tr '\n' ' ')"; fi
+  : > "${d}/ghrepo-cr.log"
+  _crm "(a3b-MUT) roda sem o export" 's/^  if \[ "\${#REPO_ARG\[@\]}" -lt 2 \] \&\& \[ "\${_CORE_SESSION}" != 1 \]; then GH_REPO="\${_t}"; export GH_REPO; fi$/  :/' "${_pi}" 0 "merged" "${_cr_peca}"
+  if grep -qvx 'onion-bancada/peca' "${d}/ghrepo-cr.log"; then record_pass "pr-merge-verified: (a3b-MUT) sem o export o gh resolveria sozinho (GH_REPO vazio) — o export é a causa"
+  else record_fail "pr-merge-verified: (a3b-MUT)" "o mutante também entregou o GH_REPO"; fi
+  # M1: PR que toca a própria catraca segue do maestro, mesmo com resíduo isolado
+  CR_FILES="docs/evolution/federation/members.yaml docs/evolution/review/feat-x.md" \
+    _crs "(m1) PR que toca o members.yaml com resíduo isolado ⇒ recusa (a catraca não se muda sozinha)" 1 "a própria catraca" "${fc}" "${_pi}"
+  CR_FILES="ops/pr-merge-verified.sh docs/evolution/review/feat-x.md" \
+    _crs "(m1b) PR que toca o ops/pr-merge-verified.sh com resíduo isolado ⇒ recusa" 1 "a própria catraca" "${fc}" "${_pi}"
+  CR_FILES="docs/evolution/federation/members.yaml docs/evolution/review/feat-x.md" \
+    _crm "(m1-MUT) sem a recusa da catraca, o members.yaml com resíduo mergearia" 's/^  \[ -z "\${_cat}" \] || die/  true || die/' "${_pi}" 0 "PR de GUARDA pela sessão" "${fc}"
+  # B1: esquema em maiúsculas não vira dono "https:"
+  local _sn; _sn="$(awk '/^_slug_norm\(\) \{/{print; exit}' "${_pi}")"
+  o="$(bash -c "${_sn}"$'\n_slug_norm HTTPS://GitHub.com/Cliente/Repo.git' 2>&1)"
+  [ "${o}" = "cliente/repo" ] && record_pass "pr-merge-verified: (b1) HTTPS://GitHub.com/Cliente/Repo.git normaliza para cliente/repo" || record_fail "pr-merge-verified: (b1)" "veio '${o}'"
+  o="$(bash -c "$(sed "s/tr '\[:upper:\]' '\[:lower:\]' <<< \"\$1\" | sed -E/sed -E/; s/; s#\/+\$##'; }/; s#\/+\$##' <<< \"\$1\"; }/" <<< "${_sn}")"$'\n_slug_norm HTTPS://GitHub.com/Cliente/Repo.git' 2>&1)"
+  [ "${o}" != "cliente/repo" ] && record_pass "pr-merge-verified: (b1-MUT) sem as minúsculas antes, o esquema maiúsculo escapa ('${o}') — a ordem é a causa" || record_fail "pr-merge-verified: (b1-MUT)" "o mutante também normalizou"
   cp "${d}/members-pre-1118" "${_mfy}"; git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm registro-volta
   git -C "${fc}" update-ref refs/remotes/origin/main "${_om}"
   rm -f "${fc}/ops/pmv-mut.sh"; git -C "${fc}" remote set-url origin "${d}/sem-remoto.git"
