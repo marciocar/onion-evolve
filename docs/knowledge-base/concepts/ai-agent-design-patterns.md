@@ -21,7 +21,7 @@ source: "https://code.claude.com/docs/en/workflows"
 
 **Substrato nativo (Claude Code, 2026):**
 
-- [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`), lançada em research preview (28/mai/2026); a URL hoje redireciona para `claude.com/resources/articles/…` (HTTP 200, 2026-11-18)
+- [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`; o `isolation: "worktree"` dos agentes está declarado no CHANGELOG do Claude Code, o `budget` não aparece na documentação pública), lançada em research preview (28/mai/2026); a URL hoje redireciona para `claude.com/resources/articles/…` (HTTP 200, 2026-11-18)
 - [Dynamic workflows — doc oficial](https://code.claude.com/docs/en/workflows) — estado atual: disponível em todos os planos pagos, limites do run (verificado 2026-11-18, HTTP 200)
 - [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — relatório sobre doutrina de orquestração
 - Padrões canônicos de orquestração da Anthropic (2026)
@@ -222,7 +222,7 @@ A ferramenta Workflow permite fixar o modelo por chamada de `agent(...)`, então
 
 ### Nesting de subagentes (profundidade 3 por default)
 
-Reverificado em 2026-11-18 na [doc de subagentes](https://code.claude.com/docs/en/sub-agents) e no CHANGELOG: desde **2.1.219** um subagente pode disparar subagentes **até 3 camadas abaixo da conversa principal** por default, ajustável por `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` (`=1` desliga). A nota antiga ("5 níveis desde v2.1.172") foi superada: houve 5 níveis em 2.1.181, nesting desligado por default em 2.1.217 e o default de 3 em 2.1.219. Há também um teto de **20 subagentes concorrentes** (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`), sem teto total por sessão.
+Reverificado em 2026-11-18 na [doc de subagentes](https://code.claude.com/docs/en/sub-agents) e no CHANGELOG: desde **2.1.219** um subagente pode disparar subagentes **até 3 camadas abaixo da conversa principal** por default, ajustável por `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` (`=1` desliga). A nota antiga ("5 níveis desde v2.1.172") foi superada: houve 5 níveis desde 2.1.172, nesting desligado por default em 2.1.217 e o default de 3 em 2.1.219. Há também um teto de **20 subagentes concorrentes** (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`), sem teto total por sessão.
 
 Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente. Coordenar a orquestração a partir do nível principal é mais barato (coordenação JS = 0 tokens) e mais limpo (respeita a regra `agents/* ↛ commands/*`). Reserve o nesting profundo para sub-decomposições legítimas, não para esconder a orquestração dentro de um agente.
 

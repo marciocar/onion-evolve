@@ -23,7 +23,7 @@ source: "https://platform.claude.com/docs/en/models/overview"
 
 - [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`), research preview (28/mai/2026)
 - [Dynamic workflows — doc oficial](https://code.claude.com/docs/en/workflows) — limites do run (16 concorrentes por default, ajustável de 1 a 256; 1.000 agentes por run; 4.096 itens por `parallel()`/`pipeline()`) (verificado 2026-11-18, HTTP 200)
-- [CHANGELOG do Claude Code](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md) — nesting de subagentes: profundidade 3 por default desde 2.1.219 (a nota antiga de "5 níveis" valia em 2.1.181) (verificado 2026-11-18, HTTP 200, topo 2.1.327)
+- [CHANGELOG do Claude Code](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md) — nesting de subagentes: profundidade 3 por default desde 2.1.219 (a nota antiga de "5 níveis" nasceu em 2.1.172) (verificado 2026-11-18, HTTP 200, topo 2.1.327)
 - [Agent view](https://code.claude.com/docs/en/agent-view) — observabilidade de sessões e agentes; **segue em research preview** (introduzida em 2.1.139). A redação antiga dizia "GA, mai/2026", o que a doc não sustenta (verificado 2026-11-18)
 - [Building Effective Agents — Anthropic](https://www.anthropic.com/engineering/building-effective-agents) — padrões canônicos de orquestração (2026)
 - [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — doutrina da "era da orquestração"
@@ -275,7 +275,7 @@ A ferramenta **Workflow** é o substrato de orquestração. A ferramenta **Agent
 
 **Coordenação = 0 tokens:** a lógica de fan-out/fan-in/filtro/loop roda em JavaScript no orquestrador. Não há custo de modelo na coordenação — só os subagentes pagam tokens. Isso muda o eixo econômico: vale a pena empurrar o máximo de lógica determinística para o JS.
 
-**Nesting (profundidade 3 por default, reverificado 2026-11-18):** o teto mudou três vezes no CHANGELOG — 5 níveis (2.1.181), nesting desligado por default (2.1.217) e, desde **2.1.219**, **até 3 camadas abaixo da conversa principal** por default, ajustável por `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` (`=1` desliga). No limite, o `Agent` some das ferramentas do subagente. A nota antiga ("5 níveis desde v2.1.172") não vale mais. Fonte: [sub-agents §Let subagents spawn their own subagents](https://code.claude.com/docs/en/sub-agents). Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente — é mais barato e respeita a regra arquitetural do Onion.
+**Nesting (profundidade 3 por default, reverificado 2026-11-18):** o teto mudou três vezes no CHANGELOG — 5 níveis (2.1.172), nesting desligado por default (2.1.217) e, desde **2.1.219**, **até 3 camadas abaixo da conversa principal** por default, ajustável por `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` (`=1` desliga). No limite, o `Agent` some das ferramentas do subagente. A nota antiga ("5 níveis desde v2.1.172") não vale mais. Fonte: [sub-agents §Let subagents spawn their own subagents](https://code.claude.com/docs/en/sub-agents). Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente — é mais barato e respeita a regra arquitetural do Onion.
 
 ---
 
