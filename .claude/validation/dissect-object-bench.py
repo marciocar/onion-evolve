@@ -49,8 +49,14 @@ SYNTH_LEGACY = "estudo anterior à régua, não tocado pelo update, sem síntese
 SYNTH_TOUCHED = "o mesmo estudo tocado depois da régua: reprova inteiro"
 SYNTH_AFTER_CUT = "estudo não tocado com Etapa 0 depois do corte: reprova"
 SYNTH_MERGE = "update num commit sem estudos + merge da main (o #339): avisa"
+SYNTH_DIRTY = "estudo anterior à régua com edição não commitada: reprova"
+SYNTH_SIDE = "ramo bifurcado antes da régua muda o estudo e é mergeado (S5): reprova"
+SYNTH_FORGED = "estudo novo antedatado num ramo antes da régua, mergeado (S1): reprova"
 CATRACA_MUTANTS = {
-    SYNTH_MERGE: ("elif all(git(\"diff\", \"--quiet\", p, commit", "elif any(git(\"diff\", \"--quiet\", p, commit", "reprova"),
+    SYNTH_DIRTY: ('git("status", "--porcelain", "--", study_dir)[1].strip()', "False", "aprova"),
+    SYNTH_SIDE: ("return int(ct) < when_arrival", "return True", "aprova"),
+    SYNTH_FORGED: ("return int(ct) < when_arrival", "return True", "aprova"),
+    SYNTH_MERGE: ("return all(git(\"diff\", \"--quiet\", p, commit", "return any(git(\"diff\", \"--quiet\", p, commit", "reprova"),
     # (trecho do checador, troca, o que o mutante tem de produzir para o caso discriminar)
     SYNTH_LEGACY: ("synth_legacy = registered_before(", "synth_legacy = False and registered_before(", "reprova"),
     SYNTH_TOUCHED: ("and untouched_since_rule(11, study_dir)", "and True", "aprova"),
@@ -58,8 +64,16 @@ CATRACA_MUTANTS = {
 }
 
 
+CLOCK = {}  # repo → minutos já usados: cada commit ganha a sua data, em ordem (a catraca do item 11 compara datas de commit)
+
+
 def sh(cwd, *cmd):
-    return subprocess.run(list(cmd), cwd=cwd, capture_output=True, text=True)
+    env = None
+    if list(cmd[:2]) in (["git", "commit"], ["git", "merge"]):
+        CLOCK[cwd] = CLOCK.get(cwd, 0) + 1
+        stamp = "2026-11-10T00:%02d:00+00:00" % CLOCK[cwd]
+        env = dict(os.environ, GIT_COMMITTER_DATE=stamp, GIT_AUTHOR_DATE=stamp)
+    return subprocess.run(list(cmd), cwd=cwd, capture_output=True, text=True, env=env)
 
 
 def good_graph(sha):
@@ -343,6 +357,9 @@ CASES = [
     (SYNTH_LEGACY, "aviso:synthesis-ausente", None, "synth-legacy", []),
     (SYNTH_TOUCHED, "synthesis-ausente", None, "synth-legacy-touched", []),
     (SYNTH_MERGE, "aviso:synthesis-ausente", None, "synth-legacy-merge", []),
+    (SYNTH_DIRTY, "synthesis-ausente", None, "synth-legacy-dirty", []),
+    (SYNTH_SIDE, "synthesis-ausente", None, "synth-side-legacy", []),
+    (SYNTH_FORGED, "synthesis-ausente", None, "synth-side-forged", []),
     (SYNTH_AFTER_CUT, "synthesis-ausente", lambda g: node(g, "S_STAGE0")["x_criterion"].update(registered_at="2026-11-13T00:00:00+00:00"), "synth-legacy", []),
     ("estudo não tocado que piorou noutro item: reprova (a catraca só cobre o item 11)", "sem-x_who_pays", lambda g: g["meta"].pop("x_who_pays"), "synth-legacy", []),
 ]
@@ -396,7 +413,7 @@ def build(checker_src, mut, order):
     def graph():
         write_yaml(tmp, GRAPH, g)
         # o item 11: a síntese nasce com o grafo; sem ela, ou sem citar o grafo, nas ordens que o caso pede
-        if order not in ("no-synth", "plan-uncommitted", "synth-legacy", "synth-legacy-touched", "synth-legacy-merge"):
+        if order not in ("no-synth", "plan-uncommitted") and not order.startswith("synth-legacy") and not order.startswith("synth-side"):
             write(tmp, SYNTHESIS, SYNTHESIS_TEXT.get(order, SYNTHESIS_TEXT["ok"]))
     if order == "plan-uncommitted":
         plan(); graph()
@@ -434,6 +451,31 @@ def build(checker_src, mut, order):
         if order == "synth-legacy-touched":
             g["nodes"][-1]["label"] = "parquear, revisto."
             write_yaml(tmp, GRAPH, g); commit(tmp, "toca o estudo depois da régua")
+    elif order == "synth-legacy-dirty":
+        write(tmp, CHECK_PY, "# o checador antes da régua do item 11\n")
+        plan(); commit(tmp, "plano com o checador velho"); graph(); commit(tmp, "n0 com o checador velho")
+        write(tmp, CHECK_PY, checker_src); commit(tmp, "o update traz a régua do item 11")
+        g["nodes"][-1]["label"] = "parquear, revisto sem commit."
+        write_yaml(tmp, GRAPH, g)
+    elif order in ("synth-side-legacy", "synth-side-forged"):
+        # S5 e S1 da revisão de 2026-11-18: um ramo bifurcado ANTES da régua muda (S5) ou cria (S1, com a Etapa 0
+        # antedatada) o estudo depois que ela chegou na main, e o merge --no-ff o traz; o commit do ramo não descende
+        # do arrival e o merge é idêntico ao pai lateral, então só a data de commit o enxerga
+        write(tmp, CHECK_PY, "# o checador antes da régua do item 11\n")
+        if order == "synth-side-legacy":
+            plan(); commit(tmp, "plano com o checador velho"); graph(); commit(tmp, "n0 com o checador velho")
+        else:
+            commit(tmp, "base sem estudos")
+        sh(tmp, "git", "branch", "-M", "main"); sh(tmp, "git", "branch", "side")
+        write(tmp, CHECK_PY, checker_src); commit(tmp, "a régua do item 11 chega na main")
+        sh(tmp, "git", "checkout", "-q", "side")
+        if order == "synth-side-legacy":
+            g["nodes"][-1]["label"] = "parquear, revisto no ramo velho."
+            write_yaml(tmp, GRAPH, g); commit(tmp, "o ramo velho muda o estudo")
+        else:
+            plan(); commit(tmp, "plano no ramo velho"); graph(); commit(tmp, "n0 no ramo velho")
+        sh(tmp, "git", "checkout", "-q", "main")
+        sh(tmp, "git", "merge", "-q", "--no-edit", "--no-ff", "side")
     elif order == "synth-legacy-merge":
         # a forma medida do PR #339: o update nasce num commit SEM os estudos e um merge junta a main; o merge difere
         # do pai do update em todos os estudos sem ter mexido em nenhum
