@@ -366,3 +366,115 @@ integrity.trace-sha256-mismatch  docs/events.kg.yaml#E_INVOICE_4512_PAID  → do
 A node alone fails as `integrity.orphan-node`: an event always serves a question or a decision, so link it. The
 recommended shape of `x_event`, and when it becomes a canonical profile, is in
 [chapter 3](03-format.md#recording-an-external-event-recommended-shape-not-normative).
+
+## Handle a small request from a person to an agent
+
+A person asks an agent for a small service: a personal summary every working day. The request is done when the person
+who asked accepts it, after a real test. Record it with what the contract already has: no new node type and no new
+profile. A small, new request needs **two nodes**:
+
+- **The request**, a `question` with `owner` (the role that answers for it). The narrative holds what was agreed with
+  the person: when, what and from which sources, with the access to those sources checked. Commit this node **before**
+  the test, with `status: open`; it becomes `done` in the commit that adds the acceptance. The git history then shows
+  that the agreement came first. The contract does not check this order today.
+- **The acceptance**, an `evidence` with `provenance.method` of class `testimony`: the person who asked, with a
+  `locator` that points at the reply. It comes after a real test, never before. The agent does not testify to its own
+  acceptance: `testimony` comes from an outside party, and the agent that did the work is not one (see
+  [who did it](03-format.md#who-did-it-the-subagent-rule-v423)). Here the test is a real summary sent on 2026-11-18,
+  before the first scheduled run.
+
+Two more nodes appear only when they are needed:
+
+- **When the request recurs**, the service itself is a ritual: a `rule` with
+  [`x_ritual`](03-format.md#x_ritual-v425) and a `TRACES_TO` edge to the request. The contract judges
+  `x_ritual` from v4.25 on; with an earlier contract, the key is free and is not judged.
+- **When something blocks the request**, the blocker is a `question` with a `CONSTRAINS` edge to the request, and
+  `x_essential` says whether it is essential to the agreed minimum. A blocker that is not essential does not stop the
+  service: the agent delivers the agreed minimum, or asks the person, and never waits in silence. `x_essential` is a
+  free `x_` key: the contract does not judge it.
+
+A larger request adds what it needs: a separate pre-registered criterion
+([`x_criterion`](03-format.md#x_criterion-and-x_measured_under-v412)), an
+[`x_questionnaire`](03-format.md#x_mirror-x_doc_cycle-and-x_questionnaire) with several evidence requests, domain
+states, a test separate from the acceptance, and more than one approver.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: requests
+nodes:
+  - id: Q_REQUEST_DAILY_SUMMARY
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.8
+    owner: assistant-operator
+    label: "The finance lead asked for a personal summary every working day: is it agreed, tested and accepted?"
+    narrative: "Agreed with the finance lead on 2026-11-17, before any test: every working day at 08:00 (America/Sao_Paulo), by direct message; content: overdue invoices, payments received the day before and open approvals; sources: the billing system and the approval queue, read with the lead's own access, checked on 2026-11-17."
+  - id: R_DAILY_SUMMARY_FINANCE
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    owner: assistant-operator
+    label: "Every working day at 08:00 (America/Sao_Paulo), the finance lead gets the personal summary by direct message."
+    reverify_every: P3D
+    x_ritual:
+      purpose: "the finance lead starts the day knowing what is overdue, paid and waiting for approval"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.finance-summary.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=8;BYMINUTE=0;BYSECOND=0"
+        dtstart: "20261119T080000"
+        tz: America/Sao_Paulo
+  - id: Q_BLOCKER_PAYMENTS_CHART
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.5
+    label: "Drawing the payments chart as an image needs a library that is not installed yet."
+    narrative: "Not essential to the agreed minimum: the summary goes as text now, and the chart comes later."
+    x_essential: false
+  - id: E_ACCEPTED_DAILY_SUMMARY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    label: "The finance lead got a real test summary on 2026-11-18 and accepted it as agreed."
+    verified_at: "2026-11-18"
+    verified_against: "the reply of the finance lead to the test summary"
+    provenance:
+      source: "the finance lead, by direct message"
+      locator: "reply of 2026-11-18 09:12 to the test summary, in the direct-message thread"
+      method: "testimony: acceptance by the person who asked, after a real test"
+      locality: pessoa
+edges:
+  - from: R_DAILY_SUMMARY_FINANCE
+    to: Q_REQUEST_DAILY_SUMMARY
+    edge_type: TRACES_TO
+  - from: Q_BLOCKER_PAYMENTS_CHART
+    to: Q_REQUEST_DAILY_SUMMARY
+    edge_type: CONSTRAINS
+  - from: E_ACCEPTED_DAILY_SUMMARY
+    to: Q_REQUEST_DAILY_SUMMARY
+    edge_type: SUPPORTS
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/requests.kg.yaml
+```
+
+```text
+PASS docs/requests.kg.yaml
+· 1 files; 1 pass the MUST; 0 with a SHOULD warning (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+The contract checks the form, the edges and the provenance. It does not check that the test was real, that the reply
+came from that person, or that the agent did not wait on a blocker that was not essential. The graph keeps those facts
+where a person can read them, with dates. This recipe is a guide, not a contract rule: the warnings for a request
+closed without an outside acceptance will come only if use shows that they are needed.

@@ -166,6 +166,76 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
   1.2 profile. It falls back to the slower pure parser only for the rare texts where the two can differ (a tab,
   `%YAML`, a surrogate or `\U` escape, a BOM past the start).
 
+### The rhythm report (`--rituals`, 4.55.0)
+
+`--rituals WHEN` replaces the verdict with the rhythm report of the rituals, the nodes with `x_ritual` (chapter 3).
+Each one is listed under its `owner`, in one state:
+
+| State | When |
+|---|---|
+| `OPEN FAILURE` (`failing`) | the most recent run that the report sees ended in `fail` or `error`, and no run passed after it |
+| `NEVER RUN` (`never_run`) | no `verified_at`, no `evidence` with `TRACES_TO` to the ritual, and no event in the run log |
+| `LATE` (`late`) | by the calendar, when it is expanded (an occurrence of the RRULE after the last run that passed, or after `dtstart` when none passed, and before `WHEN` minus the slack); without it, by the cadence (`verified_at` plus `reverify_every` falls before the day of `WHEN`) |
+| `BY EVENT` (`event_only`) | only `reverify_on`, with no cadence and no calendar: there is no deadline to measure |
+| `ON TIME` (`on_time`) | the rest, with the last run and the next one by the calendar |
+
+`WHEN` is a date `YYYY-MM-DD`, read as the end of the day in the time zone of each ritual, or an RFC 3339 date-time
+with an offset. A ritual whose cadence falls due on that day is not late yet; it is late the day after. With the
+calendar expanded, the calendar decides: the cadence counts calendar days, and the calendar knows the weekend, so a
+ritual from Monday to Friday is not late on Sunday. The late states add up: a ritual whose first run failed, or that
+never ran, also carries `late_by` when occurrences went by, and that is what the gate counts.
+
+**Two sources.** The graph, always: the `verified_at` of the ritual, which has the precision of a day, and the
+promoted runs, `evidence` nodes with `TRACES_TO` to the ritual, `x_outcome`, and `x_event.time`. And the run log of the
+executor, with `--runs FILE` (repeatable): the CloudEvents it emits, one per run, as JSON Lines, an object, or an
+array. The log gives the hour, so an hourly ritual is measured only with it:
+
+```json
+{"specversion":"1.0","id":"run-2026-11-17-1400","source":"urn:example:agent:rituals","type":"com.example.ritual.watch.completed","subject":"rituals#R_WATCH","time":"2026-11-17T17:00:40Z","kgssotstarted":"2026-11-17T17:00:02Z","kgssotoutcome":"pass"}
+```
+
+`type` is the `emits` of the ritual and `subject` is `<meta.id>#<node id>`. `time` is when the run ended. CloudEvents
+has no attribute for the result, so the report reads two extension attributes of KG-SSOT: `kgssotoutcome` (`pass`,
+`fail`, or `error`; without it, the run passed) and `kgssotstarted` (when the run started: a run covers the occurrence it started in, so a run from 09:00 to 10:10 does not cover the 10:00 one).
+`dataref` points to what the run produced; a run that produced nothing leaves it out, because for CloudEvents `none`
+would be a reference to a resource named `none`. The report does not read it. A
+conditional ritual that had nothing to say still writes its line, with `pass`: running with nothing to report is not
+the same as not running. A line that cannot be read (not JSON, not CloudEvents 1.0, no `type`, `subject`, or `time`,
+an unknown outcome) is skipped and counted with its reason, never guessed. A run after `WHEN` does not count, and neither does a day
+stamp after the day of `WHEN`. A promoted run without `x_outcome` counts as a run, not as a pass. The day of a
+`verified_at` (and of an `evidence` without `x_event.time`) is read in the time zone of the ritual, and it is shown as a
+date. When the
+log has a run that passed, with its time, on the day of the `verified_at` or later (in the time zone of the ritual or in UTC, for an executor that stamps the UTC date), the day stamp leaves the count, so
+the end of the day does not hide the run that was missed at 17:00. Against a failure, the day stamp counts as the start
+of its day: a failure at 17:31 is not cleared by a `verified_at` of the same day.
+
+**The calendar.** It is expanded only with the `rituals` extra, `python-dateutil` (`pip install "kg-ssot[rituals]"`,
+or `tools/requirements-rituals.txt` with `--require-hashes`; on Windows, the extra also brings `tzdata`, the time zone database the system lacks), and only after the calendar passes the form of the
+SHOULD: the expander is lenient and is not the judge. Without the extra, the report measures lateness by the cadence
+only, per day, and says so. A time zone that the machine does not know is not expanded either, and the line says why;
+the JSON carries the version of the machine's time zone database (`tzdata`). `--grace PT30M` (an ISO 8601 duration
+with time only) gives the executor its slack, so the 10:00 occurrence is not late at 10:00:30. The count of missed
+occurrences stops at 1000, and the next run is searched up to about two years ahead. A calendar whose `COUNT` or
+`UNTIL` was reached says so: what was missed before the end still counts, and nothing after it does. A rule that never occurs (`BYMONTH=2;BYMONTHDAY=30` passes the form) takes
+the expander a few seconds per ritual to rule out.
+
+```bash
+kg-validate --rituals 2026-11-17T21:10:00Z --runs runs.jsonl --grace PT30M docs/rituals.kg.yaml
+```
+
+```text
+owner hub-brain
+  OPEN FAILURE docs/rituals.kg.yaml  R_REPORT_1730: failed at 2026-11-17T17:31:00-03:00 (evidence:E_RUN_1730_FAIL), no run passed after it; calendar: 1 run(s) missed since 2026-11-17T17:30:00-03:00; last pass 2026-11-16; next 2026-11-18T17:30:00-03:00
+  LATE         docs/rituals.kg.yaml  R_WATCH: calendar: 1 run(s) missed since 2026-11-17T17:00:00-03:00; last pass 2026-11-17T16:00:30-03:00; next 2026-11-17T19:00:00-03:00
+  ON TIME      docs/rituals.kg.yaml  R_REPORT_1200: last pass 2026-11-17; next 2026-11-18T12:00:00-03:00
+· on 2026-11-17T21:10:00Z: 1 with an open failure, 0 never run, 1 late, 0 by event, 1 on time; the report does not change the verdict
+· run log: 9 event(s) read, 0 ignored
+```
+
+It never changes the verdict: rc is 0, or 2 on broken input (an unreadable log, `WHEN` out of form). With
+`--format json`, the output uses the `kg-ssot.rituals/1` format (`spec/rituals.schema.json`); `kg-ssot.due/1` does not
+change. To fail a CI on an overdue ritual, see `--rituals-overdue` in `kg_gate.py` below.
+
 ## `kg_conformance.py`: the suite
 
 Runs the conformance suite against the reference reader. First the metaschema tests itself, then each manifest is
@@ -179,7 +249,7 @@ The last lines:
 
 ```text
 —
-latest: 621/621 (gates the rc)
+latest: 745/745 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -578,6 +648,28 @@ the forge authenticates. The gate runs offline and never reads the review from t
 `--update`. Copying the content to a new graph, or to another repository, is not a drop for this gate (chapter 6,
 *What is not covered yet*).
 
+### Overdue rituals: `--rituals-overdue` (4.55.0)
+
+`--rituals-overdue` fails (rc 1) when a ritual is overdue: any entry with `late_by`, by the calendar or (without it) by
+the cadence, including a ritual never run, or whose last run failed, once occurrences went by. A ritual by event only,
+and a failure with no occurrence missed yet, show up in the rhythm report, not here.
+It is off by default and stays out of the verdict and the baseline, because it reads the clock: the same commit passes
+today and fails tomorrow. `--as-of WHEN` fixes the moment (without it, the machine's clock, in UTC), and `--runs` and
+`--grace` are those of `kg_validate.py --rituals` above. It does not go with `--update` or `--touched`.
+
+```bash
+python3 -I vendor/kg-ssot/tools/kg_gate.py --rituals-overdue --as-of 2026-11-17T21:10:00Z --runs "$RUN_LOG" --grace PT30M
+```
+
+```text
+· rituals at 2026-11-17T21:10:00Z: 2 overdue of 3
+✗ ritual overdue: docs/rituals.kg.yaml R_REPORT_1730 (owner hub-brain)
+✗ ritual overdue: docs/rituals.kg.yaml R_WATCH (owner hub-brain)
+```
+
+Run it in a scheduled job, not on every pull request: a change that does not touch the rituals should not fail because
+an executor stopped.
+
 ## `kg_vendor.py`: bring in and verify the release
 
 An adopter never copies the contract by hand. The vendor tool reads a **tag** with `git archive` and writes a stamp
@@ -890,11 +982,15 @@ A client configuration over stdio, with a versioned store outside the repository
 | `--init` | Creates the root if it does not exist |
 | `--author "Name <email>"` | Who signs the writes |
 | `--read-only` | Removes `kg_write` and `kg_delete` |
-| `--http PORT` · `--host H` · `--allow-remote` | HTTP instead of stdio; off the loopback, only with `--allow-remote`, which requires `--secret-env` |
+| `--http PORT` · `--host H` · `--allow-remote` | HTTP instead of stdio; off the loopback, only with `--allow-remote`, which requires `--secret-env` or `--secret-file` |
 | `--secret-env VAR` · `--secret-header H` | The shared secret, read from the variable `VAR`, that each HTTP request carries in header `H` (default `X-Api-Key`), compared with hmac |
-| `--identity-header H` | The "behind a proxy" profile: each request's identity comes from header `H` (an email address), with its own area and author; requires `--secret-env` |
+| `--secret-file @FILE` | Instead of `--secret-env` (the two are exclusive): the shared secret read from a file, on one line, and read again when the file changes; the value never shows in output or errors (see *The secret from a file* below) |
+| `--identity-header H` | The "behind a proxy" profile: each request's identity comes from header `H` (an email address), with its own area and author; requires `--secret-env` or `--secret-file` |
 | `--area-policy FILE` | JSON file, outside `--root`, naming the shared areas each identity reads; requires `--identity-header` |
 | `--area-policy-digest sha256:HEX\|@FILE` | Only with `--area-policy`: the digest the policy must have (`kg_policy.py digest FILE`), read once at startup; with another digest the server does not start (rc 2), and a policy changed to another digest while it runs closes reading (when the change moves the file's stamp: see the area filter) |
+| `--serve-ref REF` | Only with `--backend git` and `--read-only`: serves exactly the tree of a ref of the clone, `refs/heads/NAME` (or `NAME`), `refs/tags/NAME`, or a pattern such as `refs/tags/hub-v*`, never its working tree (see *The served ref* below) |
+| `--verify-signers @FILE` | Only with `--serve-ref`, and required for a tag: the git `allowed_signers` file; the tag, or the tip commit of the branch, must carry a valid SSH signature, at startup and at every change of the ref |
+| `--serve-state DIR` | Only with a tag pattern of `--serve-ref`, and required with one: a directory outside the clone and outside `--root` that keeps the highest version already served (the version floor); a lower version is never served, also after a restart |
 | `--max-bytes N` | The maximum size of a graph (default 2,000,000) |
 | `--max-graphs N` | Graphs per store, or per area in the profile; past that, a new name is refused |
 | `--max-concurrent N` | HTTP requests at the same time; past that, 503 |
@@ -1094,6 +1190,111 @@ write or a name that does not exist comes with `isError: true`, so the model can
     Here `aud@x.org` reads `g-compliance` up to `confidential`, does not see its `restricted` graph and does not write;
     `off@x.org` and `dpo@x.org` read it up to `restricted`. Giving `aud@x.org` the `officer` role too would show the
     `restricted` graph and allow writing, because the higher grant wins.
+- **The served ref (`--serve-ref`):** a read-only server for readers who are not developers serves what was published,
+  not what sits in the clone. Without the option, the git store reads the tracked files (`git ls-files`) with their text
+  from the working tree, so a change that was never committed is served. With `--serve-ref REF`, it reads the tree of
+  the commit that the ref names (`git ls-tree` and `git cat-file`): a changed or untracked file in the working tree does
+  not count, and a symbolic link or a submodule never enters. The server writes nothing in the clone, not even
+  `.git/info/exclude`, so it can run without write access to it. The option needs `--backend git` and `--read-only`,
+  and it does not go with `--init`.
+  - **A branch** (`refs/heads/NAME`, or just `NAME`): the tree of its tip commit, and only while the `HEAD` of the clone
+    descends from it (`git merge-base --is-ancestor`); a branch rewritten, or on a line the clone does not have, does
+    not start (rc 2). With `--verify-signers`, the tip commit must carry a valid SSH signature (`git verify-commit`). A
+    branch has no version floor: moved back, by whoever can write to the clone, to an older commit that is validly
+    signed and that `HEAD` still contains, it is served. For readers who must never see a withdrawn version, serve a
+    tag pattern with `--serve-state`.
+  - **A tag** (`refs/tags/NAME`): the exact tree of `NAME^{commit}`, only with `--verify-signers`. The tag must be
+    annotated and signed with SSH, and `git -c gpg.format=ssh -c gpg.ssh.allowedSignersFile=FILE verify-tag` must pass
+    with the file given. The `tag` header of the signed object must be `NAME` itself, so a signed tag of one version,
+    copied under the name of a higher one, is refused. A lightweight tag, an unsigned one, and one signed by a key that
+    is not in the file do not start (rc 2).
+  - **A tag pattern** (`refs/tags/hub-v*`): one `*`, where a semver 2.0.0 version without a pre-release goes. The
+    highest version by the semver precedence wins: numbers compare as numbers (`1.10.0` beats `1.2.0`), and the build
+    metadata (`+...`) does not count. This is the semver order, not the one of `git tag --sort=v:refname`, which puts
+    `1.0.0-rc1` after `1.0.0`. A pre-release (`hub-v2.0.0-rc.1`) does not count, so a candidate tag never reaches the
+    readers; a tag outside semver (`hub-vlatest`, `hub-v01.2.0`, a digit that is not ASCII) does not count either, no
+    matching tag gives rc 2, and two tags of the same precedence are refused.
+  - **The version floor (`--serve-state DIR`, required with a pattern):** the highest version already served is kept in
+    a file of that directory, one per area and pattern, written atomically. A version below it is never served: it
+    closes reading, with the reason on stderr, also after a restart. Without the floor, whoever can delete the highest
+    tag on the remote (and a fetch with `--prune-tags` deletes it here) would make the server serve the previous,
+    validly signed one, a rollback to content that was withdrawn. The directory stays outside the clone and outside
+    `--root`, so neither a push nor the served content can lower it. The floor is written under a lock of the directory
+    (`flock`), reading the file again first, so two servers on the same directory keep the highest of the two. On the
+    same precedence as the floor, only the same tag is served, by name and by object: a tag cut again with the version
+    already served, or the same version with another build (`+...`), closes reading. A state file out of form, or a
+    directory or file that the group or others can write (`g+w`, `o+w`), is refused.
+  - **Trust on first use:** the floor protects from the first version served on. A first start without a state file
+    accepts the highest valid tag the clone has, whatever it is, and deleting the state file resets the floor, so the
+    directory is the operator's and backed up like a configuration file.
+  - **Read again, and it fails closed:** the server checks the stamp (modification time, size, inode) of `HEAD` (and
+    its content), `packed-refs`, `reftable/tables.list`, `config`, `config.worktree`, `commondir`, `info/grafts`,
+    `shallow`, `objects/info/alternates`, each loose ref under `refs/heads`, `refs/tags`, and `refs/replace`, and the
+    signers file, once per request, and resolves the ref again when one of them changed. A file that the configuration
+    includes (`include.path`, `includeIf`) is not in the stamp; the check for a partial clone, below, runs at every
+    request instead. A ref that no longer verifies (a branch moved off the history of `HEAD`, a new highest tag that is not
+    validly signed, a version below the floor, a signers file changed or removed) closes reading, as an invalid policy
+    does: `kg_list` is empty, a graph answers like one that does not exist, and the reason goes once to stderr. It
+    reopens when the ref verifies again. When the highest tag of a pattern fails, the server does not fall back to the
+    previous one: it serves the version the pattern names, or nothing.
+  - **One snapshot per request:** each request reads one resolution of the ref, from its first read to its last, so a
+    `kg_query` or a `kg_validate` never mixes two tags, and a ref that closes in the middle closes the whole answer.
+  - **A failure to run is not a verdict:** every git the server runs in this mode (and the `ssh-keygen` it calls) has
+    30 seconds, in a process group of its own that is killed whole when the time runs out. A git that does not run,
+    dies by a signal, or runs out of time closes that answer but is not recorded against the ref: the next request
+    tries again, with no change to the ref needed.
+  - **What the clone cannot change:** the server runs `git` and `ssh-keygen` by the absolute paths found at startup
+    in the absolute folders of `PATH` (never the current folder nor a relative entry), with no system or global
+    configuration, and fixes on the command line a list of keys. A key fixed there wins over the same key in the
+    `.git/config` of the clone and in what it includes; a key it does not name still comes from the clone, so each key
+    that matters is named: what verifies (`gpg.format=ssh`, `gpg.ssh.program` with that `ssh-keygen`,
+    `gpg.minTrustLevel=fully`, GPG and X.509 programs that never run), what could run code (`core.fsmonitor`,
+    `core.hooksPath`, `core.pager`, `diff.external`, `core.sshCommand`, `core.gitProxy`, `core.askPass`,
+    `credential.helper`, `log.showSignature`), and no transport: `protocol.allow=never` and, because
+    `protocol.<name>.allow` is more specific and would win over it, `never` for each protocol by name (`ext`, `fd`,
+    `file`, `git`, `http`, `https`, `ftp`, `ftps`, `ssh`, `git+ssh`, `ssh+git`, `rsync`). It runs with
+    `GIT_NO_LAZY_FETCH`, `GIT_PROTOCOL_FROM_USER=0`, `GIT_NO_REPLACE_OBJECTS`, and an empty graft file. The signature
+    git checks is the block of the last `-----BEGIN` line of the tag, and it must be the SSH one: an SSH marker in the
+    message with a GPG block after it is refused.
+  - **The minimum git:** `GIT_NO_LAZY_FETCH` came with the fix of May 2024: git 2.45.1, or 2.39.4, 2.40.2, 2.41.1,
+    2.42.2, 2.43.4, 2.44.1 (and the builds of distributions that carry the fix). At startup the server proves that the
+    git it found honors it, in a temporary repository with a promisor remote and a missing object, and does not start
+    (rc 2) with a git that does not, naming the version and the minimum.
+  - **What the clone cannot be:** the server does not start, with the reason on stderr, if the clone is one of these:
+    a partial clone (`extensions.partialClone`, or any `remote.*.promisor`), where a missing object would be fetched by
+    running a command of the clone's own configuration; a clone with `.git/info/grafts`; a shallow clone
+    (`.git/shallow`); a clone that borrows objects from outside it (`objects/info/alternates`); a linked worktree
+    (`.git/commondir`); and a clone with a symbolic link in `.git` (`HEAD`, `config`, `packed-refs`, or under `objects`
+    or `refs`). With the server running, the partial clone is checked at every request, in the configuration git reads
+    (`config`, `config.worktree`, and what `include.path` and `includeIf` include), and closes that answer; the others
+    close reading when the stamp sees them. Three layers keep a missing object from being fetched, and each holds on its
+    own: `GIT_NO_LAZY_FETCH`, the protocols fixed by name, and the refusal of the partial clone. The server fetches
+    nothing and runs no command of the clone.
+  - **History up to the ref:** `kg_history` lists the commits up to the served one, and `kg_get` with `ref` reads only
+    a commit in that history; a commit ahead of it, such as the tip of the clone past the tag, answers like a name that
+    does not exist at that `ref`.
+  - **In the "behind a proxy" profile:** it holds for every area the server opens. At startup, each shared area of the
+    policy that exists as a directory must serve the ref, or the server does not start (rc 2); with the server running,
+    an area whose ref stops verifying closes on its own, and the other areas keep serving. An identity's own area that
+    does not serve the ref is left out, and the shared areas are still read.
+  - **The date that the key validity is judged at:** git passes `ssh-keygen` the date written in the tag (the tagger
+    date) or in the commit (`-Overify-time`), and the signer writes that date. So `valid-after` and `valid-before` in
+    the `allowed_signers` file are judged against a date the signer chose, not against the clock: a key that left keeps
+    validating the tags it dated before its `valid-before`. To retire a key, remove its line from the file; every tag
+    it signed then stops verifying, and an area whose highest tag it signed closes until a tag signed by another key is
+    cut.
+  - **Out of this version:** a GPG or X.509 signature (refused before git checks it), the revocation file of SSH keys,
+    pre-releases in a pattern, an expiry by the clock, and a floor for a branch. The server fetches nothing (see what
+    the clone cannot be, above): bringing new commits and tags into the clone is the operator's (chapter 6, step 5).
+- **The secret from a file (`--secret-file @FILE`):** instead of `--secret-env`, and never with it. The file follows the
+  rules of the `@FILE` of `--area-policy-digest`: one line, with the blanks at both ends ignored and the UTF-8 BOM
+  accepted, up to 4,096 bytes; a file in UTF-16 is refused with the hint to save it as UTF-8, and an empty file, a second
+  line, or a control character is refused. A file that does not pass gives rc 2 at startup. The server reads it again
+  when its stamp changes, so a rotation takes effect on the next request without a restart; a file that breaks or
+  disappears while it runs closes the server, and every request gets 401 until the file is valid again, with the reason
+  once on stderr. The value never shows in output, in an error, or in the log: the messages name the path and the
+  reason only. Unlike a variable, the file does not show in `/proc/<pid>/environ` and is not inherited by a child
+  process.
 - **The content screen (4.47.0):** in any profile, every text that `kg_get`, `kg_list`, `kg_history`, `kg_query`, and
   `kg_terms` return is screened before it reaches the model (`tools/kg_screen.py`, standard library only, a pure
   function of the text). Three verdicts: `pass` (nothing found); `quarantine` (one signal alone: an invisible

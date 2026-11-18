@@ -182,6 +182,7 @@ is free, and any other key warns. Enum values are codes, in English, whatever th
 | `x_classification` | meta | the sensitivity level of the whole graph, one level of the organization's own scheme (v4.20) |
 | `x_dispose_by` · `x_dispose_basis` · `x_hold` | meta | the disposal deadline of the whole graph, its basis, and its suspension (v4.23) |
 | `x_downgrade` | meta | the trail of the level downgrades of the whole graph: from, to, reason, approver, reference, and date (v4.24) |
+| `x_ritual` | node (`rule`, `policy`) | an agent ritual: a recurring obligation that an executor runs and checks, with its calendar (v4.25) |
 
 ### `x_term`
 
@@ -461,6 +462,113 @@ graph, and in the order of the levels, which belongs to the organization's polic
 of `kg_gate.py --classification-downgrade` (chapter 5), which compares each graph with the base and asks that the last
 entry record this drop, be appended after the trail of the base, which stays as it was, and name an approver who did
 not change the level.
+
+### `x_ritual` (v4.25)
+
+An agent ritual is a recurring obligation that an executor runs and checks: every working day at 08:00, each person gets
+the briefing; at each new hire, the agent checks access and an owner. The ritual is a profile on a node type that
+already exists, `rule` (a business rule) or `policy` (a policy that governs rules), never a node type of its own. The
+definition and each run are separate objects, as a CronJob and its Jobs: the node with `x_ritual` is the definition,
+and a run that matters becomes an `evidence` node with a `TRACES_TO` edge to the ritual.
+
+```yaml
+- id: R_MORNING_BRIEFING
+  node_type: rule
+  plane: DEV
+  status: open
+  impact: 3
+  confidence: 0.9
+  label: "Every working day at 08:00 (America/Sao_Paulo), each person gets the briefing by direct message."
+  owner: ops-lead
+  reverify_every: P3D
+  x_ritual:
+    purpose: "no open item, late card or agent promise goes a day without its owner seeing it"
+    kind: deterministic
+    autonomy: notify
+    emits: com.example.ritual.briefing.completed
+    sources:
+      - channel: linear
+      - channel: slack
+        ref: "mentions and open threads of the day before"
+    delivery:
+      - channel: slack
+        to: "direct message to each person"
+    promote: on_failure
+    calendar:
+      rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=8;BYMINUTE=0;BYSECOND=0"
+      dtstart: "20261116T080000"
+      tz: America/Sao_Paulo
+```
+
+The cadence the contract judges is the one the node already has: `reverify_every` is the longest gap between two runs (`P3D` for a ritual from Monday to Friday, from Friday to Monday),
+which `kg_validate.py --due` already reports, and `reverify_on` is the triggering event (the CloudEvents `type`).
+`owner` is the role that approves a change to the ritual. `verified_at` and `verified_against` move with each run that
+passes: the date of the run and the run it cites.
+
+| Key | Required | Form |
+|---|---|---|
+| `purpose` | yes | what the ritual protects, in text that is not empty; the `label` says what it does |
+| `kind` | yes | `deterministic` (a script measures) or `judgment` (the agent reads and assesses) |
+| `autonomy` | yes | `notify` (only measures and warns) or `act` (acts when the action is safe) |
+| `emits` | yes | the CloudEvents `type` each run emits, with a reverse-DNS prefix (`com.example.ritual.briefing.completed`) |
+| `sources` | no | a list that is not empty of `{channel, ref}`: `channel` a slug, `ref` text |
+| `delivery` | no | a list that is not empty of `{channel, to}`: `channel` a slug, `to` text (the role or the destination) |
+| `promote` | no | which run becomes a node: `on_failure` (the default), `on_change`, or `every_run` |
+| `calendar` | no | `{rrule, dtstart, tz}`, the RFC 5545 recurrence |
+
+The channels have no list of values: they belong to the organization, and adding one does not change the contract.
+Another `x_` key inside the profile, the calendar, or an entry is free; any other key warns as `form.unknown-key`. There
+is no nested `status`: the result of a run lives in the `evidence` node.
+
+With `x_ritual`, a node without `owner` warns as `form.required.node.owner`, and a node with neither `reverify_every`
+nor `reverify_on` warns as `form.required.node.x_ritual.cadence` (`cadence` is a name for the rule, not a key): the
+calendar alone is not enough, because it is not judged yet. On another node type, the profile warns as
+`form.misplaced.node.x_ritual`; on an edge, it is a free `x_` key. A key out of form warns with its path, such as
+`form.enum.node.x_ritual.kind` or `form.pattern.node.x_ritual.sources.channel`.
+
+**The calendar.** `rrule` is the value of an RFC 5545 RRULE, without the `RRULE:` prefix, `dtstart` is its first
+instance, and `tz` is the IANA time zone, so the two lines go to iCalendar as they are:
+
+```text
+DTSTART;TZID=America/Sao_Paulo:20261116T080000
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=8;BYMINUTE=0;BYSECOND=0
+```
+
+The profile accepts a strict subset of the RFC, never a superset, so everything that passes is valid RFC 5545:
+
+- `rrule` in uppercase, `FREQ` first and once, each other part `NAME=VALUE` with one of the 14 names of the grammar
+  and no part repeated, never `COUNT` with `UNTIL`, `COUNT` and `INTERVAL` positive, the values in the ranges of the
+  grammar, and the rules between parts of the RFC prose: a numbered `BYDAY` only in `MONTHLY` or `YEARLY` (and not
+  with `BYWEEKNO`), `BYMONTHDAY` not in `WEEKLY`, `BYYEARDAY` not in `DAILY`, `WEEKLY`, or `MONTHLY`, `BYWEEKNO` only
+  in `YEARLY`, `BYSETPOS` only with another `BYxxx` part. `UNTIL` is a date-time, in UTC when `dtstart` is in UTC or
+  has a `tz`, and local when `dtstart` floats. Every rule warns as `form.pattern.node.x_ritual.calendar.rrule`.
+- `dtstart` is a date-time in the basic form of RFC 5545 (`20261116T080000`, on the calendar, from year 0001: the
+  year 0000, which the RFC grammar allows, warns, as in every date of the contract), not the extended form of RFC 3339: local with `tz`, or in UTC (`20261116T110000Z`) without it. Out of form it warns as
+  `form.pattern.node.x_ritual.calendar.dtstart`; `tz` with a UTC time, as `form.exclusive.node.x_ritual.calendar`; a
+  local time without `tz`, which would float with the machine that reads it, as
+  `form.required.node.x_ritual.calendar.tz`.
+- `tz` has the form of a name in the IANA time zone database (`America/Sao_Paulo`, `Etc/UTC`): parts of 1 to 14
+  ASCII letters, digits, `.`, `-`, `_`, or `+`, separated by `/`, each starting with a letter or `_` (as every name in
+  the database does, which also rules out `-`, `.`, `..`, and an offset such as `+0300`), and never `Etc/Unknown`. Out
+  of form it warns as `form.pattern.node.x_ritual.calendar.tz`. Whether the name exists in the database is not judged:
+  it depends on the machine (Windows has no database, and the system one changes version), and the same commit would
+  pass in one place and fail in another. So a name with the right form that is not in the database, such as `UTC-3`,
+  `GMT+3`, or `EST5`, passes.
+
+The calendar is judged only by its form. The contract does not expand the occurrences, compute the next run, check that
+`dtstart` is in step with the rule, or read `RDATE`, `EXDATE`, or the RFC 7529 extensions (`RSCALE`, `SKIP`): the next
+run is derived by whoever shows it, never written into the graph. The patterns in the schema are generated from a table
+of the grammar, with no lookahead, so every reader that passes the suite reads them the same way.
+
+**A run.** The executor emits one CloudEvents per run, with the `type` of `emits` and the `subject` set to the ritual
+(`<meta.id>#<node id>`), the shape of "Recording an external event" below. Not every run becomes a node: `promote`
+says which one does. A promoted run is an `evidence` node with `x_event`, its `x_outcome` (`pass`, `fail`, or `error`,
+recommended and not judged), and a `TRACES_TO` edge to the ritual. Do not record a failed run with `REFUTES` on the
+ritual: a day's failure says the obligation was not met that day, not that the rule is false.
+
+**The rhythm report.** `kg_validate.py --rituals` (chapter 5, since 4.55.0) reads the runs, from the graph and from the
+executor's run log, and lists per owner the ritual with an open failure, never run, late, by event only, or on time.
+The run log is the same CloudEvents, one line per run, with the result in the `kgssotoutcome` extension.
 
 ## Recording an external event (recommended shape, not normative)
 

@@ -25,7 +25,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 # as citações entre repositórios,
 # a busca por semelhança (o extra vector), o servidor MCP e o exportador PROV-O.
 # O kg_vendor.py fica de fora: ele serve ao vendor por pin, que é outro canal.
-MODULES = ["kg_validate", "kg_conformance", "kg_gate", "kg_store", "kg_screen", "kg_policy", "kg_query", "kg_diff", "kg_vocab", "kg_criterion", "kg_audit", "kg_trace", "kg_refs", "kg_vector", "kg_mcp", "kg_prov_export"]
+MODULES = ["kg_validate", "kg_conformance", "kg_gate", "kg_store", "kg_screen", "kg_policy", "kg_query", "kg_diff", "kg_vocab", "kg_criterion", "kg_audit", "kg_trace", "kg_refs", "kg_vector", "kg_rituals", "kg_mcp", "kg_prov_export"]
 # kg-ssot é o servidor MCP (o mesmo kg-mcp): o MCP Registry e os clientes rodam `uvx kg-ssot` pelo nome do pacote
 SCRIPTS = {"kg-ssot": "kg_mcp", "kg-validate": "kg_validate", "kg-conformance": "kg_conformance", "kg-gate": "kg_gate",
            "kg-store": "kg_store", "kg-query": "kg_query", "kg-diff": "kg_diff", "kg-vocab": "kg_vocab", "kg-criterion": "kg_criterion", "kg-audit": "kg_audit", "kg-trace": "kg_trace", "kg-refs": "kg_refs", "kg-vector": "kg_vector", "kg-mcp": "kg_mcp", "kg-prov-export": "kg_prov_export"}
@@ -69,6 +69,9 @@ dependencies = ["PyYAML>=6.0.2", "jsonschema>=4.23"]
 vector = ["onnxruntime>=1.20", "tokenizers>=0.20", "numpy>=1.26"]
 # a leitura da exportação PROV por um leitor RDF (desde a 4.29): o kg-prov-export --edges vira grafo do rdflib
 rdf = ["rdflib>=7.0"]
+# a expansão do calendário do relatório do ritmo (kg-validate --rituals, kg-gate --rituals-overdue): a próxima execução
+# e o atraso pela RRULE
+rituals = ["python-dateutil>=2.9", "tzdata>=2024.1; sys_platform == 'win32'"]
 
 [project.urls]
 Homepage = "{mirror}"
@@ -90,10 +93,10 @@ include = ["src/kg_ssot", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
 INIT = '''"""KG-SSOT: the formal contract of the verifiable knowledge graph.
 
 The modules are the adoption kit's (kg_validate, kg_conformance, kg_gate, kg_store, kg_screen, kg_policy, kg_query, kg_diff, kg_vocab,
-kg_criterion, kg_audit, kg_trace, kg_refs, kg_vector, kg_mcp, kg_prov_export), and the contract, the suite and the output schemas live in
+kg_criterion, kg_audit, kg_trace, kg_refs, kg_vector, kg_rituals, kg_mcp, kg_prov_export), and the contract, the suite and the output schemas live in
 kg_ssot/spec. The commands kg-validate, kg-conformance, kg-gate, kg-store, kg-query, kg-diff, kg-vocab, kg-criterion,
 kg-audit, kg-trace, kg-refs, kg-vector, kg-mcp and kg-prov-export are the same scripts as the kit's. The vector search
-(kg-query --semantic, kg-vector) needs the extra: pip install "kg-ssot[vector]". To read the kg-prov-export output in RDF tools (rdflib, SPARQL), pip install "kg-ssot[rdf]". Manual: {mirror}/tree/main/docs/manual
+(kg-query --semantic, kg-vector) needs the extra: pip install "kg-ssot[vector]". To read the kg-prov-export output in RDF tools (rdflib, SPARQL), pip install "kg-ssot[rdf]". The rhythm report (kg-validate --rituals) expands calendars with pip install "kg-ssot[rituals]". Manual: {mirror}/tree/main/docs/manual
 """
 __version__ = "{version}"
 '''

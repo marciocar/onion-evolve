@@ -8,7 +8,99 @@ com as releases marcadas como `kg-ssot-vX.Y.Z`. A versão do contrato (`v4.N`) �
 Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As releases anteriores à 4.16.0 estão no
 [ADOPTING.pt-BR.md](ADOPTING.pt-BR.md).
 
-## [Unreleased]
+## [4.55.0] - 2026-11-18
+
+Contrato v4.25, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda.
+
+- Contrato v4.25: o perfil canônico `x_ritual`, o ritual do agente, num nó `rule` ou `policy`, julgado só quando
+  presente e só pela forma, nunca pelo relógio. `purpose` (texto não vazio), `kind` (`deterministic` ou `judgment`),
+  `autonomy` (`notify` ou `act`) e `emits` (o `type` CloudEvents de cada execução, com prefixo DNS reverso) são
+  obrigatórios; `sources` e `delivery` (listas de `{channel, ref}` e de `{channel, to}`, com `channel` em slug e sem
+  lista de valores), `promote` (`on_failure`, `on_change` ou `every_run`) e `calendar` são opcionais. A cadência
+  julgada é o `reverify_every` ou o `reverify_on` do próprio nó, que o `kg_validate.py --due` já lê: com o perfil, o nó
+  sem nenhum dos dois alerta como `form.required.node.x_ritual.cadence`, e o nó sem `owner` como
+  `form.required.node.owner`. O `calendar` é `{rrule, dtstart, tz}`: o valor da RRULE da RFC 5545 num subconjunto
+  estrito (maiúsculas, `FREQ` primeiro e uma vez, os 14 nomes da gramática, sem parte repetida, nunca `COUNT` com
+  `UNTIL`, as faixas e as regras entre partes da prosa da RFC), com toda regra alertando como
+  `form.pattern.node.x_ritual.calendar.rrule`; o `dtstart` na forma básica da RFC 5545, no calendário; e o `tz` na forma
+  de nome de fuso da IANA (a regra da `theory.html` da base tz: partes de até 14 caracteres separadas por `/`, nenhuma
+  começando por `-`, nunca `.` nem `..` e nunca `Etc/Unknown`; o perfil pede também que cada parte comece por letra ou
+  `_`, como todo nome da base, o que exclui um deslocamento como `+0300`, enquanto `UTC-3`, `GMT+3` e `EST5` seguem
+  passando pela forma). O ano `0000` alerta no `dtstart` e no `UNTIL`, como em toda data do contrato, um desvio
+  declarado da gramática da RFC. O `tz`
+  com `dtstart` em UTC alerta como `form.exclusive.node.x_ritual.calendar`, e o `dtstart` local sem `tz` como
+  `form.required.node.x_ritual.calendar.tz`. Se o fuso existe na base não é julgado: depende da máquina. Em outro tipo de
+  nó, o perfil alerta como `form.misplaced.node.x_ritual`. Os padrões são gerados de uma tabela da gramática, sem
+  lookahead e sem dependência nova. Os dois leitores dão o mesmo veredito; a suíte vai de 621 a 745 casos
+  (`latest/form/ritual/`, com os 53 valores RRULE distintos dos exemplos da RFC 5545 como caso válido).
+- **A identidade do contrato no seu gate muda.** O schema SHOULD muda, então o gate imprime o aviso `· identidade` na
+  primeira rodada depois da atualização e passa, salvo com `--strict-identity`; o `kg_gate.py --update` grava a
+  identidade nova. O grafo que já leva um `x_ritual` fora da forma, ou num nó que não é `rule` nem `policy`, vê dívida
+  SHOULD nova e reprova na catraca: corrija a forma, ou aceite-a como linha de base com o motivo, `python3 -I -B
+  vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.25: the agent ritual, debt that already
+  existed"`. O grafo sem a chave não vê nada novo.
+- `kg-mcp --serve-ref REF`, só com `--backend git` e `--read-only`: o armazém serve exatamente a árvore de uma ref do
+  clone (`git ls-tree` e `git cat-file`), não a árvore de trabalho, que era o que o armazém git lia até aqui (os nomes
+  rastreados do `git ls-files`, com o texto do disco, mudança não commitada incluída). A branch (`refs/heads/NOME` ou
+  `NOME`) é servida enquanto o `HEAD` do clone descende dela (`git merge-base --is-ancestor`); a tag (`refs/tags/NOME`)
+  é servida na árvore exata de `NOME^{commit}`; um padrão com um `*` (`refs/tags/hub-v*`) serve a maior versão semver,
+  pela precedência do semver, e a tag fora de semver não conta. A ref é relida quando `HEAD`, `packed-refs`, uma ref
+  solta ou o arquivo de signatários muda; a ref que deixa de verificar fecha a leitura, como a política de áreas
+  inválida, e reabre quando volta a verificar, sem cair para uma tag anterior. O `kg_history` e o `kg_get` com `ref`
+  param no commit servido. A ref que não verifica na partida é rc 2, mesmo com `--store-optional`; no perfil "atrás de
+  proxy", a regra vale para cada área, e cada área compartilhada da política que existe tem de servir a ref na partida.
+  Nada é escrito no clone.
+- `kg-mcp --verify-signers @ARQ`, só com `--serve-ref` e obrigatório para tag: o arquivo `allowed_signers` do git. A
+  tag tem de ser anotada e ter assinatura SSH válida (`git -c gpg.format=ssh -c gpg.ssh.allowedSignersFile=ARQ
+  verify-tag`), com o próprio nome no cabeçalho `tag` do objeto assinado; na branch, o commit da ponta é conferido com
+  `git verify-commit`. A assinatura ausente ou inválida não sobe (rc 2) ou fecha a leitura. GPG e X.509 ficam fora desta
+  versão, e o arquivo tem de ficar fora de `--root`.
+- `kg-mcp --secret-file @ARQ`, exclusivo com `--secret-env`: o segredo compartilhado lido de um arquivo com as regras do
+  `@ARQ` do `--area-policy-digest` (uma linha, brancos das pontas ignorados, até 4.096 bytes, BOM do UTF-8 aceito,
+  UTF-16 recusado com a dica de salvar em UTF-8), relido quando o arquivo muda. O arquivo que quebra com o servidor de
+  pé o fecha (401 para toda requisição) até voltar a valer. O valor nunca aparece na saída nem nos erros.
+- `kg-mcp --serve-state DIR`, obrigatório com padrão de tag: o piso de versão. A maior versão já servida fica fora do
+  clone e fora de `--root`, e uma menor nunca é servida, também depois de reiniciar: apagar a tag mais alta no remoto (e
+  buscar com `--prune-tags`) não faz quem lê voltar. O pré-lançamento não conta num padrão.
+- O modo servido fica endurecido: o `.git/config` do clone não troca o programa que verifica a assinatura nem roda
+  código (o servidor fixa `gpg.ssh.program`, `gpg.minTrustLevel`, os programas de GPG e X.509, `core.fsmonitor`,
+  `core.hooksPath`, `core.pager`, `diff.external` e outros na linha de comando); o `git replace` e os enxertos não trocam
+  o conteúdo depois da conferência (`GIT_NO_REPLACE_OBJECTS`, um arquivo de enxertos vazio), e o clone com enxertos, o
+  raso e o que toma objetos de fora são recusados; a assinatura conferida é o bloco da última linha `-----BEGIN`, que
+  tem de ser SSH. Cada git tem 30 segundos, e a falha de execução fecha só aquela resposta, sem ficar registrada contra
+  a ref. Cada requisição lê um retrato só da ref.
+- O modo servido não busca nada e não roda comando do clone: o git roda com `GIT_NO_LAZY_FETCH` e
+  `protocol.allow=never`, e o clone parcial (`extensions.partialClone` ou um remoto promisor), a worktree ligada
+  (`.git/commondir`) e o link simbólico em `.git` são recusados, como os enxertos, o clone raso e os alternates de fora.
+  O `git` e o `ssh-keygen` rodam pelos caminhos absolutos achados na partida. O piso é gravado sob trava, guardando o
+  maior, e na mesma precedência só a mesma tag (nome e objeto) é servida; o diretório ou o arquivo de estado que o grupo
+  ou os outros podem gravar é recusado. Declarado: o piso é confiança no primeiro uso, e a branch não tem piso.
+- O modo servido pede um git que respeite o `GIT_NO_LAZY_FETCH` (2.45.1, ou 2.39.4, 2.40.2, 2.41.1, 2.42.2, 2.43.4,
+  2.44.1), provado na partida num repositório temporário; cada protocolo que o git conhece é fixado em `never` pelo
+  nome, porque um `protocol.<nome>.allow` no clone venceria o `protocol.allow`; e o clone parcial é recusado a cada
+  requisição, e um promisor posto num arquivo incluído depois da partida fecha a leitura.
+- Capítulo 6, passo 5: servir a tag assinada do hub como serviço do systemd, com `LoadCredential=` para a política, o
+  digest dela, o segredo e o arquivo `allowed_signers`, com o `StateDirectory=` para o piso e um fetch sem
+  `--prune-tags`.
+- O relatório do ritmo, `kg_validate.py --rituals QUANDO [--runs ARQ]... [--grace PT30M]`: fora do veredito, como o
+  `--due`, ele lista por `owner` cada ritual (um nó com `x_ritual`) com falha aberta, nunca executado, atrasado (pela
+  cadência ou pelo calendário), só por evento ou em dia, com a última execução e a próxima. `QUANDO` é uma data ou um
+  instante RFC 3339. Ele lê o grafo (o `verified_at`, que tem precisão de dia, e as execuções `evidence` com
+  `TRACES_TO` para o ritual) e, com `--runs`, o registro de execuções do executor: o CloudEvents de cada execução, com
+  `type` igual ao `emits` e `subject` igual a `<meta.id>#<id do nó>`, e duas extensões do KG-SSOT, `kgssotoutcome`
+  (`pass`, `fail` ou `error`) e `kgssotstarted` (a execução cobre a ocorrência em que começou). O registro dá a hora,
+  e o ritual de hora em hora se mede com ele. Com o calendário expandido, é ele que decide o atraso (a cadência conta
+  dias corridos e não sabe do fim de semana); sem ele, decide a cadência. O
+  calendário só se expande com o extra novo `rituals` (`python-dateutil`, `pip install "kg-ssot[rituals]"` ou
+  `tools/requirements-rituals.txt` com hash), e só depois de passar na forma do SHOULD; sem o extra, o relatório diz
+  que o atraso é só pela cadência. O JSON é o novo `kg-ssot.rituals/1` (`spec/rituals.schema.json`); o
+  `kg-ssot.due/1` não muda.
+- `kg_gate.py --rituals-overdue [--as-of QUANDO] [--runs ARQ]... [--grace PT30M]`, desligado por padrão: reprova (rc
+  1) quando um ritual passou do prazo. Ele lê o relógio, e por isso fica fora do veredito e da base, e não combina com
+  `--update` nem com `--touched`; rode num job agendado.
+- O contrato não muda com o relatório: o `x_ritual` segue julgado só pela forma. Os exemplos de ritual de segunda a
+  sexta dos capítulos 3 e 8 passam a usar `reverify_every: P3D`, o maior intervalo entre duas execuções (de sexta a
+  segunda), como o capítulo 3 o define.
 
 ## [4.54.0] - 2026-11-17
 

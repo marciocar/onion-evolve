@@ -34,6 +34,12 @@ quebrada; um arquivo que não parseia sai no relatório (NÃO LIDO, broken no JS
 formato kg-ssot.due/1 (spec/due.schema.json). Desde o v4.23, o relatório lista também o prazo de expurgo do grafo
 inteiro (meta.x_dispose_by): o vencido, o suspenso por um x_hold vigente e, num grafo com x_dispose_by, todo nó com
 retain_for como conflito a decidir pelo dono, sem calcular vigência. O vencimento abre o procedimento; nada é apagado.
+--rituals QUANDO troca o veredito pelo relatório do ritmo (kg_rituals.py): por dono, o ritual (o nó com x_ritual) com
+falha aberta, nunca executado, atrasado (pela cadência ou pelo calendário), só por evento ou em dia. QUANDO é uma data
+AAAA-MM-DD (o fim do dia, no fuso de cada ritual) ou um instante RFC 3339 com fuso. --runs ARQ (repetível) lê o
+registro de execuções do executor (CloudEvents 1.0, um por execução), e --grace PT30M dá a folga do executor. O
+calendário só se expande com o extra rituals (python-dateutil). Nunca muda o veredito: o rc é 0, ou 2 com entrada
+quebrada. Com --format json, o relatório sai no formato kg-ssot.rituals/1 (spec/rituals.schema.json).
 --where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta (where()); a saída padrão não muda.
 --spike troca a saída humana e o rc pelos do spike (check() e classify(), perfil Yaml12BoolLoader), para
 reproduzir a medição do spike. --json OUT grava SEMPRE o formato do spike ({summary, results}),
@@ -46,6 +52,7 @@ Uso:
   kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...
   kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]
   kg_validate.py --due AAAA-MM-DD [--format json] FILE...
+  kg_validate.py --rituals AAAA-MM-DD|INSTANTE [--runs ARQ]... [--grace PT30M] [--format json] FILE...
 """
 import argparse
 import bisect
@@ -92,7 +99,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.24"
+CONTRACT_VERSION = "4.25"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1849,6 +1856,36 @@ HINTS = {
                                               "testimony (v4.21). The Portuguese alias still passes and leaves in v5.",
     "form.pattern.node.provenance.source": "Write the source of truth (URL, path, command); with no recoverable source, "
                                            "remove provenance and change the status to unverifiable.",
+    # v4.25: o ritual do agente; as dicas do calendário e da cadência dizem a regra exata, e a do perfil (PROFILE_HINTS)
+    # ensina a forma inteira
+    "form.misplaced.node.x_ritual": "x_ritual goes on a rule or policy node (v4.25): the ritual is a recurring "
+                                    "obligation. A run is an evidence node with a TRACES_TO edge to the ritual, and "
+                                    "the script or agent that runs it is an artifact the ritual traces to.",
+    "form.required.node.owner": "Add owner: the role that answers for the node, never a person's name.",
+    "form.required.node.x_ritual.cadence": "Give the ritual a cadence the contract judges (v4.25): reverify_every (the "
+                                           "longest gap between two runs, such as P1D, which kg_validate.py --due "
+                                           "checks) or reverify_on (the CloudEvents type of the triggering event). "
+                                           "calendar alone is not enough: it is not judged yet. cadence is not a key.",
+    "form.pattern.node.x_ritual.calendar.rrule": "Write the RFC 5545 RRULE value without the RRULE: prefix, in "
+                                                 "uppercase (v4.25): FREQ first and once, then NAME=VALUE parts "
+                                                 "separated by ; with no part repeated, never COUNT with UNTIL, "
+                                                 "values in range, a numbered BYDAY only in MONTHLY or YEARLY (and "
+                                                 "not with BYWEEKNO), BYWEEKNO only in YEARLY, BYMONTHDAY not in "
+                                                 "WEEKLY, BYYEARDAY not in DAILY, WEEKLY, or MONTHLY, BYSETPOS only "
+                                                 "with another BYxxx part, and UNTIL as a date-time in UTC (ending in "
+                                                 "Z) when dtstart has tz or is in UTC.",
+    "form.pattern.node.x_ritual.calendar.dtstart": "Write dtstart in the basic RFC 5545 form, in quotes: "
+                                                   "\"20261116T080000\" (local time, with tz) or \"20261116T110000Z\" "
+                                                   "(UTC, without tz), a real calendar date and time (v4.25).",
+    "form.pattern.node.x_ritual.calendar.tz": "Write tz as a name of the IANA time zone database, such as "
+                                              "America/Sao_Paulo or Etc/UTC (v4.25): parts of up to 14 ASCII letters, "
+                                              "digits, ., -, _, or + separated by /, each starting with a letter or _. "
+                                              "Only the form is judged.",
+    "form.required.node.x_ritual.calendar.tz": "Add tz, the IANA time zone of dtstart, such as America/Sao_Paulo "
+                                               "(v4.25): a local time without a time zone floats with the machine "
+                                               "that reads it. For UTC, end dtstart in Z.",
+    "form.exclusive.node.x_ritual.calendar": "Drop tz or the Z of dtstart (v4.25): a UTC time takes no time zone "
+                                             "(RFC 5545, §3.2.19).",
 }
 # v4.21: a dica de form.required.node.provenance pelo tipo do nó. Mandar uma decision done para unverifiable sugeriria
 # desfazer a decisão; o que falta nela é dizer em que se apoiou.
@@ -1859,6 +1896,10 @@ PROVENANCE_HINTS = {
     "evidence": "Add provenance with source, locator, and method: where this evidence was read or measured; with no "
                 "recoverable source, change the status to unverifiable.",
 }
+# v4.25: a dica de form.required.node.owner pelo contexto do nó, como a do provenance pelo tipo: no ritual, o dono é quem
+# aprova a mudança dele
+RITUAL_OWNER_HINT = ("Add owner: the role that approves a change to the ritual, never a person's name (v4.25, a node "
+                     "with x_ritual).")
 # v4.22: o mesmo código, no SHOULD, para o marcador de citação a nó privado fora da forma; a dica do placeholder ali
 # mandaria apagar a fonte
 PRIVATE_CITE_HINT = ("Write the marker as private-cite: followed by a random id of 22 to 43 base64url characters "
@@ -1928,6 +1969,13 @@ PROFILE_HINTS = {
                              "quotes). kg_gate.py --classification-downgrade asks for the entry when the level drops.",
     ("node", "x_downgrade"): "x_downgrade belongs in meta (v4.24), next to x_classification: the unit is the graph, not "
                              "the node.",
+    # v4.25: o ritual do agente, julgado só pela forma; a cadência é o reverify_every e o reverify_on do nó
+    ("node", "x_ritual"): "x_ritual is the agent ritual profile, on a rule or policy node (v4.25): purpose (text that is "
+                          "not empty), kind (deterministic or judgment), autonomy (notify or act), and emits (the "
+                          "CloudEvents type of each run, with a reverse-DNS prefix, such as "
+                          "com.example.ritual.briefing.completed) are required; sources and delivery are lists of "
+                          "{channel, ref} and {channel, to}, with channel a slug; promote is on_failure, on_change, or "
+                          "every_run; calendar is {rrule, dtstart, tz}.",
 }
 
 
@@ -1958,6 +2006,13 @@ def _private_source_at(doc, path):
     return False
 
 
+def _ritual_at(doc, path):
+    """O nó em nodes[i] leva x_ritual (v4.25)?"""
+    nodes = doc.get("nodes") if isinstance(doc, dict) and isinstance(doc.get("nodes"), list) else []
+    return (isinstance(path, (list, tuple)) and len(path) >= 2 and path[0] == "nodes" and isinstance(path[1], int)
+            and 0 <= path[1] < len(nodes) and isinstance(nodes[path[1]], dict) and "x_ritual" in nodes[path[1]])
+
+
 def _node_type_at(doc, path):
     """O node_type do nó em nodes[i] (o caminho da ocorrência), ou None."""
     nodes = doc.get("nodes") if isinstance(doc, dict) and isinstance(doc.get("nodes"), list) else []
@@ -1979,6 +2034,8 @@ def hint_of(code, place=None, doc=None, path=None):
             return _(PROVENANCE_HINTS[node_type])
     if code == "form.pattern.node.provenance.source" and doc is not None and _private_source_at(doc, path):
         return _(PRIVATE_CITE_HINT)
+    if code == "form.required.node.owner" and doc is not None and _ritual_at(doc, path):
+        return _(RITUAL_OWNER_HINT)
     if (code == "integrity.orphan-node" and isinstance(place, str) and place.startswith("nó ")
             and not place.startswith("nó #")):
         nid = place[3:]
@@ -2028,9 +2085,11 @@ def occurrences(text, validator, should_validator=None, corpus=None):
 
 
 def _hint_doc(text, found):
-    """O documento para a dica que depende do nó: a do tipo (form.required.node.provenance) e a do marcador privado
-    (form.pattern.node.provenance.source, v4.22). Só quando uma delas ocorre, porque o parse custa."""
-    if not any(item[1] in ("form.required.node.provenance", "form.pattern.node.provenance.source") for item in found):
+    """O documento para a dica que depende do nó: a do tipo (form.required.node.provenance), a do marcador privado
+    (form.pattern.node.provenance.source, v4.22) e a do dono do ritual (form.required.node.owner, v4.25). Só quando
+    uma delas ocorre, porque o parse custa."""
+    if not any(item[1] in ("form.required.node.provenance", "form.pattern.node.provenance.source",
+                           "form.required.node.owner") for item in found):
         return None
     _raw, doc, parse_code = parse_v1(text)
     return None if parse_code or not isinstance(doc, dict) else doc
@@ -2548,6 +2607,12 @@ verdict: rc is 0, or 2 on broken input. With --format json, the report uses the 
 it also lists the disposal deadline of the whole graph (meta.x_dispose_by): the one that came due, the one held by an
 x_hold in force and, in a graph with x_dispose_by, every node with retain_for as a conflict for the owner to decide,
 without computing which one prevails. The date opens the disposal procedure; nothing is deleted.
+--rituals WHEN replaces the verdict with the rhythm report: per owner, each ritual (a node with x_ritual) with an
+open failure, never run, late (by the cadence or by the calendar), by event only, or on time. WHEN is a date
+YYYY-MM-DD (the end of the day, in the time zone of each ritual) or an RFC 3339 date-time with an offset. --runs FILE
+(repeatable) reads the executor's run log (CloudEvents 1.0, one per run), and --grace PT30M gives the executor's
+slack. The calendar is expanded only with the rituals extra (python-dateutil). It never changes the verdict: rc is 0,
+or 2 on broken input. With --format json, the report uses the kg-ssot.rituals/1 format.
 --where adds, per file, one line per occurrence with the node or edge.
 --spike replaces the human output and the rc with those of the spike; --json OUT ALWAYS writes the frozen spike format.
 
@@ -2557,6 +2622,7 @@ Usage:
   kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...
   kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]
   kg_validate.py --due YYYY-MM-DD [--format json] FILE...
+  kg_validate.py --rituals YYYY-MM-DD|DATE-TIME [--runs FILE]... [--grace PT30M] [--format json] FILE...
 """
 
 
@@ -2574,6 +2640,14 @@ def main(argv=None):
                                                        "against the .kg.yaml and .kg.json files under DIR (without it, "
                                                        "only the form and the local end)"))
     ap.add_argument("--due", metavar=_("YYYY-MM-DD"), help=_("the due report on the date (v4.8), instead of the verdict"))
+    ap.add_argument("--rituals", metavar=_("WHEN"),
+                    help=_("the rhythm report at WHEN (a date YYYY-MM-DD or an RFC 3339 date-time), instead of the "
+                           "verdict"))
+    ap.add_argument("--runs", action="append", default=[], metavar="FILE",
+                    help=_("with --rituals: the executor's run log, CloudEvents 1.0 (JSON Lines, an object, or an "
+                           "array); repeatable"))
+    ap.add_argument("--grace", metavar="PT30M",
+                    help=_("with --rituals: the executor's slack, an ISO 8601 duration with time only"))
     ap.add_argument("--format", choices=("human", "json"), default="human",
                     help=_("json: the structured verdict kg-ssot.verdict/1 (spec/verdict.schema.json) on stdout"))
     ap.add_argument("--limit", type=int, default=50, help=_("with --format json, occurrences per file (default 50)"))
@@ -2593,6 +2667,33 @@ def main(argv=None):
     if args.where and args.spike:
         say(_("BROKEN INPUT") + "  " + _("--where does not work with --spike (the spike has its own frozen output)"))
         return 2
+    if (args.runs or args.grace is not None) and args.rituals is None:
+        say(_("BROKEN INPUT") + "  " + _("--runs and --grace only go with --rituals"))
+        return 2
+    if args.rituals is not None:
+        if args.spike or args.json or args.where or args.corpus or args.due is not None:
+            say(_("BROKEN INPUT") + "  " + _("--rituals does not combine with --due, --spike, --json, --where, or "
+                                             "--corpus"))
+            return 2
+        if __package__:
+            from . import kg_rituals  # noqa: PLC0415
+        else:
+            import kg_rituals  # noqa: PLC0415
+        try:
+            grace = kg_rituals.parse_grace(args.grace) if args.grace is not None else None
+            rep = kg_rituals.rituals_report(list(load_sources(args)), args.rituals, args.runs, grace,
+                                            kg=sys.modules[__name__])
+        except kg_rituals.Broken as exc:
+            say(_("BROKEN INPUT") + f"  {exc}")
+            return 2
+        except (OSError, ValueError, UnicodeDecodeError, subprocess.CalledProcessError) as exc:
+            say(_("BROKEN INPUT") + f"  {exc}")
+            return 2
+        if args.format == "json":
+            print(json.dumps({"schema_version": kg_rituals.SCHEMA_VERSION, **rep}, ensure_ascii=False, indent=1))
+        else:
+            print("\n".join(kg_rituals.lines(rep)))
+        return 0
     if args.due is not None:
         if args.spike or args.json or args.where or args.corpus:
             say(_("BROKEN INPUT") + "  " + _("--due does not combine with --spike, --json, --where, or --corpus"))

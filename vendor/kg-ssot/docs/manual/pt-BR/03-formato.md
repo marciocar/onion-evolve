@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:3ecadfc4f53c43f8 -->
+<!-- translation-of: docs/manual/03-format.md sha256:6a503f7f90a0a07a -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -185,6 +185,7 @@ livre, e qualquer outra chave alerta. Os valores de enum são códigos, em ingl�
 | `x_classification` | meta | o nível de sensibilidade do grafo inteiro, um nível do esquema próprio da organização (v4.20) |
 | `x_dispose_by` · `x_dispose_basis` · `x_hold` | meta | o prazo de expurgo do grafo inteiro, a base dele e a suspensão (v4.23) |
 | `x_downgrade` | meta | a trilha dos rebaixamentos de nível do grafo inteiro: de, para, motivo, aprovador, referência e data (v4.24) |
+| `x_ritual` | nó (`rule`, `policy`) | um ritual do agente: uma obrigação recorrente que um executor cumpre e confere, com o calendário (v4.25) |
 
 ### `x_term`
 
@@ -460,6 +461,112 @@ O contrato não diz quando o registro é exigido: a queda do nível só se vê e
 níveis, que é da política da organização e não do grafo. Isso é do `kg_gate.py --classification-downgrade` (capítulo
 5), que compara cada grafo com a base e pede que o último registro seja esta queda, venha depois da trilha da base, que
 fica como era, e nomeie um aprovador que não mudou o nível.
+
+### `x_ritual` (v4.25)
+
+Um ritual do agente é uma obrigação recorrente que um executor cumpre e confere: todo dia útil às 08:00, cada pessoa
+recebe o briefing; a cada entrada de pessoa, o agente confere o acesso e o dono. O ritual é um perfil sobre um tipo de
+nó que já existe, `rule` (uma regra de negócio) ou `policy` (uma política que governa regras), nunca um tipo de nó
+próprio. A definição e cada execução são objetos distintos, como um CronJob e os Jobs dele: o nó com `x_ritual` é a
+definição, e a execução que importa vira um nó `evidence` com uma aresta `TRACES_TO` para o ritual.
+
+```yaml
+- id: R_MORNING_BRIEFING
+  node_type: rule
+  plane: DEV
+  status: open
+  impact: 3
+  confidence: 0.9
+  label: "Todo dia útil às 08:00 (America/Sao_Paulo), cada pessoa recebe o briefing por mensagem direta."
+  owner: ops-lead
+  reverify_every: P3D
+  x_ritual:
+    purpose: "nenhuma pendência, card atrasado ou promessa do agente passa um dia sem ser vista pelo dono"
+    kind: deterministic
+    autonomy: notify
+    emits: com.example.ritual.briefing.completed
+    sources:
+      - channel: linear
+      - channel: slack
+        ref: "menções e fios abertos do dia anterior"
+    delivery:
+      - channel: slack
+        to: "mensagem direta a cada pessoa"
+    promote: on_failure
+    calendar:
+      rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=8;BYMINUTE=0;BYSECOND=0"
+      dtstart: "20261116T080000"
+      tz: America/Sao_Paulo
+```
+
+A cadência que o contrato julga é a que o nó já tem: `reverify_every` é o maior intervalo entre duas execuções (`P3D` para um ritual de segunda a sexta, de sexta a segunda), que o
+`kg_validate.py --due` já relata, e `reverify_on` é o evento que dispara (o `type` CloudEvents). O `owner` é o papel que
+aprova a mudança do ritual. O `verified_at` e o `verified_against` andam com cada execução que passa: a data da
+execução e a execução que ele cita.
+
+| Chave | Obrigatória | Forma |
+|---|---|---|
+| `purpose` | sim | o que o ritual protege, em texto não vazio; o `label` diz o que ele faz |
+| `kind` | sim | `deterministic` (um script mede) ou `judgment` (o agente lê e avalia) |
+| `autonomy` | sim | `notify` (só mede e avisa) ou `act` (age quando a ação é segura) |
+| `emits` | sim | o `type` CloudEvents que cada execução emite, com prefixo DNS reverso (`com.example.ritual.briefing.completed`) |
+| `sources` | não | uma lista não vazia de `{channel, ref}`: `channel` em slug, `ref` em texto |
+| `delivery` | não | uma lista não vazia de `{channel, to}`: `channel` em slug, `to` em texto (o papel ou o destino) |
+| `promote` | não | que execução vira nó: `on_failure` (o padrão), `on_change` ou `every_run` |
+| `calendar` | não | `{rrule, dtstart, tz}`, a recorrência da RFC 5545 |
+
+Os canais não têm lista de valores: são da organização, e acrescentar um não muda o contrato. Outra chave `x_` dentro
+do perfil, do calendário ou de um item é livre; qualquer outra chave alerta como `form.unknown-key`. Não há `status`
+aninhado: o resultado de uma execução mora no nó `evidence`.
+
+Com `x_ritual`, o nó sem `owner` alerta como `form.required.node.owner`, e o nó sem `reverify_every` e sem
+`reverify_on` alerta como `form.required.node.x_ritual.cadence` (`cadence` é o nome da regra, não uma chave): o
+calendário sozinho não basta, porque ainda não é julgado. Em outro tipo de nó, o perfil alerta como
+`form.misplaced.node.x_ritual`; na aresta, é chave `x_` livre. Uma chave fora da forma alerta com o caminho, como
+`form.enum.node.x_ritual.kind` ou `form.pattern.node.x_ritual.sources.channel`.
+
+**O calendário.** `rrule` é o valor de uma RRULE da RFC 5545, sem o prefixo `RRULE:`, `dtstart` é a primeira
+ocorrência, e `tz` é o fuso IANA, de modo que as duas linhas vão para o iCalendar como estão:
+
+```text
+DTSTART;TZID=America/Sao_Paulo:20261116T080000
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=8;BYMINUTE=0;BYSECOND=0
+```
+
+O perfil aceita um subconjunto estrito da RFC, nunca um superconjunto, e tudo o que passa é RFC 5545 válida:
+
+- `rrule` em maiúsculas, `FREQ` primeiro e uma vez, cada outra parte `NOME=VALOR` com um dos 14 nomes da gramática e
+  sem parte repetida, nunca `COUNT` com `UNTIL`, `COUNT` e `INTERVAL` positivos, os valores nas faixas da gramática, e
+  as regras entre partes da prosa da RFC: `BYDAY` numerado só em `MONTHLY` ou `YEARLY` (e não com `BYWEEKNO`),
+  `BYMONTHDAY` não em `WEEKLY`, `BYYEARDAY` não em `DAILY`, `WEEKLY` nem `MONTHLY`, `BYWEEKNO` só em `YEARLY`,
+  `BYSETPOS` só com outra parte `BYxxx`. O `UNTIL` é data e hora, em UTC quando o `dtstart` está em UTC ou tem `tz`, e
+  local quando o `dtstart` flutua. Toda regra alerta como `form.pattern.node.x_ritual.calendar.rrule`.
+- `dtstart` é data e hora na forma básica da RFC 5545 (`20261116T080000`, no calendário, a partir do ano 0001: o ano
+  0000, que a gramática da RFC admite, alerta, como em toda data do contrato), não na forma estendida do RFC 3339: local com `tz`, ou em UTC (`20261116T110000Z`) sem ele. Fora da forma, alerta como
+  `form.pattern.node.x_ritual.calendar.dtstart`; o `tz` com horário em UTC, como
+  `form.exclusive.node.x_ritual.calendar`; a hora local sem `tz`, que flutuaria com a máquina que a lê, como
+  `form.required.node.x_ritual.calendar.tz`.
+- `tz` tem a forma de um nome da base de fusos da IANA (`America/Sao_Paulo`, `Etc/UTC`): partes de 1 a 14 caracteres
+  entre letras ASCII, dígitos, `.`, `-`, `_` ou `+`, separadas por `/`, cada uma começando por letra ou `_` (como todo
+  nome da base, o que também exclui `-`, `.`, `..` e um deslocamento como `+0300`), e nunca `Etc/Unknown`. Fora da
+  forma, alerta como `form.pattern.node.x_ritual.calendar.tz`. Se o nome existe na base não é julgado: depende da
+  máquina (o Windows não tem base, e a do sistema muda de versão), e o mesmo commit passaria num lugar e reprovaria no
+  outro. Por isso um nome com a forma certa que não está na base, como `UTC-3`, `GMT+3` ou `EST5`, passa.
+
+O calendário é julgado só pela forma. O contrato não expande as ocorrências, não calcula a próxima execução, não
+confere se o `dtstart` está sincronizado com a regra e não lê `RDATE`, `EXDATE` nem as extensões da RFC 7529 (`RSCALE`,
+`SKIP`): a próxima execução é derivada por quem a mostra, nunca gravada no grafo. Os padrões do schema são gerados de
+uma tabela da gramática, sem lookahead, e todo leitor que passa na suíte os lê do mesmo jeito.
+
+**Uma execução.** O executor emite um CloudEvents por execução, com o `type` do `emits` e o `subject` igual ao ritual
+(`<meta.id>#<id do nó>`), a forma de «Registrar um evento externo», abaixo. Nem toda execução vira nó: o `promote` diz
+qual vira. A execução promovida é um nó `evidence` com `x_event`, o `x_outcome` dela (`pass`, `fail` ou `error`,
+recomendado e não julgado) e uma aresta `TRACES_TO` para o ritual. Não registre a execução que falhou com `REFUTES` no
+ritual: a falha de um dia diz que a obrigação não foi cumprida naquele dia, não que a regra é falsa.
+
+**O relatório do ritmo.** O `kg_validate.py --rituals` (capítulo 5, desde a 4.55.0) lê as execuções, do grafo e do
+registro de execuções do executor, e lista por dono o ritual com falha aberta, nunca executado, atrasado, só por evento
+ou em dia. O registro é o mesmo CloudEvents, uma linha por execução, com o resultado na extensão `kgssotoutcome`.
 
 ## Registrar um evento externo (forma recomendada, não normativa)
 

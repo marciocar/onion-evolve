@@ -1,0 +1,34 @@
+meta:
+  schema_version: "1"
+  id: warn-ritual-rrule-bymonthday-weekly
+  layer: domain
+nodes:
+  - id: R_A
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A regra sintética R_A, cumprida por um ritual do agente."
+    owner: ops-lead
+    reverify_every: P1D
+    x_ritual:
+      purpose: "nenhuma pendência passa um dia sem ser vista pelo dono"
+      kind: deterministic
+      autonomy: notify
+      emits: com.example.ritual.briefing.completed
+      calendar:
+        rrule: "FREQ=WEEKLY;BYMONTHDAY=1"
+        dtstart: "20261116T080000"
+        tz: "America/Sao_Paulo"
+  - id: A_RUNNER
+    node_type: artifact
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "O executor sintético dos rituais, que emite um CloudEvents por execução."
+edges:
+  - from: R_A
+    to: A_RUNNER
+    edge_type: TRACES_TO

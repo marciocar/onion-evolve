@@ -8,7 +8,99 @@ The contract version (`v4.N`) is the version of the `.kg.yaml` / `.kg.json` cont
 only when the contract changes. Each release section is also the body of its GitHub release.
 Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
-## [Unreleased]
+## [4.55.0] - 2026-11-18
+
+Contract v4.25, SHOULD only: nothing that passed fails, and no MUST verdict changes.
+
+- Contract v4.25: the canonical profile `x_ritual`, the agent ritual, on a `rule` or `policy` node, judged only when
+  present and only by its form, never by the clock. `purpose` (text that is not empty), `kind` (`deterministic` or
+  `judgment`), `autonomy` (`notify` or `act`), and `emits` (the CloudEvents `type` of each run, with a reverse-DNS
+  prefix) are required; `sources` and `delivery` (lists of `{channel, ref}` and `{channel, to}`, with `channel` a slug
+  and no list of values), `promote` (`on_failure`, `on_change`, or `every_run`), and `calendar` are optional. The
+  judged cadence is the node's own `reverify_every` or `reverify_on`, which `kg_validate.py --due` already reads: with
+  the profile, a node with neither warns as `form.required.node.x_ritual.cadence`, and a node without `owner` as
+  `form.required.node.owner`. `calendar` is `{rrule, dtstart, tz}`: the RFC 5545 RRULE value in a strict subset
+  (uppercase, `FREQ` first and once, the 14 names of the grammar, no part repeated, never `COUNT` with `UNTIL`, the
+  ranges, and the rules between parts of the RFC prose), with every rule warning as
+  `form.pattern.node.x_ritual.calendar.rrule`; `dtstart` in the basic RFC 5545 form, on the calendar; and `tz` in the
+  form of an IANA time zone name (the rule of the tz database's `theory.html`: parts of up to 14 characters separated
+  by `/`, none starting with `-`, never `.` or `..`, and never `Etc/Unknown`; the profile also asks each part to start
+  with a letter or `_`, as every name in the database does, which rules out an offset such as `+0300`, while `UTC-3`,
+  `GMT+3`, and `EST5` still pass by their form). The year `0000` warns in `dtstart` and `UNTIL`, as in every date of the
+  contract, a declared departure from the RFC grammar. `tz` with a UTC `dtstart` warns as `form.exclusive.node.x_ritual.calendar`, and a local `dtstart` without
+  `tz` as `form.required.node.x_ritual.calendar.tz`. Whether the zone exists in the database is not judged: it depends
+  on the machine. On another node type, the profile warns as `form.misplaced.node.x_ritual`. The patterns are generated
+  from a table of the grammar, with no lookahead and no new dependency. Both readers give the same verdict; the suite
+  goes from 621 to 745 cases (`latest/form/ritual/`, with the 53 distinct RRULE values of the RFC 5545 examples as a
+  valid case).
+- **Your gate's contract identity changes.** The SHOULD schema changes, so the gate prints the `· identity` notice on
+  the first run after the update and passes, unless you run it with `--strict-identity`; `kg_gate.py --update` records
+  the new identity. A graph that already carries an `x_ritual` out of form, or on a node that is not `rule` or
+  `policy`, sees new SHOULD debt and fails the ratchet: fix the form, or accept it as baseline with the reason,
+  `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.25: the agent ritual, debt
+  that already existed"`. A graph without the key sees nothing new.
+- `kg-mcp --serve-ref REF`, only with `--backend git` and `--read-only`: the store serves exactly the tree of a ref of
+  the clone (`git ls-tree` and `git cat-file`), not its working tree, which the git store read until now (the tracked
+  names of `git ls-files`, with the text from the disk, uncommitted changes included). A branch (`refs/heads/NAME` or
+  `NAME`) is served while the `HEAD` of the clone descends from it (`git merge-base --is-ancestor`); a tag
+  (`refs/tags/NAME`) is served at the exact tree of `NAME^{commit}`; a pattern with one `*` (`refs/tags/hub-v*`) serves
+  the highest semver version, by the semver precedence, and a tag outside semver does not count. The ref is read again
+  when `HEAD`, `packed-refs`, a loose ref, or the signers file changes; a ref that no longer verifies closes reading,
+  as an invalid area policy does, and it reopens when the ref verifies again, without falling back to an earlier tag.
+  `kg_history` and `kg_get` with `ref` stop at the served commit. A ref that does not verify at startup is rc 2, even
+  with `--store-optional`; in the "behind a proxy" profile, the rule holds for every area, and each shared area of the
+  policy that exists must serve the ref at startup. Nothing is written in the clone.
+- `kg-mcp --verify-signers @FILE`, only with `--serve-ref` and required for a tag: the git `allowed_signers` file. The
+  tag must be annotated and carry a valid SSH signature (`git -c gpg.format=ssh -c gpg.ssh.allowedSignersFile=FILE
+  verify-tag`), with its own name in the `tag` header of the signed object; with a branch, the tip commit is checked
+  with `git verify-commit`. A missing or invalid signature does not start (rc 2) or closes reading. GPG and X.509 are
+  out of this version, and the file must stay outside `--root`.
+- `kg-mcp --secret-file @FILE`, exclusive with `--secret-env`: the shared secret read from a file with the rules of the
+  `@FILE` of `--area-policy-digest` (one line, blanks at both ends ignored, up to 4,096 bytes, UTF-8 BOM accepted,
+  UTF-16 refused with the hint to save it as UTF-8), read again when the file changes. A file that breaks while the
+  server runs closes it (401 for every request) until it is valid again. The value never shows in output or errors.
+- `kg-mcp --serve-state DIR`, required with a tag pattern: the version floor. The highest version already served is
+  kept outside the clone and outside `--root`, and a lower one is never served, also after a restart, so deleting the
+  highest tag on the remote (and fetching with `--prune-tags`) does not roll the readers back. A pre-release does not
+  count in a pattern.
+- The served mode is hardened: the `.git/config` of the clone cannot change the program that verifies the signature or
+  run code (the server fixes `gpg.ssh.program`, `gpg.minTrustLevel`, the GPG and X.509 programs, `core.fsmonitor`,
+  `core.hooksPath`, `core.pager`, `diff.external`, and more on the command line); `git replace` and grafts do not change
+  the content after the check (`GIT_NO_REPLACE_OBJECTS`, an empty graft file), and a clone with grafts, a shallow one,
+  or one that borrows objects from outside is refused; the signature checked is the block of the last `-----BEGIN`
+  line, which must be SSH. Each git has 30 seconds, and a failure to run closes only that answer, without being
+  recorded against the ref. Each request reads one snapshot of the ref.
+- The served mode fetches nothing and runs no command of the clone: git runs with `GIT_NO_LAZY_FETCH` and
+  `protocol.allow=never`, and a partial clone (`extensions.partialClone` or a promisor remote), a linked worktree
+  (`.git/commondir`), and a symbolic link in `.git` are refused, like grafts, a shallow clone, and outside alternates.
+  `git` and `ssh-keygen` are run by the absolute paths found at startup. The floor is written under a lock, keeping
+  the highest, and on the same precedence only the same tag (name and object) is served; a state directory or file
+  that the group or others can write is refused. Declared: the floor is trust on first use, and a branch has none.
+- The served mode needs a git that honors `GIT_NO_LAZY_FETCH` (2.45.1, or 2.39.4, 2.40.2, 2.41.1, 2.42.2, 2.43.4,
+  2.44.1), proved at startup in a temporary repository; every protocol git knows is fixed to `never` by name, since a
+  `protocol.<name>.allow` in the clone would win over `protocol.allow`; and the partial clone is refused at every
+  request, so a promisor put in an included file after startup closes reading.
+- Chapter 6, step 5: serving the signed hub tag as a systemd service, with `LoadCredential=` for the policy, its digest,
+  the secret, and the `allowed_signers` file, with `StateDirectory=` for the floor and a fetch without `--prune-tags`.
+- The rhythm report, `kg_validate.py --rituals WHEN [--runs FILE]... [--grace PT30M]`: outside the verdict, like
+  `--due`, it lists per `owner` each ritual (a node with `x_ritual`) with an open failure, never run, late (by the
+  cadence, or by the calendar), by event only, or on time, with the last run and the next one. `WHEN` is a date or an
+  RFC 3339 date-time. It reads the graph (`verified_at`, which has day precision, and the `evidence` runs with
+  `TRACES_TO` to the ritual) and, with `--runs`, the executor's run log: the CloudEvents of each run, with `type` equal
+  to `emits` and `subject` equal to `<meta.id>#<node id>`, and two extension attributes of KG-SSOT, `kgssotoutcome`
+  (`pass`, `fail`, or `error`) and `kgssotstarted` (the run covers the occurrence it started in). The log gives the
+  hour, so an hourly ritual is measured with it. With the calendar expanded, the calendar decides lateness (the cadence
+  counts calendar days and does not know the weekend); without it, the cadence does. The
+  calendar is expanded only with the new `rituals` extra (`python-dateutil`, `pip install "kg-ssot[rituals]"` or
+  `tools/requirements-rituals.txt` with hashes), and only after it passes the form of the SHOULD; without the extra,
+  the report says lateness is by the cadence only. The JSON is the new `kg-ssot.rituals/1` (`spec/rituals.schema.json`);
+  `kg-ssot.due/1` does not change.
+- `kg_gate.py --rituals-overdue [--as-of WHEN] [--runs FILE]... [--grace PT30M]`, off by default: fails (rc 1) when a
+  ritual is overdue. It reads the clock, so it stays out of the verdict and the baseline, and does not go with
+  `--update` or `--touched`; run it in a scheduled job.
+- The contract does not change with the report: `x_ritual` is still judged only by its form. The examples of a ritual
+  from Monday to Friday in chapters 3 and 8 now use `reverify_every: P3D`, the longest gap between two runs (Friday to
+  Monday), as chapter 3 defines it.
 
 ## [4.54.0] - 2026-11-17
 

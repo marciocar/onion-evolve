@@ -1,0 +1,1092 @@
+{
+  "description": "O perfil canônico do ritual do agente (v4.25): x_ritual, num nó rule ou policy, com purpose, kind (deterministic ou judgment), autonomy (notify ou act) e emits (o type CloudEvents de cada execução), e sources, delivery, promote e calendar opcionais. É SHOULD: julgado só quando presente e só pela forma, nunca pelo relógio. Com o perfil, o nó pede owner e uma cadência que o contrato julga (reverify_every ou reverify_on; sem as duas, form.required.node.x_ritual.cadence). O calendar é a RRULE da RFC 5545 num subconjunto estrito, com o dtstart na forma básica e o tz com a forma de nome da base tz da IANA; a existência do nome na base fica fora do veredito. Em outro tipo de nó, form.misplaced.node.x_ritual. Na aresta, segue chave x_ livre.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-rule-ritual-full.kg.yaml",
+      "description": "o ritual com todas as chaves: fontes, entrega, promoção e calendário (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-rule-ritual-minimal.kg.yaml",
+      "description": "só as quatro chaves obrigatórias, com owner e reverify_every no nó (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-rule-ritual-by-event.kg.yaml",
+      "description": "o ritual só por evento: reverify_on, sem calendário (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-policy-ritual.kg.yaml",
+      "description": "o ritual que governa outros, num nó policy, que age quando é seguro (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-both-cadences.kg.yaml",
+      "description": "o relógio e o evento juntos, com promote on_change (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-calendar-utc.kg.yaml",
+      "description": "o dtstart em UTC, com Z e sem tz (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-calendar-leap-day.kg.yaml",
+      "description": "o dtstart em 29 de fevereiro de ano bissexto (2028 e 2000) (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-calendar-leading-zero.kg.yaml",
+      "description": "a hora e o mês com zero à esquerda, que a gramática admite (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-calendar-until-utc.kg.yaml",
+      "description": "o UNTIL em UTC com o dtstart local e o fuso (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-ritual-floating-until-local.kg.yaml",
+      "description": "o UNTIL local com o dtstart local sem fuso: o par é coerente; só o fuso ausente alerta (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "valid-ritual-tz-legacy.kg.yaml",
+      "description": "os nomes legados da base tz ainda aceitos: Etc/GMT+3, EST5EDT e UTC (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-tz-offset-like-names.kg.yaml",
+      "description": "UTC-3, GMT+3 e EST5 têm a forma de nome e passam: a existência na base fica fora do veredito (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-tz-three-parts.kg.yaml",
+      "description": "o nome de três componentes e o de 14 caracteres (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-emits-underscore.kg.yaml",
+      "description": "o type com sublinhado depois do prefixo DNS, como o do GitHub (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-extension-keys.kg.yaml",
+      "description": "chaves x_ dentro do perfil, do calendário e de uma fonte são livres (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-edge-ritual-free.kg.yaml",
+      "description": "x_ritual na aresta não é perfil: segue chave x_ livre (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-ritual-rfc5545-examples.kg.yaml",
+      "description": "os 53 valores RRULE distintos dos exemplos da RFC 5545, com o UNTIL corrigido pela errata 3883 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-node-ritual-misplaced.kg.yaml",
+      "description": "x_ritual num nó claim: o ritual é regra ou política (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_ritual"
+      ]
+    },
+    {
+      "file": "warn-node-ritual-on-event.kg.yaml",
+      "description": "x_ritual num nó event: o evento de domínio é o gatilho, não o ritual; o perfil fora da forma não soma aviso (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_ritual"
+      ]
+    },
+    {
+      "file": "warn-ritual-no-owner.kg.yaml",
+      "description": "o ritual sem owner, o papel que aprova a mudança (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.owner"
+      ]
+    },
+    {
+      "file": "warn-ritual-no-cadence.kg.yaml",
+      "description": "o ritual sem reverify_every e sem reverify_on (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.cadence"
+      ]
+    },
+    {
+      "file": "warn-ritual-calendar-only-no-cadence.kg.yaml",
+      "description": "o calendário sozinho não é cadência julgada: alerta mesmo com a RRULE válida (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.cadence"
+      ]
+    },
+    {
+      "file": "warn-ritual-cadence-as-key.kg.yaml",
+      "description": "cadence escrito como chave do perfil não é cadência: segue alertando (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.x_ritual.cadence"
+      ]
+    },
+    {
+      "file": "warn-ritual-missing-purpose.kg.yaml",
+      "description": "o perfil sem purpose (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.purpose"
+      ]
+    },
+    {
+      "file": "warn-ritual-missing-kind.kg.yaml",
+      "description": "o perfil sem kind (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.kind"
+      ]
+    },
+    {
+      "file": "warn-ritual-missing-autonomy.kg.yaml",
+      "description": "o perfil sem autonomy (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.autonomy"
+      ]
+    },
+    {
+      "file": "warn-ritual-missing-emits.kg.yaml",
+      "description": "o perfil sem emits (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.emits"
+      ]
+    },
+    {
+      "file": "warn-ritual-not-map.kg.yaml",
+      "description": "o perfil como texto, não como mapa (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_ritual"
+      ]
+    },
+    {
+      "file": "warn-ritual-purpose-blank.kg.yaml",
+      "description": "o propósito só com espaço não separável (U+00A0) (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.purpose"
+      ]
+    },
+    {
+      "file": "warn-ritual-purpose-integer.kg.yaml",
+      "description": "o propósito como número (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_ritual.purpose"
+      ]
+    },
+    {
+      "file": "warn-ritual-kind-enum.kg.yaml",
+      "description": "o tipo fora da lista: determinístico em português (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.x_ritual.kind"
+      ]
+    },
+    {
+      "file": "warn-ritual-autonomy-enum.kg.yaml",
+      "description": "a autonomia fora da lista: notificar (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.x_ritual.autonomy"
+      ]
+    },
+    {
+      "file": "warn-ritual-emits-not-reverse-dns.kg.yaml",
+      "description": "o type sem prefixo DNS reverso (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.emits"
+      ]
+    },
+    {
+      "file": "warn-ritual-emits-two-labels.kg.yaml",
+      "description": "o type só com o prefixo DNS, sem o nome do evento (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.emits"
+      ]
+    },
+    {
+      "file": "warn-ritual-promote-enum.kg.yaml",
+      "description": "a promoção fora da lista: always (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.x_ritual.promote"
+      ]
+    },
+    {
+      "file": "warn-ritual-status-key.kg.yaml",
+      "description": "um status aninhado no perfil: o resultado mora no nó evidence (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.x_ritual.status"
+      ]
+    },
+    {
+      "file": "warn-ritual-sources-empty.kg.yaml",
+      "description": "a lista de fontes vazia (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.node.x_ritual.sources"
+      ]
+    },
+    {
+      "file": "warn-ritual-sources-not-list.kg.yaml",
+      "description": "as fontes como texto (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_ritual.sources"
+      ]
+    },
+    {
+      "file": "warn-ritual-sources-item-not-map.kg.yaml",
+      "description": "a fonte como texto, não como mapa (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_ritual.sources.item"
+      ]
+    },
+    {
+      "file": "warn-ritual-sources-channel-uppercase.kg.yaml",
+      "description": "o canal fora da forma de slug (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.sources.channel"
+      ]
+    },
+    {
+      "file": "warn-ritual-sources-missing-channel.kg.yaml",
+      "description": "a fonte sem canal (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.sources.channel"
+      ]
+    },
+    {
+      "file": "warn-ritual-sources-unknown-key.kg.yaml",
+      "description": "a fonte com uma chave fora do mapa: to é da entrega (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.x_ritual.sources.to"
+      ]
+    },
+    {
+      "file": "warn-ritual-delivery-missing-to.kg.yaml",
+      "description": "a entrega sem destino (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.delivery.to"
+      ]
+    },
+    {
+      "file": "warn-ritual-delivery-to-blank.kg.yaml",
+      "description": "o destino só com espaço (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.delivery.to"
+      ]
+    },
+    {
+      "file": "warn-ritual-calendar-not-map.kg.yaml",
+      "description": "o calendário como texto (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_ritual.calendar"
+      ]
+    },
+    {
+      "file": "warn-ritual-calendar-missing-rrule.kg.yaml",
+      "description": "o calendário sem rrule (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-calendar-missing-dtstart.kg.yaml",
+      "description": "o calendário sem dtstart: a série não tem começo (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-calendar-unknown-key.kg.yaml",
+      "description": "o calendário com exdate, fora do perfil (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.x_ritual.calendar.exdate"
+      ]
+    },
+    {
+      "file": "warn-ritual-dtstart-extended.kg.yaml",
+      "description": "o dtstart na forma estendida do RFC 3339, não na básica da RFC 5545 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-dtstart-date-only.kg.yaml",
+      "description": "o dtstart só com data: o ritual sem hora não diz quando roda (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-dtstart-impossible.kg.yaml",
+      "description": "o dtstart em 31 de novembro (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-dtstart-feb29-common-year.kg.yaml",
+      "description": "o dtstart em 29 de fevereiro de ano comum (2026) (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-dtstart-feb29-century.kg.yaml",
+      "description": "o dtstart em 29 de fevereiro de 1900: o século só é bissexto quando divisível por 400 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-dtstart-year-zero.kg.yaml",
+      "description": "o dtstart no ano 0000: desvio declarado da RFC (4DIGIT), como a data do contrato, que não tem ano zero (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-dtstart-hour-24.kg.yaml",
+      "description": "o dtstart às 24h (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-dtstart-tzid-prefix.kg.yaml",
+      "description": "o dtstart com o TZID dentro do valor: o fuso vai em tz (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.dtstart"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-with-utc.kg.yaml",
+      "description": "o fuso com o dtstart em UTC: o TZID não vale para UTC (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.exclusive.node.x_ritual.calendar"
+      ]
+    },
+    {
+      "file": "warn-ritual-floating.kg.yaml",
+      "description": "a hora local sem fuso, que seria flutuante (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-space.kg.yaml",
+      "description": "o fuso com espaço no lugar do sublinhado (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-long-component.kg.yaml",
+      "description": "o componente acima de 14 caracteres, o exemplo da própria theory.html (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-unknown.kg.yaml",
+      "description": "o nome que a CLDR usa para fuso desconhecido (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-leading-hyphen.kg.yaml",
+      "description": "o componente que começa por hífen (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-dotdot.kg.yaml",
+      "description": "o componente .. (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-double-slash.kg.yaml",
+      "description": "o nome com // (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-offset.kg.yaml",
+      "description": "o deslocamento no lugar do nome (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-offset-plus.kg.yaml",
+      "description": "o deslocamento numérico: o componente começa por letra ou sublinhado (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-component-15.kg.yaml",
+      "description": "o componente de exatamente 15 caracteres, um acima do teto (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-tz-integer.kg.yaml",
+      "description": "o fuso como número (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-prefix.kg.yaml",
+      "description": "a RRULE com o prefixo RRULE:, que não é do valor (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-lowercase.kg.yaml",
+      "description": "a RRULE em minúsculas: o perfil pede a forma canônica (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-lowercase-value.kg.yaml",
+      "description": "a RRULE com o valor do FREQ em minúsculas (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-empty.kg.yaml",
+      "description": "a RRULE vazia (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-no-freq.kg.yaml",
+      "description": "a RRULE sem FREQ (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-freq-not-first.kg.yaml",
+      "description": "a RRULE com o FREQ fora da primeira posição (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-freq-invalid.kg.yaml",
+      "description": "a RRULE com o FREQ fora dos sete valores (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-freq-repeated.kg.yaml",
+      "description": "a RRULE com o FREQ repetido (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-part-unknown.kg.yaml",
+      "description": "a RRULE com uma parte fora dos 14 nomes (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-part-rscale.kg.yaml",
+      "description": "a RRULE com o RSCALE da RFC 7529, fora do perfil (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-part-repeated.kg.yaml",
+      "description": "a RRULE com uma parte repetida (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-wkst-repeated.kg.yaml",
+      "description": "a RRULE com o WKST repetido (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-bymonthday-weekly-middle.kg.yaml",
+      "description": "a RRULE com BYMONTHDAY em WEEKLY, com outra parte no meio (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byyearday-daily-middle.kg.yaml",
+      "description": "a RRULE com BYYEARDAY em DAILY, com outra parte no meio (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byweekno-monthly-middle.kg.yaml",
+      "description": "a RRULE com BYWEEKNO em MONTHLY, com outra parte no meio (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-numbered-weekly-middle.kg.yaml",
+      "description": "a RRULE com BYDAY numerado em WEEKLY, com outra parte no meio (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-numbered-byweekno-middle.kg.yaml",
+      "description": "a RRULE com BYDAY numerado e BYWEEKNO em YEARLY, com outra parte no meio (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-numbered-byweekno-after-middle.kg.yaml",
+      "description": "a RRULE com BYDAY numerado antes do BYWEEKNO em YEARLY, com outra parte no meio (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-part-no-value.kg.yaml",
+      "description": "a RRULE com uma parte sem valor (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-trailing-semicolon.kg.yaml",
+      "description": "a RRULE com ; no fim (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-space.kg.yaml",
+      "description": "a RRULE com espaço entre as partes (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-count-and-until.kg.yaml",
+      "description": "a RRULE com COUNT e UNTIL juntos (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-until-and-count.kg.yaml",
+      "description": "a RRULE com UNTIL e COUNT juntos, na outra ordem (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-count-zero.kg.yaml",
+      "description": "a RRULE com COUNT zero (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-interval-zero.kg.yaml",
+      "description": "a RRULE com INTERVAL zero (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-interval-negative.kg.yaml",
+      "description": "a RRULE com INTERVAL negativo (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-bysecond-61.kg.yaml",
+      "description": "a RRULE com BYSECOND acima de 60 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byminute-60.kg.yaml",
+      "description": "a RRULE com BYMINUTE acima de 59 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byhour-24.kg.yaml",
+      "description": "a RRULE com BYHOUR acima de 23 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byhour-signed.kg.yaml",
+      "description": "a RRULE com BYHOUR com sinal (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-bymonthday-32.kg.yaml",
+      "description": "a RRULE com BYMONTHDAY acima de 31 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-bymonthday-zero.kg.yaml",
+      "description": "a RRULE com BYMONTHDAY zero (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byyearday-367.kg.yaml",
+      "description": "a RRULE com BYYEARDAY acima de 366 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byweekno-54.kg.yaml",
+      "description": "a RRULE com BYWEEKNO acima de 53 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-bymonth-13.kg.yaml",
+      "description": "a RRULE com BYMONTH acima de 12 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-bysetpos-zero.kg.yaml",
+      "description": "a RRULE com BYSETPOS zero (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-weekday.kg.yaml",
+      "description": "a RRULE com um dia da semana fora de SU a SA (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-ordinal-54.kg.yaml",
+      "description": "a RRULE com o ordinal do BYDAY acima de 53 (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-empty-item.kg.yaml",
+      "description": "a RRULE com um item vazio na lista (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-wkst-invalid.kg.yaml",
+      "description": "a RRULE com WKST fora de SU a SA (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-numbered-weekly.kg.yaml",
+      "description": "a RRULE com BYDAY numerado em WEEKLY (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-numbered-daily.kg.yaml",
+      "description": "a RRULE com BYDAY numerado em DAILY (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-numbered-byweekno.kg.yaml",
+      "description": "a RRULE com BYDAY numerado em YEARLY com BYWEEKNO (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byday-numbered-byweekno-after.kg.yaml",
+      "description": "a RRULE com BYDAY numerado antes do BYWEEKNO, em YEARLY (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-bymonthday-weekly.kg.yaml",
+      "description": "a RRULE com BYMONTHDAY em WEEKLY (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byyearday-daily.kg.yaml",
+      "description": "a RRULE com BYYEARDAY em DAILY (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byyearday-monthly.kg.yaml",
+      "description": "a RRULE com BYYEARDAY em MONTHLY (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-byweekno-monthly.kg.yaml",
+      "description": "a RRULE com BYWEEKNO fora de YEARLY (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-bysetpos-alone.kg.yaml",
+      "description": "a RRULE com BYSETPOS sem outro BYxxx (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-until-date.kg.yaml",
+      "description": "a RRULE com UNTIL só com data, e o dtstart é DATE-TIME (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-until-local-with-tz.kg.yaml",
+      "description": "a RRULE com UNTIL local, e o dtstart tem fuso: o UNTIL é UTC (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-until-local-middle.kg.yaml",
+      "description": "a RRULE com UNTIL local no meio da regra, e o dtstart tem fuso (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-until-impossible.kg.yaml",
+      "description": "a RRULE com UNTIL em 31 de novembro (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-until-utc-with-utc-dtstart.kg.yaml",
+      "description": "a RRULE com UNTIL local e o dtstart em UTC: o UNTIL é UTC (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-until-utc-with-floating.kg.yaml",
+      "description": "a RRULE com UNTIL em UTC e o dtstart flutuante: com hora local sem fuso, o UNTIL é local (errata 4414) (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_ritual.calendar.rrule",
+        "form.required.node.x_ritual.calendar.tz"
+      ]
+    },
+    {
+      "file": "warn-ritual-rrule-integer.kg.yaml",
+      "description": "a RRULE como número (v4.25)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_ritual.calendar.rrule"
+      ]
+    }
+  ]
+}

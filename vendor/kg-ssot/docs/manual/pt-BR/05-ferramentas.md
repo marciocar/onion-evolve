@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:c601b6905448c973 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:3ff8739679108d67 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -169,6 +169,75 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
   YAML 1.2. Ele só cai no parser puro, mais lento, nos raros textos em que os dois podem divergir (tab, `%YAML`,
   escape de surrogate ou `\U`, BOM fora do início).
 
+### O relatório do ritmo (`--rituals`, 4.55.0)
+
+`--rituals QUANDO` troca o veredito pelo relatório do ritmo dos rituais, os nós com `x_ritual` (capítulo 3). Cada um
+sai sob o seu `owner`, num estado:
+
+| Estado | Quando |
+|---|---|
+| `FALHA ABERTA` (`failing`) | a execução mais recente que o relatório enxerga terminou em `fail` ou `error`, e nenhuma passou depois |
+| `NUNCA EXECUTADO` (`never_run`) | sem `verified_at`, sem `evidence` com `TRACES_TO` para o ritual e sem evento no registro de execuções |
+| `ATRASADO` (`late`) | pelo calendário, quando ele se expande (uma ocorrência da RRULE depois da última execução que passou, ou depois do `dtstart` quando nenhuma passou, e antes de `QUANDO` menos a folga); sem ele, pela cadência (o `verified_at` mais o `reverify_every` cai antes do dia de `QUANDO`) |
+| `POR EVENTO` (`event_only`) | só `reverify_on`, sem cadência nem calendário: não há prazo a medir |
+| `EM DIA` (`on_time`) | o resto, com a última execução e a próxima pelo calendário |
+
+`QUANDO` é uma data `AAAA-MM-DD`, lida como o fim do dia no fuso de cada ritual, ou um instante RFC 3339 com fuso. O
+ritual cuja cadência vence naquele dia ainda não está atrasado; atrasa no dia seguinte. Com o calendário expandido, é
+ele que decide: a cadência conta dias corridos, e o calendário sabe do fim de semana, então o ritual de segunda a sexta
+não está atrasado no domingo. Os estados se somam ao atraso: o ritual cuja primeira execução falhou, ou que nunca rodou,
+também leva `late_by` quando ocorrências passaram, e é isso que o gate conta.
+
+**Duas fontes.** O grafo, sempre: o `verified_at` do ritual, que tem precisão de dia, e as execuções promovidas, nós
+`evidence` com `TRACES_TO` para o ritual, `x_outcome` e `x_event.time`. E o registro de execuções do executor, com
+`--runs ARQ` (repetível): os CloudEvents que ele emite, um por execução, em JSON Lines, num objeto ou num array. O
+registro dá a hora, e por isso o ritual de hora em hora só se mede com ele:
+
+```json
+{"specversion":"1.0","id":"run-2026-11-17-1400","source":"urn:example:agent:rituals","type":"com.example.ritual.watch.completed","subject":"rituals#R_WATCH","time":"2026-11-17T17:00:40Z","kgssotstarted":"2026-11-17T17:00:02Z","kgssotoutcome":"pass"}
+```
+
+`type` é o `emits` do ritual, e `subject` é `<meta.id>#<id do nó>`. `time` é quando a execução terminou. O CloudEvents
+não tem atributo para o resultado, e por isso o relatório lê duas extensões do KG-SSOT: `kgssotoutcome` (`pass`,
+`fail` ou `error`; sem ela, a execução passou) e `kgssotstarted` (quando a execução começou: a execução cobre a ocorrência em que começou, e a das 09:00 às 10:10 não cobre a das 10:00). O
+`dataref` aponta o que a execução produziu; a execução que não produziu nada o deixa de fora, porque para o CloudEvents
+`none` seria uma referência a um recurso chamado `none`. O relatório não o lê. O ritual
+condicional que não teve nada a dizer grava a linha mesmo assim, com `pass`: rodar sem nada a relatar não é o mesmo que
+não rodar. A linha que não se lê (não é JSON, não é CloudEvents 1.0, sem `type`, `subject` ou `time`, resultado
+desconhecido) é pulada e contada com o motivo, nunca adivinhada. A execução depois de `QUANDO` não conta, nem o
+carimbo de dia depois do dia de `QUANDO`. A execução promovida sem `x_outcome` conta como execução, não como uma que
+passou. O dia de um `verified_at` (e de um `evidence` sem `x_event.time`) é lido no fuso do ritual, e sai como data. Quando o
+registro tem uma execução que passou, com o instante, no dia do `verified_at` ou depois (no fuso do ritual ou em UTC, para o executor que carimba a data UTC), o carimbo de dia sai da conta,
+para o fim do dia não esconder a execução perdida das 17h. Contra uma falha, o carimbo de dia vale o começo do dia: a
+falha das 17h31 não some por um `verified_at` do mesmo dia.
+
+**O calendário.** Ele só se expande com o extra `rituals`, o `python-dateutil` (`pip install "kg-ssot[rituals]"`, ou
+`tools/requirements-rituals.txt` com `--require-hashes`; no Windows, o extra traz também o `tzdata`, a base de fusos que
+o sistema não tem), e só depois de o calendário passar na forma do SHOULD: o
+expansor é tolerante e não é o juiz. Sem o extra, o relatório mede o atraso só pela cadência, por dia, e diz isso. O
+fuso que a máquina não conhece também não se expande, e a linha diz por quê; o JSON traz a versão da base tz da máquina
+(`tzdata`). `--grace PT30M` (uma duração ISO 8601 só com hora) dá a folga do executor, para a ocorrência das 10:00 não
+atrasar às 10:00:30. A contagem de ocorrências perdidas para em 1000, e a próxima execução se procura até cerca de
+dois anos à frente. O calendário cujo `COUNT` ou `UNTIL` chegou diz isso: o que se perdeu antes do fim ainda conta, e nada depois dele. A regra que nunca ocorre
+(`BYMONTH=2;BYMONTHDAY=30` passa na forma) custa ao expansor alguns segundos por ritual para ser descartada.
+
+```bash
+KG_SSOT_LANG=pt-BR kg-validate --rituals 2026-11-17T21:10:00Z --runs runs.jsonl --grace PT30M docs/rituals.kg.yaml
+```
+
+```text
+dono hub-brain
+  FALHA ABERTA    docs/rituals.kg.yaml  R_REPORT_1730: falhou em 2026-11-17T17:31:00-03:00 (evidence:E_RUN_1730_FAIL), e nenhuma execução passou depois; calendário: 1 execução(ões) perdida(s) desde 2026-11-17T17:30:00-03:00; última que passou 2026-11-16; próxima 2026-11-18T17:30:00-03:00
+  ATRASADO        docs/rituals.kg.yaml  R_WATCH: calendário: 1 execução(ões) perdida(s) desde 2026-11-17T17:00:00-03:00; última que passou 2026-11-17T16:00:30-03:00; próxima 2026-11-17T19:00:00-03:00
+  EM DIA          docs/rituals.kg.yaml  R_REPORT_1200: última que passou 2026-11-17; próxima 2026-11-18T12:00:00-03:00
+· em 2026-11-17T21:10:00Z: 1 com falha aberta, 0 nunca executado(s), 1 atrasado(s), 0 por evento, 1 em dia; o relatório não muda o veredito
+· registro de execuções: 9 evento(s) lido(s), 0 ignorado(s)
+```
+
+Nunca muda o veredito: o rc é 0, ou 2 com entrada quebrada (um registro ilegível, `QUANDO` fora da forma). Com
+`--format json`, a saída sai no formato `kg-ssot.rituals/1` (`spec/rituals.schema.json`); o `kg-ssot.due/1` não muda.
+Para reprovar um CI por ritual vencido, veja o `--rituals-overdue` do `kg_gate.py`, abaixo.
+
 ## `kg_conformance.py`: a suíte
 
 Roda a suíte de conformidade contra o leitor de referência. Primeiro o metaschema se auto-testa, depois cada
@@ -182,7 +251,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 621/621 (reprova)
+latest: 745/745 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -573,6 +642,27 @@ para os grafos e para a política, para quem aprova ser quem o forge autentica. 
 pela API do forge. Não combina com `--update`. Copiar o conteúdo para um grafo novo, ou para outro repositório, não é
 queda para este gate (capítulo 6, *O que ainda não está coberto*).
 
+### Os rituais vencidos: `--rituals-overdue` (4.55.0)
+
+`--rituals-overdue` reprova (rc 1) quando um ritual passou do prazo: toda entrada com `late_by`, pelo calendário ou (sem
+ele) pela cadência, inclusive o ritual nunca executado, ou cuja última execução falhou, quando ocorrências passaram. O
+ritual só por evento, e a falha sem ocorrência perdida ainda, saem no relatório do ritmo, não aqui. Ele vem desligado e fica fora do veredito e da base, porque lê o relógio: o mesmo commit passa hoje e reprova
+amanhã. `--as-of QUANDO` fixa o instante (sem ela, o relógio da máquina, em UTC), e `--runs` e `--grace` são os do
+`kg_validate.py --rituals`, acima. Não combina com `--update` nem com `--touched`.
+
+```bash
+python3 -I vendor/kg-ssot/tools/kg_gate.py --rituals-overdue --as-of 2026-11-17T21:10:00Z --runs "$RUN_LOG" --grace PT30M
+```
+
+```text
+· rituais em 2026-11-17T21:10:00Z: 2 vencido(s) de 3
+✗ ritual vencido: docs/rituals.kg.yaml R_REPORT_1730 (dono hub-brain)
+✗ ritual vencido: docs/rituals.kg.yaml R_WATCH (dono hub-brain)
+```
+
+Rode num job agendado, não em todo pull request: uma mudança que não toca os rituais não deve reprovar porque um
+executor parou.
+
 ## `kg_vendor.py`: trazer e conferir a release
 
 O adotante nunca copia o contrato à mão. A ferramenta de vendor lê uma **tag** com `git archive` e grava um carimbo
@@ -878,11 +968,15 @@ Uma configuração de cliente por stdio, com um armazém versionado fora do repo
 | `--init` | Cria a raiz se não existir |
 | `--author "Name <email>"` | Quem assina as gravações |
 | `--read-only` | Tira `kg_write` e `kg_delete` |
-| `--http PORT` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote`, que exige `--secret-env` |
+| `--http PORT` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote`, que exige `--secret-env` ou `--secret-file` |
 | `--secret-env VAR` · `--secret-header H` | O segredo compartilhado, lido da variável `VAR`, que cada requisição HTTP traz no header `H` (padrão `X-Api-Key`), comparado por hmac |
-| `--identity-header H` | O perfil "atrás de proxy": a identidade de cada requisição vem do header `H` (um e-mail), com área e autor próprios; exige `--secret-env` |
+| `--secret-file @ARQ` | No lugar de `--secret-env` (as duas se excluem): o segredo compartilhado lido de um arquivo, numa linha, e relido quando o arquivo muda; o valor nunca aparece na saída nem nos erros (veja *O segredo de arquivo* abaixo) |
+| `--identity-header H` | O perfil "atrás de proxy": a identidade de cada requisição vem do header `H` (um e-mail), com área e autor próprios; exige `--secret-env` ou `--secret-file` |
 | `--area-policy ARQUIVO` | Arquivo JSON, fora de `--root`, com as áreas compartilhadas que cada identidade lê; exige `--identity-header` |
 | `--area-policy-digest sha256:HEX\|@ARQ` | Só com `--area-policy`: o digest que a política tem de ter (`kg_policy.py digest ARQ`), lido uma vez na partida; com outro digest o servidor não sobe (rc 2), e a política trocada por outro digest com ele de pé fecha a leitura (quando a troca muda o carimbo do arquivo: veja o filtro por área) |
+| `--serve-ref REF` | Só com `--backend git` e `--read-only`: serve exatamente a árvore de uma ref do clone, `refs/heads/NOME` (ou `NOME`), `refs/tags/NOME` ou um padrão como `refs/tags/hub-v*`, nunca a árvore de trabalho (veja *A ref servida* abaixo) |
+| `--verify-signers @ARQ` | Só com `--serve-ref`, e obrigatório para tag: o arquivo `allowed_signers` do git; a tag, ou o commit da ponta da branch, tem de ter assinatura SSH válida, na partida e a cada troca da ref |
+| `--serve-state DIR` | Só com um padrão de tag do `--serve-ref`, e obrigatório com ele: um diretório fora do clone e fora de `--root` que guarda a maior versão já servida (o piso de versão); uma versão menor nunca é servida, também depois de reiniciar |
 | `--max-bytes N` | O tamanho máximo de um grafo (default 2.000.000) |
 | `--max-graphs N` | Grafos por armazém, ou por área no perfil; além disso, um nome novo é recusado |
 | `--max-concurrent N` | Requisições HTTP ao mesmo tempo; além disso, 503 |
@@ -1075,6 +1169,109 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     Aqui o `aud@x.org` lê a `g-compliance` até `confidential`, não vê o grafo `restricted` dela e não grava; o
     `off@x.org` e o `dpo@x.org` a leem até `restricted`. Dar também o papel `officer` ao `aud@x.org` mostraria o grafo
     `restricted` e liberaria a gravação, porque vale a concessão maior.
+- **A ref servida (`--serve-ref`):** um servidor só de leitura para quem não é desenvolvedor serve o que foi publicado,
+  não o que está no clone. Sem a opção, o armazém git lê os arquivos rastreados (`git ls-files`) com o texto da árvore
+  de trabalho, e uma mudança nunca commitada é servida. Com `--serve-ref REF`, ele lê a árvore do commit que a ref nomeia
+  (`git ls-tree` e `git cat-file`): o arquivo mudado ou não rastreado na árvore de trabalho não conta, e link simbólico
+  ou submódulo nunca entra. O servidor não escreve nada no clone, nem o `.git/info/exclude`, e por isso roda sem
+  permissão de escrita nele. A opção pede `--backend git` e `--read-only`, e não vai com `--init`.
+  - **Uma branch** (`refs/heads/NOME`, ou só `NOME`): a árvore do commit da ponta, e só enquanto o `HEAD` do clone
+    descende dela (`git merge-base --is-ancestor`); a branch reescrita, ou numa linha que o clone não tem, não sobe
+    (rc 2). Com `--verify-signers`, o commit da ponta tem de ter assinatura SSH válida (`git verify-commit`). A branch
+    não tem piso de versão: movida para trás, por quem pode escrever no clone, para um commit mais antigo assinado e
+    válido que o `HEAD` ainda contém, ela é servida. Para quem nunca pode ver uma versão retirada, sirva um padrão de tag
+    com `--serve-state`.
+  - **Uma tag** (`refs/tags/NOME`): a árvore exata de `NOME^{commit}`, só com `--verify-signers`. A tag tem de ser
+    anotada e assinada com SSH, e `git -c gpg.format=ssh -c gpg.ssh.allowedSignersFile=ARQ verify-tag` tem de passar com
+    o arquivo dado. O cabeçalho `tag` do objeto assinado tem de ser o próprio `NOME`: a tag assinada de uma versão,
+    copiada com o nome de uma maior, é recusada. A tag leve, a sem assinatura e a assinada por uma chave que não está
+    no arquivo não sobem (rc 2).
+  - **Um padrão de tag** (`refs/tags/hub-v*`): um `*` só, onde vai uma versão semver 2.0.0 sem pré-lançamento. Vale a
+    maior versão pela precedência do semver: números se comparam como números (`1.10.0` vence `1.2.0`) e os metadados
+    de build (`+...`) não contam. É a ordem do semver, não a de `git tag --sort=v:refname`, que põe `1.0.0-rc1` depois
+    de `1.0.0`. O pré-lançamento (`hub-v2.0.0-rc.1`) não conta, e uma tag candidata nunca chega a quem lê; a tag fora de
+    semver (`hub-vlatest`, `hub-v01.2.0`, um dígito que não é ASCII) também não conta, nenhuma tag que case dá rc 2, e
+    duas tags da mesma precedência são recusadas.
+  - **O piso de versão (`--serve-state DIR`, obrigatório com padrão):** a maior versão já servida fica num arquivo desse
+    diretório, um por área e padrão, gravado de forma atômica. Uma versão abaixo dela nunca é servida: fecha a leitura,
+    com o motivo no stderr, também depois de reiniciar. Sem o piso, quem pode apagar a tag mais alta no remoto (e um
+    fetch com `--prune-tags` a apaga aqui) faria o servidor servir a anterior, assinada e válida: um rollback para um
+    conteúdo que foi retirado. O diretório fica fora do clone e fora de `--root`, e nem um push nem o conteúdo servido o
+    baixam. O piso é gravado sob uma trava do diretório (`flock`), relendo o arquivo antes, e dois servidores no mesmo
+    diretório guardam o maior dos dois. Na mesma precedência do piso, só a mesma tag é servida, pelo nome e pelo objeto:
+    uma tag cortada de novo com a versão já servida, ou a mesma versão com outro build (`+...`), fecha a leitura. O
+    arquivo de estado fora da forma, ou o diretório ou o arquivo que o grupo ou os outros podem gravar (`g+w`, `o+w`), é
+    recusado.
+  - **Confiança no primeiro uso:** o piso protege da primeira versão servida em diante. A primeira partida sem arquivo
+    de estado aceita a maior tag válida que o clone tem, seja qual for, e apagar o arquivo de estado zera o piso: o
+    diretório é do operador, com backup como um arquivo de configuração.
+  - **Relida, e a falha fecha:** o servidor confere o carimbo (data de modificação, tamanho, inode) do `HEAD` (e do
+    conteúdo dele), do `packed-refs`, do `reftable/tables.list`, do `config`, do `config.worktree`, do `commondir`, do
+    `info/grafts`, do `shallow`, do `objects/info/alternates`, de cada ref solta em `refs/heads`, `refs/tags` e
+    `refs/replace` e do arquivo de signatários, uma vez por requisição, e resolve a ref de novo quando um deles mudou. Um
+    arquivo que a configuração inclui (`include.path`, `includeIf`) não está no carimbo; a conferência do clone
+    parcial, abaixo, roda a cada requisição no lugar dele. A ref que deixa de verificar (a branch movida para fora do histórico do `HEAD`, uma tag nova
+    mais alta sem assinatura válida, uma versão abaixo do piso, o arquivo de signatários trocado ou removido) fecha a
+    leitura, como a política inválida: o `kg_list` fica vazio, um grafo responde como o que não existe, e o motivo vai
+    uma vez ao stderr. Reabre quando a ref volta a verificar. Quando a tag mais alta de um padrão falha, o servidor não
+    volta para a anterior: serve a versão que o padrão nomeia, ou nada.
+  - **Um retrato por requisição:** cada requisição lê uma resolução só da ref, da primeira leitura à última: um
+    `kg_query` ou um `kg_validate` nunca mistura duas tags, e a ref que fecha no meio fecha a resposta inteira.
+  - **Falha de execução não é veredito:** cada git que o servidor roda neste modo (e o `ssh-keygen` que ele chama) tem
+    30 segundos, num grupo de processos próprio que morre inteiro quando o tempo acaba. O git que não roda, morre por
+    sinal ou passa do tempo fecha aquela resposta, mas não fica registrado contra a ref: a requisição seguinte tenta de
+    novo, sem precisar de mudança na ref.
+  - **O que o clone não troca:** o servidor roda o `git` e o `ssh-keygen` pelos caminhos absolutos achados na partida
+    nas pastas absolutas do `PATH` (nunca a pasta atual nem uma entrada relativa), sem configuração de sistema nem
+    global, e fixa na linha de comando uma lista de chaves. A chave fixada ali vence a mesma chave no `.git/config` do
+    clone e no que ele inclui; a chave que ela não nomeia ainda vem do clone, e por isso cada chave que importa é
+    nomeada: o que verifica (`gpg.format=ssh`, `gpg.ssh.program` com esse `ssh-keygen`, `gpg.minTrustLevel=fully`,
+    programas de GPG e X.509 que nunca rodam), o que poderia rodar código (`core.fsmonitor`, `core.hooksPath`,
+    `core.pager`, `diff.external`, `core.sshCommand`, `core.gitProxy`, `core.askPass`, `credential.helper`,
+    `log.showSignature`) e nenhum transporte: `protocol.allow=never` e, como `protocol.<nome>.allow` é mais específica e
+    venceria ela, `never` para cada protocolo pelo nome (`ext`, `fd`, `file`, `git`, `http`, `https`, `ftp`, `ftps`,
+    `ssh`, `git+ssh`, `ssh+git`, `rsync`). Roda com `GIT_NO_LAZY_FETCH`, `GIT_PROTOCOL_FROM_USER=0`,
+    `GIT_NO_REPLACE_OBJECTS` e um arquivo de enxertos vazio. A assinatura que o git confere é o bloco da última linha
+    `-----BEGIN` da tag, e ela tem de ser a SSH: um marcador SSH na mensagem com um bloco GPG depois é recusado.
+  - **O git mínimo:** o `GIT_NO_LAZY_FETCH` veio com a correção de maio de 2024: git 2.45.1, ou 2.39.4, 2.40.2, 2.41.1,
+    2.42.2, 2.43.4, 2.44.1 (e os pacotes de distribuição que trazem a correção). Na partida o servidor prova que o git
+    achado a respeita, num repositório temporário com um remoto promisor e um objeto que falta, e não sobe (rc 2) com
+    um git que não respeita, dizendo a versão e a mínima.
+  - **O que o clone não pode ser:** o servidor não sobe, com o motivo no stderr, se o clone for um destes: um clone
+    parcial (`extensions.partialClone`, ou qualquer `remote.*.promisor`), em que um objeto que falta seria buscado
+    rodando um comando da própria configuração do clone; um clone com `.git/info/grafts`; um clone raso
+    (`.git/shallow`); um clone que toma objetos de fora dele (`objects/info/alternates`); uma worktree ligada
+    (`.git/commondir`); e um clone com link simbólico em `.git` (`HEAD`, `config`, `packed-refs`, ou dentro de `objects`
+    ou `refs`). Com o servidor de pé, o clone parcial é conferido a cada requisição, na configuração que o git lê
+    (`config`, `config.worktree` e o que `include.path` e `includeIf` incluem), e fecha aquela resposta; os outros fecham
+    a leitura quando o carimbo os vê. Três camadas impedem que um objeto que falta seja buscado, e cada uma segura
+    sozinha: o `GIT_NO_LAZY_FETCH`, os protocolos fixados pelo nome e a recusa do clone parcial. O servidor não busca
+    nada e não roda comando do clone.
+  - **O histórico até a ref:** o `kg_history` lista os commits até o servido, e o `kg_get` com `ref` só lê um commit
+    desse histórico; um commit à frente dele, como a ponta do clone depois da tag, responde como o nome que não existe
+    naquele `ref`.
+  - **No perfil "atrás de proxy":** vale para cada área que o servidor abre. Na partida, cada área compartilhada da
+    política que existe como pasta tem de servir a ref, ou o servidor não sobe (rc 2); com ele de pé, a área cuja ref
+    deixa de verificar fecha sozinha, e as outras seguem servindo. A própria área de uma identidade que não serve a ref
+    fica fora, e as compartilhadas seguem sendo lidas.
+  - **A data em que a validade da chave é julgada:** o git passa ao `ssh-keygen` a data escrita na tag (a do tagger)
+    ou no commit (`-Overify-time`), e quem assina escreve essa data. Assim, `valid-after` e `valid-before` no arquivo
+    `allowed_signers` são julgados contra uma data que o signatário escolheu, não contra o relógio: uma chave que saiu
+    segue validando as tags que ela datou antes do `valid-before` dela. Para aposentar uma chave, tire a linha dela do
+    arquivo; toda tag que ela assinou deixa de verificar, e a área cuja tag mais alta ela assinou fecha até que se corte
+    uma tag assinada por outra chave.
+  - **Fora desta versão:** a assinatura GPG ou X.509 (recusada antes de o git conferi-la), o arquivo de revogação de
+    chaves SSH, o pré-lançamento num padrão, o vencimento pelo relógio e um piso para a branch. O servidor não busca
+    nada (veja o que o clone não pode ser, acima): trazer commits e tags novos para o clone é do operador (capítulo 6,
+    passo 5).
+- **O segredo de arquivo (`--secret-file @ARQ`):** no lugar de `--secret-env`, e nunca junto dele. O arquivo segue as
+  regras do `@ARQ` do `--area-policy-digest`: uma linha, com os brancos das pontas ignorados e o BOM do UTF-8 aceito,
+  até 4.096 bytes; o arquivo em UTF-16 é recusado com a dica de salvá-lo em UTF-8, e o arquivo vazio, uma segunda linha
+  ou um caractere de controle são recusados. O arquivo que não passa dá rc 2 na partida. O servidor o relê quando o
+  carimbo muda, e a rotação vale na requisição seguinte, sem reiniciar; o arquivo que quebra ou some com o servidor de
+  pé o fecha, e toda requisição recebe 401 até o arquivo voltar a valer, com o motivo uma vez no stderr. O valor nunca
+  aparece na saída, num erro ou no log: as mensagens nomeiam só o caminho e o motivo. Ao contrário da variável, o
+  arquivo não aparece em `/proc/<pid>/environ` e não é herdado por um processo filho.
 - **A triagem do conteúdo (4.47.0):** em qualquer perfil, cada texto que `kg_get`, `kg_list`, `kg_history`, `kg_query`
   e `kg_terms` devolvem é triado antes de chegar ao modelo (`tools/kg_screen.py`, só biblioteca padrão, uma função pura
   do texto). Três vereditos: `pass` (nada achado); `quarantine` (um sinal sozinho: caractere invisível, região

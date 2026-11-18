@@ -749,8 +749,8 @@ msgid "✗ bench vendor: {stamp} says unreleased (commit {commit}); a release co
 msgstr "✗ vendor de bancada: o {stamp} diz unreleased (commit {commit}); uma release vem do update --tag, e a bancada passa --allow-unreleased"
 
 #: tools/kg_mcp.py
-msgid "--allow-remote without --secret-env: outside the loopback, every request must carry the secret"
-msgstr "--allow-remote sem --secret-env: fora do loopback, toda requisição tem de trazer o segredo"
+msgid "--allow-remote without --secret-env or --secret-file: outside the loopback, every request must carry the secret"
+msgstr "--allow-remote sem --secret-env nem --secret-file: fora do loopback, toda requisição tem de trazer o segredo"
 
 #: tools/kg_mcp.py
 msgid "--gate-cmd with --read-only: without writes, the gate would never run"
@@ -769,8 +769,8 @@ msgid "--host {host} leaves the loopback: use --allow-remote, with --secret-env,
 msgstr "--host {host} sai do loopback: use --allow-remote, com --secret-env, atrás de um proxy com TLS"
 
 #: tools/kg_mcp.py
-msgid "--identity-header without --secret-env: a header identity is never enough on its own"
-msgstr "--identity-header sem --secret-env: a identidade por header nunca vale sozinha"
+msgid "--identity-header without --secret-env or --secret-file: a header identity is never enough on its own"
+msgstr "--identity-header sem --secret-env nem --secret-file: a identidade por header nunca vale sozinha"
 
 #: tools/kg_mcp.py
 msgid "--identity-header, --secret-env and --max-concurrent only apply with --http"
@@ -821,8 +821,8 @@ msgid "an external gate, after the contract, on every write and removal: the com
 msgstr "um gate externo, depois do contrato, em toda gravação e remoção: o comando (sem shell) recebe o texto no stdin e devolve um kg-ssot.verdict/1; é por ele que quem adota liga o próprio gate"
 
 #: tools/kg_mcp.py
-msgid "behind-proxy profile (HTTP only): the identity of each request comes from this header (an email, e.g. X-User-Email); each identity writes in its own area under --root and signs the writes. Requires --secret-env"
-msgstr "perfil atrás de proxy (só HTTP): a identidade de cada requisição vem deste header (um e-mail, ex.: X-User-Email); cada identidade grava na própria área sob --root e assina as gravações. Exige --secret-env"
+msgid "behind-proxy profile (HTTP only): the identity of each request comes from this header (an email, e.g. X-User-Email); each identity writes in its own area under --root and signs the writes. Requires --secret-env or --secret-file"
+msgstr "perfil atrás de proxy (só HTTP): a identidade de cada requisição vem deste header (um e-mail, ex.: X-User-Email); cada identidade grava na própria área sob --root e assina as gravações. Exige --secret-env ou --secret-file"
 
 #: tools/kg_mcp.py
 msgid "empty root: name the directory of the areas"
@@ -2291,84 +2291,6 @@ msgstr "Chave fora da gramática (sem prefixo x_): «{field}» {scope}."
 #: tools/kg_validate.py
 msgid "Missing required field \"{field}\" {scope}."
 msgstr "Falta o campo obrigatório «{field}» {scope}."
-
-#: tools/kg_validate.py
-msgid ""
-"NEUTRAL reference reader of the .kg.yaml: validates graphs against a JSON Schema.\n"
-"\n"
-"It depends only on Python 3, PyYAML, and jsonschema, and on no agent harness. It is also the instrument of the\n"
-"measurement that gave rise to the contract (the \"spike\", options --spike and --json).\n"
-"\n"
-"Layers measured per file:\n"
-"  1. parse     — valid YAML, a single document, the root is a map;\n"
-"  2. schema    — the canonical JSON (dates in ISO, keys as strings) meets the schema;\n"
-"  3. integrity — unique ids, edges with no orphan end, and no node of degree 0 (what JSON Schema cannot reach).\n"
-"\n"
-"Human output: per file, the verdict and the codes, in the SAME vocabulary as the gate (kg_gate.py) and the\n"
-"conformance suite (parse.*, form.*, integrity.*, yaml.*), with the occurrence count:\n"
-"  FAIL <file>   MUST  form.required.node.provenance ×33 · yaml.forbidden-key-on ×7\n"
-"                SHOULD form.required.node.verified_at ×33\n"
-"  PASS <file>   (SHOULD only warns, it does not fail)\n"
-"Without --schema, the contract is the current one and the warnings come from its SHOULD schema. With --schema S, the\n"
-"SHOULD schema is --should-schema, or the sibling S.should.schema.json when it exists, or none.\n"
-"\n"
-"A .kg.json (the same data model in JSON) is read by the JSON parser in the contract profile (RFC 8259 and I-JSON): a\n"
-"*.json file is read as JSON, and '-' follows --stdin-format yaml|json.\n"
-"\n"
-"--corpus DIR enables the check of the external end of external_edges against the graphs under DIR.\n"
-"--due YYYY-MM-DD replaces the verdict with the due report: nodes whose verified_at plus the reverify_every cadence\n"
-"has passed on the date, nodes with a cadence and no stamp, and nodes with only reverify_on. It never changes the\n"
-"verdict: rc is 0, or 2 on broken input. With --format json, the report uses the kg-ssot.due/1 format. Since v4.23,\n"
-"it also lists the disposal deadline of the whole graph (meta.x_dispose_by): the one that came due, the one held by an\n"
-"x_hold in force and, in a graph with x_dispose_by, every node with retain_for as a conflict for the owner to decide,\n"
-"without computing which one prevails. The date opens the disposal procedure; nothing is deleted.\n"
-"--where adds, per file, one line per occurrence with the node or edge.\n"
-"--spike replaces the human output and the rc with those of the spike; --json OUT ALWAYS writes the frozen spike format.\n"
-"\n"
-"rc: 0 every file passes the MUST · 1 some file fails · 2 broken input (unreadable schema or file, failing git show).\n"
-"\n"
-"Usage:\n"
-"  kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...\n"
-"  kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]\n"
-"  kg_validate.py --due YYYY-MM-DD [--format json] FILE...\n"
-msgstr ""
-"Leitor de referência NEUTRO do .kg.yaml: valida grafos contra um JSON Schema.\n"
-"\n"
-"Depende só de Python 3, PyYAML e jsonschema, e não depende de nenhum harness de agente. Também é o instrumento\n"
-"da medição que deu origem ao contrato (o \"spike\", opções --spike e --json).\n"
-"\n"
-"Camadas medidas por arquivo:\n"
-"  1. parse     — YAML válido, um documento só, raiz é mapa;\n"
-"  2. schema    — o JSON canônico (datas em ISO, chaves em string) cumpre o schema;\n"
-"  3. integrity — ids únicos, arestas sem ponta órfã e nenhum nó de grau 0 (o que JSON Schema não alcança).\n"
-"\n"
-"Saída humana: por arquivo, o veredito e os códigos com o MESMO vocabulário do gate (kg_gate.py) e da suíte\n"
-"(parse.*, form.*, integrity.*, yaml.*), com a contagem de ocorrências:\n"
-"  REPROVA <arquivo>   MUST  form.required.node.provenance ×33 · yaml.forbidden-key-on ×7\n"
-"                      SHOULD form.required.node.verified_at ×33\n"
-"  PASSA   <arquivo>   (SHOULD só avisa, não reprova)\n"
-"Sem --schema, o contrato é o vigente e os avisos são do SHOULD dele. Com --schema S, o SHOULD é --should-schema,\n"
-"ou o vizinho S.should.schema.json quando existe, ou nenhum.\n"
-"\n"
-"O .kg.json (o mesmo modelo de dados em JSON) é lido pelo parser JSON no perfil do contrato (RFC 8259 e I-JSON): um\n"
-"arquivo *.json é lido como JSON, e '-' segue --stdin-format yaml|json.\n"
-"\n"
-"--corpus DIR liga a conferência da ponta externa das external_edges contra os grafos sob DIR.\n"
-"--due AAAA-MM-DD troca o veredito pelo relatório de vencimento: o nó cujo verified_at somado à cadência\n"
-"reverify_every já passou na data, o que tem cadência e não tem carimbo, e o que só tem reverify_on. Nunca muda o\n"
-"veredito: o rc é 0, ou 2 com entrada quebrada. Com --format json, o relatório sai no formato kg-ssot.due/1. Desde o\n"
-"v4.23, lista também o prazo de expurgo do grafo inteiro (meta.x_dispose_by): o vencido, o suspenso por um x_hold\n"
-"vigente e, num grafo com x_dispose_by, todo nó com retain_for como conflito a decidir pelo dono, sem calcular qual\n"
-"prevalece. A data abre o procedimento de descarte; nada é apagado.\n"
-"--where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta.\n"
-"--spike troca a saída humana e o rc pelos do spike; --json OUT grava SEMPRE o formato do spike, congelado.\n"
-"\n"
-"rc: 0 todo arquivo passa no MUST · 1 algum reprova · 2 entrada quebrada (schema ou arquivo ilegível, git show que falha).\n"
-"\n"
-"Uso:\n"
-"  kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...\n"
-"  kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]\n"
-"  kg_validate.py --due AAAA-MM-DD [--format json] FILE...\n"
 
 #: tools/kg_validate.py
 msgid "UNREADABLE"
@@ -4977,3 +4899,566 @@ msgstr "✗ rebaixamento de nível: {graph} foi de {old} para {new}, e o último
 #: tools/kg_gate.py
 msgid "✗ classification downgrade: {graph} went from {old} to {new}, and meta.x_downgrade does not keep the trail of the base: the entries already there stay as they were, and the new one is appended after them"
 msgstr "✗ rebaixamento de nível: {graph} foi de {old} para {new}, e o meta.x_downgrade não guarda a trilha da base: os registros que já estavam ficam como eram, e o novo vai depois deles"
+
+#: tools/kg_mcp.py
+msgid "--secret-file and --secret-env are exclusive: give the secret one way"
+msgstr "--secret-file e --secret-env se excluem: dê o segredo de um jeito só"
+
+#: tools/kg_mcp.py
+msgid "--secret-file only applies with --http"
+msgstr "--secret-file só vale com --http"
+
+#: tools/kg_mcp.py
+msgid "--secret-file takes @FILE, the path of the file with the secret"
+msgstr "--secret-file recebe @ARQ, o caminho do arquivo com o segredo"
+
+#: tools/kg_mcp.py
+msgid "--secret-file: {error}"
+msgstr "--secret-file: {error}"
+
+#: tools/kg_mcp.py
+msgid "--serve-ref only applies with --backend git"
+msgstr "--serve-ref só vale com --backend git"
+
+#: tools/kg_mcp.py
+msgid "--serve-ref serves a ref, which takes no writes: add --read-only"
+msgstr "--serve-ref serve uma ref, que não recebe gravação: acrescente --read-only"
+
+#: tools/kg_mcp.py
+msgid "--serve-ref with --init: a new repository has no ref to serve"
+msgstr "--serve-ref com --init: um repositório novo não tem ref para servir"
+
+#: tools/kg_mcp.py
+msgid "--serve-ref without --root: there is no clone to serve"
+msgstr "--serve-ref sem --root: não há clone para servir"
+
+#: tools/kg_mcp.py
+msgid "--serve-ref: the area {area} does not serve the ref: {error}"
+msgstr "--serve-ref: a área {area} não serve a ref: {error}"
+
+#: tools/kg_mcp.py
+msgid "--serve-ref: {error}"
+msgstr "--serve-ref: {error}"
+
+#: tools/kg_mcp.py
+msgid "--verify-signers only goes with --serve-ref"
+msgstr "--verify-signers só vale com --serve-ref"
+
+#: tools/kg_mcp.py
+msgid "--verify-signers takes @FILE, the allowed_signers file"
+msgstr "--verify-signers recebe @ARQ, o arquivo allowed_signers"
+
+#: tools/kg_mcp.py
+msgid "--verify-signers: the signers file must stay outside --root"
+msgstr "--verify-signers: o arquivo de signatários tem de ficar fora de --root"
+
+#: tools/kg_mcp.py
+msgid "instead of --secret-env: the file with the shared secret, on one line (UTF-8), reread when it changes; the value never shows in output or errors"
+msgstr "no lugar de --secret-env: o arquivo com o segredo compartilhado, numa linha (UTF-8), relido quando muda; o valor nunca aparece na saída nem nos erros"
+
+#: tools/kg_mcp.py
+msgid "only with --backend git and --read-only: serves exactly the tree of a ref, not the working tree of the clone: refs/heads/NAME (or NAME), while the HEAD of the clone descends from it, or refs/tags/NAME, or a pattern such as refs/tags/hub-v* (the highest semver version), with --verify-signers; the ref is reread when it changes, and one that no longer verifies closes reading"
+msgstr "só com --backend git e --read-only: serve exatamente a árvore de uma ref, não a árvore de trabalho do clone: refs/heads/NOME (ou NOME), enquanto o HEAD do clone descende dela, ou refs/tags/NOME, ou um padrão como refs/tags/hub-v* (a maior versão semver), com --verify-signers; a ref é relida quando muda, e a que deixa de verificar fecha a leitura"
+
+#: tools/kg_mcp.py
+msgid "only with --serve-ref: the allowed_signers file of git (gpg.ssh.allowedSignersFile); the tag (required) or the tip commit of the branch must carry a valid SSH signature, at startup and at every change of the ref"
+msgstr "só com --serve-ref: o arquivo allowed_signers do git (gpg.ssh.allowedSignersFile); a tag (obrigatório) ou o commit da ponta da branch tem de ter assinatura SSH válida, na partida e a cada troca da ref"
+
+#: tools/kg_store.py
+msgid "a branch is served by its exact name, without *: {ref!r}"
+msgstr "a branch é servida pelo nome exato, sem *: {ref!r}"
+
+#: tools/kg_store.py
+msgid "a tag is served only with --verify-signers: without it nothing proves who cut it"
+msgstr "a tag só é servida com --verify-signers: sem ela, nada prova quem a cortou"
+
+#: tools/kg_store.py
+msgid "git cat-file did not return the blob {sha}"
+msgstr "o git cat-file não devolveu o blob {sha}"
+
+#: tools/kg_store.py
+msgid "invalid ref name: {ref!r}"
+msgstr "nome de ref inválido: {ref!r}"
+
+#: tools/kg_store.py
+msgid "no semver tag matches {ref}"
+msgstr "nenhuma tag semver casa {ref}"
+
+#: tools/kg_store.py
+msgid "the HEAD of the clone does not descend from {ref}"
+msgstr "o HEAD do clone não descende de {ref}"
+
+#: tools/kg_store.py
+msgid "the branch {ref} does not exist"
+msgstr "a branch {ref} não existe"
+
+#: tools/kg_store.py
+msgid "the served ref is refs/heads/<name>, <name> or refs/tags/<name or pattern>, not {ref!r}"
+msgstr "a ref servida é refs/heads/<nome>, <nome> ou refs/tags/<nome ou padrão>, não {ref!r}"
+
+#: tools/kg_store.py
+msgid "the signature of {ref} does not verify against the signers file ({error})"
+msgstr "a assinatura de {ref} não confere com o arquivo de signatários ({error})"
+
+#: tools/kg_store.py
+msgid "the signers file {path} cannot be read ({error})"
+msgstr "o arquivo de signatários {path} não pode ser lido ({error})"
+
+#: tools/kg_store.py
+msgid "the signers file {path} has no signer line"
+msgstr "o arquivo de signatários {path} não tem linha de signatário"
+
+#: tools/kg_store.py
+msgid "the signers file {path} is UTF-16: save it as UTF-8"
+msgstr "o arquivo de signatários {path} está em UTF-16: salve em UTF-8"
+
+#: tools/kg_store.py
+msgid "the signers file {path} is larger than {limit} bytes"
+msgstr "o arquivo de signatários {path} passa de {limit} bytes"
+
+#: tools/kg_store.py
+msgid "the signers file {path} is not UTF-8"
+msgstr "o arquivo de signatários {path} não está em UTF-8"
+
+#: tools/kg_store.py
+msgid "the signers file {path} starts with a BOM: save it as UTF-8 without BOM"
+msgstr "o arquivo de signatários {path} começa com BOM: salve em UTF-8 sem BOM"
+
+#: tools/kg_store.py
+msgid "the tag object of {ref} was cut under another name"
+msgstr "o objeto de tag de {ref} foi cortado com outro nome"
+
+#: tools/kg_store.py
+msgid "the tag pattern {ref!r} has one * only, where the semver version goes"
+msgstr "o padrão de tag {ref!r} tem um * só, onde vai a versão semver"
+
+#: tools/kg_store.py
+msgid "the tag {ref} does not exist"
+msgstr "a tag {ref} não existe"
+
+#: tools/kg_store.py
+msgid "the tags {a} and {b} have the same version: the pattern {ref} does not choose"
+msgstr "as tags {a} e {b} têm a mesma versão: o padrão {ref} não escolhe"
+
+#: tools/kg_store.py
+msgid "this store serves the ref {ref}: it does not write"
+msgstr "este armazém serve a ref {ref}: ele não grava"
+
+#: tools/kg_store.py
+msgid "{ref} does not point to a commit"
+msgstr "{ref} não aponta para um commit"
+
+#: tools/kg_store.py
+msgid "{ref} has no SSH signature (GPG is out of this version)"
+msgstr "{ref} não tem assinatura SSH (a GPG fica fora desta versão)"
+
+#: tools/kg_store.py
+msgid "{ref} is a lightweight tag: only an annotated, signed tag is served"
+msgstr "{ref} é uma tag leve: só a tag anotada e assinada é servida"
+
+#: tools/kg_mcp.py
+msgid "--serve-state only goes with --serve-ref"
+msgstr "--serve-state só vale com --serve-ref"
+
+#: tools/kg_mcp.py
+msgid "--serve-state: the directory {path} is not writable"
+msgstr "--serve-state: o diretório {path} não aceita gravação"
+
+#: tools/kg_mcp.py
+msgid "--serve-state: the state directory must stay outside --root"
+msgstr "--serve-state: o diretório de estado tem de ficar fora de --root"
+
+#: tools/kg_mcp.py
+msgid "required with a tag pattern of --serve-ref: a directory outside the clone and outside --root where the highest version already served is kept; a lower version is never served, also after a restart"
+msgstr "obrigatório com um padrão de tag do --serve-ref: um diretório fora do clone e fora de --root onde fica a maior versão já servida; uma versão menor nunca é servida, também depois de reiniciar"
+
+#: tools/kg_store.py
+msgid "--serve-state only applies with a tag pattern"
+msgstr "--serve-state só vale com um padrão de tag"
+
+#: tools/kg_store.py
+msgid "a tag pattern is served only with --serve-state: without the highest version already served, removing a tag would serve an earlier one"
+msgstr "um padrão de tag só é servido com --serve-state: sem a maior versão já servida, remover uma tag faria servir uma anterior"
+
+#: tools/kg_store.py
+msgid "git {cmd} did not finish within {seconds} s"
+msgstr "o git {cmd} não terminou em {seconds} s"
+
+#: tools/kg_store.py
+msgid "git {cmd} was killed by signal {signal}"
+msgstr "o git {cmd} foi morto pelo sinal {signal}"
+
+#: tools/kg_store.py
+msgid "the clone borrows objects from outside it (objects/info/alternates): clone it without --shared or --reference"
+msgstr "o clone toma objetos de fora dele (objects/info/alternates): clone sem --shared nem --reference"
+
+#: tools/kg_store.py
+msgid "the clone has .git/info/grafts, which rewrites the history outside the signed ref: remove it"
+msgstr "o clone tem .git/info/grafts, que reescreve o histórico por fora da ref assinada: remova-o"
+
+#: tools/kg_store.py
+msgid "the clone is shallow (.git/shallow): the history up to the ref is incomplete, and descent and history are not checked; clone it in full"
+msgstr "o clone é raso (.git/shallow): o histórico até a ref está incompleto, e a descendência e o histórico não se conferem; clone-o inteiro"
+
+#: tools/kg_store.py
+msgid "the highest tag {tag} is below the version already served, {floor}: a higher tag was removed (a rollback is never served)"
+msgstr "a tag mais alta {tag} está abaixo da versão já servida, {floor}: uma tag mais alta foi removida (um rollback nunca é servido)"
+
+#: tools/kg_store.py
+msgid "the serve state {path} cannot be read ({error})"
+msgstr "o estado {path} não pode ser lido ({error})"
+
+#: tools/kg_store.py
+msgid "the serve state {path} cannot be written ({error})"
+msgstr "o estado {path} não pode ser gravado ({error})"
+
+#: tools/kg_store.py
+msgid "the serve state {path} is not a directory"
+msgstr "o estado {path} não é um diretório"
+
+#: tools/kg_store.py
+msgid "the serve state {path} is not valid: fix it or remove it to start a new floor"
+msgstr "o estado {path} não é válido: corrija-o ou remova-o para começar um piso novo"
+
+#: tools/kg_store.py
+msgid "git was not found in the absolute folders of PATH"
+msgstr "o git não foi achado nas pastas absolutas do PATH"
+
+#: tools/kg_store.py
+msgid "ssh-keygen was not found in the absolute folders of PATH: --verify-signers needs it"
+msgstr "o ssh-keygen não foi achado nas pastas absolutas do PATH: o --verify-signers precisa dele"
+
+#: tools/kg_store.py
+msgid "the clone has .git/commondir (a linked worktree): its objects and refs live elsewhere"
+msgstr "o clone tem .git/commondir (uma worktree ligada): os objetos e as refs dele moram em outro lugar"
+
+#: tools/kg_store.py
+msgid "the clone has a symbolic link in .git ({path}): it is refused"
+msgstr "o clone tem um link simbólico em .git ({path}): é recusado"
+
+#: tools/kg_store.py
+msgid "the clone is a partial clone (extensions.partialClone or a promisor remote): a missing object would be fetched by a command of its config; clone it in full"
+msgstr "o clone é um clone parcial (extensions.partialClone ou um remoto promisor): um objeto que falta seria buscado por um comando da config dele; clone-o inteiro"
+
+#: tools/kg_store.py
+msgid "the serve state {path} is writable by the group or by others: chmod go-w"
+msgstr "o estado {path} pode ser gravado pelo grupo ou pelos outros: chmod go-w"
+
+#: tools/kg_store.py
+msgid "the tag {tag} has the version already served, {floor}, but not the tag object that was served ({served}): a tag was moved or cut again"
+msgstr "a tag {tag} tem a versão já servida, {floor}, mas não o objeto de tag que foi servido ({served}): uma tag foi movida ou cortada de novo"
+
+#: tools/kg_store.py
+msgid "git {version} does not honor GIT_NO_LAZY_FETCH, and a partial clone could run a command of its configuration: the served mode needs git {minimum}"
+msgstr "o git {version} não respeita o GIT_NO_LAZY_FETCH, e um clone parcial poderia rodar um comando da config dele: o modo servido pede o git {minimum}"
+
+#: tools/kg_store.py
+msgid "the serve state {path} cannot be locked ({error})"
+msgstr "o estado {path} não pode ser travado ({error})"
+#: tools/kg_validate.py
+msgid "x_ritual goes on a rule or policy node (v4.25): the ritual is a recurring obligation. A run is an evidence node with a TRACES_TO edge to the ritual, and the script or agent that runs it is an artifact the ritual traces to."
+msgstr "x_ritual fica num nó rule ou policy (v4.25): o ritual é uma obrigação recorrente. Uma execução é um nó evidence com uma aresta TRACES_TO para o ritual, e o script ou o agente que o executa é um artifact para o qual o ritual aponta."
+
+#: tools/kg_validate.py
+msgid "Add owner: the role that approves a change to the ritual, never a person's name (v4.25, a node with x_ritual)."
+msgstr "Acrescente owner: o papel que aprova a mudança do ritual, nunca o nome de uma pessoa (v4.25, um nó com x_ritual)."
+
+#: tools/kg_validate.py
+msgid "Give the ritual a cadence the contract judges (v4.25): reverify_every (the longest gap between two runs, such as P1D, which kg_validate.py --due checks) or reverify_on (the CloudEvents type of the triggering event). calendar alone is not enough: it is not judged yet. cadence is not a key."
+msgstr "Dê ao ritual uma cadência que o contrato julga (v4.25): reverify_every (o maior intervalo entre duas execuções, como P1D, que o kg_validate.py --due confere) ou reverify_on (o type CloudEvents do evento que dispara). O calendar sozinho não basta: ainda não é julgado. cadence não é uma chave."
+
+#: tools/kg_validate.py
+msgid "Write the RFC 5545 RRULE value without the RRULE: prefix, in uppercase (v4.25): FREQ first and once, then NAME=VALUE parts separated by ; with no part repeated, never COUNT with UNTIL, values in range, a numbered BYDAY only in MONTHLY or YEARLY (and not with BYWEEKNO), BYWEEKNO only in YEARLY, BYMONTHDAY not in WEEKLY, BYYEARDAY not in DAILY, WEEKLY, or MONTHLY, BYSETPOS only with another BYxxx part, and UNTIL as a date-time in UTC (ending in Z) when dtstart has tz or is in UTC."
+msgstr "Escreva o valor da RRULE da RFC 5545 sem o prefixo RRULE:, em maiúsculas (v4.25): FREQ primeiro e uma vez, depois partes NOME=VALOR separadas por ; sem parte repetida, nunca COUNT com UNTIL, valores na faixa, BYDAY numerado só em MONTHLY ou YEARLY (e não com BYWEEKNO), BYWEEKNO só em YEARLY, BYMONTHDAY não em WEEKLY, BYYEARDAY não em DAILY, WEEKLY nem MONTHLY, BYSETPOS só com outra parte BYxxx, e UNTIL como data e hora em UTC (terminando em Z) quando o dtstart tem tz ou está em UTC."
+
+#: tools/kg_validate.py
+msgid "Write dtstart in the basic RFC 5545 form, in quotes: \"20261116T080000\" (local time, with tz) or \"20261116T110000Z\" (UTC, without tz), a real calendar date and time (v4.25)."
+msgstr "Escreva o dtstart na forma básica da RFC 5545, entre aspas: \"20261116T080000\" (hora local, com tz) ou \"20261116T110000Z\" (UTC, sem tz), com data e hora que existem no calendário (v4.25)."
+
+#: tools/kg_validate.py
+msgid "Write tz as a name of the IANA time zone database, such as America/Sao_Paulo or Etc/UTC (v4.25): parts of up to 14 ASCII letters, digits, ., -, _, or + separated by /, each starting with a letter or _. Only the form is judged."
+msgstr "Escreva o tz como um nome da base de fusos da IANA, como America/Sao_Paulo ou Etc/UTC (v4.25): partes de até 14 caracteres entre letras ASCII, dígitos, ., -, _ ou +, separadas por /, cada uma começando por letra ou _. Só a forma é julgada."
+
+#: tools/kg_validate.py
+msgid "Add tz, the IANA time zone of dtstart, such as America/Sao_Paulo (v4.25): a local time without a time zone floats with the machine that reads it. For UTC, end dtstart in Z."
+msgstr "Acrescente tz, o fuso IANA do dtstart, como America/Sao_Paulo (v4.25): uma hora local sem fuso flutua com a máquina que a lê. Para UTC, termine o dtstart em Z."
+
+#: tools/kg_validate.py
+msgid "Drop tz or the Z of dtstart (v4.25): a UTC time takes no time zone (RFC 5545, §3.2.19)."
+msgstr "Tire o tz ou o Z do dtstart (v4.25): um horário em UTC não leva fuso (RFC 5545, §3.2.19)."
+
+#: tools/kg_validate.py
+msgid "x_ritual is the agent ritual profile, on a rule or policy node (v4.25): purpose (text that is not empty), kind (deterministic or judgment), autonomy (notify or act), and emits (the CloudEvents type of each run, with a reverse-DNS prefix, such as com.example.ritual.briefing.completed) are required; sources and delivery are lists of {channel, ref} and {channel, to}, with channel a slug; promote is on_failure, on_change, or every_run; calendar is {rrule, dtstart, tz}."
+msgstr "x_ritual é o perfil do ritual do agente, num nó rule ou policy (v4.25): purpose (texto não vazio), kind (deterministic ou judgment), autonomy (notify ou act) e emits (o type CloudEvents de cada execução, com prefixo DNS reverso, como com.example.ritual.briefing.completed) são obrigatórios; sources e delivery são listas de {channel, ref} e de {channel, to}, com channel em slug; promote é on_failure, on_change ou every_run; calendar é {rrule, dtstart, tz}."
+
+#: tools/kg_validate.py
+msgid "Add owner: the role that answers for the node, never a person's name."
+msgstr "Acrescente owner: o papel que responde pelo nó, nunca o nome de uma pessoa."
+
+#: tools/kg_rituals.py
+msgid "--grace {value}: give an ISO 8601 duration with time only, such as PT30M or PT1H"
+msgstr "--grace {value}: dê uma duração ISO 8601 só com hora, como PT30M ou PT1H"
+
+#: tools/kg_validate.py
+msgid "--rituals does not combine with --due, --spike, --json, --where, or --corpus"
+msgstr "--rituals não combina com --due, --spike, --json, --where nem --corpus"
+
+#: tools/kg_validate.py
+msgid "--runs and --grace only go with --rituals"
+msgstr "--runs e --grace só vão com --rituals"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --as-of, --runs, and --grace only go with --rituals-overdue"
+msgstr "GATE QUEBRADO  --as-of, --runs e --grace só vão com --rituals-overdue"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --rituals-overdue does not go with --touched (an overdue ritual is not a change)"
+msgstr "GATE QUEBRADO  --rituals-overdue não vai com --touched (um ritual vencido não é uma mudança)"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --rituals-overdue does not go with --update (the check is not part of the baseline)"
+msgstr "GATE QUEBRADO  --rituals-overdue não vai com --update (a conferência não faz parte da base)"
+
+#: tools/kg_rituals.py
+msgid "LATE"
+msgstr "ATRASADO"
+
+#: tools/kg_validate.py
+msgid ""
+"NEUTRAL reference reader of the .kg.yaml: validates graphs against a JSON Schema.\n"
+"\n"
+"It depends only on Python 3, PyYAML, and jsonschema, and on no agent harness. It is also the instrument of the\n"
+"measurement that gave rise to the contract (the \"spike\", options --spike and --json).\n"
+"\n"
+"Layers measured per file:\n"
+"  1. parse     — valid YAML, a single document, the root is a map;\n"
+"  2. schema    — the canonical JSON (dates in ISO, keys as strings) meets the schema;\n"
+"  3. integrity — unique ids, edges with no orphan end, and no node of degree 0 (what JSON Schema cannot reach).\n"
+"\n"
+"Human output: per file, the verdict and the codes, in the SAME vocabulary as the gate (kg_gate.py) and the\n"
+"conformance suite (parse.*, form.*, integrity.*, yaml.*), with the occurrence count:\n"
+"  FAIL <file>   MUST  form.required.node.provenance ×33 · yaml.forbidden-key-on ×7\n"
+"                SHOULD form.required.node.verified_at ×33\n"
+"  PASS <file>   (SHOULD only warns, it does not fail)\n"
+"Without --schema, the contract is the current one and the warnings come from its SHOULD schema. With --schema S, the\n"
+"SHOULD schema is --should-schema, or the sibling S.should.schema.json when it exists, or none.\n"
+"\n"
+"A .kg.json (the same data model in JSON) is read by the JSON parser in the contract profile (RFC 8259 and I-JSON): a\n"
+"*.json file is read as JSON, and '-' follows --stdin-format yaml|json.\n"
+"\n"
+"--corpus DIR enables the check of the external end of external_edges against the graphs under DIR.\n"
+"--due YYYY-MM-DD replaces the verdict with the due report: nodes whose verified_at plus the reverify_every cadence\n"
+"has passed on the date, nodes with a cadence and no stamp, and nodes with only reverify_on. It never changes the\n"
+"verdict: rc is 0, or 2 on broken input. With --format json, the report uses the kg-ssot.due/1 format. Since v4.23,\n"
+"it also lists the disposal deadline of the whole graph (meta.x_dispose_by): the one that came due, the one held by an\n"
+"x_hold in force and, in a graph with x_dispose_by, every node with retain_for as a conflict for the owner to decide,\n"
+"without computing which one prevails. The date opens the disposal procedure; nothing is deleted.\n"
+"--rituals WHEN replaces the verdict with the rhythm report: per owner, each ritual (a node with x_ritual) with an\n"
+"open failure, never run, late (by the cadence or by the calendar), by event only, or on time. WHEN is a date\n"
+"YYYY-MM-DD (the end of the day, in the time zone of each ritual) or an RFC 3339 date-time with an offset. --runs FILE\n"
+"(repeatable) reads the executor's run log (CloudEvents 1.0, one per run), and --grace PT30M gives the executor's\n"
+"slack. The calendar is expanded only with the rituals extra (python-dateutil). It never changes the verdict: rc is 0,\n"
+"or 2 on broken input. With --format json, the report uses the kg-ssot.rituals/1 format.\n"
+"--where adds, per file, one line per occurrence with the node or edge.\n"
+"--spike replaces the human output and the rc with those of the spike; --json OUT ALWAYS writes the frozen spike format.\n"
+"\n"
+"rc: 0 every file passes the MUST · 1 some file fails · 2 broken input (unreadable schema or file, failing git show).\n"
+"\n"
+"Usage:\n"
+"  kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...\n"
+"  kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]\n"
+"  kg_validate.py --due YYYY-MM-DD [--format json] FILE...\n"
+"  kg_validate.py --rituals YYYY-MM-DD|DATE-TIME [--runs FILE]... [--grace PT30M] [--format json] FILE...\n"
+msgstr ""
+"Leitor de referência NEUTRO do .kg.yaml: valida grafos contra um JSON Schema.\n"
+"\n"
+"Depende só de Python 3, PyYAML e jsonschema, e não depende de nenhum harness de agente. Também é o instrumento\n"
+"da medição que deu origem ao contrato (o \"spike\", opções --spike e --json).\n"
+"\n"
+"Camadas medidas por arquivo:\n"
+"  1. parse     — YAML válido, um documento só, raiz é mapa;\n"
+"  2. schema    — o JSON canônico (datas em ISO, chaves em string) cumpre o schema;\n"
+"  3. integrity — ids únicos, arestas sem ponta órfã e nenhum nó de grau 0 (o que JSON Schema não alcança).\n"
+"\n"
+"Saída humana: por arquivo, o veredito e os códigos com o MESMO vocabulário do gate (kg_gate.py) e da suíte\n"
+"(parse.*, form.*, integrity.*, yaml.*), com a contagem de ocorrências:\n"
+"  REPROVA <arquivo>   MUST  form.required.node.provenance ×33 · yaml.forbidden-key-on ×7\n"
+"                      SHOULD form.required.node.verified_at ×33\n"
+"  PASSA   <arquivo>   (SHOULD só avisa, não reprova)\n"
+"Sem --schema, o contrato é o vigente e os avisos são do SHOULD dele. Com --schema S, o SHOULD é --should-schema,\n"
+"ou o vizinho S.should.schema.json quando existe, ou nenhum.\n"
+"\n"
+"O .kg.json (o mesmo modelo de dados em JSON) é lido pelo parser JSON no perfil do contrato (RFC 8259 e I-JSON): um\n"
+"arquivo *.json é lido como JSON, e '-' segue --stdin-format yaml|json.\n"
+"\n"
+"--corpus DIR liga a conferência da ponta externa das external_edges contra os grafos sob DIR.\n"
+"--due AAAA-MM-DD troca o veredito pelo relatório de vencimento: o nó cujo verified_at somado à cadência\n"
+"reverify_every já passou na data, o que tem cadência e não tem carimbo, e o que só tem reverify_on. Nunca muda o\n"
+"veredito: o rc é 0, ou 2 com entrada quebrada. Com --format json, o relatório sai no formato kg-ssot.due/1. Desde o\n"
+"v4.23, lista também o prazo de expurgo do grafo inteiro (meta.x_dispose_by): o vencido, o suspenso por um x_hold\n"
+"vigente e, num grafo com x_dispose_by, todo nó com retain_for como conflito a decidir pelo dono, sem calcular qual\n"
+"prevalece. A data abre o procedimento de descarte; nada é apagado.\n"
+"--rituals QUANDO troca o veredito pelo relatório do ritmo: por dono, cada ritual (o nó com x_ritual) com falha aberta,\n"
+"nunca executado, atrasado (pela cadência ou pelo calendário), só por evento ou em dia. QUANDO é uma data AAAA-MM-DD (o\n"
+"fim do dia, no fuso de cada ritual) ou um instante RFC 3339 com fuso. --runs ARQ (repetível) lê o registro de\n"
+"execuções do executor (CloudEvents 1.0, um por execução), e --grace PT30M dá a folga do executor. O calendário só se\n"
+"expande com o extra rituals (python-dateutil). Nunca muda o veredito: o rc é 0, ou 2 com entrada quebrada. Com\n"
+"--format json, o relatório sai no formato kg-ssot.rituals/1.\n"
+"--where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta.\n"
+"--spike troca a saída humana e o rc pelos do spike; --json OUT grava SEMPRE o formato do spike, congelado.\n"
+"\n"
+"rc: 0 todo arquivo passa no MUST · 1 algum reprova · 2 entrada quebrada (schema ou arquivo ilegível, git show que falha).\n"
+"\n"
+"Uso:\n"
+"  kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...\n"
+"  kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]\n"
+"  kg_validate.py --due AAAA-MM-DD [--format json] FILE...\n"
+"  kg_validate.py --rituals AAAA-MM-DD|INSTANTE [--runs ARQ]... [--grace PT30M] [--format json] ARQ...\n"
+
+#: tools/kg_rituals.py
+msgid "NEVER RUN"
+msgstr "NUNCA EXECUTADO"
+
+#: tools/kg_rituals.py
+msgid "ON TIME"
+msgstr "EM DIA"
+
+#: tools/kg_rituals.py
+msgid "OPEN FAILURE"
+msgstr "FALHA ABERTA"
+
+#: tools/kg_rituals.py
+msgid "UNREADABLE {file}: {error}"
+msgstr "NÃO LIDO {file}: {error}"
+
+#: tools/kg_validate.py
+msgid "WHEN"
+msgstr "QUANDO"
+
+#: tools/kg_rituals.py
+msgid "an evidence node that traces to the ritual has no time and no verified_at"
+msgstr "um nó evidence que aponta o ritual não tem instante nem verified_at"
+
+#: tools/kg_rituals.py
+msgid "calendar: {missed} run(s) missed since {since}"
+msgstr "calendário: {missed} execução(ões) perdida(s) desde {since}"
+
+#: tools/kg_rituals.py
+msgid "every {every}, due on {due_on}, {days} day(s) late"
+msgstr "a cada {every}, venceu em {due_on}, {days} dia(s) de atraso"
+
+#: tools/kg_rituals.py
+msgid "failed at {when} ({ref}), no run passed after it"
+msgstr "falhou em {when} ({ref}), e nenhuma execução passou depois"
+
+#: tools/kg_gate.py
+msgid "fails (rc 1) when a ritual (a node with x_ritual) is overdue, by the cadence or by the calendar. Off by default: the clock makes the same commit pass today and fail tomorrow, so it stays out of the verdict and the baseline"
+msgstr "reprova (rc 1) quando um ritual (um nó com x_ritual) passou do prazo, pela cadência ou pelo calendário. Desligado por padrão: o relógio faz o mesmo commit passar hoje e reprovar amanhã, por isso fica fora do veredito e da base"
+
+#: tools/kg_rituals.py
+msgid "last pass {when}"
+msgstr "última que passou {when}"
+
+#: tools/kg_rituals.py
+msgid "next {when}"
+msgstr "próxima {when}"
+
+#: tools/kg_rituals.py
+msgid "no owner (add owner: the role that approves a change to the ritual)"
+msgstr "sem dono (acrescente owner: o papel que aprova a mudança do ritual)"
+
+#: tools/kg_rituals.py
+msgid "on the event {event}"
+msgstr "no evento {event}"
+
+#: tools/kg_gate.py
+msgid "only with --rituals-overdue: the date YYYY-MM-DD or RFC 3339 date-time to measure at (default: now, from the machine clock)"
+msgstr "só com --rituals-overdue: a data AAAA-MM-DD ou o instante RFC 3339 em que medir (padrão: agora, pelo relógio da máquina)"
+
+#: tools/kg_gate.py
+msgid "only with --rituals-overdue: the executor's run log, CloudEvents 1.0; repeatable"
+msgstr "só com --rituals-overdue: o registro de execuções do executor, CloudEvents 1.0; repetível"
+
+#: tools/kg_gate.py
+msgid "only with --rituals-overdue: the executor's slack, an ISO 8601 duration with time only"
+msgstr "só com --rituals-overdue: a folga do executor, uma duração ISO 8601 só com hora"
+
+#: tools/kg_rituals.py
+msgid "owner {owner}"
+msgstr "dono {owner}"
+
+#: tools/kg_rituals.py
+msgid "the calendar is out of form (see the SHOULD warning), so it was not expanded"
+msgstr "o calendário está fora da forma (veja o aviso SHOULD), por isso não foi expandido"
+
+#: tools/kg_rituals.py
+msgid "the calendar was not expanded: install the rituals extra (python-dateutil)"
+msgstr "o calendário não foi expandido: instale o extra rituals (python-dateutil)"
+
+#: tools/kg_validate.py
+msgid "the rhythm report at WHEN (a date YYYY-MM-DD or an RFC 3339 date-time), instead of the verdict"
+msgstr "o relatório do ritmo em QUANDO (uma data AAAA-MM-DD ou um instante RFC 3339), no lugar do veredito"
+
+#: tools/kg_rituals.py
+msgid "this machine does not know the time zone, so the calendar was not expanded"
+msgstr "esta máquina não conhece o fuso, por isso o calendário não foi expandido"
+
+#: tools/kg_validate.py
+msgid "with --rituals: the executor's run log, CloudEvents 1.0 (JSON Lines, an object, or an array); repeatable"
+msgstr "com --rituals: o registro de execuções do executor, CloudEvents 1.0 (JSON Lines, um objeto ou um array); repetível"
+
+#: tools/kg_validate.py
+msgid "with --rituals: the executor's slack, an ISO 8601 duration with time only"
+msgstr "com --rituals: a folga do executor, uma duração ISO 8601 só com hora"
+
+#: tools/kg_rituals.py
+msgid "{path}: unreadable run log ({error})"
+msgstr "{path}: registro de execuções ilegível ({error})"
+
+#: tools/kg_rituals.py
+msgid "{path}: {size} bytes, above the 64 MiB cap; split the run log"
+msgstr "{path}: {size} bytes, acima do teto de 64 MiB; divida o registro"
+
+#: tools/kg_rituals.py
+msgid "{value}: give a date YYYY-MM-DD or an RFC 3339 date-time with an offset, such as 2026-11-17T10:30:00-03:00"
+msgstr "{value}: dê uma data AAAA-MM-DD ou um instante RFC 3339 com fuso, como 2026-11-17T10:30:00-03:00"
+
+#: tools/kg_rituals.py
+msgid "{value}: the date is YYYY-MM-DD"
+msgstr "{value}: a data é AAAA-MM-DD"
+
+#: tools/kg_rituals.py
+msgid "· no run log (--runs): the last run is the verified_at of the graph, with day precision; an hourly ritual is only measured with the log"
+msgstr "· sem registro de execuções (--runs): a última execução é o verified_at do grafo, com precisão de dia; o ritual de hora em hora só se mede com o registro"
+
+#: tools/kg_rituals.py
+msgid "· on {as_of}: {failing} with an open failure, {never} never run, {late} late, {event} by event, {ok} on time; the report does not change the verdict"
+msgstr "· em {as_of}: {failing} com falha aberta, {never} nunca executado(s), {late} atrasado(s), {event} por evento, {ok} em dia; o relatório não muda o veredito"
+
+#: tools/kg_gate.py
+msgid "· rituals at {when}: {late} overdue of {total}"
+msgstr "· rituais em {when}: {late} vencido(s) de {total}"
+
+#: tools/kg_rituals.py
+msgid "· run log: {events} event(s) read, {ignored} ignored"
+msgstr "· registro de execuções: {events} evento(s) lido(s), {ignored} ignorado(s)"
+
+#: tools/kg_rituals.py
+msgid "· the calendars were not expanded: without the rituals extra (python-dateutil), lateness is measured by the cadence only, per day"
+msgstr "· os calendários não foram expandidos: sem o extra rituals (python-dateutil), o atraso é medido só pela cadência, por dia"
+
+#: tools/kg_gate.py
+msgid "✗ ritual overdue: {file} {id} (owner {owner})"
+msgstr "✗ ritual vencido: {file} {id} (dono {owner})"
+
+#: tools/kg_rituals.py
+msgid "--grace {value}: the slack goes past the start of the calendar"
+msgstr "--grace {value}: a folga passa do começo do calendário"
+
+#: tools/kg_rituals.py
+msgid "--grace {value}: the slack is too large"
+msgstr "--grace {value}: a folga é grande demais"
+
+#: tools/kg_rituals.py
+msgid "the calendar has no more occurrences (COUNT or UNTIL reached)"
+msgstr "o calendário não tem mais ocorrências (o COUNT ou o UNTIL chegou)"
