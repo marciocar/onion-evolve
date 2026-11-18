@@ -2,7 +2,7 @@
 branch: fix/hookspath-auto-revert-1118
 pr: pendente
 date: 2026-11-18
-reviewed_diff_sha256: a736e963fd288b80fedb23362f90bb08fb5fa3b42ad568dae980135a13e6e232
+reviewed_diff_sha256: de04c59b48ac5a0915c25dc9b9963fd2b109eb348f9f1d6db34134b98fc34dcd
 reviewed_code_sha256: 145edd58728418a18b07e80659363923891d46ca3257c36da7c3b87ce784d421
 findings_total: 5
 findings_real: 3
