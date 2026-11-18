@@ -438,7 +438,11 @@ def untouched_since_rule(item, study_dir):
     Mudar é diferir de TODOS os pais. Medido no PR #339 da curadoria: o update nasce num commit sem os estudos e um merge
     junta a main; esse merge difere do pai do update em 989 arquivos dos estudos sem ter mexido em nenhum, e por isso a
     alternativa "o último commit da pasta é ancestral do arrival" foi descartada (ali o arrival não tem os estudos, e ela
-    reprovaria todos). A régua fora da história, ou a história rasa, não tolera: cobra, e diz por quê."""
+    reprovaria todos). A régua fora da história, ou a história rasa, não tolera: cobra, e diz por quê.
+    LIMITES DECLARADOS (2ª revisão, 2026-11-18): (1) a prova do relógio confia na data de commit, então um estudo
+    novo criado num ramo bifurcado antes da régua com GIT_COMMITTER_DATE antedatado escapa POR DESENHO — a régua é
+    conformidade, não fronteira (quem forja a data também pode editar o checador); (2) a mudança FEITA e datada antes
+    da régua, num ramo mergeado depois, recebe aviso de propósito: quem a fez não conhecia a régua, e é o caso do #339."""
     del CATRACA_WHY[:]
     arrival = rule_arrival(item)
     if git("rev-parse", "--is-shallow-repository")[1].strip() == "true":
