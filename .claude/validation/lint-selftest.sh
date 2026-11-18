@@ -26828,19 +26828,19 @@ STUB
     record_fail "pr-merge-verified: ${lbl}" "rc=${rc} merge=$(head -c 60 "${d}/merge-args") out=$(tail -3 <<< "${o}" | tr '\n' '|' | cut -c1-300)"
   }
   # PARTE 1: PR de guarda do core pela sessão do core
-  CR_FILES=".claude/hooks/lib/moat-judge.py docs/evolution/review/feat-x.md" \
+  CR_FILES=".claude/hooks/pretooluse-merge-gate.sh docs/evolution/review/feat-x.md" \
     _crs "(gs1) PR de GUARDA + resíduo com elenxo_isolado: true ⇒ a sessão mergeia sem --maestro" 0 "PR de GUARDA pela sessão" "${fc}" "${_pi}"
-  CR_FILES=".claude/hooks/lib/moat-judge.py docs/evolution/review/feat-x.md" \
+  CR_FILES=".claude/hooks/pretooluse-merge-gate.sh docs/evolution/review/feat-x.md" \
   CR_RESIDUE="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_cr_h1118}")" \
     _crs "(gs2) PR de GUARDA + resíduo SEM elenxo_isolado ⇒ recusa e diz o que falta" 1 "não declara elenxo_isolado: true" "${fc}" "${_pi}"
-  CR_FILES=".claude/hooks/lib/moat-judge.py a.txt" \
+  CR_FILES=".claude/hooks/pretooluse-merge-gate.sh a.txt" \
     _crs "(gs3) PR de GUARDA sem resíduo nenhum ⇒ recusa (o merge segue do maestro)" 1 "toca GUARDA" "${fc}" "${_pi}"
   CR_FILES="a.txt" CR_RESIDUE="" _crs "(gs4) PR que não toca guarda ⇒ como antes, sem exigir resíduo" 0 "catraca do repo próprio" "${fc}" "${_pi}"
   # MUTANTE: sem a exigência do resíduo, o PR de guarda do gs2 mergearia
   sed 's/^  _isolated_residue_ok "\${_PMV_CORE_SLUG}" /  _IR_REL=x _IR_V=x _IR_H=x; : _isolated_residue_ok "${_PMV_CORE_SLUG}" /' "${_pi}" > "${fc}/ops/pmv-mut.sh"
   if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (gs-MUT)" "a âncora da exigência do resíduo sumiu"
   else
-    CR_FILES=".claude/hooks/lib/moat-judge.py docs/evolution/review/feat-x.md" \
+    CR_FILES=".claude/hooks/pretooluse-merge-gate.sh docs/evolution/review/feat-x.md" \
     CR_RESIDUE="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_cr_h1118}")" \
       _crs "(gs-MUT) sem a exigência do resíduo isolado, o PR de guarda do gs2 mergearia — a exigência é a causa" 0 "catraca do repo próprio" "${fc}" "${fc}/ops/pmv-mut.sh"
   fi
@@ -26899,6 +26899,20 @@ STUB
     _crs "(m1) PR que toca o members.yaml com resíduo isolado ⇒ recusa (a catraca não se muda sozinha)" 1 "a própria catraca" "${fc}" "${_pi}"
   CR_FILES="ops/pr-merge-verified.sh docs/evolution/review/feat-x.md" \
     _crs "(m1b) PR que toca o ops/pr-merge-verified.sh com resíduo isolado ⇒ recusa" 1 "a própria catraca" "${fc}" "${_pi}"
+  CR_FILES=".claude/hooks/lib/moat-judge.py docs/evolution/review/feat-x.md" \
+    _crs "(m1c) PR que toca o moat-judge.py (o veto de que A1/A2 dependem) com resíduo isolado ⇒ recusa" 1 "a própria catraca" "${fc}" "${_pi}"
+  CR_FILES=".claude/settings.json docs/evolution/review/feat-x.md" \
+    _crs "(m1d) PR que toca o settings.json (o registro do hook) com resíduo isolado ⇒ recusa" 1 "a própria catraca" "${fc}" "${_pi}"
+  CR_FILES=".claude/hooks/lib/moat-judge.py docs/evolution/review/feat-x.md" \
+    _crm "(m1c-MUT) com a lista sem o hook e o juiz, o PR que tira o veto mergearia" \
+    's/|\\.claude\/hooks\/pretooluse-moat-gate\\.sh|\\.claude\/hooks\/lib\/moat-judge\\.py|\\.claude\/hooks\/lib\/invocation-lines\\.sh|\\.claude\/settings(\\.local)?\\.json//' "${_pi}" 0 "PR de GUARDA pela sessão" "${fc}"
+  # A2, 3º critério: o checkout da sessão com origin = o core honra a variável (as cópias de bancada rodam sob ela)
+  git init -q "${d}/s-core2"; git -C "${d}/s-core2" remote add origin https://github.com/marciocar/onion-evolve.git
+  sed 's#^_PMV_CORE_CONST=onion-bancada/core$#_PMV_CORE_CONST=marciocar/onion-evolve#' "${_pi}" > "${fc}/ops/pmv-real.sh"
+  CR_PREFIX="ONION_PR_MERGE_VERIFIED_TEST=1" _crs "(a2c) sessão cujo checkout tem origin = core, com a variável, no script de constante real ⇒ a variável vale (modo de bancada)" 0 "merged" "${d}/s-core2" "${fc}/ops/pmv-real.sh" --repo cliente/repo
+  CR_PREFIX="ONION_PR_MERGE_VERIFIED_TEST=1" _crm "(a2c-MUT) sem o 3º critério, a variável é ignorada e a catraca recusa" \
+    's/^     || { \[ -n "\${_SESSION_CWD}" \] \&\& \[ "\$(_slug_norm/     || { false \&\& [ "$(_slug_norm/' "${fc}/ops/pmv-real.sh" 1 "TEST ignorada" "${d}/s-core2" --repo cliente/repo
+  rm -f "${fc}/ops/pmv-real.sh"
   CR_FILES="docs/evolution/federation/members.yaml docs/evolution/review/feat-x.md" \
     _crm "(m1-MUT) sem a recusa da catraca, o members.yaml com resíduo mergearia" 's/^  \[ -z "\${_cat}" \] || die/  true || die/' "${_pi}" 0 "PR de GUARDA pela sessão" "${fc}"
   # B1: esquema em maiúsculas não vira dono "https:"
