@@ -108,7 +108,8 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   modo desta casa.
   Depois da revisão separada (REJECTED do cf2729c53): `--maestro` e `ONION_PR_MERGE_VERIFIED_TEST` só valem na sessão
   do core, cujo hook os veta; sem `--repo` o gh recebe `GH_REPO` do alvo julgado e alvo ambíguo recusa; e o PR que toca
-  `members.yaml`, `ops/pr-merge-verified.sh` ou `ops/moat-targets.tsv` (a própria catraca) segue do maestro. **Tetos
+  `members.yaml`, `ops/pr-merge-verified.sh`, `ops/moat-targets.tsv` ou o veto de que a catraca depende (o
+  `pretooluse-moat-gate.sh`, o `lib/moat-judge.py`, o `lib/invocation-lines.sh` e os `settings*.json`) segue do maestro. **Tetos
   declarados:** host GitHub Enterprise (o slug não carrega o host), chave do `members.yaml` entre aspas, processo
   desligado da árvore (`setsid`/`nohup` com o pai morto perde o ancestral Claude), Claude instalado por npm (o
   executável não casa `*/claude/versions/*` nem `*/bin/claude`) e sessão que reaponta o próprio origin para o core.

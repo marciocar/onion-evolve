@@ -575,7 +575,10 @@ _guard_pr_gate() {
   [ -z "${_g}" ] && return 0
   # (M1 da revisão de 2026-11-18) os três arquivos que SÃO a catraca: com o resíduo auto-atestado a sessão poderia se dar
   # `owner_session:` num repo de cliente sob o dono do core, ou abrir o script. PR que toca qualquer um segue do maestro.
-  local _cat; _cat="$(grep -xE 'docs/evolution/federation/members\.yaml|ops/pr-merge-verified\.sh|ops/moat-targets\.tsv' <<< "${_PR_FILES}" | head -3 | tr '\n' ' ')"
+  # (2ª revisão, 2026-11-18) e o que a catraca PRESSUPÕE: o veto do hook do core ao --maestro e à variável de bancada
+  # (A1/A2 se apoiam nele). O hook, o juiz e o tokenizador que ele carrega, e o settings que o registra (o local também:
+  # pode desligar hooks). Sem eles na lista, um PR de guarda tirava o veto e o seguinte atravessava a catraca.
+  local _cat; _cat="$(grep -xE 'docs/evolution/federation/members\.yaml|ops/pr-merge-verified\.sh|ops/moat-targets\.tsv|\.claude/hooks/pretooluse-moat-gate\.sh|\.claude/hooks/lib/moat-judge\.py|\.claude/hooks/lib/invocation-lines\.sh|\.claude/settings(\.local)?\.json' <<< "${_PR_FILES}" | head -3 | tr '\n' ' ')"
   [ -z "${_cat}" ] || die "o PR #${PR} toca GUARDA e a própria catraca (${_cat% }): esse merge segue do maestro mesmo com resíduo isolado (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118). Peça: ! bash ops/pr-merge-verified.sh ${PR} --maestro. Nada foi feito."
   _isolated_residue_ok "${_PMV_CORE_SLUG}" "o PR #${PR} toca GUARDA (${_g% }): a sessão o mergeia só com o resíduo da branch declarando refutador independente (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118); sem ele, o merge é do maestro (! bash ops/pr-merge-verified.sh ${PR} --maestro)"
   say "✓ PR de GUARDA pela sessão: resíduo ${_IR_REL} com refutador independente (elenxo_isolado: true), verdict ${_IR_V}, diff ${_IR_H:0:12} (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)"
