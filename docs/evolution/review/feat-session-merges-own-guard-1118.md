@@ -2,8 +2,7 @@
 branch: feat/session-merges-own-guard-1118
 pr: pendente
 date: 2026-11-18
-reviewed_diff_sha256: 9829f8c3f43ee0da0cfb236b9c6134be3f27d181b56d212abd9b6c1759917716
-reviewed_code_sha256: dac3f735a8af850e57f7c684c4ddcbad607b212c73cfae8a4ff2f9b902f6e5b4
+reviewed_diff_sha256: pendente
 findings_total: 9
 findings_real: 7
 findings_blocking: 4
@@ -36,7 +35,7 @@ inclusive os de guarda, e a liberdade vale só no repo próprio, numa catraca de
 ## As passadas
 
 - **1ª (REJECTED):** A1, A2 e A3 (contornos da catraca fora do core, todos medidos por sonda) e M1 (a sessão
-  mergearia a própria catraca, medido por leitura: `marciocar/brain-dufrio` é origin de uma consultoria). B1, B2 e B3
+  mergearia a própria catraca, medido por leitura: há um repo de cliente sob o dono do core). B1, B2 e B3
   baixos.
 - **2ª (REJECTED):** A1, A2, A3 e B1 curados e medidos por sonda; o M1 não incluía o hook do veto, de que A1 e A2
   dependem (caminho em dois PRs, por leitura).
