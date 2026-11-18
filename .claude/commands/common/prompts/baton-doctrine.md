@@ -62,7 +62,7 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    script confere as condições do selo e recusa sozinho. Recusou, a batuta não procura outra forma: leva ao maestro
    o motivo que o script imprimiu. O push de porta segue com ele (`D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113`).
    **Desde 2026-11-18 (`D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118`) cada sessão merja o PRÓPRIO PR, inclusive o de
-   guarda,** pelo `ops/pr-merge-verified.sh` sem `--maestro` quando o resíduo da branch declara `elenxo_isolado: true`
+   guarda,** pelo merge verificado do core sem `--maestro` quando o resíduo da branch declara `elenxo_isolado: true`
    e verdict aceito, só no repo dela e só se ele está na lista fechada (o core e os membros com `owner_session:`, dono
    da família); repo de cliente ou de empresa segue só do maestro, e deploy, produção, firewall, segredo e publicação
    externa também.
