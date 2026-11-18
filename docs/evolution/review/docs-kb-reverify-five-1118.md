@@ -2,7 +2,8 @@
 branch: docs/kb-reverify-five-1118
 pr: pendente
 date: 2026-11-18
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 42402b9010f619f31cccfc5e7c2a02389e2ff2e70b7f76a45c8e2f22b6a651be
+reviewed_code_sha256: f342468fb79dc96f4b2bce4cec43b9addbf7edfa48680f451ff31820c42a5b3c
 findings_total: 6
 findings_real: 6
 findings_blocking: 0
