@@ -2,7 +2,8 @@
 branch: fix/dissect-synthesis-ratchet-1118
 pr: pendente
 date: 2026-11-18
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9607d999aa874342a2a73c2e5923435d57ccb4ac1cafba501e96370c11b7d568
+reviewed_code_sha256: e8512da9bc56464d1fb71d99f0dd25fc2eb4ebc79d023dea61a7c2c62308e5b1
 findings_total: 9
 findings_real: 6
 findings_blocking: 1
