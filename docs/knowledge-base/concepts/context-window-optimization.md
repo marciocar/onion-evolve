@@ -49,10 +49,10 @@ Lineup atual do Claude no Claude Code — use estes modelos; não há modelos Op
 
 | Modelo | Papel típico em orquestração | Context Window | ~Linhas de Código |
 |--------|-----------------------|----------------|-------------------|
-| tier `fable` (hoje **Fable 5.2**) | Orquestração de raciocínio profundo | 1M tokens | ~400K linhas |
-| tier `opus` (hoje **Opus 5.5**) | Orquestrador (planeja, sintetiza, decide) | 1M tokens | ~400K linhas |
-| tier `sonnet` (hoje **Sonnet 5.5**) | Worker de uso geral (implementação, análise) | 1M tokens | ~400K linhas |
-| tier `haiku` (hoje **Haiku 5.5**) | Worker barato/rápido (classificação, extração, filtro) | 1M tokens | ~400K linhas |
+| tier `fable` (hoje **Fable 5.2**) | Orquestração de raciocínio profundo | 1M tokens | ~60–100K linhas |
+| tier `opus` (hoje **Opus 5.5**) | Orquestrador (planeja, sintetiza, decide) | 1M tokens | ~60–100K linhas |
+| tier `sonnet` (hoje **Sonnet 5.5**) | Worker de uso geral (implementação, análise) | 1M tokens | ~60–100K linhas |
+| tier `haiku` (hoje **Haiku 5.5**) | Worker barato/rápido (classificação, extração, filtro) | 1M tokens | ~60–100K linhas |
 
 > **Reverificado em 2026-11-18** no [overview de modelos](https://platform.claude.com/docs/en/models/overview): os quatro modelos vigentes têm **1M de contexto e 128K de saída**. A versão anterior desta tabela dava 200K ao `haiku` e 200K–1M ao `sonnet`, o que não vale mais. O Haiku 5.5 cobra mais caro acima de 100K tokens de prompt ($0,50/$2,50 em vez de $0,10/$0,50 por MTok, CHANGELOG do Claude Code 2.1.293), o que pesa no tiering de workers com contexto grande.
 
@@ -248,7 +248,7 @@ Para o mecanismo concreto de cache de prompt entre chamadas e entre subagentes, 
 | Arquivo sendo editado | Baixa (muda por turno) | ❌ Não — fica fora do prefixo cacheado |
 | Erros/saída recentes | Baixa | ❌ Não |
 
-**Números do mecanismo (reverificados 2026-11-18 na [doc de prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)):** o cache vive **5 minutos** por default e se renova sem custo a cada uso; há TTL de **1 hora** a custo maior. A escrita custa **1,25×** o input base (TTL de 5 min) ou **2×** (TTL de 1 h); a leitura custa **0,1×** no padrão, **0,05×** no Opus 5.5 e no Sonnet 5.5 e **0,025×** no Fable/Mythos 5.1 e 5.2. No Claude Code, o agente de workflow fica fora do balde de TTL da conversa principal e o cache dele dura 5 min por default, inclusive em assinatura; `subagentPromptCacheTtl: "1h"` estende ([doc de workflows](https://code.claude.com/docs/en/workflows), §Prompt caching in a fan-out).
+**Números do mecanismo (reverificados 2026-11-18 na [doc de prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)):** o cache vive **5 minutos** por default e se renova sem custo a cada uso; há TTL de **1 hora** a custo maior. A escrita custa **1,25×** o input base (TTL de 5 min) ou **2×** (TTL de 1 h); a leitura custa **0,1×** no padrão, **0,05×** no Opus 5.5 e no Sonnet 5.5 (fontes divergem no Sonnet 5.5: a doc de caching diz 0,05×, o CHANGELOG 2.1.284 diz $0,20/Mtok, 0,1× de $2; a KB segue a doc de caching) e **0,025×** no Fable/Mythos 5.1 e 5.2. No Claude Code, o agente de workflow fica fora do balde de TTL da conversa principal e o cache dele dura 5 min por default, inclusive em assinatura; `subagentPromptCacheTtl: "1h"` estende ([doc de workflows](https://code.claude.com/docs/en/workflows), §Prompt caching in a fan-out).
 
 **Regra de ouro:** ordene o contexto do **mais estável para o mais volátil**. O cache cobre apenas o prefixo comum; qualquer mudança no início invalida o que vem depois. System prompt e blocos compartilhados primeiro, conteúdo volátil (arquivo atual, tarefa, erros) por último.
 
