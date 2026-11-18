@@ -2,7 +2,8 @@
 branch: feat/session-merges-own-guard-1118
 pr: pendente
 date: 2026-11-18
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 21ebc9eb5ba3c677f944245b1127e821e14fd800b6a30ed4e29e781cff8c7e74
+reviewed_code_sha256: 1ad9aaba2e569758ea348f30f5155e6e4907eb19c88cc7a23d11e8572f09e95f
 findings_total: 9
 findings_real: 7
 findings_blocking: 4
