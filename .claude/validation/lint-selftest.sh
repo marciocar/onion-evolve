@@ -10170,37 +10170,84 @@ run_hookspath_reminder_selftests() {
         ONION_CURRENCY_STATE_DIR="${d}/state" CLAUDE_PROJECT_DIR="${dir}" "$@" bash "${sut}" 2>/dev/null)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
-  local r
+  local r v
+  _v() { git -C "${d}/repo" config --local --get core.hooksPath 2>/dev/null; }
+  # (a) a forma EXATA que o Claude Code grava ⇒ REVERTE para o relativo e diz de onde, para onde e a causa
   git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
+  r="$(_hp "${d}/repo" s1 "")"; v="$(_v)"
+  case "${r}" in "0|"*"REVERTIDO de '${d}/repo/.githooks' para '.githooks'"*"Claude Code grava o caminho absoluto"*)
+      [ "${v}" = ".githooks" ] && record_pass "hookspath-reminder: (a) absoluto do mesmo repo ⇒ reverte para .githooks e diz de onde/para onde/causa, rc=0" \
+        || record_fail "hookspath-reminder: (a) reversão" "disse que reverteu, mas o valor ficou '${v}'" ;;
+    *) record_fail "hookspath-reminder: (a) absoluto reverte" "veio: ${r:0:200} | valor: ${v}" ;; esac
   r="$(_hp "${d}/repo" s1 "")"
-  case "${r}" in "0|"*"core.hooksPath está ABSOLUTO"*"git config core.hooksPath .githooks"*) record_pass "hookspath-reminder: (a) absoluto ⇒ lembrete com o conserto, rc=0" ;;
-    *) record_fail "hookspath-reminder: (a) absoluto avisa" "veio: ${r:0:200}" ;; esac
-  r="$(_hp "${d}/repo" s1 "")"
-  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (a2) 2ª vez na mesma (sessão, valor) ⇒ cala" \
-    || record_fail "hookspath-reminder: (a2) dedupe" "veio: ${r:0:200}"
-  r="$(_hp "${d}/wt" s2 "")"
-  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (a3) sessão numa worktree ligada ⇒ avisa (lê o .git/config comum)" ;;
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (a2) depois da reversão (relativo) ⇒ cala" \
+    || record_fail "hookspath-reminder: (a2) pós-reversão" "veio: ${r:0:200}"
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
+  r="$(_hp "${d}/wt" s2 "")"; v="$(_v)"
+  case "${r}" in "0|"*"REVERTIDO"*) [ "${v}" = ".githooks" ] && record_pass "hookspath-reminder: (a3) sessão numa worktree ligada ⇒ reverte o .git/config comum" \
+      || record_fail "hookspath-reminder: (a3) worktree" "valor ficou '${v}'" ;;
     *) record_fail "hookspath-reminder: (a3) worktree" "veio: ${r:0:200}" ;; esac
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
   r="$(_hp "${d}/repo" s3 "" ONION_CURRENCY_CENSUS="${d}/nao-existe.sh")"
-  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (a4) sem o censo ⇒ o lembrete sai mesmo assim" ;;
+  case "${r}" in "0|"*"REVERTIDO"*) record_pass "hookspath-reminder: (a4) sem o censo ⇒ a reversão acontece mesmo assim" ;;
     *) record_fail "hookspath-reminder: (a4) sem censo" "veio: ${r:0:200}" ;; esac
+  # (a5) o modo do PostToolUse(Agent): só a função, em JSON com additionalContext, e reverte
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
+  r="$(printf '{"session_id":"s3b","hook_event_name":"PostToolUse","tool_name":"Agent"}' \
+    | env -u CLAUDE_CODE_SESSION_ID LC_ALL=C GIT_CEILING_DIRECTORIES="${d}" ONION_CURRENCY_CENSUS="${d}/census-ok.sh" \
+      HOME="${d}" GIT_CONFIG_GLOBAL="${d}/gcfg" GIT_CONFIG_NOSYSTEM=1 ONION_CURRENCY_STATE_DIR="${d}/state" \
+      CLAUDE_PROJECT_DIR="${d}/repo" bash "${hk}" --hookspath-only 2>/dev/null; printf '|%s' "$?")"; v="$(_v)"
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "hookspath-reminder: (a5) python3 ausente → JSON não conferido"
+  elif [ "${v}" = ".githooks" ] && printf '%s' "${r}" | python3 -c 'import json,sys;s=sys.stdin.read();b,rc=s.rsplit("|",1);o=json.loads(b);assert rc=="0" and o["hookSpecificOutput"]["hookEventName"]=="PostToolUse" and "REVERTIDO" in o["hookSpecificOutput"]["additionalContext"]' 2>/dev/null; then
+    record_pass "hookspath-reminder: (a5) --hookspath-only (PostToolUse Agent) ⇒ reverte e responde JSON válido, rc=0"
+  else record_fail "hookspath-reminder: (a5) --hookspath-only" "veio: ${r:0:200} | valor: ${v}"; fi
+  # (a6) git config FALHA (lock do config já tomado) ⇒ o aviso ANTIGO volta, nada muda, rc=0
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
+  : > "${d}/repo/.git/config.lock"
+  r="$(_hp "${d}/repo" s3c "")"; v="$(_v)"
+  rm -f "${d}/repo/.git/config.lock"
+  case "${r}" in "0|"*"core.hooksPath está ABSOLUTO"*"git config core.hooksPath .githooks"*)
+      case "${r}" in *REVERTIDO*) record_fail "hookspath-reminder: (a6) git config falhando" "disse que reverteu: ${r:0:200}" ;;
+        *) [ "${v}" = "${d}/repo/.githooks" ] && record_pass "hookspath-reminder: (a6) git config falhando ⇒ aviso antigo, valor intocado, rc=0" \
+             || record_fail "hookspath-reminder: (a6) git config falhando" "valor mudou para '${v}'" ;; esac ;;
+    *) record_fail "hookspath-reminder: (a6) git config falhando" "veio: ${r:0:200} | valor: ${v}" ;; esac
   git -C "${d}/repo" config core.hooksPath .githooks
   r="$(_hp "${d}/repo" s1 "")"
   [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (b) relativo ⇒ silêncio, rc=0" \
     || record_fail "hookspath-reminder: (b) relativo" "veio: ${r:0:200}"
-  # (b2) o MESMO valor do (a), na mesma sessão: só re-avisa se o conserto tiver limpado a marca
+  # (b2) o MESMO valor do (a), na mesma sessão: o Claude Code regravou ⇒ reverte DE NOVO
   git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
   r="$(_hp "${d}/repo" s1 "")"
-  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (b2) consertado e voltou ao MESMO absoluto ⇒ avisa DE NOVO na mesma sessão" ;;
-    *) record_fail "hookspath-reminder: (b2) re-aviso" "veio: ${r:0:200}" ;; esac
+  case "${r}" in "0|"*"REVERTIDO"*) record_pass "hookspath-reminder: (b2) regravado o MESMO absoluto ⇒ reverte DE NOVO na mesma sessão" ;;
+    *) record_fail "hookspath-reminder: (b2) re-reversão" "veio: ${r:0:200}" ;; esac
+  # (b3) barra final: mesmo diretório, NÃO a forma exata ⇒ só avisa, não toca
   git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks/"
-  r="$(_hp "${d}/repo" s1b "")"
-  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (b3) barra final no absoluto ⇒ avisa (identidade de diretório)" ;;
+  r="$(_hp "${d}/repo" s1b "")"; v="$(_v)"
+  case "${r}" in "0|"*"ABSOLUTO"*) [ "${v}" = "${d}/repo/.githooks/" ] && record_pass "hookspath-reminder: (b3) barra final no absoluto ⇒ avisa e não toca" \
+      || record_fail "hookspath-reminder: (b3) barra final" "tocou: '${v}'" ;;
     *) record_fail "hookspath-reminder: (b3) barra final" "veio: ${r:0:200}" ;; esac
-  # (f) `~/` que o git expande e que É o .githooks deste repo (HOME da bancada = ${d}) ⇒ avisa
+  # (b4) absoluto para o .githooks da WORKTREE (outro diretório, mesmo papel) ⇒ avisa nela, não toca
+  git -C "${d}/repo" config core.hooksPath "${d}/wt/.githooks"
+  r="$(_hp "${d}/wt" s1c "")"; v="$(_v)"
+  case "${r}" in "0|"*"ABSOLUTO"*) case "${r}" in *REVERTIDO*) record_fail "hookspath-reminder: (b4) .githooks da worktree" "reverteu: ${r:0:200}" ;;
+        *) [ "${v}" = "${d}/wt/.githooks" ] && record_pass "hookspath-reminder: (b4) absoluto de OUTRO diretório (.githooks da worktree) ⇒ avisa e não toca" \
+             || record_fail "hookspath-reminder: (b4) .githooks da worktree" "tocou: '${v}'" ;; esac ;;
+    *) record_fail "hookspath-reminder: (b4) .githooks da worktree" "veio: ${r:0:200}" ;; esac
+  # (b5) a forma exata, mas no escopo WORKTREE (extensions.worktreeConfig) ⇒ avisa, não escreve no --local
+  git -C "${d}/repo" config core.hooksPath .githooks
+  git -C "${d}/repo" config extensions.worktreeConfig true
+  git -C "${d}/wt" config --worktree core.hooksPath "${d}/repo/.githooks"
+  r="$(_hp "${d}/wt" s1d "")"; v="$(git -C "${d}/wt" config --worktree --get core.hooksPath 2>/dev/null)"
+  git -C "${d}/wt" config --worktree --unset core.hooksPath; git -C "${d}/repo" config --unset extensions.worktreeConfig
+  case "${r}" in "0|"*"ABSOLUTO"*) case "${r}" in *REVERTIDO*) record_fail "hookspath-reminder: (b5) escopo worktree" "reverteu: ${r:0:200}" ;;
+        *) [ "${v}" = "${d}/repo/.githooks" ] && record_pass "hookspath-reminder: (b5) forma exata no escopo worktree ⇒ avisa e não toca" \
+             || record_fail "hookspath-reminder: (b5) escopo worktree" "tocou: '${v}'" ;; esac ;;
+    *) record_fail "hookspath-reminder: (b5) escopo worktree" "veio: ${r:0:200}" ;; esac
+  # (f) `~/` que o git expande e que É o .githooks deste repo (HOME da bancada = ${d}) ⇒ avisa, não toca
   git -C "${d}/repo" config core.hooksPath "~/repo/.githooks"
-  r="$(_hp "${d}/repo" s8 "")"
-  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (f) ~/ que resolve no .githooks deste repo ⇒ avisa" ;;
+  r="$(_hp "${d}/repo" s8 "")"; v="$(_v)"
+  case "${r}" in "0|"*"ABSOLUTO"*) [ "${v}" = "~/repo/.githooks" ] && record_pass "hookspath-reminder: (f) ~/ que resolve no .githooks deste repo ⇒ avisa e não toca" \
+      || record_fail "hookspath-reminder: (f) til" "tocou: '${v}'" ;;
     *) record_fail "hookspath-reminder: (f) til" "veio: ${r:0:200}" ;; esac
   # (e2) gestor de hooks COMPARTILHADO noutro lugar, também chamado .githooks ⇒ cala (o conserto trocaria os hooks)
   git -C "${d}/repo" config core.hooksPath "${d}/shared/.githooks"
@@ -10237,8 +10284,18 @@ run_hookspath_reminder_selftests() {
     || record_fail "hookspath-reminder: (d) fora de git" "veio: ${r:0:200}"
   git -C "${d}/repo" config core.hooksPath "${d}/other"
   r="$(_hp "${d}/repo" s6 "")"
-  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (e) absoluto para outro diretório (não .githooks) ⇒ cala (erra para o lado de calar)" \
-    || record_fail "hookspath-reminder: (e) outro diretório" "veio: ${r:0:200}"
+  [ "${r}" = "0|" ] && [ "$(_v)" = "${d}/other" ] && record_pass "hookspath-reminder: (e) absoluto para outro diretório (não .githooks) ⇒ cala e não toca (erra para o lado de calar)" \
+    || record_fail "hookspath-reminder: (e) outro diretório" "veio: ${r:0:200} | valor: $(_v)"
+  # (m2) MUTANTE: sem a linha que REVERTE, o caso (a) não reverte — o caso morde
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
+  # (troca o `git config` da reversão por `true`: a sintaxe fica de pé e só a escrita some)
+  sed 's/if git -C "\${repo}" config --local core\.hooksPath \.githooks/if true/' "${hk}" > "${d}/mutant-rev.sh"
+  r="$(_hp "${d}/repo" s7b "${d}/mutant-rev.sh")"; v="$(_v)"
+  if cmp -s "${hk}" "${d}/mutant-rev.sh"; then record_fail "hookspath-reminder: (m2) mutante" "o sed não achou a linha da reversão (âncora mudou)"
+  else case "${r}" in "0|"*REVERTIDO*) record_fail "hookspath-reminder: (m2) mutante" "o mutante ainda disse que reverteu: ${r:0:200} | valor: ${v}" ;;
+      "0|"*"ABSOLUTO"*) [ "${v}" = "${d}/repo/.githooks" ] && record_pass "hookspath-reminder: (m2) mutante sem a escrita da reversão ⇒ (a) não reverte e o aviso antigo volta (o caso morde)" \
+           || record_fail "hookspath-reminder: (m2) mutante" "valor mudou: ${v}" ;;
+      *) record_fail "hookspath-reminder: (m2) mutante" "o mutante não rodou como esperado: ${r:0:200}" ;; esac; fi
   # (m) MUTANTE: sem o ramo do absoluto, o caso (a) cala — o caso morde
   git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
   sed '/ -ef "\${top}\/\.githooks"/d' "${hk}" > "${d}/mutant.sh"

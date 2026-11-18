@@ -247,6 +247,16 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/bash-empty-result-guard.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-currency-check.sh\" --hookspath-only",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PreToolUse": [
