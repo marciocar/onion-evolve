@@ -185,6 +185,7 @@ delega	script	ops/slack-persona.sh	@rootcopy=/usr/local/lib/onion-ops	--apply,st
 #   (act-signature-check.sh) confere que toda execução de script do repo, a partir de ato/delega/fecho, está aqui. Os
 #   executores do gate (lint-artifacts, lint-selftest) são FRONTEIRA: entram, mas o que eles rodam não se desce.
 fecho	script	.claude/hooks/co-evolution-inbox-check.sh	-
+fecho	script	.claude/utils/approval/one_touch.py	-
 fecho	script	.claude/utils/adopt/emit-eol-gitattributes.sh	-
 fecho	script	.claude/utils/adopt/regen-ssot-projections.sh	-
 fecho	script	.claude/utils/adopt/vendor-manifest.sh	-

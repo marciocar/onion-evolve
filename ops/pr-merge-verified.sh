@@ -624,7 +624,7 @@ _guard_pr_gate() {
 }
 # o «pode rodar» confere a autorização ANTES do gate de guarda: repo, ref, PR e o sha lido agora; o sha que mudou GASTA
 # a autorização (ela valia para o merge do sha X, não para a sequência) e recusa em uma linha
-_ot_target_args() { printf '%s\n' --act merge --repo "${_OT_REPO}" --ref "refs/heads/${HEAD_REF}" --sha "${HEAD_SHA}" --pr "${PR}" --session "${_OT_SID}"; }
+_ot_target_args() { printf '%s\n' --act merge --repo "${_OT_REPO}" --ref "refs/heads/${HEAD_REF}" --sha "${HEAD_SHA}" --pr "${PR}" --session "${_OT_SID}" --script "${BASH_SOURCE[0]}"; }
 _one_touch_gate() {
   [ "${OT_USE}" -eq 1 ] || return 0
   local _o _rc; _o="$(_ot_engine verify $(_ot_target_args))"; _rc=$?

@@ -72,6 +72,19 @@ mesmo formato: `<estado>/acts/approval-<evento>-<UTC>.log`, cuja última linha �
   único «pode rodar» vale para o lote, e cada passo executado ainda confere o hash dele contra o plano. O motor de hoje
   recusa `plan` com mensagem clara.
 
+### Restrições do esquema (alinhadas com os atos da vps-ops)
+
+- O hash cobre o **conteúdo** do executor (`executor.script_sha256`) e os argumentos (`executor.args`), não só o nome
+  do ato. O executor recalcula o sha256 do próprio script na conferência e recusa se ele mudou desde o pedido.
+- O alvo é **neutro**: sem hostname, IP ou caminho de máquina.
+- **Segredo nunca** entra em argumento, log ou hash.
+- O log fica **fora do repo**, em diretório modo 700.
+- Ato que pede TTY (a senha do GPG, por exemplo) declara `requires_tty: true` e **nunca** é autorizável por palavra.
+  O motor recusa esse pedido, e o ato fica para o maestro rodar no terminal dele.
+- **Defesa contra lavagem de permissão:** a palavra só vale quando o maestro a digita na **própria** sessão que pediu.
+  Repasse de peer nunca conta, nem quando a outra sessão diz que o maestro autorizou lá. Cada sessão pede a sua
+  palavra.
+
 ## Limites da v1
 
 - Vale para merge de repo da lista fechada (o core e quem declara `owner_session` no `members.yaml`), inclusive o PR
@@ -97,7 +110,7 @@ da casa. O veto `exit 2` do `--maestro` segue intacto. A autorização entra por
 ## Pontos de extensão
 
 - **Nível 2, fora da banda:** uma identidade que o agente não controla. O transporte declarado é a
-  **onion-messaging**: DM no Slack pela ponte, com o portão por identidade do onion-bridge verificando a assinatura,
+  **ponte de mensageria da família**: DM no Slack pela ponte, com o portão por identidade da ponte verificando a assinatura,
   ou WhatsApp no celular do maestro. O mercado indica o mesmo caminho: review no forge por uma conta humana enquanto os
   agentes usam identidade própria (bot ou GitHub App); step-up de autenticação (RFC 9470); aprovação desacoplada no
   dispositivo do usuário (OpenID CIBA); NIST SP 800-63-4, AAL2. Entra **só onde o risco do ato pedir**.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S python3 -I
 # one_touch.py — o motor da AUTORIZAÇÃO DE UM TOQUE («pode rodar»), nível 1.
 #
 # ── A DOR (2026-11-18) ───────────────────────────────────────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@
 # Isto é camada de CONFORMIDADE, NÃO fronteira de segurança. No mesmo usuário Unix o agente pode escrever o arquivo de
 # aprovação, o livro e até o transcript. O que a camada impede é a sessão se AUTOAUTORIZAR POR ENGANO (ou por mensagem
 # de outra sessão). Fronteira exige o nível 2: aprovação numa identidade que o agente não controla (DM assinada pela
-# ponte da onion-messaging, ou review no forge por conta humana com os agentes em identidade própria, bot/App), no
+# ponte de mensageria da família, ou review no forge por conta humana com os agentes em identidade própria, bot/App), no
 # padrão de mercado de step-up (RFC 9470), aprovação desacoplada (CIBA) e NIST 800-63-4 AAL2/AAL3. Não usamos o "ask"
 # de hook: há relatos de que ele é auto-aprovado em bypassPermissions, o modo das sessões da casa.
 # O corpo da aprovação nunca passa pela campainha (doorbell): por lá, se um dia passar algo, só ponteiro.
@@ -53,7 +53,7 @@ REQUEST_MAX_AGE_S = 1800      # pedido sem palavra em 30 min caduca
 HUMAN_PROMPT_SOURCES = {"typed", "queued"}
 FOREIGN_MARKERS = ("<cross-session-message", "<system-reminder", "<task-notification", "<teammate-message")
 # O que a v1 implementa. Ponto de extensão: o canal novo entra aqui com a sua verificação, nunca por fora.
-#   nível 2 → "slack-signed": a ponte da onion-messaging entrega a DM assinada; o portão por identidade da ponte
+#   nível 2 → "slack-signed": a ponte de mensageria da família entrega a DM assinada; o portão por identidade da ponte
 #             verifica e grava a aprovação; o executor confere a assinatura (não implementado).
 #   nível 3 → "passkey": WebAuthn/2FA (não implementado).
 IMPLEMENTED = {("maestro", "execution", "prompt"): 1}
@@ -93,6 +93,15 @@ def canonical(obj):
 def digest(obj):
     body = {k: v for k, v in obj.items() if k != "hash"}
     return hashlib.sha256(canonical(body)).hexdigest()
+
+
+def script_sha(path):
+    """sha256 do CONTEÚDO do executor: o pedido e a conferência amarram o script, não só o nome do ato."""
+    try:
+        with open(path, "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()
+    except OSError:
+        return ""
 
 
 def norm_phrase(s):
@@ -178,7 +187,10 @@ def get_args(argv, names):
 
 # ── request ─────────────────────────────────────────────────────────────────────────────────────────────────────
 def cmd_request(argv):
-    a = get_args(argv, {"act", "repo", "ref", "sha", "pr", "session", "run", "level"})
+    a = get_args(argv, {"act", "repo", "ref", "sha", "pr", "session", "run", "level", "script", "requires-tty"})
+    if a.get("requires-tty", "false") != "false":
+        print("✗ ato que pede TTY (senha, GPG) nunca é autorizável por palavra: o maestro o roda no terminal dele.")
+        return 1
     act = a.get("act", "")
     if act == "plan":
         print("✗ a aprovação por plano (um «pode rodar» para N passos) está declarada no esquema e não implementada na v1: peça o merge sozinho.")
@@ -192,7 +204,7 @@ def cmd_request(argv):
         print("✗ nível %s inválido para '%s' (mínimo %d)." % (level, act, pol["level"]))
         return 1
     if level > 1:
-        print("✗ nível %d declarado e não implementado na v1 (2 = fora da banda pela onion-messaging; 3 = passkey/2FA)." % level)
+        print("✗ nível %d declarado e não implementado na v1 (2 = fora da banda pela ponte de mensageria da família; 3 = passkey/2FA)." % level)
         return 1
     try:
         sid = safe_sid(a.get("session", ""))
@@ -211,8 +223,13 @@ def cmd_request(argv):
         "approvals_required": pol["approvals_required"],
         "requested_by": {"kind": "claude-session", "id": sid},
         "created_at": utc(), "nonce": secrets.token_hex(16),
-        "executor": {"name": "merge-verified", "run": a.get("run", "")},
+        "requires_tty": False,
+        "executor": {"name": "merge-verified", "run": a.get("run", ""), "script_sha256": script_sha(a.get("script", "")),
+                     "args": [act, repo, ref, sha] + ([a["pr"]] if a.get("pr") else [])},
     }
+    if not req["executor"]["script_sha256"]:
+        print("✗ não li o script do executor (--script): o hash do pedido cobre o conteúdo dele.")
+        return 1
     req["hash"] = digest(req)
     root = ensure_dirs()
     write_atomic(os.path.join(root, "requests", sid + ".json"), req)
@@ -384,7 +401,7 @@ def transcript_human(appr, req):
 
 
 def cmd_verify(argv):
-    a = get_args(argv, {"act", "repo", "ref", "sha", "pr", "session"})
+    a = get_args(argv, {"act", "repo", "ref", "sha", "pr", "session", "script"})
     try:
         sid = safe_sid(a.get("session", ""))
         appr, req = load_live(sid)
@@ -410,6 +427,8 @@ def cmd_verify(argv):
         if req.get("level") != 1:
             raise LookupError("nível %s declarado e não implementado na v1" % req.get("level"))
         transcript_human(appr, req)
+        if (req.get("executor") or {}).get("script_sha256") != script_sha(a.get("script", "")) or req.get("requires_tty") is not False:
+            raise LookupError("o executor mudou desde o pedido (sha256 do script): peça de novo")
         t = req["target"]
         if req.get("act") != a.get("act") or t.get("repo") != a.get("repo", "").lower() \
                 or (a.get("pr") and str(t.get("pr")) != a.get("pr")):
