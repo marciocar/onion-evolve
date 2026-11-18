@@ -27094,7 +27094,9 @@ p=sys.argv[2];a=json.load(open(p));r=a["request"];r["created_at"]=o.utc(o.time.t
   rm -f "${fc}/ops/pmv-mut.sh"
   # (ot11) o log de uso no formato dos atos da vps-ops: última linha «✓ RESULTADO», com o nível e a espera
   o=""; for _f in "${_otst}/onion/approvals/acts/"approval-grant-*.log; do
-    [ -f "${_f}" ] && head -1 "${_f}" | grep -q '^── ato approval-grant · início ' && tail -1 "${_f}" | grep -qE '^✓ RESULTADO autorizado · act=merge level=1 wait_s=[0-9]+' && { o="${_f}"; break; }
+    [ -f "${_f}" ] || continue
+    grep -q '^── ato approval-grant · início ' <<< "$(head -1 "${_f}")" \
+      && grep -qE '^✓ RESULTADO autorizado · act=merge level=1 wait_s=[0-9]+' <<< "$(tail -1 "${_f}")" && { o="${_f}"; break; }
   done
   if [ -n "${o}" ] && grep -qE $'^[0-9TZ:-]+\tgrant\tmerge\t1\t[0-9]+\t' "${_otst}/onion/approvals/usage.tsv"; then record_pass "pr-merge-verified: (ot11) o log da autorização segue o formato dos atos («── ato …» e «✓ RESULTADO … level=1 wait_s=N») e o usage.tsv mede a espera"
   else record_fail "pr-merge-verified: (ot11)" "logs=$(ls "${_otst}/onion/approvals/acts/" 2>/dev/null | tr '\n' ' ')"; fi
