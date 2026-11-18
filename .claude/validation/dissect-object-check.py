@@ -269,8 +269,10 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
     # item 11 — a SYNTHESIS.md do estudo final, projeção do grafo da mesma pasta (caso medido: uma dissecação da
     # curadoria passou na forma sem síntese, e só a ganhou depois de cobrada)
     # catraca: o estudo anterior à régua e não tocado desde que ela chegou recebe a mesma lista como aviso (rc 0)
+    del CATRACA_WHY[:]
     synth_legacy = registered_before(by_id.get("S_STAGE0"), SYNTHESIS_SINCE) and untouched_since_rule(11, study_dir)
-    synthesis_check(add if not synth_legacy else (lambda item, code, detail: note(11, code, "estudo anterior a %s e não tocado desde que a régua chegou, aviso e não achado: %s" % (SYNTHESIS_SINCE[:10], detail))), path, study_dir)
+    why = (" (%s)" % CATRACA_WHY[0]) if CATRACA_WHY else ""
+    synthesis_check((lambda item, code, detail: add(item, code, detail + why)) if not synth_legacy else (lambda item, code, detail: note(11, code, "estudo anterior a %s e não tocado desde que a régua chegou, aviso e não achado: %s" % (SYNTHESIS_SINCE[:10], detail))), path, study_dir)
 
     # item 4 — quem paga e o que não foi verificado
     if not (isinstance(meta.get("x_who_pays"), str) and meta["x_who_pays"].strip()):
@@ -413,29 +415,53 @@ def rule_arrival(item):
     return RULE_ARRIVAL[item]
 
 
+def authored(commit, parents, study_dir):
+    """o commit MUDOU a pasta: difere de TODOS os pais (o merge que só traz a pasta de um dos lados não a tocou); no
+    1º commit do repo, mudou se a pasta já estava nele."""
+    if not parents:
+        return bool(git("diff-tree", "--root", "--no-commit-id", "--name-only", "-r", commit, "--", study_dir)[1].strip())
+    return all(git("diff", "--quiet", p, commit, "--", study_dir)[0] != 0 for p in parents)
+
+
+CATRACA_WHY = []  # o porquê de a catraca não ter sido avaliada (vai junto do achado, nunca em silêncio)
+
+
 def untouched_since_rule(item, study_dir):
-    """True só quando a régua do item já está na história e a pasta do estudo não mudou desde ela: nem no commit que a
-    trouxe, nem num descendente dele (--ancestry-path: o commit da base que o PR ainda não tinha não conta), nem na
-    árvore. A régua fora da história (checador não commitado, ou o de outro repo) não tolera: cobra, que é o lado seguro.
-    Mudar é diferir de TODOS os pais: o merge que só traz a pasta de um dos lados não a tocou. Medido no PR #339 da
-    curadoria: o update nasce num commit sem os estudos e um merge junta a main, e esse merge difere do pai do update
-    em 989 arquivos dos estudos sem ter mexido em nenhum."""
+    """True só quando a régua do item já está na história e a pasta do estudo não mudou desde ela. Três provas, todas
+    têm de valer:
+      · a árvore: nada não commitado na pasta;
+      · a descendência: nenhum commit do arrival em diante (--ancestry-path) mudou a pasta. O commit da base que o PR
+        ainda não tinha não conta;
+      · o relógio: o último commit que MUDOU a pasta em TODA a história tem data de commit anterior à do arrival. Fecha
+        o ramo lateral bifurcado antes da régua e mergeado depois (revisão de 2026-11-18, cenários S5 e S1): o commit
+        dele não descende do arrival e o merge que o traz é idêntico ao pai lateral, então só a data o enxerga.
+    Mudar é diferir de TODOS os pais. Medido no PR #339 da curadoria: o update nasce num commit sem os estudos e um merge
+    junta a main; esse merge difere do pai do update em 989 arquivos dos estudos sem ter mexido em nenhum, e por isso a
+    alternativa "o último commit da pasta é ancestral do arrival" foi descartada (ali o arrival não tem os estudos, e ela
+    reprovaria todos). A régua fora da história, ou a história rasa, não tolera: cobra, e diz por quê."""
+    del CATRACA_WHY[:]
     arrival = rule_arrival(item)
+    if git("rev-parse", "--is-shallow-repository")[1].strip() == "true":
+        CATRACA_WHY.append("história rasa, catraca não avaliada")
+        return False
     if not arrival:
         return False
     if git("status", "--porcelain", "--", study_dir)[1].strip():
         return False
-    rc_a, head_a = git("log", "-1", "--format=%H %P", arrival)
-    rc, out = git("log", "--ancestry-path", "--full-history", "--format=%H %P", "%s..HEAD" % arrival, "--", study_dir)
-    if rc != 0 or rc_a != 0:
+    rc_a, head_a = git("log", "-1", "--format=%H %ct %P", arrival)
+    rc, out = git("log", "--ancestry-path", "--full-history", "--format=%H %ct %P", "%s..HEAD" % arrival, "--", study_dir)
+    rc_h, hist = git("log", "--full-history", "--format=%H %ct %P", "--", study_dir)
+    if rc != 0 or rc_a != 0 or rc_h != 0:
         return False
+    when_arrival = int(head_a.split()[1])
     for line in [head_a.strip()] + out.splitlines():
-        commit, *parents = line.split()
-        if not parents:  # a régua chegou no 1º commit do repo: tocou a pasta se ela já estava nele
-            if git("diff-tree", "--root", "--no-commit-id", "--name-only", "-r", commit, "--", study_dir)[1].strip():
-                return False
-        elif all(git("diff", "--quiet", p, commit, "--", study_dir)[0] != 0 for p in parents):
+        commit, _, *parents = line.split()
+        if authored(commit, parents, study_dir):
             return False
+    for line in hist.splitlines():  # do mais novo ao mais antigo: o 1º que mudou a pasta decide
+        commit, ct, *parents = line.split()
+        if authored(commit, parents, study_dir):
+            return int(ct) < when_arrival
     return True
 
 
