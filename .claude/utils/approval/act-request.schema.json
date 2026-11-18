@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/marciocar/onion-evolve/.claude/utils/approval/act-request.schema.json",
   "title": "onion.act-request/1 e onion.act-approval/1",
-  "description": "Esquema de ATO compartilhado do «pode rodar» (autorização de um toque). O PEDIDO nasce na sessão que preparou o ato; a APROVAÇÃO nasce do canal do aprovador; o EXECUTOR confere os dois contra o vivo e grava o uso único no livro dele. O hash é sha256 da forma canônica: JSON com chaves ordenadas, sem espaços, UTF-8 (estilo JCS; só inteiros, sem ponto flutuante), calculado sobre o objeto SEM o campo hash. A v1 implementa só role=maestro, scope=execution, channel=prompt (nível 1); o resto está declarado e é recusado com mensagem clara. Camada de CONFORMIDADE, não fronteira de segurança: no mesmo usuário Unix o agente pode forjar os arquivos.",
+  "description": "Esquema de ATO compartilhado do «pode rodar» (autorização de um toque). O PEDIDO nasce na sessão que preparou o ato; a APROVAÇÃO nasce do canal do aprovador; o EXECUTOR confere os dois contra o vivo e grava o uso único no livro dele. O hash é sha256 da forma canônica: JSON com chaves ordenadas, sem espaços, UTF-8 (estilo JCS; só inteiros, sem ponto flutuante), calculado sobre o objeto SEM o campo hash. A v1 implementa só role=maestro, scope=execution, channel=prompt (nível 1); o resto está declarado e é recusado com mensagem clara. Camada de CONFORMIDADE, não fronteira de segurança: no mesmo usuário Unix o agente pode forjar os arquivos. Log fora do repo, em diretório modo 700. A palavra só vale digitada pelo maestro na própria sessão: repasse de peer nunca conta (defesa contra lavagem de permissão).",
   "$defs": {
     "iso_utc": {
       "type": "string",
@@ -19,7 +19,7 @@
         2,
         3
       ],
-      "description": "1 = frase digitada pelo humano no prompt da sessão que pediu (implementado). 2 = aprovação FORA DA BANDA, numa identidade que o agente não controla: DM assinada no Slack pela ponte (onion-messaging/onion-bridge, portão por identidade) ou WhatsApp ao celular do maestro; ou review no forge por conta humana enquanto os agentes usam identidade própria (bot/App). Declarado, não implementado. 3 = passkey/2FA (step-up RFC 9470; NIST 800-63-4 AAL3). Declarado, não implementado."
+      "description": "1 = frase digitada pelo humano no prompt da sessão que pediu (implementado). 2 = aprovação FORA DA BANDA, numa identidade que o agente não controla: DM assinada no Slack pela ponte (ponte de mensageria da família, portão por identidade) ou WhatsApp ao celular do maestro; ou review no forge por conta humana enquanto os agentes usam identidade própria (bot/App). Declarado, não implementado. 3 = passkey/2FA (step-up RFC 9470; NIST 800-63-4 AAL3). Declarado, não implementado."
     },
     "required_approval": {
       "type": "object",
@@ -86,16 +86,18 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "schema",
         "act",
-        "target",
-        "level",
         "approvals_required",
-        "requested_by",
         "created_at",
-        "nonce",
+        "effect",
         "executor",
-        "hash"
+        "hash",
+        "level",
+        "nonce",
+        "requested_by",
+        "requires_tty",
+        "schema",
+        "target"
       ],
       "properties": {
         "schema": {
@@ -130,7 +132,8 @@
               "type": "integer",
               "minimum": 1
             }
-          }
+          },
+          "description": "NEUTRO: sem hostname, IP nem caminho de máquina. Para o merge, repo + ref completo + sha (+ PR)."
         },
         "level": {
           "$ref": "#/$defs/level"
@@ -171,8 +174,11 @@
           "additionalProperties": false,
           "required": [
             "name",
-            "run"
+            "run",
+            "script_sha256",
+            "args"
           ],
+          "description": "O hash do pedido cobre o CONTEÚDO do executor (sha256 do script) e os argumentos, não só o nome do ato: o executor que confere recalcula o sha256 do próprio script e recusa se mudou. Segredo NUNCA entra em argumento, log ou hash.",
           "properties": {
             "name": {
               "type": "string"
@@ -180,6 +186,16 @@
             "run": {
               "type": "string",
               "description": "o comando que a sessão roda depois da palavra"
+            },
+            "script_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "os argumentos do ato, sem segredo"
             }
           }
         },
@@ -253,6 +269,11 @@
               }
             }
           }
+        },
+        "requires_tty": {
+          "type": "boolean",
+          "const": false,
+          "description": "ato que pede TTY (a senha do GPG, por exemplo) é declarado requires_tty: true e NUNCA é autorizável por palavra: o maestro o roda no terminal dele. O motor recusa o pedido com true."
         }
       }
     },

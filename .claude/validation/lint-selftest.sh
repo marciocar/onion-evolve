@@ -26960,7 +26960,7 @@ print(json.dumps(e))' "$@" >> "${_ottp}"
   }
   _otarm() { # [kind source meta] → o pedido pelo script, a palavra pelo hook e a entrada no transcript; deixa _otpid
     _otn=$((_otn+1)); _otpid="pid-${_otn}"
-    _otrun "${fc}" "${_pi}" --one-touch-request
+    _otrun "${fc}" "${OT_SCRIPT:-${_pi}}" --one-touch-request
     [ "${_otrc}" -eq 0 ] || record_fail "pr-merge-verified: (ot-arm ${_otn})" "o pedido falhou: $(tail -1 <<< "${_oto}")"
     _othook "pode rodar" "${_otpid}" >/dev/null
     _ottr "${_otpid}" "${1:-human}" "${2:-typed}" "${3:-0}" "pode rodar"
@@ -27064,12 +27064,12 @@ p=sys.argv[2];a=json.load(open(p));r=a["request"];r["created_at"]=o.utc(o.time.t
   _otarm; OT_BEHIND=2 _otrun "${fc}" "${_pi}" --one-touch
   _otcase "(ot9) autorização viva + PR atrás da base ⇒ recusa sem rebasear, e gasta a autorização" 1 "a autorização foi gasta"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot9b) depois da recusa por rebase, a autorização não vale mais" 1 "já foi usada"
-  _otarm
   sed 's/^  if \[ "\${OT_LIVE}" -eq 1 \]; then$/  if false; then/' "${_pi}" > "${fc}/ops/pmv-mut.sh"
   if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (ot9-MUT)" "a âncora da recusa do rebase sumiu"
   else
+    OT_SCRIPT="${fc}/ops/pmv-mut.sh" _otarm
     OT_BEHIND=2 _otrun "${fc}" "${fc}/ops/pmv-mut.sh" --one-touch
-    if [ "${_otrc}" -ne 0 ] && ! grep -qF "a autorização foi gasta" <<< "${_oto}"; then record_pass "pr-merge-verified: (ot9-MUT) sem a recusa, o script tentaria o auto-rebase com a autorização viva — a recusa é a causa"
+    if [ "${_otrc}" -ne 0 ] && grep -qF "nenhuma worktree" <<< "${_oto}" && ! grep -qF "a autorização foi gasta" <<< "${_oto}"; then record_pass "pr-merge-verified: (ot9-MUT) sem a recusa, o script tentaria o auto-rebase com a autorização viva — a recusa é a causa"
     else record_fail "pr-merge-verified: (ot9-MUT)" "rc=${_otrc} out=$(tail -1 <<< "${_oto}")"; fi
   fi
   rm -f "${fc}/ops/pmv-mut.sh"
@@ -27081,17 +27081,33 @@ p=sys.argv[2];a=json.load(open(p));r=a["request"];r["created_at"]=o.utc(o.time.t
   # (ot10) repo de CLIENTE é recusado mesmo com autorização viva para ele (pedido gravado direto no motor)
   _otn=$((_otn+1)); _otpid="pid-${_otn}"
   XDG_STATE_HOME="${_otst}" python3 -I "${_ote}" request --act merge --repo cliente/repo --ref refs/heads/feat/x \
-    --sha deadbeefdeadbeefdeadbeefdeadbeefdeadbeef --pr 999 --session "${_otsid}" --run x >/dev/null
+    --sha deadbeefdeadbeefdeadbeefdeadbeefdeadbeef --pr 999 --session "${_otsid}" --run x --script "${_pi}" >/dev/null
   _othook "pode rodar" "${_otpid}" >/dev/null; _ottr "${_otpid}" human typed 0 "pode rodar"
   OT_FILES="a.txt" _otrun "${_cr_cli}" "${_pi}" --repo cliente/repo --one-touch
   _otcase "(ot10) repo de cliente com autorização viva ⇒ recusa pelo dono, sempre" 1 "repo de cliente ou de empresa"
   sed 's/^  \[ -n "\${_corown}" \] && \[ "\${_t%%\/\*}" = "\${_corown}" \] \\$/  true \\/' "${_pi}" > "${fc}/ops/pmv-mut.sh"
   if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (ot10-MUT)" "a âncora da recusa pelo dono sumiu"
   else
+    _otn=$((_otn+1)); _otpid="pid-${_otn}"
+    XDG_STATE_HOME="${_otst}" python3 -I "${_ote}" request --act merge --repo cliente/repo --ref refs/heads/feat/x \
+      --sha deadbeefdeadbeefdeadbeefdeadbeefdeadbeef --pr 999 --session "${_otsid}" --run x --script "${fc}/ops/pmv-mut.sh" >/dev/null
+    _othook "pode rodar" "${_otpid}" >/dev/null; _ottr "${_otpid}" human typed 0 "pode rodar"
     OT_FILES="a.txt" _otrun "${_cr_cli}" "${fc}/ops/pmv-mut.sh" --repo cliente/repo --one-touch
     _otcase "(ot10-MUT) sem a recusa pelo dono, o cliente autorizado mergearia — a recusa é a causa" 0 "autorização viva"
   fi
   rm -f "${fc}/ops/pmv-mut.sh"
+  # (ot14) o hash do pedido cobre o CONTEÚDO do executor: script mudado entre o pedido e o uso ⇒ recusa
+  _otarm
+  { cat "${_pi}"; echo '# editado depois do pedido'; } > "${fc}/ops/pmv-mut.sh"
+  _otrun "${fc}" "${fc}/ops/pmv-mut.sh" --one-touch; _otcase "(ot14) executor editado depois do pedido ⇒ recusa (sha256 do script)" 1 "o executor mudou"
+  _otmut 's/        if (req.get("executor") or {}).get("script_sha256") != script_sha(a.get("script", "")) or req.get("requires_tty") is not False:/        if False:/' "(ot14-MUT)"
+  _otrun "${fc}" "${fc}/ops/pmv-mut.sh" --one-touch; _otcase "(ot14-MUT) sem conferir o conteúdo, o script editado rodaria — a conferência é a causa" 0 "pelo «pode rodar»"
+  _otrestore; rm -f "${fc}/ops/pmv-mut.sh"
+  # (ot15) ato que pede TTY nunca é autorizável por palavra
+  o="$(XDG_STATE_HOME="${_otst}" python3 -I "${_ote}" request --act merge --repo onion-bancada/core --ref refs/heads/feat/x \
+    --sha deadbeefdeadbeefdeadbeefdeadbeefdeadbeef --pr 999 --session "${_otsid}" --run x --script "${_pi}" --requires-tty true 2>&1)"
+  if grep -qF "nunca é autorizável por palavra" <<< "${o}"; then record_pass "pr-merge-verified: (ot15) ato com requires_tty ⇒ o pedido é recusado"
+  else record_fail "pr-merge-verified: (ot15)" "out=${o}"; fi
   # (ot11) o log de uso no formato dos atos da vps-ops: última linha «✓ RESULTADO», com o nível e a espera
   o=""; for _f in "${_otst}/onion/approvals/acts/"approval-grant-*.log; do
     [ -f "${_f}" ] || continue
