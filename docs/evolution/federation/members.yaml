@@ -733,6 +733,8 @@ members:
     name: onion-slm (espaço de execução do Onion SLM)
     role: standalone
     kind: adopter
+    owner_session: onion-slm    # a sessão dona merja o PR próprio pelo caminho verificado (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118); sem `piece:`, que é outra decisão
+    sponsor: maestro
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-slm (privado)
     local_path: /home/marcio/onion-slm
