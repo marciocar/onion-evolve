@@ -3,7 +3,6 @@ branch: chore/members-owner-session-slm
 pr: 1687
 date: 2026-11-18
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
