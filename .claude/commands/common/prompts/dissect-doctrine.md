@@ -399,4 +399,4 @@ nível 1, o registro de ideias, a candidata nomeada pelo parque (§1c) e a sínt
 qualidade: se a superação entrega e se o gatilho mede a coisa certa é trabalho do Elenxo. Estudo anterior a
 2026-10-24 (sem `x_study_destination`) fica fora por desenho; rodar o checador direto sobre ele lista o que falta
 para migrar. Bancada: `run_dissect_object_selftests`.
-**A síntese é obrigatória no estágio final:** sem `<pasta-do-grafo>/SYNTHESIS.md` citando o grafo da pasta (no `kg:` ou num link) o item 11 reprova (`synthesis-ausente`, `synthesis-nao-cita-o-grafo`); o `--stage plan` não a cobra.
+**A síntese é obrigatória no estágio final:** sem `<pasta-do-grafo>/SYNTHESIS.md` citando o grafo da pasta (no `kg:` ou num link) o item 11 reprova (`synthesis-ausente`, `synthesis-nao-cita-o-grafo`); o `--stage plan` não a cobra. Catraca (PR #339 da curadoria, 2026-11-18): o estudo com Etapa 0 anterior a 2026-11-13 e **não tocado** desde o commit em que a régua chegou ao repo recebe a mesma lista como `aviso item 11`, com rc 0; tocado ou criado depois, é cobrado inteiro, e a tolerância não cobre nenhum outro item.

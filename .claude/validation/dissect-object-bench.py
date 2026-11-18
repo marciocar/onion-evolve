@@ -43,6 +43,19 @@ SYNTHESIS_TEXT = {
     "synth-unlinked": "---\nkg: docs/evolution/dissect/outro-2026-10/outro-2026-10.kg.yaml\n---\n\n# Síntese solta\n\ntexto sem o grafo.\n",
 }
 DYNAMIC = "stage0-criterion-digest"  # o código que vem do kg_criterion (add(5, "stage0-" + …))
+# a catraca do item 11: cada caso tem, além do mutante do código, o mutante que tira UMA condição da tolerância, e o
+# desfecho do caso tem de mudar contra ele (sem isso, a catraca podia sumir ou valer para todos com a bancada verde)
+SYNTH_LEGACY = "estudo anterior à régua, não tocado pelo update, sem síntese: avisa, rc 0"
+SYNTH_TOUCHED = "o mesmo estudo tocado depois da régua: reprova inteiro"
+SYNTH_AFTER_CUT = "estudo não tocado com Etapa 0 depois do corte: reprova"
+SYNTH_MERGE = "update num commit sem estudos + merge da main (o #339): avisa"
+CATRACA_MUTANTS = {
+    SYNTH_MERGE: ("elif all(git(\"diff\", \"--quiet\", p, commit", "elif any(git(\"diff\", \"--quiet\", p, commit", "reprova"),
+    # (trecho do checador, troca, o que o mutante tem de produzir para o caso discriminar)
+    SYNTH_LEGACY: ("synth_legacy = registered_before(", "synth_legacy = False and registered_before(", "reprova"),
+    SYNTH_TOUCHED: ("and untouched_since_rule(11, study_dir)", "and True", "aprova"),
+    SYNTH_AFTER_CUT: ('registered_before(by_id.get("S_STAGE0"), SYNTHESIS_SINCE) and ', "", "aprova"),
+}
 
 
 def sh(cwd, *cmd):
@@ -326,6 +339,12 @@ CASES = [
     ("síntese que cita o grafo por link (variante legítima)", None, None, "synth-link", []),
     ("síntese que não cita o grafo da pasta", "synthesis-nao-cita-o-grafo", None, "synth-unlinked", []),
     ("kg de outra pasta com o mesmo nome (o ponteiro velho)", "synthesis-nao-cita-o-grafo", None, "synth-same-name", []),
+    # item 11 — a catraca (PR #339 da curadoria, 2026-11-18): a régua nova não reprova o estudo que o update não tocou
+    (SYNTH_LEGACY, "aviso:synthesis-ausente", None, "synth-legacy", []),
+    (SYNTH_TOUCHED, "synthesis-ausente", None, "synth-legacy-touched", []),
+    (SYNTH_MERGE, "aviso:synthesis-ausente", None, "synth-legacy-merge", []),
+    (SYNTH_AFTER_CUT, "synthesis-ausente", lambda g: node(g, "S_STAGE0")["x_criterion"].update(registered_at="2026-11-13T00:00:00+00:00"), "synth-legacy", []),
+    ("estudo não tocado que piorou noutro item: reprova (a catraca só cobre o item 11)", "sem-x_who_pays", lambda g: g["meta"].pop("x_who_pays"), "synth-legacy", []),
 ]
 CAND_GRAPH = "docs/evolution/dissect/fixture-cand-2026-11/fixture-cand-2026-11.kg.yaml"
 RC3_CASES = [
@@ -377,7 +396,7 @@ def build(checker_src, mut, order):
     def graph():
         write_yaml(tmp, GRAPH, g)
         # o item 11: a síntese nasce com o grafo; sem ela, ou sem citar o grafo, nas ordens que o caso pede
-        if order not in ("no-synth", "plan-uncommitted"):
+        if order not in ("no-synth", "plan-uncommitted", "synth-legacy", "synth-legacy-touched", "synth-legacy-merge"):
             write(tmp, SYNTHESIS, SYNTHESIS_TEXT.get(order, SYNTHESIS_TEXT["ok"]))
     if order == "plan-uncommitted":
         plan(); graph()
@@ -406,6 +425,24 @@ def build(checker_src, mut, order):
                                                 "label": "rejeitar a candidata pela licença.", "x_dissect_verdict": "rejeitar"}]})
         sh(tmp, "git", "remote", "add", "origin", "https://github.com/marciocar/onion-evolve.git")  # o <repo>: do ponteiro sai do origin
         plan(); commit(tmp, "plano"); graph(); commit(tmp, "n0")
+    elif order in ("synth-legacy", "synth-legacy-touched"):
+        # a catraca do item 11 (PR #339 da curadoria): o estudo entra com o checador ANTERIOR à régua, e o update traz a
+        # régua depois, num commit que não toca o estudo; "touched" mexe no estudo depois que a régua chegou
+        write(tmp, CHECK_PY, "# o checador antes da régua do item 11\n")
+        plan(); commit(tmp, "plano com o checador velho"); graph(); commit(tmp, "n0 com o checador velho")
+        write(tmp, CHECK_PY, checker_src); commit(tmp, "o update traz a régua do item 11")
+        if order == "synth-legacy-touched":
+            g["nodes"][-1]["label"] = "parquear, revisto."
+            write_yaml(tmp, GRAPH, g); commit(tmp, "toca o estudo depois da régua")
+    elif order == "synth-legacy-merge":
+        # a forma medida do PR #339: o update nasce num commit SEM os estudos e um merge junta a main; o merge difere
+        # do pai do update em todos os estudos sem ter mexido em nenhum
+        write(tmp, CHECK_PY, "# o checador antes da régua do item 11\n"); commit(tmp, "base sem estudos")
+        sh(tmp, "git", "branch", "-M", "main"); sh(tmp, "git", "branch", "update")
+        plan(); commit(tmp, "plano com o checador velho"); graph(); commit(tmp, "n0 com o checador velho")
+        sh(tmp, "git", "checkout", "-q", "update")
+        write(tmp, CHECK_PY, checker_src); commit(tmp, "o update traz a régua do item 11")
+        sh(tmp, "git", "merge", "-q", "--no-edit", "--no-ff", "main")
     elif order in ("protocol-untracked", "protocol-tracked"):
         plan(); commit(tmp, "plano")
         if order == "protocol-tracked":
@@ -469,6 +506,21 @@ def silence(src, code):
     return out
 
 
+def catraca_mutant(src, name, mut, order, extra, made):
+    """o mutante que tira uma condição da catraca do item 11; devolve a falha, ou "" quando o caso o mata."""
+    if name not in CATRACA_MUTANTS:
+        return ""
+    old, new, want = CATRACA_MUTANTS[name]
+    mutated = src.replace(old, new)
+    assert mutated != src, "mutante da catraca não achou %r" % old
+    t = build(mutated, mut, order); made.append(t)
+    rc, out = run(t, extra)
+    hard = rc == 1 and re.search(r"^item 11 synthesis-ausente:", out, re.M) is not None  # o aviso também traz o código
+    if (want == "reprova") != hard:
+        return "%s: o MUTANTE da catraca (%s → %s) não muda o desfecho (rc %d) — o caso não discrimina" % (name, old, new or "''", rc)
+    return ""
+
+
 def one_case(src, item_of, case):
     """um caso e, se ele acusa, o mutante do seu código; devolve (linha ok | None, falha | None). Cada caso tem os
     seus repos temporários, então os casos rodam em paralelo sem se ver."""
@@ -492,9 +544,9 @@ def one_case(src, item_of, case):
                 return None, "%s: esperado rc 0 com '%s'; veio rc %d:\n%s" % (name, tag, rc, out)
             if lit:
                 muted = re.sub(r'\bnote\((\d+), "%s"' % re.escape(acode), r'(lambda *a: None)(\1, "%s"' % acode, src)
-            elif item == 9:
-                muted = src.replace("note(9, code, ", "(lambda *a: None)(9, code, ")
-                assert muted != src, "mutante do aviso do item 9 não achou o note(9"
+            elif item in (9, 11):
+                muted = src.replace("note(%d, code, " % item, "(lambda *a: None)(%d, code, " % item)
+                assert muted != src, "mutante do aviso do item %d não achou o note(%d" % (item, item)
             else:
                 muted = re.sub(r'\bfired\(7, "%s"' % re.escape(acode), r'(lambda *a: None)(7, "%s"' % acode, src)
             assert muted != src, "mutante do aviso %s não achou o fired" % acode
@@ -502,6 +554,9 @@ def one_case(src, item_of, case):
             rc_m, out_m = run(t2, extra)
             if tag in out_m:
                 return None, "%s: o MUTANTE do aviso %s ainda avisa — o caso não discrimina" % (name, acode)
+            why = catraca_mutant(src, name, mut, order, extra, made)
+            if why:
+                return None, why
             return "ok   %-58s %s (mutante calado: rc %d)" % (name, tag, rc_m), None
         tag = "item %d %s:" % (item_of.get(code, 0), code)
         if rc != 1 or tag not in out:
@@ -510,6 +565,9 @@ def one_case(src, item_of, case):
         rc_m, out_m = run(t2, extra)
         if tag in out_m:
             return None, "%s: o MUTANTE de %s ainda acusa — o caso não discrimina" % (name, code)
+        why = catraca_mutant(src, name, mut, order, extra, made)
+        if why:
+            return None, why
         if order == "synth-same-name":
             # o defeito que o refutador do #1638 mediu: comparar só o nome do arquivo aceita o ponteiro velho
             based = src.replace("os.path.normpath(c) == graph for c in cited",

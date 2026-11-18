@@ -30,6 +30,8 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
   item 11 o estudo final traz <pasta-do-grafo>/SYNTHESIS.md, e ela cita o grafo da mesma pasta (no kg: do frontmatter
           ou num link): a síntese é projeção do grafo, não documento solto. Sem ela o estudo passava na forma (caso
           medido em 2026-11-12: uma dissecação da curadoria só ganhou a síntese depois de cobrada). Stage plan não cobra.
+          CATRACA: Etapa 0 anterior a SYNTHESIS_SINCE e estudo não tocado desde que a régua chegou ao repo saem como
+          AVISO (o adotante que confere todos os estudos quando a régua muda; PR #339 da curadoria, 2026-11-18).
 
 PEÇAS (achado da curadoria em 2026-10-26): um objeto pode ter peças de vereditos diferentes (costurar uma, parquear
 outra). O meta declara `x_dissect_pieces: [ids]` (2 ou mais), e cada peça tem o SEU `x_dissect_verdict`, o mesmo campo
@@ -94,6 +96,14 @@ TRIGGER_FLAGS = {"--id", "--id-prefix", "--type", "--status", "--plane", "--laye
 # a mesma lista, para o update não pôr em vermelho o corpus de um adotante que roda o checador sobre TODOS os estudos
 # no CI (a curadoria tem 22) e travar atualizações alheias à colheita. A dívida fica visível e a colheita, a cargo dele.
 IDEAS_SINCE = "2026-11-07T00:00:00+00:00"
+# o item 11 nasceu sem o corte que o item 9 tem, e o update ea93c767 da curadoria (PR #339, 2026-11-18) pôs em vermelho
+# 14 estudos que o PR não tocava: a régua nova virava refém da dívida que ela mesma expõe. A catraca do item 11 tem duas
+# condições, e as duas têm de valer para o achado sair como AVISO: a Etapa 0 é anterior ao corte, e o estudo não foi
+# tocado desde que a régua chegou a ESTE repo (o 1º commit em que o checador traz RULE_MARKER). Estudo criado ou tocado
+# depois disso é cobrado inteiro; e a tolerância só cobre o item 11: dívida em outro item reprova como sempre.
+SYNTHESIS_SINCE = "2026-11-13T00:00:00+00:00"
+RULE_MARKER = {11: "def synthesis_check("}
+CHECKER_REL = ".claude/validation/dissect-object-check.py"
 IDEA_KINDS = ("funcionalidade", "estrategia", "decisao-de-desenho")
 IDEA_ONION = {"temos", "nao-temos", "diferente"}
 # o destino que consome a ideia: o nó de um repo (o mesmo formato do selo), uma issue (SAC-123) ou a URL dela
@@ -258,7 +268,9 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
 
     # item 11 — a SYNTHESIS.md do estudo final, projeção do grafo da mesma pasta (caso medido: uma dissecação da
     # curadoria passou na forma sem síntese, e só a ganhou depois de cobrada)
-    synthesis_check(add, path, study_dir)
+    # catraca: o estudo anterior à régua e não tocado desde que ela chegou recebe a mesma lista como aviso (rc 0)
+    synth_legacy = registered_before(by_id.get("S_STAGE0"), SYNTHESIS_SINCE) and untouched_since_rule(11, study_dir)
+    synthesis_check(add if not synth_legacy else (lambda item, code, detail: note(11, code, "estudo anterior a %s e não tocado desde que a régua chegou, aviso e não achado: %s" % (SYNTHESIS_SINCE[:10], detail))), path, study_dir)
 
     # item 4 — quem paga e o que não foi verificado
     if not (isinstance(meta.get("x_who_pays"), str) and meta["x_who_pays"].strip()):
@@ -388,6 +400,43 @@ def registered_before(s0, since):
     if when.tzinfo is None:
         when = when.replace(tzinfo=datetime.timezone.utc)
     return when < datetime.datetime.fromisoformat(since)
+
+
+RULE_ARRIVAL = {}  # item → commit em que a régua chegou a este repo ("" = não chegou à história)
+
+
+def rule_arrival(item):
+    """o 1º commit deste repo em que o checador traz o marcador da régua do item (git log -S, do mais antigo)."""
+    if item not in RULE_ARRIVAL:
+        rc, out = git("log", "--reverse", "--format=%H", "-S", RULE_MARKER[item], "--", CHECKER_REL)
+        RULE_ARRIVAL[item] = out.split()[0] if rc == 0 and out.split() else ""
+    return RULE_ARRIVAL[item]
+
+
+def untouched_since_rule(item, study_dir):
+    """True só quando a régua do item já está na história e a pasta do estudo não mudou desde ela: nem no commit que a
+    trouxe, nem num descendente dele (--ancestry-path: o commit da base que o PR ainda não tinha não conta), nem na
+    árvore. A régua fora da história (checador não commitado, ou o de outro repo) não tolera: cobra, que é o lado seguro.
+    Mudar é diferir de TODOS os pais: o merge que só traz a pasta de um dos lados não a tocou. Medido no PR #339 da
+    curadoria: o update nasce num commit sem os estudos e um merge junta a main, e esse merge difere do pai do update
+    em 989 arquivos dos estudos sem ter mexido em nenhum."""
+    arrival = rule_arrival(item)
+    if not arrival:
+        return False
+    if git("status", "--porcelain", "--", study_dir)[1].strip():
+        return False
+    rc_a, head_a = git("log", "-1", "--format=%H %P", arrival)
+    rc, out = git("log", "--ancestry-path", "--full-history", "--format=%H %P", "%s..HEAD" % arrival, "--", study_dir)
+    if rc != 0 or rc_a != 0:
+        return False
+    for line in [head_a.strip()] + out.splitlines():
+        commit, *parents = line.split()
+        if not parents:  # a régua chegou no 1º commit do repo: tocou a pasta se ela já estava nele
+            if git("diff-tree", "--root", "--no-commit-id", "--name-only", "-r", commit, "--", study_dir)[1].strip():
+                return False
+        elif all(git("diff", "--quiet", p, commit, "--", study_dir)[0] != 0 for p in parents):
+            return False
+    return True
 
 
 def ideas_check(add, meta, nodes, by_id):
