@@ -378,6 +378,7 @@
 .claude/utils/adopt/vendor-manifest.sh	Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 .claude/utils/adopt/write-stamp.sh	E_CORTE_QUE_NAO_SE_CARIMBA_NAO_ACONTECE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/write-stamp.sh	E_W9_PIN_GREP_MEDIDO	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
+.claude/utils/approval/one_touch.py	D_PEDIDO_PALAVRA_EXECUTOR	docs/evolution/research/guard-one-touch-approval-2026-11/one-touch-approval-2026-11.kg.yaml
 .claude/utils/census/census-seal.py	Q_REABRIR_CARIMBO_POR_PROBE	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
 .claude/utils/census/census-workflow.mjs	Q_PROBE_WORKFLOW_ALIAS	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
 .claude/utils/co-evolution/co-relay.sh	D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA	docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml
@@ -2799,6 +2800,7 @@ ops/pr-merge-verified.sh	C_CHAINED_SYNC_IS_FLAWED	docs/onion/graph/sync-gate-sup
 ops/pr-merge-verified.sh	D_SYNC_GATED_IN_MERGE_PROOF	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/pr-merge-verified.sh	E_CURE_PROVEN_BY_BEHAVIOR	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
+ops/pr-merge-verified.sh	E_MAESTRO_COPIA_COMANDO_PARA_O_TERMINAL	docs/evolution/research/guard-one-touch-approval-2026-11/one-touch-approval-2026-11.kg.yaml
 ops/pr-merge-verified.sh	E_MEDICAO_RULESET_E_PROJECOES_2026_10_14	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 ops/pr-merge-verified.sh	E_MERGE_SEM_CI_EXECUTADO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/pr-merge-verified.sh	E_OBJECAO_INCIDENT_ACCUSES_MERGE_WITHOUT_CI	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
