@@ -52,7 +52,9 @@
 # Falha do `git config` (lock, permissão) ou valor que não ficou relativo ⇒ o aviso antigo volta.
 # GATILHO MAIS CEDO: com `--hookspath-only` o hook roda SÓ esta função e responde em JSON de
 # PostToolUse; o settings.json o liga ao PostToolUse da ferramenta Agent (a worktree de agente nasce no
-# meio do turno). O WorktreeCreate do Claude Code SUBSTITUI a criação (docs de hooks), não a observa:
+# meio do turno). LIMITE: o PostToolUse dispara quando a ferramenta RETORNA; o agente de fundo retorna
+# logo, mas o de primeiro plano só ao terminar, e até lá o pre-commit da worktree dele ainda roda o
+# .githooks do checkout principal (a cura chega na próxima chamada de Agent ou no prompt seguinte). O WorktreeCreate do Claude Code SUBSTITUI a criação (docs de hooks), não a observa:
 # parqueado com gatilho em D_WORKTREECREATE_PROPRIO_PARQUEADO_1026.
 set -uo pipefail
 mode="${1:-}"
