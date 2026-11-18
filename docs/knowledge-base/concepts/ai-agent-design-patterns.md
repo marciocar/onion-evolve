@@ -1,6 +1,6 @@
 ---
-verified_at: 2026-07-23
-source: "https://claude.com/blog/introducing-dynamic-workflows-in-claude-code"
+verified_at: 2026-11-18
+source: "https://code.claude.com/docs/en/workflows"
 ---
 
 # AI Agent Design Patterns
@@ -13,7 +13,7 @@ source: "https://claude.com/blog/introducing-dynamic-workflows-in-claude-code"
 |-------|-------|
 | **Versão** | 1.1.0 |
 | **Data de Criação** | 2025-11-24 |
-| **Última Atualização** | 2026-06-13 (refresh orquestração de subagentes) |
+| **Última Atualização** | 2026-11-18 (reverificação: limites do Workflow, nesting, nomes de ferramenta, fontes externas) |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Design de Agentes |
 
@@ -21,16 +21,17 @@ source: "https://claude.com/blog/introducing-dynamic-workflows-in-claude-code"
 
 **Substrato nativo (Claude Code, 2026):**
 
-- [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`), research preview (28/mai/2026)
+- [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`), lançada em research preview (28/mai/2026); a URL hoje redireciona para `claude.com/resources/articles/…` (HTTP 200, 2026-11-18)
+- [Dynamic workflows — doc oficial](https://code.claude.com/docs/en/workflows) — estado atual: disponível em todos os planos pagos, limites do run (verificado 2026-11-18, HTTP 200)
 - [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — relatório sobre doutrina de orquestração
 - Padrões canônicos de orquestração da Anthropic (2026)
 - Práticas do Sistema Onion
 
 **Influências históricas (frameworks externos):**
 
-- [LangChain Agent Documentation](https://python.langchain.com/docs/modules/agents/)
+- [LangChain Agent Documentation](https://docs.langchain.com/oss/python/langchain/overview) — a URL antiga `python.langchain.com/docs/modules/agents/` hoje redireciona para cá (2026-11-18)
 - [CrewAI Framework](https://www.crewai.com/)
-- [AutoGen Multi-Agent Framework](https://microsoft.github.io/autogen/)
+- [AutoGen Multi-Agent Framework](https://microsoft.github.io/autogen/) — ⚠️ a página do projeto hoje avisa que o repositório está **arquivado**, sem manutenção nem correções de segurança, e recomenda migrar para o [Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/migration-guide/from-autogen/) (verificado 2026-11-18). Influência histórica, não recomendação
 
 ---
 
@@ -38,7 +39,7 @@ source: "https://claude.com/blog/introducing-dynamic-workflows-in-claude-code"
 
 Este documento define patterns de design para agentes de IA, focando em arquitetura, especialização, delegação e orquestração para sistemas multi-agente eficientes.
 
-> **Atualização 2026-06-13**: a orquestração multi-agente deixou de ser conceitual e passou a assentar sobre primitivas **nativas do Claude Code** — a ferramenta **Workflow** (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`). A seção de orquestração foi reescrita para refletir esse substrato. Para o aprofundamento operacional de **orquestração** (até 16 subagentes concorrentes, 1.000 agregados por run, custo e tiers), consulte a KB irmã [`agent-orchestration.md`](agent-orchestration.md).
+> **Atualização 2026-06-13**: a orquestração multi-agente deixou de ser conceitual e passou a assentar sobre primitivas **nativas do Claude Code** — a ferramenta **Workflow** (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`). A seção de orquestração foi reescrita para refletir esse substrato. Para o aprofundamento operacional de **orquestração** (16 agentes concorrentes por default e ajustáveis, 1.000 por run, custo e tiers), consulte a KB irmã [`agent-orchestration.md`](agent-orchestration.md).
 
 ### Definição de Agente
 
@@ -151,7 +152,7 @@ Agente = Identidade + Especialização + Ferramentas + Protocolo de Ação
 
 ## 🚀 Orquestração nativa (ferramenta Workflow)
 
-No Claude Code, a coordenação multi-agente não é mais "promptware": ela assenta na ferramenta **Workflow** (research preview, 28/mai/2026). A lógica de coordenação roda em **JavaScript** e custa **0 tokens de modelo** — só os subagentes consomem tokens. Isso muda o eixo de design: o orquestrador descreve o **grafo de execução** em código, não em prosa.
+No Claude Code, a coordenação multi-agente não é mais "promptware": ela assenta na ferramenta **Workflow** (lançada em research preview em 28/mai/2026; hoje disponível em todos os planos pagos, sem rótulo de preview na doc, reverificado 2026-11-18). A lógica de coordenação roda em **JavaScript** e custa **0 tokens de modelo** — só os subagentes consomem tokens. Isso muda o eixo de design: o orquestrador descreve o **grafo de execução** em código, não em prosa.
 
 ### Primitivas
 
@@ -164,7 +165,9 @@ No Claude Code, a coordenação multi-agente não é mais "promptware": ela asse
 | `isolation: 'worktree'` | Isolamento por git worktree | Cada agente em sua própria árvore de trabalho |
 | `budget` | Teto de tokens | Limite de custo por agente/run |
 
-**Limites operacionais (jun/2026):** até **16 subagentes concorrentes** e **1.000 agregados por run**.
+**Limites operacionais (reverificados 2026-11-18 na [doc de workflows](https://code.claude.com/docs/en/workflows)):** **16 agentes concorrentes por default** (ajustável de 1 a 256 por `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`), **1.000 agentes por run** e até **4.096 itens** por chamada de `parallel()`/`pipeline()`.
+
+> **Alcance da tabela acima (2026-11-18):** a doc pública documenta `agent()`, `parallel()`, `pipeline()`, `phase()`, `log()`, `args` e as opções `schema` e `label` de `agent()`. `isolation: "worktree"` e `budget` **não** aparecem na doc pública; o que se conferiu é que o binário 2.1.326 do Claude Code contém as strings `isolation: "worktree"` e `budget.remaining()`, este último como global do script (saldo do run), não como opção por agente. A referência completa do script é a skill embutida `/workflow-authoring`.
 
 ### Snippet: fan-out + síntese
 
@@ -217,9 +220,9 @@ A ferramenta Workflow permite fixar o modelo por chamada de `agent(...)`, então
 
 > Tiers no Claude Code, do topo para a base: **fable** (Mythos-class, **acima** de opus — não é par dele), **opus**, **sonnet**, **haiku**. Versões driftam; cite por **tier**, nunca por versão — fonte única do lineup: [`agent-orchestration.md` §Disponibilidade de modelos](agent-orchestration.md). Não existe "gpt-4" nem qualquer modelo OpenAI como opção de modelo de agente no Claude Code.
 
-### Nesting de subagentes (5 níveis)
+### Nesting de subagentes (profundidade 3 por default)
 
-Desde **10/jun/2026 (v2.1.172)**, subagentes podem aninhar **até 5 níveis** de profundidade — antes, o fan-out era de nível único.
+Reverificado em 2026-11-18 na [doc de subagentes](https://code.claude.com/docs/en/sub-agents) e no CHANGELOG: desde **2.1.219** um subagente pode disparar subagentes **até 3 camadas abaixo da conversa principal** por default, ajustável por `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` (`=1` desliga). A nota antiga ("5 níveis desde v2.1.172") foi superada: houve 5 níveis em 2.1.181, nesting desligado por default em 2.1.217 e o default de 3 em 2.1.219. Há também um teto de **20 subagentes concorrentes** (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`), sem teto total por sessão.
 
 Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente. Coordenar a orquestração a partir do nível principal é mais barato (coordenação JS = 0 tokens) e mais limpo (respeita a regra `agents/* ↛ commands/*`). Reserve o nesting profundo para sub-decomposições legítimas, não para esconder a orquestração dentro de um agente.
 
@@ -258,7 +261,7 @@ expertise:
   - Performance optimization
 tools:
   - Read
-  - write
+  - Write
   - Grep
 ```
 
@@ -275,7 +278,7 @@ expertise:
   - Estruturação de conhecimento
 tools:
   - Read
-  - write
+  - Write
   - Grep
 related_agents:
   - command-creator-specialist
@@ -395,11 +398,13 @@ context:
 
 | Tipo de Agente | Ferramentas Recomendadas |
 |----------------|--------------------------|
-| **Pesquisa** | `Grep`, `WebSearch`, `Grep`, `Read` |
+| **Pesquisa** | `Glob`, `Grep`, `WebSearch`, `WebFetch`, `Read` |
 | **Desenvolvimento** | `Read`, `Write`, `Edit`, `Bash` |
-| **Review** | `Read`, `Grep`, `Grep` |
+| **Review** | `Read`, `Grep`, `Glob` |
 | **Documentação** | `Read`, `Write`, `Grep` |
 | **Teste** | `Read`, `Write`, `Bash` |
+
+> Os nomes vêm da [referência de ferramentas](https://code.claude.com/docs/en/tools-reference) (`Read`, `Write`, `Edit`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `Bash`…), escritos com a inicial maiúscula. A redação anterior trazia `write` e `grep` em minúsculas e `Grep` repetido nos exemplos; corrigido em 2026-11-18.
 
 ### Pattern: Agnostic Tools
 
@@ -409,9 +414,9 @@ context:
 ```yaml
 tools:
   - Read
-  - write
+  - Write
   - Grep
-  - grep
+  - Glob
   - WebSearch
 # Sem MCPs específicos - portável para qualquer projeto
 ```
@@ -420,7 +425,7 @@ tools:
 ```yaml
 tools:
   - Read
-  - write
+  - Write
   - mcp__clickup__*      # Acoplado ao ClickUp
 # Útil, mas menos portável
 ```
@@ -553,7 +558,7 @@ name: agent-name
 description: |
   Descrição clara em 1-2 linhas.
 model: sonnet
-tools: [Read, write, Grep, grep]
+tools: [Read, Write, Grep, Glob]
 
 color: purple
 priority: alta
@@ -639,12 +644,13 @@ Faça o que achar melhor.
 
 ### Substrato nativo (Claude Code, 2026)
 - [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code)
+- [Dynamic workflows — doc oficial](https://code.claude.com/docs/en/workflows)
 - [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/)
 
 ### Influências históricas (frameworks externos)
-- [LangChain Agents](https://python.langchain.com/docs/modules/agents/)
+- [LangChain Agents](https://docs.langchain.com/oss/python/langchain/overview)
 - [CrewAI Documentation](https://docs.crewai.com/)
-- [AutoGen](https://microsoft.github.io/autogen/)
+- [AutoGen](https://microsoft.github.io/autogen/) (arquivado; sucessor: Microsoft Agent Framework)
 
 ---
 

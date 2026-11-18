@@ -1,6 +1,6 @@
 ---
-verified_at: 2026-07-23
-source: "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5"
+verified_at: 2026-11-18
+source: "https://platform.claude.com/docs/en/models/overview"
 ---
 
 # Agent Orchestration
@@ -13,7 +13,7 @@ source: "https://platform.claude.com/docs/en/about-claude/models/introducing-cla
 |-------|-------|
 | **Versão** | 1.4.0 |
 | **Data de Criação** | 2026-06-13 |
-| **Última Atualização** | 2026-07-20 |
+| **Última Atualização** | 2026-11-18 (reverificação contra a doc do Claude Code, o CHANGELOG 2.1.327 e o overview de modelos) |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Camada de Orquestração de Agentes |
 
@@ -22,15 +22,17 @@ source: "https://platform.claude.com/docs/en/about-claude/models/introducing-cla
 **Substrato nativo (Claude Code, 2026):**
 
 - [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`), research preview (28/mai/2026)
-- [Claude Code Release Notes — v2.1.172](https://docs.claude.com/en/docs/claude-code/release-notes) — nesting de subagentes até 5 níveis (10/jun/2026)
-- [Agent View — General Availability](https://docs.claude.com/en/docs/claude-code/agent-view) — observabilidade de orquestração (GA, mai/2026)
+- [Dynamic workflows — doc oficial](https://code.claude.com/docs/en/workflows) — limites do run (16 concorrentes por default, ajustável de 1 a 256; 1.000 agentes por run; 4.096 itens por `parallel()`/`pipeline()`) (verificado 2026-11-18, HTTP 200)
+- [CHANGELOG do Claude Code](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md) — nesting de subagentes: profundidade 3 por default desde 2.1.219 (a nota antiga de "5 níveis" valia em 2.1.181) (verificado 2026-11-18, HTTP 200, topo 2.1.327)
+- [Agent view](https://code.claude.com/docs/en/agent-view) — observabilidade de sessões e agentes; **segue em research preview** (introduzida em 2.1.139). A redação antiga dizia "GA, mai/2026", o que a doc não sustenta (verificado 2026-11-18)
 - [Building Effective Agents — Anthropic](https://www.anthropic.com/engineering/building-effective-agents) — padrões canônicos de orquestração (2026)
 - [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — doutrina da "era da orquestração"
-- [Claude Code — Agent Teams](https://code.claude.com/docs/en/agent-teams) — substrato experimental de peers persistentes (`TeamCreate`/`SendMessage`/task list compartilhada), atrás de `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
-- [Create custom subagents](https://code.claude.com/docs/en/sub-agents) — teto de 200 subagentes por sessão (`CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`), requer v2.1.212+ (verificado 2026-07-20)
+- [Claude Code — Agent Teams](https://code.claude.com/docs/en/agent-teams) — substrato experimental de peers persistentes (um time implícito por sessão, `SendMessage`, task list compartilhada), atrás de `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; o `TeamCreate`/`TeamDelete` saiu em 2.1.178 (verificado 2026-11-18)
+- [Create custom subagents](https://code.claude.com/docs/en/sub-agents) — limite de **20 subagentes concorrentes** (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`, desde 2.1.217) e de profundidade; **não há teto total por sessão**: o de 200 (`CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`, 2.1.212) foi removido em 2.1.224 (verificado 2026-11-18)
 - [Tools reference — Claude Code](https://code.claude.com/docs/en/tools-reference) — teto de 200 `WebSearch` por sessão (`CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`), somado entre conversa principal e subagentes (verificado 2026-07-20)
 - [Introducing Claude Fable 5 and Claude Mythos 5](https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5) e [anúncio Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5) — tier Mythos-class acima de Opus, GA 09/jun/2026 (Fable 5) vs gated (Mythos 5) (verificado 2026-07-20)
 - [Introducing Claude Sonnet 5](https://www.anthropic.com/news/claude-sonnet-5) — GA 30/jun/2026, novo default agentic (verificado 2026-07-20)
+- [Models overview](https://platform.claude.com/docs/en/models/overview) — lineup vigente: Fable 5.2, Opus 5.5, Sonnet 5.5, Haiku 5.5; Mythos 5.2 em disponibilidade limitada (verificado 2026-11-18, HTTP 200)
 
 **Relacionados no Onion:**
 
@@ -43,7 +45,7 @@ source: "https://platform.claude.com/docs/en/about-claude/models/introducing-cla
 
 Uma **orquestração de subagentes** é a **execução paralela coordenada de subagentes especializados** sob um único orquestrador. Em vez de um agente único processar uma tarefa de ponta a ponta de forma serial, a orquestração **decompõe** o trabalho, **despacha** N subagentes em paralelo (fan-out), aguarda (ou não) sua conclusão e **consolida** os resultados (fan-in).
 
-A partir de jun/2026, no Claude Code, a orquestração deixou de ser "promptware" e passou a assentar sobre a ferramenta nativa **Workflow** (research preview, 28/mai/2026). A coordenação roda em **JavaScript** e custa **0 tokens de modelo** — apenas os subagentes consomem tokens. O orquestrador descreve o **grafo de execução** em código, não em prosa.
+A partir de jun/2026, no Claude Code, a orquestração deixou de ser "promptware" e passou a assentar sobre a ferramenta nativa **Workflow** (lançada em research preview em 28/mai/2026; a doc atual a dá como disponível em todos os planos pagos, na API e nas nuvens, sem rótulo de preview, verificado 2026-11-18). A coordenação roda em **JavaScript** e custa **0 tokens de modelo** — apenas os subagentes consomem tokens. O orquestrador descreve o **grafo de execução** em código, não em prosa.
 
 As cinco propriedades que definem uma orquestração madura:
 
@@ -53,7 +55,7 @@ As cinco propriedades que definem uma orquestração madura:
 | **Isolamento** | Cada worker pode rodar em sua própria git worktree (`isolation: 'worktree'`), sem colisão de estado. |
 | **Verificação** | Geradores são contestados por críticos/juízes antes de o resultado ser aceito. |
 | **Budget** | Teto de tokens por agente e por run, contendo custo de execuções longas. |
-| **Observabilidade** | Cada subagente é inspecionável em tempo real via Agent View. |
+| **Observabilidade** | Cada agente do run é inspecionável em tempo real (`/workflows`, e as sessões pelo agent view). |
 
 > A camada de orquestração é o nível operacional acima do design de agente individual. Para o design do agente em si (identidade, ferramentas, especialização), veja a KB irmã [`ai-agent-design-patterns.md`](ai-agent-design-patterns.md).
 
@@ -83,7 +85,7 @@ Orquestração **não é default**. Ela paga overhead de coordenação, multipli
 
 ## 🔀 Dois Substratos de Orquestração: Workflow vs Agent Teams
 
-> **Status (jun/2026):** Agent Teams é **experimental**, atrás da flag `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (off por default). O substrato **default e portável** da orquestração Onion é a ferramenta **Workflow**. Esta seção fixa a fronteira; a decisão de framework está registrada em `onion-agent-teams-evaluation-2026-06.md` (análise interna do core).
+> **Status (jun/2026, reconferido em 2026-11-18 na doc oficial):** Agent Teams segue **experimental**, atrás da flag `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (off por default). O substrato **default e portável** da orquestração Onion é a ferramenta **Workflow**. Esta seção fixa a fronteira; a decisão de framework está registrada em `onion-agent-teams-evaluation-2026-06.md` (análise interna do core).
 
 Decididos a usar uma orquestração (acima), restam **dois substratos** com modelos de coordenação opostos. Não competem — cobrem **shapes de trabalho diferentes**:
 
@@ -95,7 +97,7 @@ Decididos a usar uma orquestração (acima), restam **dois substratos** com mode
 | Retomável | Sim (journal de run) | Parcial (sem resumption de teammate in-process) |
 | Custo de coordenação | **0 tokens** (roda em JS) | Tokens (cada turno de teammate + lead) |
 | Auditável | Alto (grafo explícito, determinístico) | Menor (coordenação emergente) |
-| Substrato | ferramenta `Workflow` | `TeamCreate` / `SendMessage` / task list nativa |
+| Substrato | ferramenta `Workflow` | time implícito da sessão (teammate = `Agent` com `name`) / `SendMessage` / task list nativa. O `TeamCreate` saiu em 2.1.178 |
 
 ### Decisão: qual substrato
 
@@ -252,26 +254,28 @@ A ferramenta **Workflow** é o substrato de orquestração. A ferramenta **Agent
 
 **Barreira vs. sem barreira:** `parallel` é a escolha quando há um passo de fan-in que precisa de **todos** os resultados (síntese). `pipeline` é a escolha quando cada item pode percorrer os estágios no seu próprio ritmo, sem esperar os demais (maior throughput).
 
-**Limites operacionais (jun/2026):** até **16 subagentes concorrentes** e **1.000 agregados por run** — teto do **Workflow** (o run).
+**Limites operacionais (reverificados 2026-11-18 na [doc de workflows](https://code.claude.com/docs/en/workflows), §Behavior and limits):** até **16 agentes concorrentes por default** (menos quando há menos CPUs, inclusive em container com limite de CPU; ajustável de 1 a 256 por `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`, desde 2.1.269), **1.000 agentes no total por run** e **até 4.096 itens** numa única chamada de `parallel()` ou `pipeline()` (a lista maior é recusada com erro). São tetos do **Workflow** (o run).
 
 > ⚠️ **`CLAUDE_CODE_SUBAGENT_MODEL_FORCE` (Claude Code ≥ 2.1.257, verificado no CHANGELOG oficial, radar E3 2026-09-02) força UM modelo em todo subagente, ignorando `model` por spawn e por definição de agente.** É exatamente o que o tiering por fase desta casa declara (51 de 60 agentes trazem `model:`; a skill fixa model por spawn) — com a env setada, o relatório de tiering **mente**. **Desde 2.1.296 há uma segunda: `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL`** roda todo agente de Workflow num modelo só, enquanto os demais subagentes mantêm o seu (radar E3 r9, 2026-10-11). A `onion-orchestration` checa as duas antes de declarar o tier (passo 8) pelo helper determinístico `.claude/utils/orchestration/forced-model-check.sh` (rc 1 + linha de AVISO quando algo força; silêncio e rc 0 quando nada força). O helper substitui o grep de substring `CLAUDE_CODE_SUBAGENT_MODEL` da redação anterior, que errava nos dois sentidos: dava 0 para a variável nova e acusava `CLAUDE_CODE_SUBAGENT_MODEL` sozinha, que desde 2.1.251 é piso e não força. Variável `CLAUDE_CODE_*MODEL*` fora do catálogo também vira AVISO, como "não catalogada"; o remapeamento de alias por `ANTHROPIC_DEFAULT_*_MODEL` é outra classe e fica fora (lacuna declarada no helper). Mecanizar a checagem no lint continua GATED até a 1ª orquestração real rodar com o modelo forçado.
 >
-> ⚠️ **Teto POR SESSÃO do Claude Code (verificado na doc primária, 2026-07-20) — é OUTRO teto, e NÃO é o fan-out do Workflow.** O harness limita **200 subagentes por sessão** (`CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`, requer Claude Code ≥ v2.1.212; qualquer inteiro positivo, sem teto máximo, **não desligável**).
+> ⚠️ **Teto da SESSÃO do Claude Code — reverificado 2026-11-18: o teto TOTAL de 200 por sessão NÃO EXISTE MAIS.** Ele nasceu em 2.1.212 (`CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`) e foi **removido em 2.1.224** (CHANGELOG: *"Removed the 200-subagent-per-session spawn cap; long-running sessions no longer refuse new agents (concurrency and depth limits still apply)"*). A doc de subagentes hoje diz: *"There's no limit on the total number of subagents Claude can spawn over a session."* O que vale são **dois** limites:
 >
-> **O que CONTA:** todo subagente disparado com a ferramenta `Agent` — aninhados, background, e **inclusive os que um agente de workflow dispara com `Agent`**; e o `/subtask` (fork in-session) gasta o mesmo orçamento.
-> **O que NÃO conta — o ponto que inverte a intuição:** *"Agents a workflow script spawns with `agent()` don't count; workflows have their own per-run limit."* Ou seja, **o fan-out de `agent()` de uma orquestração NÃO consome o orçamento da sessão** — o teto de run (16 concorrentes / 1.000 agregados) é que rege ali. `/fork` também não conta (vira sessão separada, com orçamento próprio).
+> - **Concorrência:** com **20 subagentes rodando**, o próximo `Agent` falha com `Concurrent subagent limit reached` e o erro manda não repetir; ajustável por `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` (desde 2.1.217). O `/subtask` ocupa vaga enquanto roda. **Agentes de workflow e teammates de agent team seguem os limites próprios**, não este, então o fan-out de `agent()` de uma orquestração continua regido pelo teto do run (acima).
+> - **Profundidade:** ver *Nesting* abaixo.
+>
+> Fonte: [sub-agents §Concurrent subagent limit](https://code.claude.com/docs/en/sub-agents) (HTTP 200, 2026-11-18). O texto abaixo descreve o teto de 200 enquanto ele existiu (2.1.212 a 2.1.223) e fica como registro.
 >
 > ⚠️ **Correção de um erro de leitura desta casa (2026-07-20):** a 1ª versão desta nota afirmava que "a sessão morde ANTES do run" e que o fan-out da orquestração contava contra os 200. **É falso**, e justamente no caso que esta KB cobre — foi inferido de "200 < 1.000" sem verificar a fonte, e propagado. Registrado como instância de `declarado≠verificado`, não apagado.
 >
 > **Modo de falha (também invertido na 1ª versão): é ERRO EXPLÍCITO, não silêncio.** *"When Claude reaches the limit, the Agent tool fails with `Subagent spawn limit reached`"* — e o erro instrui a concluir com as próprias ferramentas. O comportamento **silencioso** é o do teto de **WebSearch** (`CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`, default 200, somado entre conversa principal e subagentes) — foi esse que já mordeu a casa (ver [verify-external-for-current](verify-external-for-current.md) e [search-is-sdaal-fallback-when-capped]). **Não generalize um teto pelo sintoma do outro:** diagnosticar com o instrumento errado é o oposto do que a doutrina de percepção prega.
 >
-> **`/clear` reseta a contagem — com ressalva:** *"If work that can still spawn subagents survives the clear, such as a running workflow, the count carries over instead."*
+> **`/clear` resetava a contagem** do teto de 200 (histórico). O teto de **WebSearch** continua vivo (reverificado 2026-11-18): **200 chamadas** por sessão interativa, somadas entre conversa principal e subagentes, elevável mas não desligável; desde 2.1.290 ele **recarrega ~100 por hora** (`CLAUDE_CODE_WEB_SEARCH_REFILLS_PER_HOUR`); em `-p` e no Agent SDK vale por turno.
 >
-> Fontes: [sub-agents §Session subagent limit](https://code.claude.com/docs/en/sub-agents) · [tools-reference §Session search limit](https://code.claude.com/docs/en/tools-reference).
+> Fontes: [sub-agents §Concurrent subagent limit](https://code.claude.com/docs/en/sub-agents) · [tools-reference §Session search limit](https://code.claude.com/docs/en/tools-reference).
 
 **Coordenação = 0 tokens:** a lógica de fan-out/fan-in/filtro/loop roda em JavaScript no orquestrador. Não há custo de modelo na coordenação — só os subagentes pagam tokens. Isso muda o eixo econômico: vale a pena empurrar o máximo de lógica determinística para o JS.
 
-**Nesting (5 níveis):** desde **10/jun/2026 (v2.1.172)**, subagentes podem aninhar **até 5 níveis** de profundidade. Antes, o fan-out era de nível único. Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente — é mais barato e respeita a regra arquitetural do Onion.
+**Nesting (profundidade 3 por default, reverificado 2026-11-18):** o teto mudou três vezes no CHANGELOG — 5 níveis (2.1.181), nesting desligado por default (2.1.217) e, desde **2.1.219**, **até 3 camadas abaixo da conversa principal** por default, ajustável por `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` (`=1` desliga). No limite, o `Agent` some das ferramentas do subagente. A nota antiga ("5 níveis desde v2.1.172") não vale mais. Fonte: [sub-agents §Let subagents spawn their own subagents](https://code.claude.com/docs/en/sub-agents). Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente — é mais barato e respeita a regra arquitetural do Onion.
 
 ---
 
@@ -283,7 +287,7 @@ O caso mais forte de verificação é o **judge-panel**: N céticos avaliam o me
 const verdicts = await parallel(
   Array.from({ length: 3 }, () => () =>
     agent(`Você é um revisor cético. Aprove ou rejeite, com justificativa: ${JSON.stringify(artifact)}`,
-      { schema: VerdictSchema, model: "sonnet-4.6" })
+      { schema: VerdictSchema, model: "sonnet" })
   )
 );
 const approved = verdicts.filter((v) => v.approve).length > verdicts.length / 2; // voto em JS
@@ -320,16 +324,18 @@ A ferramenta Workflow permite fixar o `model` por chamada de `agent(...)`, entã
 >
 > **Opus 5 (verificado por busca externa 2026-07-24): novo `opus`, sucessor drop-in do 4.8.** `claude-opus-5`, GA 24/jul/2026, **mesmo preço do Opus 4.8** ($5/$25 por MTok — o degrau de custo do tier `opus` NÃO mudou), SOTA em coding/knowledge (Frontier-Bench, GDPval-AA), 1M contexto / 128K output, Fast mode ~2.5×. Fica **abaixo** da Mythos-class — "metade do preço do Fable 5" e explicitamente **atrás do Mythos 5 em cyber** —, então o tier Mythos-class continua ACIMA. Ergo: o degrau `opus` ganha um modelo estritamente melhor pelo mesmo custo; **o resto da régua não muda** (referências são por-tier evergreen). ✅ **Acesso ao Opus 5 CONFIRMADO nesta conta (maestro, 2026-07-25)** — a *behavior-verification* que faltava (antes: "GA de mercado ≠ liberado nesta conta, não verificável daqui"; agora verificado). ⚠️ **PORÉM — gap de runtime (behavior-over-declaration AO VIVO):** a ferramenta `Workflow` (e `Agent`) só aceita os aliases de tier `sonnet | opus | haiku | fable` — **não existe alias `opus-5`**. O alias `opus` resolve pro **opus da SESSÃO** (hoje Opus 4.8), então a orquestração **executa 4.8 mesmo com acesso ao 5 confirmado**. Para a orquestração de fato usar Opus 5: **ou** o harness atualiza o mapeamento `opus`→`opus-5`, **ou** a sessão principal roda em Opus 5 (aí os agentes herdam por default). É a própria doutrina [behavior-over-declaration](../agentic-patterns/ai-strategies/behavior-over-declaration.md) ao vivo: **acesso declarado+confirmado ≠ execução observada** (4.8). Nomeie o gap, não o esconda — a régua por-tier segue evergreen (nada a "hardcodar"; o lever é o alias do harness / o modelo da sessão). ✅ **Gap FECHADO por medição (2026-09-02, radar E3):** o transcript do subagente `juiz-e3` spawnado com `model: opus` registra `model: claude-opus-5` em 39 turnos — o alias `opus` **executa** Opus 5 agora (Claude Code 2.1.257; sessão principal em Fable 5.1). Comportamento observado, não catálogo. Fonte: [Introducing Claude Opus 5](https://www.anthropic.com/news/claude-opus-5).
 
+> **Lineup reverificado em 2026-11-18** no [overview de modelos](https://platform.claude.com/docs/en/models/overview) (HTTP 200) e no CHANGELOG do Claude Code: a linha inteira subiu para **5.5**, e a tabela e o snapshot abaixo de 2026-07/09 estão superados. Hoje: **Opus 5.5** (`claude-opus-5-5`, default Opus desde 2.1.280, $4/$20 por MTok — **mais barato** que o Opus 5), **Sonnet 5.5** (`claude-sonnet-5-5`, default Sonnet desde 2.1.284, $2/$10), **Haiku 5.5** (`claude-haiku-5-5`, default Haiku desde 2.1.293, a partir de $0,10/$0,50), **Fable 5.2** (`claude-fable-5-2`, default Fable desde 2.1.321, $8/$40) e **Mythos 5.2** em disponibilidade limitada ($8/$40). Todos com 1M de contexto e 128K de saída. O overview recomenda começar pelo Opus 5.5 e subir para o Fable 5.2 no trabalho exigente. A régua por tier (`opus`/`sonnet`/`haiku`/`fable`) não muda: só o modelo por trás de cada alias.
+>
 > **Fable 5.2 (2026-11-11):** `claude-fable-5-2` é o Fable padrão desde o Claude Code 2.1.321 e o primário do lineup da sessão. Numa comparação com gabarito dentro do Onion ele superou o 5.1, e o Sonnet 5.5 empatou com ele em acerto a cerca de um oitavo do custo, em auditoria de um arquivo. Estudo: `docs/evolution/research/model-compare-onion-2026-11/`.
 
-| Tier | Uso típico | Disponibilidade (verificado 2026-07-20) |
+| Tier | Uso típico | Disponibilidade (reverificado 2026-11-18) |
 |---|---|---|
-| `opus` | orquestrador, juízes adversariais padrão | geral — **Claude Opus 5** (`claude-opus-5`, GA 24/jul/2026) é hoje o opus: SOTA em coding/agentic, **mesmo preço do 4.8** ($5/$25 por MTok), sucessor drop-in ao tier |
-| `sonnet` | raciocínio de média complexidade | geral — **Claude Sonnet 5** (GA 30/jun/2026) é hoje o worker sonnet: o mais agentic da linha Sonnet, qualidade próxima de Opus a custo menor, e novo default dos planos Free/Pro |
-| `haiku` | workers mecânicos, alto volume | geral — **Claude Haiku 5** é hoje o worker haiku (a linha inteira subiu para 5-family em 2026-07) |
-| **Mythos-class** (acima de opus) | reservado à faixa **difícil/alto risco** (verify adversarial, juiz/painel, síntese crítica) — **só se a conta tiver acesso confirmado** | `claude-fable-5` é **GA de mercado** (fato verificável); `claude-mythos-5` é **gated** (Project Glasswing). **GA de mercado ≠ liberado nesta conta/plano** — isso não é verificável daqui |
+| `opus` | orquestrador, juízes adversariais padrão | geral — **Claude Opus 5.5** (`claude-opus-5-5`, default Opus desde o Claude Code 2.1.280), $4/$20 por MTok. Antes: Opus 5 (24/jul/2026, $5/$25) |
+| `sonnet` | raciocínio de média complexidade | geral — **Claude Sonnet 5.5** (`claude-sonnet-5-5`, default Sonnet desde 2.1.284), $2/$10 por MTok. Antes: Sonnet 5 (30/jun/2026) |
+| `haiku` | workers mecânicos, alto volume | geral — **Claude Haiku 5.5** (`claude-haiku-5-5`, default Haiku desde 2.1.293), a partir de $0,10/$0,50 por MTok |
+| **Mythos-class** (acima de opus) | reservado à faixa **difícil/alto risco** (verify adversarial, juiz/painel, síntese crítica) — **só se a conta tiver acesso confirmado** | `claude-fable-5-2` é **GA de mercado** (default Fable desde 2.1.321, $8/$40); `claude-mythos-5-2` é de **disponibilidade limitada**. **GA de mercado ≠ liberado nesta conta/plano** — isso não é verificável daqui |
 
-Tiers de **worker** recomendados (uso geral): **opus / sonnet / haiku** — sempre disponíveis, sempre o piso seguro. Para a faixa **difícil/alto risco**: **se a conta tiver acesso confirmado ao tier Mythos-class**, o frontier atual dessa faixa é `claude-fable-5`; **sem confirmação de acesso, use `opus`** — não assuma o tier superior só porque ele é GA no mercado. Snapshot de versões (2026-09-02 — lineup **5-family**; Fable 5.1 verificado no CHANGELOG oficial do Claude Code 2.1.257, l.10 e l.99, radar E3): **Opus 5** (`claude-opus-5`, tier `opus`) / **Sonnet 5** (`claude-sonnet-5`, tier `sonnet`) / **Haiku 5** (tier `haiku`) / **Fable 5.1** (`claude-fable-5-1`, Mythos-class GA — novo default Fable, 1M ctx, $10/$50 por MTok, cache read $0,25) / **Mythos 5** (Mythos-class gated). ✅ **Alias `fable` do `Agent` MEDIDO em 2026-09-02** (sessão sem gateway, Claude Code 2.1.257): o campo `model` da resposta da API do subagente devolveu `claude-fable-5-1` — fecha por medição a lacuna 2 do radar E3 (`E_PROBE_ALIAS_FABLE_5_1` no grafo `fable-5-1-superacao-2026-09`). ⚠️ Escopo do medido: o `Workflow` tool **não** foi medido (mesma cadeia de resolução, declarado); em sessões **via gateway** o CHANGELOG (l.99) segue dizendo que o alias resolve para Fable 5 ("for now"; 5.1 só por `/model`) — ali "5.1 é o frontier" continua declaração de catálogo; ✅ **acesso ao 5.1 nesta conta CONFIRMADO pelo maestro (2026-09-02, testemunho — `E_FABLE_5_1_CONFIRMADO_NA_CONTA` no grafo do radar E3)**; a sessão principal do core já executa `claude-fable-5-1` (observado). Custo continua declaração de catálogo, não medição. Toda a linha subiu para 5 — atualizar SÓ este snapshot mantém o framework corrente (o resto referencia por tier evergreen). Não existe "gpt-4" nem qualquer modelo de outro provider como opção de modelo de agente no Claude Code.
+Tiers de **worker** recomendados (uso geral): **opus / sonnet / haiku** — sempre disponíveis, sempre o piso seguro. Para a faixa **difícil/alto risco**: **se a conta tiver acesso confirmado ao tier Mythos-class**, o frontier atual dessa faixa é `claude-fable-5-2` (reverificado 2026-11-18); **sem confirmação de acesso, use `opus`** — não assuma o tier superior só porque ele é GA no mercado. Snapshot de versões (2026-09-02, **superado em 2026-11-18 pela linha 5.5 da nota acima**, mantido como registro — lineup **5-family**; Fable 5.1 verificado no CHANGELOG oficial do Claude Code 2.1.257, l.10 e l.99, radar E3): **Opus 5** (`claude-opus-5`, tier `opus`) / **Sonnet 5** (`claude-sonnet-5`, tier `sonnet`) / **Haiku 5** (tier `haiku`) / **Fable 5.1** (`claude-fable-5-1`, Mythos-class GA — novo default Fable, 1M ctx, $10/$50 por MTok, cache read $0,25) / **Mythos 5** (Mythos-class gated). ✅ **Alias `fable` do `Agent` MEDIDO em 2026-09-02** (sessão sem gateway, Claude Code 2.1.257): o campo `model` da resposta da API do subagente devolveu `claude-fable-5-1` — fecha por medição a lacuna 2 do radar E3 (`E_PROBE_ALIAS_FABLE_5_1` no grafo `fable-5-1-superacao-2026-09`). ⚠️ Escopo do medido: o `Workflow` tool **não** foi medido (mesma cadeia de resolução, declarado); em sessões **via gateway** o CHANGELOG (l.99) segue dizendo que o alias resolve para Fable 5 ("for now"; 5.1 só por `/model`) — ali "5.1 é o frontier" continua declaração de catálogo; ✅ **acesso ao 5.1 nesta conta CONFIRMADO pelo maestro (2026-09-02, testemunho — `E_FABLE_5_1_CONFIRMADO_NA_CONTA` no grafo do radar E3)**; a sessão principal do core já executa `claude-fable-5-1` (observado). Custo continua declaração de catálogo, não medição. Toda a linha subiu para 5 — atualizar SÓ este snapshot mantém o framework corrente (o resto referencia por tier evergreen). Não existe "gpt-4" nem qualquer modelo de outro provider como opção de modelo de agente no Claude Code.
 
 **Fontes (verificado por busca externa em 2026-07-20):**
 - [Introducing Claude Fable 5 and Claude Mythos 5](https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5) — especificações, disponibilidade (GA vs gated), 1M contexto/128K output, $10/$50 por MTok
@@ -482,9 +488,9 @@ Doutrina da era da orquestração:
 
 ## 👁️ Observabilidade
 
-Cada subagente de uma orquestração é inspecionável via **Agent View** (GA, mai/2026): estado, prompt, tokens consumidos e output estruturado de cada worker em tempo real. Sem essa visibilidade, uma orquestração é uma caixa-preta — um worker travado ou divergente passa despercebido até o fan-in.
+Cada agente de um run é inspecionável na view **`/workflows`** (estado, tokens de cada agente enquanto o run anda, e parada a qualquer momento), e as sessões pelo **agent view** (`claude agents`, que **segue em research preview** desde 2.1.139; a redação antiga dizia "GA, mai/2026", reverificado 2026-11-18). Sem essa visibilidade, uma orquestração é uma caixa-preta — um worker travado ou divergente passa despercebido até o fan-in.
 
-Superfícies relacionadas (jun/2026): **Managed Agents** (beta, abr/2026) e **Routines** (research preview, mai/2026).
+Superfícies relacionadas (jun/2026; estado de preview não reconferido em 2026-11-18): **Managed Agents** (beta, abr/2026) e **Routines** (research preview, mai/2026).
 
 ---
 
