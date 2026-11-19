@@ -113,6 +113,10 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   declarados:** host GitHub Enterprise (o slug não carrega o host), chave do `members.yaml` entre aspas, processo
   desligado da árvore (`setsid`/`nohup` com o pai morto perde o ancestral Claude), Claude instalado por npm (o
   executável não casa `*/claude/versions/*` nem `*/bin/claude`) e sessão que reaponta o próprio origin para o core.
+  **Lista privada (2026-11-19, `D_PRIVATE_OWNER_SESSIONS_1119`):** o membro de consultoria (id neutro, `remote: n/a`)
+  entra pela lista fora do repo (`~/.config/onion/private-owner-sessions.tsv`, modo 600), só quando o alvo não casa
+  remote público, com membro `kind: adopter` e `remote: n/a` em origin/main e o mesmo dono do core; a recusa da catraca nomeia o member_id, nunca
+  o slug, e no CI a lista não é lida.
 - **`Read(...)` de caminho do home vira bloqueio do sistema sob sandbox.** O Claude Code a aplica como negação de leitura
   do sandbox: o processo do Bash não lê aquele caminho, inclusive quando o leitor é a maquinaria. Com a regra do
   `hosts.yml` do `gh`, `gh auth status` e o credential helper do git quebram (medido). A exceção

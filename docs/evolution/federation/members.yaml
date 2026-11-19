@@ -31,6 +31,11 @@
 # `owner_session` também é a LISTA FECHADA do merge pela sessão (2026-11-18, D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118):
 # o ops/pr-merge-verified.sh só deixa uma sessão mergear no repo dela quando ele é o `kind: source` ou declara
 # `owner_session`, e o dono do remote é o dono do core; repo de cliente (outro dono) fica sempre fora.
+# LISTA PRIVADA de sessões donas (2026-11-19, D_PRIVATE_OWNER_SESSIONS_1119): o membro de consultoria fica AQUI com id
+# neutro e `remote: n/a`, porque o endereço leva o nome do cliente e este repo é público. O slug real vive fora do repo,
+# em ~/.config/onion/private-owner-sessions.tsv (ou $ONION_PRIVATE_OWNERS_FILE), modo 600, uma linha
+# `member_id<TAB>dono/repo<TAB>owner_session`. A catraca a lê só quando o alvo não casa nenhum `remote:` daqui, e só vale
+# para o membro que existe aqui com `kind: adopter` e `remote: n/a`; dono do slug igual ao do core; no CI ela não é lida.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1

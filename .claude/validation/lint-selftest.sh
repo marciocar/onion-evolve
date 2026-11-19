@@ -26426,6 +26426,9 @@ run_pr_merge_verified_selftests() {
   local sut="${REPO_ROOT}/ops/pr-merge-verified.sh"
   [ -f "${sut}" ] || { record_skip "pr-merge-verified: ops/ ausente (adotante) → pulado"; return; }
   local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  # (D_PRIVATE_OWNER_SESSIONS_1119) a lista privada de sessões donas da família é SEMPRE fixture: nunca o arquivo real
+  # do maestro em ~/.config/onion. Sem os casos pv*, o caminho não existe e a catraca se comporta como antes.
+  local -x ONION_PRIVATE_OWNERS_FILE="${d}/sem-lista-privada.tsv"
   cat > "${d}/gh" <<'STUB'
 #!/usr/bin/env bash
 args="$*"
@@ -26821,6 +26824,7 @@ STUB
       GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x GH_WF_COUNT=5 \
       GH_PR_FILES="${CR_FILES:-docs/evolution/review/feat-x.md a.txt}" GH_RESIDUE="${CR_RESIDUE-${_cr_ok}}" ONION_MERGE_POLL_SECS=0 \
       STUB_GHREPO_LOG="${d}/ghrepo-cr.log" env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "${CR_PREFIX:-} bash '${scr}' 999 $*; exit \$?" 2>&1)" || rc=$?
+    _CR_OUT="${o}"   # (pv*) a saída do caso, para conferir o que a recusa NÃO imprime
     if { [ "${want}" = 0 ] && [ "${rc}" -eq 0 ] && [ -s "${d}/merge-args" ]; } \
        || { [ "${want}" = 1 ] && [ "${rc}" -ne 0 ] && [ ! -s "${d}/merge-args" ]; }; then
       grep -qF -- "${txt}" <<< "${o}" && { record_pass "pr-merge-verified: ${lbl}"; return 0; }
@@ -26852,7 +26856,7 @@ STUB
   _crs "(cr5) a peça mergeando OUTRA peça listada ⇒ recusa (só o próprio repo)" 1 "não é o repo desta sessão" "${_cr_peca}" "${_pi}" --repo onion-bancada/peca2
   _crs "(cr6) PORTA da família, mesmo com owner_session ⇒ recusa" 1 "PORTA" "${_cr_peca}" "${_pi}" --repo onion-bancada/porta2
   # MUTANTE que ABRE a lista: o ausente do registro passa a valer, e o cr3 mergearia
-  sed "s/^    \"\") die \"'\${_t}' não está na lista fechada/    \"\") : ;; #/" "${_pi}" > "${fc}/ops/pmv-mut.sh"
+  sed "s/^    \"\") die \"\${_lbl} não está na lista fechada/    \"\") : ;; #/" "${_pi}" > "${fc}/ops/pmv-mut.sh"
   if cmp -s "${_pi}" "${fc}/ops/pmv-mut.sh"; then record_fail "pr-merge-verified: (cr3-MUT)" "a âncora da lista fechada sumiu"
   else _crs "(cr3-MUT) com a lista aberta, o repo fora do registro mergearia — a lista fechada é a causa" 0 "catraca do repo próprio" "${d}/s-nada" "${fc}/ops/pmv-mut.sh" --repo onion-bancada/nada; fi
   # MUTANTE sem a recusa pelo dono: o cliente listado do cr2 mergearia
@@ -26921,6 +26925,90 @@ STUB
   [ "${o}" = "cliente/repo" ] && record_pass "pr-merge-verified: (b1) HTTPS://GitHub.com/Cliente/Repo.git normaliza para cliente/repo" || record_fail "pr-merge-verified: (b1)" "veio '${o}'"
   o="$(bash -c "$(sed "s/tr '\[:upper:\]' '\[:lower:\]' <<< \"\$1\" | sed -E/sed -E/; s/; s#\/+\$##'; }/; s#\/+\$##' <<< \"\$1\"; }/" <<< "${_sn}")"$'\n_slug_norm HTTPS://GitHub.com/Cliente/Repo.git' 2>&1)"
   [ "${o}" != "cliente/repo" ] && record_pass "pr-merge-verified: (b1-MUT) sem as minúsculas antes, o esquema maiúsculo escapa ('${o}') — a ordem é a causa" || record_fail "pr-merge-verified: (b1-MUT)" "o mutante também normalizou"
+  # ── LISTA PRIVADA DE SESSÕES DONAS (D_PRIVATE_OWNER_SESSIONS_1119, 2026-11-19): o membro de consultoria tem id neutro e
+  # `remote: n/a` no registro, e o slug real numa lista FORA do repo (aqui, sempre fixture). Os slugs privados levam
+  # "sigilo" no nome, e nenhuma recusa pode imprimi-lo. O registro de sandbox ganha os membros neutros (restaurado no fim
+  # da família, pelo registro-volta).
+  printf '  - id: semremote\n    kind: adopter\n  - id: neutro\n    kind: adopter\n    remote: n/a   # consultoria\n  - id: neutro2\n    kind: adopter\n    owner_session: outra\n    remote: n/a\n  - id: neutroporta\n    kind: door\n    remote: n/a\n  - id: publico\n    kind: adopter\n    remote: github.com/onion-bancada/publico\n' >> "${_mfy}"
+  git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm registro-1119
+  git -C "${fc}" update-ref refs/remotes/origin/main HEAD
+  local _pv="${d}/priv" _pvs _pvl
+  mkdir -p "${_pv}"
+  printf '# member_id\tdono/repo\towner_session\n%s\t%s\t%s\n' \
+    neutro onion-bancada/sigilo-a sessao-neutra \
+    fantasma onion-bancada/sigilo-b x \
+    neutroporta onion-bancada/sigilo-c x \
+    neutro2 outrodono/sigilo-d outra \
+    publico onion-bancada/sigilo-e x \
+    neutro2 onion-bancada/sigilo-f errada \
+    neutro onion-bancada/sigilo-h sessao-neutra \
+    neutro2 onion-bancada/sigilo-h outra \
+    neutro onion-bancada/porta2 sessao-neutra \
+    semremote onion-bancada/sigilo-i x > "${_pv}/lista.tsv"
+  printf 'neutro\tonion-bancada/sigilo-g\n' >> "${_pv}/lista.tsv"
+  chmod 600 "${_pv}/lista.tsv"; cp -p "${_pv}/lista.tsv" "${_pv}/aberta.tsv"; chmod 644 "${_pv}/aberta.tsv"
+  for _pvs in a b c d e f g h i; do
+    _pvl="onion-bancada"; [ "${_pvs}" = d ] && _pvl="outrodono"
+    git init -q "${d}/s-sig-${_pvs}"; git -C "${d}/s-sig-${_pvs}" remote add origin "https://github.com/${_pvl}/sigilo-${_pvs}.git"
+  done
+  git init -q "${d}/s-porta2"; git -C "${d}/s-porta2" remote add origin https://github.com/onion-bancada/porta2.git
+  local _pvp="ONION_PRIVATE_OWNERS_FILE='${_pv}/lista.tsv' CI= GITHUB_ACTIONS="
+  _pvq() { # $1=rótulo : a última saída do _crs não traz o slug privado (nem o nome, nem o dono de fora)
+    if grep -qE 'sigilo|outrodono' <<< "${_CR_OUT}"; then record_fail "pr-merge-verified: $1" "a saída imprimiu o slug privado: $(grep -oE '[^ ]*(sigilo|outrodono)[^ ]*' <<< "${_CR_OUT}" | head -1)"
+    else record_pass "pr-merge-verified: $1"; fi
+  }
+  CR_PREFIX="${_pvp}" _crs "(pv1) membro neutro + linha privada (modo 600, mesmo dono) ⇒ a sessão dona mergeia" 0 "pela lista privada de sessões donas" "${d}/s-sig-a" "${_pi}" --repo onion-bancada/sigilo-a
+  _pvq "(pv1q) o aceite nomeia o member_id, não o slug"
+  CR_PREFIX="${_pvp}" _crs "(pv2) linha privada de membro inexistente no registro ⇒ recusa" 1 "não existe no members.yaml" "${d}/s-sig-b" "${_pi}" --repo onion-bancada/sigilo-b
+  _pvq "(pv2q) a recusa do membro inexistente não imprime o slug"
+  CR_PREFIX="ONION_PRIVATE_OWNERS_FILE='${_pv}/aberta.tsv' CI= GITHUB_ACTIONS=" \
+    _crs "(pv3) a lista em modo 644 ⇒ recusa" 1 "mais aberto que 600" "${d}/s-sig-a" "${_pi}" --repo onion-bancada/sigilo-a
+  _pvq "(pv3q) a recusa do modo não imprime o slug"
+  CR_PREFIX="${_pvp}" _crs "(pv4) slug de OUTRO dono, mesmo listado ⇒ recusa pelo dono" 1 "é de outro dono" "${d}/s-sig-d" "${_pi}" --repo outrodono/sigilo-d
+  _pvq "(pv4q) a recusa pelo dono não imprime o slug nem o dono"
+  CR_PREFIX="${_pvp}" _crs "(pv5) membro neutro kind: door ⇒ recusa" 1 "kind: door" "${d}/s-sig-c" "${_pi}" --repo onion-bancada/sigilo-c
+  _pvq "(pv5q) a recusa da porta não imprime o slug"
+  CR_PREFIX="${_pvp}" _crs "(pv6) membro com remote público ⇒ a lista privada não o amplia" 1 "não é o membro neutro" "${d}/s-sig-e" "${_pi}" --repo onion-bancada/sigilo-e
+  CR_PREFIX="${_pvp}" _crs "(pv7) owner_session da linha difere da do registro ⇒ recusa" 1 "difere da do members.yaml" "${d}/s-sig-f" "${_pi}" --repo onion-bancada/sigilo-f
+  CR_PREFIX="${_pvp}" _crs "(pv8) linha sem owner_session ⇒ recusa" 1 "não diz a owner_session" "${d}/s-sig-g" "${_pi}" --repo onion-bancada/sigilo-g
+  CR_PREFIX="${_pvp}" _crs "(pv9) o alvo casa duas linhas ⇒ recusa (ambíguo)" 1 "ambíguo" "${d}/s-sig-h" "${_pi}" --repo onion-bancada/sigilo-h
+  _crs "(pv10) sem a lista privada (o caminho não existe) ⇒ o comportamento antigo: fora da lista fechada" 1 "não está na lista fechada" "${d}/s-sig-a" "${_pi}" --repo onion-bancada/sigilo-a
+  CR_PREFIX="ONION_PRIVATE_OWNERS_FILE='${_pv}/lista.tsv' CI=true" \
+    _crs "(pv11) no CI (CI=true) a lista não é lida ⇒ o comportamento antigo" 1 "não está na lista fechada" "${d}/s-sig-a" "${_pi}" --repo onion-bancada/sigilo-a
+  CR_PREFIX="${_pvp}" _crs "(pv12) remote público casa antes: a peça do registro segue pela lista pública" 0 "sessão dona peca" "${_cr_peca}" "${_pi}" --repo onion-bancada/peca
+  CR_PREFIX="ONION_PRIVATE_OWNERS_FILE='${_pv}/lista.tsv' CI= GITHUB_ACTIONS=true" \
+    _crs "(pv11b) no CI (só GITHUB_ACTIONS=true) a lista não é lida ⇒ o comportamento antigo" 1 "não está na lista fechada" "${d}/s-sig-a" "${_pi}" --repo onion-bancada/sigilo-a
+  CR_PREFIX="${_pvp}" _crs "(pv13) linha privada que aponta a PORTA pública para o membro neutro ⇒ o registro público vence e recusa" 1 "PORTA" "${d}/s-porta2" "${_pi}" --repo onion-bancada/porta2
+  CR_PREFIX="${_pvp}" _crs "(pv14) membro adopter SEM remote (não é o neutro n/a) ⇒ recusa" 1 "não é o membro neutro" "${d}/s-sig-i" "${_pi}" --repo onion-bancada/sigilo-i
+  # um mutante por cura: cada um tira UMA condição e o caso que ela recusa passa a mergear (ou a imprimir o slug)
+  CR_PREFIX="${_pvp}" _crm "(pv1-MUT) sem a consulta à lista privada, o membro neutro do pv1 é recusado — a consulta é a causa" \
+    's/^  if \[ -z "\${_row}" \] \&\& \[ -n "\${_priv}" \]; then/  if false; then/' "${_pi}" 1 "não está na lista fechada" "${d}/s-sig-a" --repo onion-bancada/sigilo-a
+  CR_PREFIX="${_pvp}" _crm "(pv2-MUT) sem exigir o membro no registro, a linha de membro inexistente mergearia" \
+    's/^  \[ -n "\${_mrow}" \] || die/  _mrow="${_mrow:-adopter\t-\tn\/a}"; true || die/' "${_pi}" 0 "merged" "${d}/s-sig-b" --repo onion-bancada/sigilo-b
+  CR_PREFIX="ONION_PRIVATE_OWNERS_FILE='${_pv}/aberta.tsv' CI= GITHUB_ACTIONS=" _crm "(pv3-MUT) sem a recusa do modo, a lista 644 valeria" \
+    's/^  \[\[ "\${_mode}" =~ ^\[0-7\]{3,4}\$ \]\] \&\& \[ \$(( 8#\${_mode} \& 8#077 )) -eq 0 \] \\$/  true \\/' "${_pi}" 0 "merged" "${d}/s-sig-a" --repo onion-bancada/sigilo-a
+  CR_PREFIX="${_pvp}" _crm "(pv4-MUT) sem a recusa pelo dono, o slug de outro dono listado mergearia" \
+    's/^  \[ -n "\${_corown}" \] && \[ "\${_t%%\/\*}" = "\${_corown}" \] \\$/  true \\/' "${_pi}" 0 "merged" "${d}/s-sig-d" --repo outrodono/sigilo-d
+  CR_PREFIX="${_pvp}" _crm "(pv5-MUT) sem exigir kind: adopter, a porta neutra mergearia" \
+    's/^  \[ "\${_mk}" = adopter \] || die/  true || die/' "${_pi}" 0 "merged" "${d}/s-sig-c" --repo onion-bancada/sigilo-c
+  CR_PREFIX="${_pvp}" _crm "(pv6-MUT) sem exigir remote: n/a, o membro público ganharia um 2º endereço" \
+    's/^  \[ "\${_mr}" = "n\/a" \] \\$/  true \\/' "${_pi}" 0 "merged" "${d}/s-sig-e" --repo onion-bancada/sigilo-e
+  CR_PREFIX="${_pvp}" _crm "(pv7-MUT) sem conferir a owner_session do registro, a linha divergente mergearia" \
+    's/^  \[ "\${_mo}" = "-" \] || \[ "\${_mo}" = "\${_os}" \] \\$/  true \\/' "${_pi}" 0 "merged" "${d}/s-sig-f" --repo onion-bancada/sigilo-f
+  CR_PREFIX="${_pvp}" _crm "(pv8-MUT) sem exigir a owner_session na linha, a linha sem ela mergearia" \
+    's/^  \[ -n "\${_os}" \] || die/  true || die/' "${_pi}" 0 "merged" "${d}/s-sig-g" --repo onion-bancada/sigilo-g
+  CR_PREFIX="${_pvp}" _crm "(pv9-MUT) sem a recusa do ambíguo, a 1ª linha valeria" \
+    's/^  \[ "\${_n}" -eq 1 \] || die/  true || die/' "${_pi}" 0 "merged" "${d}/s-sig-h" --repo onion-bancada/sigilo-h
+  CR_PREFIX="ONION_PRIVATE_OWNERS_FILE='${_pv}/lista.tsv' CI=true" _crm "(pv11-MUT) lendo a lista no CI, o pv11 mergearia" \
+    's/^  { \[ "\${CI:-}" = true \] || \[ "\${GITHUB_ACTIONS:-}" = true \]; } \&\& return 0$/  :/' "${_pi}" 0 "merged" "${d}/s-sig-a" --repo onion-bancada/sigilo-a
+  CR_PREFIX="${_pvp}" _crm "(pv13-MUT) consultando a lista mesmo quando o remote público casa, a porta mergearia" \
+    's/^  if \[ -z "\${_row}" \] \&\& \[ -n "\${_priv}" \]; then/  if [ -n "${_priv}" ]; then/' "${_pi}" 0 "merged" "${d}/s-porta2" --repo onion-bancada/porta2
+  CR_PREFIX="${_pvp}" _crm "(pv14-MUT) aceitando membro sem remote como neutro, o pv14 mergearia" \
+    's/^  \[ "\${_mr}" = "n\/a" \] \\$/  [ "${_mr}" = "n\/a" ] || [ "${_mr}" = "-" ] \\/' "${_pi}" 0 "merged" "${d}/s-sig-i" --repo onion-bancada/sigilo-i
+  CR_PREFIX="${_pvp}" _crm "(pvq-MUT) sem o rótulo do member_id, a recusa do pv4 ainda recusa…" \
+    's/^  \[ -n "\${_priv}" \] \&\& { _lbl=/  false \&\& { _lbl=/' "${_pi}" 1 "é de outro dono" "${d}/s-sig-d" --repo outrodono/sigilo-d
+  if grep -qE 'sigilo' <<< "${_CR_OUT}"; then record_pass "pr-merge-verified: (pvq-MUT) …e imprime o slug privado — o rótulo é a causa"
+  else record_fail "pr-merge-verified: (pvq-MUT)" "o mutante também escondeu o slug"; fi
   # ── «PODE RODAR», nível 1 (2026-11-18): a autorização de um toque. A sessão pede (--one-touch-request, depois de todos
   # os gates), o hook UserPromptSubmit grava a aprovação quando o prompt é a frase sozinha, e o executor (--one-touch)
   # confere repo/ref/PR/sha vivos, TTL, o livro de uso único DELE e o prompt humano no transcript. O hook roda como o
