@@ -13,9 +13,10 @@ meta:
   x_unverified:
     - "adoção do padrão fora da Pelles (1 estrela; nenhum adotante externo medido)"
     - "as três rotas do demo com LLM (exigem chave de API; não rodadas)"
-    - "o registro compartilhado e os trust tiers atribuídos por registro: só na spec, sem implementação de registro remoto no SDK"
+    - "o registro compartilhado, os trust tiers e a delegação por Token Exchange: só na spec, sem implementação no SDK"
+    - "o @a2a-js/sdk: lido no índice do npm (versão, licença), não instalado nem rodado"
     - "rodada de capital da Pelles (estudo de ator, fora do recorte)"
-  note: "Dissecação conduzida direto pela sessão (subagente), nível a nível, sem o motor onion-research.js, que não conhece níveis. Execução isolada: clone e venv no scratchpad, sem dependência global."
+  note: "Dissecação conduzida direto pela sessão (subagente), nível a nível, sem o motor onion-research.js, que não conhece níveis. Execução isolada: clone e venv no scratchpad, sem dependência global. Revisão adversarial isolada (resíduo em docs/evolution/review/docs-dissect-taco-1119.md) derrubou duas razões da 1ª versão do veredito; as curas estão neste grafo."
 external_edges:
   - from: S_STAGE0
     to: .claude/validation/dissect-families.kg.yaml#T_FAMILY_FERRAMENTA
@@ -52,12 +53,13 @@ nodes:
       O LICENSE tem o título «Apache License, Version 2.0» e o aviso de aplicação, sem o texto integral; o
       detector do GitHub não casa e devolve «Other». O pyproject declara license = "Apache-2.0" e o README
       também. Logo a licença permite vendorizar com aviso (E1 da Etapa 0 não barra). Trajetória: 1º commit
-      em 15/03/2026, rajadas em 03, 05, 09-10 e 11/2026; último commit da main em 03/11/2026 (tag v0.7.1),
-      16 dias antes desta medida. Autores: 2 humanos (matanweks, Ido Glanz), o dependabot e commits com
-      autor «Claude» (63 dos 206). Mantenedor é uma organização pequena; sucessão não declarada. O push de
-      15/11 do brief não está na main (há 48 ramos remotos).
+      em 01/03/2026, rajadas em 03, 05, 09-10 e 11/2026; último commit da main em 03/11/2026 (tag v0.7.1),
+      16 dias antes desta medida; 48 tags em 8 meses, todas 0.x. Autores: 2 humanos (matanweks, Ido
+      Glanz), o dependabot e 77 commits com autor «Claude». Mantenedor é uma organização pequena;
+      sucessão não declarada. O push de 15/11 do brief não está na main (há 46 ramos remotos).
+      Contagens corrigidas pela revisão adversarial (a 1ª versão dizia 63, 15/03 e 48 ramos).
     verified_at: "2026-11-19"
-    verified_against: "git clone de github.com/pelles-ai/taco; git log --format='%cs %an'; git tag; cabeça do LICENSE; sdk/pyproject.toml"
+    verified_against: "git clone de github.com/pelles-ai/taco; git log --format=%an | grep -c Claude; git log --reverse --format=%cs | head -1; git tag; git branch -r; cabeça do LICENSE; sdk/pyproject.toml"
     source_tier: 9
     provenance:
       source: "https://github.com/pelles-ai/taco/tree/04062d4b2613995daddc7937d95b0abc9bd73c64"
@@ -80,14 +82,15 @@ nodes:
       skills em runtime (add/remove/list), `TacoClient.discover / send_message / stream`, `AgentRegistry.
       register / find / refresh / remove`, `TacoAgent.send_to_peer` (descoberta do par pela skill),
       `JsonFileTaskStore`, push notifications com checagem de SSRF, `BearerAuthMiddleware` com escopos
-      `taco:task:<tipo>` e `taco:project:<id>:<ação>`. Delta contra o Onion: o bridge A2A do core é
-      signals-only e NÃO serve tasks/get nem SSE (marcador vazio em .claude/validation/a2a-agent-card.sh);
-      o Onion não tem vocabulário de tipos de tarefa com esquema de entrada e saída. Toca dois dos três
-      temas em decisão: (a) núcleo de tarefas — é a forma «construir o núcleo sobre o contrato A2A Task»
-      (C_OPCAO_BUILD_OWN_CORE_CONTRACTS da curadoria); (c) orquestração de sessões — agentes que se
-      descobrem por skill e se chamam por tipo de tarefa. NÃO toca o Company Brain (b): não há memória,
-      grafo nem conhecimento; o /monitor é rastreio de payload. Consumidor nomeado do delta: a pergunta
-      Q_ONION_TRACKER_CORE_GAP_2026_11 (curadoria) e a decisão D_A2A_BACKBONE_PRODUCT_2026_11 (core).
+      `taco:task:<tipo>` (403 por padrão, require_task_scope=True) e `taco:project:<id>:<ação>`. Delta
+      contra o Onion: o bridge A2A do core (TypeScript, onion-bridge) é signals-only e NÃO serve tasks/get
+      nem SSE (marcador vazio em .claude/validation/a2a-agent-card.sh); o Onion não tem vocabulário de
+      tipos de tarefa com esquema de entrada e saída. Toca dois dos três temas em decisão: (a) núcleo de
+      tarefas — é a forma «construir o núcleo sobre o contrato A2A Task» (C_OPCAO_BUILD_OWN_CORE_CONTRACTS
+      da curadoria); (c) orquestração de sessões — agentes que se descobrem por skill, se chamam por tipo
+      de tarefa e (só na spec) delegam com token estreitado. NÃO toca o Company Brain (b): não há
+      memória, grafo nem conhecimento; o /monitor é rastreio de payload. Consumidor nomeado do delta: a
+      pergunta Q_ONION_TRACKER_CORE_GAP_2026_11 (curadoria) e a decisão D_A2A_BACKBONE_PRODUCT_2026_11 (core).
     verified_at: "2026-11-19"
     verified_against: "sdk/taco/cli.py add_parser; grep de def em server.py, client.py, registry.py, agent.py, auth.py, task_store.py, push.py"
     source_tier: 9
@@ -106,25 +109,26 @@ nodes:
     confidence: 0.85
     x_dissect_level: 2
     x_dissect_n2_evidence: artefato-aberto
-    label: "N2: camada fina sobre o a2a-sdk 1.3.1; despacho por metadata.taskType para um dicionário de handlers; o 1º DataPart é a entrada; 660 testes verdes num venv isolado."
+    label: "N2: camada própria sobre o a2a-sdk 1.3.1: despacho por metadata.taskType, escopo por tipo, store por dono, push com SSRF; o 1º DataPart é a entrada; 660 testes verdes num venv isolado."
     narrative: >-
-      Substrato: 7 dos 15 módulos importam o a2a-sdk (Apache-2.0, Google/Linux Foundation); o servidor é o
-      AgentExecutor do a2a-sdk com um executor próprio (_TacoAgentExecutor, server.py:241). Estrutura de
-      dados: a Task do A2A (id, contextId, status, artifacts, history, metadata) com metadata.taskType como
-      chave de roteamento; o handler recebe (task, input_data) e devolve um Artifact; o executor emite
-      working antes do handler, depois artifact e completed, ou failed com texto. Cancelamento é
-      cooperativo (future + conjunto _canceled). Persistência: JsonFileTaskStore por dono (o sujeito do
-      token), escrita atômica com mkstemp + os.replace, single-process declarado. Esquemas: modelos
-      pydantic com teste de paridade estrutural e comportamental contra spec/schemas/*.json (o JSON
-      Schema é a fonte, ADR-0002). Determinismo onde mora: na paridade modelo×esquema e na paridade de
-      dialeto A2A 0.3×1.0 (tests/_wire.py), ambas na bancada. O que NÃO garante: que a entrada e a saída
-      de uma tarefa obedeçam ao esquema declarado na skill (E_N2_PROBE_SCHEMA_NOT_ENFORCED).
+      Substrato: 8 dos 22 arquivos .py do pacote (7 dos 16 do topo, mais monitor/__init__.py) importam o
+      a2a-sdk (Apache-2.0; autor Google LLC no metadata). O a2a-sdk dá o protocolo: AgentExecutor,
+      TaskStore, InMemoryTaskStore, DatabaseTaskStore, push sender, TaskManager. O taco põe por cima uma
+      camada PRÓPRIA e neutra quanto ao domínio: o executor _TacoAgentExecutor (server.py:241) roteia por
+      metadata.taskType (task_type é str livre, types.py:135) para um dicionário de handlers; o handler
+      recebe (task, input_data) e devolve um Artifact; o executor emite working antes do handler, depois
+      artifact e completed, ou failed com texto. Cancelamento cooperativo (future + conjunto _canceled).
+      Escopo por tipo de tarefa com 403. JsonFileTaskStore por dono (o sujeito do token), escrita atômica
+      com mkstemp + os.replace, single-process declarado. Esquemas: modelos pydantic com teste de paridade
+      estrutural e comportamental contra spec/schemas/*.json. Determinismo onde mora: na paridade
+      modelo×esquema e na paridade de dialeto A2A 0.3×1.0 (tests/_wire.py), ambas na bancada. O que NÃO
+      garante: que a entrada e a saída de uma tarefa obedeçam ao esquema declarado na skill.
     verified_at: "2026-11-19"
-    verified_against: "venv isolado no scratchpad: pip install -e sdk[dev] (taco-agent 0.7.2.dev2, a2a-sdk 1.3.1); pytest -q em sdk/ → 660 passed"
+    verified_against: "venv isolado no scratchpad: pip install -e sdk[dev] (taco-agent 0.7.2.dev2, a2a-sdk 1.3.1); pytest -q em sdk/ → 660 passed; dir(a2a.server.tasks)"
     source_tier: 9
     provenance:
       source: "https://github.com/pelles-ai/taco/tree/04062d4b2613995daddc7937d95b0abc9bd73c64/sdk"
-      locator: "server.py:241-478; task_store.py:71-262; tests/test_schema_parity.py:1-16; tests/_wire.py:31"
+      locator: "server.py:241-478 e 529; task_store.py:71-262; types.py:135; tests/test_schema_parity.py:1-16; tests/_wire.py:31"
       method: "measurement: suíte do próprio repo rodada em ambiente descartável, mais leitura do código"
       locality: web
 
@@ -136,61 +140,84 @@ nodes:
     confidence: 0.9
     x_dissect_level: 2
     x_dissect_n2_evidence: artefato-aberto
-    label: "Sonda: skill declarada bom-v1→estimate-v1, entrada lixo e saída lixo; a tarefa sai completed e o artefato não valida como EstimateV1. O esquema é declarado, não cobrado no fio."
+    label: "Sonda: skill declarada bom-v1→estimate-v1, entrada e saída lixo; a tarefa sai completed e o artefato não valida como EstimateV1. A validação é opcional no handler, não cobrada na borda."
     narrative: >-
       Sonda própria (probe_output_schema.py nesta pasta), rodada no venv isolado contra o A2AServer via
       httpx.ASGITransport, sem rede nem chave. Saída medida: {"state": "completed", "artifact_data":
-      {"not": "an estimate", "input_seen": {"garbage": true}}, "artifact_is_estimate_v1": false}. O
-      grep por validação de input_schema/output_schema em server.py, agent.py e client.py devolve zero.
-      É a diferença de fosso: o Onion vende mecanismo que barra (gate determinístico); o taco declara o
-      contrato no Agent Card e confia no handler.
+      {"not": "an estimate", "input_seen": {"garbage": true}}, "artifact_is_estimate_v1": false}. No
+      servidor, o artefato do handler segue sem validação (server.py:389); os model_validate de
+      client.py:339-498 e server.py:800 validam tipos de fio (AgentCard, Task, AgentSkill), não o esquema
+      de domínio. O SDK oferece validação OPCIONAL dentro do handler (get_schema_model, schemas.py:539), e o
+      exemplo de referência a usa (examples/common/llm_provider.py:100-110). Logo o contrato é declarado no
+      card e cobrado só se o handler quiser. Frase corrigida pela revisão (a 1ª dizia que o grep devolvia zero).
     verified_at: "2026-11-19"
-    verified_against: "python -I probe_output_schema.py no venv isolado; grep -n 'validat|output_schema|input_schema' em sdk/taco/server.py agent.py client.py"
+    verified_against: "python -I probe_output_schema.py no venv isolado; grep -n model_validate em sdk/taco/client.py e server.py; leitura de schemas.py:539"
     source_tier: 9
     provenance:
       source: "docs/evolution/dissect/taco-2026-11/probe_output_schema.py contra taco@04062d4b"
-      locator: "linha JSON impressa pela sonda; server.py:389 (o artefato do handler segue sem validação)"
+      locator: "linha JSON impressa pela sonda; server.py:389; schemas.py:539"
+      method: "measurement: sonda executada em ambiente descartável"
+      locality: repo
+
+  - id: E_N2_PROBE_PLAIN_CARD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    x_dissect_level: 2
+    x_dissect_n2_evidence: artefato-aberto
+    label: "Sonda da revisão: card A2A comum, sem x-construction, e taskType code-review; a tarefa sai completed. A camada genérica do taco serve tarefa de software."
+    narrative: >-
+      Sonda escrita pelo revisor adversarial e reproduzida pela sessão (probe_plain_card.py nesta pasta):
+      saída {"state": "completed", "art": [{"data": {"inp": {"diff": "x"}, "ok": true}, "kind": "data"}],
+      "err": null}. Só o ConstructionAgentCard prende o vocabulário (trade em Literal). O despacho, o
+      escopo por tipo e o store são neutros quanto ao domínio.
+    verified_at: "2026-11-19"
+    verified_against: "python -I probe_plain_card.py no venv isolado"
+    source_tier: 9
+    provenance:
+      source: "docs/evolution/dissect/taco-2026-11/probe_plain_card.py contra taco@04062d4b"
+      locator: "linha JSON impressa pela sonda"
       method: "measurement: sonda executada em ambiente descartável"
       locality: repo
 
   # ─── N3 transferibilidade ───
-  - id: C_N3_PROTOCOL_LAYER_IS_A2A_SDK
+  - id: C_N3_GENERIC_LAYER_TRANSFERS_AS_CONCEPT
     node_type: claim
     plane: DEV
     status: confirmed
     impact: 4
-    confidence: 0.8
+    confidence: 0.75
     x_dissect_level: 3
-    label: "N3, igual → transfere, mas de outra fonte: o que serve ao Onion (ciclo da Task, stores, push, dois dialetos) é do a2a-sdk; o taco só o embrulha."
+    label: "N3, igual → transfere: a camada genérica do taco (despacho por tipo, escopo por tipo, store por dono) é o que um núcleo de tarefas do Onion sobre A2A precisa, e não está no a2a-sdk."
     narrative: >-
-      O núcleo de tarefas que a curadoria nomeou (A2A Task na borda entre sessões) e a decisão C do backbone
-      (adotar/costurar o A2A 1.0) pedem exatamente o ciclo de vida que o taco serve. Mas o taco o herda:
-      InMemoryTaskStore e DatabaseTaskStore vêm do a2a-sdk (importados no venv), e o JsonFileTaskStore é
-      uma implementação da interface TaskStore do a2a-sdk. A analogia é igual no protocolo; a fonte que
-      transfere é o a2a-sdk, não o taco.
+      A analogia é igual: tarefa entre sessões do Onion e tarefa entre agentes do taco têm a mesma forma
+      (tipo, entrada, artefato, estado), e a sonda do card comum prova que a camada roda fora da
+      construção. O a2a-sdk Python dá só o protocolo (dir(a2a.server.tasks): stores e push, sem despacho
+      por tipo nem escopo por tipo). O que transfere é o CONCEITO, para reescrever; ver o veredito.
     verified_at: "2026-11-19"
-    verified_against: "from a2a.server.tasks import InMemoryTaskStore, DatabaseTaskStore → ok; grep -l '^from a2a' sdk/taco/*.py → 7"
+    verified_against: "probe_plain_card.py → completed; dir(a2a.server.tasks) no venv isolado"
     provenance:
-      source: "https://github.com/pelles-ai/taco/tree/04062d4b2613995daddc7937d95b0abc9bd73c64/sdk/taco"
-      locator: "server.py:35-45 (imports do a2a-sdk); task_store.py:37-45"
-      method: "measurement: import no venv isolado e grep no pino"
-      locality: web
+      source: "docs/evolution/dissect/taco-2026-11/probe_plain_card.py contra taco@04062d4b"
+      locator: "saída da sonda; lista de nomes públicos de a2a.server.tasks 1.3.1"
+      method: "measurement: sonda e introspecção em venv descartável"
+      locality: repo
 
-  - id: C_N3_CONSTRUCTION_ONTOLOGY_FALSE_ANALOGY
+  - id: C_N3_CONSTRUCTION_EXTENSION_FALSE_ANALOGY
     node_type: claim
     plane: DEV
     status: confirmed
-    impact: 4
+    impact: 3
     confidence: 0.8
     x_dissect_level: 3
-    label: "N3, diferente → desenha: o vocabulário é da construção civil (trade, CSI, BOM, RFI) e está em Literal no código; tarefa de software do Onion seria falsa analogia."
+    label: "N3, diferente → desenha: só a extensão x-construction e o AgentRegistry.find são presos à construção (trade, CSI, BOM em Literal); para o Onion, esse vocabulário é falsa analogia."
     narrative: >-
       Trade, ProjectType, Integration, BOMUnit e RFICategory são Literal em sdk/taco/types.py:74-124; o
       AgentRegistry.find filtra por trade, csi_division, project_type e integration (registry.py:112-143).
-      O que transfere é a FORMA (uma ontologia de domínio pendurada nos pontos de extensão do A2A, com URI
-      formal em capabilities.extensions[]), não o conteúdo. Para o Onion, a forma tem de ser desenhada com
-      vocabulário próprio (tipos de tarefa de produto, engenharia e compliance) e com o gate que o taco não
-      tem (E_N2_PROBE_SCHEMA_NOT_ENFORCED).
+      Transfere a FORMA (uma ontologia de domínio pendurada nos pontos de extensão do A2A, com URI formal
+      em capabilities.extensions[]), com vocabulário próprio. A 1ª versão estendia a falsa analogia a todo o
+      taco; a revisão a estreitou a esta peça.
     verified_at: "2026-11-19"
     verified_against: "grep -n 'Literal\\[' sdk/taco/types.py; leitura de registry.py:112-143"
     provenance:
@@ -199,28 +226,63 @@ nodes:
       method: "reading: código no pino"
       locality: web
 
-  # ─── superação medida (entrega o valor que o objeto prometia ao Onion) ───
-  - id: E_A2A_SDK_DIRECT
-    node_type: evidence
+  - id: C_N3_SUBSTRATE_MISMATCH
+    node_type: claim
     plane: DEV
     status: confirmed
     impact: 4
-    confidence: 0.85
-    label: "Superação medida: o a2a-sdk oficial (1.3.1, Apache-2.0, Linux Foundation) entrega o servidor de Task, os stores e o push sem o vocabulário de construção."
+    confidence: 0.8
+    x_dissect_level: 3
+    label: "N3, diferente → desenha: o bridge A2A do Onion é TypeScript e o taco é um SDK Python; usar o código põe um segundo runtime na borda, e a camada genérica cabe em reescrita."
     narrative: >-
-      Instalado no venv isolado como dependência do taco: versão 1.3.1 (a última do índice), License-
-      Expression Apache-2.0, repositório a2aproject/a2a-python; InMemoryTaskStore e DatabaseTaskStore
-      importam. É o que o Onion usaria para servir tasks/get e SSE no bridge, se o núcleo de tarefas for
-      construído sobre o contrato A2A — sem herdar Literal de construção nem a dependência de um
-      mantenedor de 2 pessoas.
+      O a2a-agent-card.sh cita o onion-bridge em src/server.ts:687 e src/a2a-routes.ts:12, e o package.json
+      do bridge é TypeScript. O taco não roda nesse processo; costurá-lo seria um serviço Python ao lado.
+      A camada genérica que interessa é pequena (o executor tem cerca de 240 linhas, server.py:241-478), e
+      a casa absorve reescrevendo na própria gramática, nunca vendorizando por conveniência.
     verified_at: "2026-11-19"
-    verified_against: "pip index versions a2a-sdk → 1.3.1; importlib.metadata('a2a-sdk') License-Expression → Apache-2.0; import de InMemoryTaskStore e DatabaseTaskStore → ok"
+    verified_against: "sed -n 55,58p .claude/validation/a2a-agent-card.sh; package.json do onion-bridge (name onion-bridge, src/*.ts)"
+    provenance:
+      source: ".claude/validation/a2a-agent-card.sh"
+      locator: "linhas 55-58 (medido no onion-bridge origin/main 21ae69c: src/server.ts:687, src/a2a-routes.ts:12)"
+      method: "reading: o próprio script do core e o manifesto do bridge"
+      locality: repo
+
+  - id: E_OVERCOMING_SEARCH_A2A_SDKS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "Busca de superação: os SDKs oficiais do A2A (Python 1.3.1 e JS 1.3.0, ambos Apache-2.0) dão o protocolo, não a camada genérica do taco. Nenhum entrega o valor por inteiro."
+    narrative: >-
+      Python: a2a-sdk 1.3.1 instalado no venv; dir(a2a.server.tasks) lista stores, push e TaskManager, sem
+      despacho por tipo de tarefa nem escopo por tipo. JS (o substrato do bridge): npm view @a2a-js/sdk →
+      versão 1.3.0, Apache-2.0, repositório a2aproject/a2a-js, modificado em 2026-09-29; não instalado.
+      Nenhum dos dois é superação que entrega: servem o RPC de tarefas, e o despacho, o escopo e o store
+      por dono continuam por desenhar. Por isso o veredito declara superação nenhuma.
+    verified_at: "2026-11-19"
+    verified_against: "dir(a2a.server.tasks) no venv isolado; npm view @a2a-js/sdk version license repository.url time.modified"
     source_tier: 9
     provenance:
-      source: "https://pypi.org/project/a2a-sdk/1.3.1/"
-      locator: "metadata do pacote instalado (License-Expression, Project-URL repository github.com/a2aproject/a2a-python)"
-      method: "measurement: instalação e import em venv descartável"
+      source: "https://www.npmjs.com/package/@a2a-js/sdk"
+      locator: "metadata do índice npm (version 1.3.0, license Apache-2.0); a2a-sdk 1.3.1 do PyPI instalado"
+      method: "measurement: consulta ao índice e introspecção em venv descartável"
       locality: web
+
+  # ─── objeção sobrevivente da revisão (limita, não derruba) ───
+  - id: C_OBJ_PIECES_ALTERNATIVE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Objeção da revisão: um veredito em peças (rejeitar a x-construction, parquear a camada genérica com gatilho no núcleo de tarefas) também é defensável; fica ao maestro."
+    narrative: >-
+      A sessão manteve rejeitar porque o que se quer da camada genérica é o conceito, que entra pelo
+      registro de ideias e por reescrita no substrato TypeScript, e parquear o código Python criaria uma
+      espera por algo que a casa não usaria nem com o gatilho disparado. A objeção limita o veredito: se o
+      maestro decidir que o núcleo de tarefas nasce em Python, a camada genérica do taco volta a ser
+      candidata a costura, e este nó é o ponto de reabertura.
 
   # ─── veredito ───
   - id: D_TACO_VERDICT
@@ -228,22 +290,31 @@ nodes:
     plane: DEV
     status: open
     impact: 4
-    confidence: 0.75
+    confidence: 0.7
     x_dissect_level: 3
     x_dissect_verdict: rejeitar
-    label: "Rejeitar o uso do taco (código e dependência) em 19/11/2026: o genérico é do a2a-sdk, o próprio é vocabulário de construção e o contrato não é cobrado. As ideias seguem para o núcleo de tarefas."
+    label: "Rejeitar o uso do código do taco em 19/11/2026: substrato Python contra o bridge TypeScript, vocabulário de construção, contrato não cobrado e mantenedor 0.x. Os conceitos seguem para o núcleo de tarefas."
     narrative: >-
-      Razão datada (2026-11-19): (1) o que o Onion precisaria — o ciclo da A2A Task — vem do a2a-sdk, que
-      o Onion pode usar direto (E_A2A_SDK_DIRECT); (2) o que é do taco é ontologia de construção em
-      Literal, falsa analogia com tarefa de software; (3) o diferencial que interessaria, o esquema por
-      tipo de tarefa, é declarado e não cobrado no fio (sonda). Rejeitar o USO não encerra a colheita: a
-      forma «ontologia de domínio sobre o A2A» e quatro mecanismos (tipos de tarefa com esquema no Agent
-      Card, store por dono, escopo por tipo de tarefa, tier atribuído por registro) vão como ideias para
-      a pergunta do núcleo de tarefas da curadoria e para a decisão do backbone A2A do core. O veredito
-      nasce open; quem sela é o maestro.
+      Razões datadas (2026-11-19), já curadas pela revisão adversarial: (1) substrato — o bridge A2A do
+      Onion é TypeScript; o taco é um SDK Python e usá-lo põe um segundo runtime na borda
+      (C_N3_SUBSTRATE_MISMATCH); (2) a camada genérica que serviria (despacho, escopo, store) é pequena e
+      a casa absorve reescrevendo, não por dependência (C_N3_GENERIC_LAYER_TRANSFERS_AS_CONCEPT); (3) a
+      parte própria da construção é falsa analogia (C_N3_CONSTRUCTION_EXTENSION_FALSE_ANALOGY); (4) o
+      contrato por tipo de tarefa é declarado e não cobrado na borda (sonda); (5) risco de mantenedor:
+      organização de 2 pessoas, 48 tags 0.x em 8 meses. Rejeitar o USO não encerra a colheita: nove ideias
+      vão para a pergunta do núcleo de tarefas da curadoria e para a decisão do backbone A2A do core. A
+      objeção C_OBJ_PIECES_ALTERNATIVE limita o veredito. Nasce open; quem sela é o maestro.
     trace: docs/evolution/dissect/taco-2026-11/STAGE0.md
-    x_dissect_criterion: "no clone do taco@04062d4b: grep -n 'Trade = Literal' sdk/taco/types.py (vocabulário preso à construção) e python -I probe_output_schema.py no venv isolado (state completed com artifact_is_estimate_v1 false)"
-    x_dissect_overcoming: E_A2A_SDK_DIRECT
+    x_dissect_criterion: "no clone do taco@04062d4b: grep -n 'Trade = Literal' sdk/taco/types.py (vocabulário preso à construção) e python -I probe_output_schema.py no venv isolado (state completed com artifact_is_estimate_v1 false); no core: sed -n 55,58p .claude/validation/a2a-agent-card.sh (bridge em TypeScript)"
+    x_dissect_overcoming: nenhuma
+    x_dissect_overcoming_measure: "procurei quem entregue, no substrato do bridge, o servidor de tarefas A2A com despacho por tipo, escopo por tipo e store por dono: o a2a-sdk Python (instalado, só protocolo) e o @a2a-js/sdk (índice npm, protocolo); nenhum entrega a camada genérica (E_OVERCOMING_SEARCH_A2A_SDKS)"
+    x_dissect_overcoming_search:
+      - where: corpus
+        cmd: "git grep -n 'a2a-js\\|a2a-sdk\\|tasks/get' -- '*.kg.yaml' .claude/validation/a2a-agent-card.sh"
+      - where: web
+        source: "https://www.npmjs.com/package/@a2a-js/sdk"
+      - where: web
+        source: "https://pypi.org/project/a2a-sdk/1.3.1/"
 
   # ─── registro de ideias (§1c) ───
   - id: I_TASK_TYPES_WITH_SCHEMAS_IN_CARD
@@ -269,15 +340,15 @@ nodes:
     status: open
     impact: 3
     confidence: 0.6
-    label: "O esquema declarado não é cobrado no fio; o Onion faria o contrário: o gate barra a tarefa cuja saída não valida contra o output_schema da skill."
+    label: "O esquema declarado só é cobrado se o handler quiser; o Onion faria o contrário: a borda barra a tarefa cuja saída não valida contra o output_schema da skill."
     x_dissect_idea:
       kind: decisao-de-desenho
       onion: diferente
-      why: "o taco confia no handler e cobre o esquema só na bancada (paridade modelo×JSON Schema); a casa vende mecanismo que barra, então a borda do núcleo validaria entrada e saída e marcaria failed, não completed."
+      why: "o taco oferece validação opcional dentro do handler (get_schema_model) e cobre o esquema na bancada (paridade modelo×JSON Schema), mas a borda marca completed com saída inválida; a casa vende mecanismo que barra, então a borda do núcleo validaria entrada e saída e marcaria failed."
       source: "https://github.com/pelles-ai/taco/blob/04062d4b2613995daddc7937d95b0abc9bd73c64/sdk/taco/server.py#L389"
       candidate: true
       value: 4
-      value_why: "é o diferencial do Onion medido contra um par real: contrato tipado com gate determinístico na borda entre sessões, onde o taco só declara."
+      value_why: "é o diferencial do Onion medido contra um par real: contrato tipado com gate determinístico na borda entre sessões, onde o taco só oferece."
       destination: "onion-curation:docs/evolution/research/onion-tracker-choice-2026-11/onion-tracker-choice-2026-11.kg.yaml#Q_ONION_TRACKER_CORE_GAP_2026_11"
 
   - id: I_TASK_STORE_PER_OWNER
@@ -306,12 +377,29 @@ nodes:
     label: "Escopo OAuth por tipo de tarefa e por projeto com reticulado de ação (read < write < admin): taco:task:<tipo>, taco:project:<id>:<ação>."
     x_dissect_idea:
       kind: decisao-de-desenho
-      onion: nao-temos
-      why: "a rede A2A do core autoriza por membro (chave do members.yaml) e aceite humano por sinal; não há permissão por tipo de tarefa nem por projeto."
+      onion: diferente
+      why: "o core autoriza por par e por tipo de ação (trust can_receive_from, can_advise_to, can_correct_to no members.yaml) e o card declara o escopo co-evolution.signal por skill; falta o eixo do tipo de TAREFA e do projeto, com ação ordenada."
       source: "https://github.com/pelles-ai/taco/blob/04062d4b2613995daddc7937d95b0abc9bd73c64/sdk/taco/auth.py#L78"
       candidate: true
       value: 3
       value_why: "permite delegar a uma sessão só os tipos de tarefa que ela pode pedir, o que a orquestração de peers hoje resolve por combinado em prosa."
+      destination: "onion-evolve:docs/evolution/research/a2a-backbone-product-2026-11/a2a-backbone-product-2026-11.kg.yaml#D_A2A_BACKBONE_PRODUCT_2026_11"
+
+  - id: I_DELEGATION_TOKEN_EXCHANGE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: "Delegação em cadeia com token estreitado a cada salto (OAuth Token Exchange, RFC 8693): o orquestrador troca o seu token por um mais estreito antes de chamar o subagente."
+    x_dissect_idea:
+      kind: estrategia
+      onion: nao-temos
+      why: "a orquestração do core (core → sessão → subagente) passa autoridade por combinado e por I3 (um escritor por repo), sem token estreitado por tarefa; no taco está só na spec, com o campo delegationSupported e sem implementação."
+      source: "https://github.com/pelles-ai/taco/blob/04062d4b2613995daddc7937d95b0abc9bd73c64/spec/security.md#L23"
+      candidate: true
+      value: 3
+      value_why: "cada salto da orquestração levaria só a autoridade da própria tarefa, o que fecha por mecanismo o que hoje é disciplina."
       destination: "onion-evolve:docs/evolution/research/a2a-backbone-product-2026-11/a2a-backbone-product-2026-11.kg.yaml#D_A2A_BACKBONE_PRODUCT_2026_11"
 
   - id: I_PEER_BY_SKILL
@@ -324,7 +412,7 @@ nodes:
     x_dissect_idea:
       kind: funcionalidade
       onion: diferente
-      why: "a orquestração de sessões do core endereça pelo id do membro ou pelo socket da sessão (to=uds:...); rotear pela capacidade desacopla o pedido de quem o atende."
+      why: "a orquestração de sessões do core endereça pelo id do membro ou pelo socket da sessão; rotear pela capacidade desacopla o pedido de quem o atende."
       source: "https://github.com/pelles-ai/taco/blob/04062d4b2613995daddc7937d95b0abc9bd73c64/sdk/taco/agent.py#L342"
       candidate: true
       value: 2
@@ -351,15 +439,15 @@ nodes:
     status: open
     impact: 2
     confidence: 0.5
-    label: "Tier de confiança atribuído pelo registro, separado das certificações auto-declaradas no card: declarado não é verificado."
+    label: "Tier de confiança atribuído pelo registro por verificação de terceiro, separado das certificações auto-declaradas no card."
     x_dissect_idea:
       kind: estrategia
       onion: diferente
-      why: "o core tem a doutrina declarado≠verificado e o members.yaml, mas nenhum campo de confiança medido por terceiro no Agent Card; aqui é só spec, sem implementação de registro remoto."
+      why: "o core já tem tiers atribuídos pelo registro (.claude/utils/trust/, T0 a T3 a partir do members.yaml), mas o tier é de PAPEL, não de verificação por terceiro publicada no Agent Card; no taco é só spec, sem registro remoto implementado."
       source: "https://github.com/pelles-ai/taco/blob/04062d4b2613995daddc7937d95b0abc9bd73c64/spec/security.md#L159"
       candidate: true
       value: 2
-      value_why: "dá forma de dado à governança acima do protocolo que o backbone nomeou como lacuna, mas o próprio taco não implementou."
+      value_why: "dá forma de dado publicada à governança acima do protocolo que o backbone nomeou como lacuna, mas o próprio taco não implementou."
       destination: "onion-evolve:docs/evolution/research/a2a-backbone-product-2026-11/a2a-backbone-product-2026-11.kg.yaml#D_A2A_BACKBONE_PRODUCT_2026_11"
 
   - id: I_WIRE_DIALECT_PARITY
@@ -388,20 +476,29 @@ edges:
     to: E_N2_MECHANISM
     edge_type: SUPPORTS
   - from: E_N2_MECHANISM
-    to: C_N3_PROTOCOL_LAYER_IS_A2A_SDK
+    to: C_N3_GENERIC_LAYER_TRANSFERS_AS_CONCEPT
+    edge_type: SUPPORTS
+  - from: E_N2_PROBE_PLAIN_CARD
+    to: C_N3_GENERIC_LAYER_TRANSFERS_AS_CONCEPT
     edge_type: SUPPORTS
   - from: E_N2_PROBE_SCHEMA_NOT_ENFORCED
-    to: C_N3_CONSTRUCTION_ONTOLOGY_FALSE_ANALOGY
-    edge_type: SUPPORTS
-  - from: C_N3_PROTOCOL_LAYER_IS_A2A_SDK
     to: D_TACO_VERDICT
     edge_type: SUPPORTS
-  - from: C_N3_CONSTRUCTION_ONTOLOGY_FALSE_ANALOGY
+  - from: C_N3_GENERIC_LAYER_TRANSFERS_AS_CONCEPT
     to: D_TACO_VERDICT
     edge_type: SUPPORTS
-  - from: E_A2A_SDK_DIRECT
+  - from: C_N3_CONSTRUCTION_EXTENSION_FALSE_ANALOGY
     to: D_TACO_VERDICT
     edge_type: SUPPORTS
+  - from: C_N3_SUBSTRATE_MISMATCH
+    to: D_TACO_VERDICT
+    edge_type: SUPPORTS
+  - from: E_OVERCOMING_SEARCH_A2A_SDKS
+    to: D_TACO_VERDICT
+    edge_type: SUPPORTS
+  - from: C_OBJ_PIECES_ALTERNATIVE
+    to: D_TACO_VERDICT
+    edge_type: CONSTRAINS
   - from: I_TASK_TYPES_WITH_SCHEMAS_IN_CARD
     to: E_N1_VERBS
     edge_type: TRACES_TO
@@ -414,11 +511,14 @@ edges:
   - from: I_SCOPE_PER_TASK_TYPE
     to: E_N1_VERBS
     edge_type: TRACES_TO
+  - from: I_DELEGATION_TOKEN_EXCHANGE
+    to: E_N1_VERBS
+    edge_type: TRACES_TO
   - from: I_PEER_BY_SKILL
     to: E_N1_VERBS
     edge_type: TRACES_TO
   - from: I_ONTOLOGY_NOT_PROTOCOL
-    to: C_N3_CONSTRUCTION_ONTOLOGY_FALSE_ANALOGY
+    to: C_N3_CONSTRUCTION_EXTENSION_FALSE_ANALOGY
     edge_type: TRACES_TO
   - from: I_REGISTRY_ASSIGNED_TRUST_TIER
     to: E_N1_VERBS
