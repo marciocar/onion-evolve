@@ -103,9 +103,10 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    Portal AI Explorer; patrocinador humano ao lado do dono, do Entra Agent ID). O mercado não tem nome para «agente
    dono de repo», e esse desenho é do Onion (`docs/evolution/research/agent-repo-ownership-2026-11/`).
 
-9. **Sessão longa roda em tmux nomeado, a 2ª no mesmo checkout vai de `--worktree`, e o teto é de 8 sessões
+9. **Sessão longa roda em tmux nomeado, a 2ª no mesmo checkout vai de `--worktree`, e o teto é de 10 sessões
    interativas mais 5 agentes. O pulso avisa, nunca bloqueia.** O teto subiu de 4 para 8 em 2026-11-16
-   (`D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116`, em `docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml`).
+   (`D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116`) e de 8 para 10 em 2026-11-19 (`D_SESSION_CAP_10_PLUS_5_AGENTS_1119`, que
+   o supera; horizonte: teto dinâmico, aprendido da carga medida), ambos em `docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml`.
    Decidida pela sessão do core por delegação do maestro
    em 2026-11-14 (`D_SESSION_HYGIENE_TMUX_WORKTREE_1114`, em
    `docs/evolution/research/forge-baton-2026-11/forge-baton-2026-11.kg.yaml`). O incidente: a sessão do core rodava
@@ -119,7 +120,7 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    - `SESSION_STOPPED`: estado T, cura `kill -CONT <pid>` ou `fg`;
    - `SESSION_NOT_IN_TMUX`: sem `TMUX` e sem tmux na árvore, cura `bash ops/session-open.sh <nome do repo> --resume <id>` (core-only; onde não há o abridor, `tmux new -s <nome> -c <pasta> 'claude --resume <id>'`);
    - `SESSION_SAME_CHECKOUT`: duas interativas no mesmo topo git, cura `claude --worktree <nome>`;
-   - `SESSION_CAP`: interativas acima de `--max-interactive` (8).
+   - `SESSION_CAP`: interativas acima de `--max-interactive` (10).
 
    Estado ou árvore ilegível é lacuna (`HYGIENE_UNMEASURED`), nunca «em tmux». A decisão é reversível, e por isso o
    mecanismo é aviso: fechar, retomar ou abrir sessão continua sendo ato da sessão dona ou do maestro.

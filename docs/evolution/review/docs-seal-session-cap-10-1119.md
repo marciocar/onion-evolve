@@ -4,16 +4,16 @@ pr: pendente
 date: 2026-11-19
 reviewed_diff_sha256: e9d63eb097b97f67dd1700743171e6c0f31feaccbd951d2615a13d50aa32dfbc
 reviewed_code_sha256: 2bbf31e6345b7771510f919938338654fe3ba8aff6a70765e3226e3de7a117b8
-findings_total: 0
-findings_real: 0
+findings_total: 3
+findings_real: 3
 findings_blocking: 0
 tokens: 0
 duration_min: 5
-findings_fixed: 0
-verdict: NO_FINDINGS
+findings_fixed: 2
+verdict: REJECTED_AND_FIXED
 elenxo: true
-elenxo_isolado: false
-reviewer: "Passada da própria sessão do core, só leitura: quatro selos pelo kg-decide-seal (radar exit 0) com as opções marcadas pelo maestro em 19/11; o padrão do pulso sobe de 8 para 10 e o caso de bancada (as2) acompanha, com o mutante MAXI=10 → 4 mordendo do mesmo jeito (7 interativas > 4)."
+elenxo_isolado: true
+reviewer: "Agente revisor separado (code-reviewer), só leitura, mandato de refutar, ~2 min: REJECTED com 3 achados reais. (1) a doutrina baton-doctrine.md ainda dizia teto 8 — curado; (2) o nó do teto 10 ligava ao do teto 8 por TRACES_TO em vez de SUPERSEDES — curado; (3) o caso (as2) com 7 interativas não separa padrão 8 de 10 — declarado como lacuna no comentário do caso. Bancada baton_pulse 110/110 no revisor."
 nota: "tokens 0 = não medido. Não toca guarda."
 ---
 
@@ -32,4 +32,4 @@ cada sessão, da pergunta antes de fechar as duplicadas e da abertura do Jogo; e
 
 ## Veredito
 
-NO_FINDINGS.
+REJECTED_AND_FIXED: duas curas e uma lacuna declarada (o caso que separa 8 de 10 pede fixture com 9 interativas).
