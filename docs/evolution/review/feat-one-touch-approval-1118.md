@@ -2,7 +2,7 @@
 branch: feat/one-touch-approval-1118
 pr: pendente
 date: 2026-11-18
-reviewed_diff_sha256: 55b06f47263008c09728a19bcb2687b99855a247a21a572b0b83f9cceb8d68a0
+reviewed_diff_sha256: 2a2f5fa881940d59a025a5f3c1393bcf841b27493cecbb61661b47a12d8ef934
 reviewed_code_sha256: 89c729dc1c4b7ed0f466ef022145a73523a3afef471d1348c229a957357c0756
 findings_total: 8
 findings_real: 5
