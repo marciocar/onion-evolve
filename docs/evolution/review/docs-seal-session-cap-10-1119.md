@@ -2,7 +2,8 @@
 branch: docs/seal-session-cap-10-1119
 pr: pendente
 date: 2026-11-19
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 54ff0299c4c3c3085c1ef2413e0de01d7b2f63ac2dfa71ca02df3176a37ecc0c
+reviewed_code_sha256: 44743aa0e84ba6bcdbbf3e8f74c52e563792eb5a96fc21424223cc90d8dbadf5
 findings_total: 3
 findings_real: 3
 findings_blocking: 0
