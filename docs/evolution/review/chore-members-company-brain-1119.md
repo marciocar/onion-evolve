@@ -2,8 +2,7 @@
 branch: chore/members-company-brain-1119
 pr: pendente
 date: 2026-11-19
-reviewed_diff_sha256: 7e8955f777cd01a38456e13aac3b3025ebbf972d92befecf8a36c69fa4fc033c
-reviewed_code_sha256: 11af74f35962cc6851cfe0a798373766ab351436dc6563b2b01d21dc7145bf7f
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
@@ -21,7 +20,7 @@ nota: "tokens 0 = não medido."
 
 ## O que muda
 
-O membro `company-brain` entra no registro como peça (`piece: true`), com `owner_session: company-brain` e
+O membro `onion-company-brain` (repo company-brain) entra no registro como peça (`piece: true`), com `owner_session: company-brain` e
 `sponsor: maestro` (D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119). A sessão dona passa a merjar o PR do próprio repo
 pelo caminho verificado, e o nome do repo deixa de ser tratado como privado pela REGRA 119.
 

@@ -780,7 +780,7 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
-  - id: company-brain
+  - id: onion-company-brain   # prefixo onion-: o id não pode colidir com a vertical company-brain do framework (REGRA 36)
     name: company-brain (produto Onion Company Brain)
     role: standalone            # adota o core direto (o stamp do alvo diz role: adopted)
     kind: adopter
