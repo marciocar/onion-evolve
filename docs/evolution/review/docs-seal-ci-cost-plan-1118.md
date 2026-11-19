@@ -2,8 +2,7 @@
 branch: docs/seal-ci-cost-plan-1118
 pr: pendente
 date: 2026-11-19
-reviewed_diff_sha256: 5cadf1c5d42baf92c36c8f7c184a099e4ff917ed0ce7849d40c14590d65009e5
-reviewed_code_sha256: 1a643c42d2297c8d738a5f0943a5051f2b162ab535d66acf0988e1db253dea65
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
