@@ -2,7 +2,8 @@
 branch: docs/seal-company-brain-federation-1119
 pr: pendente
 date: 2026-11-19
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 237f5eeb1acd35156b8d032f7f6162ad154c1bcabe23a798841927c6737b8c1a
+reviewed_code_sha256: b56934eb3fd75466957ccbbf96af10f67b24058a741e8453730111285f49fbfd
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
