@@ -626,14 +626,14 @@ onion-codex	specialization	portability-proof
 onion-codex	specialization	substrate-port	
 onion-codex	tier	standalone	
 onion-codex	trust-advises	onion-evolve	
-onion-company-brain	adopts	onion-evolve	
-onion-company-brain	mode	greenfield	
-onion-company-brain	pin	56bcd68122bd	
-onion-company-brain	specialization	atendimento	
-onion-company-brain	specialization	company-brain	
-onion-company-brain	specialization	produto	
-onion-company-brain	tier	standalone	
-onion-company-brain	trust-advises	onion-evolve	
+onion-company-brain-product	adopts	onion-evolve	
+onion-company-brain-product	mode	greenfield	
+onion-company-brain-product	pin	56bcd68122bd	
+onion-company-brain-product	specialization	atendimento	
+onion-company-brain-product	specialization	company-brain	
+onion-company-brain-product	specialization	produto	
+onion-company-brain-product	tier	standalone	
+onion-company-brain-product	trust-advises	onion-evolve	
 onion-compliance	loads	when:build -> resolve:compliance-context (skill onion-compliance-context)	
 onion-compliance	loads	when:framework=iso27001 -> template:compliance_iso27001_template.md	
 onion-compliance	loads	when:framework=soc2 -> template:compliance_soc2_template.md	
