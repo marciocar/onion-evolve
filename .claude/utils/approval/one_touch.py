@@ -428,7 +428,7 @@ def cmd_verify(argv):
             raise LookupError("nível %s declarado e não implementado na v1" % req.get("level"))
         transcript_human(appr, req)
         if (req.get("executor") or {}).get("script_sha256") != script_sha(a.get("script", "")) or req.get("requires_tty") is not False:
-            raise LookupError("o executor mudou desde o pedido (sha256 do script): peça de novo")
+            raise LookupError("o executor mudou desde o pedido (sha256 do script; rode do MESMO checkout em que pediu): peça de novo")
         t = req["target"]
         if req.get("act") != a.get("act") or t.get("repo") != a.get("repo", "").lower() \
                 or (a.get("pr") and str(t.get("pr")) != a.get("pr")):
