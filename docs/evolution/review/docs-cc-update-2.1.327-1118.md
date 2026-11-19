@@ -2,7 +2,8 @@
 branch: docs/cc-update-2.1.327-1118
 pr: pendente
 date: 2026-11-18
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 64e6e5ff086dd0a69198fae33a3e8fb079fc43f2c789093f85c62d45c767fd47
+reviewed_code_sha256: 1b21468c946fc5a4328983dd67d7ad75ea15e34e05f81a20e97b133b4a1ff941
 findings_total: 10
 findings_real: 10
 tokens: 191039
