@@ -494,6 +494,102 @@ nodes:
       locator: "pergunta com opções de 2026-11-18: «slm, método nas relações raras: com só 11 e 3 casos no eval, a variação entre sementes (1 a 8 de 11) é maior que qualquer diferença entre modelos. Como segue?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-18"
       locality: "pessoa"
+  - id: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-19"
+    verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «Dois repos, duas sessões»"
+    label: "Company Brain vira peça com repo e sessão donos: company-brain é dono do produto (persona, atendimento com exemplo primeiro, multiaudiência); company-brain-game é o Jogo, opcional; os Brains de empresa são usuários"
+    narrative: "Selado por /meta:decide em 2026-11-19: escolhida «Dois repos, duas sessões»; descartadas: «Um repo agora, dividir depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-19: «Como selamos o modelo do Company Brain (produto e Jogo)?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
+      locality: "pessoa"
+  - id: D_COMPANY_BRAIN_OPENS_FIRST_GAME_AFTER_EMITTER_1119
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-19"
+    verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «company-brain já, Jogo depois»"
+    label: "A sessão company-brain abre já; a do Jogo abre quando o emissor de eventos existir; fecham a slm suspensa, a sge e a brain-dufrio para abrir slot"
+    narrative: "Selado por /meta:decide em 2026-11-19: escolhida «company-brain já, Jogo depois»; descartadas: «As duas já» · «Só o Jogo agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-19: «Em que ordem as duas sessões abrem?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
+      locality: "pessoa"
+  - id: D_COMPANY_BRAIN_VERTICAL_KGSSOT_MODEL_1119
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-19"
+    verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «Modelo kg-ssot»"
+    label: "A vertical company-brain-context segue o modelo kg-ssot: o company-brain é upstream do motor e o core vendoriza em vendor/company-brain; hub, skill e construtor ficam em .claude do core e viajam"
+    narrative: "Selado por /meta:decide em 2026-11-19: escolhida «Modelo kg-ssot»; descartadas: «Core autora, Brain usa»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-19: «Qual a relação entre a vertical company-brain-context do core e o repo company-brain?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
+      locality: "pessoa"
+  - id: D_COMPANY_BRAIN_BUILDER_FIRST_DELIVERY_1119
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-19"
+    verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «É a 1ª entrega do Brain»"
+    label: "O construtor /docs:build-company-brain-docs, com template no molde dos build-*-docs e feito com exemplo primeiro, é a 1ª entrega da sessão company-brain; entra no core por PR do core"
+    narrative: "Selado por /meta:decide em 2026-11-19: escolhida «É a 1ª entrega do Brain»; descartadas: «O core faz agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-19: «Como nasce o construtor da vertical company-brain-context?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
+      locality: "pessoa"
+  - id: D_COMPANY_BRAIN_FEDERATED_SERVICE_CHARTER_TRIGGER_1119
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-19"
+    verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «No estatuto, com gatilho»"
+    label: "Company Brain como serviço federado para Brains de outras empresas entra no estatuto como horizonte com gatilho (2º Brain em uso real e A2A entre contas); revisão em nova rodada de decisões"
+    narrative: "Selado por /meta:decide em 2026-11-19: escolhida «No estatuto, com gatilho»; descartadas: «Já como objetivo da v1»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-19: «Quando entra o Company Brain como serviço federado?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
+      locality: "pessoa"
+  - id: D_COMPANY_BRAIN_GAME_CONSUMES_BOOK_AND_EVENTS_1119
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-19"
+    verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «Book + eventos da kg-ssot»"
+    label: "O Jogo consome o book da vertical (personas e papéis) e os eventos do modelo de dados da kg-ssot (#459 a #461)"
+    narrative: "Selado por /meta:decide em 2026-11-19: escolhida «Book + eventos da kg-ssot»; descartadas: «Só os eventos»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-19: «O Jogo (company-brain-game) consome o quê?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
+      locality: "pessoa"
 edges:
   - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
     to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
@@ -566,4 +662,22 @@ edges:
     edge_type: TRACES_TO
   - from: D_SLM_STOP_MODEL_COMPARISON_RARE_CLASSES_1118
     to: D_CI_COST_CUT_MEASURE_THEN_CHOOSE_1118
+    edge_type: TRACES_TO
+  - from: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
+    to: D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118
+    edge_type: TRACES_TO
+  - from: D_COMPANY_BRAIN_OPENS_FIRST_GAME_AFTER_EMITTER_1119
+    to: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
+    edge_type: TRACES_TO
+  - from: D_COMPANY_BRAIN_VERTICAL_KGSSOT_MODEL_1119
+    to: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
+    edge_type: TRACES_TO
+  - from: D_COMPANY_BRAIN_BUILDER_FIRST_DELIVERY_1119
+    to: D_COMPANY_BRAIN_VERTICAL_KGSSOT_MODEL_1119
+    edge_type: TRACES_TO
+  - from: D_COMPANY_BRAIN_FEDERATED_SERVICE_CHARTER_TRIGGER_1119
+    to: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
+    edge_type: TRACES_TO
+  - from: D_COMPANY_BRAIN_GAME_CONSUMES_BOOK_AND_EVENTS_1119
+    to: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
     edge_type: TRACES_TO
