@@ -122,6 +122,13 @@
 #           outra sessão. A fronteira é o nível 2 (aprovação fora da banda, numa identidade que o agente não controla:
 #           DM assinada pela ponte da onion-messaging, ou review no forge por conta humana; RFC 9470, CIBA, NIST
 #           800-63-4 AAL2/AAL3), declarado no esquema e recusado na v1, como o nível 3 (passkey/2FA).
+#   LISTA PRIVADA DE SESSÕES DONAS (sem flag, D_PRIVATE_OWNER_SESSIONS_1119, 2026-11-19): a catraca do repo próprio lê
+#           também ${ONION_PRIVATE_OWNERS_FILE:-~/.config/onion/private-owner-sessions.tsv}, FORA do repo, com
+#           `member_id<TAB>dono/repo<TAB>owner_session` por linha, para o membro de consultoria que no members.yaml tem
+#           id neutro e `remote: n/a` (o endereço leva o nome do cliente e não vai ao core público). Só vale quando o alvo
+#           não casa remote público; o arquivo em modo 600 (mais aberto recusa); o membro neutro existe em
+#           origin/main com `kind: adopter`; o dono do slug é o do core; a recusa DA CATRACA nomeia o member_id, nunca o slug (fora dela, o slug que veio no --repo pode aparecer); no CI
+#           não é lida. As regras completas estão no bloco da catraca (_pmv_private_row).
 set -uo pipefail
 
 PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--allow-draft] [--dispensa <check> --motivo <texto>]}"; shift || true
@@ -325,6 +332,62 @@ _delegated_env_guard() {
 #       com --foreign-repo (D_DELEGATE_FOREIGN_MERGE_VERIFIED_1113), que segue com as condições dela e agora também (1)+(2).
 # TETO: o registro é lido de origin/main sem buscar (o que a última busca trouxe); o dono do alvo é o do slug, não o do
 # host. O maestro, pelo terminal dele (sem ancestral) ou pelo `!` com --maestro, fica fora da catraca.
+# ── LISTA PRIVADA DE SESSÕES DONAS (D_PRIVATE_OWNER_SESSIONS_1119, decisão do maestro por formulário, 2026-11-19) ──
+# O repo de consultoria leva o nome do cliente no endereço, e o endereço não pode ir ao core público: no members.yaml ele
+# fica com id NEUTRO e `remote: n/a`, e por isso a lista fechada (que casa pelo `remote:`) não o enxergava. A exceção
+# aprovada: a catraca lê TAMBÉM uma lista FORA do repo, ${ONION_PRIVATE_OWNERS_FILE:-~/.config/onion/private-owner-sessions.tsv},
+# com `member_id<TAB>dono/repo<TAB>owner_session` por linha (`#` comenta). As regras, todas antes de qualquer efeito:
+#   · só é consultada quando o alvo NÃO casa nenhum `remote:` do members.yaml (o público vence; a lista não amplia membro
+#     que já tem endereço);
+#   · o arquivo tem modo sem bit para grupo e outros (600 ou 400); mais aberto, recusa;
+#   · o member_id existe no members.yaml de origin/main com `kind: adopter` (nunca door) e `remote: n/a` (o membro neutro);
+#     se ele declara owner_session lá, a da linha tem de ser a mesma; linha de membro inexistente não vale;
+#   · as condições de antes seguem: o dono do slug é o dono do core (a regra (1) recusa cliente SEMPRE, listado ou não),
+#     o repo é o da própria sessão, e adiante CI verde, rascunho, provenance e o resto do caminho verificado;
+#   · a recusa DESTA catraca nunca imprime o slug privado, só o member_id (o terminal pode ir parar num log público).
+#     TETO: fora dela (o modo "repo sem CI", a sessão do core sem --foreign-repo) o slug que quem chama digitou no --repo
+#     ainda pode aparecer; e a owner_session sai no aceite, então ela também não leva nome de cliente;
+#   · no CI (CI=true ou GITHUB_ACTIONS=true) a lista não é lida: lá ela não existe, e o comportamento é o de antes.
+# TETO HONESTO: o arquivo mora no mesmo usuário Unix que o agente; é camada de conformidade, como o resto da catraca. O que
+# ele impede é a sessão mergear repo fora da lista por engano, não um agente que forja o arquivo de propósito.
+_PMV_PRIVATE_OWNERS="${ONION_PRIVATE_OWNERS_FILE:-${HOME:-/nonexistent}/.config/onion/private-owner-sessions.tsv}"
+_pmv_private_lines() { # $1=slug normalizado → "member_id<TAB>owner_session" de cada linha que casa; nada no CI ou sem arquivo
+  { [ "${CI:-}" = true ] || [ "${GITHUB_ACTIONS:-}" = true ]; } && return 0
+  [ -f "${_PMV_PRIVATE_OWNERS}" ] && [ -r "${_PMV_PRIVATE_OWNERS}" ] || return 0
+  local _id _sl _os _rest
+  while IFS=$'\t' read -r _id _sl _os _rest || [ -n "${_id}" ]; do
+    _id="$(tr -d '[:space:]' <<< "${_id}")"; _os="$(tr -d '[:space:]' <<< "${_os}")"; _sl="$(tr -d '[:space:]' <<< "${_sl}")"
+    case "${_id}" in ''|'#'*) continue ;; esac
+    [ -n "${_sl}" ] && [ "$(_slug_norm "${_sl}")" = "$1" ] && printf '%s\t%s\n' "${_id}" "${_os}"
+  done < "${_PMV_PRIVATE_OWNERS}"
+}
+_pmv_private_row() { # $1=linhas que casaram  $2=members.yaml de origin/main → _PMV_PRIV_ROW="adopter<TAB>owner_session", ou morre
+  local _lines="$1" _m="$2" _n _id _os _mode _mrow _mk _mo _mr _lbl
+  _n="$(awk 'NF' <<< "${_lines}" | wc -l)"
+  _id="$(head -1 <<< "${_lines}" | cut -f1)"; _os="$(head -1 <<< "${_lines}" | cut -f2)"
+  _lbl="o membro privado '${_id}'"
+  _mode="$(stat -L -c '%a' -- "${_PMV_PRIVATE_OWNERS}" 2>/dev/null)"
+  [[ "${_mode}" =~ ^[0-7]{3,4}$ ]] && [ $(( 8#${_mode} & 8#077 )) -eq 0 ] \
+    || die "${_lbl}: a lista privada de sessões donas tem modo ${_mode:-ilegível}, mais aberto que 600 (chmod 600 nela). Não a uso. Nada foi feito."
+  [ "${_n}" -eq 1 ] || die "${_lbl}: o alvo casa ${_n} linhas da lista privada de sessões donas: ambíguo, não escolho uma. Nada foi feito."
+  _mrow="$(awk -v want="${_id}" '
+    function norm(v) { sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]*\(.*$/, "", v); gsub(/["'"'"' ]/, "", v); return tolower(v) }
+    function flush() { if (id != "" && id == want && out == "") out = (kind == "" ? "?" : kind) "\t" (own == "" ? "-" : own) "\t" (rem == "" ? "-" : rem); id = ""; kind = ""; own = ""; rem = "" }
+    /^[[:space:]]*-[[:space:]]+id:/ { flush(); i = $0; sub(/^[[:space:]]*-[[:space:]]+id:[[:space:]]*/, "", i); sub(/[[:space:]#].*$/, "", i); gsub(/["'"'"']/, "", i); id = i }
+    /^[[:space:]]+kind:/ { k = $0; sub(/^[[:space:]]+kind:[[:space:]]*/, "", k); sub(/[[:space:]#].*$/, "", k); kind = k }
+    /^[[:space:]]+owner_session:/ { o = $0; sub(/^[[:space:]]+owner_session:[[:space:]]*/, "", o); sub(/[[:space:]#].*$/, "", o); gsub(/["'"'"']/, "", o); own = o }
+    /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
+    END { flush(); print out }' <<< "${_m}")"
+  [ -n "${_mrow}" ] || die "${_lbl} não existe no members.yaml de origin/main do core: linha privada de membro inexistente não vale. Registre o membro neutro por PR. Nada foi feito."
+  _mk="$(cut -f1 <<< "${_mrow}")"; _mo="$(cut -f2 <<< "${_mrow}")"; _mr="$(cut -f3 <<< "${_mrow}")"
+  [ "${_mk}" = adopter ] || die "${_lbl} tem kind: ${_mk} no members.yaml: a lista privada só vale para membro kind: adopter (porta é publicação, D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113). Nada foi feito."
+  [ "${_mr}" = "n/a" ] \
+    || die "${_lbl} não é o membro neutro (remote: n/a) no members.yaml: a lista privada não amplia membro com remote público nem sem remote. Nada foi feito."
+  [ -n "${_os}" ] || die "${_lbl}: a linha da lista privada não diz a owner_session. Nada foi feito."
+  [ "${_mo}" = "-" ] || [ "${_mo}" = "${_os}" ] \
+    || die "${_lbl}: a owner_session da lista privada ('${_os}') difere da do members.yaml ('${_mo}'). Nada foi feito."
+  _PMV_PRIV_ROW="adopter"$'\t'"${_os}"
+}
 _own_repo_gate() {
   [ -n "${_SESSION_CWD}" ] || return 0
   # (A1 da revisão de 2026-11-18) --maestro só pula a catraca na sessão do CORE, cujo hook veta a flag na linha (o maestro
@@ -335,10 +398,14 @@ _own_repo_gate() {
   _t="${_PMV_TARGET}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _t="$(_slug_norm "${REPO_ARG[1]}")"
   [ "${_CORE_SESSION}" = 1 ] && [ "${#REPO_ARG[@]}" -lt 2 ] && _t="${_PMV_CORE_SLUG}"
   [ -n "${_t}" ] || die "não sei em que repo este merge cairia (sem --repo e sem remote legível): a sessão só mergeia no repo próprio, listado. Nada foi feito."
+  # (D_PRIVATE_OWNER_SESSIONS_1119) o alvo listado na lista privada aparece nas mensagens só pelo member_id, nunca pelo slug
+  local _priv _lbl="'${_t}'" _lown=" (${_t%%/*})"
+  _priv="$(_pmv_private_lines "${_t}" 2>/dev/null)"
+  [ -n "${_priv}" ] && { _lbl="o membro privado '$(head -1 <<< "${_priv}" | cut -f1)'"; _lown=""; }
   [ -n "${_corown}" ] && [ "${_t%%/*}" = "${_corown}" ] \
-    || die "'${_t}' é de outro dono (${_t%%/*}), não da família Onion de ${_corown}: repo de cliente ou de empresa só o dono mergeia, nunca a sessão, nem com resíduo isolado e CI verde (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118). Nada foi feito."
+    || die "${_lbl} é de outro dono${_lown}, não da família Onion de ${_corown}: repo de cliente ou de empresa só o dono mergeia, nunca a sessão, nem com resíduo isolado e CI verde (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118). Nada foi feito."
   _m="$(git -C "${_PMV_DIR}" show origin/main:docs/evolution/federation/members.yaml 2>/dev/null)" \
-    || die "não li docs/evolution/federation/members.yaml de origin/main do core: sem a lista fechada não sei se '${_t}' é repo que a sessão pode mergear. Nada foi feito."
+    || die "não li docs/evolution/federation/members.yaml de origin/main do core: sem a lista fechada não sei se ${_lbl} é repo que a sessão pode mergear. Nada foi feito."
   _row="$(awk -v want="${_t}" '
     function norm(v) { sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]*\(.*$/, "", v); gsub(/["'"'"' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v); sub(/\.git$/, "", v); sub(/\/+$/, "", v); return tolower(v) }
     function flush() { if (rem != "" && rem == want && out == "") out = (kind == "" ? "?" : kind) "\t" (own == "" ? "-" : own); rem = ""; kind = ""; own = "" }
@@ -347,12 +414,15 @@ _own_repo_gate() {
     /^[[:space:]]+owner_session:/ { o = $0; sub(/^[[:space:]]+owner_session:[[:space:]]*/, "", o); sub(/[[:space:]#].*$/, "", o); gsub(/["'"'"']/, "", o); own = o }
     /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
     END { flush(); print out }' <<< "${_m}")"
+  # (D_PRIVATE_OWNER_SESSIONS_1119) só quando o alvo não casa nenhum remote público: a lista privada, com as condições dela
+  local _via_priv=0
+  if [ -z "${_row}" ] && [ -n "${_priv}" ]; then _PMV_PRIV_ROW=""; _pmv_private_row "${_priv}" "${_m}"; _row="${_PMV_PRIV_ROW}"; _via_priv=1; fi
   local _k="${_row%%$'\t'*}" _o="${_row#*$'\t'}"
   case "${_k}" in
-    "") die "'${_t}' não está na lista fechada (members.yaml de origin/main do core): a sessão só mergeia repo registrado como o core ou com sessão dona declarada (owner_session). Registre por PR, ou o dono roda com --maestro. Nada foi feito." ;;
-    door) die "'${_t}' é PORTA (kind: door): merge nela publica, e a publicação segue com o dono (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113). Nada foi feito." ;;
+    "") die "${_lbl} não está na lista fechada (members.yaml de origin/main do core, nem a lista privada de sessões donas): a sessão só mergeia repo registrado como o core ou com sessão dona declarada (owner_session). Registre por PR, ou o dono roda com --maestro. Nada foi feito." ;;
+    door) die "${_lbl} é PORTA (kind: door): merge nela publica, e a publicação segue com o dono (D_DOOR_PUBLISH_STAYS_WITH_MAESTRO_1113). Nada foi feito." ;;
     source) : ;;
-    *) [ "${_o}" != "-" ] || die "'${_t}' está no registro (kind: ${_k}) mas sem owner_session: fora da lista fechada, a sessão não mergeia lá. Declarar a sessão dona é PR no members.yaml; até lá, o dono roda com --maestro. Nada foi feito." ;;
+    *) [ "${_o}" != "-" ] || die "${_lbl} está no registro (kind: ${_k}) mas sem owner_session: fora da lista fechada, a sessão não mergeia lá. Declarar a sessão dona é PR no members.yaml; até lá, o dono roda com --maestro. Nada foi feito." ;;
   esac
   if [ "${_CORE_SESSION}" = 1 ]; then _own="${_PMV_CORE_SLUG}"
   else _own="$(_slug_norm "$(git -C "${_SESSION_CWD}" remote get-url origin 2>/dev/null)")"; fi
@@ -360,13 +430,13 @@ _own_repo_gate() {
   # slug não-core distinto entre remotes, gh-resolved e GH_REPO é alvo ambíguo, e recusa
   if [ "${#REPO_ARG[@]}" -lt 2 ] && [ "${_CORE_SESSION}" != 1 ]; then
     local _nc; _nc="$(_pmv_remote_slugs | awk -v c="${_PMV_CORE_SLUG}" 'NF && $0 != c && !seen[$0]++' | wc -l)"
-    [ "${_nc}" -le 1 ] || die "sem --repo, os remotes, o gh-resolved e o GH_REPO apontam ${_nc} repos distintos: o gh poderia mirar outro que não '${_t}'. Diga o alvo com --repo. Nada foi feito."
+    [ "${_nc}" -le 1 ] || die "sem --repo, os remotes, o gh-resolved e o GH_REPO apontam ${_nc} repos distintos: o gh poderia mirar outro que não ${_lbl}. Diga o alvo com --repo. Nada foi feito."
   fi
   if [ "${_t}" != "${_own}" ]; then
     [ "${_CORE_SESSION}" = 1 ] && [ "${DELEGATED_FOREIGN}" -eq 1 ] \
-      || die "'${_t}' não é o repo desta sessão ('${_own:-ilegível}'): cada sessão mergeia só o próprio repo; em outro, só a coordenação do core pelo --foreign-repo. Nada foi feito."
+      || die "${_lbl} não é o repo desta sessão ($([ -n "${_own}" ] && [ -n "$(_pmv_private_lines "${_own}" 2>/dev/null)" ] && printf 'outro membro privado' || printf "'%s'" "${_own:-ilegível}")): cada sessão mergeia só o próprio repo; em outro, só a coordenação do core pelo --foreign-repo. Nada foi feito."
   fi
-  say "✓ catraca do repo próprio: '${_t}' é da família e está na lista fechada (${_k}$([ "${_o}" != "-" ] && printf ', sessão dona %s' "${_o}"))"
+  say "✓ catraca do repo próprio: ${_lbl} é da família e está na lista fechada$([ "${_via_priv}" = 1 ] && printf ' (pela lista privada de sessões donas)') (${_k}$([ "${_o}" != "-" ] && printf ', sessão dona %s' "${_o}"))"
   # (A3) e o gh mira o que a catraca julgou: sem --repo, GH_REPO explícito
   if [ "${#REPO_ARG[@]}" -lt 2 ] && [ "${_CORE_SESSION}" != 1 ]; then GH_REPO="${_t}"; export GH_REPO; fi
 }
