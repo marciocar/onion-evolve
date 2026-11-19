@@ -3,16 +3,16 @@ branch: feat/one-touch-approval-1118
 pr: pendente
 date: 2026-11-18
 reviewed_diff_sha256: pendente
-findings_total: 6
-findings_real: 4
+findings_total: 8
+findings_real: 5
 tokens: 0
 duration_min: 6
-findings_fixed: 4
+findings_fixed: 5
 verdict: FIXED
 elenxo: true
 elenxo_isolado: true
 reviewer: "agente revisor isolado (code-reviewer), só leitura, com mandato de refutar; duas passadas sobre o diff da worktree"
-nota: "tokens = 0: não medido. 1ª passada APPROVED com 4 LIMITE, todos curados no mesmo laço com caso e mutante; 2ª passada APPROVED com 2 LIMITE declarados abaixo."
+nota: "tokens = 0: não medido. 1ª passada APPROVED com 4 LIMITE, todos curados no mesmo laço com caso e mutante; 2ª passada APPROVED com 2 LIMITE declarados; 3ª passada (delta do hash do executor, TTY, efeito e plano) APPROVED com 2 LIMITE, 1 curado na mensagem."
 ---
 
 # Passada adversarial: `feat/one-touch-approval-1118`
@@ -50,6 +50,14 @@ esquema compartilhado de ato ficam em `.claude/utils/approval/`. A bancada são 
    `promptId` próprio do `queued` foram medidos em `-p` e em transcripts reais, mas a bancada usa transcript
    sintético. O nó `C_TETO_ORDEM_INTERATIVA_SUPOSTA` traz o gatilho: o 1º uso real. Uma recusa com «não está no
    transcript» é o sinal para medir de novo.
+
+### 3ª passada (delta: hash do executor, `requires_tty`, `effect`, plano): APPROVED, com 2 LIMITE
+
+7. **REAL, curado na mensagem: falso positivo entre checkouts.** Se a sessão pede de uma worktree e usa a partir de
+   outra, o sha256 do script diverge, e a recusa não dizia a causa. Agora ela pede para rodar do mesmo checkout em
+   que pediu. A recusa continua fechada.
+8. **LIMITE: `--requires-tty` sem valor é ignorado.** Hoje nenhum chamador passa a flag. Quando entrar o primeiro ato
+   com TTY, ela vira booleana.
 
 ## Limites (teto da peça)
 
