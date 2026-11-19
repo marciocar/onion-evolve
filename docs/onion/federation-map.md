@@ -31,7 +31,7 @@ flowchart TD
   jogo_da_vida["jogo-da-vida<br/>standalone · greenfield"]:::standalone
   onion_slm["onion-slm<br/>standalone · greenfield"]:::standalone
   onion_curation["onion-curation<br/>standalone · greenfield"]:::standalone
-  company_brain["company-brain<br/>standalone · greenfield"]:::standalone
+  onion_company_brain["onion-company-brain<br/>standalone · greenfield"]:::standalone
   onion_kg_ssot["onion-kg-ssot<br/>standalone · greenfield"]:::standalone
   bomtexto["bomtexto<br/>standalone · greenfield"]:::standalone
   maestro_notebook_test["maestro-notebook-test<br/>standalone · greenfield"]:::standalone
@@ -66,7 +66,7 @@ flowchart TD
   jogo_da_vida -->|adopts| onion_evolve
   onion_slm -->|adopts| onion_evolve
   onion_curation -->|adopts| onion_evolve
-  company_brain -->|adopts| onion_evolve
+  onion_company_brain -->|adopts| onion_evolve
   onion_kg_ssot -->|adopts| onion_evolve
   bomtexto -->|adopts| onion_evolve
   maestro_notebook_test -->|adopts| onion_evolve
@@ -109,7 +109,7 @@ flowchart TD
 | jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `df031ef53683` |
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
 | onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `4e488f2fef65` |
-| company-brain | standalone | greenfield | company-brain, produto, atendimento | `56bcd68122bd` |
+| onion-company-brain | standalone | greenfield | company-brain, produto, atendimento | `56bcd68122bd` |
 | onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `fb2a7d72c98c` |
 | bomtexto | standalone | greenfield |  | `bd769f168411` |
 | maestro-notebook-test | standalone | greenfield | a2a-spike | `n/a` |
