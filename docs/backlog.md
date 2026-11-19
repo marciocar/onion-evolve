@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1190 itens abertos** em 174 grafo(s) com aberto (de 233 no escopo) · 168 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1202 itens abertos** em 175 grafo(s) com aberto (de 234 no escopo) · 169 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1177,6 +1177,23 @@
 | 3.0 | `Q_MD_PLUGINS_DIRECTORY_UNTRUSTED_HOOK_1109` | maestro-decisions-1109b | O hook do onion-plugins funciona em pasta não confiada, e quais são os requisitos duros do diretório comunitário? |
 | 2.0 | `Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT` | inbox-triage-1108 | O ack da fila leva resultado? E o aviso a N sessões segue como N mensagens ou vira cursor por tópico? |
 | 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
+
+## taco-2026-11 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 22.4 | `D_TACO_VERDICT` | taco-2026-11 | Rejeitar o uso do código do taco em 19/11/2026: substrato Python contra o bridge TypeScript, vocabulário de construção, contra |
+| 8.1 | `S_STAGE0` | taco-2026-11 | Etapa 0 pré-registrada antes de qualquer dado do taco além do N0 do brief: família ferramenta, destino core, alvo N3. |
+| 3.6 | `I_GATE_THE_DECLARED_SCHEMA` | taco-2026-11 | O esquema declarado só é cobrado se o handler quiser; o Onion faria o contrário: a borda barra a tarefa cuja saída não valida |
+| 3.6 | `I_TASK_STORE_PER_OWNER` | taco-2026-11 | Store de tarefas por dono (o sujeito do token), escrita atômica e ListTasks com filtro e paginação, sobre a interface TaskStore |
+| 3.6 | `I_TASK_TYPES_WITH_SCHEMAS_IN_CARD` | taco-2026-11 | Tipos de tarefa com esquema de entrada e saída declarados por skill no Agent Card, sob uma extensão A2A com URI formal. |
+| 3.0 | `C_OBJ_PIECES_ALTERNATIVE` | taco-2026-11 | Objeção da revisão: um veredito em peças (rejeitar a x-construction, parquear a camada genérica com gatilho no núcleo de tar |
+| 2.8 | `I_ONTOLOGY_NOT_PROTOCOL` | taco-2026-11 | Estratégia «ontologia, não protocolo»: todo agente TACO é um agente A2A padrão; o valor fica no vocabulário, não no transp |
+| 2.4 | `I_SCOPE_PER_TASK_TYPE` | taco-2026-11 | Escopo OAuth por tipo de tarefa e por projeto com reticulado de ação (read < write < admin): taco:task:<tipo>, taco:project:<id> |
+| 2.0 | `I_DELEGATION_TOKEN_EXCHANGE` | taco-2026-11 | Delegação em cadeia com token estreitado a cada salto (OAuth Token Exchange, RFC 8693): o orquestrador troca o seu token por um  |
+| 2.0 | `I_PEER_BY_SKILL` | taco-2026-11 | O agente chama o par pelo tipo de tarefa (send_to_peer), e o registro resolve qual agente tem a skill; o chamador não nomeia o de |
+| 2.0 | `I_REGISTRY_ASSIGNED_TRUST_TIER` | taco-2026-11 | Tier de confiança atribuído pelo registro por verificação de terceiro, separado das certificações auto-declaradas no card. |
+| 1.2 | `I_WIRE_DIALECT_PARITY` | taco-2026-11 | Bancada que roda o mesmo cenário nos dois dialetos do A2A (0.3 e 1.0), escritos à mão, para provar que o servidor fala os dois. |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
 

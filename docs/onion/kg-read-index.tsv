@@ -1623,6 +1623,8 @@ docs/evolution/dissect/problem-route-2026-11/score.py	A_SCORE_PY	docs/evolution/
 docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	E_REMEDIDA_SUPERACAO_SUPERPOWERS_1027	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
 docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	Q_REABRIR_AUTORIDADE_NO_PROBE	docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml
 docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	Q_REABRIR_TRES_SKILLS	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
+docs/evolution/dissect/taco-2026-11/STAGE0.md	D_TACO_VERDICT	docs/evolution/dissect/taco-2026-11/taco-2026-11.kg.yaml
+docs/evolution/dissect/taco-2026-11/STAGE0.md	S_STAGE0	docs/evolution/dissect/taco-2026-11/taco-2026-11.kg.yaml
 docs/evolution/federation-roadmap-2026.md	C_naive_admin_platform	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 docs/evolution/federation-roadmap-2026.md	ENT_substrate	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
 docs/evolution/federation/CHANGELOG.md	C_D7_11	docs/onion/graph/onion-evolution-2026-07.kg.yaml
