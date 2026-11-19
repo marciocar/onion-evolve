@@ -780,6 +780,30 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: company-brain
+    name: company-brain (produto Onion Company Brain)
+    role: standalone            # adota o core direto (o stamp do alvo diz role: adopted)
+    kind: adopter
+    piece: true                 # PEÇA estratégica com sessão dona (D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119)
+    owner_session: company-brain # o NOME da sessão que a defende; o baton-pulse casa por nome, nunca pelo ref
+    sponsor: maestro
+    parent: onion-evolve
+    remote: https://github.com/marciocar/company-brain (privado)
+    local_path: /home/marcio/company-brain
+    onion_version: 56bcd68122bd
+    adopted_at: 2026-11-19
+    mode: greenfield
+    personality_summary: "Dona do PRODUTO Onion Company Brain e upstream da vertical company-brain-context no modelo kg-ssot: persona de serviço, padrão de atendimento com exemplo primeiro, multiaudiência e o contrato de um Brain de empresa. Os Brains de empresa são usuários; o dado de cada empresa fica no Brain dela e o aprendizado volta como sinal de forma. 1ª entrega: o construtor do contexto do Company Brain."
+    specializations: [company-brain, produto, atendimento]
+    personality_last_sync: 2026-11-19
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: onion-kg-ssot
     name: onion-kg-ssot (produto KG-SSOT)
     role: standalone
