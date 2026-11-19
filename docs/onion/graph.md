@@ -349,6 +349,14 @@ command-creator-specialist	related	/meta/create-command
 command-creator-specialist	related	agent-creator-specialist	
 command-creator-specialist	related	claude-code-specialist	
 command-creator-specialist	related	gitflow-specialist	
+company-brain	adopts	onion-evolve	
+company-brain	mode	greenfield	
+company-brain	pin	56bcd68122bd	
+company-brain	specialization	atendimento	
+company-brain	specialization	company-brain	
+company-brain	specialization	produto	
+company-brain	tier	standalone	
+company-brain	trust-advises	onion-evolve	
 consultoria-analise-de-caso	adopts	onion-evolve	
 consultoria-analise-de-caso	mode	greenfield	
 consultoria-analise-de-caso	pin	e4c954ebad47	
