@@ -503,7 +503,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-19"
     verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «Dois repos, duas sessões»"
-    label: "Company Brain vira peça com repo e sessão donos: company-brain é dono do produto (persona, atendimento com exemplo primeiro, multiaudiência); company-brain-game é o Jogo, opcional; os Brains de empresa são usuários"
+    label: "Company Brain vira peça com repo e sessão donos: company-brain é dono do produto (persona, atendimento com exemplo primeiro, multiaudiência); o repo do Jogo, opcional; os Brains de empresa são usuários"
     narrative: "Selado por /meta:decide em 2026-11-19: escolhida «Dois repos, duas sessões»; descartadas: «Um repo agora, dividir depois»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
@@ -587,7 +587,7 @@ nodes:
     narrative: "Selado por /meta:decide em 2026-11-19: escolhida «Book + eventos da kg-ssot»; descartadas: «Só os eventos»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-19: «O Jogo (company-brain-game) consome o quê?»"
+      locator: "pergunta com opções de 2026-11-19: «O Jogo consome o quê?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
       locality: "pessoa"
 edges:
