@@ -519,7 +519,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-19"
     verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «company-brain já, Jogo depois»"
-    label: "A sessão company-brain abre já; a do Jogo abre quando o emissor de eventos existir; fecham a slm suspensa, a sge e a brain-dufrio para abrir slot"
+    label: "A sessão company-brain abre já; a do Jogo abre quando o emissor de eventos existir; fecham três sessões paradas para abrir slot"
     narrative: "Selado por /meta:decide em 2026-11-19: escolhida «company-brain já, Jogo depois»; descartadas: «As duas já» · «Só o Jogo agora»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
