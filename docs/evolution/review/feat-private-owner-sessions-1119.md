@@ -3,7 +3,6 @@ branch: feat/private-owner-sessions-1119
 pr: pendente
 date: 2026-11-19
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 9
 findings_real: 6
 findings_blocking: 0
