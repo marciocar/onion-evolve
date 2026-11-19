@@ -1183,7 +1183,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 22.4 | `D_TACO_VERDICT` | taco-2026-11 | Rejeitar o uso do código do taco em 19/11/2026: substrato Python contra o bridge TypeScript, vocabulário de construção, contra |
-| 8.1 | `S_STAGE0` | taco-2026-11 | Etapa 0 pré-registrada antes de qualquer dado do taco além do N0 do brief: família ferramenta, destino core, alvo N3. |
+| 8.1 | `S_STAGE0` | taco-2026-11 | Etapa 0 pré-registrada antes de qualquer dado do taco além do dissect:N0 do brief: família ferramenta, destino core, alvo disse |
 | 3.6 | `I_GATE_THE_DECLARED_SCHEMA` | taco-2026-11 | O esquema declarado só é cobrado se o handler quiser; o Onion faria o contrário: a borda barra a tarefa cuja saída não valida |
 | 3.6 | `I_TASK_STORE_PER_OWNER` | taco-2026-11 | Store de tarefas por dono (o sujeito do token), escrita atômica e ListTasks com filtro e paginação, sobre a interface TaskStore |
 | 3.6 | `I_TASK_TYPES_WITH_SCHEMAS_IN_CARD` | taco-2026-11 | Tipos de tarefa com esquema de entrada e saída declarados por skill no Agent Card, sob uma extensão A2A com URI formal. |
