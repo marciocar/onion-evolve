@@ -503,7 +503,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-19"
     verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «Dois repos, duas sessões»"
-    label: "Company Brain vira peça com repo e sessão donos: company-brain é dono do produto (persona, atendimento com exemplo primeiro, multiaudiência); o repo do Jogo, opcional; os Brains de empresa são usuários"
+    label: "Company Brain vira peça com repo e sessão donos: Company Brain é dono do produto (persona, atendimento com exemplo primeiro, multiaudiência); o repo do Jogo, opcional; os Brains de empresa são usuários"
     narrative: "Selado por /meta:decide em 2026-11-19: escolhida «Dois repos, duas sessões»; descartadas: «Um repo agora, dividir depois»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
@@ -518,9 +518,9 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "2026-11-19"
-    verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «company-brain já, Jogo depois»"
-    label: "A sessão company-brain abre já; a do Jogo abre quando o emissor de eventos existir; fecham três sessões paradas para abrir slot"
-    narrative: "Selado por /meta:decide em 2026-11-19: escolhida «company-brain já, Jogo depois»; descartadas: «As duas já» · «Só o Jogo agora»."
+    verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «Company Brain já, Jogo depois»"
+    label: "A sessão Company Brain abre já; a do Jogo abre quando o emissor de eventos existir; fecham três sessões paradas para abrir slot"
+    narrative: "Selado por /meta:decide em 2026-11-19: escolhida «Company Brain já, Jogo depois»; descartadas: «As duas já» · «Só o Jogo agora»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-19: «Em que ordem as duas sessões abrem?»"
@@ -535,11 +535,11 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-19"
     verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «Modelo kg-ssot»"
-    label: "A vertical company-brain-context segue o modelo kg-ssot: o company-brain é upstream do motor e o core vendoriza em vendor/company-brain; hub, skill e construtor ficam em .claude do core e viajam"
+    label: "A vertical de contexto do Company Brain segue o modelo kg-ssot: o Company Brain é upstream do motor e o core vendoriza em vendor/Company Brain; hub, skill e construtor ficam em .claude do core e viajam"
     narrative: "Selado por /meta:decide em 2026-11-19: escolhida «Modelo kg-ssot»; descartadas: «Core autora, Brain usa»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-19: «Qual a relação entre a vertical company-brain-context do core e o repo company-brain?»"
+      locator: "pergunta com opções de 2026-11-19: «Qual a relação entre a vertical de contexto do Company Brain do core e o repo Company Brain?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
       locality: "pessoa"
   - id: D_COMPANY_BRAIN_BUILDER_FIRST_DELIVERY_1119
@@ -551,11 +551,11 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-19"
     verified_against: "decisão do maestro em 2026-11-19, por pergunta com opções (/meta:decide): escolhida «É a 1ª entrega do Brain»"
-    label: "O construtor /docs:build-company-brain-docs, com template no molde dos build-*-docs e feito com exemplo primeiro, é a 1ª entrega da sessão company-brain; entra no core por PR do core"
+    label: "O construtor o construtor de docs do Company Brain, com template no molde dos build-*-docs e feito com exemplo primeiro, é a 1ª entrega da sessão Company Brain; entra no core por PR do core"
     narrative: "Selado por /meta:decide em 2026-11-19: escolhida «É a 1ª entrega do Brain»; descartadas: «O core faz agora»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-19: «Como nasce o construtor da vertical company-brain-context?»"
+      locator: "pergunta com opções de 2026-11-19: «Como nasce o construtor da vertical de contexto do Company Brain?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-19"
       locality: "pessoa"
   - id: D_COMPANY_BRAIN_FEDERATED_SERVICE_CHARTER_TRIGGER_1119
