@@ -2,7 +2,8 @@
 branch: docs/dissect-taco-1119
 pr: pendente
 date: 2026-11-19
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c109b6b152945d18934eb39af40cdcb74af9f7aab3c629ff753acddf0a09ae20
+reviewed_code_sha256: 2dfac3b85e314a622f40f323bf1635fa7b9646c8df0b1626118bc7db3a0573ac
 findings_total: 8
 findings_real: 8
 findings_blocking: 2
