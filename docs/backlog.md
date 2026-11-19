@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1186 itens abertos** em 173 grafo(s) com aberto (de 232 no escopo) · 167 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1190 itens abertos** em 174 grafo(s) com aberto (de 233 no escopo) · 168 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1697,6 +1697,15 @@
 | 4.5 | `C_TETO_GATE_DO_GIT` | hooks-python-isolated-2026-11 | TETO: os scripts que o pre-commit e o pre-push executam não entraram: 149 invocações sem -I em 38 arquivos, fora dos hooks da s |
 | 3.2 | `C_API_DIRETA_SEM_PYTHON_CALA` | hooks-python-isolated-2026-11 | sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fech |
 | 3.2 | `C_TETO_LEXICO` | hooks-python-isolated-2026-11 | TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho |
+
+## radar-E3-2026-11-18-r25 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.3 | `Q_SUBIR_SDK_DO_BRIDGE_0_3_327_E_PIN_DO_REVISOR_V1_0_282_1118` | radar-E3-2026-11-18-r25 | o SDK do bridge sobe para 0.3.327 (com o lock) e o pin do revisor do CI para a action v1.0.282, cada um pelo caminho declarado; a  |
+| 2.8 | `Q_CURINGA_DAS_LOCAIS_R_S_NO_MOLDE_DO_CITED_DIRECTIVE_1118` | radar-E3-2026-11-18-r25 | o molde do caso (f) da família cited_directive passa a tratar como curinga também as locais r e s (como já faz com g e h), e a  |
+| 2.4 | `Q_BRIEF_DE_AGENTE_ISOLADO_USA_GIT_SIMPLES_1118` | radar-E3-2026-11-18-r25 | o preâmbulo dos agentes de execução pede git em forma simples, com o rc lido numa chamada à parte; antes, medir numa worktree  |
+| 2.4 | `Q_PULSO_DO_BATON_NO_LOOP_SOB_A_2_1_327_1118` | radar-E3-2026-11-18-r25 | medir numa sessão descartável se o /loop da 2.1.327 pergunta antes do /meta:baton em bypass e em default; se perguntar, decidir  |
 
 ## ai-front-2026-10 — 1 item(ns)
 
