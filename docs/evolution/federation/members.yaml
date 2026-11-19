@@ -780,8 +780,8 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
-  - id: onion-company-brain
-    # prefixo onion-: o id não pode colidir com a vertical company-brain do framework (REGRA 36); o repo segue company-brain
+  - id: onion-company-brain-product
+    # id com prefixo onion- e sufixo -product: não colide com a vertical company-brain nem com a skill onion-company-brain-context (REGRAS 36 e 106); o repo segue company-brain
     name: company-brain (produto Onion Company Brain)
     role: standalone            # adota o core direto (o stamp do alvo diz role: adopted)
     kind: adopter
