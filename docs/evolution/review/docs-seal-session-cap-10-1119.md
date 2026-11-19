@@ -1,0 +1,34 @@
+---
+branch: docs/seal-session-cap-10-1119
+pr: pendente
+date: 2026-11-19
+reviewed_diff_sha256: pendente
+findings_total: 0
+findings_real: 0
+findings_blocking: 0
+tokens: 0
+duration_min: 5
+findings_fixed: 0
+verdict: NO_FINDINGS
+elenxo: true
+elenxo_isolado: false
+reviewer: "Passada da própria sessão do core, só leitura: quatro selos pelo kg-decide-seal (radar exit 0) com as opções marcadas pelo maestro em 19/11; o padrão do pulso sobe de 8 para 10 e o caso de bancada (as2) acompanha, com o mutante MAXI=10 → 4 mordendo do mesmo jeito (7 interativas > 4)."
+nota: "tokens 0 = não medido. Não toca guarda."
+---
+
+# Passada adversarial: `docs/seal-session-cap-10-1119`
+
+## O que muda
+
+Selos do teto de 10 sessões + 5 agentes (com o horizonte do teto dinâmico), da migração para tmux combinada com
+cada sessão, da pergunta antes de fechar as duplicadas e da abertura do Jogo; e o padrão `--max-interactive` do
+`baton-pulse.sh` de 8 para 10, com o caso (as2) da bancada.
+
+## O que se tentou refutar
+
+- O caso (as) usa --max-interactive explícito (6 e 7) e não depende do padrão: segue igual.
+- O mutante do (as2) ainda morre? Com 7 interativas e padrão 4, 7 > 4 dispara SESSION_CAP: sim.
+
+## Veredito
+
+NO_FINDINGS.

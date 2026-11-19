@@ -60103,12 +60103,12 @@ BP_HY
     grep -q "^hygiene${T}-${T}SESSION_CAP${T}.*7 sessão(ões) interativa(s) distinta(s) acima do teto de 6" <<< "${a}" && ! grep -q "SESSION_CAP" <<< "${b}"; }
   _bpcase "(as) interativas acima do teto saem SESSION_CAP; no teto não" \
     "    if inter_sessions > int(max_inter):" "    if False:" _bp_as
-  # (as2) o PADRÃO é 8 (D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116, 2026-11-16): com 7 interativas e SEM --max-interactive,
-  #       não dispara. Se o padrão voltar a 4, 7 > 4 e o SESSION_CAP volta — o mutante (MAXI="8" → MAXI="4") morde.
+  # (as2) o PADRÃO é 10 (D_SESSION_CAP_10_PLUS_5_AGENTS_1119, 2026-11-19; antes 8): com 7 interativas e SEM --max-interactive,
+  #       não dispara. Se o padrão voltar a 4, 7 > 4 e o SESSION_CAP volta — o mutante (MAXI="10" → MAXI="4") morde.
   _bp_as2() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E 'SESSION_CAP' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
     ! grep -q "SESSION_CAP" <<< "${a}"; }
-  _bpcase "(as2) o teto padrão é 8: 7 interativas não disparam SESSION_CAP sem flag" \
-    'MAXI="8"' 'MAXI="4"' _bp_as2
+  _bpcase "(as2) o teto padrão é 10: 7 interativas não disparam SESSION_CAP sem flag" \
+    'MAXI="10"' 'MAXI="4"' _bp_as2
   # (at) sem environ legível e com a árvore cortada: lacuna HYGIENE_UNMEASURED, nunca «fora do tmux» nem «em tmux»
   _bp_at() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E "h-unread|HYGIENE" <<< "${a}" | tr '\t' ' ')"
     grep -q "^gap${T}.*HYGIENE_UNMEASURED.*h-unread (pid 4007).*tmux NÃO medido" <<< "${a}" && ! grep -q "^hygiene${T}sid-h-unread${T}" <<< "${a}"; }
