@@ -31,7 +31,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.9
-    label: "Etapa 0 pré-registrada antes de qualquer dado do taco além do N0 do brief: família ferramenta, destino core, alvo N3."
+    label: "Etapa 0 pré-registrada antes de qualquer dado do taco além do dissect:N0 do brief: família ferramenta, destino core, alvo dissect:N3."
     trace: docs/evolution/dissect/taco-2026-11/STAGE0.md
     x_criterion:
       id: TACO_STAGE0
@@ -48,11 +48,11 @@ nodes:
     impact: 3
     confidence: 0.9
     x_dissect_level: 0
-    label: "N0 passa: Apache-2.0 real (o gh lê «Other» por causa do cabeçalho curto), Pelles AI, 206 commits, 48 tags até v0.7.1 em 03/11/2026, vivo na janela de 30 dias."
+    label: "dissect:N0 passa: Apache-2.0 real (o gh lê «Other» por causa do cabeçalho curto), Pelles AI, 206 commits, 48 tags até v0.7.1 em 03/11/2026, vivo na janela de 30 dias."
     narrative: >-
       O LICENSE tem o título «Apache License, Version 2.0» e o aviso de aplicação, sem o texto integral; o
       detector do GitHub não casa e devolve «Other». O pyproject declara license = "Apache-2.0" e o README
-      também. Logo a licença permite vendorizar com aviso (E1 da Etapa 0 não barra). Trajetória: 1º commit
+      também. Logo a licença permite vendorizar com aviso (o eliminatório de licença da Etapa 0 não barra). Trajetória: 1º commit
       em 01/03/2026, rajadas em 03, 05, 09-10 e 11/2026; último commit da main em 03/11/2026 (tag v0.7.1),
       16 dias antes desta medida; 48 tags em 8 meses, todas 0.x. Autores: 2 humanos (matanweks, Ido
       Glanz), o dependabot e 77 commits com autor «Claude». Mantenedor é uma organização pequena;
@@ -75,7 +75,7 @@ nodes:
     impact: 4
     confidence: 0.85
     x_dissect_level: 1
-    label: "N1: o taco serve o ciclo de vida da A2A Task (send, stream, get, list, cancel, push) com tipos de tarefa e esquemas tipados por skill; o Onion não serve tarefa A2A."
+    label: "dissect:N1: o taco serve o ciclo de vida da A2A Task (send, stream, get, list, cancel, push) com tipos de tarefa e esquemas tipados por skill; o Onion não serve tarefa A2A."
     narrative: >-
       Verbos da superfície executável: CLI `taco discover | inspect | send | health | list-tasks`
       (sdk/taco/cli.py:288-308); SDK `A2AServer.register_handler / register_streaming_handler`, admin de
@@ -109,7 +109,7 @@ nodes:
     confidence: 0.85
     x_dissect_level: 2
     x_dissect_n2_evidence: artefato-aberto
-    label: "N2: camada própria sobre o a2a-sdk 1.3.1: despacho por metadata.taskType, escopo por tipo, store por dono, push com SSRF; o 1º DataPart é a entrada; 660 testes verdes num venv isolado."
+    label: "dissect:N2: camada própria sobre o a2a-sdk 1.3.1: despacho por metadata.taskType, escopo por tipo, store por dono, push com SSRF; o 1º DataPart é a entrada; 660 testes verdes num venv isolado."
     narrative: >-
       Substrato: 8 dos 22 arquivos .py do pacote (7 dos 16 do topo, mais monitor/__init__.py) importam o
       a2a-sdk (Apache-2.0; autor Google LLC no metadata). O a2a-sdk dá o protocolo: AgentExecutor,
@@ -190,7 +190,7 @@ nodes:
     impact: 4
     confidence: 0.75
     x_dissect_level: 3
-    label: "N3, igual → transfere: a camada genérica do taco (despacho por tipo, escopo por tipo, store por dono) é o que um núcleo de tarefas do Onion sobre A2A precisa, e não está no a2a-sdk."
+    label: "dissect:N3, igual → transfere: a camada genérica do taco (despacho por tipo, escopo por tipo, store por dono) é o que um núcleo de tarefas do Onion sobre A2A precisa, e não está no a2a-sdk."
     narrative: >-
       A analogia é igual: tarefa entre sessões do Onion e tarefa entre agentes do taco têm a mesma forma
       (tipo, entrada, artefato, estado), e a sonda do card comum prova que a camada roda fora da
@@ -211,7 +211,7 @@ nodes:
     impact: 3
     confidence: 0.8
     x_dissect_level: 3
-    label: "N3, diferente → desenha: só a extensão x-construction e o AgentRegistry.find são presos à construção (trade, CSI, BOM em Literal); para o Onion, esse vocabulário é falsa analogia."
+    label: "dissect:N3, diferente → desenha: só a extensão x-construction e o AgentRegistry.find são presos à construção (trade, CSI, BOM em Literal); para o Onion, esse vocabulário é falsa analogia."
     narrative: >-
       Trade, ProjectType, Integration, BOMUnit e RFICategory são Literal em sdk/taco/types.py:74-124; o
       AgentRegistry.find filtra por trade, csi_division, project_type e integration (registry.py:112-143).
@@ -233,7 +233,7 @@ nodes:
     impact: 4
     confidence: 0.8
     x_dissect_level: 3
-    label: "N3, diferente → desenha: o bridge A2A do Onion é TypeScript e o taco é um SDK Python; usar o código põe um segundo runtime na borda, e a camada genérica cabe em reescrita."
+    label: "dissect:N3, diferente → desenha: o bridge A2A do Onion é TypeScript e o taco é um SDK Python; usar o código põe um segundo runtime na borda, e a camada genérica cabe em reescrita."
     narrative: >-
       O a2a-agent-card.sh cita o onion-bridge em src/server.ts:687 e src/a2a-routes.ts:12, e o package.json
       do bridge é TypeScript. O taco não roda nesse processo; costurá-lo seria um serviço Python ao lado.
