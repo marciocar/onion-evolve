@@ -2,8 +2,7 @@
 branch: chore/members-company-brain-1119
 pr: pendente
 date: 2026-11-19
-reviewed_diff_sha256: 6c52471d56cc4a52e35333d649838a09f98679319610fdf90d4529dad4132a20
-reviewed_code_sha256: 5811174dedf6b32abd221347e0d7c45b5fc9494f4d88fad7b8f0d6bd9b0b85ed
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
