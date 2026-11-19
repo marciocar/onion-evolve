@@ -1,0 +1,33 @@
+# kg-backlog-guard: on
+# ═══ TETO: 30 NÓS ═══
+meta:
+  id: taco-2026-11
+  schema_version: "1"
+  baseline: "2026-11-19"
+  review_after: "2026-12-19"
+  x_dissect_tool: taco
+  x_dissect_against: onion
+  x_dissect_family: ferramenta
+  x_study_destination: core
+  x_who_pays: "a preencher no N0"
+  x_unverified: []
+external_edges:
+  - from: S_STAGE0
+    to: .claude/validation/dissect-families.kg.yaml#T_FAMILY_FERRAMENTA
+    edge_type: TRACES_TO
+nodes:
+  - id: S_STAGE0
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "Etapa 0 pré-registrada antes de qualquer dado do taco além do N0 do brief: família ferramenta, destino core, alvo N3."
+    trace: docs/evolution/dissect/taco-2026-11/STAGE0.md
+    x_criterion:
+      id: TACO_STAGE0
+      version: 1
+      registered_at: "2026-11-19T21:49:49+00:00"
+      sha256: b29382f975129d3f558bf580e58d727a8e587770b7c58d7005c9d12e326ce89d
+      ref: docs/evolution/dissect/taco-2026-11/STAGE0.md
+edges: []
