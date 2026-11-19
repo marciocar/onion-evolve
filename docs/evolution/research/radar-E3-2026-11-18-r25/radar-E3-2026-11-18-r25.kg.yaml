@@ -277,7 +277,7 @@ nodes:
     verified_at: "2026-11-18"
     verified_against: "medido pelo juiz: python3 -I ops/testing/permissions-deny-bench.py --settings .claude/settings.json --only default,bypass → rc 0, binário 2.1.327, 74 regras, 340 casos, 0 divergentes, sentinela ok"
     label: "o permissions.deny do core segue barrando e deixando passar o esperado na 2.1.327, nas fases default e bypass, depois das mudanças de permissão de 2.1.326 e 2.1.327"
-    narrative: "Itens: 2.1.326 l.233, l.313, l.314; 2.1.327 l.138. Não supera o nó da r24 (o estado não mudou), só o re-data."
+    narrative: "Itens: 2.1.326 l.233, l.313, l.314; 2.1.327 l.138. Não supera o nó da rodada 24 (o estado não mudou), só o re-data."
     provenance:
       source: "data/judge-verdicts.json"
       locator: "omissoes: permissions.deny"
