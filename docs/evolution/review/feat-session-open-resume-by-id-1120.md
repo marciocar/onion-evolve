@@ -2,8 +2,7 @@
 branch: feat/session-open-resume-by-id-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: b9b8805f86cd0e24f042def808ee52c4774c31808cf2d82e47ea5965434bdeaf
-reviewed_code_sha256: c7d5ebf2504029f16abf5fac62030aa30feac100e95db8ab9269af3d6a0cbf68
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 11
 findings_blocking: 0
