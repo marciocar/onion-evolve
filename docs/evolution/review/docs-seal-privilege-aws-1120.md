@@ -2,7 +2,8 @@
 branch: docs/seal-privilege-aws-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 39aaea43138b6ebf4990f90ece4be312b9e4d7d1865e69d1414708bb820c07e0
+reviewed_code_sha256: ceccff2aa903880b68e96fcd92e4450b91092ee2859ef80a2e3e0172b682066a
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
