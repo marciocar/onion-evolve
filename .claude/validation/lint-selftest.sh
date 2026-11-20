@@ -60928,7 +60928,21 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   _so_g5() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-lp.yaml" SO_PRIV="${sb}/priv-dup.tsv" _so_run "$1" priv-sess --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     ! grep -qF 'merja sozinho? sim' <<< "${r}"; }
   _so_case_own "(g5) slug repetido na lista privada: nenhuma das linhas vale (a catraca recusa)" _so_g5 \
-    'if ((i in r) && n[s[i]] == 1) print r[i]' 'if (i in r) print r[i]'
+    'if [ -n "${sl}" ] && [ "${nsl["${sl}"]:-0}" -gt 1 ]; then' 'if false; then'
+  # (g6) o MESMO id em duas linhas (slugs distintos): id repetido derruba todas as cópias (mais estrito que a catraca)
+  printf 'm-priv\tonion-bancada/rep1\tpriv-sess\trepoP\nm-priv\tonion-bancada/rep2\tpriv-sess\trepoP\n' > "${sb}/priv-twice.tsv"; chmod 600 "${sb}/priv-twice.tsv"
+  _so_g6() { local r rc=0  # o leitor direto: a nota do id repetido e nenhuma linha privada na lista
+    r="$(ONION_PRIVATE_OWNERS_FILE="${sb}/priv-twice.tsv" bash "${SO_OWN:-${own}}" list --members "${sb}/members-lp.yaml" 2>&1)" || rc=$?
+    SO_WHY="rc=${rc} $(tr '\t\n' ' |' <<< "${r}")"
+    [ "${rc}" = 0 ] && grep -qF "linha privada 'm-priv' repetida" <<< "${r}" && ! grep -q 'privada$' <<< "${r}"; }
+  _so_case_own "(g6) linha privada duplicada: todas as cópias caem" _so_g6 \
+    'if [ "${nid["${id}"]:-0}" -gt 1 ]; then' 'if false; then'
+  # (g7) linha válida + linha INVÁLIDA (membro inexistente) com o mesmo slug: a catraca conta as duas e recusa
+  printf 'm-priv\tonion-bancada/sombra\tpriv-sess\trepoP\nfantasma\tonion-bancada/sombra\tx\n' > "${sb}/priv-ghost.tsv"; chmod 600 "${sb}/priv-ghost.tsv"
+  _so_g7() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-lp.yaml" SO_PRIV="${sb}/priv-ghost.tsv" _so_run "$1" priv-sess --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    ! grep -qF 'merja sozinho? sim' <<< "${r}"; }
+  _so_case_own "(g7) linha inválida com o mesmo slug ainda conta (como na catraca)" _so_g7 \
+    'sl="$(_own_slug_norm "${sl}")"; nsl["${sl}"]=$(( ${nsl["${sl}"]:-0} + 1 ))' ':'
   # (d2) local_path com `..`: o dir é canonizado antes de comparar com o cwd do /proc; o claude fora do tmux é visto
   _so_d2() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-lp.yaml" SO_PROC="${sb}/proc-out" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'FORA do tmux' <<< "${r}"; }

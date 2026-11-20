@@ -238,6 +238,12 @@ open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a 
     elif [ -n "${out}" ]; then
       say "session-open: ⚠️ há também um claude em ${dir} FORA do tmux (pid ${out}): se for a mesma sessão, dê /exit lá e fique só com a do tmux."
     fi
+    # e a sessão de FUNDO viva no checkout, que o /proc não vê como claude: aviso (anexar não abre uma 2ª)
+    local pl; pl="$(peers_tsv)" || say "session-open: ⚠️ não li a lista de peers do harness: não sei se há sessão de fundo viva em ${dir}."
+    while IFS=$'\t' read -r _s _k _st _p _nm _cw; do
+      [ -n "${_s}" ] && [ "${_k}" = background ] && [ "${_cw}" != "-" ] && [ "$(realpath -m -- "${_cw}")" = "${dir}" ] || continue
+      peer_live "${_k}" "${_st}" && say "session-open: ⚠️ há também a sessão de fundo «${_nm}» (id ${_s}) viva em ${dir}: duas no mesmo checkout; pare uma (claude stop ${_s}) ou leve-a para uma worktree."
+    done <<< "${pl}"
   else
     # nunca duas sessões no mesmo checkout: QUALQUER claude vivo com o cwd na pasta (fora do tmux ou noutra sessão tmux)
     out="$(claude_pids "${dir}" any)"; rc=$?
