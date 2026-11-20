@@ -26,11 +26,13 @@ SUFFIX="— rota canônica sugerida; use julgamento se conflitar. Isto é recall
 GATE="PROPONHA e aguarde a confirmação do maestro (Ato 3/W6) ANTES de executar."
 TODAY="$(date +%F)"
 
-# Raiz da maquinaria a partir do PRÓPRIO motor (core: .claude/; plugin: a raiz dele). CDPATH= : com CDPATH no
-# ambiente o `cd` relativo imprime o destino e a variável ganharia duas linhas.
+# Raiz da maquinaria a partir do PRÓPRIO motor (core: .claude/; plugin: a raiz dele). Com CDPATH no ambiente o
+# `cd` relativo pode cair num diretório homônimo de outra raiz (CDPATH= impede) e imprime o destino (>/dev/null engole).
 MACHINERY_ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null && pwd)"
 TM="${MACHINERY_ROOT}/utils/task-manager/tm.sh"
 ENVCHECK="${MACHINERY_ROOT}/utils/task-manager/env-check.sh"
+# na rota, os caminhos vão citados para o shell (%q): HOME com espaço quebraria o comando que a sessão copia
+TM_Q="$(printf '%q' "$TM")"; ENVCHECK_Q="$(printf '%q' "$ENVCHECK")"
 
 route() {  # $1 = key
   case "$1" in
@@ -44,11 +46,15 @@ route() {  # $1 = key
     # ("precisamos de um manual…"), que o notes.md da sessão perdia. O caminho do tm.sh sai do inventário vivo:
     # sem o tm.sh nesta instalação, a rota já manda ao notes.md.
     NOTE)
+      # a frase do maestro entra por heredoc com delimitador citado: entre aspas duplas, crase e $( ) dela seriam
+      # executados pelo shell (revisão isolada, 2026-11-20)
       if [ -f "$TM" ]; then
-        printf 'APARTE nota — vira CARD de gestão, não nota de sessão. Confira o provider (bash %s --provider); se houver um, crie o card no dono certo (o core ou a sessão dona do assunto): bash %s item.create --title "[dono · %s] <resumo>" --description "<a frase do maestro, verbatim> (%s)" [--project <projeto do dono>], e confirme ao maestro o número do card que voltou. Sem provider (none) ou se o tm.sh falhar: anote no notes.md do scratchpad e DIGA que não virou card e por quê. %s' "$ENVCHECK" "$TM" "$TODAY" "$TODAY" "$SUFFIX"
+        printf "APARTE nota — vira CARD de gestão, não nota de sessão. Confira o provider (bash %s --provider); se houver um, crie o card no dono certo (o core ou a sessão dona do assunto): bash %s item.create --title '[dono · %s] <resumo>' --description \"\$(cat <<'NOTA' … NOTA)\" [--project <projeto do dono>], com a frase do maestro verbatim e a data (%s) DENTRO do heredoc de delimitador citado (entre aspas duplas, crase e \$( ) da frase rodariam no shell), e confirme ao maestro o número do card que voltou. Sem provider (none) ou se o tm.sh falhar: anote no notes.md do scratchpad e DIGA que não virou card e por quê. %s" "$ENVCHECK_Q" "$TM_Q" "$TODAY" "$TODAY" "$SUFFIX"
       else
-        printf 'APARTE nota — vira CARD de gestão, mas esta instalação não tem o tm.sh (%s): anote no notes.md do scratchpad com a frase e a data %s, e DIGA ao maestro que não virou card e por quê. %s' "$TM" "$TODAY" "$SUFFIX"
+        printf 'APARTE nota — vira CARD de gestão, mas esta instalação não tem o tm.sh (%s): anote no notes.md do scratchpad com a frase e a data %s, e DIGA ao maestro que não virou card e por quê. %s' "$TM_Q" "$TODAY" "$SUFFIX"
       fi ;;
+    # fyi:/avisa: seguem aviso SÓ desta sessão (0 usos no período medido; o card é decisão sobre `nota:`)
+    FYI)        printf 'APARTE aviso — lembrete/aviso SÓ desta sessão. Anote no notes.md do scratchpad (parking-lot); NÃO vira card nem memória. %s' "$SUFFIX" ;;
     REMEMBER)   printf 'APARTE guarda — memória DURÁVEL. Escolha o tier: fato pessoal/de-ambiente ou estado-de-trabalho → memória do harness (auto-memory); aprendizado/decisão de rede → /meta:diary (conflict_class + review_after). Repo é fonte, memória é cache. %s' "$SUFFIX" ;;
     ADD_STEP)   printf 'APARTE +etapa — adicionar etapa ao plano. Insira no STATE.md (bloco NEXT)/plan; se altera escopo já commitado, PROPONHA antes. %s' "$SUFFIX" ;;
     DROP_STEP)  printf 'APARTE -etapa — remover/pular etapa. %s Não descarte trabalho sem OK. %s' "$GATE" "$SUFFIX" ;;
@@ -73,6 +79,8 @@ detect() {
   while [ "$n" -lt 3 ] && [ -n "$line" ]; do
     key="$(match_key "$line")"
     [ -n "$key" ] || break
+    # depois de uma DÚVIDA, marcador de efeito é assunto da pergunta, não ordem ("dúvida: nota: vira card?")
+    case " ${seen} " in *" QUESTION "*) case "$key" in NOTE|DROP_STEP|ADD_STEP|GUARDRAIL|REMEMBER) break ;; esac ;; esac
     # numa linha só, separadas por " ‖ ": o fallback sem jq do hook escapa só \\ e ", e uma quebra de linha
     # crua deixaria o JSON inválido
     case "$seen" in *" ${key} "*) ;; *) out="${out:+${out} ‖ }$(route "$key")"; seen="${seen}${key} " ;; esac
@@ -95,10 +103,11 @@ match_key() {  # $1 = linha → imprime a chave do marcador no INÍCIO (ou nada)
   if   grep -qiE '^guarda-regra[[:space:]]*:' <<< "$line";                  then key=GUARDRAIL
   elif grep -qiE '^\+etapa[[:space:]]*:' <<< "$line";                        then key=ADD_STEP
   elif grep -qiE '^-etapa[[:space:]]*:' <<< "$line";                         then key=DROP_STEP
-  elif grep -qiE '^(d(ú|Ú|u)vida|dpuvida|dp(ú|Ú)vida|d(í|Í)vida|pergunta)[[:space:]]*:' <<< "$line"; then key=QUESTION
+  elif grep -qiE '^(d(ú|Ú|u)vida|dpuvida|d(í|Í)vida|pergunta)[[:space:]]*:' <<< "$line"; then key=QUESTION
   elif grep -qiE '^(corrige|dica|orienta)[[:space:]]*:' <<< "$line";         then key=CORRECTION
   elif grep -qiE '^refor(ç|Ç|c)o[[:space:]]*:' <<< "$line";                  then key=DIRECTIVE
-  elif grep -qiE '^(nota|fyi|avisa)[[:space:]]*:' <<< "$line";               then key=NOTE
+  elif grep -qiE '^nota[[:space:]]*:' <<< "$line";                         then key=NOTE
+  elif grep -qiE '^(fyi|avisa)[[:space:]]*:' <<< "$line";                  then key=FYI
   elif grep -qiE '^(guarda|relembra)[[:space:]]*:' <<< "$line";              then key=REMEMBER
   elif grep -qiE '^lembre-se[[:space:]]*[:,]' <<< "$line";                   then key=REMEMBER
   elif grep -qiE '^(paralelo|pesquisa)[[:space:]]*:' <<< "$line";            then key=PARALLEL
