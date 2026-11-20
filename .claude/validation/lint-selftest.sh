@@ -60697,7 +60697,9 @@ SO_TMUX
   }
   _so_run() {  # $1=SUT, resto=args → "rc<TAB>saída-numa-linha"; SO_* do ambiente de chamada
     local w="$1" o rc; shift; : > "${sb}/tlog"
-    if o="$(SESSION_OPEN_HOME="${HM}" SESSION_OPEN_PROC="${SO_PROC:-${sb}/proc-empty}" SESSION_OPEN_TMUX="${sb}/tmux" \
+    # CI/GITHUB_ACTIONS saem: no CI a lista privada não se lê (desenho da catraca), e a bancada a exercita; o caso (g8)
+    # prova o lado do CI à parte. SO_CI=1 devolve CI=true.
+    if o="$(env -u CI -u GITHUB_ACTIONS ${SO_CI:+CI=true} SESSION_OPEN_HOME="${HM}" SESSION_OPEN_PROC="${SO_PROC:-${sb}/proc-empty}" SESSION_OPEN_TMUX="${sb}/tmux" \
             SESSION_OPEN_CLAUDE="${sb}/claude" SESSION_OPEN_PROJECTS="${PJ}" SESSION_OPEN_MEMBERS="${SO_MEMBERS:-${sb}/members.yaml}" \
             SESSION_OPEN_OWNERSHIP="${SO_OWN:-${own}}" ONION_PRIVATE_OWNERS_FILE="${SO_PRIV:-${sb}/sem-lista.tsv}" \
             ONION_OWNERSHIP_CORE=onion-bancada/core SO_AGENTS="${SO_AGENTS:-${sb}/agents-empty.json}" \
@@ -60932,7 +60934,7 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   # (g6) o MESMO id em duas linhas (slugs distintos): id repetido derruba todas as cópias (mais estrito que a catraca)
   printf 'm-priv\tonion-bancada/rep1\tpriv-sess\trepoP\nm-priv\tonion-bancada/rep2\tpriv-sess\trepoP\n' > "${sb}/priv-twice.tsv"; chmod 600 "${sb}/priv-twice.tsv"
   _so_g6() { local r rc=0  # o leitor direto: a nota do id repetido e nenhuma linha privada na lista
-    r="$(ONION_PRIVATE_OWNERS_FILE="${sb}/priv-twice.tsv" bash "${SO_OWN:-${own}}" list --members "${sb}/members-lp.yaml" 2>&1)" || rc=$?
+    r="$(env -u CI -u GITHUB_ACTIONS ONION_PRIVATE_OWNERS_FILE="${sb}/priv-twice.tsv" bash "${SO_OWN:-${own}}" list --members "${sb}/members-lp.yaml" 2>&1)" || rc=$?
     SO_WHY="rc=${rc} $(tr '\t\n' ' |' <<< "${r}")"
     [ "${rc}" = 0 ] && grep -qF "linha privada 'm-priv' repetida" <<< "${r}" && ! grep -q 'privada$' <<< "${r}"; }
   _so_case_own "(g6) linha privada duplicada: todas as cópias caem" _so_g6 \
@@ -60971,6 +60973,35 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
     [ "${r%%$'\t'*}" = 2 ] && grep -qF -- '--mode fora da lista' <<< "${r}"; }
   _so_case "(r2) --mode fora da lista: rc 2" _so_r2 \
     'case "${MODE}" in '\'''\''|default' 'case "${MODE}" in *|default'
+  # (g8) no CI a lista privada NÃO se lê (ela não existe lá, como na catraca): a sessão dela não entra no --all
+  _so_g8() { local r; r="$(SO_CI=1 SO_TSESS="" SO_PRIV="${sb}/priv-ok.tsv" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    ! grep -q 'priv-sess' <<< "${r}" && grep -q 'new-session -d -s repoA' <<< "${r}"; }
+  _so_case_own "(g8) no CI a lista privada não é lida" _so_g8 \
+    'if [ "${CI:-}" = true ] || [ "${GITHUB_ACTIONS:-}" = true ]; then OWN_PRIV_NOTE' 'if false; then OWN_PRIV_NOTE'
+  # (t) as superfícies que ensinam a reiniciar a sessão (o aviso do hook de versão, o censo de atualidade e a REGRA 65)
+  #     ensinam a retomada pelo id exato, nunca `/exit → claude --continue` (D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120).
+  #     Mutante: devolver a forma antiga a cada uma e exigir que o caso reprove.
+  _so_t() {  # $1 = pasta-raiz a conferir
+    local f bad=""
+    for f in .claude/hooks/session-version-drift.sh .claude/validation/currency-census.sh .claude/validation/lint-artifacts.sh; do
+      [ -f "$1/${f}" ] || { bad="${bad} ${f}:ausente"; continue; }
+      grep -qF 'claude --continue' "$1/${f}" && bad="${bad} ${f}:--continue"
+      grep -qF 'session-open.sh <nome> --resume <id>' "$1/${f}" || bad="${bad} ${f}:sem-o-abridor"
+    done
+    SO_WHY="${bad}"; [ -z "${bad}" ]
+  }
+  if _so_t "${REPO_ROOT}"; then record_pass "session-open: (t) as 3 superfícies de reinício ensinam o id exato, nunca --continue"
+  else record_fail "session-open: (t) superfícies de reinício" "${SO_WHY}"; fi
+  local tf t_ok=1
+  for tf in .claude/hooks/session-version-drift.sh .claude/validation/currency-census.sh .claude/validation/lint-artifacts.sh; do
+    rm -rf "${sb}/tm"; mkdir -p "${sb}/tm/.claude/hooks" "${sb}/tm/.claude/validation"
+    cp "${REPO_ROOT}/.claude/hooks/session-version-drift.sh" "${sb}/tm/.claude/hooks/"
+    cp "${REPO_ROOT}/.claude/validation/currency-census.sh" "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" "${sb}/tm/.claude/validation/"
+    sed -i 's#bash ops/session-open.sh <nome> --resume <id> (core-only; fora do core, claude --resume <id>), nunca --continue#/exit → claude --continue#' "${sb}/tm/${tf}"
+    if cmp -s "${REPO_ROOT}/${tf}" "${sb}/tm/${tf}" || _so_t "${sb}/tm"; then t_ok=0; SO_WHY="mutante de ${tf} não derrubou o caso"; fi
+  done
+  if [ "${t_ok}" = 1 ]; then record_pass "session-open: (t) superfícies de reinício (MUT): a forma antiga em cada uma derruba o caso"
+  else record_fail "session-open: (t) (MUT)" "${SO_WHY}"; fi
   rm -rf "${sb}"
 }
 _family run_session_open_selftests

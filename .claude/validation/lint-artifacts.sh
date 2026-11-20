@@ -5183,7 +5183,7 @@ check_radar_staleness() {
     violation "SOFT" "${bl}" "REGRA 65: Claude Code mudou de versão desde a última rodada de estratégia (rodada=${pinned_cc}, ${src_label}=${installed_cc}) — adequação não re-medida; rode /meta:radar E3-claude-code-delta"
   fi
   if [ -n "${proc_cc:-}" ] && [ -n "${disk_cc:-}" ] && [ "${proc_cc}" != "${disk_cc}" ]; then
-    violation "SOFT" "${bl}" "REGRA 65: esta sessão roda o Claude Code ${proc_cc} mas o disco já tem ${disk_cc} — picker/hooks/capacidades refletem o PROCESSO; reinicie a sessão (/exit → claude --continue) antes de medir adequação"
+    violation "SOFT" "${bl}" "REGRA 65: esta sessão roda o Claude Code ${proc_cc} mas o disco já tem ${disk_cc} — picker/hooks/capacidades refletem o PROCESSO; reinicie a sessão (anote o id da sessão (/status) ANTES do /exit e retome pelo id exato: bash ops/session-open.sh <nome> --resume <id> (core-only; fora do core, claude --resume <id>), nunca --continue) antes de medir adequação"
   fi
 }
 
