@@ -26611,7 +26611,7 @@ case "$args" in
         printf 'onion-review-verdict\tfail\t7s\turl\n'
       fi
       printf 'selftest\tpass\t1s\turl\n'; exit 0 ;;
-  *"pr view"*baseRefName*)         echo "main"; exit 0 ;;
+  *"pr view"*baseRefName*)         echo "${GH_BASE_REF:-main}"; exit 0 ;;
   *"api "*pulls*commits*)
       # os pais de cada commit do PR, um número por linha (1 = commit comum, 2 = commit de merge)
       printf '%s\n' ${GH_PR_PARENTS:-1}; exit "${GH_PR_COMMITS_RC:-0}" ;;
@@ -27299,6 +27299,131 @@ p=sys.argv[2];a=json.load(open(p));r=a["request"];r["created_at"]=o.utc(o.time.t
   done
   if [ -n "${o}" ] && grep -qE $'^[0-9TZ:-]+\tgrant\tmerge\t1\t[0-9]+\t' "${_otst}/onion/approvals/usage.tsv"; then record_pass "pr-merge-verified: (ot11) o log da autorização segue o formato dos atos («── ato …» e «✓ RESULTADO … level=1 wait_s=N») e o usage.tsv mede a espera"
   else record_fail "pr-merge-verified: (ot11)" "logs=$(ls "${_otst}/onion/approvals/acts/" 2>/dev/null | tr '\n' ' ')"; fi
+  # ── REPOS DE SERVIÇO COM SESSÃO DONA (D_SERVICE_REPOS_OWNER_VPS_OPS_1120, 2026-11-20) ──────────────────────────────
+  # (b) MESMA DONA REGISTRADA: a sessão da peça "dona" mergeia o repo de serviço "svc" (owner_session: dona), pela regra (3)
+  #     estendida; dona diferente, alvo sem owner_session e sessão sem membro seguem recusados, cada um com mutante.
+  # (a) o acréscimo do maestro: a sessão do CORE, com --foreign-repo, pede o «pode rodar» e mergeia o repo de serviço sem
+  #     CI (gate local no clone, no head, limpo), base master, sem resíduo. O registro de sandbox ganha os membros.
+  printf '  - id: dona\n    kind: adopter\n    owner_session: dona\n    remote: github.com/onion-bancada/dona\n  - id: svc\n    kind: method\n    owner_session: dona\n    onion_version: n/a\n    remote: https://github.com/onion-bancada/svc (privado)\n  - id: svc2\n    kind: method\n    owner_session: dona\n    onion_version: n/a\n    remote: https://github.com/onion-bancada/svc2 (privado)\n  - id: solto2\n    kind: adopter\n    remote: github.com/onion-bancada/solto2\n' >> "${_mfy}"
+  git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm registro-1120
+  git -C "${fc}" update-ref refs/remotes/origin/main HEAD
+  local _sv="${d}/svc-clone" _svd="${d}/s-dona" _svs="${d}/s-solto2"
+  git init -q "${_svd}"; git -C "${_svd}" remote add origin https://github.com/onion-bancada/dona.git
+  git init -q "${_svs}"; git -C "${_svs}" remote add origin https://github.com/onion-bancada/solto2.git
+  git init -q "${d}/s-svc"; git -C "${d}/s-svc" remote add origin https://github.com/onion-bancada/svc.git
+  mkdir -p "${_sv}/ops"; printf '#!/usr/bin/env bash\nexit 0\n' > "${_sv}/ops/local-gate.sh"; printf 'servico\n' > "${_sv}/docker-compose.yml"
+  local _sge=(env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_PREFIX -u GIT_OBJECT_DIRECTORY -u REPO_ROOT)
+  ( cd "${_sv}" && "${_sge[@]}" git init -q -b feat/x && "${_sge[@]}" git remote add origin https://github.com/onion-bancada/svc.git \
+    && "${_sge[@]}" git add -A && "${_sge[@]}" git -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -qm base --no-verify ) >/dev/null 2>&1
+  # (b) a catraca, pela sessão de fora do core (CI presente: o _crs de sempre)
+  _crs "(sv1) mesma dona registrada: a sessão 'dona' mergeia o repo de serviço 'svc' ⇒ aceita" 0 "pela mesma sessão dona" "${_svd}" "${_pi}" --repo onion-bancada/svc
+  _crs "(sv2) dona diferente: a sessão 'peca' no repo de serviço da 'dona' ⇒ recusa" 1 "nem tem a mesma sessão dona" "${_cr_peca}" "${_pi}" --repo onion-bancada/svc
+  _crs "(sv3) alvo sem owner_session, sessão sem owner_session ⇒ recusa" 1 "sem owner_session" "${_svs}" "${_pi}" --repo onion-bancada/solto
+  _crs "(sv4) sessão sem membro no registro ⇒ recusa" 1 "nem tem a mesma sessão dona" "${d}/s-nada" "${_pi}" --repo onion-bancada/svc
+  _crs "(sv5) a sessão 'dona' no repo de CLIENTE ⇒ recusa pelo dono, como antes" 1 "repo de cliente ou de empresa" "${_svd}" "${_pi}" --repo cliente/repo
+  _crs "(sv6) a sessão 'dona' na PORTA ⇒ recusa, como antes" 1 "PORTA" "${_svd}" "${_pi}" --repo onion-bancada/porta2
+  _crm "(sv1-MUT) sem marcar a mesma dona, o sv1 é recusado — a marca é a causa" \
+    's/\*) \[ "\${_srow#\*\$'"'"'\\t'"'"'}" = "\${_o}" \] \&\& _via_owner=1 ;;/*) : ;;/' "${_pi}" 1 "nem tem a mesma sessão dona" "${_svd}" --repo onion-bancada/svc
+  _crm "(sv2-MUT) sem comparar a owner_session, a sessão de outra dona mergearia — a comparação é a causa" \
+    's/\*) \[ "\${_srow#\*\$'"'"'\\t'"'"'}" = "\${_o}" \] \&\& _via_owner=1 ;;/*) _via_owner=1 ;;/' "${_pi}" 0 "merged" "${_cr_peca}" --repo onion-bancada/svc
+  _crm "(sv3-MUT) sem a recusa do alvo sem owner_session E sem a exigência dela na regra nova, o sv3 mergearia" \
+    's/^    \*) \[ "\${_o}" != "-" \] || die/    *) true || die/; s/^     \&\& \[ "\${_o}" != "-" \] \&\& \[ -n "\${_own}" \]/     \&\& [ -n "${_own}" ]/' "${_pi}" 0 "merged" "${_svs}" --repo onion-bancada/solto
+  _crm "(sv3b-MUT) sem só a recusa antiga, a regra nova ainda recusa o alvo sem owner_session (defesa em profundidade)" \
+    's/^    \*) \[ "\${_o}" != "-" \] || die/    *) true || die/' "${_pi}" 1 "nem tem a mesma sessão dona" "${_svs}" --repo onion-bancada/solto
+  # (achado 3 da passada adversarial) a sessão aberta num clone de SERVIÇO não mergeia o irmão: a casa da dona não é method
+  _crs "(sv13) sessão aberta no clone de um repo de serviço, alvo o repo de serviço irmão ⇒ recusa" 1 "nem tem a mesma sessão dona" "${d}/s-svc" "${_pi}" --repo onion-bancada/svc2
+  _crm "(sv13-MUT) aceitando repo de serviço (kind method e onion_version: n/a) como casa da dona, o irmão mergearia — a exclusão é a causa" \
+    's/in ""|door|source|method) ;;/in ""|door|source) ;;/; /^    _pmv_member_nonvendor "\${_own}" "\${_m}" \&\& _srow=""$/d' "${_pi}" 0 "merged" "${d}/s-svc" --repo onion-bancada/svc2
+  _crm "(sv13b-MUT) só sem a exclusão por kind, o onion_version: n/a ainda segura o irmão (defesa em profundidade)" \
+    's/in ""|door|source|method) ;;/in ""|door|source) ;;/' "${_pi}" 1 "nem tem a mesma sessão dona" "${d}/s-svc" --repo onion-bancada/svc2
+  _crm "(sv4-MUT) lendo um membro fixo (a casa da dona) no lugar do da sessão, a sessão sem membro mergearia — ler o da sessão é a causa" \
+    's/^    _srow="\$(_pmv_member_row "\${_own}" "\${_m}")"$/    _srow="$(_pmv_member_row onion-bancada\/dona "${_m}")"/' "${_pi}" 0 "merged" "${d}/s-nada" --repo onion-bancada/svc
+  # o caminho inteiro do repo de serviço: sem CI, base master, gate local no clone (a sessão 'dona' roda de dentro dele)
+  _svrun() { # $1=cwd da sessão (o "claude") $2=script ; resto = args → _svo/_svrc ; roda do clone do svc, sem CI, base master
+    local cwd="$1" scr="$2"; shift 2
+    echo 0 > "${d}/n"; : > "${d}/merge-args"; : > "${d}/svc-comment"
+    _svo="$(cd "${cwd}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" STUB_COMMENT="${d}/svc-comment" \
+      GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged \
+      GH_HEAD_REF=feat/x GH_BASE_REF=master GH_WF_COUNT="${SV_WF:-0}" GH_RUNS_EMPTY="${SV_RUNS_EMPTY-1}" STUB_HEAD_FROM="${_sv}" \
+      GH_PR_FILES="${SV_FILES:-docker-compose.yml}" GH_RESIDUE="${SV_RESIDUE:-}" \
+      ONION_MERGE_POLL_SECS=0 XDG_STATE_HOME="${_otst}" CLAUDE_CONFIG_DIR="${_otcc}" CLAUDE_CODE_SESSION_ID="${_otsid}" \
+      env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "(cd '${_sv}' && bash '${scr}' 999 $*); exit \$?" 2>&1)"; _svrc=$?
+  }
+  local _svo="" _svrc=0
+  _svrun "${_svd}" "${_pi}" --repo onion-bancada/svc --merge-commit
+  if [ "${_svrc}" -eq 0 ] && [ -s "${d}/merge-args" ] && grep -qF "pela mesma sessão dona" <<< "${_svo}" && grep -qF "gate local EXERCIDO" <<< "${_svo}" \
+     && grep -qF "Merge SEM CI" "${d}/svc-comment"; then record_pass "pr-merge-verified: (sv7) a sessão dona mergeia o repo de serviço SEM CI, base master, pelo gate local do clone"
+  else record_fail "pr-merge-verified: (sv7)" "rc=${_svrc} out=$(tail -3 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"; fi
+  # (a) a sessão do CORE (cwd fc) com --foreign-repo e o «pode rodar»; o script é o de origin/main (o delegado exige)
+  local _svp="${fc}/ops/pr-merge-verified.sh"
+  _svrun "${fc}" "${_svp}" --repo onion-bancada/svc --foreign-repo --merge-commit
+  if [ "${_svrc}" -ne 0 ] && [ ! -s "${d}/merge-args" ] && grep -qF "não traz o resíduo" <<< "${_svo}"; then record_pass "pr-merge-verified: (sv8) core + --foreign-repo no repo de serviço sem resíduo, sem o «pode rodar» ⇒ recusa como antes"
+  else record_fail "pr-merge-verified: (sv8)" "rc=${_svrc} out=$(tail -2 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"; fi
+  _otn=$((_otn+1)); _otpid="pid-${_otn}"
+  _svrun "${fc}" "${_svp}" --repo onion-bancada/svc --foreign-repo --merge-commit --one-touch-request
+  if [ "${_svrc}" -eq 0 ] && [ ! -s "${d}/merge-args" ] && [ ! -s "${d}/svc-comment" ] && grep -qF "merge onion-bancada/svc#999" <<< "${_svo}" \
+     && grep -qF "responda: pode rodar" <<< "${_svo}" && grep -qF "cd ${_sv} && bash ${fc}/ops/pr-merge-verified.sh 999 --repo onion-bancada/svc --foreign-repo --merge-commit" "${_otst}/onion/approvals/requests/${_otsid}.json"; then record_pass "pr-merge-verified: (sv9) core + --foreign-repo + --one-touch-request no repo de serviço sem CI ⇒ grava o pedido, sem merge e sem comentário"
+  else record_fail "pr-merge-verified: (sv9)" "rc=${_svrc} out=$(tail -3 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"; fi
+  _othook "pode rodar" "${_otpid}" >/dev/null; _ottr "${_otpid}" human typed 0 "pode rodar"
+  _svrun "${fc}" "${_svp}" --repo onion-bancada/svc --foreign-repo --merge-commit --one-touch
+  if [ "${_svrc}" -eq 0 ] && grep -q -- "--merge" "${d}/merge-args" && grep -qF "o «pode rodar» do maestro o substitui" <<< "${_svo}" \
+     && grep -qF "gate local EXERCIDO" <<< "${_svo}" && grep -qF "Merge SEM CI" "${d}/svc-comment" && grep -qF "Quem autorizou:" "${d}/svc-comment"; then
+    record_pass "pr-merge-verified: (sv10) «pode rodar» na sessão do core ⇒ mergeia o repo de serviço sem CI (base master, gate local, sem resíduo)"
+  else record_fail "pr-merge-verified: (sv10)" "rc=${_svrc} merge=$(head -c 80 "${d}/merge-args") out=$(tail -3 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"; fi
+  _svrun "${fc}" "${_svp}" --repo onion-bancada/svc --foreign-repo --merge-commit --one-touch
+  if [ "${_svrc}" -ne 0 ] && [ ! -s "${d}/merge-args" ] && grep -qF "já foi usada" <<< "${_svo}"; then record_pass "pr-merge-verified: (sv11) a mesma palavra não mergeia de novo (uso único)"
+  else record_fail "pr-merge-verified: (sv11)" "rc=${_svrc} out=$(tail -2 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"; fi
+  # a sessão de FORA do core não usa o «pode rodar» com --foreign-repo
+  _svrun "${_svd}" "${_svp}" --repo onion-bancada/svc --foreign-repo --one-touch-request
+  if [ "${_svrc}" -ne 0 ] && [ ! -s "${d}/merge-args" ] && grep -qF "é da sessão do core" <<< "${_svo}"; then record_pass "pr-merge-verified: (sv12) --foreign-repo com o «pode rodar» fora da sessão do core ⇒ recusa"
+  else record_fail "pr-merge-verified: (sv12)" "rc=${_svrc} out=$(tail -2 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"; fi
+  # (achado 1) o «pode rodar» só dispensa o resíduo no repo que NÃO vendoriza: a peça (vendoriza, REGRA 56) segue exigindo
+  _svcase() { # $1=rótulo $2=0 (pedido gravado) | 1 (recusa) $3=trecho
+    if { [ "$2" = 0 ] && [ "${_svrc}" -eq 0 ]; } || { [ "$2" = 1 ] && [ "${_svrc}" -ne 0 ]; }; then
+      [ ! -s "${d}/merge-args" ] && grep -qF -- "$3" <<< "${_svo}" && { record_pass "pr-merge-verified: $1"; return 0; }
+    fi
+    record_fail "pr-merge-verified: $1" "rc=${_svrc} out=$(tail -2 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"
+  }
+  _svmut() { # $1=sed → o script do delegado mutado, COMMITADO como origin/main (o delegado roda só o de origin/main)
+    cp "${_svp}" "${d}/svp-intacto"; sed -i "$1" "${_svp}"
+    cmp -s "${_svp}" "${d}/svp-intacto" && { record_fail "pr-merge-verified: $2" "a âncora do mutante sumiu"; return 1; }
+    git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm "mut $2"; git -C "${fc}" update-ref refs/remotes/origin/main HEAD
+  }
+  _svunmut() { cp "${d}/svp-intacto" "${_svp}"; git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm volta; git -C "${fc}" update-ref refs/remotes/origin/main HEAD; }
+  SV_WF=5 SV_RUNS_EMPTY="" _svrun "${fc}" "${_svp}" --repo onion-bancada/peca2 --foreign-repo --one-touch-request
+  _svcase "(sv14) «pode rodar» delegado numa peça que VENDORIZA (peca2), sem resíduo ⇒ recusa (o resíduo segue exigido)" 1 "não traz o resíduo"
+  if _svmut 's/^  _DF_NONVENDOR=0; _pmv_member_nonvendor "\${_t}" "\${_m}" \&\& _DF_NONVENDOR=1$/  _DF_NONVENDOR=1/' "(sv14-MUT)"; then
+    SV_WF=5 SV_RUNS_EMPTY="" _svrun "${fc}" "${_svp}" --repo onion-bancada/peca2 --foreign-repo --one-touch-request
+    _svcase "(sv14-MUT) sem conferir que o alvo não vendoriza, a peça sem resíduo ganharia o pedido — a conferência é a causa" 0 "responda: pode rodar"
+    _svunmut
+  fi
+  SV_FILES="docker-compose.yml docs/evolution/review/feat-x.md" SV_RESIDUE="$(printf -- '---\\nverdict: REJECTED\\nreviewed_diff_sha256: %s\\n---\\n' "${_fr_h}")" \
+    _svrun "${fc}" "${_svp}" --repo onion-bancada/svc --foreign-repo --one-touch-request
+  _svcase "(sv15) «pode rodar» no repo de serviço com resíduo PRESENTE e reprovado ⇒ recusa (o presente segue julgado)" 1 "verdict 'REJECTED'"
+  # (achado 2) o leitor do delegado não muda para quem já existia: a peça privada (vendoriza) com resíduo e CI segue fora
+  git -C "${fc}" show HEAD:docs/evolution/federation/members.yaml > /dev/null
+  SV_WF=5 SV_RUNS_EMPTY="" SV_FILES="a.txt docs/evolution/review/feat-x.md" SV_RESIDUE="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_fr_h}")" \
+    _svrun "${fc}" "${_svp}" --repo onion-bancada/peca --foreign-repo
+  _svcase "(sv16) delegado puro na peça de remote « (privado)» ⇒ segue não registrada para o delegado, como antes" 1 "não está registrado"
+  if _svmut 's/^  if \[ -z "\${_kind}" \] \&\& _pmv_member_nonvendor "\${_t}" "\${_m}"; then$/  if [ -z "${_kind}" ]; then/' "(sv16-MUT)"; then
+    SV_WF=5 SV_RUNS_EMPTY="" SV_FILES="a.txt docs/evolution/review/feat-x.md" SV_RESIDUE="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_fr_h}")" \
+      _svrun "${fc}" "${_svp}" --repo onion-bancada/peca --foreign-repo
+    if [ "${_svrc}" -eq 0 ] && [ -s "${d}/merge-args" ]; then record_pass "pr-merge-verified: (sv16-MUT) com o leitor novo para todos, a peça privada mergearia pelo delegado — o limite é a causa"
+    else record_fail "pr-merge-verified: (sv16-MUT)" "rc=${_svrc} out=$(tail -2 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"; fi
+    _svunmut
+  fi
+  # (2ª passada, achado 1) o modo «repo sem CI» no delegado com a palavra também exige o alvo que não vendoriza
+  SV_FILES="a.txt docs/evolution/review/feat-x.md" SV_RESIDUE="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_fr_h}")" \
+    _svrun "${fc}" "${_svp}" --repo onion-bancada/peca2 --foreign-repo --one-touch-request
+  _svcase "(sv17) «pode rodar» delegado numa peça que VENDORIZA e não tem CI ⇒ recusa o modo «repo sem CI»" 1 "leu ZERO workflows"
+  if _svmut 's/ || \[ "\${_DF_NONVENDOR}" != 1 \]; } \\$/; } \\/' "(sv17-MUT)"; then
+    SV_FILES="a.txt docs/evolution/review/feat-x.md" SV_RESIDUE="$(printf -- '---\\nverdict: APPROVED\\nreviewed_diff_sha256: %s\\nelenxo: true\\n---\\n' "${_fr_h}")" \
+      _svrun "${fc}" "${_svp}" --repo onion-bancada/peca2 --foreign-repo --one-touch-request
+    if [ "${_svrc}" -ne 0 ] && ! grep -qF "leu ZERO workflows" <<< "${_svo}" && grep -qF "modo 'repo sem CI'" <<< "${_svo}"; then record_pass "pr-merge-verified: (sv17-MUT) sem a cláusula, a peça que vendoriza entraria no modo «repo sem CI» — a cláusula é a causa"
+    else record_fail "pr-merge-verified: (sv17-MUT)" "rc=${_svrc} out=$(tail -2 <<< "${_svo}" | tr '\n' '|' | cut -c1-300)"; fi
+    _svunmut
+  fi
+  unset -f _svrun _svcase _svmut _svunmut
   unset -f _otrun _othook _ottr _otarm _otcase _otmut _otrestore
   cp "${d}/members-pre-1118" "${_mfy}"; git -C "${fc}" add -A; git -C "${fc}" -c user.email=t@t -c user.name=t commit -qm registro-volta
   git -C "${fc}" update-ref refs/remotes/origin/main "${_om}"

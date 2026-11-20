@@ -129,6 +129,15 @@
 #           não casa remote público; o arquivo em modo 600 (mais aberto recusa); o membro neutro existe em
 #           origin/main com `kind: adopter`; o dono do slug é o do core; a recusa DA CATRACA nomeia o member_id, nunca o slug (fora dela, o slug que veio no --repo pode aparecer); no CI
 #           não é lida. As regras completas estão no bloco da catraca (_pmv_private_row).
+#   MESMA DONA REGISTRADA (sem flag, D_SERVICE_REPOS_OWNER_VPS_OPS_1120, 2026-11-20): a regra (3) da catraca aceita também o
+#           alvo cujo membro declara a MESMA owner_session que o membro do repo da sessão (a onion-vps-ops e os repos de
+#           serviço da VPS). Só sessão que não é a do core, alvo pela lista pública e que não é a fonte, e o repo da sessão
+#           registrado pelo remote público, do dono do core, nem porta nem fonte, nem repo de serviço (kind method ou
+#           onion_version: n/a: a sessão aberta num clone de serviço não mergeia os irmãos). Cliente, porta e lista privada: como antes.
+#   «PODE RODAR» NO DELEGADO (mesmo selo, acréscimo do maestro): na sessão do core, --foreign-repo combina com
+#           --one-touch-request/--one-touch; com a palavra do maestro, e SÓ no alvo que não vendoriza (onion_version: n/a, o
+#           repo de serviço), o modo «repo sem CI» vale no delegado (gate local no clone do alvo, no head, limpo) e o PR sem
+#           resíduo passa (resíduo presente segue julgado). Alvo que vendoriza, ou sem a palavra: nada muda.
 set -uo pipefail
 
 PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--allow-draft] [--dispensa <check> --motivo <texto>]}"; shift || true
@@ -388,6 +397,27 @@ _pmv_private_row() { # $1=linhas que casaram  $2=members.yaml de origin/main →
     || die "${_lbl}: a owner_session da lista privada ('${_os}') difere da do members.yaml ('${_mo}'). Nada foi feito."
   _PMV_PRIV_ROW="adopter"$'\t'"${_os}"
 }
+_pmv_member_row() { # $1=slug normalizado $2=members.yaml → "kind<TAB>owner_session" (owner "-" se ausente) do 1º membro cujo
+  # remote: casa, ou nada. UM leitor para o alvo e para o repo da sessão (D_SERVICE_REPOS_OWNER_VPS_OPS_1120)
+  awk -v want="$1" '
+    function norm(v) { sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]*\(.*$/, "", v); gsub(/["'"'"' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v); sub(/\.git$/, "", v); sub(/\/+$/, "", v); return tolower(v) }
+    function flush() { if (rem != "" && rem == want && out == "") out = (kind == "" ? "?" : kind) "\t" (own == "" ? "-" : own); rem = ""; kind = ""; own = "" }
+    /^[[:space:]]*-[[:space:]]+id:/ { flush() }
+    /^[[:space:]]+kind:/ { k = $0; sub(/^[[:space:]]+kind:[[:space:]]*/, "", k); sub(/[[:space:]#].*$/, "", k); kind = k }
+    /^[[:space:]]+owner_session:/ { o = $0; sub(/^[[:space:]]+owner_session:[[:space:]]*/, "", o); sub(/[[:space:]#].*$/, "", o); gsub(/["'"'"']/, "", o); own = o }
+    /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
+    END { flush(); print out }' <<< "$2"
+}
+_pmv_member_nonvendor() { # $1=slug $2=members.yaml → rc 0 se o 1º membro cujo remote casa declara onion_version: n/a
+  # (o repo de serviço, que não vendoriza o Onion e não tem a REGRA 56); mesmo casamento de remote do _pmv_member_row
+  [ "$(awk -v want="$1" '
+    function norm(v) { sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]*\(.*$/, "", v); gsub(/["'"'"' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v); sub(/\.git$/, "", v); sub(/\/+$/, "", v); return tolower(v) }
+    function flush() { if (rem != "" && rem == want && out == "") out = (ver == "" ? "-" : ver); rem = ""; ver = "" }
+    /^[[:space:]]*-[[:space:]]+id:/ { flush() }
+    /^[[:space:]]+onion_version:/ { x = $0; sub(/^[[:space:]]+onion_version:[[:space:]]*/, "", x); sub(/[[:space:]#].*$/, "", x); gsub(/["'"'"']/, "", x); ver = x }
+    /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
+    END { flush(); print out }' <<< "$2")" = "n/a" ]
+}
 _own_repo_gate() {
   [ -n "${_SESSION_CWD}" ] || return 0
   # (A1 da revisão de 2026-11-18) --maestro só pula a catraca na sessão do CORE, cujo hook veta a flag na linha (o maestro
@@ -406,14 +436,7 @@ _own_repo_gate() {
     || die "${_lbl} é de outro dono${_lown}, não da família Onion de ${_corown}: repo de cliente ou de empresa só o dono mergeia, nunca a sessão, nem com resíduo isolado e CI verde (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118). Nada foi feito."
   _m="$(git -C "${_PMV_DIR}" show origin/main:docs/evolution/federation/members.yaml 2>/dev/null)" \
     || die "não li docs/evolution/federation/members.yaml de origin/main do core: sem a lista fechada não sei se ${_lbl} é repo que a sessão pode mergear. Nada foi feito."
-  _row="$(awk -v want="${_t}" '
-    function norm(v) { sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]*\(.*$/, "", v); gsub(/["'"'"' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v); sub(/\.git$/, "", v); sub(/\/+$/, "", v); return tolower(v) }
-    function flush() { if (rem != "" && rem == want && out == "") out = (kind == "" ? "?" : kind) "\t" (own == "" ? "-" : own); rem = ""; kind = ""; own = "" }
-    /^[[:space:]]*-[[:space:]]+id:/ { flush() }
-    /^[[:space:]]+kind:/ { k = $0; sub(/^[[:space:]]+kind:[[:space:]]*/, "", k); sub(/[[:space:]#].*$/, "", k); kind = k }
-    /^[[:space:]]+owner_session:/ { o = $0; sub(/^[[:space:]]+owner_session:[[:space:]]*/, "", o); sub(/[[:space:]#].*$/, "", o); gsub(/["'"'"']/, "", o); own = o }
-    /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
-    END { flush(); print out }' <<< "${_m}")"
+  _row="$(_pmv_member_row "${_t}" "${_m}")"
   # (D_PRIVATE_OWNER_SESSIONS_1119) só quando o alvo não casa nenhum remote público: a lista privada, com as condições dela
   local _via_priv=0
   if [ -z "${_row}" ] && [ -n "${_priv}" ]; then _PMV_PRIV_ROW=""; _pmv_private_row "${_priv}" "${_m}"; _row="${_PMV_PRIV_ROW}"; _via_priv=1; fi
@@ -432,11 +455,24 @@ _own_repo_gate() {
     local _nc; _nc="$(_pmv_remote_slugs | awk -v c="${_PMV_CORE_SLUG}" 'NF && $0 != c && !seen[$0]++' | wc -l)"
     [ "${_nc}" -le 1 ] || die "sem --repo, os remotes, o gh-resolved e o GH_REPO apontam ${_nc} repos distintos: o gh poderia mirar outro que não ${_lbl}. Diga o alvo com --repo. Nada foi feito."
   fi
-  if [ "${_t}" != "${_own}" ]; then
-    [ "${_CORE_SESSION}" = 1 ] && [ "${DELEGATED_FOREIGN}" -eq 1 ] \
-      || die "${_lbl} não é o repo desta sessão ($([ -n "${_own}" ] && [ -n "$(_pmv_private_lines "${_own}" 2>/dev/null)" ] && printf 'outro membro privado' || printf "'%s'" "${_own:-ilegível}")): cada sessão mergeia só o próprio repo; em outro, só a coordenação do core pelo --foreign-repo. Nada foi feito."
+  # (D_SERVICE_REPOS_OWNER_VPS_OPS_1120, 2026-11-20) MESMA DONA REGISTRADA: a sessão mergeia também o repo cujo membro
+  # declara a MESMA owner_session que o membro do repo dela (a onion-vps-ops e os repos de serviço da VPS). Só para sessão
+  # que NÃO é a do core (a do core segue pelo --foreign-repo), alvo pela lista PÚBLICA (a privada não amplia por aqui),
+  # alvo que não é a fonte, e o repo da sessão registrado pelo remote público, do dono do core, nem porta nem fonte.
+  local _srow="" _via_owner=0
+  if [ "${_t}" != "${_own}" ] && [ "${_CORE_SESSION}" != 1 ] && [ "${_via_priv}" = 0 ] && [ "${_k}" != source ] \
+     && [ "${_o}" != "-" ] && [ -n "${_own}" ] && [ "${_own%%/*}" = "${_corown}" ]; then
+    _srow="$(_pmv_member_row "${_own}" "${_m}")"
+    # o repo da sessão é a CASA da dona, nunca um repo de serviço (kind method ou onion_version: n/a): a sessão aberta num clone de serviço não
+    # mergeia os irmãos nem a casa (achado 3 da passada adversarial)
+    _pmv_member_nonvendor "${_own}" "${_m}" && _srow=""
+    case "${_srow%%$'\t'*}" in ""|door|source|method) ;; *) [ "${_srow#*$'\t'}" = "${_o}" ] && _via_owner=1 ;; esac
   fi
-  say "✓ catraca do repo próprio: ${_lbl} é da família e está na lista fechada$([ "${_via_priv}" = 1 ] && printf ' (pela lista privada de sessões donas)') (${_k}$([ "${_o}" != "-" ] && printf ', sessão dona %s' "${_o}"))"
+  if [ "${_t}" != "${_own}" ] && [ "${_via_owner}" != 1 ]; then
+    [ "${_CORE_SESSION}" = 1 ] && [ "${DELEGATED_FOREIGN}" -eq 1 ] \
+      || die "${_lbl} não é o repo desta sessão ($([ -n "${_own}" ] && [ -n "$(_pmv_private_lines "${_own}" 2>/dev/null)" ] && printf 'outro membro privado' || printf "'%s'" "${_own:-ilegível}")) nem tem a mesma sessão dona registrada: cada sessão mergeia só o próprio repo e os da mesma owner_session no members.yaml; em outro, só a coordenação do core pelo --foreign-repo. Nada foi feito."
+  fi
+  say "✓ catraca do repo próprio: ${_lbl} é da família e está na lista fechada$([ "${_via_priv}" = 1 ] && printf ' (pela lista privada de sessões donas)')$([ "${_via_owner}" = 1 ] && printf ' (pela mesma sessão dona do repo desta sessão)') (${_k}$([ "${_o}" != "-" ] && printf ', sessão dona %s' "${_o}"))"
   # (A3) e o gh mira o que a catraca julgou: sem --repo, GH_REPO explícito
   if [ "${#REPO_ARG[@]}" -lt 2 ] && [ "${_CORE_SESSION}" != 1 ]; then GH_REPO="${_t}"; export GH_REPO; fi
 }
@@ -446,8 +482,12 @@ _OT_ENGINE="${_PMV_DIR}/.claude/utils/approval/one_touch.py"
 _OT_SID="${CLAUDE_CODE_SESSION_ID:-}"
 if [ "${OT_REQUEST}" -eq 1 ] || [ "${OT_USE}" -eq 1 ]; then
   [ "${OT_REQUEST}" -eq 1 ] && [ "${OT_USE}" -eq 1 ] && die "--one-touch-request pede e --one-touch usa: uma de cada vez. Nada foi feito."
-  { [ "${MAESTRO}" -eq 0 ] && [ "${DELEGATED_FOREIGN}" -eq 0 ] && [ "${#DISPENSA[@]}" -eq 0 ] && [ "${CI_INOPERANTE}" -eq 0 ] && [ "${ALLOW_DRAFT}" -eq 0 ]; } \
-    || die "o «pode rodar» vale só para o merge verificado puro: sem --maestro, --foreign-repo, --dispensa, --ci-inoperante e --allow-draft. Nada foi feito."
+  # (D_SERVICE_REPOS_OWNER_VPS_OPS_1120, acréscimo do maestro em 2026-11-20) o --foreign-repo entra: o maestro diz «pode
+  # rodar» na sessão do CORE para o merge de um repo da lista fechada (a catraca acima já exigiu owner_session registrada)
+  { [ "${MAESTRO}" -eq 0 ] && [ "${#DISPENSA[@]}" -eq 0 ] && [ "${CI_INOPERANTE}" -eq 0 ] && [ "${ALLOW_DRAFT}" -eq 0 ]; } \
+    || die "o «pode rodar» vale só para o merge verificado puro (ou o delegado, --foreign-repo): sem --maestro, --dispensa, --ci-inoperante e --allow-draft. Nada foi feito."
+  [ "${DELEGATED_FOREIGN}" -eq 0 ] || [ "${_CORE_SESSION}" = 1 ] \
+    || die "o «pode rodar» com --foreign-repo é da sessão do core. Nada foi feito."
   [ -n "${_SESSION_CWD}" ] || die "o «pode rodar» é da sessão do Claude Code; fora dela (o seu terminal), rode com --maestro. Nada foi feito."
   [ -n "${_OT_SID}" ] || die "sem CLAUDE_CODE_SESSION_ID não sei qual sessão pediu: a palavra só vale na sessão que pediu. Nada foi feito."
   command -v python3 >/dev/null 2>&1 && [ -f "${_OT_ENGINE}" ] \
@@ -645,6 +685,7 @@ _guard_hits() { # stdin = os arquivos do PR; imprime os que são guarda
 # TETO DECLARADO (o mesmo do fallback do revisor): `elenxo_isolado: true` é AUTO-ATESTADO no resíduo.
 # _isolated_residue_ok <slug> <por-quê> — lê o resíduo da branch no head e morre com o que falta; ao passar, deixa
 # _IR_REL, _IR_V e _IR_H (o caminho, o verdict e o sha do diff revisado). Usado aqui e no fallback do revisor.
+_DF_NONVENDOR=0   # o alvo do delegado não vendoriza (onion_version: n/a); posto no _delegated_foreign_gate
 _FB_OK_VERDICTS="APPROVED FIXED REJECTED_AND_FIXED NO_FINDINGS"
 _isolated_residue_ok() {
   local _slug="$1" _why="$2" _rel _body _fm _dup _v _h _e _ei
@@ -745,6 +786,12 @@ _delegated_foreign_gate() {
     /^[[:space:]]+kind:/ { k = $0; sub(/^[[:space:]]+kind:[[:space:]]*/, "", k); sub(/[[:space:]#].*$/, "", k); kind = k }
     /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
     END { flush(); print out }' <<< "${_m}")"
+  # (D_SERVICE_REPOS_OWNER_VPS_OPS_1120) o leitor acima não tira o « (privado)» do remote, e o membro privado registrado
+  # assim não casa. Ele fica como está (o alcance do delegado para os membros que já existiam não muda: decisão do maestro);
+  # o leitor da catraca entra SÓ para o repo de serviço, o membro que não vendoriza (onion_version: n/a)
+  if [ -z "${_kind}" ] && _pmv_member_nonvendor "${_t}" "${_m}"; then
+    _kind="$(_pmv_member_row "${_t}" "${_m}")"; _kind="${_kind%%$'\t'*}"
+  fi
   case "${_kind}" in
     "") die "'${_t}' não está registrado em members.yaml (origin/main do core): ${_why}, num repo da família registrado. Nada foi feito." ;;
     source) die "'${_t}' é a própria fonte (kind: source): o merge do core segue sem a flag. Nada foi feito." ;;
@@ -754,6 +801,13 @@ _delegated_foreign_gate() {
   # o RESÍDUO da REGRA 56, pela convenção do AUTOMATE do drive: docs/evolution/review/<branch com / trocado por ->.md
   local _rel="docs/evolution/review/${HEAD_REF//\//-}.md" _body _fm _v _h _dup
   [ -n "${HEAD_REF}" ] || die "não li a branch do PR #${PR}: sem ela não acho o resíduo. Nada foi feito."
+  # (D_SERVICE_REPOS_OWNER_VPS_OPS_1120) com o «pode rodar» o PR do repo de SERVIÇO sem resíduo passa: a palavra do maestro,
+  # digitada no prompt da sessão, é o que o --maestro seria. O resíduo PRESENTE segue julgado inteiro.
+  # Só no membro que NÃO vendoriza (onion_version: n/a): o repo que vendoriza tem a REGRA 56, e lá o resíduo segue exigido.
+  _DF_NONVENDOR=0; _pmv_member_nonvendor "${_t}" "${_m}" && _DF_NONVENDOR=1
+  if { [ "${OT_REQUEST}" -eq 1 ] || [ "${OT_USE}" -eq 1 ]; } && [ "${_DF_NONVENDOR}" = 1 ]; then
+    grep -qxF -- "${_rel}" <<< "${_PR_FILES}" || { say "ℹ️  o PR #${PR} não traz resíduo (${_rel}): repo que não vendoriza o Onion, e o «pode rodar» do maestro o substitui"; return 0; }
+  fi
   grep -qxF -- "${_rel}" <<< "${_PR_FILES}" \
     || die "o PR #${PR} não traz o resíduo ${_rel} (REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)): ${_why}. Nada foi feito."
   _body="$(gh api -H 'Accept: application/vnd.github.raw+json' "repos/${_t}/contents/${_rel}?ref=${HEAD_SHA}" 2>/dev/null)" \
@@ -1428,8 +1482,9 @@ if [ -z "$head_runs" ] && [ "${_WF_COUNT}" -eq 0 ]; then
   # repo do PR, no head do PR, sem mudança rastreada. O merge e o comentário no PR dizem que não havia CI.
   # NUNCA vale para o core: o core tem CI, e workflow "sumido" ali é defeito a investigar, não modo.
   _nc_slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _nc_slug="${REPO_ARG[1]}"
-  [ "${DELEGATED_FOREIGN}" -eq 1 ] \
-    && die "o repo '${_nc_slug}' leu ZERO workflows: o merge alheio delegado (--foreign-repo) exige CI verde, e o modo 'repo sem CI' (gate local) fica com o maestro. Nada foi mergeado."
+  # (D_SERVICE_REPOS_OWNER_VPS_OPS_1120) o modo 'repo sem CI' no delegado só com o «pode rodar» (a palavra do maestro)
+  [ "${DELEGATED_FOREIGN}" -eq 1 ] && { { [ "${OT_REQUEST}" -eq 0 ] && [ "${OT_USE}" -eq 0 ]; } || [ "${_DF_NONVENDOR}" != 1 ]; } \
+    && die "o repo '${_nc_slug}' leu ZERO workflows: o merge alheio delegado (--foreign-repo) exige CI verde, e o modo 'repo sem CI' (gate local) fica com o maestro (ou, no repo de serviço que não vendoriza, com o «pode rodar» dele: --one-touch-request). Nada foi mergeado."
   _slug_of_url() { sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##' <<< "$1" | tr '[:upper:]' '[:lower:]'; }
   _core_slug="$(_slug_of_url "$(git -C "${_SKIP_HERE}/.." remote get-url origin 2>/dev/null)")"
   _nc_target="$(tr '[:upper:]' '[:lower:]' <<< "${_nc_slug}")"
@@ -1755,7 +1810,10 @@ fi
 # ── REGISTRO DO MODO "REPO SEM CI" (SAC-302) — a mesma precondição, pelo mesmo motivo ─────────────
 # Merge sem CI tem de dizer, no PR, que não havia CI, e o que o substituiu. Não exige --motivo: o motivo
 # é o FATO medido (zero workflows), e é ele que o registro carrega. Corpo contado antes de postar.
-if [ -n "${NO_CI_PROVADO}" ]; then
+if [ -n "${NO_CI_PROVADO}" ] && [ "${OT_REQUEST}" -eq 0 ]; then   # o pedido não mergeia: o registro vai no --one-touch
+  # (D_SERVICE_REPOS_OWNER_VPS_OPS_1120) no delegado com a palavra do maestro, o registro diz quem autorizou
+  _nc_who=""; [ "${DELEGATED_FOREIGN}" -eq 1 ] && [ "${OT_LIVE}" -eq 1 ] \
+    && _nc_who="**Quem autorizou:** a sessão do core, pelo caminho delegado (--foreign-repo), com o «pode rodar» do maestro (nível 1)."
   _reg_nc="$(printf '%s\n' \
     "## ⚠️ Merge SEM CI — o repositório não tem workflow" \
     "" \
@@ -1769,7 +1827,8 @@ if [ -n "${NO_CI_PROVADO}" ]; then
     "| medido no forge + exercido localmente | ${NO_CI_PROVADO} |" \
     "" \
     "**O que NÃO foi medido:** CI nenhum (não existe) e a revisão semântica. A cobertura deste merge é o" \
-    "gate local, rodado pelo próprio script na árvore do PR, não citado por quem mergeou." )"
+    "gate local, rodado pelo próprio script na árvore do PR, não citado por quem mergeou." \
+    "${_nc_who}" )"
   for _ex in "Merge SEM CI" "não tem CI" "${HEAD_SHA}" "${_GATE_DESC}"; do
     grep -qF -- "${_ex}" <<< "${_reg_nc}" \
       || die "o corpo do registro de 'repo sem CI' saiu INCOMPLETO (falta: ${_ex}) — merge abortado antes de postar."
@@ -1876,7 +1935,7 @@ t0="$(date -u +%s)"
 JUDGED_HEAD="${HEAD_SHA}"
 # «pode rodar»: o PEDIDO nasce aqui, depois de TODOS os gates (CI verde no head julgado), no lugar do merge
 if [ "${OT_REQUEST}" -eq 1 ]; then
-  _o="$(_ot_engine request $(_ot_target_args) --run "bash ops/pr-merge-verified.sh ${PR}$([ "${#REPO_ARG[@]}" -ge 2 ] && printf ' --repo %s' "${REPO_ARG[1]}") --one-touch")" \
+  _o="$(_ot_engine request $(_ot_target_args) --run "$([ -n "${NO_CI_PROVADO}" ] && printf 'cd %q && ' "${_top}")bash $(printf '%q' "${_PMV_DIR}/ops/pr-merge-verified.sh") ${PR}$([ "${#REPO_ARG[@]}" -ge 2 ] && printf ' --repo %s' "${REPO_ARG[1]}")$([ "${DELEGATED_FOREIGN}" -eq 1 ] && printf ' --foreign-repo')$([ "${MERGE_COMMIT}" -eq 1 ] && printf ' --merge-commit')$([ "${#DEL[@]}" -eq 0 ] && printf ' --keep-branch')$([ -n "${ASSERT_ANCESTOR}" ] && printf ' --assert-ancestor %q' "${ASSERT_ANCESTOR}") --one-touch")" \
     || die "não gravei o pedido: ${_o#✗ } Nada foi feito."
   printf '%s\n' "${_o}"; exit 0
 fi
