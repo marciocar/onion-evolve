@@ -145,12 +145,14 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   E `rm -f my-report /`, porque `-*r*` lê o `r` do nome. Saída: o maestro roda fora da sessão (`!`).
 - **Refspec `+` e simulação do clean (2026-11-20, `fix/deny-force-refspec-1120`, medido em 2.1.329):** `git push origin
   +main` força sem flag e passava; caem agora `git push* +*`, `git -* push +*` e `git -* push * +*` (aspas não salvam:
-  o motor as tira). Custo: `+` no começo de argumento do push que não é refspec (`-o "ci +skip"`) e a menção dentro de
-  `git -C . commit -m "… push … +x"`. As regras `git clean* -x*`, com o curinga no MEIO, barravam `git clean -n -x`, que só
+  o motor as tira). Custo: `+` no começo de argumento do push que não é refspec (`-o "ci +skip"`), a menção dentro de
+  `git -C . commit -m "… push … +x"` e o pipe, que o motor julga inteiro (`git push origin x | tail -n +2` cai; use
+  `| tail -n 2` ou `| sed 1d`). As regras `git clean* -x*`, com o curinga no MEIO, barravam `git clean -n -x`, que só
   lista: o glob não sabe dizer "exceto `-n`". Foram aposentadas em `deny-retired.tsv` e trocadas pelo grupo destrutivo como
   1º argumento (`git clean -fdx*`); a ordem livre (`git clean -f -d -x`, `-e keep -fdx`) é julgada por token no hook
-  `pretooluse-protect-main.sh`, que deixa passar `-n` e `--dry-run`. Teto: o `-n` DEPOIS do grupo (`git clean -fdx -n`,
-  `git clean -x -n`) segue barrado pelo deny; ponha o `-n` antes. Saiu de brinde o custo `git -C clean status -x`.
+  `pretooluse-protect-main.sh`, que deixa passar `-n` e `--dry-run` (e veta `--exc -n`, porque o git toma o `-n` como
+  padrão do `--exclude` abreviado). Teto: o `-n` DEPOIS do grupo (`git clean -fdx -n`, `git clean -x -n`) ou grudado no
+  fim dele (`-xn`, `-fdxn`) segue barrado pelo deny; ponha o `-n` antes. `eval` segue fora dos dois. Saiu de brinde o custo `git -C clean status -x`.
 
 ## O que esta doutrina NÃO promete
 

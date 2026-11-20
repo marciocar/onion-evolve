@@ -7,7 +7,9 @@
 # porque o deny nativo não sabe dizer "exceto -n": o glob não tem negação, e as regras `git clean* -x*`
 # barravam `git clean -n -x`, que só lista (falso positivo medido no motor real, 2.1.329). O deny ficou só
 # com o grupo destrutivo como 1º argumento (`git clean -fdx*`); a ordem livre (`-f -d -x`, `-e keep -fdx`)
-# é julgada aqui, por token. TETO: o -n DEPOIS do grupo (`git clean -fdx -n`) segue barrado pelo deny.
+# é julgada aqui, por token. Vale em qualquer pasta (`git -C /outra clean -fdx` também cai), como o deny.
+# TETO: o -n DEPOIS do grupo (`git clean -fdx -n`, `-x --dry-run`) ou grudado no fim dele (`-xn`, `-fdxn`) segue
+# barrado pelo deny; `eval "git clean -fdx"` não é visto aqui (a lib só marca inanalisável o que cita push ou merge).
 input=$(cat)
 # `cwd` do JSON é o diretório ONDE o comando roda — numa worktree de agente é a worktree, não a raiz
 # (`CLAUDE_PROJECT_DIR`). Julgar pela raiz vetava `git push -u origin HEAD` de agente e deixava passar
@@ -51,7 +53,7 @@ clean_destroys_ignored() {
         nm = t; sub(/=.*/, "", nm)
         if (length(nm) >= 3 && index("--dry-run", nm) == 1) n = 1
         else if (length(nm) >= 6 && index("--no-dry-run", nm) == 1) n = 0
-        else if (nm == "--exclude" && t !~ /=/) skip = 1
+        else if (length(nm) >= 3 && index("--exclude", nm) == 1 && t !~ /=/) skip = 1
         continue
       }
       if (t ~ /^-./) {
@@ -68,11 +70,15 @@ clean_destroys_ignored() {
   END { exit found ? 0 : 1 }'
 }
 # clean_by_shape <texto> — sem tokenizador (python ausente, ou linha inanalisável): corta por ; & | e quebra de
-# linha, tira aspas e `\`, e leva ao juiz o que vem depois do último ` clean` de cada segmento que cita git.
+# linha, tira aspas e `\`, e leva ao juiz o que vem depois do 1º token `clean` que segue um `git` (o `clean` de
+# um comentário ou de um caminho, mais adiante, não rouba o lugar do verbo).
 clean_by_shape() {
   printf '%s\n' "$1" | tr -d "\"'\\\\" | tr ';&|' '\n\n\n' \
-    | grep -E '(^|[^[:alnum:]_])git([^[:alnum:]_]|$)' \
-    | sed -nE 's/^.*[[:space:]]clean([[:space:]].*)?$/git clean\1/p' | clean_destroys_ignored
+    | awk '{ g = 0
+        for (i = 1; i <= NF; i++) {
+          if (!g && ($i == "git" || $i ~ /\/git$/)) g = 1
+          else if (g && $i == "clean") { s = "git clean"; for (j = i + 1; j <= NF; j++) s = s " " $j; print s; next }
+        } }' | clean_destroys_ignored
 }
 # Julga POR LINHA DE INVOCAÇÃO, nunca a string inteira: heredoc/prosa num comando composto que
 # apenas CITA o vocabulário não pode vetar (falso-positivo medido no 1º dogfood, 2026-09-01 —
