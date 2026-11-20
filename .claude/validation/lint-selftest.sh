@@ -10498,6 +10498,9 @@ PY
     'git clean --dry-run -fdx' "${_PM}" 'index("--dry-run", nm) == 1) n = 1' 'index("--dry-run", nm) == 1) n = 0'
   _pvmut "(cl4) protect-main: -e<padrão> colado não é flag (git clean -fd -exlog) → passa" 0 "${_PM}" feat \
     'git clean -fd -exlog' "${_PM}" 'if (j == length(t)) skip = 1; break }' 'if (j == length(t)) skip = 1 }'
+  # (cl5) achado da revisão separada: o git aceita `--exc` por `--exclude` e toma o `-n` seguinte como PADRÃO — o .env some
+  _pvmut "(cl5) protect-main: --exclude abreviado engole o -n (git clean --exc -n -f -x) → VETO" 2 "${_PM}" feat \
+    'git clean --exc -n -f -x' "${_PM}" 'else if (length(nm) >= 3 && index("--exclude", nm) == 1 && t !~ /=/) skip = 1' 'else if (nm == "--exclude" && t !~ /=/) skip = 1'
   _case "protect-main: git clean -e keep -fdx → VETO"            2 "${pm}" feat 'git clean -e keep -fdx'
   _case "protect-main: git -C . clean -f -X → VETO"              2 "${pm}" feat 'git -C . clean -f -X'
   _case "protect-main: bash -c \"git clean -f -d -x\" → VETO"    2 "${pm}" feat 'bash -c "git clean -f -d -x"'
@@ -10721,8 +10724,28 @@ PY
   _casen "(np-pm-plus) protect-main: +main → FECHA"              2 "${pm}" feat 'git push origin +main'
   _casen "(np-pm-push) protect-main: push sem force → passa"     0 "${pm}" feat 'git push origin feat'
   _casen "(np-pm-ls) protect-main: ls → passa"                   0 "${pm}" feat 'ls -la'
-  _casen "(np-pm-clean) protect-main: git clean -f -d -x → FECHA" 2 "${pm}" feat 'git clean -f -d -x'
   _casen "(np-pm-clean-n) protect-main: git clean -n -x → passa" 0 "${pm}" feat 'git clean -n -x'
+  # (np-pm-clean*) com mutante: sem a linha do clean_by_shape no caminho sem python, o veto cai; com o `clean` do
+  # comentário roubando o lugar do verbo (o sed guloso da 1ª redação), `git clean -f -x # clean` passava
+  _pvnmut() {  # <nome> <esperado> <comando> <OLD> <NEW>
+    local got gotm rc_i=1 rc_m=1 mh; mh="$(mktemp -d)"; cp -r "${REPO_ROOT}/.claude/hooks/." "${mh}/"
+    OLD="$4" NEW="$5" python3 - "${mh}/pretooluse-protect-main.sh" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    got="$(_pvn "${pm}" feat "$3")"
+    if [ "${got}" = "$2" ]; then record_pass "pretooluse-veto: sem python3: $1 (rc=$2)"; rc_i=0
+    else record_fail "pretooluse-veto: sem python3: $1" "esperava rc=$2, veio rc=${got} — cmd: $3"; fi
+    gotm="$(_pvn "${mh}/pretooluse-protect-main.sh" feat "$3")"; [ "${gotm}" = "$2" ] && rc_m=0
+    _prove_mutation "pretooluse-veto: sem python3: $1 (MUT)" "${pm}" "${mh}/pretooluse-protect-main.sh" "${rc_i}" "${rc_m}"
+    rm -rf "${mh}"
+  }
+  _pvnmut "(np-pm-clean) protect-main: git clean -f -d -x → FECHA" 2 'git clean -f -d -x' \
+    '  if clean_by_shape "$cmd"; then echo "$CLEAN_MSG" >&2; exit 2; fi' '  :'
+  _pvnmut "(np-pm-clean-cmt) protect-main: git clean -f -x # clean → FECHA" 2 'git clean -f -x # clean' \
+    'else if (g && $i == "clean") { s = "git clean"' 'else if (g && $i == "clean" && i == NF) { s = "git clean"'
   _casen "(np-mg-merge) merge-gate: gh pr merge → FECHA"         2 "${mg}" feat 'gh pr merge 1 --rebase'
   _casen "(np-mg-push) merge-gate: git push origin main → FECHA" 2 "${mg}" feat 'git push origin main'
   _casen "(np-mg-api) merge-gate: gh api …/merge → FECHA"        2 "${mg}" feat 'gh api -X PUT repos/o/r/pulls/1/merge'
@@ -54877,8 +54900,9 @@ run_update_base_and_deny_selftests() {
   # ── (fr) o deny REAL do core contra refspec com `+` e contra a simulação do clean (fix/deny-force-refspec-1120) ──
   # `git push origin +main` força sem flag e escapava das regras de push forçado; `git clean* -x*` barrava `git clean -n -x`.
   # O juiz aqui é uma EMULAÇÃO do glob do Claude Code (`*` casa qualquer coisa, espaço inclusive; aspas saem; cada
-  # subcomando de && ; | é julgado só). Quem prova que ela bate com o motor é ops/testing/permissions-deny-bench.py
-  # (D61-D66, N19-N27, C09-C12, L41-L45, medido no 2.1.329); aqui a emulação guarda a LISTA contra regressão no CI.
+  # subcomando de && || ; é julgado só, mas o PIPE é julgado inteiro — medido pela revisão separada: `git push origin
+  # x | tail -n +2` cai na regra `git push* +*`). Quem prova que ela bate com o motor é ops/testing/permissions-deny-bench.py
+  # (D61-D66, N19-N27, C09-C14, L41-L45, medido no 2.1.329); aqui a emulação guarda a LISTA contra regressão no CI.
   _fr_judge() {  # <settings.json> <casos: esperado TAB comando> → linhas que divergem
     python3 -I - "$1" "$2" <<'PY'
 import json, re, sys
@@ -54886,7 +54910,7 @@ deny = [r[5:-1] for r in json.load(open(sys.argv[1]))["permissions"]["deny"] if 
 rx = [re.compile("^" + ".*".join(re.escape(p) for p in r.split("*")) + "$", re.S) for r in deny]
 for line in open(sys.argv[2]):
     want, cmd = line.rstrip("\n").split("\t", 1)
-    subs = [s.strip() for s in re.split(r"&&|\|\||;|\|", cmd.replace('"', "").replace("'", ""))]
+    subs = [s.strip() for s in re.split(r"&&|\|\||;", cmd.replace('"', "").replace("'", ""))]
     got = "deny" if any(x.match(s) for s in subs for x in rx) else "pass"
     if got != want:
         print(f"{cmd} → {got} (esperado {want})")
@@ -54896,6 +54920,7 @@ PY
   printf '%s\t%s\n' deny 'git push origin +main' deny 'git push origin +HEAD:main' deny 'git push origin +refs/heads/x:refs/heads/y' \
     deny 'git -C . push +feat/x' deny 'git -c a.b=c push origin +feat/x' deny "git push origin '+main'" \
     deny 'git push --force origin feat/x' deny 'git clean -fdx' deny 'git clean -x' deny 'git -C . clean -fdX' deny 'cd sub && git clean -fdx' \
+    deny 'git push origin feat/x | tail -n +2' \
     pass 'git push origin feat/x' pass 'git push origin v1.0.0+build1' pass 'git commit -m "fix +x" && git push origin feat/x' \
     pass 'git log --grep "+main"' pass 'git clean -n -x' pass 'git clean --dry-run -x' pass 'git clean -n -fdx' pass 'git clean -f -n -x' \
     pass 'git -C . clean -n -x' pass 'git -C . clean --dry-run -fdX' pass 'git clean -nx' > "${frc}"

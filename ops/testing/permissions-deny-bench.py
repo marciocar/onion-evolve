@@ -199,6 +199,9 @@ CASES = [
     ("C10", "Bash", "git clean -fdx --dry-run", "deny", 0),
     ("C11", "Bash", 'git -C . commit --allow-empty -m "push origin +main"', "deny", 0),
     ("C12", "Bash", 'git push origin feat/x -o "ci +skip"', "deny", 0),
+    # o pipe é julgado inteiro (o && e o ; não): o `+2` do tail cai em `git push* +*`; saída: `| tail -n 2` ou `| sed 1d`
+    ("C13", "Bash", "git push origin feat/x | tail -n +2", "deny", 0),
+    ("C14", "Bash", "git clean -xn", "deny", 0),
     # ── limite medido: o deny NÃO alcança (o esperado é passar; se passar a barrar, a declaração muda) ──
     ("L04", "Bash", "python3 -c \"print(open('.env').read())\"", "pass", 1),
     ("L06", "Bash", "bash -c 'git push --force origin HEAD:refs/heads/feat/bc'", "pass", 1),
