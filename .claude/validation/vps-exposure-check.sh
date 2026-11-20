@@ -111,7 +111,15 @@ for _bdir in ${BACKUP_DIRS_OVERRIDE:-${_op_home:+${_op_home}/onion-vps-*/backups
   [ -d "${_bdir}" ] || continue
   # `find` (nao glob) porque o glob expande no shell do chamador e devolve vazio sem acesso —
   # e vazio lido como ausencia e exatamente o fail-open que este arquivo existe para impedir.
-  _plain="$(find "${_bdir}" -maxdepth 1 -type f ! -name '*.gpg' 2>/dev/null | wc -l)"
+  # ALLOWLIST DECLARADA (2026-11-20, sinal da operacao da VPS em 19/11): `restore-test-*.txt` e o
+  # RELATORIO do teste de restauracao, nao dado — contado como backup em claro, fazia a guarda acusar
+  # HARD todo diretorio que prova o proprio restore, e falso positivo treina a ignorar o veto.
+  # ⚠️ ESTREITA DE PROPOSITO: so o prefixo E a extensao juntos. `restore-test-*.tar`/`.sql` e um
+  #    `.txt` de nome qualquer seguem acusados — a extensao de dado vence o prefixo. Por isso a
+  #    extensao DUPLA (`restore-test-x.sql.txt`, `.tar.gz.txt`) tambem segue acusada: o miolo nao
+  #    pode ter ponto (a revisao adversarial achou que o glob sozinho a deixava calada).
+  # ⚠️ A allowlist confia no NOME: o relatorio nao pode carregar linhas do dump. Se carregar, e dado.
+  _plain="$(find "${_bdir}" -maxdepth 1 -type f ! -name '*.gpg' ! \( -name 'restore-test-*.txt' ! -name 'restore-test-*.*.txt' \) 2>/dev/null | wc -l)"
   if [ "${_plain}" -gt 0 ]; then
     _say "BACKUP-EM-CLARO" "${_bdir}" "${_plain} arquivo(s) sem .gpg — backup nao cifrado e dado sensivel em repouso"
   fi
