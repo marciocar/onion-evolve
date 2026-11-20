@@ -2,14 +2,13 @@
 branch: feat/aside-routes-reforco-nota-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: 32cb2733094267dac79e6ae5382720b533a29672221851f5a134de6b076a1f98
-reviewed_code_sha256: e5fb8edc58f625188bb7e6981ea25ae700ae5f9d187dc15b27c383f6d6be435d
-findings_total: 9
-findings_real: 9
+reviewed_diff_sha256: pendente
+findings_total: 10
+findings_real: 10
 findings_blocking: 0
 tokens: 92944
 duration_min: 11
-findings_fixed: 8
+findings_fixed: 9
 verdict: FIXED
 elenxo: false
 elenxo_isolado: true
@@ -49,3 +48,14 @@ Decisão do maestro de 2026-11-20 sobre a revisão medida dos apartes (transcrip
 
 Famílias isoladas: `aside_router_routes` 28/28 (em C e em C.UTF-8; 23 mutantes de motor e 2 de hook, todos mortos
 pelo id certo); `aside_router` e `aside_router_hook` 9/9.
+
+## Achado do CI (depois da revisão isolada)
+
+10. BLOQUEANTE (CI do PR, faixa 3) — a bancada abortava o worker sem trailer de soma. Sob o `set -euo pipefail`
+    do runner, um diretório vazio no PATH devolve o `*` literal; o 2º `ln -s` dele caía sobre o link pendente e o
+    rc≠0 matava o worker. A revisão isolada e a bancada local não viram porque o harness local rodava sem `set -e`
+    e o PATH daqui tem um só diretório vazio. Curado: pula o que não existe, confere `-L` e o `ln` nunca decide o
+    rc. Caso permanente: a varredura inclui dois diretórios vazios (numa variável, porque o `:` literal entre
+    expansões não divide pelo IFS — a 1ª tentativa do caso não varria os vazios). Mutante (a cura revertida) com
+    o harness espelhando o runner (`set -euo pipefail`): rc=1 sem trailer, como no CI. Curado: 28/28 com trailer em
+    `LC_ALL=C` e C.UTF-8. Não houve nova passada isolada sobre esta cura; a prova é o mutante que reproduz o CI.
