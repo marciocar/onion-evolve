@@ -345,9 +345,11 @@ def ledger_hit(lines, appr, word_id):
     da mensagem do meio do turno). Uma aprovação regravada para a mesma palavra tem hash novo, mas a palavra já está no
     livro."""
     wid = word_id or "\0"
+    # «P/*» é a marca do consume que não leu o transcript: gasta toda palavra do turno P (topo e meio)
+    fam = wid.split("/", 1)[0] + "/*"
     for line in lines:
         cols = line.rstrip("\n").split("\t")
-        if cols[0] == appr["hash"] or (len(cols) > 1 and cols[1] == wid):
+        if cols[0] == appr["hash"] or (len(cols) > 1 and cols[1] in (wid, fam)):
             return True
     return False
 
@@ -384,6 +386,9 @@ def transcript_word(appr, req):
       palavra só se está DENTRO do turno do prompt_id (o último promptId visto antes dela é o do payload) e nasceu a
       MIDTURN_SKEW_S da gravação da aprovação. O id da palavra é prompt_id/uuid da mensagem.
     Escolhe-se, entre as candidatas que trazem a frase, a mais perto da aprovação; a origem se julga DEPOIS, na escolhida.
+    LIMITE MEDIDO (revisão de 20/11, M1): nenhuma das 44 mensagens humanas do meio do turno no transcript do core traz
+    promptSource, então esta forma NÃO distingue digitado de sugestão aceita. Os 32 aceites de sugestão medidos vieram
+    todos com a sessão parada (forma de topo, recusada). Se o harness um dia marcar promptSource aqui, ele é julgado.
     """
     ev = appr.get("evidence") or {}
     pid = str(ev.get("prompt_id") or "")
@@ -402,17 +407,21 @@ def transcript_word(appr, req):
                 continue
             try:
                 e = json.loads(line)
-            except ValueError:
+            except (ValueError, RecursionError):
                 continue
             if not isinstance(e, dict) or e.get("isSidechain"):
                 continue
             if e.get("type") == "user" and e.get("promptId"):
+                m = e.get("message")
+                c = m.get("content") if isinstance(m, dict) else None
+                # tool_result herda o promptId do turno e não abre turno: não move a amarra (revisão de 20/11, M4)
+                if isinstance(c, list) and c and all(isinstance(x, dict) and x.get("type") == "tool_result" for x in c):
+                    continue
                 cur = e.get("promptId")
                 if cur != pid:
                     continue
                 # o MESMO promptId pode ter mais de uma entrada (medido em 18/11: a auto-compactação disparada no envio
                 # grava o resumo com o promptId do prompt, ANTES dele). Candidata é a que traz a frase.
-                c = (e.get("message") or {}).get("content")
                 text = c if isinstance(c, str) else "".join(x.get("text", "") for x in (c or []) if isinstance(x, dict) and x.get("type") == "text")
                 if is_word(text):
                     when, ts = entry_ts(e)
@@ -519,11 +528,12 @@ def cmd_consume(argv):
         print("✗ não consumi: %s." % e)
         return 1
     # o id da palavra (prompt_id no topo, prompt_id/uuid no meio do turno); o consume só roda depois do verify ter
-    # aceito, e se o transcript não se ler agora, grava o prompt_id cru (gastar mais, nunca menos)
+    # aceito, e se o transcript não se ler agora (por QUALQUER erro), grava «prompt_id/*», que gasta toda palavra do
+    # turno: gastar mais, nunca menos (revisão de 20/11, M2 e M3)
     try:
         word_id = transcript_human(appr, req)
-    except (LookupError, ValueError, KeyError, TypeError, OSError):
-        word_id = str((appr.get("evidence") or {}).get("prompt_id") or "-")
+    except Exception:
+        word_id = str((appr.get("evidence") or {}).get("prompt_id") or "-") + "/*"
     ensure_dirs()
     outcome = re.sub(r"[\t\n]", " ", a.get("outcome", "used"))[:200]
     with open(ledger_path(), "a+", encoding="utf-8") as f:
