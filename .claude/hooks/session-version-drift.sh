@@ -42,5 +42,5 @@ marker="${state_dir}/${CLAUDE_CODE_SESSION_ID:-nosession}-${disk_ver}"
 [ -e "${marker}" ] && exit 0
 : > "${marker}" 2>/dev/null || true
 del_note=""; [ -n "${deleted}" ] && del_note=" (binário do processo já DELETADO do disco)"
-echo "⚠️ Onion: esta sessão roda o Claude Code ${proc_ver}${del_note}; o disco já tem ${disk_ver}. Picker de modelo, hooks e capacidades refletem o PROCESSO — o que só existe em ${disk_ver} está invisível aqui. Reinicie a sessão (/exit → claude --continue) para pegar a versão nova; avise o maestro se a diferença importar para a tarefa."
+echo "⚠️ Onion: esta sessão roda o Claude Code ${proc_ver}${del_note}; o disco já tem ${disk_ver}. Picker de modelo, hooks e capacidades refletem o PROCESSO — o que só existe em ${disk_ver} está invisível aqui. Reinicie a sessão para pegar a versão nova — anote o id da sessão (/status) ANTES do /exit e retome pelo id exato: bash ops/session-open.sh <nome> --resume <id> (core-only; fora do core, claude --resume <id>), nunca --continue; avise o maestro se a diferença importar para a tarefa."
 exit 0

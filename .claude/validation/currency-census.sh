@@ -249,7 +249,7 @@ except Exception: print("")' "${HOME}/.claude/settings.json" 2>/dev/null)"
   _has "${NPM}" || { _row "claude-cli (canal ${ch})" "${disk}" - ausente "falta o npm para ler o registro: ${ASK} o Node.js/npm pela fonte oficial (nodejs.org ou o pacote da distro)"; return 0; }
   latest="$(_src "npm-cc-${ch}" "${TTL}" "${VRE}" _npm_tag @anthropic-ai/claude-code "${ch}")" || rc=$?
   [ -n "${latest}" ] || { _row "claude-cli (canal ${ch})" "${disk}" - nao-medida "registro npm inalcançável ou sem o dist-tag ${ch} (rc=${rc})"; return 0; }
-  _judge "claude-cli (canal ${ch})" "${disk}" "${latest}" "claude update (e reinicie a sessão: /exit → claude --continue)"
+  _judge "claude-cli (canal ${ch})" "${disk}" "${latest}" "claude update (e reinicie a sessão: anote o id da sessão (/status) ANTES do /exit e retome pelo id exato: bash ops/session-open.sh <nome> --resume <id> (core-only; fora do core, claude --resume <id>), nunca --continue)"
 }
 
 leg_sdk() {

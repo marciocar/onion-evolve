@@ -19,6 +19,12 @@
 #     abre sessão NOVA com --new, dito na linha (abrir nova sem querer perde o histórico da antiga).
 #     A retomada leva só `--resume <id>` (mais o canal da campainha, onde o repo a declara, e o --mode se pedido): o
 #     teste nativo de 2026-11-20 mediu que flag a mais na retomada de sessão de fundo abre uma CÓPIA com outro id e nome.
+#     A campainha EXIGE a flag do canal (sem ela a sessão volta muda). Medido em 2026-11-20 (Claude Code 2.1.329, sessão
+#     descartável num repo de brinquedo): `claude --bg --resume <sid> --dangerously-load-development-channels
+#     server:doorbell` abriu CÓPIA (note: «the flags you passed started a copy as …»); `claude --resume <sid>` com a
+#     mesma flag, INTERATIVO num tmux (o que este abridor faz), retomou o MESMO id e o mesmo nome, com o histórico.
+#     Custo medido: o interativo para no aviso «Loading development channels» até alguém dar Enter no painel; depois
+#     do --all, entre em cada sessão de campainha e confirme. Por isso este abridor nunca usa --bg.
 #   · NUNCA DUAS SESSÕES NO MESMO CHECKOUT: `tmux new-session -A` só anexa; e, para criar, RECUSA (rc 3) se já há um
 #     `claude` vivo com o cwd naquela pasta (fora do tmux ou noutra sessão tmux), ou se o id resolvido já está vivo
 #     noutro lugar (a cópia escreveria no mesmo histórico: incidente de 2026-11-16). Nunca mata processo.
