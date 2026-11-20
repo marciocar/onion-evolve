@@ -2,7 +2,8 @@
 branch: docs/seal-session-method-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 835615ed9d9c783d94bc8e821b7de4b5495a0af6eb9b0c88cfcaca09851ff806
+reviewed_code_sha256: eb271f001cf31fefa6b0f9a5a9562fd21af2a93461217f33094491c01b7536fe
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
