@@ -42,10 +42,26 @@ na 1ª mensagem de uma sessão, o arquivo nem existe quando o hook roda. Daí a 
 - o **executor** confere a origem: entre as entradas do `prompt_id` no transcript, julga a que traz a frase (a
   auto-compactação disparada no envio grava o resumo com o mesmo `promptId`, antes) e exige `origin.kind: human`,
   `promptSource` `typed` ou `queued` e nenhum `isMeta`. O prazo de 10 minutos conta do horário dessa entrada.
-- o **livro do executor** guarda o hash da aprovação **e** o `prompt_id`: regravar a aprovação para a mesma palavra
-  gera hash novo, mas não um segundo uso.
+- **no meio do turno** (medido em 20/11/2026, SAC-485, prompt_id `d82f5d09` e `81ad8498`): quando o maestro digita
+  com a sessão trabalhando, o hook recebe o `prompt_id` **do turno em curso**, e a mensagem entra no transcript como
+  `type: attachment` com `attachment.type: queued_command`, **sem** `promptId`: a frase em `attachment.prompt`, a
+  origem em `attachment.origin` (`human` traz `commandMode: prompt` e `humanTurn: true`; peer traz `origin.kind: peer`
+  e `isMeta`). O executor aceita essa forma só se ela está **dentro** do turno do `prompt_id` (o último `promptId` visto
+  antes dela é o do payload), nasceu a até 30 s da gravação da aprovação, tem `humanTurn: true`, `commandMode: prompt`,
+  `origin.kind: human`, nenhum `isMeta` e, se trouxer `promptSource`, ele é `typed` ou `queued`. Antes da cura o leitor
+  só via a forma de topo e recusava («a frase … não está no transcript»). **Limite medido**: nenhuma das 44 mensagens
+  humanas do meio do turno traz `promptSource`, então esta forma não distingue digitado de sugestão aceita; os 32
+  aceites de sugestão medidos vieram com a sessão parada (forma de topo, recusada). Se o harness passar a marcar
+  `promptSource` aqui, o executor já o julga;
+- o **livro do executor** guarda o hash da aprovação **e** o id da palavra (o `prompt_id` no topo; `prompt_id/uuid` da
+  mensagem no meio do turno; `prompt_id/*` quando o consume não leu o transcript, que gasta todo o turno): regravar a aprovação para a mesma palavra gera hash novo, mas não um segundo uso, e duas
+  palavras no mesmo turno são duas palavras.
 
 Falha **fechada** nos dois: o que não dá para ler não autoriza.
+
+O teto inclui a **injeção pelo terminal**: no mesmo usuário Unix, `tmux send-keys 'pode rodar' Enter` no painel da
+sessão é gravado pelo harness como digitação humana legítima, nas duas formas. Só o nível 2 (identidade que o agente
+não controla) fecha isso.
 
 ## O esquema de ato (compartilhado)
 
