@@ -2,7 +2,8 @@
 branch: feat/aside-task-dogfood-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4416b0b2b2c0ebfd2de56f721db346f2f34ccf2d2736e0fdc656dca70b356b6b
+reviewed_code_sha256: fc28176e5fd1cb516a0aa667b69b4a5829d2de551625b816bfb62b7e86b9b52e
 findings_total: 12
 findings_real: 11
 findings_blocking: 0
