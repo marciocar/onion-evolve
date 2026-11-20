@@ -2,8 +2,7 @@
 branch: feat/service-repos-owner-vps-ops-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: cebed87a802b6f5255c91c914aca2484e47589e5cc4a42c3685ae75ed7644509
-reviewed_code_sha256: 48382a7dea871a625eefb1295fbd49fc1bc8c16ed61edca30c79e9c722568699
+reviewed_diff_sha256: pendente
 findings_total: 15
 findings_real: 13
 findings_blocking: 2
@@ -13,7 +12,7 @@ duration_min: 7
 verdict: FIXED
 elenxo: true
 elenxo_isolado: true
-reviewer: "Agente revisor separado (code-reviewer), só leitura, com mandato de refutar e foco em escalada. A 1ª passada deu REJECTED com 2 achados bloqueantes. A 2ª deu APPROVED, com 4 não-bloqueantes e 1 teto. A 3ª conferiu as curas desses e deu APPROVED."
+reviewer: "Agente revisor separado (code-reviewer), só leitura, com mandato de refutar e foco em escalada. A 1ª passada deu REJECTED com 2 achados bloqueantes. A 2ª deu APPROVED, com 4 não-bloqueantes e 1 teto. A 3ª conferiu as curas desses e deu APPROVED. A 4ª revisou o extrator do caso (q) da session_open e deu APPROVED."
 nota: "tokens = soma aproximada das passadas pelo harness (119.577 + 150.193 + a 3ª). Os achados que não viraram código são tetos declarados abaixo."
 ---
 
@@ -79,3 +78,13 @@ A família `pr_merge_verified` passou com 0 falhas. Casos sv1 a sv17:
 - **«Pode rodar» delegado**, nos casos sv8 a sv12 e sv14 a sv17: pedido, uso, uso único, fora do core, peça que vendoriza, resíduo ruim e leitor antigo.
 
 Cada regra nova tem caso. As guardas da linha 8 e a recusa do «pode rodar» com `--foreign-repo` fora do core (só o sv12) não têm mutante.
+
+## 4ª passada: o caso (q) da `session_open`
+
+O #1699, que entrou na main depois do rebase, extraía o awk da catraca de dentro do `_own_repo_gate` por padrão de texto. A catraca
+agora chama o `_pmv_member_row` para o alvo, e a extração quebrou. O extrator novo:
+- exige a chamada `_row="$(_pmv_member_row "${_t}" "${_m}")"` dentro do corpo do gate, limitado até o fim da função, como pediu o revisor;
+- extrai o awk da própria `_pmv_member_row`.
+
+O revisor confirmou que a paridade compara o awk que a catraca usa de fato. O mutante do (q) muda o leitor `ownership.sh` e segue
+morrendo pela causa. As famílias `session_open` e `pr_merge_verified` passaram com 0 falhas.
