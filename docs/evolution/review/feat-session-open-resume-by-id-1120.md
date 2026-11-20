@@ -1,20 +1,20 @@
 ---
 branch: feat/session-open-resume-by-id-1120
-pr: pendente
+pr: 1699
 date: 2026-11-20
 reviewed_diff_sha256: 4232b90113d448449ae5a3e348b3883d99d9bb9ec5b5a56d3267eecf22b2fe13
 reviewed_code_sha256: e2c2ebe1728f83b56383578c06638545a74b2c5db9f08788382cf83b14fa7dc3
-findings_total: 12
-findings_real: 11
+findings_total: 15
+findings_real: 14
 findings_blocking: 0
-tokens: 152181
-duration_min: 12
-findings_fixed: 10
+tokens: 177300
+duration_min: 23
+findings_fixed: 13
 verdict: FIXED
 elenxo: true
 elenxo_isolado: true
-reviewer: "Agente revisor separado (code-reviewer), só leitura, mandato de refutar, três passadas sobre o mesmo diff. 1ª: CHANGES_REQUESTED com 10 achados (8 curados, 1 declarado no cabeçalho, 1 hipótese não medida). 2ª: CHANGES_REQUESTED com 1 achado novo (lista privada contada só entre linhas válidas) e 1 observação, ambos curados. 3ª: APPROVED, com 1 observação baixa do lado seguro, declarada no código."
-nota: "tokens = os do revisor no fim da 3ª passada; duration_min = soma das três passadas declarada pelo revisor."
+reviewer: "Agente revisor separado (code-reviewer), só leitura, mandato de refutar, três passadas sobre o mesmo diff. 1ª: CHANGES_REQUESTED com 10 achados (8 curados, 1 declarado no cabeçalho, 1 hipótese não medida). 2ª: CHANGES_REQUESTED com 1 achado novo (lista privada contada só entre linhas válidas) e 1 observação, ambos curados. 3ª: APPROVED, com 1 observação baixa do lado seguro, declarada no código. 4ª (acréscimos pedidos pelo core, incluindo o hook session-version-drift, que é guarda): código correto, CHANGES_REQUESTED só pelo inventário do harness defasado (REGRA 80, regenerado pelo pr-finalize) e pelo carimbo caduco do resíduo; 1 sugestão baixa (imprimir o id da sessão no hook) curada."
+nota: "tokens = os do revisor no fim da 4ª passada; duration_min = soma das quatro passadas declarada pelo revisor."
 ---
 
 # Passada adversarial: `feat/session-open-resume-by-id-1120`
@@ -46,6 +46,15 @@ O `ops/pr-merge-verified.sh` NÃO foi tocado. A paridade com a catraca é provad
 10. **Hipótese, não medida.** O preflight busca pelo nome, e a catraca pelo slug do origin. Se o origin real divergir do `remote` do registro, os dois respondem diferente.
 11. **Observação da 2ª passada, curado.** Ao anexar, o abridor não avisava da sessão de fundo no checkout. Agora avisa.
 12. **Observação da 3ª passada, declarado.** O id repetido com slugs distintos é mais estrito que a catraca, do lado seguro. Fica escrito no comentário da 1ª varredura.
+
+13. **4ª passada, curado.** A bancada herdava CI=true, e no CI a lista privada não se lê (desenho da catraca): 13 casos reprovaram no CI. Agora a bancada tira o CI do ambiente, e o caso g8 prova o lado do CI. Verde nos dois ambientes.
+14. **4ª passada, curado.** `docs/onion/testing-inventory.md` defasado (REGRA 80): o texto novo das superfícies conta como par de modo consumido. O pr-finalize regenera a projeção.
+15. **4ª passada, sugestão curada.** O hook de versão imprime o id da sessão, em vez de mandar anotar.
+
+## Acréscimos pedidos pelo core (4ª passada)
+
+- Três superfícies trocaram «/exit → claude --continue» pela retomada pelo id exato: o hook `session-version-drift.sh` (guarda), o `currency-census.sh` e a REGRA 65 do `lint-artifacts.sh`. O caso t, com um mutante por arquivo, trava o regresso.
+- A flag da campainha foi medida numa sessão descartável, depois removida. Com `--bg --resume`, abre cópia. Interativo no tmux, retoma o mesmo id, mas para no aviso de dev channels até alguém dar Enter. O registro está no cabeçalho do abridor.
 
 ## Dogfood
 
