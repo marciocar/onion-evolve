@@ -2801,10 +2801,19 @@ run_aside_router_routes_selftests() {
   # hook ponta a ponta com prefixo composto, com jq e no fallback SEM jq (escape só de \ e "); JSON por python3
   payload='{"session_id":"s1","transcript_path":"/tmp/t","cwd":"/x","hook_event_name":"UserPromptSubmit","prompt":"paralelo: nota: precisamos de um manual"}'
   local nojq="${base}/nojq" p x b IFS_OLD="$IFS"
-  mkdir -p "$nojq"; IFS=':'
-  for p in $PATH; do
+  # dois diretórios VAZIOS no PATH varrido: o caso que abortou o worker no CI fica dentro da própria varredura
+  # (numa variável: o ':' literal entre expansões não é ponto de divisão do IFS)
+  local scan="${base}/vazio1:${base}/vazio2:${PATH}"
+  mkdir -p "$nojq" "${base}/vazio1" "${base}/vazio2"; IFS=':'
+  for p in $scan; do
     [ -d "$p" ] || continue
-    for x in "$p"/*; do b="${x##*/}"; [ "$b" = jq ] && continue; [ -e "${nojq}/${b}" ] || ln -s "$x" "${nojq}/${b}" 2>/dev/null; done
+    # sob set -e (o runner): diretório vazio devolve o "*" literal e o 2º ln dele falhava sobre o link pendente,
+    # abortando o worker sem soma (CI do #1704). Pula o que não existe e nunca deixa o ln decidir o rc.
+    for x in "$p"/*; do
+      [ -e "$x" ] || continue
+      b="${x##*/}"; [ "$b" = jq ] && continue
+      [ -e "${nojq}/${b}" ] || [ -L "${nojq}/${b}" ] || ln -s "$x" "${nojq}/${b}" 2>/dev/null || true
+    done
   done
   IFS="$IFS_OLD"
   _arr_hook_both() {
