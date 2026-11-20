@@ -775,7 +775,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-20"
     verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «5 dias úteis»"
-    label: "Migração do brain-granaai para conta/VPC própria na AWS da Grana.Ai (Delphi hub-to-aws-1120, 4 aceites): a máquina nova fica 5 dias úteis em sombra passiva antes do corte."
+    label: "Migração do brain-granaai para conta/VPC própria na AWS do próprio adotante (Delphi hub-to-aws-1120, 4 aceites): a máquina nova fica 5 dias úteis em sombra passiva antes do corte."
     narrative: "Selado por /meta:decide em 2026-11-20: escolhida «5 dias úteis»; descartadas: «3 dias úteis» · «7 dias corridos»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
