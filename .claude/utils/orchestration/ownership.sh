@@ -85,7 +85,17 @@ _own_private_tsv() {  # $1 = members_tsv
   if ! [[ "${mode}" =~ ^[0-7]{3,4}$ ]] || [ $(( 8#${mode} & 8#077 )) -ne 0 ]; then
     OWN_PRIV_NOTE="lista privada com modo ${mode:-ilegível}, mais aberto que 600: ignorada (a catraca também a recusa)"; return 0
   fi
-  local id sl os lp _r mk mo mr ml seen=" " rows=""
+  local id sl os lp _r mk mo mr ml rows="" dslug=" " did=" "
+  # 1ª varredura, ANTES de validar, como a catraca conta (_pmv_private_lines devolve toda linha cujo slug casa, válida
+  # ou não, e _pmv_private_row recusa com mais de uma): slug repetido e id repetido derrubam TODAS as suas linhas
+  local -A nsl=() nid=()
+  while IFS=$'\t' read -r id sl _r || [ -n "${id}" ]; do
+    id="$(tr -d '[:space:]' <<< "${id}")"; sl="$(tr -d '[:space:]' <<< "${sl}")"
+    case "${id}" in ''|'#'*) continue ;; esac
+    nid["${id}"]=$(( ${nid["${id}"]:-0} + 1 ))
+    [ -n "${sl}" ] || continue
+    sl="$(_own_slug_norm "${sl}")"; nsl["${sl}"]=$(( ${nsl["${sl}"]:-0} + 1 ))
+  done < "${OWN_PRIVATE}"
   while IFS=$'\t' read -r id sl os lp _r || [ -n "${id}" ]; do
     id="$(tr -d '[:space:]' <<< "${id}")"; sl="$(tr -d '[:space:]' <<< "${sl}")"; os="$(tr -d '[:space:]' <<< "${os}")"
     lp="$(tr -d '[:space:]' <<< "${lp:-}")"
@@ -95,9 +105,15 @@ _own_private_tsv() {  # $1 = members_tsv
     if [ -z "${mk:-}" ]; then OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}': membro inexistente no registro, ignorada"; continue; fi
     if [ "${mk}" != adopter ] || [ "${mr}" != "n/a" ]; then OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}': o membro não é o neutro (kind: adopter, remote: n/a), ignorada"; continue; fi
     if [ -z "${os}" ] || { [ "${mo}" != "-" ] && [ "${mo}" != "${os}" ]; }; then OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}': owner_session vazia ou diferente da do registro, ignorada"; continue; fi
-    case "${seen}" in *" ${id} "*) OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}' repetida: ambígua, ignorada"; continue ;; esac
-    seen="${seen}${id} "
+    if [ "${nid["${id}"]:-0}" -gt 1 ]; then
+      case "${did}" in *" ${id} "*) ;; *) did="${did}${id} "; OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}' repetida: ambígua, todas as cópias ignoradas" ;; esac
+      continue
+    fi
     sl="$(_own_slug_norm "${sl}")"
+    if [ -n "${sl}" ] && [ "${nsl["${sl}"]:-0}" -gt 1 ]; then
+      case "${dslug}" in *" ${id} "*) ;; *) dslug="${dslug}${id} "; OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}': o slug dela aparece em mais de uma linha (ambíguo para a catraca), ignorada" ;; esac
+      continue
+    fi
     # a pasta vem da 4ª coluna OPCIONAL (a catraca lê só as 3 primeiras); sem ela, desconhecida («-»): nunca adivinhada
     # pelo nome do slug, porque o clone pode ter outro nome. Relativa é sob --home.
     # Sem ela, vale o local_path do membro neutro, se ele tiver um.
@@ -105,10 +121,7 @@ _own_private_tsv() {  # $1 = members_tsv
     case "${lp}" in /*) lp="$(realpath -m -- "${lp}")" ;; esac
     rows="${rows}${id}"$'\t'"adopter"$'\t'"${os}"$'\t'"${sl}"$'\t'"${lp}"$'\n'
   done < "${OWN_PRIVATE}"
-  # o MESMO slug em duas linhas é ambíguo para a catraca (_pmv_private_row recusa): aqui as duas saem, ditas pelo id
-  local dup; dup="$(awk -F'\t' 'NF { n[$4]++; ids[$4] = ids[$4] " " $1 } END { for (k in n) if (n[k] > 1) print ids[k] }' <<< "${rows}" | tr '\n' ' ')"
-  [ -z "${dup// /}" ] || OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linhas privadas${dup% } com o mesmo slug: ambíguas, ignoradas"
-  awk -F'\t' 'NF { n[$4]++; r[NR] = $0; s[NR] = $4 } END { for (i = 1; i <= NR; i++) if ((i in r) && n[s[i]] == 1) print r[i] }' <<< "${rows}"
+  printf '%s' "${rows}"
 }
 
 # a tabela de posse, no shell corrente → OWN_TBL: members (via=members.yaml) + privada (via=privada). Colunas:
