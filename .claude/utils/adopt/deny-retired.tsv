@@ -2,8 +2,25 @@
 # `--update`, só as exatas desta lista; o `deny-monotonic.sh` não conta a retirada como regra perdida.
 # Colunas, separadas por TAB: regra exata · data · motivo. Linha com # é comentário.
 #
-# Vazia por decisão: nenhuma regra foi aposentada até agora. Mover uma regra do deny para cá é o caminho de tirá-la do adotante,
-# porque o deny da fonte só soma.
+# Mover uma regra do deny para cá é o caminho de tirá-la do adotante, porque o deny da fonte só soma.
+# 2026-11-20 (fix/deny-force-refspec-1120): as 16 regras `git clean` com `*` no MEIO barravam a simulação (`git clean -n -x`).
+# Cada uma foi trocada pela forma com o grupo destrutivo como 1º argumento, e a ordem livre passou ao hook pretooluse-protect-main.sh.
 #
 # LIMITE: a comparação é por texto. Regra que o adotante escreveu com o MESMO texto de uma aposentada também sai.
 # Linha malformada é ignorada com aviso (deny-retired-list.sh). Regra listada que a fonte ainda traz fica no alvo, com aviso.
+Bash(git clean* -x*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -x*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -fx*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -fx*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -fdx*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -fdx*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -dfx*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -dfx*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -dx*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -dx*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -X*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -X*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -fX*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -fX*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -fdX*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -fdX*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -dfX*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -dfX*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -dX*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -dX*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -ffx*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -ffx*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -ffdx*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -ffdx*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -ffX*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -ffX*) e o hook pretooluse-protect-main.sh
+Bash(git clean* -ffdX*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -ffdX*) e o hook pretooluse-protect-main.sh
+Bash(git -* clean * -x*)	2026-11-20	o * do meio casa -n e barrava a simulação; a forma git -* clean -x* segue, e a ordem livre é do hook pretooluse-protect-main.sh
+Bash(git -* clean * -X*)	2026-11-20	o * do meio casa -n e barrava a simulação; a forma git -* clean -X* segue, e a ordem livre é do hook pretooluse-protect-main.sh

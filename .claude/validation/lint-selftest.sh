@@ -10486,6 +10486,28 @@ PY
   _case "protect-main: printf de '+main' → passa"         0 "${pm}" feat "printf '%s' 'git push origin +main'"
   _case "merge-gate: B=feat; push \$B → passa"             0 "${mg}" feat 'B=feat; git push origin $B'
   _case "protect-main: force de feature por +ref → passa"  0 "${pm}" feat 'git push origin +feat'
+  # ── git clean que apaga ignorado sem simulação (fix/deny-force-refspec-1120) ──
+  # O deny nativo barrava `git clean -n -x` (o `*` do meio de `git clean* -x*` casa o -n; medido no motor real 2.1.329)
+  # e ficou só com o grupo destrutivo como 1º argumento. A ordem livre é julgada aqui, por token, e a simulação passa.
+  local _PM=pretooluse-protect-main.sh
+  _pvmut "(cl1) protect-main: git clean -f -d -x (ordem livre, fora do deny) → VETO" 2 "${_PM}" feat \
+    'git clean -f -d -x' "${_PM}" 'if clean_destroys_ignored <<< "$inv" \' 'if false && clean_destroys_ignored <<< "$inv" \'
+  _pvmut "(cl2) protect-main: git clean -n -x (simulação) → passa" 0 "${_PM}" feat \
+    'git clean -n -x' "${_PM}" 'if (c == "n") n = 1' 'if (c == "n") n = 0'
+  _pvmut "(cl3) protect-main: git clean --dry-run -fdx → passa" 0 "${_PM}" feat \
+    'git clean --dry-run -fdx' "${_PM}" 'index("--dry-run", nm) == 1) n = 1' 'index("--dry-run", nm) == 1) n = 0'
+  _pvmut "(cl4) protect-main: -e<padrão> colado não é flag (git clean -fd -exlog) → passa" 0 "${_PM}" feat \
+    'git clean -fd -exlog' "${_PM}" 'if (j == length(t)) skip = 1; break }' 'if (j == length(t)) skip = 1 }'
+  _case "protect-main: git clean -e keep -fdx → VETO"            2 "${pm}" feat 'git clean -e keep -fdx'
+  _case "protect-main: git -C . clean -f -X → VETO"              2 "${pm}" feat 'git -C . clean -f -X'
+  _case "protect-main: bash -c \"git clean -f -d -x\" → VETO"    2 "${pm}" feat 'bash -c "git clean -f -d -x"'
+  _case "protect-main: -n anulado por --no-dry-run → VETO"       2 "${pm}" feat 'git clean -n --no-dry-run -x'
+  _case "protect-main: git clean -f -n -x → passa"               0 "${pm}" feat 'git clean -f -n -x'
+  _case "protect-main: git clean -nx → passa"                    0 "${pm}" feat 'git clean -nx'
+  _case "protect-main: git clean -fd (sem -x) → passa"           0 "${pm}" feat 'git clean -fd'
+  _case "protect-main: -x depois de -- é caminho → passa"        0 "${pm}" feat 'git clean -fd -- -x'
+  _case "protect-main: git log --grep 'clean -x' → passa"        0 "${pm}" feat "git log --grep 'git clean -x'"
+  _case "protect-main: cherry-pick cleanup -x → passa"           0 "${pm}" feat 'git cherry-pick cleanup -x'
   # ── os 5 falsos positivos que a REEXECUÇÃO dos 12.268 comandos reais pegou na 1ª versão desta lib ──
   _case "merge-gate: \$( com aspas e parênteses dentro → passa" 0 "${mg}" feat $'f=x; echo "n: $(grep -c \'REGRA 65 (\' $f) m: $(printf \'%s\' "$o" | grep -c \'y\')"; git push origin feat'
   _case "merge-gate: xargs gh run view (leitura) → passa"  0 "${mg}" feat "gh run list --json databaseId -q '.[0].databaseId' | xargs -I{} gh run view {} --log-failed"
@@ -10699,6 +10721,8 @@ PY
   _casen "(np-pm-plus) protect-main: +main → FECHA"              2 "${pm}" feat 'git push origin +main'
   _casen "(np-pm-push) protect-main: push sem force → passa"     0 "${pm}" feat 'git push origin feat'
   _casen "(np-pm-ls) protect-main: ls → passa"                   0 "${pm}" feat 'ls -la'
+  _casen "(np-pm-clean) protect-main: git clean -f -d -x → FECHA" 2 "${pm}" feat 'git clean -f -d -x'
+  _casen "(np-pm-clean-n) protect-main: git clean -n -x → passa" 0 "${pm}" feat 'git clean -n -x'
   _casen "(np-mg-merge) merge-gate: gh pr merge → FECHA"         2 "${mg}" feat 'gh pr merge 1 --rebase'
   _casen "(np-mg-push) merge-gate: git push origin main → FECHA" 2 "${mg}" feat 'git push origin main'
   _casen "(np-mg-api) merge-gate: gh api …/merge → FECHA"        2 "${mg}" feat 'gh api -X PUT repos/o/r/pulls/1/merge'
@@ -54850,7 +54874,67 @@ run_update_base_and_deny_selftests() {
   _ub_adv "{\"sandbox\":{\"enabled\":true,\"filesystem\":{\"allowRead\":[\"${HOME}/.config/gh/hosts.yml\"]}},\"permissions\":{\"deny\":[\"Read(~/.config/gh/hosts.yml)\"]}}" "https://github.com/o/r.git" ""; out="$(bash "${adv}" "${A}" 2>&1)"
   if ! grep -q 'FALTA allowRead' <<< "${out}"; then record_pass "update-base-deny: (a12) allowRead com o home expandido cobre"
   else record_fail "update-base-deny: (a12)" "${out}"; fi
-  rm -rf "${d}"; unset -f _ub_git _ub_setup _ub_dm _ub_merge _ub_machine _ub_adv
+  # ── (fr) o deny REAL do core contra refspec com `+` e contra a simulação do clean (fix/deny-force-refspec-1120) ──
+  # `git push origin +main` força sem flag e escapava das regras de push forçado; `git clean* -x*` barrava `git clean -n -x`.
+  # O juiz aqui é uma EMULAÇÃO do glob do Claude Code (`*` casa qualquer coisa, espaço inclusive; aspas saem; cada
+  # subcomando de && ; | é julgado só). Quem prova que ela bate com o motor é ops/testing/permissions-deny-bench.py
+  # (D61-D66, N19-N27, C09-C12, L41-L45, medido no 2.1.329); aqui a emulação guarda a LISTA contra regressão no CI.
+  _fr_judge() {  # <settings.json> <casos: esperado TAB comando> → linhas que divergem
+    python3 -I - "$1" "$2" <<'PY'
+import json, re, sys
+deny = [r[5:-1] for r in json.load(open(sys.argv[1]))["permissions"]["deny"] if r.startswith("Bash(")]
+rx = [re.compile("^" + ".*".join(re.escape(p) for p in r.split("*")) + "$", re.S) for r in deny]
+for line in open(sys.argv[2]):
+    want, cmd = line.rstrip("\n").split("\t", 1)
+    subs = [s.strip() for s in re.split(r"&&|\|\||;|\|", cmd.replace('"', "").replace("'", ""))]
+    got = "deny" if any(x.match(s) for s in subs for x in rx) else "pass"
+    if got != want:
+        print(f"{cmd} → {got} (esperado {want})")
+PY
+  }
+  local frc="${d}/fr-cases.tsv" frs="${REPO_ROOT}/.claude/settings.json"
+  printf '%s\t%s\n' deny 'git push origin +main' deny 'git push origin +HEAD:main' deny 'git push origin +refs/heads/x:refs/heads/y' \
+    deny 'git -C . push +feat/x' deny 'git -c a.b=c push origin +feat/x' deny "git push origin '+main'" \
+    deny 'git push --force origin feat/x' deny 'git clean -fdx' deny 'git clean -x' deny 'git -C . clean -fdX' deny 'cd sub && git clean -fdx' \
+    pass 'git push origin feat/x' pass 'git push origin v1.0.0+build1' pass 'git commit -m "fix +x" && git push origin feat/x' \
+    pass 'git log --grep "+main"' pass 'git clean -n -x' pass 'git clean --dry-run -x' pass 'git clean -n -fdx' pass 'git clean -f -n -x' \
+    pass 'git -C . clean -n -x' pass 'git -C . clean --dry-run -fdX' pass 'git clean -nx' > "${frc}"
+  out="$(_fr_judge "${frs}" "${frc}" 2>&1)"
+  if [ -z "${out}" ]; then record_pass "update-base-deny: (fr1) o deny do core barra o refspec com + e deixa passar a simulação do clean"
+  else record_fail "update-base-deny: (fr1) deny do core" "${out}"; fi
+  # (fr1-MUT) sem a regra `git push* +*` o `+main` volta a passar; com `git clean* -x*` de volta o `-n -x` volta a cair
+  jq '.permissions.deny -= ["Bash(git push* +*)"]' "${frs}" > "${d}/fr-m1.json"
+  out="$(_fr_judge "${d}/fr-m1.json" "${frc}" 2>&1)"
+  if grep -qF 'git push origin +main → pass' <<< "${out}"; then record_pass "update-base-deny: (fr1-MUT) sem Bash(git push* +*) o +main passa — a regra é load-bearing"
+  else record_fail "update-base-deny: (fr1-MUT) push +" "o mutante não soltou o +main: ${out:-nada divergiu}"; fi
+  jq '.permissions.deny += ["Bash(git clean* -x*)"]' "${frs}" > "${d}/fr-m2.json"
+  out="$(_fr_judge "${d}/fr-m2.json" "${frc}" 2>&1)"
+  if grep -qF 'git clean -n -x → deny' <<< "${out}"; then record_pass "update-base-deny: (fr1-MUT) com Bash(git clean* -x*) de volta a simulação cai — a troca é load-bearing"
+  else record_fail "update-base-deny: (fr1-MUT) clean -n" "o mutante não barrou a simulação: ${out:-nada divergiu}"; fi
+  # (fr2) o adotante que tem a regra velha a perde no merge, recebe a nova, e o deny-monotonic nomeia a retirada
+  local frt='{"permissions":{"deny":["Bash(git clean* -x*)","Bash(git -* clean * -X*)","Bash(crontab *)"]},"hooks":{}}'
+  printf '%s\n' "${frt}" > "${d}/fr-alvo.json"
+  out="$(bash "${mh}" "${frs}" "${d}/fr-alvo.json" 2>/dev/null)"
+  if [ "$(jq '[.permissions.deny[] | select(. == "Bash(git clean* -x*)" or . == "Bash(git -* clean * -X*)")] | length' <<< "${out}")" = 0 ] \
+     && jq -e '.permissions.deny | index("Bash(git push* +*)") and index("Bash(git clean -x*)") and index("Bash(crontab *)")' <<< "${out}" >/dev/null; then
+    record_pass "update-base-deny: (fr2) merge tira do adotante as regras do clean aposentadas, soma as novas e mantém as dele"
+  else record_fail "update-base-deny: (fr2) merge" "deny resultante: $(jq -c '.permissions.deny' <<< "${out}" 2>&1 | head -c 600)"; fi
+  # (fr2-MUT) sem as linhas no deny-retired.tsv a regra velha fica no adotante (a lista é quem retira)
+  local frm="${d}/fr-adopt"; mkdir -p "${frm}"; cp "${REPO_ROOT}/.claude/utils/adopt/"*.sh "${REPO_ROOT}/.claude/utils/adopt/deny-retired.tsv" "${frm}/"
+  sed -i '/^Bash(git clean\* -x\*)\t/d' "${frm}/deny-retired.tsv"
+  out="$(bash "${frm}/merge-onion-hooks.sh" "${frs}" "${d}/fr-alvo.json" 2>/dev/null)"
+  if cmp -s "${frm}/deny-retired.tsv" "${REPO_ROOT}/.claude/utils/adopt/deny-retired.tsv"; then record_fail "update-base-deny: (fr2-MUT)" "o sed não tirou a linha da lista (âncora mudou)"
+  elif jq -e '.permissions.deny | index("Bash(git clean* -x*)")' <<< "${out}" >/dev/null; then
+    record_pass "update-base-deny: (fr2-MUT) sem a linha na lista a regra velha fica no adotante — a retirada é load-bearing"
+  else record_fail "update-base-deny: (fr2-MUT)" "a regra saiu mesmo sem a linha na lista: $(jq -c '.permissions.deny' <<< "${out}" | head -c 400)"; fi
+  # (fr3) deny-monotonic: a ponta da integração tem a regra velha, o head do update não — retirada declarada, rc 0
+  rm -rf "${d}/frg"; git init -q -b main "${d}/frg"; mkdir -p "${d}/frg/.claude"; printf '%s\n' "${frt}" > "${d}/frg/.claude/settings.json"
+  _ub_git "${d}/frg" add -A; _ub_git "${d}/frg" commit -qm base
+  bash "${mh}" "${frs}" "${d}/frg/.claude/settings.json" > "${d}/frg/.claude/settings.json.new" 2>/dev/null && mv "${d}/frg/.claude/settings.json.new" "${d}/frg/.claude/settings.json"
+  rc=0; out="$(bash "${dm}" "${d}/frg" main 2>&1)" || rc=$?
+  if [ "${rc}" = 0 ] && grep -qF '~ Bash(git clean* -x*)' <<< "${out}"; then record_pass "update-base-deny: (fr3) deny-monotonic nomeia a retirada do clean e não reprova"
+  else record_fail "update-base-deny: (fr3) deny-monotonic" "rc=${rc}: ${out:0:500}"; fi
+  rm -rf "${d}"; unset -f _ub_git _ub_setup _ub_dm _ub_merge _ub_machine _ub_adv _fr_judge
 }
 _family run_update_base_and_deny_selftests
 
