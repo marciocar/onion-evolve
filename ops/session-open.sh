@@ -25,6 +25,10 @@
 #   · PREFLIGHT na abertura: «este repo merja sozinho? sim|não, e por quê», pela parte estática da catraca do
 #     ops/pr-merge-verified.sh, lida pelo ownership.sh (sem reimplementar aqui).
 #   · O tmux NÃO sobrevive a reboot: depois de um, `--all` reabre as sessões donas do registro, cada uma pelo seu id.
+#     O core (kind: source, sem owner_session) fica FORA do --all por desenho deste passo: ele é quem roda o abridor;
+#     abre-se à mão (`session-open.sh core`). Entrar no --all é decisão do maestro (2º passo da migração).
+#   · A lista de peers do harness é obrigatória para CRIAR: a sessão de fundo não aparece no /proc como `claude`, e só a
+#     lista diz que ela está viva neste checkout ou que o id já roda noutro lugar. Sem a lista, recusa (rc 3).
 #
 # Saída: 0 abriu/anexou/ensaiou · 2 uso ou pasta inválida · 3 recusa (sessão viva: duplicaria) · 4 tmux ou claude
 # ausente · 5 id não resolvido (ambíguo, ou nenhum sem --new).
@@ -69,7 +73,9 @@ while [ $# -gt 0 ]; do
   shift
 done
 [ -z "${RESUME}" ] || [ "${NEW}" -eq 0 ] || die "--resume e --new se excluem"
-[ -z "${RESUME}" ] || [[ "${RESUME}" =~ ^[A-Za-z0-9][A-Za-z0-9-]{7,63}$ ]] || die "id de sessão inválido: «${RESUME}»"
+ID_RE='^[A-Za-z0-9][A-Za-z0-9-]{7,63}$'
+[ -z "${RESUME}" ] || [[ "${RESUME}" =~ ${ID_RE} ]] || die "id de sessão inválido: «${RESUME}»"
+case "${MODE}" in ''|default|acceptEdits|plan|auto|dontAsk|bypassPermissions) ;; *) die "--mode fora da lista (default, acceptEdits, plan, auto, dontAsk, bypassPermissions): «${MODE}»" ;; esac
 
 valid_name() { [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]; }
 
@@ -133,7 +139,18 @@ resolve_id() {
   local n="$1" dir="$2" hits ids cnt enc f t m best="" bestm=0 second=0 nhit=0
   RID="" RID_SRC=""
   if PEERS="$(peers_tsv)"; then PEERS_NOTE=""
-  else PEERS=""; PEERS_NOTE="a lista de peers do harness (claude agents --json) não foi lida: só os transcripts"; fi
+  else
+    # sem a lista não se vê sessão de fundo (o processo dela não se chama claude no /proc) nem id vivo noutro lugar
+    say "session-open: não li a lista de peers do harness (${CLAUDE_BIN} agents --json): sem ela não sei se há sessão de fundo neste checkout ou se o id já está vivo noutro lugar. Não abro às cegas." >&2; return 3
+  fi
+  # nunca duas sessões no mesmo checkout: peer VIVO (qualquer nome) com o cwd nesta pasta. A sessão de fundo não aparece
+  # no /proc como `claude` (o processo leva o nome da versão), então o /proc sozinho não a vê.
+  local s k st p nm cw
+  while IFS=$'\t' read -r s k st p nm cw; do
+    [ -n "${s}" ] && [ "${cw}" != "-" ] || continue
+    [ "$(realpath -m -- "${cw}")" = "${dir}" ] || continue
+    peer_live "${k}" "${st}" && { say "session-open: a sessão «${nm}» (id ${s}, ${k}/${st}) já está viva neste checkout (${dir}): nunca duas sessões no mesmo checkout. Entre nela, ou abra a 2ª numa worktree (claude --worktree)." >&2; return 3; }
+  done <<< "${PEERS}"
   if [ -n "${RESUME}" ]; then RID="${RESUME}"; RID_SRC="--resume"
   else
     hits="$(awk -F'\t' -v n="${n}" '$5 == n' <<< "${PEERS}")"
@@ -162,6 +179,8 @@ resolve_id() {
       RID="$(basename "${best}" .jsonl)"; RID_SRC="transcript mais recente com o título «${n}» ($(date -u -d "@${bestm}" +%Y-%m-%dT%H:%MZ 2>/dev/null || echo "${bestm}"))"
     fi
   fi
+  # o id resolvido vem de fora (harness, nome de arquivo): só entra no comando se tiver a forma de id
+  [[ "${RID}" =~ ${ID_RE} ]] || { say "session-open: o id resolvido para «${n}» não tem a forma de id de sessão («${RID}»): não o ponho no comando." >&2; return 5; }
   # o id escolhido não pode estar vivo noutro lugar (outro nome, outra pasta): a cópia escreveria no mesmo histórico
   hits="$(awk -F'\t' -v s="${RID}" '$1 == s' <<< "${PEERS}")"
   if [ -n "${hits}" ]; then
@@ -205,6 +224,7 @@ open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a 
   if [ -z "${dir}" ]; then loc="$(locate "${n}")" || exit $?; IFS=$'\t' read -r n dir key <<< "${loc}"
   else key="${n}"; fi
   valid_name "${n}" || die "nome de sessão inválido no registro: «${n}»"
+  dir="$(realpath -m -- "${dir}")"   # o /proc dá o cwd canônico: barra final ou `..` no registro furariam a comparação
   [ -d "${dir}/.git" ] || [ -f "${dir}/.git" ] || die "«${dir}» não é um repositório git: o nome da sessão é o nome do repo"
 
   preflight "${key}"
@@ -234,13 +254,13 @@ open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a 
     [ -z "${PEERS_NOTE}" ] || say "session-open: ℹ️  ${PEERS_NOTE}"
     case "${rc}" in
       0) say "session-open: retomo «${n}» pelo id exato ${RID} (fonte: ${RID_SRC})."
-         cmd="${CLAUDE_BIN} --resume ${RID}" ;;
+         cmd="$(printf '%q --resume %q' "${CLAUDE_BIN}" "${RID}")" ;;
       1) [ "${NEW}" -eq 1 ] || die "não achei sessão com o nome «${n}» (harness e transcripts de ${dir}): para abrir uma NOVA, rode de novo com --new; para retomar outra, --resume <id>. Nunca --continue." 5
          say "session-open: nenhuma sessão «${n}» achada; abro NOVA (--new)."
-         cmd="${CLAUDE_BIN} --name ${n}" ;;
+         cmd="$(printf '%q --name %q' "${CLAUDE_BIN}" "${n}")" ;;
       *) exit "${rc}" ;;
     esac
-    [ -n "${MODE}" ] && cmd="${cmd} --permission-mode ${MODE}"
+    [ -n "${MODE}" ] && cmd="${cmd} --permission-mode $(printf '%q' "${MODE}")"
     # o canal da campainha só entra onde o repo a declara
     if [ -f "${dir}/.mcp.json" ] && grep -q '"doorbell"' "${dir}/.mcp.json"; then
       cmd="${cmd} --dangerously-load-development-channels server:doorbell"

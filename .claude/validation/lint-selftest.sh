@@ -60729,7 +60729,7 @@ SO_TMUX
     [ "${r%%$'\t'*}" = 0 ] && grep -qF "ensaio: ${sb}/tmux new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --resume 11111111-aaaa'" <<< "${r}" \
       && grep -qF 'pelo id exato 11111111-aaaa (fonte: transcript' <<< "${r}" && ! grep -qE -- '--continue|server:doorbell' <<< "${r}"; }
   _so_case "(a) cria: retoma pelo id exato do transcript, nunca --continue, sem doorbell sem .mcp.json" _so_a \
-    'cmd="${CLAUDE_BIN} --resume ${RID}" ;;' 'cmd="${CLAUDE_BIN} --continue" ;;'
+    'cmd="$(printf '\''%q --resume %q'\'' "${CLAUDE_BIN}" "${RID}")" ;;' 'cmd="${CLAUDE_BIN} --continue" ;;'
   # (a2) repo com .mcp.json que declara doorbell: o ensaio carrega o canal server:doorbell
   printf '{ "mcpServers": { "doorbell": {} } }\n' > "${HM}/myrepo/.mcp.json"
   _so_a2() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
@@ -60766,7 +60766,7 @@ SO_TMUX
   _so_k() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-live.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'já está viva' <<< "${r}" && ! grep -q 'new-session' "${sb}/tlog"; }
   _so_case "(k) sessão com o nome viva no harness: recusa rc 3, sem cópia" _so_k \
-    'peer_live "${k}" "${st}" && { say "session-open: a sessão' 'false && { say "session-open: a sessão'
+    'peer_live "${k}" "${st}" && { say "session-open: a sessão «${n}» já está viva' 'false && { say "session-open: a sessão «${n}» já está viva'
   # (l) o id resolvido pelo transcript está VIVO com outro nome: recusa rc 3 (a cópia escreveria no mesmo histórico)
   printf '[{"kind":"interactive","sessionId":"11111111-aaaa","name":"outro-nome","pid":4242,"cwd":"/x/y"}]' > "${sb}/agents-id.json"
   _so_l() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-id.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
@@ -60887,7 +60887,7 @@ SO_TMUX
     "    if [ \"\${mk}\" != adopter ] || [ \"\${mr}\" != \"n/a\" ]; then" "    if true; then"
   # (q) PARIDADE com a catraca: a busca no registro do ownership.sh (`row`) dá o MESMO «kind<TAB>owner_session» que o awk
   #     do _own_repo_gate, EXTRAÍDO do ops/pr-merge-verified.sh (core-only) e rodado sobre o mesmo registro, para cada slug
-  printf 'members:\n  - id: s\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: a\n    kind: adopter\n    owner_session: "sa"   # dona\n    remote: https://github.com/Onion-Bancada/A.git (privado)\n  - id: b\n    kind: adopter\n    remote: github.com/onion-bancada/b\n  - id: d\n    kind: door\n    owner_session: sd\n    remote: https://www.github.com/onion-bancada/d/\n  - id: x\n    kind: adopter\n    owner_session: sx#c\n    remote: github.com/onion-bancada/x\n' > "${sb}/par.yaml"
+  printf 'members:\n  - id: s\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: a\n    kind: adopter\n    owner_session: "sa"   # dona\n    remote: https://github.com/Onion-Bancada/A.git (privado)\n  - id: b\n    kind: adopter\n    remote: github.com/onion-bancada/b\n  - id: d\n    kind: door\n    owner_session: sd\n    remote: https://www.github.com/onion-bancada/d/\n  - id: x\n    kind: adopter\n    owner_session: sx#c\n    remote: github.com/onion-bancada/x\n  - id: qk\n    kind: "source"\n    owner_session: sq\n    remote: github.com/onion-bancada/qk\n' > "${sb}/par.yaml"
   _so_q() {  # $1 = o leitor sob teste
     [ -f "${pmv}" ] || { SO_WHY="pr-merge-verified.sh ausente"; return 1; }
     local prog s a b ok=0
@@ -60897,7 +60897,7 @@ s = open(sys.argv[1], encoding="utf-8").read()
 g = s.index("_own_repo_gate() {"); a = s.index("_row=\"$(awk -v want=\"${_t}\" '"'"'", g) + len("_row=\"$(awk -v want=\"${_t}\" '"'"'")
 b = s.index("'"'"' <<< \"${_m}\")\"", a)
 print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="não extraí o awk da catraca"; return 1; }
-    for s in onion-bancada/core onion-bancada/a onion-bancada/b onion-bancada/d onion-bancada/x onion-bancada/nada; do
+    for s in onion-bancada/core onion-bancada/a onion-bancada/b onion-bancada/d onion-bancada/x onion-bancada/qk onion-bancada/nada; do
       a="$(awk -v want="${s}" "${prog}" < "${sb}/par.yaml")"
       b="$(ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista.tsv" bash "$1" row "${s}" --members "${sb}/par.yaml")"
       [ "${a}" = "${b}" ] || { ok=1; SO_WHY="${SO_WHY:-}${s}: catraca «${a}» ≠ leitor «${b}»|"; }
@@ -60908,6 +60908,55 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   _so_case_own "(q) paridade: a busca do leitor dá o mesmo kind/owner_session que o awk extraído da catraca" _so_qr \
     'sub(/[[:space:]]*\(.*$/, "", v); gsub(/["'\''"'\''"'\'' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v)' \
     'gsub(/["'\''"'\''"'\'' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v)'
+  # ── 1ª passada adversarial (revisor isolado, 2026-11-20): cada achado vira caso com mutante ──────────────────────
+  # registro variante: o membro neutro COM local_path (forma real de membros neutros), um 2º neutro, e o myrepo por um
+  # caminho com `..` (o /proc dá o canônico)
+  printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: m-my\n    kind: adopter\n    owner_session: myrepo\n    remote: github.com/onion-bancada/myrepo\n    local_path: %s/sub/../myrepo\n  - id: m-priv\n    kind: adopter\n    remote: n/a\n    local_path: %s/repoP\n  - id: m-priv2\n    kind: adopter\n    remote: n/a\n    local_path: n/a\n' "${HM}" "${HM}" > "${sb}/members-lp.yaml"
+  # (o5) slug privado de OUTRO dono: o preflight diz não SEM o dono do slug (leva o nome do cliente), como a catraca
+  printf 'm-priv\toutro-cliente/x\tpriv-sess\trepoP\n' > "${sb}/priv-fora.tsv"; chmod 600 "${sb}/priv-fora.tsv"
+  _so_o5() { local r; r="$(SO_TSESS="" SO_PRIV="${sb}/priv-fora.tsv" _so_run "$1" priv-sess --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -qF 'merja sozinho? não: m-priv é de outro dono:' <<< "${r}" && ! grep -q 'outro-cliente' <<< "${r}"; }
+  _so_case_own "(o5) slug privado de outro dono: não, sem imprimir o dono do slug" _so_o5 \
+    '"$([ "${via}" = privada ] || printf '\'' (%s)'\'' "${rem%%/*}")"' '" (${rem%%/*})"'
+  # (o6) membro neutro COM local_path: a linha privada substitui a do registro; o nome da pasta casa uma vez só
+  _so_o6() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-lp.yaml" SO_PRIV="${sb}/priv-ok.tsv" _so_run "$1" repoP --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'new-session -d -s priv-sess' <<< "${r}" && grep -qF 'merja sozinho? sim: m-priv' <<< "${r}"; }
+  _so_case_own "(o6) neutro com local_path: a linha privada substitui a do registro (sem ambiguidade)" _so_o6 \
+    '!($6 == "members.yaml" && ($1 in p))'\'' <(' '1'\'' <('
+  # (g5) o MESMO slug em duas linhas privadas: ambíguo para a catraca, então nenhuma vale aqui
+  printf 'm-priv\tonion-bancada/dup\tpriv-sess\trepoP\nm-priv2\tonion-bancada/dup\tpriv-two\n' > "${sb}/priv-dup.tsv"; chmod 600 "${sb}/priv-dup.tsv"
+  _so_g5() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-lp.yaml" SO_PRIV="${sb}/priv-dup.tsv" _so_run "$1" priv-sess --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    ! grep -qF 'merja sozinho? sim' <<< "${r}"; }
+  _so_case_own "(g5) slug repetido na lista privada: nenhuma das linhas vale (a catraca recusa)" _so_g5 \
+    'if ((i in r) && n[s[i]] == 1) print r[i]' 'if (i in r) print r[i]'
+  # (d2) local_path com `..`: o dir é canonizado antes de comparar com o cwd do /proc; o claude fora do tmux é visto
+  _so_d2() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-lp.yaml" SO_PROC="${sb}/proc-out" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'FORA do tmux' <<< "${r}"; }
+  _so_case "(d2) caminho do registro não canônico: ainda vê o claude no checkout (rc 3)" _so_d2 \
+    'dir="$(realpath -m -- "${dir}")"   # o /proc' ':   # o /proc'
+  # (k2) sessão de FUNDO viva neste checkout com OUTRO nome (o /proc não a vê como claude): recusa rc 3
+  printf '[{"kind":"background","sessionId":"eeee5555-v","name":"outra","state":"blocked","cwd":"%s/myrepo/"}]' "${HM}" > "${sb}/agents-cwd.json"
+  _so_k2() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-cwd.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'já está viva neste checkout' <<< "${r}" && ! grep -q 'new-session' "${sb}/tlog"; }
+  _so_case "(k2) sessão de fundo viva no checkout com outro nome: recusa rc 3" _so_k2 \
+    '[ "$(realpath -m -- "${cw}")" = "${dir}" ] || continue' 'false || continue'
+  # (s) a lista de peers não se lê: recusa rc 3 (sem ela não se vê sessão de fundo nem id vivo), nunca «nenhum»
+  printf 'garbage' > "${sb}/agents-bad.json"
+  _so_s() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-bad.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não li a lista de peers' <<< "${r}"; }
+  _so_case "(s) lista de peers ilegível: recusa rc 3 (fail-closed)" _so_s \
+    'Não abro às cegas." >&2; return 3' 'Não abro às cegas." >&2; :'
+  # (r) id vindo do harness com metacaractere de shell: nunca entra no comando (rc 5)
+  printf '[{"kind":"background","sessionId":"x;touch PWN #","name":"myrepo","state":"stopped"}]' > "${sb}/agents-inj.json"
+  _so_r() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-inj.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && ! grep -q 'ensaio:' <<< "${r}"; }
+  _so_case "(r) id resolvido com metacaractere: recusa rc 5, nunca no comando" _so_r \
+    '[[ "${RID}" =~ ${ID_RE} ]] || {' 'true || {'
+  # (r2) --mode fora da lista: rc 2 antes de qualquer efeito
+  _so_r2() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run --mode 'x;id')"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 2 ] && grep -qF -- '--mode fora da lista' <<< "${r}"; }
+  _so_case "(r2) --mode fora da lista: rc 2" _so_r2 \
+    'case "${MODE}" in '\'''\''|default' 'case "${MODE}" in *|default'
   rm -rf "${sb}"
 }
 _family run_session_open_selftests
