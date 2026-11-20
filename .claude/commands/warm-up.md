@@ -75,8 +75,8 @@ Estabelecer contexto completo do projeto incluindo:
 - ✅ Sem esta etapa, a sessão sabe *operar* o framework mas não sabe *quem ele é* — perguntas de identidade/persona/site ficam sem resposta
 
 ### 4.6 Aparte do Maestro — canal lateral tipado (side-channel)
-- ✅ Conhecer `docs/knowledge-base/agentic-patterns/harness/maestro-aside.md` — o vocabulário de **marcadores tipados** que o maestro usa no meio da sessão para rotear a intenção (dúvida/correção/lembrete/etapa/memória/pesquisa-paralela) ao mecanismo certo **sem descarrilhar** a tarefa.
-- ✅ Marcadores (no início da mensagem): `dúvida:` `corrige:` `reforço:` `nota:` `guarda:` `+etapa:` `-etapa:` `paralelo:` `guarda-regra:`. O hook `UserPromptSubmit` (`.claude/hooks/aside-router-hook.sh`) injeta a **rota canônica** como recall (nunca gate; os irreversíveis pedem confirmação — Ato 3/W6).
+- ✅ Conhecer `docs/knowledge-base/agentic-patterns/harness/maestro-aside.md` — o vocabulário de **marcadores tipados** que o maestro usa no meio da sessão para rotear a intenção (dúvida/correção/lembrete/etapa/memória/pesquisa-paralela/tarefa pela maquinaria) ao mecanismo certo **sem descarrilhar** a tarefa.
+- ✅ Marcadores (no início da mensagem): `dúvida:` `corrige:` `reforço:` `nota:` `guarda:` `+etapa:` `-etapa:` `paralelo:` `tarefa:` `guarda-regra:`. O hook `UserPromptSubmit` (`.claude/hooks/aside-router-hook.sh`) injeta a **rota canônica** como recall (nunca gate; os irreversíveis pedem confirmação — Ato 3/W6).
 
 ### 5. Co-evolução (se `docs/evolution/` existir)
 - ✅ Reconhecer o papel do repo: `source` (core) · `adopted` (consumidor) — via `.claude/.onion-version` ou `.claude/validation/onion-version.sh`
