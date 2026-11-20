@@ -66,10 +66,11 @@ _own_members_tsv() {
     function val(s, key) { sub("^[[:space:]]*(-[[:space:]]+)?" key ":[[:space:]]*", "", s); sub(/[[:space:]]+#.*$/, "", s); gsub(/["'"'"']/, "", s); sub(/[[:space:]]+$/, "", s); return s }
     function flush() { if (id != "") printf "%s\t%s\t%s\t%s\t%s\n", id, (kind == "" ? "?" : kind), (own == "" ? "-" : own), (rem == "" ? "-" : rem), (lp == "" ? "-" : lp); id = ""; kind = ""; own = ""; rem = ""; lp = "" }
     /^[[:space:]]*-[[:space:]]+id:/ { flush(); id = val($0, "id"); sub(/[[:space:]#].*$/, "", id) }
-    /^[[:space:]]+kind:/ { kind = val($0, "kind"); sub(/[[:space:]#].*$/, "", kind) }
+    # o kind SEM tirar aspas, como a catraca: `kind: "source"` não é source lá, e não pode ser aqui (paridade)
+    /^[[:space:]]+kind:/ { k = $0; sub(/^[[:space:]]+kind:[[:space:]]*/, "", k); sub(/[[:space:]#].*$/, "", k); kind = k }
     /^[[:space:]]+owner_session:/ { own = val($0, "owner_session"); sub(/[[:space:]#].*$/, "", own) }
     /^[[:space:]]+remote:/ { v = $0; sub(/^[[:space:]]+remote:[[:space:]]*/, "", v); rem = norm(v) }
-    /^[[:space:]]+local_path:/ { lp = val($0, "local_path") }
+    /^[[:space:]]+local_path:/ { lp = val($0, "local_path"); if (lp ~ /^\//) { gsub(/\/+/, "/", lp); sub(/\/$/, "", lp) } }
     END { flush() }'
 }
 
@@ -84,13 +85,13 @@ _own_private_tsv() {  # $1 = members_tsv
   if ! [[ "${mode}" =~ ^[0-7]{3,4}$ ]] || [ $(( 8#${mode} & 8#077 )) -ne 0 ]; then
     OWN_PRIV_NOTE="lista privada com modo ${mode:-ilegível}, mais aberto que 600: ignorada (a catraca também a recusa)"; return 0
   fi
-  local id sl os lp _r mk mo mr seen=" "
+  local id sl os lp _r mk mo mr ml seen=" " rows=""
   while IFS=$'\t' read -r id sl os lp _r || [ -n "${id}" ]; do
     id="$(tr -d '[:space:]' <<< "${id}")"; sl="$(tr -d '[:space:]' <<< "${sl}")"; os="$(tr -d '[:space:]' <<< "${os}")"
     lp="$(tr -d '[:space:]' <<< "${lp:-}")"
     case "${id}" in ''|'#'*) continue ;; esac
-    mk="" mo="" mr=""
-    read -r mk mo mr < <(awk -F'\t' -v w="${id}" '$1 == w { print $2, $3, $4; exit }' <<< "$1")
+    mk="" mo="" mr="" ml=""
+    read -r mk mo mr ml < <(awk -F'\t' -v w="${id}" '$1 == w { print $2, $3, $4, $5; exit }' <<< "$1")
     if [ -z "${mk:-}" ]; then OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}': membro inexistente no registro, ignorada"; continue; fi
     if [ "${mk}" != adopter ] || [ "${mr}" != "n/a" ]; then OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}': o membro não é o neutro (kind: adopter, remote: n/a), ignorada"; continue; fi
     if [ -z "${os}" ] || { [ "${mo}" != "-" ] && [ "${mo}" != "${os}" ]; }; then OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linha privada '${id}': owner_session vazia ou diferente da do registro, ignorada"; continue; fi
@@ -99,9 +100,15 @@ _own_private_tsv() {  # $1 = members_tsv
     sl="$(_own_slug_norm "${sl}")"
     # a pasta vem da 4ª coluna OPCIONAL (a catraca lê só as 3 primeiras); sem ela, desconhecida («-»): nunca adivinhada
     # pelo nome do slug, porque o clone pode ter outro nome. Relativa é sob --home.
-    case "${lp}" in ''|-) lp="-" ;; /*) ;; *) lp="${OWN_HOME}/${lp}" ;; esac
-    printf '%s\tadopter\t%s\t%s\t%s\n' "${id}" "${os}" "${sl}" "${lp}"
+    # Sem ela, vale o local_path do membro neutro, se ele tiver um.
+    case "${lp}" in ''|-) lp="-"; case "${ml:-}" in /*) lp="${ml}" ;; esac ;; /*) ;; *) lp="${OWN_HOME}/${lp}" ;; esac
+    case "${lp}" in /*) lp="$(realpath -m -- "${lp}")" ;; esac
+    rows="${rows}${id}"$'\t'"adopter"$'\t'"${os}"$'\t'"${sl}"$'\t'"${lp}"$'\n'
   done < "${OWN_PRIVATE}"
+  # o MESMO slug em duas linhas é ambíguo para a catraca (_pmv_private_row recusa): aqui as duas saem, ditas pelo id
+  local dup; dup="$(awk -F'\t' 'NF { n[$4]++; ids[$4] = ids[$4] " " $1 } END { for (k in n) if (n[k] > 1) print ids[k] }' <<< "${rows}" | tr '\n' ' ')"
+  [ -z "${dup// /}" ] || OWN_PRIV_NOTE="${OWN_PRIV_NOTE:+${OWN_PRIV_NOTE}; }linhas privadas${dup% } com o mesmo slug: ambíguas, ignoradas"
+  awk -F'\t' 'NF { n[$4]++; r[NR] = $0; s[NR] = $4 } END { for (i = 1; i <= NR; i++) if ((i in r) && n[s[i]] == 1) print r[i] }' <<< "${rows}"
 }
 
 # a tabela de posse, no shell corrente → OWN_TBL: members (via=members.yaml) + privada (via=privada). Colunas:
@@ -117,6 +124,9 @@ _own_load() {
       sn = $3; if ($2 == "source" || sn == "-") { sn = $5; sub(/^.*\//, "", sn); if (sn == "-" || sn == "") sn = $1 }
       print $1, $2, $3, sn, $5, "members.yaml", $4 }' <<< "${mt}"
     awk -F'\t' 'BEGIN{OFS="\t"} NF { print $1, $2, $3, $3, $5, "privada", $4 }' <<< "${pt}")"
+  # a linha privada válida SUBSTITUI a do members.yaml do mesmo id (o membro neutro): duas linhas do mesmo membro
+  # fariam o nome ou a pasta casar duas vezes (ambíguo)
+  OWN_TBL="$(awk -F'\t' 'NR == FNR { if (NF) p[$1] = 1; next } !($6 == "members.yaml" && ($1 in p))' <(printf '%s\n' "${pt}") - <<< "${OWN_TBL}")"
 }
 
 # nome ou caminho → a linha da tabela. Nome: «core» é o checkout da fonte; casa owner_session, a pasta do local_path ou
@@ -151,7 +161,8 @@ _own_merge_alone() {  # $1 = linha da tabela → «sim|não<TAB>por quê»
     printf 'não\t%s não tem remote no registro: sem slug, a catraca não o reconhece (só pela lista privada válida)\n' "${id}"; return 1
   fi
   if [ "${rem%%/*}" != "${core_owner}" ]; then
-    printf 'não\t%s é de outro dono (%s): repo de cliente ou de empresa só o dono merja (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)\n' "${id}" "${rem%%/*}"; return 1
+    # o dono do slug PRIVADO nunca sai (leva o nome do cliente), como na catraca (_lown vazio)
+    printf 'não\t%s é de outro dono%s: repo de cliente ou de empresa só o dono merja (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)\n' "${id}" "$([ "${via}" = privada ] || printf ' (%s)' "${rem%%/*}")"; return 1
   fi
   if [ "${kind}" = source ]; then
     if [ "${rem}" != "$(_own_slug_norm "${OWN_CORE_SLUG}")" ]; then
