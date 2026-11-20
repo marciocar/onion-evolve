@@ -309,7 +309,7 @@
         },
         "evidence": {
           "type": "object",
-          "description": "channel=prompt: o prompt_id do payload do hook e o transcript, que o executor relê para confirmar origin.kind=human e promptSource typed|queued.",
+          "description": "channel=prompt: o prompt_id do payload do hook e o transcript, que o executor relê para confirmar origin.kind=human e promptSource typed|queued (no topo, a entrada type=user do prompt_id; no meio do turno, o attachment queued_command dentro do turno do prompt_id, com humanTurn=true).",
           "properties": {
             "prompt_id": {
               "type": "string"
