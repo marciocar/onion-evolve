@@ -134,7 +134,7 @@ fi
 
 ---
 
-## ⚙️ Procedimento de Configuração pós-cópia (idempotente)
+## <a id="procedimento-configuracao-pos-copia"></a>⚙️ Procedimento de Configuração pós-cópia (idempotente)
 
 Usado pela **Fase 3** (install) e pelo **`--update`** — re-aplica os passos install-only que **não** vêm
 na cópia de arquivos (registro de hooks + starter de co-evolução + proteção de formatador). Idempotente:
@@ -552,7 +552,7 @@ fi
   + contextos L1+ + entrada `/onion`·`/warm-up` + **estratégia de branches** (produto vs integração:
   `${INTEGRATION_BRANCH}` é o alvo dos PRs de evolução Onion; ver `.onion-version`).
 - **Configuração pós-cópia** (`settings.json` merge + starter `docs/evolution/`): rodar o
-  [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
+  [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#procedimento-configuracao-pos-copia)
   com `DEST="$INSTALL_DIR"`. Ele **registra os hooks Onion** no `settings.json` do alvo (merge never-clobber,
   incl. o "you have mail") e cria o starter de co-evolução (`inbox/_processed/` + README-ponteiro). Os
   *scripts* dos hooks já vieram via `.claude/hooks/` (manifesto da Fase 2); o **registro** é o passo (1) do
@@ -756,7 +756,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   resolve (`git mergetool`/marcadores + `git commit`) **antes** de seguir; **exit 0** = framework atualizado
   limpo, ou conflito SÓ em projeção gerada (`regen-ssot-projections.sh --list-outputs`), que o helper regenera, commita e declara; **exit 12** = arquivo do core NÃO chegou à vendor (ex.: `.gitignore` cobrindo `.claude/`) — nada mergeado, PARE; **exit 13** = a `onion/vendor` REMOTA não é ancestral da local (outro clone a moveu) ou o push foi recusado por não-ff — nada mergeado, nada forçado, PARE e siga a dica do helper; **exit 14** = remota ilegível, push que falha ou conferência por `ls-remote` que não bate — nada mergeado, PARE. Com **consentimento registrado no core** (`vendor_push: true` no membro do `members.yaml` de `origin/main` do core (papel source), cujo `remote` tem de ser TODA URL de push do remoto efetivo da vendor, só https://, ssh:// ou scp; membro achado pelo `local_path`, senão pelo `remote`, e remote dividido sem consentimento de todos recusa; sem ele, nada é lido nem empurrado e a linha diz "não empurrada: sem consentimento registrado" com o comando), a remota anda por **fast-forward** junto com a local, antes do merge, lida e conferida pela URL de push, e a linha `onion/vendor remota (<remoto>): <de> → <para>` vai inteira ao relatório (seção "Arquivos aplicados"); remoto sem a branch não ganha a branch (a linha diz o comando), e `ONION_VENDOR_PUSH=0` desliga, declarado. Os commits do helper levam `Claude-Session:` abaixo da assinatura só quando a sessão é conhecida (`session-trailer.sh`: `ONION_CLAUDE_SESSION_URL` ou o id da sessão ligada ao claude.ai); sem ela saem sem a linha, e a nota é dita. (Adotante legado sem `onion/vendor` → o helper o **semeia** antes de mergear.) `.env.example` segue
   o never-clobber por-arquivo (grava `.env.example.onion` se o alvo já tem) — fora do merge, específico do alvo.
-- **Re-aplicar a configuração install-only** via o [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
+- **Re-aplicar a configuração install-only** via o [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#procedimento-configuracao-pos-copia)
   (`DEST="$WORK"`). **Crítico:** sem isto, um adotante com
   `settings.json` próprio recebe os *scripts* dos hooks (no manifesto acima) mas **não** o registro → o
   "you have mail" não dispara. O Procedimento faz o merge idempotente do `settings.json` + garante o

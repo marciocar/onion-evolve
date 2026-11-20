@@ -35,7 +35,7 @@ Use `updateStatus(taskId, ...)` via adapter quando o evento muda o estado da tas
 ## 📈 % de progresso da task-mãe (derivado, nunca à mão)
 
 O % da task com subtasks é a **derivação `progress`** da interface
-([`interface.md`](../../../utils/task-manager/interface.md#derivação-progress--o--da-task-mãe-por-story-points)):
+([`interface.md`](../../../utils/task-manager/interface.md#derivacao-progress)):
 soma dos **story points** das subtasks feitas sobre o total; sem pontos, cai na **contagem** e diz.
 Quem calcula é o helper determinístico — o comando não refaz a conta em prosa:
 
