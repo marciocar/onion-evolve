@@ -2,7 +2,8 @@
 branch: fix/deny-force-refspec-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 924b9884260146a319ed5dbeec99da5f0e2bfe46357b681e217a8b30641ad5cb
+reviewed_code_sha256: d31d67bba43f429b9e6717237df4dfb04a5616d7bf58d617f6669ab4dee37ce5
 findings_total: 8
 findings_real: 8
 findings_blocking: 2
