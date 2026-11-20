@@ -53,7 +53,7 @@ Marcador tipado **ancorado no início** da mensagem, case-insensitive, `:` canô
 
 **Aliases naturais** (opcionais; o tipado é o canônico): `pergunta:`→`dúvida:` · `dica:`/`orienta:`→`corrige:` ·
 `fyi:`/`avisa:`→`nota:` · `lembre-se,`/`relembra:`→`guarda:` · `em paralelo,`/`enquanto isso,`/`pesquisa:`→`paralelo:` ·
-`mandou bem,`→`reforço:` · `task:`/`faça:`/`faca:`→`tarefa:`. Os fluídos aceitam `,` além de `:`.
+`mandou bem,`→`reforço:` · `faça:`/`faca:`→`tarefa:` (`task:` ficou de fora: `Task:` em texto colado em inglês daria falso-positivo). Os fluídos aceitam `,` além de `:`.
 
 ## A tabela de roteamento
 
@@ -80,7 +80,7 @@ A rota `tarefa:` pede quatro coisas: (1) escolher a peça do inventário pela in
 peça nova → `/meta:forge`, guarda → `/meta:forge-guard`, feature → `/engineer:plan`, objeto externo →
 `/meta:dissect`, pesquisa → skill `onion-research`, plano longo → `/meta:drive`, dúvida de desenho contra o mercado
 → `/meta:peek`), e dizer qual peça faltou se nada encaixa; (2) declarar o custo estimado antes de rodar, com
-Workflow só por opt-in; (3) dogfood, rodando o artefato; (4) fechar com o comando rodado e a saída observada.
+Workflow só por opt-in; (3) dogfood, rodando o artefato, com o irreversível (merge, push na main, apagar) passando pela confirmação do maestro; (4) fechar com o comando rodado e a saída observada.
 
 O mapa é **dado** (`TASK_MAP` no motor), não prosa: a rota impressa só cita a peça cujo arquivo existe na
 instalação (o plugin e as portas não levam tudo), e `aside-router.sh task-map --check` reprova no core a linha

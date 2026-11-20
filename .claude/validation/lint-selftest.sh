@@ -2575,6 +2575,8 @@ _art_recognition() {  # $1=motor $2=dir de fixtures → imprime os casos que fal
       [ -z "$out" ] || miss="${miss} ${loc}:$(basename "$f")(falso-positivo)"
     done
   done
+  [ "$locs" = "C" ] && miss="${miss# }" && : # só C rodou: o resumo do (a) diz isso (ver _ART_LOCS)
+  _ART_LOCS="$locs"
   printf '%s' "$miss"
 }
 _art_cited_missing() {  # $1=motor $2=raiz .claude → imprime os comandos citados na rota sem arquivo ("" = ok)
@@ -2584,12 +2586,12 @@ _art_cited_missing() {  # $1=motor $2=raiz .claude → imprime os comandos citad
     [ -n "$ref" ] || continue; n=$((n + 1))
     ref="${ref#/}"
     [ -f "${root}/commands/${ref%%:*}/${ref#*:}.md" ] || miss="${miss} /${ref}"
-  done < <(grep -oE '/[a-z][a-z-]*:[a-z][a-z-]*' <<< "$out")
+  done < <(grep -oE '/[a-z0-9_-]+:[a-z0-9_-]+' <<< "$out")
   while IFS= read -r ref; do
     [ -n "$ref" ] || continue; n=$((n + 1))
     ref="${ref#skill }"
     [ -f "${root}/skills/${ref}/SKILL.md" ] || miss="${miss} skill:${ref}"
-  done < <(grep -oE 'skill [a-z][a-z-]*' <<< "$out")
+  done < <(grep -oE 'skill [a-z0-9_-]+' <<< "$out")
   [ "$n" -gt 0 ] || miss="${miss} rota-sem-nenhuma-peça"
   printf '%s' "$miss"
 }
@@ -2604,17 +2606,24 @@ run_aside_router_task_selftests() {
   eng="${d}/.claude/validation/aside-router.sh"; hk="${d}/.claude/hooks/aside-router-hook.sh"
   while IFS=$'\t' read -r _ _ line; do
     rel="${line#"${REPO_ROOT}/.claude/"}"
-    [ -f "$line" ] || continue
-    mkdir -p "${d}/.claude/$(dirname "$rel")"; cp "$line" "${d}/.claude/${rel}"
+    mkdir -p "${d}/.claude/$(dirname "$rel")"
+    # peça ausente nesta instalação (porta/adotante) vira stub: a cópia testa o MECANISMO, com o mapa inteiro
+    if [ -f "$line" ]; then cp "$line" "${d}/.claude/${rel}"; else : > "${d}/.claude/${rel}"; fi
   done < <(bash "$src_eng" task-map 2>/dev/null)
 
   # --- no repo real ---
   miss="$(_art_recognition "$src_eng" "$fx")"
-  if [ -z "$miss" ]; then record_pass "aside-router-task: (a) tarefa:/faça: roteiam com e sem acento, maiúscula, em C e UTF-8; no meio ou sem ':' fica mudo"
+  _ART_LOCS="C"; locale -a 2>/dev/null | grep -qiE '^c\.utf-?8$' && _ART_LOCS="C C.UTF-8"
+  if [ -z "$miss" ]; then record_pass "aside-router-task: (a) tarefa:/faça: roteiam com e sem acento, maiúscula, espaço antes do ':' (locales: ${_ART_LOCS}); no meio, sem ':' ou 'Task:' em inglês fica mudo"
   else record_fail "aside-router-task: (a) reconhecimento" "casos:${miss}"; fi
-  rc=0; out="$(bash "$src_eng" task-map --check 2>&1)" || rc=$?
-  if [ "$rc" -eq 0 ]; then record_pass "aside-router-task: (b) toda peça do mapa da rota tarefa existe no core"
-  else record_fail "aside-router-task: (b) mapa envelhecido" "$(grep MISSING <<< "$out" | cut -f2 | tr '\n' ' ')"; fi
+  # (b) só no core: a porta e o adotante não levam toda peça (forge-guard é core-only) — lá a rota filtra, e é o (d)
+  if [ "${SELFTEST_ROLE:-source}" != "source" ]; then
+    record_skip "aside-router-task: (b) mapa completo é cobrança do core (role: ${SELFTEST_ROLE})"
+  else
+    rc=0; out="$(bash "$src_eng" task-map --check 2>&1)" || rc=$?
+    if [ "$rc" -eq 0 ]; then record_pass "aside-router-task: (b) toda peça do mapa da rota tarefa existe no core"
+    else record_fail "aside-router-task: (b) mapa envelhecido" "$(grep MISSING <<< "$out" | cut -f2 | tr '\n' ' ')"; fi
+  fi
   miss="$(_art_cited_missing "$src_eng" "${REPO_ROOT}/.claude")"
   if [ -z "$miss" ]; then record_pass "aside-router-task: (c) a rota impressa cita só comando/skill com arquivo"
   else record_fail "aside-router-task: (c) rota cita peça inexistente" "${miss}"; fi
@@ -2641,6 +2650,12 @@ run_aside_router_task_selftests() {
     record_pass "aside-router-task: (e) o hook entrega a rota tarefa no additionalContext"
   else record_fail "aside-router-task: (e) hook" "out='${out:0:200}' rc=${rc}"; fi
 
+  # (f) as cláusulas que são o motivo da rota: custo declarado, Workflow só com opt-in, irreversível pede confirmação
+  out="$(bash "$src_eng" detect 'tarefa: x')"
+  _art_clauses() { grep -qF 'custo estimado' <<< "$1" && grep -qF 'opt-in do maestro' <<< "$1" && grep -qF 'aguarde a confirmação do maestro' <<< "$1"; }
+  if _art_clauses "$out"; then record_pass "aside-router-task: (f) a rota carrega custo declarado, Workflow por opt-in e confirmação no irreversível"
+  else record_fail "aside-router-task: (f) doutrina da rota" "cláusula ausente: ${out:0:300}"; fi
+
   # --- mutantes: cada um tem de MORRER (o contrato acusa) ---
   local orig="${d}/aside-router.sh.orig" name pat
   cp "$eng" "$orig"
@@ -2653,7 +2668,7 @@ run_aside_router_task_selftests() {
       || record_fail "aside-router-task: (M1)" "mutante sobreviveu: (a) não viu o ramo tarefa sumir"
   else record_fail "aside-router-task: (M1) guarda-da-guarda" "mutação não aplicou"; fi
   # M2 ancoragem: sem o ^, 'faça a tarefa: …' no meio da frase dispara
-  if _art_mutant M2 "s/'\\^(tarefa|task|/'(tarefa|task|/"; then
+  if _art_mutant M2 "s/'\\^(tarefa|fa/'(tarefa|fa/"; then
     [ -n "$(_art_recognition "$eng" "$fx")" ] && record_pass "aside-router-task: (M2) âncora ^ removida → (a) acusa o falso-positivo" \
       || record_fail "aside-router-task: (M2)" "mutante sobreviveu: (a) não viu o falso-positivo no meio da frase"
   else record_fail "aside-router-task: (M2) guarda-da-guarda" "mutação não aplicou"; fi
@@ -2683,6 +2698,13 @@ run_aside_router_task_selftests() {
     [ -n "$(_art_cited_missing "$eng" "${d}/.claude")" ] && record_pass "aside-router-task: (M6) comando inexistente na prosa da rota → (c) acusa" \
       || record_fail "aside-router-task: (M6)" "mutante sobreviveu: (c) não viu /meta:fantasma"
   else record_fail "aside-router-task: (M6) guarda-da-guarda" "mutação não aplicou"; fi
+  # M8 doutrina: cada cláusula apagada → (f) acusa
+  for pat in 's/declare o custo estimado/declare o que quiser/' 's/só com opt-in do maestro/à vontade/' '/APARTE tarefa/{s/ o que for irreversível (merge, push na main, apagar): %s//;s/ "\$GATE"//}'; do
+    if _art_mutant M8 "$pat"; then
+      _art_clauses "$(bash "$eng" detect 'tarefa: x' 2>/dev/null)" && record_fail "aside-router-task: (M8)" "mutante sobreviveu: ${pat}" \
+        || record_pass "aside-router-task: (M8) cláusula apagada → (f) acusa (${pat:0:40}…)"
+    else record_fail "aside-router-task: (M8) guarda-da-guarda" "mutação não aplicou: ${pat}"; fi
+  done
   # M7 hook sem motor: a rota some do JSON → (e) acusa
   cp "$orig" "$eng"; mv "$eng" "${eng}.off"
   out="$(CLAUDE_PROJECT_DIR="$d" bash "$hk" <<< "$payload")" || true

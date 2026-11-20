@@ -29,7 +29,8 @@ GATE="PROPONHA e aguarde a confirmação do maestro (Ato 3/W6) ANTES de executar
 
 # Raiz da maquinaria a partir do PRÓPRIO motor: no core, .claude/validation → .claude; no plugin, validation/ → raiz
 # do plugin. Mesma resolução do hook (2026-09-04: caminho montado a partir do repo morria em silêncio no plugin).
-MACHINERY_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# CDPATH= : com CDPATH no ambiente o `cd` relativo imprime o destino e a variável ganharia duas linhas (revisão 2026-11-20).
+MACHINERY_ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null && pwd)"
 
 # Mapa da rota `tarefa:` — intenção → peça do inventário. É DADO, não prosa: a rota só cita a peça cujo arquivo
 # EXISTE nesta instalação (o plugin e as portas não levam tudo), e a bancada `aside_router_task` reprova no core
@@ -90,8 +91,8 @@ route() {  # $1 = key
     PARALLEL)   printf 'APARTE paralelo — atividade/pesquisa em paralelo sem parar o fluxo. Dispare assíncrono (Ctrl+B/background) ou fan-out via onion-orchestration/Workflow; sintetize no retorno. Se escrever, respeite I3 (um escritor/repo). %s' "$SUFFIX" ;;
     TASK)
       local choices; choices="$(task_choices)"
-      [ -n "$choices" ] || choices="nenhuma peça do mapa existe nesta instalação: diga ao maestro qual faltou"
-      printf 'APARTE tarefa — execute PELA maquinaria do Onion, não à mão. (1) Escolha a peça do inventário: %s. Sem encaixe, diga qual peça faltou em vez de improvisar. (2) Antes de rodar, declare o custo estimado (tempo e tokens); Workflow ou fan-out só com opt-in do maestro. (3) Dogfood: rode o artefato de verdade, não pare no plano. (4) Feche com evidência: o comando rodado e a saída observada. %s' "$choices" "$SUFFIX" ;;
+      [ -n "$choices" ] || choices="nenhuma peça do mapa existe nesta instalação"
+      printf 'APARTE tarefa — execute PELA maquinaria do Onion, não à mão. (1) Escolha a peça do inventário: %s. Sem encaixe, diga qual peça faltou em vez de improvisar. (2) Antes de rodar, declare o custo estimado (tempo e tokens); Workflow ou fan-out só com opt-in do maestro. (3) Dogfood: rode o artefato de verdade, não pare no plano; o que for irreversível (merge, push na main, apagar): %s (4) Feche com evidência: o comando rodado e a saída observada. %s' "$choices" "$GATE" "$SUFFIX" ;;
     GUARDRAIL)  printf 'APARTE guarda-regra — instalar guardrail durável de comportamento. %s Prefira forcing-function (hook / .claude/rules path-scoped), não prosa "never do X"; registre a decisão no /meta:diary. %s' "$GATE" "$SUFFIX" ;;
     *) return 0 ;;
   esac
@@ -119,7 +120,7 @@ detect() {
   elif grep -qiE '^(nota|fyi|avisa)[[:space:]]*:' <<< "$line";               then key=NOTE
   elif grep -qiE '^(guarda|relembra)[[:space:]]*:' <<< "$line";              then key=REMEMBER
   elif grep -qiE '^lembre-se[[:space:]]*[:,]' <<< "$line";                   then key=REMEMBER
-  elif grep -qiE '^(tarefa|task|fa(ç|Ç|c)a)[[:space:]]*:' <<< "$line";        then key=TASK
+  elif grep -qiE '^(tarefa|fa(ç|Ç|c)a)[[:space:]]*:' <<< "$line";        then key=TASK
   elif grep -qiE '^(paralelo|pesquisa)[[:space:]]*:' <<< "$line";            then key=PARALLEL
   elif grep -qiE '^(em paralelo|enquanto isso)[[:space:]]*[:,]' <<< "$line"; then key=PARALLEL
   else return 0
