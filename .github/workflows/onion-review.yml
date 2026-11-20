@@ -309,6 +309,20 @@ jobs:
         # SUBIDO para v1.0.269 (61a9c274; a tag anotada é 402b5b79) em 2026-11-06, pelo aviso do session-currency-check: 4 commits,
         # um por release (1.0.266 a 1.0.269), todos "bump Claude Code to 2.1.31x and Agent SDK to 0.3.31x", nos mesmos 6 arquivos;
         # as notas das 4 releases só trazem o link do changelog. O action.yml da raiz não muda: nenhum input nem output usado aqui muda.
+        # SUBIDO para v1.0.286 (acfe7992; a tag anotada é cb5e7061) em 2026-11-20 (SAC-432), pelo aviso do session-currency-check:
+        # 32 commits (v1.0.273..v1.0.286), CLI 2.1.322 -> 2.1.330. Pela 1ª vez desde a v1.0.252 a subida MUDA COMPORTAMENTO, porque
+        # a v1.0.273 (#2004) abre a sessão em AUTO MODE por padrão: uma revisão de segurança decide o que nenhuma regra de
+        # allow cobre, o `--allowedTools` deixa de ser lista estrita, um run com `prompt` passa a poder editar a árvore, e
+        # regra larga como `Bash(*)` é ignorada. Isso desmontaria o contrato medido da allowlist (a cura da morte por
+        # negação, abaixo) e o mandato de só LER; por isso o `--permission-mode default` em claude_args, o opt-out que as
+        # notas da v1.0.273 nomeiam para runs com `prompt` (o último --permission-mode vence). O resto não toca este job:
+        # restrict_untrusted_prs (#2001), config da base (#2088, #2099) e allow_fork_prs (#2094) só valem para autor SEM
+        # escrita ou fork, e o job já exige head.repo.fork == false. A #2059 vale em TODO PR: o AGENTS.md da raiz vem da base
+        # (como o CLAUDE.md já vinha); o core não tem AGENTS.md, mas um PR que o crie o vê sumir da árvore na revisão, e a
+        # guarda de árvore suja abaixo pode acusar (achados -1). GITHUB_ENV/git config restaurados ao fim
+        # (#2003) não afetam, porque os passos seguintes leem execution_file/structured_output, e os outputs do action.yml
+        # não mudam. Inputs novos: allow_fork_prs e restrict_untrusted_prs, ambos com default "true", não usados aqui.
+        # A prova do pin e do modo é o PR SEGUINTE (este PR edita o workflow e a action se auto-pula). Antes:
         # SUBIDO para v1.0.272 (d5f7970a; a tag anotada é 6efe0fa3) em 2026-11-12, pelo aviso do session-currency-check: 1 commit
         # (PR #1963 da action), que só muda o exemplo test-failure-analysis.yml para passar o structured_output por env:;
         # o comportamento da action não muda, e este workflow já lê o structured_output por env (SO1/SO2). Antes:
@@ -326,7 +340,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@d5f7970ae232b6039636a16ea7f251e58e814f38
+        uses: anthropics/claude-code-action@acfe7992852970efb4fee683d63d628e3e52df67
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -398,6 +412,7 @@ jobs:
             --model ${{ env.REVIEW_MODEL }}
             --max-turns 60
             --allowedTools Read Grep Glob Bash
+            --permission-mode default
 
       # ═══ O SINAL VERDADEIRO (2026-08-03) ═══
       # `steps.review.outcome` MENTE: a action sai com exit 0 mesmo quando o agente morre —
@@ -473,6 +488,20 @@ jobs:
         # SUBIDO para v1.0.269 (61a9c274; a tag anotada é 402b5b79) em 2026-11-06, pelo aviso do session-currency-check: 4 commits,
         # um por release (1.0.266 a 1.0.269), todos "bump Claude Code to 2.1.31x and Agent SDK to 0.3.31x", nos mesmos 6 arquivos;
         # as notas das 4 releases só trazem o link do changelog. O action.yml da raiz não muda: nenhum input nem output usado aqui muda.
+        # SUBIDO para v1.0.286 (acfe7992; a tag anotada é cb5e7061) em 2026-11-20 (SAC-432), pelo aviso do session-currency-check:
+        # 32 commits (v1.0.273..v1.0.286), CLI 2.1.322 -> 2.1.330. Pela 1ª vez desde a v1.0.252 a subida MUDA COMPORTAMENTO, porque
+        # a v1.0.273 (#2004) abre a sessão em AUTO MODE por padrão: uma revisão de segurança decide o que nenhuma regra de
+        # allow cobre, o `--allowedTools` deixa de ser lista estrita, um run com `prompt` passa a poder editar a árvore, e
+        # regra larga como `Bash(*)` é ignorada. Isso desmontaria o contrato medido da allowlist (a cura da morte por
+        # negação, abaixo) e o mandato de só LER; por isso o `--permission-mode default` em claude_args, o opt-out que as
+        # notas da v1.0.273 nomeiam para runs com `prompt` (o último --permission-mode vence). O resto não toca este job:
+        # restrict_untrusted_prs (#2001), config da base (#2088, #2099) e allow_fork_prs (#2094) só valem para autor SEM
+        # escrita ou fork, e o job já exige head.repo.fork == false. A #2059 vale em TODO PR: o AGENTS.md da raiz vem da base
+        # (como o CLAUDE.md já vinha); o core não tem AGENTS.md, mas um PR que o crie o vê sumir da árvore na revisão, e a
+        # guarda de árvore suja abaixo pode acusar (achados -1). GITHUB_ENV/git config restaurados ao fim
+        # (#2003) não afetam, porque os passos seguintes leem execution_file/structured_output, e os outputs do action.yml
+        # não mudam. Inputs novos: allow_fork_prs e restrict_untrusted_prs, ambos com default "true", não usados aqui.
+        # A prova do pin e do modo é o PR SEGUINTE (este PR edita o workflow e a action se auto-pula). Antes:
         # SUBIDO para v1.0.272 (d5f7970a; a tag anotada é 6efe0fa3) em 2026-11-12, pelo aviso do session-currency-check: 1 commit
         # (PR #1963 da action), que só muda o exemplo test-failure-analysis.yml para passar o structured_output por env:;
         # o comportamento da action não muda, e este workflow já lê o structured_output por env (SO1/SO2). Antes:
@@ -490,7 +519,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@d5f7970ae232b6039636a16ea7f251e58e814f38
+        uses: anthropics/claude-code-action@acfe7992852970efb4fee683d63d628e3e52df67
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -562,6 +591,7 @@ jobs:
             --model ${{ env.REVIEW_MODEL }}
             --max-turns 60
             --allowedTools Read Grep Glob Bash
+            --permission-mode default
 
       - name: Veredito da 2ª tentativa (is_error, não o outcome)
         id: v2
