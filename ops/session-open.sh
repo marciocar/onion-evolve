@@ -3,58 +3,74 @@
 # session-open.sh — o ABRIDOR ÚNICO das sessões longas do Claude Code nesta máquina (core-only).
 #
 # Uso:
-#   bash ops/session-open.sh <nome> [--dry-run] [--no-attach] [--resume <id>] [--mode <permission-mode>]
-#   bash ops/session-open.sh --all  [--dry-run]      reabre, sem anexar, toda sessão com batuta-de-projeto (grants.tsv)
-#   bash ops/session-open.sh --list                  o que existe: sessão tmux, processo claude e pasta de cada nome
+#   bash ops/session-open.sh <nome> [--dry-run] [--no-attach] [--resume <id> | --new] [--mode <permission-mode>]
+#   bash ops/session-open.sh --all  [--dry-run]   reabre, sem anexar, toda sessão dona do registro de posse
+#   bash ops/session-open.sh --list               o que existe: sessão tmux, processo claude e pasta de cada sessão dona
 #
-# O padrão (D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116; espiada E_PEEK_SESSION_OPENER_TMUX_1116):
-#   · UMA sessão tmux por repo, com o NOME DO REPO: o mesmo nome no tmux, no `claude --name` e no grants.tsv.
-#   · `tmux new-session -A`: se a sessão existe, ANEXA; se não, CRIA. Rodar duas vezes nunca abre duas.
-#   · Quem tem a janela migra: este script NUNCA mata processo. Se já há um `claude` vivo naquela pasta FORA do tmux
-#     pedido, ele RECUSA (rc 3) e diz o que fazer (`/exit` lá, depois rodar de novo). Duas cópias da mesma sessão
-#     escrevem no mesmo histórico (incidente de 2026-11-16).
-#   · O tmux NÃO sobrevive a reboot: depois de um, `--all` reabre as sessões da lista.
+# O padrão (D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120 e D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120, 2026-11-20,
+# sobre D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116):
+#   · UMA sessão tmux por repo, com o NOME da sessão dona (o do registro de posse, que é o nome do repo): o mesmo nome
+#     no tmux e no Claude Code. O acesso de fora é tmux + mosh.
+#   · QUEM é dono e QUAL é o nome vêm do leitor único, .claude/utils/orchestration/ownership.sh (members.yaml de
+#     origin/main + a lista privada de sessões donas). Nome fora do registro abre em ~/<nome>, e o preflight diz não.
+#   · A RETOMADA É SEMPRE POR ID EXATO, nunca `--continue` (que pega «a última conversa da pasta», qualquer que seja).
+#     Sem --resume, o id se resolve pelo NOME no estado do harness: (1) `claude agents --json`; (2) o transcript mais
+#     recente da pasta cujo título é o nome. O escolhido é DITO. Dois candidatos = ambíguo: RECUSA (rc 5). Nenhum: só
+#     abre sessão NOVA com --new, dito na linha (abrir nova sem querer perde o histórico da antiga).
+#     A retomada leva só `--resume <id>` (mais o canal da campainha, onde o repo a declara, e o --mode se pedido): o
+#     teste nativo de 2026-11-20 mediu que flag a mais na retomada de sessão de fundo abre uma CÓPIA com outro id e nome.
+#   · NUNCA DUAS SESSÕES NO MESMO CHECKOUT: `tmux new-session -A` só anexa; e, para criar, RECUSA (rc 3) se já há um
+#     `claude` vivo com o cwd naquela pasta (fora do tmux ou noutra sessão tmux), ou se o id resolvido já está vivo
+#     noutro lugar (a cópia escreveria no mesmo histórico: incidente de 2026-11-16). Nunca mata processo.
+#   · PREFLIGHT na abertura: «este repo merja sozinho? sim|não, e por quê», pela parte estática da catraca do
+#     ops/pr-merge-verified.sh, lida pelo ownership.sh (sem reimplementar aqui).
+#   · O tmux NÃO sobrevive a reboot: depois de um, `--all` reabre as sessões donas do registro, cada uma pelo seu id.
 #
-# Saída: 0 abriu/anexou/ensaiou · 2 uso ou pasta inválida · 3 recusa (processo vivo fora do tmux) · 4 tmux ou claude ausente.
+# Saída: 0 abriu/anexou/ensaiou · 2 uso ou pasta inválida · 3 recusa (sessão viva: duplicaria) · 4 tmux ou claude
+# ausente · 5 id não resolvido (ambíguo, ou nenhum sem --new).
 # Este script só abre terminal: não lê .env, não toca serviço, não decide permissão (o modo vem de --mode, senão do
-# que o Claude Code já tem configurado).
+# que o Claude Code já tem configurado). Do transcript lê só a linha do título (customTitle), nunca a conversa.
 # ===========================================================================
 set -uo pipefail
 
 HOME_DIR="${SESSION_OPEN_HOME:-${HOME}}"
-STATE_DIR="${BATON_STATE_DIR:-${HOME_DIR}/.local/state/onion/baton}"
 PROC_DIR="${SESSION_OPEN_PROC:-/proc}"
 TMUX_BIN="${SESSION_OPEN_TMUX:-tmux}"
 CLAUDE_BIN="${SESSION_OPEN_CLAUDE:-claude}"
+PROJECTS_DIR="${SESSION_OPEN_PROJECTS:-${HOME_DIR}/.claude/projects}"
+OWNERSHIP="${SESSION_OPEN_OWNERSHIP:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.claude/utils/orchestration/ownership.sh}"
+OWN_ARGS=()
+[ -n "${SESSION_OPEN_MEMBERS:-}" ] && OWN_ARGS+=(--members "${SESSION_OPEN_MEMBERS}")   # bancada: registro de fixture
+OWN_ARGS+=(--home "${HOME_DIR}")
 # «meu uid» para comparar o DONO de /proc/<pid>: um claude de OUTRA conta (cwd/environ ilegível por permissão) não pode
 # ser a sessão desta conta naquela pasta, então é ignorado — sem isto o abridor travava (rc 3) por causa do processo
 # alheio. SESSION_OPEN_UID é o substituto de teste (o /proc falso da bancada é todo do usuário do teste).
 MY_UID="${SESSION_OPEN_UID:-$(id -u)}"
+# janela, em segundos, em que dois transcripts com o mesmo nome contam como simultâneos (ambíguo)
+AMBIG_SECS="${SESSION_OPEN_AMBIG_SECS:-120}"
 
 say() { printf '%s\n' "$*"; }
 die() { printf 'session-open: %s\n' "$1" >&2; exit "${2:-2}"; }
 
-NAME="" DRY=0 ATTACH=1 RESUME="" MODE="" ALL=0 LIST=0
+NAME="" DRY=0 ATTACH=1 RESUME="" MODE="" ALL=0 LIST=0 NEW=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run) DRY=1 ;;
     --no-attach) ATTACH=0 ;;
     --all) ALL=1 ;;
     --list) LIST=1 ;;
+    --new) NEW=1 ;;
     --resume) shift; RESUME="${1:-}"; [ -n "${RESUME}" ] || die "--resume pede o id da sessão" ;;
     --mode) shift; MODE="${1:-}"; [ -n "${MODE}" ] || die "--mode pede o modo de permissão" ;;
+    --continue|-c) die "--continue não existe aqui: a retomada é sempre por id exato (D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120). Sem --resume, o id se resolve pelo nome." ;;
     -*) die "opção desconhecida: $1" ;;
     *) [ -z "${NAME}" ] || die "um nome por vez (veio «${NAME}» e «$1»)"; NAME="$1" ;;
   esac
   shift
 done
+[ -z "${RESUME}" ] || [ "${NEW}" -eq 0 ] || die "--resume e --new se excluem"
+[ -z "${RESUME}" ] || [[ "${RESUME}" =~ ^[A-Za-z0-9][A-Za-z0-9-]{7,63}$ ]] || die "id de sessão inválido: «${RESUME}»"
 
-# nome → pasta. O nome É o do repo; «core» é o apelido do checkout da fonte.
-dir_of() {
-  local n="$1"
-  [ "${n}" = "core" ] && n="onion-evolve"
-  printf '%s/%s' "${HOME_DIR}" "${n}"
-}
 valid_name() { [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]; }
 
 # pids de `claude` cujo cwd é a pasta. $2 = "out" (fora de tmux) | "any". Erro de leitura NÃO vira «nenhum»: rc 2 —
@@ -88,13 +104,110 @@ claude_pids() {
 
 has_tmux_session() { "${TMUX_BIN}" has-session -t "=$1" 2>/dev/null; }
 
-open_one() {  # $1 = nome, $2 = anexar (1|0)
-  local n="$1" attach="$2" dir cmd out rc
-  valid_name "${n}" || die "nome inválido: «${n}» (letras, dígitos, ponto, hífen e sublinhado)"
-  dir="$(dir_of "${n}")"
-  [ -d "${dir}/.git" ] || [ -f "${dir}/.git" ] || die "«${dir}» não é um repositório git: o nome da sessão é o nome do repo em ${HOME_DIR}"
-  [ "${n}" = "core" ] && n="onion-evolve"
+# a lista de peers do harness, como TSV: sessionId kind state pid name cwd. rc 1 = não medida (dito por quem chama).
+peers_tsv() {
+  local j
+  j="$(timeout 20 "${CLAUDE_BIN}" agents --json 2>/dev/null)" || return 1
+  python3 -I -c '
+import json, sys
+d = json.loads(sys.stdin.read() or "null")
+if not isinstance(d, list): sys.exit(1)
+for x in d:
+    if not isinstance(x, dict): continue
+    sid = str(x.get("sessionId") or x.get("id") or "")
+    if not sid: continue
+    # campo vazio vira «-»: o read com IFS de TAB funde tabs seguidos, e o campo seguinte escorregaria
+    f = [str(x.get(k)) if x.get(k) not in (None, "") else "-" for k in ("kind", "state", "pid", "name", "cwd")]
+    print("\t".join(v.replace("\t", " ").replace("\n", " ") for v in [sid] + f))
+' <<< "${j}" 2>/dev/null
+}
+# viva = interativa listada (o harness só lista interativa que roda) ou de fundo num estado de processo de pé
+peer_live() { case "$1:$2" in interactive:*) return 0 ;; *:working|*:blocked|*:done|*:idle|*:running) return 0 ;; esac; return 1; }
 
+# o último título (customTitle) de um transcript: só a linha do título, nunca a conversa
+title_of() { grep -oE '"customTitle":"[^"]*"' "$1" 2>/dev/null | tail -1 | sed -E 's/^"customTitle":"//; s/"$//'; }
+
+# nome + pasta → RID e RID_SRC. rc 0 achou · 1 nenhum · 3 já vivo · 5 ambíguo. PEERS_NOTE diz se o harness não foi medido.
+RID="" RID_SRC="" PEERS_NOTE="" PEERS=""
+resolve_id() {
+  local n="$1" dir="$2" hits ids cnt enc f t m best="" bestm=0 second=0 nhit=0
+  RID="" RID_SRC=""
+  if PEERS="$(peers_tsv)"; then PEERS_NOTE=""
+  else PEERS=""; PEERS_NOTE="a lista de peers do harness (claude agents --json) não foi lida: só os transcripts"; fi
+  if [ -n "${RESUME}" ]; then RID="${RESUME}"; RID_SRC="--resume"
+  else
+    hits="$(awk -F'\t' -v n="${n}" '$5 == n' <<< "${PEERS}")"
+    if [ -n "${hits}" ]; then
+      while IFS=$'\t' read -r s k st p nm cw; do
+        peer_live "${k}" "${st}" && { say "session-open: a sessão «${n}» já está viva (id ${s}, ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia. Entre nela: ${TMUX_BIN} attach -t ${n}, ou claude attach ${s}." >&2; return 3; }
+      done <<< "${hits}"
+      ids="$(cut -f1 <<< "${hits}" | sort -u)"; cnt="$(wc -l <<< "${ids}")"
+      if [ "${cnt}" -gt 1 ]; then say "session-open: o harness lista ${cnt} sessões paradas com o nome «${n}» ($(tr '\n' ' ' <<< "${ids}")): ambíguo, não escolho. Diga o id com --resume." >&2; return 5; fi
+      RID="${ids}"; RID_SRC="claude agents --json"
+    else
+      enc="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${dir}")"
+      if [ -d "${PROJECTS_DIR}/${enc}" ]; then
+        while IFS= read -r f; do
+          [ -n "${f}" ] || continue
+          t="$(title_of "${f}")"; [ "${t}" = "${n}" ] || continue
+          m="$(stat -c '%Y' "${f}" 2>/dev/null)" || continue
+          nhit=$((nhit + 1))
+          if [ -z "${best}" ]; then best="${f}"; bestm="${m}"; else second="${m}"; break; fi
+        done < <(ls -1t "${PROJECTS_DIR}/${enc}"/*.jsonl 2>/dev/null | head -200)
+      fi
+      [ -n "${best}" ] || return 1
+      if [ "${nhit}" -gt 1 ] && [ $(( bestm - second )) -le "${AMBIG_SECS}" ]; then
+        say "session-open: dois transcripts de ${dir} com o título «${n}» mudaram com menos de ${AMBIG_SECS} s de diferença: ambíguo (duas sessões com o mesmo nome?), não escolho. Diga o id com --resume." >&2; return 5
+      fi
+      RID="$(basename "${best}" .jsonl)"; RID_SRC="transcript mais recente com o título «${n}» ($(date -u -d "@${bestm}" +%Y-%m-%dT%H:%MZ 2>/dev/null || echo "${bestm}"))"
+    fi
+  fi
+  # o id escolhido não pode estar vivo noutro lugar (outro nome, outra pasta): a cópia escreveria no mesmo histórico
+  hits="$(awk -F'\t' -v s="${RID}" '$1 == s' <<< "${PEERS}")"
+  if [ -n "${hits}" ]; then
+    while IFS=$'\t' read -r s k st p nm cw; do
+      peer_live "${k}" "${st}" && { say "session-open: o id ${RID} já está vivo (nome «${nm}», ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia do mesmo histórico." >&2; return 3; }
+    done <<< "${hits}"
+  fi
+  return 0
+}
+
+# o preflight: a resposta do leitor único, numa linha
+preflight() {  # $1 = nome ou pasta no registro
+  local o rc
+  if [ ! -f "${OWNERSHIP}" ]; then say "session-open: preflight — este repo merja sozinho? NÃO MEDIDO: leitor de posse ausente (${OWNERSHIP})"; return 0; fi
+  o="$(bash "${OWNERSHIP}" merge-alone "$1" "${OWN_ARGS[@]}" 2>/dev/null)"; rc=$?
+  case "${rc}" in
+    0|1) say "session-open: preflight — este repo merja sozinho? ${o%%$'\t'*}: ${o#*$'\t'}" ;;
+    *) say "session-open: preflight — este repo merja sozinho? NÃO MEDIDO: o leitor de posse falhou (rc ${rc}); trate como não" ;;
+  esac
+}
+
+# nome → «nome-da-sessão<TAB>pasta<TAB>chave-do-registro», pelo leitor único; fora do registro, ~/<nome>
+locate() {
+  local n="$1" row rc
+  if [ -f "${OWNERSHIP}" ]; then
+    row="$(bash "${OWNERSHIP}" who "${n}" "${OWN_ARGS[@]}" 2>/dev/null)"; rc=$?
+    [ "${rc}" -eq 2 ] && die "o registro de posse não respondeu por «${n}» (ilegível ou ambíguo): rode bash ${OWNERSHIP} who ${n}"
+    if [ "${rc}" -eq 0 ]; then
+      IFS=$'\t' read -r _id _k _o sn lp _v _r <<< "${row}"
+      [ "${lp}" != "-" ] || die "«${n}» está no registro de posse, mas sem pasta conhecida (local_path ausente, ou a 4ª coluna da lista privada vazia): não adivinho"
+      printf '%s\t%s\t%s\n' "${sn}" "${lp}" "${n}"; return 0
+    fi
+  fi
+  [ "${n}" = core ] && n="onion-evolve"
+  printf '%s\t%s\t%s\n' "${n}" "${HOME_DIR}/${n}" "${n}"
+}
+
+open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a sabe)
+  local n="$1" attach="$2" dir="${3:-}" key cmd out rc loc
+  valid_name "${n}" || die "nome inválido: «${n}» (letras, dígitos, ponto, hífen e sublinhado)"
+  if [ -z "${dir}" ]; then loc="$(locate "${n}")" || exit $?; IFS=$'\t' read -r n dir key <<< "${loc}"
+  else key="${n}"; fi
+  valid_name "${n}" || die "nome de sessão inválido no registro: «${n}»"
+  [ -d "${dir}/.git" ] || [ -f "${dir}/.git" ] || die "«${dir}» não é um repositório git: o nome da sessão é o nome do repo"
+
+  preflight "${key}"
   if has_tmux_session "${n}"; then
     say "session-open: a sessão tmux «${n}» já existe — anexo, não crio outra."
     # a sessão tmux existe, mas pode haver OUTRA cópia fora dela (aberta à mão num terminal): avisa, não mata. Lacuna
@@ -106,13 +219,27 @@ open_one() {  # $1 = nome, $2 = anexar (1|0)
       say "session-open: ⚠️ há também um claude em ${dir} FORA do tmux (pid ${out}): se for a mesma sessão, dê /exit lá e fique só com a do tmux."
     fi
   else
-    out="$(claude_pids "${dir}" out)"; rc=$?
+    # nunca duas sessões no mesmo checkout: QUALQUER claude vivo com o cwd na pasta (fora do tmux ou noutra sessão tmux)
+    out="$(claude_pids "${dir}" any)"; rc=$?
     [ "${rc}" -eq 0 ] || die "não li ${PROC_DIR} para saber se já há um claude em ${dir}: não abro às cegas" 3
     if [ -n "${out}" ]; then
-      die "já há um claude vivo em ${dir} FORA do tmux (pid ${out}). Abrir outro duplica a sessão no mesmo histórico. Vá à janela dele, dê /exit, e rode este comando de novo." 3
+      local o2; o2="$(claude_pids "${dir}" out)"
+      [ $? -eq 0 ] || die "já há um claude vivo em ${dir} (pid ${out}) e não li se ele está num tmux (${PROC_DIR} ilegível): não abro às cegas" 3
+      if [ -n "${o2}" ]; then
+        die "já há um claude vivo em ${dir} FORA do tmux (pid ${o2}). Abrir outro duplica a sessão no checkout. Vá à janela dele, dê /exit, e rode este comando de novo." 3
+      fi
+      die "já há um claude vivo em ${dir} (pid ${out}), noutra sessão tmux ou de outra conta, não na «${n}»: nunca duas sessões no mesmo checkout. Entre nela (${TMUX_BIN} ls) ou dê /exit lá; a 2ª sessão de trabalho vai para uma worktree (claude --worktree)." 3
     fi
-    cmd="${CLAUDE_BIN} --name ${n}"
-    if [ -n "${RESUME}" ]; then cmd="${cmd} --resume ${RESUME}"; else cmd="${cmd} --continue"; fi
+    resolve_id "${n}" "${dir}"; rc=$?
+    [ -z "${PEERS_NOTE}" ] || say "session-open: ℹ️  ${PEERS_NOTE}"
+    case "${rc}" in
+      0) say "session-open: retomo «${n}» pelo id exato ${RID} (fonte: ${RID_SRC})."
+         cmd="${CLAUDE_BIN} --resume ${RID}" ;;
+      1) [ "${NEW}" -eq 1 ] || die "não achei sessão com o nome «${n}» (harness e transcripts de ${dir}): para abrir uma NOVA, rode de novo com --new; para retomar outra, --resume <id>. Nunca --continue." 5
+         say "session-open: nenhuma sessão «${n}» achada; abro NOVA (--new)."
+         cmd="${CLAUDE_BIN} --name ${n}" ;;
+      *) exit "${rc}" ;;
+    esac
     [ -n "${MODE}" ] && cmd="${cmd} --permission-mode ${MODE}"
     # o canal da campainha só entra onde o repo a declara
     if [ -f "${dir}/.mcp.json" ] && grep -q '"doorbell"' "${dir}/.mcp.json"; then
@@ -131,16 +258,19 @@ open_one() {  # $1 = nome, $2 = anexar (1|0)
   if [ -n "${TMUX:-}" ]; then "${TMUX_BIN}" switch-client -t "=${n}"; else "${TMUX_BIN}" attach -t "=${n}"; fi
 }
 
-roster() {  # nomes com batuta-de-projeto = sim, que TÊM pasta (uma linha por repo)
-  local f="${STATE_DIR}/grants.tsv" k c g _
-  [ -r "${f}" ] || die "não li ${f}: sem a lista de concessões não sei o que reabrir" 2
-  while IFS=$'\t' read -r k c g _; do
-    case "${k}" in ''|'#'*) continue ;; esac
-    case "$(tr '[:upper:]' '[:lower:]' <<< "${g:-}")" in sim|yes|true|1) ;; *) continue ;; esac
-    valid_name "${k}" || continue
-    [ -d "$(dir_of "${k}")/.git" ] || [ -f "$(dir_of "${k}")/.git" ] || continue
-    printf '%s\n' "${k}"
-  done < "${f}" | sort -u
+# toda sessão dona do registro de posse (members.yaml + lista privada) → «nome<TAB>pasta», só as que TÊM pasta git;
+# a que não tem é DITA no stderr, nunca some em silêncio
+roster() {
+  local rows id sn lp via
+  [ -f "${OWNERSHIP}" ] || die "leitor de posse ausente (${OWNERSHIP}): sem o registro não sei o que reabrir" 2
+  rows="$(bash "${OWNERSHIP}" list "${OWN_ARGS[@]}")" || die "o leitor de posse falhou: sem o registro não sei o que reabrir" 2
+  while IFS=$'\t' read -r id sn lp via; do
+    [ -n "${id}" ] || continue
+    valid_name "${sn}" || { printf 'session-open: pulo %s: nome de sessão inválido («%s»)\n' "${id}" "${sn}" >&2; continue; }
+    if [ "${lp}" = "-" ]; then printf 'session-open: pulo «%s» (%s): pasta desconhecida no registro\n' "${sn}" "${via}" >&2; continue; fi
+    [ -d "${lp}/.git" ] || [ -f "${lp}/.git" ] || { printf 'session-open: pulo «%s»: %s não é repo git nesta máquina\n' "${sn}" "${lp}" >&2; continue; }
+    printf '%s\t%s\n' "${sn}" "${lp}"
+  done <<< "${rows}" | sort -u
 }
 
 command -v "${TMUX_BIN}" >/dev/null 2>&1 || die "tmux ausente (${TMUX_BIN})" 4
@@ -149,9 +279,8 @@ command -v "${TMUX_BIN}" >/dev/null 2>&1 || die "tmux ausente (${TMUX_BIN})" 4
 if [ "${LIST}" -eq 1 ]; then
   names="$(roster)" || exit $?
   printf '%-22s %-8s %-18s %s\n' "nome" "tmux" "claude (pid)" "pasta"
-  while IFS= read -r n; do
+  while IFS=$'\t' read -r n d; do
     [ -n "${n}" ] || continue
-    d="$(dir_of "${n}")"
     if has_tmux_session "${n}"; then t="sim"; else t="não"; fi
     p="$(claude_pids "${d}" any)" || p="NÃO MEDIDO"
     printf '%-22s %-8s %-18s %s\n' "${n}" "${t}" "${p:--}" "${d}"
@@ -161,16 +290,17 @@ fi
 
 if [ "${ALL}" -eq 1 ]; then
   [ -z "${NAME}" ] || die "--all não leva nome"
+  [ -z "${RESUME}" ] || die "--all não leva --resume: cada sessão se resolve pelo próprio nome"
   names="$(roster)" || exit $?
-  [ -n "${names}" ] || die "nenhuma sessão com batuta-de-projeto e pasta em ${STATE_DIR}/grants.tsv" 2
+  [ -n "${names}" ] || die "nenhuma sessão dona com pasta no registro de posse" 2
   worst=0
-  while IFS= read -r n; do
+  while IFS=$'\t' read -r n d; do
     [ -n "${n}" ] || continue
-    ( open_one "${n}" 0 ); r=$?
+    ( open_one "${n}" 0 "${d}" ); r=$?
     [ "${r}" -gt "${worst}" ] && worst="${r}"
   done <<< "${names}"
   exit "${worst}"
 fi
 
-[ -n "${NAME}" ] || die "uso: session-open.sh <nome> [--dry-run] [--no-attach] [--resume <id>] [--mode <modo>] | --all | --list"
+[ -n "${NAME}" ] || die "uso: session-open.sh <nome> [--dry-run] [--no-attach] [--resume <id> | --new] [--mode <modo>] | --all | --list"
 open_one "${NAME}" "${ATTACH}"

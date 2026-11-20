@@ -60146,7 +60146,8 @@ BP_PY
   _bpr() {  # $1 = medidor sob teste, resto = args
     local w="$1"; shift
     env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${BP_PROJ:-${sb}/proj}" \
-      BATON_PROC="${BP_PROC:-${sb}/proc-empty}" \
+      BATON_PROC="${BP_PROC:-${sb}/proc-empty}" BATON_OWNERSHIP="${BP_OWN:-${REPO_ROOT}/.claude/utils/orchestration/ownership.sh}" \
+      ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista-privada.tsv" \
       BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${r}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
   }
   _bpcase() {  # <nome> <OLD> <NEW> <função> [sem-farol]
@@ -60442,7 +60443,16 @@ BP_PC
       && grep -q "^piece${T}p-ord1${T}PIECE_OWNED${T}.*${T}owners.tsv${T}dono pc-tsv " <<< "${a}" \
       && grep -q "^piece${T}p-ord3${T}PIECE_OWNED${T}.*${T}core (último recurso)${T}dono core " <<< "${a}" && [ -n "${w}" ]; }
   _bpcase "(aj) dono em ordem fixa: owner_session → owners.tsv → core" \
-    "    if m.get('owner_session'): pc['owner']" "    if m.get('owner_session') and not hit: pc['owner']" _bp_aj
+    "    elif pc['id'] in own_map: pc['owner']" "    elif pc['id'] in own_map and not hit: pc['owner']" _bp_aj
+  # (aj2) o 1º degrau é o LEITOR ÚNICO de posse (D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120): leitor que falha deixa a
+  #      peça PIECE_UNMEASURED com a lacuna dita, nunca cai calado no owners.tsv nem no core (mutante: ignorar a falha)
+  printf '#!/usr/bin/env bash\nexit 7\n' > "${sb}/own-falho.sh"
+  _bp_an() { local a g; a="$(BP_OWN="${sb}/own-falho.sh" _bppc "$1")"; g="$(BP_OWN="${sb}/own-falho.sh" _bpr "$1" --tsv --peers "${sb}/peers-pc.json" | grep 'leitor de posse NÃO lido')"
+    BP_WHY="$(grep -E 'p-live|p-ord1' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^piece${T}p-live${T}PIECE_UNMEASURED${T}.*leitor de posse falhou" <<< "${a}" && grep -q "^piece${T}p-ord1${T}PIECE_UNMEASURED${T}" <<< "${a}" \
+      && ! grep -q "PIECE_OWNED" <<< "${a}" && [ -n "${g}" ]; }
+  _bpcase "(aj2) leitor de posse falho: a peça sai PIECE_UNMEASURED com a lacuna, nunca dona pelo owners.tsv ou pelo core" \
+    "    elif own_map is None:   # o 1º degrau" "    elif False:   # o 1º degrau" _bp_an
   # (ak) casa pelo NOME, nunca pelo ref: owner_session igual ao sessionId de uma sessão viva de outro nome não é dono
   _bp_ak() { local a; a="$(_bppc "$1")"; BP_WHY="$(grep 'p-ref' <<< "${a}" | tr '\t' ' ')"
     grep -q "^piece${T}p-ref${T}PIECE_UNOWNED${T}" <<< "${a}"; }
@@ -60625,17 +60635,24 @@ BP_AY
 _family run_baton_pulse_selftests
 
 # ---------------------------------------------------------------------------
-# session_open — ops/session-open.sh: o ABRIDOR ÚNICO das sessões (core-only, D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116).
-# tmux new-session -A por repo (nome = nome do repo), RECUSA rc 3 um claude vivo na pasta FORA do tmux, --list/--all/
-# --dry-run. Dublês por ambiente (SESSION_OPEN_HOME/PROC/TMUX/CLAUDE, BATON_STATE_DIR): tmux de mentira que registra as
-# chamadas e responde has-session; /proc falso com comm/cwd/environ. NENHUM tmux, claude ou processo real é tocado;
-# tudo roda com --dry-run. Cada caso reprova contra o mutante dele.
+# session_open — ops/session-open.sh: o ABRIDOR ÚNICO das sessões (core-only, D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116),
+# e o LEITOR ÚNICO de posse que ele lê (.claude/utils/orchestration/ownership.sh, D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120).
+# tmux new-session -A por repo (nome = o da sessão dona), RETOMADA SÓ POR ID EXATO resolvido pelo nome no harness ou no
+# transcript (D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120), RECUSA rc 3 qualquer claude vivo no checkout ou o id vivo
+# noutro lugar, rc 5 no ambíguo, --all pelo registro de posse (members.yaml + lista privada), preflight do merge.
+# Dublês por ambiente (SESSION_OPEN_HOME/PROC/TMUX/CLAUDE/PROJECTS/MEMBERS/OWNERSHIP, ONION_PRIVATE_OWNERS_FILE): tmux de
+# mentira que registra as chamadas e responde has-session; /proc falso com comm/cwd/environ; claude de mentira que só
+# responde `agents --json` de um arquivo. NENHUM tmux, claude ou processo real é tocado; tudo roda com --dry-run.
+# Cada caso reprova contra o mutante dele (no session-open.sh ou no ownership.sh). A paridade da busca no registro com a
+# catraca do ops/pr-merge-verified.sh roda o awk EXTRAÍDO do próprio script da catraca.
 run_session_open_selftests() {
   echo ""
-  echo "▸ session-open — abridor único: cria/anexa, recusa fora do tmux, nome inválido, /proc ilegível, --all por concessão"
-  local sut="${REPO_ROOT}/ops/session-open.sh"
-  [ -f "${sut}" ] || { record_fail "session-open: SUT ausente" "${sut} (core-only)"; return; }
-  command -v git >/dev/null 2>&1 || { record_skip "session-open: git ausente (SUT não exercido)"; return; }
+  echo "▸ session-open — abridor único: retomada por id, nunca duas no checkout, --all pelo registro de posse, preflight"
+  local sut="${REPO_ROOT}/ops/session-open.sh" own="${REPO_ROOT}/.claude/utils/orchestration/ownership.sh"
+  local pmv="${REPO_ROOT}/ops/pr-merge-verified.sh"
+  [ -f "${sut}" ] && [ -f "${own}" ] || { record_fail "session-open: SUT ausente" "${sut} ou ${own} (core-only)"; return; }
+  command -v git >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1 \
+    || { record_skip "session-open: git/python3 ausentes (SUT não exercido)"; return; }
   local sb; sb="$(TMPDIR=/tmp mktemp -d)" || { record_skip "session-open: mktemp falhou"; return; }
   # tmux de mentira: registra args em SO_TLOG; has-session rc 0 se o nome ∈ SO_TSESS (espaço-separado), senão rc 1
   cat > "${sb}/tmux" <<'SO_TMUX'
@@ -60646,11 +60663,29 @@ if [ "$1" = "has-session" ]; then
 fi
 exit 0
 SO_TMUX
-  chmod +x "${sb}/tmux"
-  printf '#!/usr/bin/env bash\nexit 0\n' > "${sb}/claude"; chmod +x "${sb}/claude"  # só precisa existir; nunca roda em --dry-run
-  local HM="${sb}/home"; mkdir -p "${HM}" "${sb}/proc-empty"
+  # claude de mentira: só `agents --json`, lido de SO_AGENTS (lista vazia por padrão); nunca abre sessão (tudo é --dry-run)
+  printf '#!/usr/bin/env bash\n[ "$1" = agents ] && { cat "${SO_AGENTS:-/dev/null}"; exit 0; }\nexit 0\n' > "${sb}/claude"
+  chmod +x "${sb}/tmux" "${sb}/claude"
+  local HM="${sb}/home" PJ="${sb}/projects"; mkdir -p "${HM}" "${sb}/proc-empty" "${PJ}"
+  printf '[]' > "${sb}/agents-empty.json"
   _so_repo() { mkdir -p "${HM}/$1"; ( cd "${HM}/$1" && git init -q -b main ) >/dev/null 2>&1; }
-  _so_repo myrepo
+  _so_repo myrepo; _so_repo repoA; _so_repo repoB; _so_repo repoP; _so_repo fora; _so_repo porta; _so_repo nohist
+  # o registro de fixture: o core, myrepo/repoA com sessão dona, repoB sem, repoC sem pasta, fora de OUTRO dono, porta
+  # (kind: door) e o membro neutro da lista privada (kind: adopter, remote: n/a)
+  printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/onion-bancada/core\n    local_path: /nao/existe/core\n  - id: m-my\n    kind: adopter\n    owner_session: myrepo\n    remote: https://github.com/onion-bancada/myrepo (privado)\n    local_path: %s/myrepo\n  - id: m-a\n    kind: adopter\n    owner_session: repoA   # dona\n    remote: github.com/onion-bancada/repoA\n    local_path: "%s/repoA"\n  - id: m-b\n    kind: adopter\n    remote: github.com/onion-bancada/repoB\n    local_path: %s/repoB\n  - id: m-c\n    kind: adopter\n    owner_session: repoC\n    remote: github.com/onion-bancada/repoC\n    local_path: /nao/existe/repoC\n  - id: m-fora\n    kind: adopter\n    owner_session: fora\n    remote: github.com/outro-dono/fora\n    local_path: %s/fora\n  - id: m-porta\n    kind: door\n    owner_session: porta\n    remote: github.com/onion-bancada/porta\n    local_path: %s/porta\n  - id: m-priv\n    kind: adopter\n    remote: n/a\n    local_path: n/a\n  - id: m-nohist\n    kind: adopter\n    owner_session: nohist\n    remote: github.com/onion-bancada/nohist\n    local_path: %s/nohist\n' \
+    "${HM}" "${HM}" "${HM}" "${HM}" "${HM}" "${HM}" > "${sb}/members.yaml"
+  printf 'm-priv\tonion-bancada/segredo\tpriv-sess\trepoP\n' > "${sb}/priv-ok.tsv"; chmod 600 "${sb}/priv-ok.tsv"
+  cp "${sb}/priv-ok.tsv" "${sb}/priv-open.tsv"; chmod 644 "${sb}/priv-open.tsv"
+  # os transcripts: myrepo tem um, com o título no fim (o último título vale); repoA tem dois bem separados no tempo
+  _so_tr() {  # $1=pasta $2=id $3=título $4=epoch
+    local e; e="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "$1")"; mkdir -p "${PJ}/${e}"
+    printf '{"type":"custom-title","customTitle":"velho","sessionId":"%s"}\n{"type":"user","message":"x"}\n{"type":"custom-title","customTitle":"%s","sessionId":"%s"}\n' "$2" "$3" "$2" > "${PJ}/${e}/$2.jsonl"
+    touch -d "@$4" "${PJ}/${e}/$2.jsonl"
+  }
+  local NOW; NOW="$(date +%s)"
+  _so_tr "${HM}/myrepo" 11111111-aaaa myrepo "$((NOW - 600))"
+  _so_tr "${HM}/repoA" 22222222-old repoA "$((NOW - 7200))"; _so_tr "${HM}/repoA" 33333333-new repoA "$((NOW - 60))"
+  _so_tr "${HM}/repoP" 44444444-priv priv-sess "$((NOW - 60))"; _so_tr "${HM}/repoB" 66666666-b repoB "$((NOW - 60))"
   _so_proc() {  # $1=dir-/proc-falso $2=cwd-do-claude $3=in|out|broken|noenv → um único claude pid 4242
     local d="${1}/4242"; rm -rf "${1:?}"; mkdir -p "${d}"; printf 'claude\n' > "${d}/comm"
     [ "$3" = broken ] || ln -sfn "$2" "${d}/cwd"
@@ -60660,16 +60695,19 @@ SO_TMUX
       noenv) mkdir -p "${d}/environ" ;;  # environ ILEGÍVEL (é diretório)
     esac
   }
-  _so_run() {  # $1=SUT, resto=args → "rc<TAB>saída-numa-linha"; SO_TSESS/SO_PROC/SO_STATE do ambiente de chamada
+  _so_run() {  # $1=SUT, resto=args → "rc<TAB>saída-numa-linha"; SO_* do ambiente de chamada
     local w="$1" o rc; shift; : > "${sb}/tlog"
     if o="$(SESSION_OPEN_HOME="${HM}" SESSION_OPEN_PROC="${SO_PROC:-${sb}/proc-empty}" SESSION_OPEN_TMUX="${sb}/tmux" \
-            SESSION_OPEN_CLAUDE="${sb}/claude" BATON_STATE_DIR="${SO_STATE:-${sb}/state}" SO_TLOG="${sb}/tlog" SO_TSESS="${SO_TSESS:-}" SESSION_OPEN_UID="${SO_UID:-}" \
+            SESSION_OPEN_CLAUDE="${sb}/claude" SESSION_OPEN_PROJECTS="${PJ}" SESSION_OPEN_MEMBERS="${SO_MEMBERS:-${sb}/members.yaml}" \
+            SESSION_OPEN_OWNERSHIP="${SO_OWN:-${own}}" ONION_PRIVATE_OWNERS_FILE="${SO_PRIV:-${sb}/sem-lista.tsv}" \
+            ONION_OWNERSHIP_CORE=onion-bancada/core SO_AGENTS="${SO_AGENTS:-${sb}/agents-empty.json}" \
+            SO_TLOG="${sb}/tlog" SO_TSESS="${SO_TSESS:-}" SESSION_OPEN_UID="${SO_UID:-}" \
             LC_ALL=C bash "${w}" "$@" 2>&1)"; then rc=0; else rc=$?; fi
     printf '%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")"
   }
   _so_mutate() { cp "$1" "$2" && python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' "$2" "$3" "$4"; }
-  local mt="${sb}/mut.sh"
-  _so_case() {  # <nome> <fn> <OLD> <NEW>: fn(SUT) 0 ⇒ caso vale; muta e exige o mutante derrubar o caso
+  local mt="${sb}/mut.sh" mo="${sb}/own-mut.sh"
+  _so_case() {  # <nome> <fn> <OLD> <NEW>: fn(SUT) 0 ⇒ caso vale; muta o session-open e exige o mutante derrubar o caso
     local name="$1" fn="$2" old="$3" new="$4" ri rm_
     if "${fn}" "${sut}"; then ri=0; else ri=1; fi
     if [ "${ri}" = 0 ]; then record_pass "session-open: ${name}"; else record_fail "session-open: ${name}" "${SO_WHY:-caso não satisfeito}"; fi
@@ -60677,12 +60715,21 @@ SO_TMUX
     if "${fn}" "${mt}"; then rm_=0; else rm_=1; fi
     _prove_mutation "session-open: ${name} (MUT)" "${sut}" "${mt}" "${ri}" "${rm_}"
   }
-  # (a) cria quando não há sessão tmux: ensaio de new-session com --name <repo>, e SEM canal doorbell (sem .mcp.json)
+  _so_case_own() {  # igual, mas o mutante é o do LEITOR de posse (o session-open intacto o lê por SESSION_OPEN_OWNERSHIP)
+    local name="$1" fn="$2" old="$3" new="$4" ri rm_
+    if "${fn}" "${sut}"; then ri=0; else ri=1; fi
+    if [ "${ri}" = 0 ]; then record_pass "session-open: ${name}"; else record_fail "session-open: ${name}" "${SO_WHY:-caso não satisfeito}"; fi
+    if ! _so_mutate "${own}" "${mo}" "${old}" "${new}"; then record_fail "session-open: ${name} (MUT não aplicou)" "âncora ausente/não-única"; return; fi
+    if SO_OWN="${mo}" "${fn}" "${sut}"; then rm_=0; else rm_=1; fi
+    _prove_mutation "session-open: ${name} (MUT)" "${own}" "${mo}" "${ri}" "${rm_}"
+  }
+  # (a) cria quando não há sessão tmux: retoma pelo ID EXATO do transcript (o último título vale), nunca --continue,
+  #     sem --name na retomada, e SEM canal doorbell (sem .mcp.json)
   _so_a() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
-    [ "${r%%$'\t'*}" = 0 ] && grep -qF "ensaio: ${sb}/tmux new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --name myrepo" <<< "${r}" \
-      && ! grep -q 'server:doorbell' <<< "${r}"; }
-  _so_case "(a) cria quando não há sessão: ensaio de new-session com --name, sem doorbell sem .mcp.json" _so_a \
-    'cmd="${CLAUDE_BIN} --name ${n}"' 'cmd="${CLAUDE_BIN}"'
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF "ensaio: ${sb}/tmux new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --resume 11111111-aaaa'" <<< "${r}" \
+      && grep -qF 'pelo id exato 11111111-aaaa (fonte: transcript' <<< "${r}" && ! grep -qE -- '--continue|server:doorbell' <<< "${r}"; }
+  _so_case "(a) cria: retoma pelo id exato do transcript, nunca --continue, sem doorbell sem .mcp.json" _so_a \
+    'cmd="${CLAUDE_BIN} --resume ${RID}" ;;' 'cmd="${CLAUDE_BIN} --continue" ;;'
   # (a2) repo com .mcp.json que declara doorbell: o ensaio carrega o canal server:doorbell
   printf '{ "mcpServers": { "doorbell": {} } }\n' > "${HM}/myrepo/.mcp.json"
   _so_a2() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
@@ -60690,6 +60737,53 @@ SO_TMUX
   _so_case "(a2) repo com .mcp.json doorbell: o ensaio carrega o canal server:doorbell" _so_a2 \
     'cmd="${cmd} --dangerously-load-development-channels server:doorbell"' 'cmd="${cmd}"'
   rm -f "${HM}/myrepo/.mcp.json"
+  # (a3) dois transcripts com o nome, bem separados no tempo: escolhe o MAIS RECENTE e diz qual
+  _so_a3() { local r; r="$(SO_TSESS="" _so_run "$1" repoA --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF -- '--resume 33333333-new' <<< "${r}" && ! grep -q '22222222-old' <<< "${r}"; }
+  _so_case "(a3) dois transcripts com o nome, separados: o mais recente, dito" _so_a3 \
+    'done < <(ls -1t "${PROJECTS_DIR}/${enc}"/*.jsonl 2>/dev/null | head -200)' 'done < <(ls -1tr "${PROJECTS_DIR}/${enc}"/*.jsonl 2>/dev/null | head -200)'
+  # (a4) dois transcripts com o nome mudados quase juntos: AMBÍGUO, recusa rc 5 sem abrir
+  _so_tr "${HM}/repoA" 55555555-twin repoA "$((NOW - 30))"
+  _so_a4() { local r; r="$(SO_TSESS="" _so_run "$1" repoA --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF 'ambíguo' <<< "${r}" && ! grep -q 'new-session' "${sb}/tlog"; }
+  _so_case "(a4) dois transcripts com o nome quase juntos: ambíguo, recusa rc 5" _so_a4 \
+    'if [ "${nhit}" -gt 1 ] && [ $(( bestm - second )) -le "${AMBIG_SECS}" ]; then' 'if false; then'
+  rm -f "${PJ}/$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/repoA")/55555555-twin.jsonl"
+  # (a5) o harness lista DUAS sessões paradas com o nome: ambíguo, rc 5
+  printf '[{"kind":"background","sessionId":"aaaa1111-x","name":"myrepo","state":"stopped"},{"kind":"background","sessionId":"bbbb2222-y","name":"myrepo","state":"failed"}]' > "${sb}/agents-two.json"
+  _so_a5() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-two.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF 'ambíguo' <<< "${r}"; }
+  _so_case "(a5) o harness lista duas paradas com o nome: ambíguo, rc 5" _so_a5 \
+    'if [ "${cnt}" -gt 1 ]; then say' 'if false; then say'
+  # (a6) o harness lista UMA parada com o nome: retoma pelo id dela (vence o transcript)
+  printf '[{"kind":"background","sessionId":"cccc3333-z","name":"myrepo","state":"stopped","cwd":"%s/myrepo"}]' "${HM}" > "${sb}/agents-one.json"
+  _so_a6() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-one.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF -- '--resume cccc3333-z' <<< "${r}" && grep -qF 'fonte: claude agents --json' <<< "${r}"; }
+  _so_case "(a6) uma parada com o nome no harness: retoma pelo id dela" _so_a6 \
+    'hits="$(awk -F'\''\t'\'' -v n="${n}" '\''$5 == n'\'' <<< "${PEERS}")"' 'hits=""'
+  # (k) o harness diz que a sessão com o nome está VIVA (de fundo, noutra pasta): recusa rc 3, nunca abre cópia
+  printf '[{"kind":"background","sessionId":"dddd4444-w","name":"myrepo","state":"blocked","cwd":"/x/worktree"}]' > "${sb}/agents-live.json"
+  _so_k() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-live.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'já está viva' <<< "${r}" && ! grep -q 'new-session' "${sb}/tlog"; }
+  _so_case "(k) sessão com o nome viva no harness: recusa rc 3, sem cópia" _so_k \
+    'peer_live "${k}" "${st}" && { say "session-open: a sessão' 'false && { say "session-open: a sessão'
+  # (l) o id resolvido pelo transcript está VIVO com outro nome: recusa rc 3 (a cópia escreveria no mesmo histórico)
+  printf '[{"kind":"interactive","sessionId":"11111111-aaaa","name":"outro-nome","pid":4242,"cwd":"/x/y"}]' > "${sb}/agents-id.json"
+  _so_l() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-id.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'o id 11111111-aaaa já está vivo' <<< "${r}"; }
+  _so_case "(l) o id escolhido vivo com outro nome: recusa rc 3" _so_l \
+    'peer_live "${k}" "${st}" && { say "session-open: o id' 'false && { say "session-open: o id'
+  # (m) nenhuma sessão com o nome e sem --new: recusa rc 5 (abrir nova sem querer perde a antiga); com --new, abre nova
+  _so_m() { local r r2; r="$(SO_TSESS="" _so_run "$1" nohist --dry-run)"; r2="$(SO_TSESS="" _so_run "$1" nohist --dry-run --new)"
+    SO_WHY="$(tr '\t' ' ' <<< "${r} || ${r2}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF 'Nunca --continue' <<< "${r}" && [ "${r2%%$'\t'*}" = 0 ] && grep -qF "'${sb}/claude --name nohist'" <<< "${r2}"; }
+  _so_case "(m) sem sessão com o nome: recusa rc 5 sem --new; com --new abre nova" _so_m \
+    '[ "${NEW}" -eq 1 ] || die "não achei sessão' 'true || die "não achei sessão'
+  # (p) --continue é recusado com o porquê (retomada só por id)
+  _so_p() { local r; r="$(_so_run "$1" myrepo --continue --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 2 ] && grep -qF 'sempre por id exato' <<< "${r}"; }
+  _so_case "(p) --continue recusado: a retomada é sempre por id exato" _so_p \
+    '    --continue|-c) die' '    --continue-x) die'
   # (b) sessão tmux já existe: ANEXA e NÃO cria (nenhum new-session no log do tmux)
   _so_b() { local r; r="$(SO_TSESS="myrepo" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
     [ "${r%%$'\t'*}" = 0 ] && grep -qF 'a sessão tmux «myrepo» já existe — anexo, não crio outra.' <<< "${r}" \
@@ -60701,30 +60795,29 @@ SO_TMUX
   _so_c() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-out" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'já há um claude vivo' <<< "${r}" && grep -qF 'FORA do tmux' <<< "${r}"; }
   _so_case "(c) claude vivo fora do tmux na pasta: RECUSA rc 3" _so_c \
-    '    if [ -n "${out}" ]; then' '    if false; then'
-  # (d) claude vivo DENTRO do tmux (chave TMUX no environ): NÃO recusa, cria normal (rc 0)
+    '      if [ -n "${o2}" ]; then' '      if false; then'
+  # (d) claude vivo DENTRO de OUTRA sessão tmux no mesmo checkout: RECUSA rc 3 (nunca duas sessões no mesmo checkout)
   _so_proc "${sb}/proc-in" "${HM}/myrepo" in
   _so_d() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-in" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
-    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'ensaio:' <<< "${r}" && ! grep -q 'FORA do tmux' <<< "${r}"; }
-  _so_case "(d) claude DENTRO do tmux não recusa: cria normal (rc 0)" _so_d \
-    'grep -q '\''^TMUX='\'' <<< "${env}" && continue' 'grep -q '\''^TMUX='\'' <<< "${env}" && :'
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'noutra sessão tmux' <<< "${r}" && ! grep -q 'new-session' "${sb}/tlog"; }
+  _so_case "(d) claude dentro de OUTRA sessão tmux no checkout: recusa rc 3" _so_d \
+    '    if [ -n "${out}" ]; then' '    if false; then'
   # (e) nome que existe como pasta mas NÃO é repo git: rc 2
   mkdir -p "${HM}/notrepo"
   _so_e() { local r; r="$(SO_TSESS="" _so_run "$1" notrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 2 ] && grep -qF 'não é um repositório git' <<< "${r}"; }
   _so_case "(e) nome que não é repo git: rc 2" _so_e \
-    '[ -d "${dir}/.git" ] || [ -f "${dir}/.git" ] || die "«${dir}» não é um repositório git: o nome da sessão é o nome do repo em ${HOME_DIR}"' \
+    '[ -d "${dir}/.git" ] || [ -f "${dir}/.git" ] || die "«${dir}» não é um repositório git: o nome da sessão é o nome do repo"' \
     ': # mutante: não confere o .git'
   # (f) cwd ILEGÍVEL de um claude do MESMO dono NÃO vira «nenhum processo»: recusa rc 3 (fail-closed). O /proc falso é
-  #     do usuário do teste, então SEM SO_UID o dono do processo == MY_UID (mesmo dono). (achado F1 da revisão: a recusa
-  #     só vale para o mesmo dono)
+  #     do usuário do teste, então SEM SO_UID o dono do processo == MY_UID (mesmo dono)
   _so_proc "${sb}/proc-broken" "${HM}/myrepo" broken
   _so_f() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-broken" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não li' <<< "${r}" && grep -qF 'às cegas' <<< "${r}"; }
   _so_case "(f) cwd ilegível de claude do MESMO dono: recusa rc 3 (fail-closed)" _so_f \
     'return 2  # cwd ilegível do mesmo dono (ou dono indeterminado) → não mede às cegas' \
     'continue  # mutante: fail-open no cwd ilegível do mesmo dono'
-  # (f2) environ ILEGÍVEL de claude do MESMO dono na pasta: recusa rc 3 (fail-closed)
+  # (f2) environ ILEGÍVEL de claude do MESMO dono na pasta: recusa rc 3 às cegas (não sabe se está num tmux)
   _so_proc "${sb}/proc-noenv" "${HM}/myrepo" noenv
   _so_f2() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-noenv" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'às cegas' <<< "${r}"; }
@@ -60737,10 +60830,11 @@ SO_TMUX
   _so_case "(i) cwd ilegível de claude de OUTRO dono: ignora e cria normal (não trava para todo mundo)" _so_i \
     '[ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && continue  # cwd ilegível de OUTRO dono → ignora' \
     '[ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && :  # cwd ilegível de OUTRO dono → ignora'
-  # (i2) environ ILEGÍVEL de claude de OUTRO dono na pasta: IGNORA → cria normal
+  # (i2) claude de OUTRO dono com o cwd LEGÍVEL na pasta e o environ ilegível: é uma 2ª sessão no checkout (rc 3), dita
+  #      sem «às cegas» (o environ alheio ilegível não trava a medida, só não diz se é tmux)
   _so_i2() { local r; r="$(SO_TSESS="" SO_UID=999999 SO_PROC="${sb}/proc-noenv" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
-    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'ensaio:' <<< "${r}" && ! grep -q 'às cegas' <<< "${r}"; }
-  _so_case "(i2) environ ilegível de claude de OUTRO dono: ignora e cria normal" _so_i2 \
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'de outra conta' <<< "${r}" && ! grep -q 'às cegas' <<< "${r}"; }
+  _so_case "(i2) claude de OUTRO dono no checkout, environ ilegível: recusa rc 3 sem «às cegas»" _so_i2 \
     '[ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && continue  # environ ilegível de OUTRO dono → ignora' \
     '[ -n "${puid}" ] && [ "${puid}" != "${MY_UID}" ] && :  # environ ilegível de OUTRO dono → ignora'
   # (h) no caminho de ANEXAR (sessão tmux já existe), cwd ilegível do MESMO dono vira LACUNA NOMEADA, nunca silêncio
@@ -60748,20 +60842,72 @@ SO_TMUX
     [ "${r%%$'\t'*}" = 0 ] && grep -qF 'já existe' <<< "${r}" && grep -qF 'não deu para medir' <<< "${r}"; }
   _so_case "(h) anexar com cwd ilegível do mesmo dono: lacuna nomeada, não silêncio" _so_h \
     'if [ "${rc}" -ne 0 ]; then' 'if false; then'
-  # (g) --all percorre só os nomes com concessão «sim» (repoB «não» fica fora)
-  _so_repo repoA; _so_repo repoB  # repoC: concessão sim, SEM pasta
-  mkdir -p "${sb}/state-all"
-  printf '# bancada\nrepoA\tinterno\tsim\tcore\nrepoB\tinterno\tnão\tcore\nrepoC\tinterno\tsim\tcore\n' > "${sb}/state-all/grants.tsv"
-  _so_g() { local r; r="$(SO_TSESS="" SO_STATE="${sb}/state-all" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
-    grep -q 'new-session -d -s repoA' <<< "${r}" && ! grep -q 'repoB' <<< "${r}"; }
-  _so_case "(g) --all só percorre nome com concessão «sim» (repoB «não» fora)" _so_g \
-    'sim|yes|true|1) ;; *) continue ;;' 'sim|yes|true|1) ;; *) ;;'
-  # (g2) --all exclui nome concedido mas SEM pasta (repoC)
-  _so_g2() { local r; r="$(SO_TSESS="" SO_STATE="${sb}/state-all" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
-    grep -q 'new-session -d -s repoA' <<< "${r}" && ! grep -q 'repoC' <<< "${r}"; }
-  _so_case "(g2) --all exclui nome concedido sem pasta (repoC)" _so_g2 \
-    '[ -d "$(dir_of "${k}")/.git" ] || [ -f "$(dir_of "${k}")/.git" ] || continue' \
-    '[ -d "$(dir_of "${k}")/.git" ] || [ -f "$(dir_of "${k}")/.git" ] || :'
+  # (g) --all percorre TODA sessão dona do registro de posse (repoA e myrepo), não a sem owner_session (repoB)
+  _so_g() { local r; r="$(SO_TSESS="" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -q 'new-session -d -s repoA' <<< "${r}" && grep -q 'new-session -d -s myrepo' <<< "${r}" && ! grep -q 'new-session -d -s repoB' <<< "${r}"; }
+  _so_case_own "(g) --all: toda sessão dona do registro, nunca a sem owner_session (repoB)" _so_g \
+    'BEGIN{OFS="\t"} $3 != "-" { print $1, $4, $5, $6 }' 'BEGIN{OFS="\t"} { print $1, $4, $5, $6 }'
+  # (g2) --all pula, DIZENDO, a sessão dona sem pasta git (repoC)
+  _so_g2() { local r; r="$(SO_TSESS="" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -q 'new-session -d -s repoA' <<< "${r}" && grep -qF 'pulo «repoC»' <<< "${r}" && ! grep -qF '/nao/existe/repoC» não é um repositório git' <<< "${r}"; }
+  _so_case "(g2) --all pula, dizendo, a sessão dona sem pasta (repoC)" _so_g2 \
+    'não é repo git nesta máquina\n'\'' "${sn}" "${lp}" >&2; continue; }' 'não é repo git nesta máquina\n'\'' "${sn}" "${lp}" >&2; }'
+  # (g3) --all inclui a sessão dona da LISTA PRIVADA (modo 600, membro neutro), pela pasta da 4ª coluna, e retoma pelo id
+  _so_g3() { local r; r="$(SO_TSESS="" SO_PRIV="${sb}/priv-ok.tsv" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -qF "new-session -d -s priv-sess -c ${HM}/repoP '${sb}/claude --resume 44444444-priv'" <<< "${r}" && ! grep -q 'onion-bancada/segredo' <<< "${r}"; }
+  _so_case_own "(g3) --all inclui a sessão dona da lista privada, sem imprimir o slug" _so_g3 \
+    'pt="$(_own_private_tsv "${mt}";' 'pt="$(:;'
+  # (g4) lista privada com modo aberto (644): ignorada, dito; a sessão dela não entra
+  _so_g4() { local r; r="$(SO_TSESS="" SO_PRIV="${sb}/priv-open.tsv" _so_run "$1" --all --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    ! grep -q 'priv-sess' <<< "${r}" && grep -q 'new-session -d -s repoA' <<< "${r}"; }
+  _so_case_own "(g4) lista privada com modo 644: ignorada" _so_g4 \
+    '[ $(( 8#${mode} & 8#077 )) -ne 0 ]; then' '[ $(( 8#${mode} & 8#077 )) -ne 0 ] && false; then'
+  # (o) PREFLIGHT: repo com sessão dona ⇒ «sim»; repo sem owner_session ⇒ «não» e o porquê
+  _so_o() { local r r2; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run)"; r2="$(SO_TSESS="" _so_run "$1" repoB --dry-run --new)"
+    SO_WHY="$(tr '\t' ' ' <<< "${r} || ${r2}")"
+    grep -qF 'este repo merja sozinho? sim: m-my declara a sessão dona «myrepo»' <<< "${r}" \
+      && grep -qF 'este repo merja sozinho? não: m-b está no registro (kind: adopter) sem owner_session' <<< "${r2}"; }
+  _so_case_own "(o) preflight: sim com sessão dona, não sem owner_session" _so_o \
+    'if [ "${own}" = "-" ]; then' 'if false; then'
+  # (o2) PREFLIGHT de repo de OUTRO dono ⇒ «não» (repo de cliente só o dono merja), mesmo com owner_session
+  _so_o2() { local r; r="$(SO_TSESS="" _so_run "$1" fora --dry-run --new)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -qF 'merja sozinho? não: m-fora é de outro dono (outro-dono)' <<< "${r}"; }
+  _so_case_own "(o2) preflight: repo de outro dono é não" _so_o2 \
+    'if [ "${rem%%/*}" != "${core_owner}" ]; then' 'if false; then'
+  # (o3) PREFLIGHT de PORTA (kind: door) ⇒ «não», mesmo com owner_session
+  _so_o3() { local r; r="$(SO_TSESS="" _so_run "$1" porta --dry-run --new)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -qF 'merja sozinho? não: m-porta é PORTA' <<< "${r}"; }
+  _so_case_own "(o3) preflight: porta é não" _so_o3 \
+    "    door) printf 'não" "    door-x) printf 'não"
+  # (o4) PREFLIGHT da lista privada: sim, dito «pela lista privada», sem o slug
+  _so_o4() { local r; r="$(SO_TSESS="" SO_PRIV="${sb}/priv-ok.tsv" _so_run "$1" priv-sess --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -qF 'merja sozinho? sim: m-priv declara a sessão dona «priv-sess» (pela lista privada de sessões donas)' <<< "${r}" \
+      && ! grep -q 'segredo' <<< "${r}"; }
+  _so_case_own "(o4) preflight: a lista privada dá sim, sem vazar o slug" _so_o4 \
+    "    if [ \"\${mk}\" != adopter ] || [ \"\${mr}\" != \"n/a\" ]; then" "    if true; then"
+  # (q) PARIDADE com a catraca: a busca no registro do ownership.sh (`row`) dá o MESMO «kind<TAB>owner_session» que o awk
+  #     do _own_repo_gate, EXTRAÍDO do ops/pr-merge-verified.sh (core-only) e rodado sobre o mesmo registro, para cada slug
+  printf 'members:\n  - id: s\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: a\n    kind: adopter\n    owner_session: "sa"   # dona\n    remote: https://github.com/Onion-Bancada/A.git (privado)\n  - id: b\n    kind: adopter\n    remote: github.com/onion-bancada/b\n  - id: d\n    kind: door\n    owner_session: sd\n    remote: https://www.github.com/onion-bancada/d/\n  - id: x\n    kind: adopter\n    owner_session: sx#c\n    remote: github.com/onion-bancada/x\n' > "${sb}/par.yaml"
+  _so_q() {  # $1 = o leitor sob teste
+    [ -f "${pmv}" ] || { SO_WHY="pr-merge-verified.sh ausente"; return 1; }
+    local prog s a b ok=0
+    prog="$(python3 -I -c '
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+g = s.index("_own_repo_gate() {"); a = s.index("_row=\"$(awk -v want=\"${_t}\" '"'"'", g) + len("_row=\"$(awk -v want=\"${_t}\" '"'"'")
+b = s.index("'"'"' <<< \"${_m}\")\"", a)
+print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="não extraí o awk da catraca"; return 1; }
+    for s in onion-bancada/core onion-bancada/a onion-bancada/b onion-bancada/d onion-bancada/x onion-bancada/nada; do
+      a="$(awk -v want="${s}" "${prog}" < "${sb}/par.yaml")"
+      b="$(ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista.tsv" bash "$1" row "${s}" --members "${sb}/par.yaml")"
+      [ "${a}" = "${b}" ] || { ok=1; SO_WHY="${SO_WHY:-}${s}: catraca «${a}» ≠ leitor «${b}»|"; }
+    done
+    return "${ok}"
+  }
+  _so_qr() { SO_WHY=""; _so_q "${SO_OWN:-${own}}"; }
+  _so_case_own "(q) paridade: a busca do leitor dá o mesmo kind/owner_session que o awk extraído da catraca" _so_qr \
+    'sub(/[[:space:]]*\(.*$/, "", v); gsub(/["'\''"'\''"'\'' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v)' \
+    'gsub(/["'\''"'\''"'\'' ]/, "", v); sub(/^(https?:\/\/)?(www\.)?github\.com\//, "", v)'
   rm -rf "${sb}"
 }
 _family run_session_open_selftests
