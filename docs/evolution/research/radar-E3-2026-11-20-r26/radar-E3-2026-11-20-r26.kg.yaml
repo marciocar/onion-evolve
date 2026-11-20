@@ -89,7 +89,7 @@ nodes:
     verified_at: "2026-11-20"
     verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → rc 1, «(f) DERIVA — ausente em: binario:function ⟨F⟩(e){return e.rep  binario:let n=e.matchAll(⟨B⟩),r=e.in»; extração do binário 2.1.329: function Snt(e){return e.replace(/`[^`\\n]+`/g,(o,r)=>{let g=e[r-1];...} e function Gkn(e){let o=e.matchAll(rkr),r=e.includes(\"!`\")?Snt(e).matchAll(skr):[],g=[];for(let h of[...o,...r]){let y=Z7s(h[1]??\"\");if(y)g.push({raw:h[0],command:y,at:h.index})}return g}; as duas regex rkr e skr byte a byte iguais ao molde"
     label: "a guarda de deriva do cited-directive segue reprovando na 2.1.329 e o motor de injeção segue com o mesmo comportamento; desta vez trocaram as três locais (n virou o, r voltou a r, s virou g), não só r e s"
-    narrative: "Na 2.1.327 a troca foi n,r,s → n,o,u (r25). Na 2.1.329 é n,r,s → o,r,g. Um curinga só para r e s, como pede a SAC-433, reprovaria de novo: o n do molde também é literal. A channel_session segue verde (E_CHANNEL_SESSION_VERDE_NA_2_1_329_1120)."
+    narrative: "Na 2.1.327 a troca foi n,r,s → n,o,u (rodada 25). Na 2.1.329 é n,r,s → o,r,g. Um curinga só para r e s, como pede a SAC-433, reprovaria de novo: o n do molde também é literal. A channel_session segue verde (E_CHANNEL_SESSION_VERDE_NA_2_1_329_1120)."
     provenance:
       source: "binário instalado do Claude Code 2.1.329 e a bancada"
       locator: "lint-selftest.sh, família cited_directive, caso (f); _cd_struct"
@@ -205,7 +205,7 @@ nodes:
     verified_at: "2026-11-20"
     verified_against: "medido pelo juiz (subagente general-purpose) na 2.1.329: Bash com run_in_background true foi recusado por «GUARDA-PRETOOLUSE (fundo em subagente)»; o cabeçalho de .claude/hooks/pretooluse-subagent-background-wait.sh (l.29-30) manda re-rodar a sonda a cada /meta:cc-update; a metade da sessão principal (Bash em fundo sem agent_id passa) não foi medida nesta rodada"
     label: "a guarda de espera em fundo em subagente segue barrando na 2.1.329: o agent_id ainda chega ao PreToolUse de um subagente, e a guarda sai rc 2 com run_in_background vindo dele"
-    narrative: "Omissão apontada pelo juiz (CU5). A mesma rodada esbarrou na guarda pelo lado certo: o laço de espera desta sessão coordenadora, que é ela própria um subagente, foi movido para fundo pelo harness sem passar pelo PreToolUse."
+    narrative: "Omissão apontada pelo juiz (critério de omissão do delta). A mesma rodada esbarrou na guarda pelo lado certo: o laço de espera desta sessão coordenadora, que é ela própria um subagente, foi movido para fundo pelo harness sem passar pelo PreToolUse."
     provenance:
       source: "data/judge-verdicts.json"
       locator: "omissoes: re-sonda do agent_id"
