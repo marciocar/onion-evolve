@@ -2,7 +2,8 @@
 branch: feat/aside-routes-reforco-nota-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a0cb1d4825acd1ad7d7910bf18009dd9354f29dd168d3252decccc742f7456bd
+reviewed_code_sha256: e819326a9192600d66dfcec844caaa9224aba8aad34a93fb4a3b85f0748724c8
 findings_total: 10
 findings_real: 10
 findings_blocking: 0
