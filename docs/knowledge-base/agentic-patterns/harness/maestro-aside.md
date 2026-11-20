@@ -42,8 +42,8 @@ Marcador tipado **ancorado no início** da mensagem, case-insensitive, `:` canô
 |---|---|---|
 | `dúvida:` | pergunta sem descarrilhar | — |
 | `corrige:` | dica / correção / orientação | — |
-| `reforço:` | reforço positivo (o PORQUÊ) | — |
-| `nota:` | lembrete/aviso **só desta sessão** | — |
+| `reforço:` | **reforço de ordem ou diretriz** (aplicar já; durável vira memória de feedback) | — |
+| `nota:` | pendência que vira **card** no task manager do dono | — (escrita externa reversível) |
 | `guarda:` | memória **durável** (guardar/relembrar) | leve |
 | `+etapa:` | adicionar etapa | leve (propor se muda escopo commitado) |
 | `-etapa:` | remover/pular etapa | **propor→confirmar (W6)** |
@@ -51,8 +51,9 @@ Marcador tipado **ancorado no início** da mensagem, case-insensitive, `:` canô
 | `guarda-regra:` | instalar guardrail durável de comportamento | **propor→confirmar (Ato 3)** |
 
 **Aliases naturais** (opcionais; o tipado é o canônico): `pergunta:`→`dúvida:` · `dica:`/`orienta:`→`corrige:` ·
-`fyi:`/`avisa:`→`nota:` · `lembre-se,`/`relembra:`→`guarda:` · `em paralelo,`/`enquanto isso,`/`pesquisa:`→`paralelo:` ·
-`mandou bem,`→`reforço:`. Os fluídos aceitam `,` além de `:`.
+`fyi:`/`avisa:` são **aviso só desta sessão** (`notes.md`, sem card; separados de `nota:` em 2026-11-20) · `lembre-se,`/`relembra:`→`guarda:` · `em paralelo,`/`enquanto isso,`/`pesquisa:`→`paralelo:` ·
+`dpuvida:`/`dívida:`→`dúvida:` (digitação medida). Os fluídos aceitam `,` além de `:`. `mandou bem,` saiu em
+2026-11-20: era alias de elogio, e `reforço:` deixou de ser elogio.
 
 ## A tabela de roteamento
 
@@ -62,13 +63,34 @@ Cada marcador aponta o mecanismo **nativo do Claude Code** + o **mecanismo Onion
 |---|---|---|
 | `dúvida:` | **`/btw`** — pergunta lateral efêmera enquanto trabalha (vê o contexto, não entra no histórico); `f` forka p/ ter ferramentas | — |
 | `corrige:` | **agora** → `Esc` (interrompe **mantendo** o trabalho) e reorienta · **depois** → `Enter` (ENFILEIRA; aplica na próxima fronteira de passo, custo-zero) | worklog: registrar a virada em `notes.md` |
-| `reforço:` | `additionalContext` (canal de absorção) | `/meta:diary` `significance:` se revela identidade |
-| `nota:` | anotação efêmera | `notes.md` append-only / scratchpad ([worklog-protocol](../../concepts/worklog-protocol.md)) |
+| `reforço:` | auto-memory `type: feedback` (frase verbatim + data) | aplicar já ao que está em curso; não é diário |
+| `nota:` | — | card via `tm.sh item.create` no dono certo (core ou sessão dona), número confirmado ao maestro; sem provider ou sem `tm.sh`, `notes.md` declarado ([worklog-protocol](../../concepts/worklog-protocol.md)) |
 | `guarda:` | **auto-memory** ("lembre que…" → grava em `~/.claude/projects/<proj>/memory/`); `/memory` p/ navegar | `/meta:diary` (aprendizado, com `conflict_class`+`review_after`); [session-memory-lifecycle](../../concepts/session-memory-lifecycle.md) |
 | `+etapa:` | TodoWrite / plano | `STATE.md` bloco `NEXT` / `plan.md` |
 | `-etapa:` | — | `STATE.md` `NEXT` (propor remoção) |
 | `paralelo:` | **`Ctrl+B`** (background) · `/tasks` · subagentes bg | [`onion-orchestration`](../../../../.claude/skills/onion-orchestration/SKILL.md) + `Workflow` (fan-out) |
 | `guarda-regra:` | `.claude/rules/*.md` (path-scoped) ou hook | diário (`decision`); **forcing-function, não prosa "never do X"** |
+
+### Revisão por medição (2026-11-20)
+
+Transcripts do core de 19/10 a 20/11, decisão do maestro no mesmo dia:
+- `reforço:` (80 usos) é **reforço de ordem**, não elogio ("ir até o final", "converse com o kg-ssot"). A rota
+  antiga mandava ao `/meta:diary`, usado 0 vezes; a sessão gravava memória em 40. Agora a rota manda aplicar já e,
+  se a diretriz é durável, gravar memória de feedback com a frase e a data.
+- `nota:` (16 usos) é **pendência futura** ("precisamos de um manual…"), que o `notes.md` perdia. Agora vira card.
+- **Prefixo composto** (2 usos: `paralelo: dúvida:`, `dúvida: reforço:`): até 3 marcadores seguidos emitem as
+  rotas na ordem escrita, sem repetir, numa linha só (o fallback sem `jq` do hook não escapa quebra de linha).
+  Depois de `dúvida:`, marcador de efeito (`nota:`, `±etapa:`, `guarda:`, `guarda-regra:`) é o assunto da
+  pergunta e não encadeia (`dúvida: nota: vira card?` só responde).
+- A rota de `nota:` cita os caminhos com `%q` e manda a frase do maestro por heredoc de delimitador citado:
+  entre aspas duplas, crase e `$( )` da frase rodariam no shell.
+- **Digitação**: `dpuvida:` 2 vezes (no ABNT2 o acento agudo fica ao lado do P) e `dívida:` 1 vez, querendo dúvida;
+  `dívida:` como palavra própria, 0 vezes. Viraram alias.
+- **Maiúscula com acento**: `grep -i` em `LC_ALL=C` não dobra multibyte; `DÚVIDA:`/`REFORÇO:` ficavam mudos. O Ú, o
+  Í e o Ç vão explícitos na regex.
+- Sem uso no período: `corrige:`, `guarda:`, `guarda-regra:`, `+etapa:`, `-etapa:`.
+
+A família `aside_router_routes` do `lint-selftest.sh` cobre cada caso com um mutante que morre pelo contrato certo.
 
 ### A raia "agora vs depois" (o consenso *STEER, don't stop*)
 

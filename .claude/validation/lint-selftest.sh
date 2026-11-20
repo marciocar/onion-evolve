@@ -2550,6 +2550,177 @@ run_aside_router_selftests() {
   fi
 }
 
+# ---------------------------------------------------------------------------
+# Rotas do Aparte revistas por medição e seladas pelo maestro (2026-11-20): `reforço:` é REFORÇO DE ORDEM/DIRETRIZ
+# (memória de feedback, não diário de elogio); `nota:` vira CARD pelo tm.sh do task manager (notes.md só sem ele);
+# `fyi:`/`avisa:` seguem aviso de sessão; prefixo composto emite até 3 rotas, sem encadear efeito depois de dúvida;
+# "dpuvida:"/"dívida:" são digitação de dúvida; DÚVIDA:/REFORÇO: roteiam em LC_ALL=C.
+# `_arr_contracts` devolve etiquetas "<id>=<observado>" dos contratos que falharam (ids ASCII: o corte por
+# caractere conta bytes em C); cada mutante tem de derrubar o SEU id, casado com o "=" (não por prefixo).
+_arr_keys() {  # $1=motor $2=locale $3=texto → chaves das rotas emitidas, separadas por vírgula ("-" = mudo)
+  local out; out="$(LC_ALL="$2" bash "$1" detect "$3" 2>/dev/null)" || out=""
+  out="$(grep -oE 'APARTE [^ ]+' <<< "$out")" || out=""
+  out="${out//APARTE /}"; out="${out//$'\n'/,}"; printf '%s' "${out:--}"
+}
+_arr_contracts() {  # $1=motor $2=raiz .claude $3=seções (default abcde) → etiquetas falhas ("" = tudo ok)
+  local eng="$1" root="$2" sec="${3:-abcde}" fails="" out loc locs="C" avail id exp txt got today tmq
+  avail="$(locale -a 2>/dev/null)" || avail=""
+  grep -qiE '^c\.utf-?8$' <<< "$avail" && locs="C C.UTF-8"
+  today="$(date +%F)"
+  if [[ "$sec" == *a* ]]; then  # reforço = ordem/diretriz → memória de feedback datada; nada de diário
+    out="$(bash "$eng" detect 'reforço: vá até o final' 2>/dev/null)" || out=""
+    grep -qF 'REFORÇO DE ORDEM' <<< "$out" || fails="${fails} a:sem-ordem="
+    grep -qF 'type: feedback' <<< "$out" || fails="${fails} a:sem-feedback="
+    grep -qF "a data ${today}" <<< "$out" || fails="${fails} a:sem-data="
+    grep -qF '/meta:diary' <<< "$out" && fails="${fails} a:diario="
+  fi
+  out="$(bash "$eng" detect 'nota: precisamos de um manual' 2>/dev/null)" || out=""
+  if [[ "$sec" == *b* ]] && [ -f "${root}/utils/task-manager/tm.sh" ]; then  # nota → card pelo tm.sh desta instalação
+    tmq="$(printf '%q' "${root}/utils/task-manager/tm.sh")"
+    grep -qF "${tmq} item.create" <<< "$out" || fails="${fails} b:sem-item-create="
+    grep -qF 'número do card' <<< "$out" || fails="${fails} b:sem-numero="
+    grep -qF 'notes.md' <<< "$out" || fails="${fails} b:sem-queda="
+    grep -qF 'heredoc de delimitador citado' <<< "$out" || fails="${fails} b:sem-heredoc="
+    grep -qF "(${today})" <<< "$out" || fails="${fails} b:sem-data="
+    [ "$(wc -l <<< "$out")" -eq 1 ] || fails="${fails} b:multilinha="
+  fi
+  if [[ "$sec" == *c* ]] && [ ! -f "${root}/utils/task-manager/tm.sh" ]; then  # sem tm.sh → notes.md declarado
+    grep -qF 'notes.md' <<< "$out" || fails="${fails} c:sem-notes="
+    grep -qF 'item.create' <<< "$out" && fails="${fails} c:card-sem-tm="
+  fi
+  # (d) reconhecimento e (e) composto: id <TAB> chaves esperadas <TAB> texto, nos dois locales
+  for loc in $locs; do
+    while IFS=$'\t' read -r id exp txt; do
+      [ -n "$txt" ] || continue
+      [[ "$sec" == *"${id:0:1}"* ]] || continue
+      got="$(_arr_keys "$eng" "$loc" "$txt")"
+      [ "$got" = "$exp" ] || fails="${fails} ${id}=${loc}:${got}"
+    done <<'CASES'
+d1	dúvida	DÚVIDA: isso quebra?
+d2	reforço	REFORÇO: vá até o final
+d3	dúvida	dpuvida: vale a pena?
+d4	dúvida	dívida: o que é o A7?
+d5	dúvida	DÍVIDA: o que é?
+d6	-	mandou bem, ficou ótimo
+d7	-	dívida técnica é alta
+d8	aviso	fyi: o build está lento
+d9	aviso	avisa: volto às 15h
+e1	paralelo,dúvida	paralelo: dúvida: precisamos fechar o repo?
+e2	dúvida,reforço	dúvida: reforço: você pode fazer?
+e3	dúvida	dúvida: o que é paralelo: aqui?
+e4	dúvida	dúvida: dúvida: repetido
+e5	guarda,nota	lembre-se, nota: x
+e6	dúvida,reforço,paralelo	dúvida: reforço: paralelo: corrige: x
+e7	dúvida	dúvida: nota: vira card?
+e8	dúvida	dúvida: guarda-regra: qual a diferença?
+CASES
+  done
+  printf '%s' "$fails"
+}
+run_aside_router_routes_selftests() {
+  local src_eng="${REPO_ROOT}/.claude/validation/aside-router.sh" src_hk="${REPO_ROOT}/.claude/hooks/aside-router-hook.sh"
+  local base d eng hk orig f payload
+  [ -f "$src_eng" ] && [ -f "$src_hk" ] || { record_fail "aside-router-routes" "motor ou hook ausente"; return; }
+
+  f="$(_arr_contracts "$src_eng" "${REPO_ROOT}/.claude")"
+  if [ -z "$f" ]; then
+    record_pass "aside-router-routes: reforço=ordem com feedback datado · nota=card pelo tm.sh · fyi=aviso · composto · digitação · maiúscula com acento em C"
+  else record_fail "aside-router-routes: contratos" "${f}"; fi
+
+  # cópia num caminho COM ESPAÇO: prova o %q dos caminhos que a rota da nota manda copiar
+  base="$(mktemp -d)"; d="${base}/com espaço"
+  mkdir -p "${d}/.claude/validation" "${d}/.claude/hooks" "${d}/.claude/utils/task-manager"
+  cp "$src_eng" "${d}/.claude/validation/"; cp "$src_hk" "${d}/.claude/hooks/"
+  : > "${d}/.claude/utils/task-manager/tm.sh"; : > "${d}/.claude/utils/task-manager/env-check.sh"
+  eng="${d}/.claude/validation/aside-router.sh"; hk="${d}/.claude/hooks/aside-router-hook.sh"; orig="${base}/orig.sh"
+  cp "$eng" "$orig"
+
+  # hook ponta a ponta com prefixo composto, com jq e no fallback SEM jq (escape só de \ e "); JSON por python3
+  payload='{"session_id":"s1","transcript_path":"/tmp/t","cwd":"/x","hook_event_name":"UserPromptSubmit","prompt":"paralelo: nota: precisamos de um manual"}'
+  local nojq="${base}/nojq" p x b IFS_OLD="$IFS"
+  # dois diretórios VAZIOS no PATH varrido: o caso que abortou o worker no CI fica dentro da própria varredura
+  # (numa variável: o ':' literal entre expansões não é ponto de divisão do IFS)
+  local scan="${base}/vazio1:${base}/vazio2:${PATH}"
+  mkdir -p "$nojq" "${base}/vazio1" "${base}/vazio2"; IFS=':'
+  for p in $scan; do
+    [ -d "$p" ] || continue
+    # sob set -e (o runner): diretório vazio devolve o "*" literal e o 2º ln dele falhava sobre o link pendente,
+    # abortando o worker sem soma (CI do #1704). Pula o que não existe e nunca deixa o ln decidir o rc.
+    for x in "$p"/*; do
+      [ -e "$x" ] || continue
+      b="${x##*/}"; [ "$b" = jq ] && continue
+      [ -e "${nojq}/${b}" ] || [ -L "${nojq}/${b}" ] || ln -s "$x" "${nojq}/${b}" 2>/dev/null || true
+    done
+  done
+  IFS="$IFS_OLD"
+  _arr_hook_both() {
+    local o pathv
+    for pathv in "$PATH" "$nojq"; do
+      o="$(CLAUDE_PROJECT_DIR="$d" PATH="$pathv" bash "$hk" <<< "$payload")" || o=""
+      grep -qF 'APARTE paralelo' <<< "$o" && grep -qF 'APARTE nota' <<< "$o" || return 1
+      python3 -c 'import json,sys; json.loads(sys.stdin.read())' <<< "$o" 2>/dev/null || return 1
+    done
+  }
+
+  if [ -n "$(_arr_contracts "$eng" "${d}/.claude")" ] || ! _arr_hook_both; then
+    record_fail "aside-router-routes: guarda-da-guarda" "a cópia limpa já reprova: $(_arr_contracts "$eng" "${d}/.claude")"; rm -rf "$base"; return
+  fi
+  record_pass "aside-router-routes: o hook entrega as duas rotas do composto em JSON válido, com e sem jq, em caminho com espaço"
+
+  mv "${d}/.claude/utils/task-manager/tm.sh" "${base}/tm.off"
+  f="$(_arr_contracts "$eng" "${d}/.claude" c)"
+  mv "${base}/tm.off" "${d}/.claude/utils/task-manager/tm.sh"
+  if [ -z "$f" ]; then record_pass "aside-router-routes: sem tm.sh a nota cai no notes.md e diz que não virou card"
+  else record_fail "aside-router-routes: (c) sem tm.sh" "${f}"; fi
+
+  # mutantes: <id que tem de cair> <TAB> <sed>; o sed tem de mudar o arquivo; cada um roda só a seção do seu id
+  local tag sedx survivors=""
+  while IFS=$'\t' read -r tag sedx; do
+    [ -n "$sedx" ] || continue
+    cp "$orig" "$eng"; sed -i "$sedx" "$eng"
+    if cmp -s "$orig" "$eng"; then record_fail "aside-router-routes: (MUT ${tag}) guarda-da-guarda" "mutação não aplicou: ${sedx}"; continue; fi
+    if [ "$tag" = "hook" ]; then
+      if _arr_hook_both; then survivors="${survivors} hook(${sedx:0:30})"
+      else record_pass "aside-router-routes: (MUT hook) ${sedx:0:40}… → o hook acusa"; fi
+      continue
+    fi
+    if [ "${tag:0:1}" = c ]; then
+      mv "${d}/.claude/utils/task-manager/tm.sh" "${base}/tm.off"; f="$(_arr_contracts "$eng" "${d}/.claude" c)"
+      mv "${base}/tm.off" "${d}/.claude/utils/task-manager/tm.sh"
+    else f="$(_arr_contracts "$eng" "${d}/.claude" "${tag:0:1}")"; fi
+    case " ${f} " in *" ${tag}="*) record_pass "aside-router-routes: (MUT ${tag}) morre pelo contrato certo" ;;
+      *) record_fail "aside-router-routes: (MUT ${tag})" "sobreviveu ou morreu por outro motivo: '${f}'" ;; esac
+  done <<'MUTANTS'
+a:sem-ordem	s/REFORÇO DE ORDEM ou DIRETRIZ do maestro (não é elogio)/reforço positivo/
+a:sem-feedback	s/grave memória de feedback (auto-memory, type: feedback)/registre via \/meta:diary/
+a:diario	s/não é caso de diário/registre também no \/meta:diary/
+a:sem-data	/DIRECTIVE)/{s/ e a data %s;/;/;s/"\$TODAY" "\$SUFFIX"/"$SUFFIX"/}
+b:sem-item-create	s/%s item.create --title/%s item.list --title/
+b:sem-item-create	s/"\$ENVCHECK_Q" "\$TM_Q"/"$ENVCHECK" "$TM"/
+b:sem-numero	s/, e confirme ao maestro o número do card que voltou//
+b:sem-queda	s/Sem provider (none) ou se o tm.sh falhar: anote no notes.md do scratchpad e DIGA que não virou card e por quê. //
+b:sem-heredoc	s/DENTRO do heredoc de delimitador citado/entre aspas duplas/
+b:sem-data	/APARTE nota — vira CARD de gestão, não/{s/a data (%s) DENTRO/a data DENTRO/;s/"\$TODAY" "\$TODAY"/"$TODAY"/}
+b:multilinha	s/ \[--project <projeto do dono>\]/\\n[--project <projeto do dono>]/
+c:card-sem-tm	s/if \[ -f "\$TM" \]; then/if true; then/
+d1	s/d(ú|Ú|u)vida/d(ú|u)vida/
+d2	s/refor(ç|Ç|c)o/refor(ç|c)o/
+d3	s/|dpuvida|/|/
+d4	s/|d(í|Í)vida|/|/
+d6	s/^  elif grep -qiE '\^nota\[/  elif grep -qiE '^mandou bem[[:space:]]*,' <<< "$line"; then key=DIRECTIVE\n&/
+d7	s/d(í|Í)vida|pergunta)\[\[:space:\]\]\*:/d(í|Í)vida|pergunta)/
+d8	s/then key=FYI/then key=NOTE/
+e1	s/while \[ "\$n" -lt 3 \]/while [ "$n" -lt 1 ]/
+e4	s/case "\$seen" in \*" \${key} "\*) ;; \*)/case "$seen" in *" NEVER "*) ;; *)/
+e6	s/while \[ "\$n" -lt 3 \]/while [ "$n" -lt 9 ]/
+e7	s/NOTE|DROP_STEP|ADD_STEP|GUARDRAIL|REMEMBER) break/NEVERKEY) break/
+hook	s/while \[ "\$n" -lt 3 \]/while [ "$n" -lt 1 ]/
+hook	s/out="\${out:+\${out} ‖ }/out="${out:+${out}\n}/
+MUTANTS
+  [ -z "$survivors" ] || record_fail "aside-router-routes: (MUT) sobreviventes" "${survivors}"
+  rm -rf "$base"
+}
+
 # Modo projection-name — REGRA 30 / P6 do projection-safety.sh. A invariante do TRECHO
 # PROJETADO: o que vem antes de " (" no `name:` do membro tem de ser o próprio slug.
 #
@@ -38746,6 +38917,7 @@ printf "%s/%s" "${PASS}" "${SKIP}"' 2>/dev/null || true)"
 _family run_selftest_outcomes_selftests
 _family run_shell_pipefail_robustness_selftests
 _family run_aside_router_selftests
+_family run_aside_router_routes_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 _family run_vendor_scrub_selftests
