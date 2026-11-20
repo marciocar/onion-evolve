@@ -89,6 +89,13 @@ CASES = [
     ("D58", "Bash", "git -C . push --force", "deny", 1),
     ("D59", "Bash", "git -C . push origin --force feat/x", "deny", 1),
     ("D60", "Bash", "git -C . push origin --mirror", "deny", 1),
+    # refspec com `+` força o push sem flag nenhuma (fix/deny-force-refspec-1120: era o L08, e passava)
+    ("D61", "Bash", "git push origin +HEAD:refs/heads/feat/plus", "deny", 1),
+    ("D62", "Bash", "git push origin +main", "deny", 1),
+    ("D63", "Bash", "git push origin +refs/heads/x:refs/heads/y", "deny", 1),
+    ("D64", "Bash", "git -C . push +feat/x", "deny", 1),
+    ("D65", "Bash", "git -C . push origin +feat/x", "deny", 1),
+    ("D66", "Bash", "git push origin '+main'", "deny", 1),
     # git clean que apaga ignorado: todo grupo de flags, com -x e com -X, nu e com git -C
     ("E01", "Bash", "git clean -x", "deny", 1), ("E02", "Bash", "git clean -fx", "deny", 1),
     ("E03", "Bash", "git clean -dfx", "deny", 1), ("E04", "Bash", "git clean -dx", "deny", 1),
@@ -96,8 +103,7 @@ CASES = [
     ("E07", "Bash", "git clean -fdX", "deny", 1), ("E08", "Bash", "git clean -dfX", "deny", 1),
     ("E09", "Bash", "git clean -dX", "deny", 1), ("E10", "Bash", "git clean -xf", "deny", 1),
     ("E11", "Bash", "git clean -fxd", "deny", 1), ("E12", "Bash", "git clean -xdf", "deny", 1),
-    ("E13", "Bash", "git clean -dxf", "deny", 1), ("E14", "Bash", "git clean -f -d -x", "deny", 1),
-    ("E15", "Bash", "git clean -f -dx", "deny", 1), ("E16", "Bash", "git clean -fdxq", "deny", 1),
+    ("E13", "Bash", "git clean -dxf", "deny", 1), ("E16", "Bash", "git clean -fdxq", "deny", 1),
     ("E21", "Bash", "git -C . clean -x", "deny", 1), ("E22", "Bash", "git -C . clean -fx", "deny", 1),
     ("E23", "Bash", "git -C . clean -dfx", "deny", 1), ("E24", "Bash", "git -C . clean -dx", "deny", 1),
     ("E25", "Bash", "git -C . clean -X", "deny", 1), ("E26", "Bash", "git -C . clean -fX", "deny", 1),
@@ -107,7 +113,6 @@ CASES = [
     ("E33", "Bash", "git clean -ffX", "deny", 1), ("E34", "Bash", "git clean -ffdX", "deny", 1),
     ("E35", "Bash", "git -C . clean -ffx", "deny", 1), ("E36", "Bash", "git -C . clean -ffdx", "deny", 1),
     ("E37", "Bash", "git -C . clean -ffX", "deny", 1), ("E38", "Bash", "git -C . clean -ffdX", "deny", 1),
-    ("E39", "Bash", "git -C . clean -f -d -x", "deny", 1), ("E40", "Bash", "git -C . clean -f -X", "deny", 1),
     # B2: a regra Read também barra escrita no .env, inclusive arquivo novo; custo aceito (.env.example segue livre)
     ("W01", "Write", "{P}/brand/new/.env", "deny", 1),
     ("W02", "Write", "{P}/brand/new/.env.local", "deny", 1),
@@ -169,6 +174,16 @@ CASES = [
     ("N16", "Bash", "git -C . cherry-pick cleanup -x", "pass", 0),
     ("N17", "Bash", "git -C . log clean.sh -x", "pass", 0),
     ("N18", "Bash", "git -C . diff clean.sh -X", "pass", 0),
+    # a simulação passa (fix/deny-force-refspec-1120): o `*` do meio de `git clean* -x*` casava o -n
+    ("N19", "Bash", "git clean -n -x", "pass", 0),
+    ("N20", "Bash", "git clean --dry-run -x", "pass", 0),
+    ("N21", "Bash", "git clean -n -fdx", "pass", 0),
+    ("N22", "Bash", "git clean -f -n -x", "pass", 0),
+    ("N23", "Bash", "git -C . clean -n -x", "pass", 0),
+    ("N24", "Bash", "git -C . clean --dry-run -fdX", "pass", 0),
+    # o `+` que não abre argumento do push não cai
+    ("N25", "Bash", "git push origin v1.0.0+build1", "pass", 0),
+    ("N26", "Bash", 'git log -1 --grep "+main"', "pass", 1),
     ("W10", "Write", "{P}/.env.example", "pass", 1),
     ("W11", "Bash", "cp .env.example sub/.env.copied && rm -f sub/.env.copied", "pass", 1),
     # ── custo declarado: a regra Read também pega inspeção de metadado no Bash; `test -f` é a saída ──
@@ -178,11 +193,19 @@ CASES = [
     ("C05", "Bash", 'git -C . commit --allow-empty -m "docs: proibe git push --force e afins"', "deny", 0),
     ("C06", "Bash", 'git -C . commit --allow-empty -m "docs: o git clean -x some"', "deny", 0),
     ("C07", "Bash", "rm -f my-report /", "deny", 0),
-    ("C08", "Bash", "git -C clean status -x", "deny", 0),
+    ("N27", "Bash", "git -C clean status -x", "pass", 0),  # era o custo C08: saiu com a regra `git -* clean * -x*`
+    # custo declarado do fix/deny-force-refspec-1120: o -n DEPOIS do grupo destrutivo, e o ` +` em mensagem com git -C
+    ("C09", "Bash", "git clean -x -n", "deny", 0),
+    ("C10", "Bash", "git clean -fdx --dry-run", "deny", 0),
+    ("C11", "Bash", 'git -C . commit --allow-empty -m "push origin +main"', "deny", 0),
+    ("C12", "Bash", 'git push origin feat/x -o "ci +skip"', "deny", 0),
     # ── limite medido: o deny NÃO alcança (o esperado é passar; se passar a barrar, a declaração muda) ──
     ("L04", "Bash", "python3 -c \"print(open('.env').read())\"", "pass", 1),
     ("L06", "Bash", "bash -c 'git push --force origin HEAD:refs/heads/feat/bc'", "pass", 1),
-    ("L08", "Bash", "git push origin +HEAD:refs/heads/feat/plus", "pass", 1),
+    # a ordem livre do clean saiu do deny (o glob não sabe "exceto -n"): quem barra é o hook pretooluse-protect-main.sh
+    ("L41", "Bash", "git clean -f -d -x", "pass", 0), ("L42", "Bash", "git clean -f -dx", "pass", 0),
+    ("L43", "Bash", "git -C . clean -f -d -x", "pass", 0), ("L44", "Bash", "git -C . clean -f -X", "pass", 0),
+    ("L45", "Bash", "git clean -e keep -fdx", "pass", 0),
     ("L10","Bash", "eval 'git push --force origin HEAD:refs/heads/feat/ev'", "pass", 1),
     ("L11", "Bash", "rm -Rf {W}/scratch/capital", "pass", 1),
     ("L12", "Bash", "find {W}/scratch/del -delete", "pass", 1),

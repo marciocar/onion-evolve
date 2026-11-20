@@ -2,6 +2,12 @@
 # PreToolUse(Bash) — o 1º uso REAL da capacidade que compra o acoplamento (Onda 7, 2026-09-01).
 # Nega force-push para o ramo de PRODUÇÃO (main, ou o resolvido do repo): a ação irreversível mais barata de barrar. exit 2 = veto ANTES de executar.
 # Escopo estreito por desenho: force-push de BRANCH DE TRABALHO segue livre (o fluxo de stack depende dele).
+# ── git clean que apaga IGNORADO (desde 2026-11-20, fix/deny-force-refspec-1120) ─────────────────────────
+# Também nega `git clean` com -x/-X (apaga o ignorado: o .env some) SEM simulação (-n/--dry-run). Mora aqui
+# porque o deny nativo não sabe dizer "exceto -n": o glob não tem negação, e as regras `git clean* -x*`
+# barravam `git clean -n -x`, que só lista (falso positivo medido no motor real, 2.1.329). O deny ficou só
+# com o grupo destrutivo como 1º argumento (`git clean -fdx*`); a ordem livre (`-f -d -x`, `-e keep -fdx`)
+# é julgada aqui, por token. TETO: o -n DEPOIS do grupo (`git clean -fdx -n`) segue barrado pelo deny.
 input=$(cat)
 # `cwd` do JSON é o diretório ONDE o comando roda — numa worktree de agente é a worktree, não a raiz
 # (`CLAUDE_PROJECT_DIR`). Julgar pela raiz vetava `git push -u origin HEAD` de agente e deixava passar
@@ -28,6 +34,46 @@ if [ "$nopy" = 1 ]; then
 fi
 [ -d "$hcwd" ] || hcwd=$PWD
 [ -z "$cmd" ] && exit 0
+CLEAN_MSG="GUARDA-PRETOOLUSE: git clean com -x/-X apaga o que o .gitignore protege (o .env some) e não volta. Simule antes com -n (ou --dry-run); para apagar, o maestro roda fora da sessão."
+# clean_destroys_ignored — lê linhas canônicas no stdin; rc 0 se alguma é `git clean` com x/X e sem simulação.
+# Por token: cluster curto (-fdx), `-e <padrão>` e `-e<padrão>` (o resto é argumento, não flag), `--exclude`,
+# `--` (dali em diante é caminho) e longa abreviada (`--dry` é `--dry-run`, como o git aceita).
+clean_destroys_ignored() {
+  awk '
+  /^git[ \t]+clean([ \t]|$)/ {
+    x = 0; n = 0; skip = 0; endopt = 0
+    for (i = 3; i <= NF; i++) {
+      t = $i
+      if (skip) { skip = 0; continue }
+      if (endopt) continue
+      if (t == "--") { endopt = 1; continue }
+      if (t ~ /^--/) {
+        nm = t; sub(/=.*/, "", nm)
+        if (length(nm) >= 3 && index("--dry-run", nm) == 1) n = 1
+        else if (length(nm) >= 6 && index("--no-dry-run", nm) == 1) n = 0
+        else if (nm == "--exclude" && t !~ /=/) skip = 1
+        continue
+      }
+      if (t ~ /^-./) {
+        for (j = 2; j <= length(t); j++) {
+          c = substr(t, j, 1)
+          if (c == "e") { if (j == length(t)) skip = 1; break }
+          if (c == "n") n = 1
+          if (c == "x" || c == "X") x = 1
+        }
+      }
+    }
+    if (x && !n) found = 1
+  }
+  END { exit found ? 0 : 1 }'
+}
+# clean_by_shape <texto> — sem tokenizador (python ausente, ou linha inanalisável): corta por ; & | e quebra de
+# linha, tira aspas e `\`, e leva ao juiz o que vem depois do último ` clean` de cada segmento que cita git.
+clean_by_shape() {
+  printf '%s\n' "$1" | tr -d "\"'\\\\" | tr ';&|' '\n\n\n' \
+    | grep -E '(^|[^[:alnum:]_])git([^[:alnum:]_]|$)' \
+    | sed -nE 's/^.*[[:space:]]clean([[:space:]].*)?$/git clean\1/p' | clean_destroys_ignored
+}
 # Julga POR LINHA DE INVOCAÇÃO, nunca a string inteira: heredoc/prosa num comando composto que
 # apenas CITA o vocabulário não pode vetar (falso-positivo medido no 1º dogfood, 2026-09-01 —
 # a classe guarda-por-vocabulário; o veto pegou o próprio commit desta feature). A redução mora na
@@ -35,11 +81,16 @@ fi
 # origin main`, `\git push`, `env git push`, `bash -c "…"` e `git -C . push` passando rc=0 aqui.
 # SEM python3 não há tokenizador: fecha SÓ o que tem forma de force-push (recorte medido, ver a lib).
 if [ "$nopy" = 1 ]; then
+  if clean_by_shape "$cmd"; then echo "$CLEAN_MSG" >&2; exit 2; fi
   onion_nopy_touches force-main "$cmd" || exit 0
   echo "GUARDA-PRETOOLUSE: a análise não rodou (python3 ausente ou quebrado, ou JSON do hook ilegível) — o veto não consegue analisar este comando, que tem forma de force-push (git push com --force, -f, +ref ou --mirror). Fechado por segurança: force-push na main é irreversível. Instale python3 (o tokenizador dos vetos); se for deliberado, o maestro roda fora da sessão." >&2
   exit 2
 fi
 inv=$(ONION_CWD="$hcwd" onion_invocation_lines "$cmd")
+if clean_destroys_ignored <<< "$inv" \
+   || clean_by_shape "$(printf '%s\n' "$inv" | sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p')"; then
+  echo "$CLEAN_MSG" >&2; exit 2
+fi
 # INANALISÁVEL que cita push → FECHADO: não se prova que não é force-push na main (radar E3, 2026-10-05).
 if printf '%s\n' "$inv" | grep -E '^__ONION_UNANALYZABLE__ merge=[01] main=1 ::' | grep -qE '\bpush\b|updateRef|git/refs'; then
   echo "GUARDA-PRETOOLUSE: comando que cita push e NÃO pode ser analisado com certeza — reescreva sem eval, nome de comando em variável, xargs ou brace expansion (force-push na main é irreversível)." >&2
