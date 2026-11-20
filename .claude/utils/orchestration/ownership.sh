@@ -87,7 +87,9 @@ _own_private_tsv() {  # $1 = members_tsv
   fi
   local id sl os lp _r mk mo mr ml rows="" dslug=" " did=" "
   # 1ª varredura, ANTES de validar, como a catraca conta (_pmv_private_lines devolve toda linha cujo slug casa, válida
-  # ou não, e _pmv_private_row recusa com mais de uma): slug repetido e id repetido derrubam TODAS as suas linhas
+  # ou não, e _pmv_private_row recusa com mais de uma): slug repetido e id repetido derrubam TODAS as suas linhas.
+  # O id repetido com slugs DISTINTOS é mais estrito que a catraca (lá cada slug casa uma linha e passa): divergência
+  # do lado seguro, declarada (o preflight diz não; quem decide o merge segue sendo o pr-merge-verified)
   local -A nsl=() nid=()
   while IFS=$'\t' read -r id sl _r || [ -n "${id}" ]; do
     id="$(tr -d '[:space:]' <<< "${id}")"; sl="$(tr -d '[:space:]' <<< "${sl}")"
