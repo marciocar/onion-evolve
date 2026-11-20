@@ -134,7 +134,7 @@ fi
 
 ---
 
-## <a id="procedimento-configuracao-pos-copia"></a>⚙️ Procedimento de Configuração pós-cópia (idempotente)
+## ⚙️ Procedimento de Configuração pós-cópia (idempotente) <a id="procedimento-configuracao-pos-copia"></a>
 
 Usado pela **Fase 3** (install) e pelo **`--update`** — re-aplica os passos install-only que **não** vêm
 na cópia de arquivos (registro de hooks + starter de co-evolução + proteção de formatador). Idempotente:

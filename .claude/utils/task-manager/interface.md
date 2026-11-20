@@ -335,7 +335,7 @@ conferida** (a pesquisa do core não viaja); o core a conferiu antes de publicar
 
 ---
 
-## <a id="derivacao-progress"></a>📈 Derivação `progress` — o % da task-mãe por story points
+## 📈 Derivação `progress` — o % da task-mãe por story points <a id="derivacao-progress"></a>
 
 Desde a **Onda 3** (SAC-64, 2026-10-11). O % de progresso de uma task com subtasks (a task-mãe) é
 **derivado**, não declarado: sai das subtasks normalizadas pelo adapter, por **uma** fórmula, e sempre
