@@ -937,6 +937,110 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  # REPOS DE SERVIÇO DA VPS (2026-11-20, D_SERVICE_REPOS_OWNER_VPS_OPS_1120): a sessão onion-vps-ops é a dona e merja
+  # os PRs deles pelo caminho verificado (ops/pr-merge-verified.sh, catraca da mesma dona registrada); deploy e produção
+  # seguem do maestro. Não vendorizam o framework (sem .claude/), por isso `onion_version: n/a`. O `kind: method` é
+  # PROVISÓRIO, como nos membros de teste do A2A: o registro não tem natureza para "repo de serviço sem vendor" (lacuna
+  # L7). O parent é a fonte, não a onion-vps-ops: o members-validate.sh exige parent = fonte para quem não é consumer, e
+  # consumer pede parent hub. A relação com a vps-ops é a `owner_session`. Sem `piece:`, que é outra decisão.
+  # O id é `onion-svc-*`, não o nome do clone (`onion-vps-*`): o id vira termo de varredura (REGRAS 36, 106 e 119), e o
+  # nome do clone já aparece em 5 arquivos que viajam (medido por grep -w); o `onion-svc-*` não aparece em nenhum.
+  - id: onion-svc-librechat
+    name: onion-svc-librechat (repo de serviço da VPS, LibreChat)
+    role: standalone
+    kind: method                # provisório: não há kind para repo de serviço sem vendor (lacuna L7)
+    owner_session: onion-vps-ops # a sessão dona merja o PR deste repo pelo caminho verificado (D_SERVICE_REPOS_OWNER_VPS_OPS_1120)
+    sponsor: maestro
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-vps-librechat (privado)
+    local_path: /home/marcio/onion-vps-librechat
+    onion_version: n/a          # não vendoriza o framework (sem .claude/)
+    integration_branch: master
+    adopted_at: 2026-11-20      # data do registro; não houve adoção
+    mode: greenfield
+    personality_summary: "Repo de serviço da VPS (LibreChat): compose, scripts de operação e ops/local-gate.sh. Dono: a sessão onion-vps-ops."
+    specializations: [servico-vps]
+    personality_last_sync: 2026-11-20
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
+  - id: onion-svc-logto
+    name: onion-svc-logto (repo de serviço da VPS, Logto)
+    role: standalone
+    kind: method                # provisório: não há kind para repo de serviço sem vendor (lacuna L7)
+    owner_session: onion-vps-ops # a sessão dona merja o PR deste repo pelo caminho verificado (D_SERVICE_REPOS_OWNER_VPS_OPS_1120)
+    sponsor: maestro
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-logto (privado)
+    local_path: /home/marcio/onion-vps-logto
+    onion_version: n/a          # não vendoriza o framework (sem .claude/)
+    integration_branch: master
+    adopted_at: 2026-11-20      # data do registro; não houve adoção
+    mode: greenfield
+    personality_summary: "Repo de serviço da VPS (Logto): compose, scripts de operação e ops/local-gate.sh. Dono: a sessão onion-vps-ops."
+    specializations: [servico-vps]
+    personality_last_sync: 2026-11-20
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
+  - id: onion-svc-waha
+    name: onion-svc-waha (repo de serviço da VPS, WAHA)
+    role: standalone
+    kind: method                # provisório: não há kind para repo de serviço sem vendor (lacuna L7)
+    owner_session: onion-vps-ops # a sessão dona merja o PR deste repo pelo caminho verificado (D_SERVICE_REPOS_OWNER_VPS_OPS_1120)
+    sponsor: maestro
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-waha (privado)
+    local_path: /home/marcio/onion-vps-waha
+    onion_version: n/a          # não vendoriza o framework (sem .claude/)
+    integration_branch: master
+    adopted_at: 2026-11-20      # data do registro; não houve adoção
+    mode: greenfield
+    personality_summary: "Repo de serviço da VPS (WAHA): compose, scripts de operação e ops/local-gate.sh. Dono: a sessão onion-vps-ops."
+    specializations: [servico-vps]
+    personality_last_sync: 2026-11-20
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
+  - id: onion-svc-vaultwarden
+    name: onion-svc-vaultwarden (repo de serviço da VPS, Vaultwarden)
+    role: standalone
+    kind: method                # provisório: não há kind para repo de serviço sem vendor (lacuna L7)
+    owner_session: onion-vps-ops # a sessão dona merja o PR deste repo pelo caminho verificado (D_SERVICE_REPOS_OWNER_VPS_OPS_1120)
+    sponsor: maestro
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-vps-vaultwarden (privado)
+    local_path: /home/marcio/onion-vps-vaultwarden
+    onion_version: n/a          # não vendoriza o framework (sem .claude/)
+    integration_branch: master
+    adopted_at: 2026-11-20      # data do registro; não houve adoção
+    mode: greenfield
+    personality_summary: "Repo de serviço da VPS (Vaultwarden): compose, scripts de operação e ops/local-gate.sh. Dono: a sessão onion-vps-ops."
+    specializations: [servico-vps]
+    personality_last_sync: 2026-11-20
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: onion-messaging
     # Registro no MESMO dia da adoção (2026-11-06): registrar é ato de segurança — a REGRA 36 ignora o
     # prefixo `onion-`, e só o registro protege um repo assim [[vendor-scrub-blind-spot]].
