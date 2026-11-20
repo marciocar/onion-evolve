@@ -63,7 +63,7 @@
 #                             desencontro não pode sair como dono ausente (pedido de rigor da curadoria).
 #   PIECE_UNMEASURED          sem a lista de peers não há nome a casar, ou o leitor de posse falhou: NÃO medido, nunca «sem dono».
 #   O 1º degrau (owner_session) é lido pelo LEITOR ÚNICO de posse, .claude/utils/orchestration/ownership.sh (o mesmo do
-#   ops/session-open.sh, D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120); BATON_OWNERSHIP troca o caminho (bancada).
+#   ops/session-open.sh (core-only), D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120); BATON_OWNERSHIP troca o caminho (bancada).
 #   HIGIENE (D_SESSION_HYGIENE_TMUX_WORKTREE_1114, 2026-11-14): por PROCESSO interativo vivo dos peers, lendo <proc>
 #   (BATON_PROC, padrão /proc): stat (estado, ppid), comm e, SÓ do processo `claude`, a chave TMUX do environ (presença;
 #   o resto do ambiente nunca sai). Aviso, nunca bloqueio; cada aviso traz o comando de cura como texto:
@@ -591,7 +591,7 @@ except Exception as e:
     _members, pieces_src = [], 'NÃO MEDIDAS'; gaps.append(f'peças NÃO MEDIDAS: members.yaml ilegível ({e})')
 _live = [s for s in S.values() if s['cls'] != 'UNREACHABLE']
 # O 1º degrau é o LEITOR ÚNICO de posse (D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120, 2026-11-20):
-# .claude/utils/orchestration/ownership.sh, o mesmo que o ops/session-open.sh lê, sobre o members.yaml deste papel (e a
+# .claude/utils/orchestration/ownership.sh, o mesmo que o ops/session-open.sh (core-only) lê, sobre o members.yaml deste papel (e a
 # lista privada de sessões donas). O pulso não relê a owner_session por conta própria: leitor ausente ou falho deixa o
 # 1º degrau NÃO MEDIDO (a peça sai PIECE_UNMEASURED), nunca cai calado no owners.tsv ou no core.
 own_reader = os.environ.get('BATON_OWNERSHIP') or os.path.normpath(os.path.join(here, '..', 'utils', 'orchestration', 'ownership.sh'))

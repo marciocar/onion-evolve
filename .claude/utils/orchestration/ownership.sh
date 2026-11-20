@@ -165,7 +165,7 @@ _own_find() {  # $1 = nome|caminho ; $2 = tabela
 _own_merge_alone() {  # $1 = linha da tabela → «sim|não<TAB>por quê»
   local id kind own sn lp via rem core_owner="${OWN_CORE_SLUG%%/*}" dyn
   IFS=$'\t' read -r id kind own sn lp via rem <<< "$1"
-  dyn="o PR ainda passa pela catraca do ops/pr-merge-verified.sh: CI verde no head, ponta da base e resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)"
+  dyn="o PR ainda passa pela catraca de merge (ops/pr-merge-verified.sh, core-only): CI verde no head, ponta da base e resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)"
   if [ "${OWN_REG_SRC}" = "árvore" ]; then
     printf 'não\tnão li o members.yaml de origin/main (só a árvore): a catraca lê origin/main, e eu não respondo pelo que ela não leu\n'; return 1
   fi
