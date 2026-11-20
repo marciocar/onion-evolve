@@ -3,14 +3,13 @@ branch: fix/one-touch-midturn-1120
 pr: pendente
 date: 2026-11-20
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 7
 findings_real: 4
 findings_blocking: 0
 tokens: 112383
 duration_min: 8
 findings_fixed: 4
-verdict: APPROVED_WITH_NITS
+verdict: FIXED
 elenxo: true
 elenxo_isolado: true
 reviewer: "Agente revisor separado (code-reviewer), só leitura, mandato de forja (outra sessão, mod/canal, o próprio modelo), ~8 min: APPROVED_WITH_NITS, sem forja nova. Mediu contra o transcript real de 120 MB: d82f5d09 e 81ad8498 aceitas como meio do turno, sugestão aceita de topo recusada, censo das 362 queued_command (peer e channel sempre emoldurados e isMeta; as 44 humanas com humanTurn e commandMode=prompt), disparos agendados nunca viram queued_command. Quatro MENORES (M1 a M4), todos tratados neste PR; três notas fora do diff (injeção por tmux send-keys, RecursionError, mensagem possivelmente duplicada)."
@@ -53,5 +52,5 @@ meio do turno só vale dentro do turno do `prompt_id`, a até 30 s da aprovaçã
 
 ## Veredito
 
-APPROVED_WITH_NITS pelo revisor separado, com os quatro menores tratados. O PR toca guarda (o motor da aprovação e a
+Revisor separado: APPROVED_WITH_NITS. Com os quatro menores tratados neste PR, o veredito do resíduo é FIXED. O PR toca guarda (o motor da aprovação e a
 bancada): o merge é do maestro.
