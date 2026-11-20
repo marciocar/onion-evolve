@@ -2562,7 +2562,8 @@ run_aside_router_selftests() {
 #   (e) o hook entrega a rota tarefa no JSON do UserPromptSubmit.
 _art_recognition() {  # $1=motor $2=dir de fixtures → imprime os casos que falharam ("" = ok)
   local eng="$1" fx="$2" f out miss="" loc locs="C"
-  locale -a 2>/dev/null | grep -qiE '^c\.utf-?8$' && locs="C C.UTF-8"
+  local avail; avail="$(locale -a 2>/dev/null)" || avail=""
+  grep -qiE '^c\.utf-?8$' <<< "$avail" && locs="C C.UTF-8"
   for loc in $locs; do
     for f in "$fx"/pos-tarefa*.txt "$fx"/pos-faca*.txt; do
       [ -f "$f" ] || { miss="${miss} fixture-ausente:$(basename "$f")"; continue; }
@@ -2613,7 +2614,8 @@ run_aside_router_task_selftests() {
 
   # --- no repo real ---
   miss="$(_art_recognition "$src_eng" "$fx")"
-  _ART_LOCS="C"; locale -a 2>/dev/null | grep -qiE '^c\.utf-?8$' && _ART_LOCS="C C.UTF-8"
+  local avail; avail="$(locale -a 2>/dev/null)" || avail=""
+  _ART_LOCS="C"; grep -qiE '^c\.utf-?8$' <<< "$avail" && _ART_LOCS="C C.UTF-8"
   if [ -z "$miss" ]; then record_pass "aside-router-task: (a) tarefa:/faça: roteiam com e sem acento, maiúscula, espaço antes do ':' (locales: ${_ART_LOCS}); no meio, sem ':' ou 'Task:' em inglês fica mudo"
   else record_fail "aside-router-task: (a) reconhecimento" "casos:${miss}"; fi
   # (b) só no core: a porta e o adotante não levam toda peça (forge-guard é core-only) — lá a rota filtra, e é o (d)
@@ -2631,7 +2633,7 @@ run_aside_router_task_selftests() {
   # --- cópia limpa passa antes de qualquer mutante (senão o mutante não prova nada) ---
   if [ -n "$(_art_recognition "$eng" "$fx")" ] || ! bash "$eng" task-map --check >/dev/null 2>&1 \
      || [ -n "$(_art_cited_missing "$eng" "${d}/.claude")" ] \
-     || ! bash "$eng" detect 'tarefa: x' | grep -qF '/meta:forge ·'; then
+     || ! grep -qF '/meta:forge ·' <<< "$(bash "$eng" detect 'tarefa: x')"; then
     record_fail "aside-router-task: guarda-da-guarda" "a cópia limpa já reprova — os mutantes não provariam nada"; rm -rf "$d"; return
   fi
 
