@@ -29,7 +29,7 @@ forma do provedor.
 | **Status** | `TaskStatus` (7 valores) + **transição** por `updateStatus` | o adapter resolve o nome do provedor; nunca inventa status que o projeto/lista não tem |
 | **Prioridade** | `TaskPriority` (`urgent` \| `high` \| `normal` \| `low`) | normalizada; o mapa por provedor está em [Prioridade](#prioridade), com a fonte de cada coluna |
 | **Estimativa** | `storyPoints?: number` (complexidade) e `timeEstimate?: number` (minutos) | duas grandezas, nunca uma: pontos não são tempo |
-| **Progresso** | `percent` + `method` (`story_points` \| `count` \| `mixed` \| `none`), **derivado** das subtasks | nunca lido do provedor nem escrito à mão: é a [derivação `progress`](#derivação-progress--o--da-task-mãe-por-story-points), executada por `progress.sh` |
+| **Progresso** | `percent` + `method` (`story_points` \| `count` \| `mixed` \| `none`), **derivado** das subtasks | nunca lido do provedor nem escrito à mão: é a [derivação `progress`](#derivacao-progress), executada por `progress.sh` |
 | **Comentário** | corpo canônico em **Markdown**; a conversão é do adapter | string no Jira DC e `text`/`html_text` no Asana (ancorados); ADF no comentário do Jira Cloud **não** ancorado — a interface não vê o formato ([texto rico](#texto-rico-é-assunto-do-adapter)) |
 | **Anexo** | `AttachmentInput { filename, contentType, bytes }` | |
 | **Label** | `tags: string[]` | no ClickUp a escrita de tag **não** vai no corpo do update (medido em 2026-10-02) |
@@ -335,7 +335,7 @@ conferida** (a pesquisa do core não viaja); o core a conferiu antes de publicar
 
 ---
 
-## 📈 Derivação `progress` — o % da task-mãe por story points
+## <a id="derivacao-progress"></a>📈 Derivação `progress` — o % da task-mãe por story points
 
 Desde a **Onda 3** (SAC-64, 2026-10-11). O % de progresso de uma task com subtasks (a task-mãe) é
 **derivado**, não declarado: sai das subtasks normalizadas pelo adapter, por **uma** fórmula, e sempre
