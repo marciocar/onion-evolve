@@ -2,6 +2,7 @@
 branch: fix/vps-exposure-restore-test-1120
 pr: pendente
 date: 2026-11-20
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 3
 findings_blocking: 0
