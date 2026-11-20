@@ -52,7 +52,7 @@ Marcador tipado **ancorado no início** da mensagem, case-insensitive, `:` canô
 | `guarda-regra:` | instalar guardrail durável de comportamento | **propor→confirmar (Ato 3)** |
 
 **Aliases naturais** (opcionais; o tipado é o canônico): `pergunta:`→`dúvida:` · `dica:`/`orienta:`→`corrige:` ·
-`fyi:`/`avisa:`→`nota:` · `lembre-se,`/`relembra:`→`guarda:` · `em paralelo,`/`enquanto isso,`/`pesquisa:`→`paralelo:` ·
+`fyi:`/`avisa:` são **aviso só desta sessão** (`notes.md`, sem card; separados de `nota:` em 2026-11-20) · `lembre-se,`/`relembra:`→`guarda:` · `em paralelo,`/`enquanto isso,`/`pesquisa:`→`paralelo:` ·
 `faça:`/`faca:`→`tarefa:` (`task:` ficou de fora: `Task:` em texto colado em inglês daria falso-positivo) · `dpuvida:`/`dívida:`→`dúvida:` (digitação medida). Os fluídos aceitam `,` além de `:`. `mandou bem,` saiu em
 2026-11-20: era alias de elogio, e `reforço:` deixou de ser elogio.
 
@@ -100,6 +100,10 @@ Transcripts do core de 19/10 a 20/11, decisão do maestro no mesmo dia:
 - `nota:` (16 usos) é **pendência futura** ("precisamos de um manual…"), que o `notes.md` perdia. Agora vira card.
 - **Prefixo composto** (2 usos: `paralelo: dúvida:`, `dúvida: reforço:`): até 3 marcadores seguidos emitem as
   rotas na ordem escrita, sem repetir, numa linha só (o fallback sem `jq` do hook não escapa quebra de linha).
+  Depois de `dúvida:`, marcador de efeito (`nota:`, `±etapa:`, `guarda:`, `guarda-regra:`) é o assunto da
+  pergunta e não encadeia (`dúvida: nota: vira card?` só responde).
+- A rota de `nota:` cita os caminhos com `%q` e manda a frase do maestro por heredoc de delimitador citado:
+  entre aspas duplas, crase e `$( )` da frase rodariam no shell.
 - **Digitação**: `dpuvida:` 2 vezes (no ABNT2 o acento agudo fica ao lado do P) e `dívida:` 1 vez, querendo dúvida;
   `dívida:` como palavra própria, 0 vezes. Viraram alias.
 - **Maiúscula com acento**: `grep -i` em `LC_ALL=C` não dobra multibyte; `DÚVIDA:`/`REFORÇO:` ficavam mudos. O Ú, o
