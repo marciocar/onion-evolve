@@ -25090,6 +25090,54 @@ run_vps_exposure_selftests() {
   else record_pass "vps-exposure: (d2) cala quando todo artefato tem .gpg"; fi
   rm -rf "${_bd}"
 
+  # (e) ALLOWLIST `restore-test-*.txt` (sinal da operacao da VPS, 19/11): o relatorio do teste de
+  #     restauracao NAO e backup em claro. O caso roda o DETECTOR como o runner o roda (bash + override)
+  #     e exige, antes do negativo, que a guarda tenha CHEGADO ao bloco de backup: sem docker ela cala
+  #     no topo e o "nao acusou" seria verde-vazio — por isso, fora da VPS, o caso e SKIP, nunca PASS.
+  _vps_bk() { # _vps_bk <guarda> <arquivo>... — fixture isolada; imprime ACUSA, CALA ou FORA
+    local _gg="$1" _dd _f _o; shift; _dd="$(mktemp -d)"
+    for _f in "$@"; do : > "${_dd}/${_f}"; done
+    _o="$(BACKUP_DIRS_OVERRIDE="${_dd}" bash "${_gg}" --format tsv 2>&1)"
+    if grep -q 'BACKUP-EM-CLARO' <<< "${_o}"; then echo ACUSA
+    elif BACKUP_DIRS_OVERRIDE="${_dd}" bash "${_gg}" 2>&1 | grep -q 'fora do escopo'; then echo FORA
+    else echo CALA; fi
+    rm -rf "${_dd}"
+  }
+  if [ "$(_vps_bk "${g}" dump.sql)" != ACUSA ]; then
+    record_skip "vps-exposure: (e) allowlist restore-test — guarda fora de escopo aqui (sem docker), o negativo seria verde-vazio"
+  else
+    local _r _case _m
+    # (e1) o falso positivo some: o relatorio sozinho, e ao lado de dump cifrado
+    _r="$(_vps_bk "${g}" restore-test-2026-11-01.txt dump-2026-11-01.sql.gpg)"
+    [ "${_r}" = CALA ] && record_pass "vps-exposure: (e1) restore-test-<data>.txt (relatorio) NAO e backup em claro" \
+      || record_fail "vps-exposure: (e1)" "relatorio do teste de restauracao acusado (${_r})"
+    # (e2..e4) o dump real e o nome parecido com extensao de dado seguem HARD, mesmo ao lado do relatorio
+    for _case in "dump-2026-11-01.sql" "restore-test-2026-11-01.tar" "restore-test-2026-11-01.sql" "notas.txt" "restore-test-2026-11-01.sql.txt"; do
+      _r="$(_vps_bk "${g}" restore-test-2026-11-01.txt "${_case}")"
+      [ "${_r}" = ACUSA ] && record_pass "vps-exposure: (e) ${_case} ao lado do relatorio segue HARD" \
+        || record_fail "vps-exposure: (e) ${_case}" "deveria ser acusado e veio ${_r}"
+    done
+    # (e5) MUTANTES — a cura e load-bearing nos dois sentidos. Cada sed tem a guarda-da-guarda do cmp.
+    _m="$(mktemp -d)"
+    # M-a: sem a exclusao, o relatorio volta a ser acusado (e1 tem de morrer)
+    sed "s/ ! \\\\( -name 'restore-test-\*\.txt' ! -name 'restore-test-\*\.\*\.txt' \\\\)//" "${g}" > "${_m}/a.sh"
+    if cmp -s "${g}" "${_m}/a.sh"; then record_fail "vps-exposure: (e5a)" "GUARDA-DA-GUARDA: mutante sem a exclusao virou no-op"
+    elif [ "$(_vps_bk "${_m}/a.sh" restore-test-2026-11-01.txt)" = ACUSA ]; then record_pass "vps-exposure: (e5a) MUTANTE sem a exclusao MORRE (relatorio volta a ser acusado)"
+    else record_fail "vps-exposure: (e5a)" "mutante sem a exclusao sobreviveu"; fi
+    # M-b: exclusao larga demais (`restore-test-*`), o tar/sql de mesmo prefixo escapa (e2/e3 tem de morrer)
+    sed "s/-name 'restore-test-\*\.txt' !/-name 'restore-test-*' !/" "${g}" > "${_m}/b.sh"
+    if cmp -s "${g}" "${_m}/b.sh"; then record_fail "vps-exposure: (e5b)" "GUARDA-DA-GUARDA: mutante largo virou no-op"
+    elif [ "$(_vps_bk "${_m}/b.sh" restore-test-2026-11-01.tar)" = CALA ]; then record_pass "vps-exposure: (e5b) MUTANTE largo (restore-test-*) MORRE (o .tar escaparia)"
+    else record_fail "vps-exposure: (e5b)" "mutante largo sobreviveu: a bancada nao distingue a cura estreita da larga"; fi
+    # M-c: sem a clausula da extensao dupla, `restore-test-x.sql.txt` escapa (o achado da revisao adversarial)
+    sed "s/ ! -name 'restore-test-\*\.\*\.txt'//" "${g}" > "${_m}/c.sh"
+    if cmp -s "${g}" "${_m}/c.sh"; then record_fail "vps-exposure: (e5c)" "GUARDA-DA-GUARDA: mutante sem a extensao dupla virou no-op"
+    elif [ "$(_vps_bk "${_m}/c.sh" restore-test-2026-11-01.sql.txt)" = CALA ]; then record_pass "vps-exposure: (e5c) MUTANTE sem a extensao dupla MORRE (o .sql.txt escaparia)"
+    else record_fail "vps-exposure: (e5c)" "mutante sem a extensao dupla sobreviveu"; fi
+    rm -rf "${_m}"
+  fi
+  unset -f _vps_bk
+
   # (c) MUTATION — a guarda-da-guarda. Se o predicado de bind for apagado, a regra vira verde-vazia.
   #     Este caso prova que a clausula e LOAD-BEARING, e nao decoracao.
   local d; d="$(mktemp -d)"
