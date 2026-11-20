@@ -2,7 +2,8 @@
 branch: fix/vps-exposure-restore-test-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2506d7117d483bfc41cfb381bc7018f6dc3b908b8556f0fe7478c934541c6125
+reviewed_code_sha256: b86f0446390a35879e1f792295c32e4a4ee91e1b0e710e7c1de37730a6bd1adb
 findings_total: 6
 findings_real: 3
 findings_blocking: 0
