@@ -2,7 +2,8 @@
 branch: fix/doc-anchors-adopter-check-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: bce83cf361af7d6eb7d207ec0713fa121cb8416273ef9fad5218b8a5de6437ec
+reviewed_code_sha256: 331b9258fc3aaf8f2f18b784de3b112a2a022b0f35fe88d4a56999c3ee64300b
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
