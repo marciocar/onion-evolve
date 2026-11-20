@@ -27218,7 +27218,7 @@ print(json.dumps(e))' "$@" >> "${_ottp}"
   # prompt_id e recusa (revisão separada de 18/11, achado 1)
   _othook "pode rodar" "${_otpid}" >/dev/null
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot5c) aprovação regravada para a mesma palavra (hash novo, mesmo prompt_id) ⇒ recusa" 1 "já foi usada"
-  _otmut 's/        if cols\[0\] == appr\["hash"\] or (len(cols) > 1 and cols\[1\] == wid):/        if cols[0] == appr["hash"]:/' "(ot5c-MUT)"
+  _otmut 's/        if cols\[0\] == appr\["hash"\] or (len(cols) > 1 and cols\[1\] in (wid, fam)):/        if cols[0] == appr["hash"]:/' "(ot5c-MUT)"
   _othook "pode rodar" "${_otpid}" >/dev/null
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot5c-MUT) com o livro só pelo hash, a palavra se reusaria — o prompt_id no livro é a causa" 0 "pelo «pode rodar»"
   _otrestore
@@ -27249,7 +27249,7 @@ print(json.dumps(e))' "$@" >> "${_ottp}"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot16c) segundo uso da palavra do meio do turno ⇒ recusa (livro)" 1 "já foi usada"
   _othook "pode rodar" "${_otpid}" >/dev/null
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot24) palavra do meio do turno com a aprovação regravada (hash novo) ⇒ recusa pelo id da palavra" 1 "já foi usada"
-  _otmut 's/        if cols\[0\] == appr\["hash"\] or (len(cols) > 1 and cols\[1\] == wid):/        if cols[0] == appr["hash"]:/' "(ot24-MUT)"
+  _otmut 's/        if cols\[0\] == appr\["hash"\] or (len(cols) > 1 and cols\[1\] in (wid, fam)):/        if cols[0] == appr["hash"]:/' "(ot24-MUT)"
   _othook "pode rodar" "${_otpid}" >/dev/null
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot24-MUT) com o livro só pelo hash, a palavra do meio do turno se reusaria — o id da palavra no livro é a causa" 0 "pelo «pode rodar»"
   _otrestore
@@ -27275,9 +27275,10 @@ print(json.dumps(e))' "$@" >> "${_ottp}"
   _otmut "${_otorig}" "(ot17-MUT)"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot17-MUT) sem conferir a origem, o peer do meio do turno mergearia — a conferência é a causa" 0 "pelo «pode rodar»"
   _otrestore
-  # (ot18) sugestão aceita no meio do turno (promptSource suggestion_accepted) ⇒ recusa
+  # (ot18) sugestão aceita no meio do turno ⇒ recusa. FORMA NÃO MEDIDA (revisão de 20/11, M1): o harness nunca gravou
+  # promptSource no queued_command; o caso prova que, se gravar, o executor julga. Hoje a forma não distingue.
   _otarmm human human 1 0 "pode rodar" "" suggestion_accepted; _otrun "${fc}" "${_pi}" --one-touch
-  _otcase "(ot18) sugestão aceita no meio do turno ⇒ recusa" 1 "sugestão aceita nunca autoriza"
+  _otcase "(ot18) sugestão aceita no meio do turno (forma não medida, promptSource marcado) ⇒ recusa" 1 "sugestão aceita nunca autoriza"
   _otmut 's/^                "origin": a.get("origin"), "promptSource": (("queued" if ps is None else ps) if human_turn else None),$/                "origin": a.get("origin"), "promptSource": "queued",/' "(ot18-MUT)"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot18-MUT) tomando todo queued_command por digitado, a sugestão aceita mergearia — ler o promptSource é a causa" 0 "pelo «pode rodar»"
   _otrestore
@@ -27313,6 +27314,29 @@ print(json.dumps(e))' "$@" >> "${_ottp}"
   _otcase "(ot22) mensagem do meio do turno a 2 min da aprovação ⇒ recusa" 1 "não está no transcript"
   _otmut 's/^            if abs(when - granted) > MIDTURN_SKEW_S:$/            if False:/' "(ot22-MUT)"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot22-MUT) sem a janela, a mensagem distante mergearia — a janela é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (ot25) revisão de 20/11 (M4): um tool_result com o promptId do turno ANTIGO, gravado depois de outro turno, não
+  # devolve a amarra ao turno antigo
+  _otarmm; _ottr "${_otpid}-outro" human typed 0 "outro assunto"
+  python3 -I -c 'import json,sys
+L=open(sys.argv[1]).read().splitlines();m=[l for l in L if "queued_command" in l][-1];L.remove(m)
+L.append(json.dumps({"type":"user","promptId":sys.argv[2],"message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t1","content":"ok"}]},"timestamp":"2026-01-01T00:00:00.000Z"}))
+L.append(m);open(sys.argv[1],"w").write("\n".join(L)+"\n")' "${_ottp}" "${_otpid}"
+  _otrun "${fc}" "${_pi}" --one-touch
+  _otcase "(ot25) tool_result do turno antigo depois de outro turno não reabre o turno antigo ⇒ recusa" 1 "não está no transcript"
+  _otmut 's/^                if isinstance(c, list) and c and all(isinstance(x, dict) and x.get("type") == "tool_result" for x in c):$/                if False:/' "(ot25-MUT)"
+  _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot25-MUT) com o tool_result movendo a amarra, a mensagem de outro turno mergearia — pular o tool_result é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (ot26) revisão de 20/11 (M2): o consume que não leu o transcript grava «P/*», que gasta também a palavra P/uuid
+  o="$(python3 -I -c 'import sys;sys.path.insert(0,sys.argv[1]);import one_touch as o
+print(o.ledger_hit(["HASH_A\tP/*\tx\n"],{"hash":"HASH_B"},"P/S"), o.ledger_hit(["HASH_A\tP/*\tx\n"],{"hash":"HASH_B"},"P"), o.ledger_hit(["HASH_A\tP/*\tx\n"],{"hash":"HASH_B"},"Q/S"))' "$(dirname "${_ote}")")"
+  if [ "${o}" = "True True False" ]; then record_pass "pr-merge-verified: (ot26) marca «P/*» do consume sem transcript gasta P e P/uuid, e só o turno P"
+  else record_fail "pr-merge-verified: (ot26)" "out=${o}"; fi
+  _otmut 's/^    fam = wid.split("\/", 1)\[0\] + "\/\*"$/    fam = "\\0"/' "(ot26-MUT)"
+  o="$(python3 -I -c 'import sys;sys.path.insert(0,sys.argv[1]);import one_touch as o
+print(o.ledger_hit(["HASH_A\tP/*\tx\n"],{"hash":"HASH_B"},"P/S"))' "$(dirname "${_ote}")")"
+  if [ "${o}" = "False" ]; then record_pass "pr-merge-verified: (ot26-MUT) sem a marca de família, a palavra P/uuid ficaria livre — a marca é a causa"
+  else record_fail "pr-merge-verified: (ot26-MUT)" "out=${o}"; fi
   _otrestore
   # (ot21b) prompt_id AUSENTE no payload ⇒ o hook não grava aprovação
   rm -f "${_otappr}"; _otrun "${fc}" "${_pi}" --one-touch-request

@@ -49,12 +49,19 @@ na 1ª mensagem de uma sessão, o arquivo nem existe quando o hook roda. Daí a 
   e `isMeta`). O executor aceita essa forma só se ela está **dentro** do turno do `prompt_id` (o último `promptId` visto
   antes dela é o do payload), nasceu a até 30 s da gravação da aprovação, tem `humanTurn: true`, `commandMode: prompt`,
   `origin.kind: human`, nenhum `isMeta` e, se trouxer `promptSource`, ele é `typed` ou `queued`. Antes da cura o leitor
-  só via a forma de topo e recusava («a frase … não está no transcript»);
+  só via a forma de topo e recusava («a frase … não está no transcript»). **Limite medido**: nenhuma das 44 mensagens
+  humanas do meio do turno traz `promptSource`, então esta forma não distingue digitado de sugestão aceita; os 32
+  aceites de sugestão medidos vieram com a sessão parada (forma de topo, recusada). Se o harness passar a marcar
+  `promptSource` aqui, o executor já o julga;
 - o **livro do executor** guarda o hash da aprovação **e** o id da palavra (o `prompt_id` no topo; `prompt_id/uuid` da
-  mensagem no meio do turno): regravar a aprovação para a mesma palavra gera hash novo, mas não um segundo uso, e duas
+  mensagem no meio do turno; `prompt_id/*` quando o consume não leu o transcript, que gasta todo o turno): regravar a aprovação para a mesma palavra gera hash novo, mas não um segundo uso, e duas
   palavras no mesmo turno são duas palavras.
 
 Falha **fechada** nos dois: o que não dá para ler não autoriza.
+
+O teto inclui a **injeção pelo terminal**: no mesmo usuário Unix, `tmux send-keys 'pode rodar' Enter` no painel da
+sessão é gravado pelo harness como digitação humana legítima, nas duas formas. Só o nível 2 (identidade que o agente
+não controla) fecha isso.
 
 ## O esquema de ato (compartilhado)
 
