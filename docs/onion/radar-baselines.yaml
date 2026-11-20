@@ -13,13 +13,13 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-11-18
-    cc_version: "2.1.327"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "juiz independente (opus não-fork): 12 sustentados e 4 exagerados (o ask de hook em bypass, o freio de mensagens entre sessões, a recusa do git composto em agente isolado e o fechamento da pergunta), aplicados com 4 superações e 3 omissões medidas; Aufhebung: SUPERSEDES de três nós da r24"
-                            # rodada 25 (2.1.322->2.1.327, quatro versões com seção, 973 itens). Campos de origem do prompt intactos;
-                            # ask de hook recusado sem quem responda já na baseline; hooksPath absoluto em worktree de agente segue;
-                            # cited_directive reprova por renomeação de locais. Ações: SAC-432 a SAC-435. Histórico da r24 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-11-18-r25/radar-E3-2026-11-18-r25.kg.yaml
+    last_run: 2026-11-20
+    cc_version: "2.1.329"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "juiz independente (opus não-fork, effort high): 8 sustentados e 4 exagerados (duas linhas citadas erradas, a régua de defasagem misturada e o fechamento da pergunta antes das omissões), aplicados com 4 superações e 4 omissões medidas; a rodada refutou a afirmação do juiz de que o effort não sai na chamada; Aufhebung: SUPERSEDES de quatro nós da r25"
+                            # rodada 26 (2.1.327->2.1.329, duas versões com seção, 274 itens). Vetos PreToolUse já com onFailure
+                            # block diante do Code Mode; cited_directive reprova por renomeação (agora o n também); bridge e revisor
+                            # seguem para trás. Ações: SAC-432 e SAC-433 comentadas, SAC-492 nova. Histórico da r25 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-11-20-r26/radar-E3-2026-11-20-r26.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml

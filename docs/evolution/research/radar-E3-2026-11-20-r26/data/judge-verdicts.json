@@ -1,0 +1,197 @@
+{
+  "criteria": [
+    {
+      "id": "CU1_CITACAO_DIVERGE",
+      "when": "data/<versão>.txt não bate byte a byte com a seção do CHANGELOG oficial, ou um nó cita texto ou linha (l.N) que não está lá",
+      "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk '$0==\"## <versão>\"{f=1;print;next} /^## /{f=0} f') data/<versão>.txt para 2.1.328 e 2.1.329; grep -n -F de cada trecho citado em data/"
+    },
+    {
+      "id": "CU2_MEDICAO_NAO_REPRODUZ",
+      "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+      "check": "re-executar: claude --version; cc-delta-census.sh --markdown; currency-census.sh; LC_ALL=C lint-selftest.sh --families cited_directive e channel_session; extração do parser de injeção do binário 2.1.329; python3 sobre .claude/settings.json (PreToolUse e onFailure); grep -n 'exit' nos hooks citados; contagem por version no transcript"
+    },
+    {
+      "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+      "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+      "check": "ler label e verified_against e conferir no core por grep -n ou leitura do hook, do comando e do settings"
+    },
+    {
+      "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+      "when": "a rodada supera nó da r25 que não existe ou cujo estado ainda vale, ou deixa de superar nó cujo estado a medição de hoje derrubou",
+      "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-11-18-r25/radar-E3-2026-11-18-r25.kg.yaml e comparar o estado afirmado com a medição de hoje"
+    },
+    {
+      "id": "CU5_OMISSAO_DO_DELTA",
+      "when": "um item do delta toca superfície real do core e a rodada não o mediu nem o declarou em NÃO-VERIFICADOS",
+      "check": "ler data/*.txt e, para cada candidato ausente, medir a superfície no core (hooks em .claude/settings.json, comandos, agentes, ops/)"
+    },
+    {
+      "id": "CU6_VAZAMENTO_EM_REPO_PUBLICO",
+      "when": "o grafo ou a SYNTHESIS trazem nome de cliente ou de pessoa, caminho de máquina, IP, hostname ou e-mail",
+      "check": "grep -rnE '/home/|/tmp/|~/' docs/evolution/research/radar-E3-2026-11-20-r26 fora de data/2.1.*.txt; kg-contract-check.sh"
+    },
+    {
+      "id": "CU7_EFEITO_AFIRMADO_SEM_MEDIR_O_MODO",
+      "when": "o nó afirma efeito de comportamento num modo (Code Mode, -p, bypass, outro crossSessionInbound) que a medição não exercitou",
+      "check": "conferir que o label ou o narrative declara o modo não medido; onde possível e barato, repetir a medição no modo afirmado"
+    }
+  ],
+  "verdicts": [
+    {
+      "alvo": "E_DELTA_DA_RODADA",
+      "veredito": "SUSTENTA",
+      "nota": "diff e cmp de data/2.1.328.txt e data/2.1.329.txt contra a seção extraída do CHANGELOG oficial baixado em 2026-11-20 (curl raw.githubusercontent) → diff vazio nos dois; 147 linhas/144 itens e 133/130 conferem (grep -c '^- '); claude --version → 2.1.329; cc-delta-census.sh --markdown → baseline 2.1.327, disco 2.1.329, processo 2.1.329, bridge 2.1.323 (SDK 0.3.323). Ressalva: o trace aponta SYNTHESIS.md, que ainda não existe na worktree."
+    },
+    {
+      "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+      "veredito": "EXAGERA",
+      "nota": "274 itens confere (144+130). Mas a pergunta se fecha como done antes de a rodada ver itens que tocam superfície medida da casa: a re-sonda do agent_id que o próprio hook pede a cada /meta:cc-update, a bancada do deny, os campos de origem do prompt (2.1.328 l.136) e o effort do juiz (2.1.329 l.45). E a SYNTHESIS com os NÃO-VERIFICADOS que o verified_against cita ainda não existe.",
+      "criterio": {
+        "id": "CU5_OMISSAO_DO_DELTA",
+        "comando": "sed -n 29,30p .claude/hooks/pretooluse-subagent-background-wait.sh (a sonda tem de ser re-rodada no /meta:cc-update) e grep -c agent_id docs/evolution/research/radar-E3-2026-11-20-r26/radar-E3-2026-11-20-r26.kg.yaml → 0"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "fechar a pergunta só com as omissões do juiz entradas como nós (como a r25 fez com C_SUPERACAO_20261118_PERGUNTA_FECHA_COM_AS_OMISSOES) e com a SYNTHESIS gravada",
+        "medida": "o juiz mediu no vivo três das omissões (agent_id, deny, origem do prompt), e as três seguem verdes na 2.1.329; ver a chave omissoes"
+      }
+    },
+    {
+      "alvo": "E_HOST_NA_2_1_329_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1120",
+      "veredito": "SUSTENTA",
+      "nota": "claude --version → 2.1.329; cc-delta-census → bridge 2.1.323 (SDK 0.3.323), 5 versões atrás (conta seções do CHANGELOG); currency-census.sh → bridge 0.3.323→0.3.329 defasada, action 1.0.272→1.0.284 defasada; grep -n 'claude-code-action@' .github/workflows/onion-review.yml → l.329 e l.493 com anthropics/claude-code-action@d5f7970a; gh api: a tag v1.0.272 aponta anthropics/claude-code-action@d5f7970a e a v1.0.284 aponta anthropics/claude-code-action@c84e279f. Ressalva de precisão: o revisor na 2.1.322 também não recebe a 2.1.323, e o npm tem a 2.1.324 (sem seção no CHANGELOG)."
+    },
+    {
+      "alvo": "Q_SUBIR_SDK_DO_BRIDGE_0_3_329_E_PIN_DO_REVISOR_V1_0_284_1120",
+      "veredito": "EXAGERA",
+      "nota": "Os alvos 0.3.329 e v1.0.284 conferem (currency-census.sh). A narrative mistura duas réguas: 'bridge de 4 para 5' e 'revisor de 5 para 7'. No npm (que tem a 2.1.324), o bridge foi de 4 para 6 e o revisor de 5 para 7. No CHANGELOG (régua do cc-delta-census, sem a 2.1.324), o bridge foi de 3 para 5 e o revisor de 4 para 6. Não medi o 'updatedAt = createdAt' do SAC-432: ler o Linear exige o .env, fora do meu mandato.",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "npm view @anthropic-ai/claude-code versions --json (2.1.324 publicada) e grep -n '^## 2.1.32' do CHANGELOG oficial (sem 2.1.324); contar versões depois de 2.1.323 e de 2.1.322 até 2.1.327 e até 2.1.329"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "uma régua só na narrative: 'bridge de 3 para 5 e revisor de 4 para 6 versões com seção no CHANGELOG' (a mesma do cc-delta-census), ou 4→6 e 5→7 pelo npm, dizendo qual",
+        "medida": "npm: 2.1.321..2.1.329 todas publicadas; CHANGELOG: seções 2.1.322, 323, 325, 326, 327, 328, 329"
+      }
+    },
+    {
+      "alvo": "E_DERIVA_DO_CITED_DIRECTIVE_TROCA_TODAS_AS_LOCAIS_NA_2_1_329_1120",
+      "veredito": "SUSTENTA",
+      "nota": "LC_ALL=C lint-selftest.sh --families cited_directive → rc 1, (f) DERIVA com o mesmo texto citado; grep -ao no binário 2.1.329 → function Snt(e){...(o,r)=>{let g=e[r-1];...} e function Gkn(e){let o=e.matchAll(rkr),r=...Snt(e).matchAll(skr):[],g=[];...} byte a byte como citado; var rkr=/```!\\s*\\n?([\\s\\S]*?)\\n?```/g,skr=/(?<=^|\\s)!`([^`]+)`/gm iguais ao molde (l.23266). O molde (lint-selftest.sh l.23265-23267) fixa n, r e s literais; contra ele mudaram n e s, e r ficou. 'Trocaram as três locais' vale contra a 2.1.327 (n,o,u), não contra o molde. O parêntese do label já diz isso."
+    },
+    {
+      "alvo": "Q_CURINGA_DE_TODAS_AS_LOCAIS_NO_MOLDE_DO_CITED_DIRECTIVE_1120",
+      "veredito": "SUSTENTA",
+      "nota": "Com o molde literal em n, r e s (l.23265-23267), um curinga só para r e s reprova na 2.1.329, porque o n virou o. O escopo de todas as locais é o que fecha a classe medida duas vezes (2.1.327 e 2.1.329)."
+    },
+    {
+      "alvo": "E_CHANNEL_SESSION_VERDE_NA_2_1_329_1120",
+      "veredito": "SUSTENTA",
+      "nota": "LC_ALL=C lint-selftest.sh --families channel_session → rc 0; 89 passaram, 0 falharam, 'OK ✓ — todas as guardas reagiram conforme esperado'; binário 2.1.329."
+    },
+    {
+      "alvo": "E_VETOS_PRETOOLUSE_JA_TEM_ONFAILURE_BLOCK_1120",
+      "veredito": "SUSTENTA",
+      "nota": "python3 sobre .claude/settings.json → 11 PreToolUse, 9 com onFailure=block, nomes exatos, e os 2 sem (kg-read-leg.sh, house-code-gloss.sh tool); 35 hooks, todos type command. grep 'exit [0-9]' kg-read-leg.sh → só exit 0 (l.29, 60, 341, 367, 397), sem permissionDecision; house-code-gloss.sh l.25 'SEMPRE exit 0', sys.exit(2) só em l.408 (modo stop). Os hooks do usuário são só Notification e Stop. Citações 2.1.329 l.108, l.110 e 2.1.328 l.4 conferem. Medida mais forte que a do nó para 'Code Mode desligado': nas entradas 2.1.329 da sessão, os tool_use são Bash, SendMessage, Agent, AskUserQuestion, TaskCreate, TaskUpdate, Write, ListAgents e Read, sem nenhuma ferramenta REPL; este subagente também não tem REPL. O modo Code Mode está declarado como não medido (CU7 atendido)."
+    },
+    {
+      "alvo": "Q_SONDA_DOS_VETOS_NO_CODE_MODE_1120",
+      "veredito": "SUSTENTA",
+      "nota": "A pergunta aberta corresponde ao modo não exercitado. Ressalva de forma (cláusula 5 da doutrina): a narrative diz 'Issue no Linear: ver a SYNTHESIS', sem id, e a SYNTHESIS ainda não existe; o id da issue tem de entrar no nó."
+    },
+    {
+      "alvo": "E_SONDA_DE_FUNDO_LE_O_TRANSCRIPT_E_SEGUE_NA_2_1_329_1120",
+      "veredito": "EXAGERA",
+      "nota": "A medição reproduz: grep -l background_tasks .claude/hooks/*.sh → nenhum (rc 1); background-task-probe.sh l.17-20 lê 'Output is being written to', backgroundTaskId e <task-notification>; contagem no transcript da sessão, version=2.1.329: backgroundTaskId 9, 'Output is being written to' 12, <task-notification> 28, igual ao nó. Mas o locator cita data/2.1.329.txt l.5 para '/tasks com uma contagem só', que está em l.113. A l.5 é a entrada de tarefas agendadas, /loop e forks no /tasks.",
+      "criterio": {
+        "id": "CU1_CITACAO_DIVERGE",
+        "comando": "grep -n -F 'one number covering shells' docs/evolution/research/radar-E3-2026-11-20-r26/data/2.1.329.txt → 113:"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "locator 'data/2.1.329.txt l.113, l.114' (com l.5 só se o nó quiser também as entradas novas do /tasks)",
+        "medida": "sed -n 113,114p data/2.1.329.txt → l.113 'Changed the /tasks header and the footer's background count to one number…', l.114 'Changed Stop and SubagentStop hooks to list a Monitor's script as monitor…'; sed -n 5p → entradas novas do /tasks"
+      }
+    },
+    {
+      "alvo": "E_MENSAGEM_ENTRE_SESSOES_E_ACEITA_NESTE_HOST_1120",
+      "veredito": "SUSTENTA",
+      "nota": "~/.claude/settings.json → crossSessionInbound=accept, remoteControlAtStartup=true; l.5, l.121, l.139 e l.144 de 2.1.328 conferem. Ressalva: a l.5 trata do REMETENTE que pula prompts. Este host está em defaultMode bypassPermissions, então a mensagem do core para uma sessão de nuvem pode ser retida. O core fala com sessões locais da mesma conta (mesmo settings, accept), por isso o efeito é baixo. O efeito sob outro crossSessionInbound está declarado como não medido (CU7 atendido)."
+    },
+    {
+      "alvo": "E_ITENS_DE_CONFIGURACAO_QUE_A_CASA_NAO_USA_1120",
+      "veredito": "EXAGERA",
+      "nota": "Medidas reproduzem: chaves de .claude/settings.json = $schema, attribution, fallbackModel, hooks, permissions; eventos sem PermissionRequest (nem nos hooks do usuário); /etc/claude-code/managed-settings.json só com pluginConfigs; CLAUDE_CODE_FORK_SUBAGENT não definido; grep -rln de autoCompactWindow, allowManagedModsOnly, CLAUDE_CODE_MAX_OUTPUT_TOKENS e DEFERRED_TOOL_RESUME em .claude/hooks, .claude/commands e ops → rc 1. Mas a narrative cita data/2.1.328.txt l.6 (aviso de OpenTelemetry sem endpoint, fora do label) onde o label fala da 'retomada de chamada adiada por hook', que está em l.7. E o label lista sandbox, allowManagedModsOnly e max_tokens sem linha citada.",
+      "criterio": {
+        "id": "CU1_CITACAO_DIVERGE",
+        "comando": "sed -n 6,7p docs/evolution/research/radar-E3-2026-11-20-r26/data/2.1.328.txt → l.6 OpenTelemetry, l.7 CLAUDE_CODE_DISABLE_DEFERRED_TOOL_RESUME"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "trocar 2.1.328 l.6 por l.7 e acrescentar as linhas que o label cobre sem citar: sandbox 2.1.328 l.90 e l.138 e 2.1.329 l.37; allowManagedModsOnly 2.1.328 l.8; max_tokens 2.1.329 l.115",
+        "medida": "grep -n -F nos data/: 2.1.328 l.7 CLAUDE_CODE_DISABLE_DEFERRED_TOOL_RESUME, l.8 allowManagedModsOnly, l.90 e l.138 sandbox; 2.1.329 l.37 /sandbox allowUnixSockets, l.115 max_tokens"
+      }
+    }
+  ],
+  "omissoes": [
+    {
+      "item": "(hook, sem linha única) re-sonda do agent_id da guarda de fundo em subagente; itens do delta que a tocam: 2.1.329 l.28 (agente de fundo segue rodando), l.45 (Agent tool), 2.1.328 l.131-132 (FORK_SUBAGENT=0)",
+      "superficie": ".claude/hooks/pretooluse-subagent-background-wait.sh (l.29-30: 'a sonda tem de ser re-rodada no /meta:cc-update')",
+      "medida": "medido pela metade, no vivo, na 2.1.329: este juiz (subagente general-purpose) chamou Bash com run_in_background=true, e o hook recusou com 'GUARDA-PRETOOLUSE (fundo em subagente)'. O agent_id segue no topo do JSON do PreToolUse. A metade negativa (sessão principal sem agent_id) não foi medida.",
+      "impacto": 3
+    },
+    {
+      "item": "2.1.328 l.136 — texto colado passa a ser marcado como colado (3P e telemetria desligada); toca o nó r25 E_CAMPOS_DE_ORIGEM_DO_PROMPT_SEGUEM_NA_2_1_327 (impacto 4)",
+      "superficie": ".claude/hooks/userprompt-one-touch-approval.sh (lê origin.kind/promptSource; HUMAN_PROMPT_SOURCES = typed|queued)",
+      "medida": "contagem das entradas type=user fora de sidechain, version=2.1.329, no transcript da sessão: (human,typed) 20, (peer,system,isMeta) 52, (task-notification,system) 11, (human,suggestion_accepted) 4, (human,queued) 3, (None,system,isMeta) 9, sem origin 342. Nenhum promptSource novo; a forma segue a da 2.1.327. A marcação de 'colado' só vale em 3P ou com telemetria desligada, e este host não está em nenhum dos dois.",
+      "impacto": 3
+    },
+    {
+      "item": "2.1.329 l.45 — o parâmetro effort do Agent tool era ignorado para teammates nomeados",
+      "superficie": ".claude/commands/meta/cc-update.md l.74-75 (juiz com model opus e effort high)",
+      "medida": "Agent tool_use no transcript da sessão (2.1.319 a 2.1.329): nenhuma chamada passa effort (0 de 142). Na 2.1.329, as 15 chamadas foram general-purpose, sem name e sem model, o que inclui este juiz. A correção da 2.1.329 não muda nada na casa. O que pesa é outra coisa: o 'effort: high' que o comando pede nunca chega ao Agent tool, e o juiz roda no esforço padrão.",
+      "impacto": 3
+    },
+    {
+      "item": "2.1.328 l.124, l.133; 2.1.329 l.36, l.99 — mudanças de permissão (auto mode, PermissionRequest, git status)",
+      "superficie": ".claude/settings.json permissions.deny (r25 E_BANCADA_DO_DENY_VERDE_NA_2_1_327)",
+      "medida": "python3 -I ops/testing/permissions-deny-bench.py --settings .claude/settings.json --only default,bypass --out <scratch> → rc 0, binário 2.1.329, 75 regras, 362 casos, 0 divergentes, sentinela ok. Re-data a r25 sem superá-la.",
+      "impacto": 2
+    },
+    {
+      "item": "2.1.329 l.97 e l.101 — tarefas agendadas salvas por versões anteriores precisam ser re-agendadas em sessão nova (o --resume da própria sessão ainda roda); 'Exit and stop tasks' encerra as agendadas",
+      "superficie": ".claude/commands/common/prompts/baton-doctrine.md l.80 (batimento de reserva no /loop) e ops/session-open.sh --resume <id>",
+      "medida": "existe .claude/scheduled_tasks.lock no checkout do core (mtime de hoje, 12:49), então o recurso está em uso. A casa reabre sessões por --resume <id>, que segue rodando as agendadas. O efeito sobre o pulso do baton não foi medido.",
+      "impacto": 2
+    },
+    {
+      "item": "2.1.329 l.102 — alguns painéis de teammate passam a iniciar por /bin/sh e podem não ler os arquivos de inicialização da shell; 2.1.328 l.118 — lock ao iniciar teammates em processo",
+      "superficie": "settings do usuário: teammateMode=auto, env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS; Agent com name no transcript (2.1.319 e 2.1.325)",
+      "medida": "não medido (exige lançar teammate em painel)",
+      "impacto": 2
+    },
+    {
+      "item": "2.1.328 l.17 — a compactação automática passa a reconstruir o system prompt como o /compact",
+      "superficie": ".claude/settings.json InstructionsLoaded (instructions-loaded-log.sh) e PreCompact (worklog-precompact-breadcrumb.sh)",
+      "medida": "não medido (exige compactação automática)",
+      "impacto": 2
+    },
+    {
+      "item": "2.1.329 l.3 — o diálogo de confiança passa a avisar onde os hooks da pasta são declarados",
+      "superficie": "/meta:adopt (o adotante herda os 35 hooks de .claude/settings.json)",
+      "medida": "não medido; muda o que o adotante vê na 1ª abertura",
+      "impacto": 1
+    },
+    {
+      "item": "2.1.328 l.126-127; 2.1.329 l.23, l.24, l.69, l.98, l.100 — /code-review embutido",
+      "superficie": ".claude/commands/git/README.md l.32, .github/workflows/onion-review.yml",
+      "medida": "grep: a casa usa /git/code-review (alias de /meta:setup-code-review), e o revisor do CI usa prompt próprio, não o /code-review embutido. Sem superfície.",
+      "impacto": 1
+    }
+  ]
+}

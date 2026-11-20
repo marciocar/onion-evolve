@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1202 itens abertos** em 175 grafo(s) com aberto (de 234 no escopo) · 169 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1205 itens abertos** em 176 grafo(s) com aberto (de 235 no escopo) · 170 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1602,6 +1602,14 @@
 | 8.4 | `C_INLINE_VISUALS_MARKET_CONVERGENCE_1021` | intelligent-ui-2026-10 | Visuais inline na resposta são convergência de mercado, não invenção da OpenAI: a Anthropic lançou visuais inline em 2026-03 |
 | 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
 | 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
+
+## radar-E3-2026-11-20-r26 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.4 | `Q_SUBIR_SDK_DO_BRIDGE_0_3_329_E_PIN_DO_REVISOR_V1_0_284_1120` | radar-E3-2026-11-20-r26 | o SDK do bridge sobe para 0.3.329 (com o lock) e o pin do revisor do CI para a action v1.0.284, cada um pelo caminho declarado; a  |
+| 4.2 | `Q_CURINGA_DE_TODAS_AS_LOCAIS_NO_MOLDE_DO_CITED_DIRECTIVE_1120` | radar-E3-2026-11-20-r26 | o molde do caso (f) da família cited_directive trata como curinga todas as locais do parser (n, r e s, além de g e h), e a cópi |
+| 3.6 | `Q_SONDA_DOS_VETOS_NO_CODE_MODE_1120` | radar-E3-2026-11-20-r26 | numa sessão descartável com Code Mode ligado, os vetos PreToolUse da casa (protect-main, merge-gate, moat-gate, env-guard) dispa |
 
 ## company-brain-market-2026-07 — 1 item(ns)
 
