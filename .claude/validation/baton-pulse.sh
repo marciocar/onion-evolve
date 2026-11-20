@@ -61,7 +61,9 @@
 #   PIECE_UNOWNED             nenhuma sessão viva com esse nome, nem sessão viva no repo da peça.
 #   PIECE_OWNER_NAME_MISMATCH há sessão viva com cwd no repo da peça, com outro nome: a retomada troca ref e nome, e o
 #                             desencontro não pode sair como dono ausente (pedido de rigor da curadoria).
-#   PIECE_UNMEASURED          sem a lista de peers não há nome a casar: NÃO medido, nunca «sem dono».
+#   PIECE_UNMEASURED          sem a lista de peers não há nome a casar, ou o leitor de posse falhou: NÃO medido, nunca «sem dono».
+#   O 1º degrau (owner_session) é lido pelo LEITOR ÚNICO de posse, .claude/utils/orchestration/ownership.sh (o mesmo do
+#   ops/session-open.sh, D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120); BATON_OWNERSHIP troca o caminho (bancada).
 #   HIGIENE (D_SESSION_HYGIENE_TMUX_WORKTREE_1114, 2026-11-14): por PROCESSO interativo vivo dos peers, lendo <proc>
 #   (BATON_PROC, padrão /proc): stat (estado, ppid), comm e, SÓ do processo `claude`, a chave TMUX do environ (presença;
 #   o resto do ambiente nunca sai). Aviso, nunca bloqueio; cada aviso traz o comando de cura como texto:
@@ -588,12 +590,32 @@ except OSError: _members, pieces_src = [], 'sem members.yaml neste papel'
 except Exception as e:
     _members, pieces_src = [], 'NÃO MEDIDAS'; gaps.append(f'peças NÃO MEDIDAS: members.yaml ilegível ({e})')
 _live = [s for s in S.values() if s['cls'] != 'UNREACHABLE']
+# O 1º degrau é o LEITOR ÚNICO de posse (D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120, 2026-11-20):
+# .claude/utils/orchestration/ownership.sh, o mesmo que o ops/session-open.sh lê, sobre o members.yaml deste papel (e a
+# lista privada de sessões donas). O pulso não relê a owner_session por conta própria: leitor ausente ou falho deixa o
+# 1º degrau NÃO MEDIDO (a peça sai PIECE_UNMEASURED), nunca cai calado no owners.tsv ou no core.
+own_reader = os.environ.get('BATON_OWNERSHIP') or os.path.normpath(os.path.join(here, '..', 'utils', 'orchestration', 'ownership.sh'))
+own_map, own_err = None, ''
+if _members:
+    try:
+        _r = subprocess.run(['bash', own_reader, 'list', '--members', os.path.join(repo, 'docs/evolution/federation/members.yaml')],
+                            capture_output=True, text=True, timeout=30)
+        if _r.returncode != 0: raise RuntimeError(f'rc {_r.returncode}: {_r.stderr.strip()[:160]}')
+        own_map = {}
+        for ln in _r.stdout.splitlines():
+            f = ln.split('\t')
+            if len(f) >= 4 and f[0]: own_map[f[0]] = (f[1], 'lista privada' if f[3] == 'privada' else f[3])
+    except Exception as e:
+        own_err = f'{type(e).__name__}: {e}'
+        gaps.append(f'leitor de posse NÃO lido ({own_reader}: {own_err}): o dono pela owner_session fica NÃO MEDIDO')
 for m in _members:
     if not isinstance(m, dict) or m.get('piece') is not True: continue
     pc = {'id': str(m.get('id')), 'lp': m.get('local_path'), 'sponsor': str(m.get('sponsor') or '')}
     lp_r = real(pc['lp']) if isinstance(pc['lp'], str) and pc['lp'].startswith('/') else ''
     hit = next((r[0] for r in (own_rows or []) if len(r) >= 2 and r[1] == pc['id']), None)
-    if m.get('owner_session'): pc['owner'], pc['osrc'] = str(m['owner_session']), 'members.yaml'
+    if own_map is None:
+        pc['owner'], pc['osrc'] = '?', 'leitor de posse falhou'
+    elif pc['id'] in own_map: pc['owner'], pc['osrc'] = own_map[pc['id']]
     elif hit: pc['owner'], pc['osrc'] = hit, 'owners.tsv'
     else: pc['owner'], pc['osrc'] = 'core', 'core (último recurso)'
     if pc['osrc'].startswith('core'):   # o core se reconhece pelo checkout da fonte, como no rótulo derivado
@@ -603,6 +625,8 @@ for m in _members:
     pc['card'] = ''
     if not peers_ok:
         pc['cls'], pc['note'] = 'PIECE_UNMEASURED', 'sem a lista de peers não há nome de sessão a casar: NÃO medido, nunca «sem dono»'
+    elif own_map is None:   # o 1º degrau não se leu: cair no owners.tsv ou no core seria palpite
+        pc['cls'], pc['note'] = 'PIECE_UNMEASURED', f'o leitor de posse falhou ({own_err[:120]}): o 1º degrau NÃO medido, nunca «sem dono»'
     elif pc['osrc'].startswith('core') and own_st.startswith('unreadable'):   # o 2º degrau não se leu: cair no core seria palpite
         pc['cls'], pc['note'] = 'PIECE_UNMEASURED', f'sem owner_session e o owners.tsv {own_st}: a ordem parou no 2º degrau, NÃO medido'
     elif match:
