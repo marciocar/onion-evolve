@@ -2,7 +2,8 @@
 branch: docs/seal-decision-ratchet-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 242f4dd1de19fbe8227901817ff31e23208691b657ad39cb81de63d089a7bd96
+reviewed_code_sha256: 2794f4e69d980da9b8b3af7c2a6be7759b4f1474b9905728ed440555b24912fc
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
