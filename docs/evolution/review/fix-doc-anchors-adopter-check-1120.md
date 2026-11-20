@@ -2,8 +2,7 @@
 branch: fix/doc-anchors-adopter-check-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: c12fb729525b4346bc35912e70569f598787e110979cf89be0d4c0af6422c3ce
-reviewed_code_sha256: 15170720e55689a8b412c3490f6c54c706767c7462b209eb3c24c823edb1bdbc
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
@@ -13,7 +12,7 @@ findings_fixed: 0
 verdict: NO_FINDINGS
 elenxo: true
 elenxo_isolado: false
-reviewer: "Passada da própria sessão do core, só leitura: duas âncoras geradas por título com emoji trocadas por <a id> explícitas na linha do título, e as três citações apontadas para elas (grep confirma zero citação velha)."
+reviewer: "Passada da própria sessão do core, só leitura (refeita após mover a âncora para o fim do título, que a bancada license-travels exige): duas âncoras geradas por título com emoji trocadas por <a id> explícitas na linha do título, e as três citações apontadas para elas (grep confirma zero citação velha)."
 nota: "tokens 0 = não medido. Não toca guarda."
 ---
 
