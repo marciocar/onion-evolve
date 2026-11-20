@@ -62868,7 +62868,8 @@ SO_TMUX
 import sys
 s = open(sys.argv[1], encoding="utf-8").read()
 # (D_SERVICE_REPOS_OWNER_VPS_OPS_1120) o awk da catraca mora no _pmv_member_row, que o _own_repo_gate chama para o alvo
-g = s.index("_own_repo_gate() {"); s.index("_row=\"$(_pmv_member_row \"${_t}\" \"${_m}\")\"", g)
+g = s.index("_own_repo_gate() {"); e = s.index("\n}\n", g)
+assert s.index("_row=\"$(_pmv_member_row \"${_t}\" \"${_m}\")\"", g) < e
 f = s.index("_pmv_member_row() {"); a = s.index("awk -v want=\"$1\" '"'"'", f) + len("awk -v want=\"$1\" '"'"'")
 b = s.index("'"'"' <<< \"$2\"", a)
 print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="não extraí o awk da catraca"; return 1; }
