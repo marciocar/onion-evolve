@@ -1,0 +1,1 @@
+DÚVIDA: isso quebra sob carga?

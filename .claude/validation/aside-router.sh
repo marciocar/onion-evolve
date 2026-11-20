@@ -24,13 +24,31 @@ set -euo pipefail
 
 SUFFIX="— rota canônica sugerida; use julgamento se conflitar. Isto é recall, não regra."
 GATE="PROPONHA e aguarde a confirmação do maestro (Ato 3/W6) ANTES de executar."
+TODAY="$(date +%F)"
+
+# Raiz da maquinaria a partir do PRÓPRIO motor (core: .claude/; plugin: a raiz dele). CDPATH= : com CDPATH no
+# ambiente o `cd` relativo imprime o destino e a variável ganharia duas linhas.
+MACHINERY_ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." >/dev/null && pwd)"
+TM="${MACHINERY_ROOT}/utils/task-manager/tm.sh"
+ENVCHECK="${MACHINERY_ROOT}/utils/task-manager/env-check.sh"
 
 route() {  # $1 = key
   case "$1" in
     QUESTION)   printf 'APARTE dúvida — pergunta lateral do maestro. Responda BREVE sem parar a tarefa; se exigir ferramenta, sugira /btw (fork "f"). Retome o fluxo em seguida. %s' "$SUFFIX" ;;
     CORRECTION) printf 'APARTE corrige — dica/correção/orientação sobre o curso. Se é p/ AGORA, reoriente o passo atual (o maestro pode ter dado Esc); se é p/ o próximo, aplique na próxima fronteira de passo. Não descarte o trabalho já feito. %s' "$SUFFIX" ;;
-    PRAISE)     printf 'APARTE reforço — reforço positivo. Absorva o PORQUÊ; se revela identidade/preferência durável, registre via /meta:diary (significance). %s' "$SUFFIX" ;;
-    NOTE)       printf 'APARTE nota — lembrete/aviso SÓ desta sessão. Anote no scratchpad/notes.md (parking-lot); NÃO é memória durável nem exige ação agora. %s' "$SUFFIX" ;;
+    # reforço = REFORÇO DE ORDEM/DIRETRIZ (decisão do maestro, 2026-11-20). Medido: nos 80 usos de 19/10 a 20/11 ele
+    # reforça uma ordem ("ir até o final", "converse com o kg-ssot"), não elogia; a rota antiga mandava ao diário de
+    # elogio, que a sessão usou 0 vezes.
+    DIRECTIVE)  printf 'APARTE reforço — REFORÇO DE ORDEM ou DIRETRIZ do maestro (não é elogio). Trate como ordem reforçada: aplique JÁ ao que está em curso, sem esperar a próxima fronteira de passo. Se vale além desta tarefa (diretriz durável), grave memória de feedback (auto-memory, type: feedback) com a frase dele verbatim e a data %s; não é caso de diário. %s' "$TODAY" "$SUFFIX" ;;
+    # nota = CARD no task manager do dono (decisão do maestro, 2026-11-20). Medido: os 16 usos eram pendência futura
+    # ("precisamos de um manual…"), que o notes.md da sessão perdia. O caminho do tm.sh sai do inventário vivo:
+    # sem o tm.sh nesta instalação, a rota já manda ao notes.md.
+    NOTE)
+      if [ -f "$TM" ]; then
+        printf 'APARTE nota — vira CARD de gestão, não nota de sessão. Confira o provider (bash %s --provider); se houver um, crie o card no dono certo (o core ou a sessão dona do assunto): bash %s item.create --title "[dono · %s] <resumo>" --description "<a frase do maestro, verbatim> (%s)" [--project <projeto do dono>], e confirme ao maestro o número do card que voltou. Sem provider (none) ou se o tm.sh falhar: anote no notes.md do scratchpad e DIGA que não virou card e por quê. %s' "$ENVCHECK" "$TM" "$TODAY" "$TODAY" "$SUFFIX"
+      else
+        printf 'APARTE nota — vira CARD de gestão, mas esta instalação não tem o tm.sh (%s): anote no notes.md do scratchpad com a frase e a data %s, e DIGA ao maestro que não virou card e por quê. %s' "$TM" "$TODAY" "$SUFFIX"
+      fi ;;
     REMEMBER)   printf 'APARTE guarda — memória DURÁVEL. Escolha o tier: fato pessoal/de-ambiente ou estado-de-trabalho → memória do harness (auto-memory); aprendizado/decisão de rede → /meta:diary (conflict_class + review_after). Repo é fonte, memória é cache. %s' "$SUFFIX" ;;
     ADD_STEP)   printf 'APARTE +etapa — adicionar etapa ao plano. Insira no STATE.md (bloco NEXT)/plan; se altera escopo já commitado, PROPONHA antes. %s' "$SUFFIX" ;;
     DROP_STEP)  printf 'APARTE -etapa — remover/pular etapa. %s Não descarte trabalho sem OK. %s' "$GATE" "$SUFFIX" ;;
@@ -49,24 +67,44 @@ detect() {
   line="${line#"${line%%[![:space:]]*}"}"
   [ -n "$line" ] || return 0
 
+  # PREFIXO COMPOSTO (2026-11-20): "paralelo: dúvida: …" emite as DUAS rotas, na ordem escrita (medido: 2 usos,
+  # "paralelo: dúvida:" e "dúvida: reforço:"; a forma antiga só via o primeiro). Até 3 marcadores, sem repetir rota.
+  local key seen=" " n=0 out=""
+  while [ "$n" -lt 3 ] && [ -n "$line" ]; do
+    key="$(match_key "$line")"
+    [ -n "$key" ] || break
+    # numa linha só, separadas por " ‖ ": o fallback sem jq do hook escapa só \\ e ", e uma quebra de linha
+    # crua deixaria o JSON inválido
+    case "$seen" in *" ${key} "*) ;; *) out="${out:+${out} ‖ }$(route "$key")"; seen="${seen}${key} " ;; esac
+    # tira o marcador já lido: até o 1º ':' ou ',' (nenhum marcador tem ':' ou ',' por dentro) e os espaços
+    line="$(printf '%s' "$line" | sed -E 's/^[^:,]*[:,][[:space:]]*//')"
+    n=$((n + 1))
+  done
+  [ -n "$out" ] || return 0
+  printf '%s\n' "$out"
+}
+
+match_key() {  # $1 = linha → imprime a chave do marcador no INÍCIO (ou nada)
+  local line="$1" key=""
   # Ordem: mais específico primeiro (guarda-regra antes de guarda; ±etapa explícitos).
-  # Canônicos exigem ':'; aliases fluídos (lembre-se / mandou bem / em paralelo / enquanto isso) aceitam ':' ou ','.
-  local key=""
+  # Canônicos exigem ':'; aliases fluídos (lembre-se / em paralelo / enquanto isso) aceitam ':' ou ','.
+  # MAIÚSCULA COM ACENTO: `grep -i` em LC_ALL=C não dobra multibyte (DÚVIDA: e REFORÇO: ficavam mudos); por isso
+  # o Ú, o Í e o Ç vão explícitos nas duas caixas.
+  # DIGITAÇÃO (medido 19/10–20/11): "dpuvida:" 2 vezes (no ABNT2 a tecla do acento agudo fica ao lado do P) e
+  # "dívida:" 1 vez, ambos querendo dúvida; "dívida:" como palavra própria, 0 vezes. Viram alias de dúvida.
   if   grep -qiE '^guarda-regra[[:space:]]*:' <<< "$line";                  then key=GUARDRAIL
   elif grep -qiE '^\+etapa[[:space:]]*:' <<< "$line";                        then key=ADD_STEP
   elif grep -qiE '^-etapa[[:space:]]*:' <<< "$line";                         then key=DROP_STEP
-  elif grep -qiE '^(dúvida|duvida|pergunta)[[:space:]]*:' <<< "$line";       then key=QUESTION
+  elif grep -qiE '^(d(ú|Ú|u)vida|dpuvida|dp(ú|Ú)vida|d(í|Í)vida|pergunta)[[:space:]]*:' <<< "$line"; then key=QUESTION
   elif grep -qiE '^(corrige|dica|orienta)[[:space:]]*:' <<< "$line";         then key=CORRECTION
-  elif grep -qiE '^(reforço|reforco)[[:space:]]*:' <<< "$line";              then key=PRAISE
-  elif grep -qiE '^mandou bem[[:space:]]*,' <<< "$line";                     then key=PRAISE
+  elif grep -qiE '^refor(ç|Ç|c)o[[:space:]]*:' <<< "$line";                  then key=DIRECTIVE
   elif grep -qiE '^(nota|fyi|avisa)[[:space:]]*:' <<< "$line";               then key=NOTE
   elif grep -qiE '^(guarda|relembra)[[:space:]]*:' <<< "$line";              then key=REMEMBER
   elif grep -qiE '^lembre-se[[:space:]]*[:,]' <<< "$line";                   then key=REMEMBER
   elif grep -qiE '^(paralelo|pesquisa)[[:space:]]*:' <<< "$line";            then key=PARALLEL
   elif grep -qiE '^(em paralelo|enquanto isso)[[:space:]]*[:,]' <<< "$line"; then key=PARALLEL
-  else return 0
   fi
-  route "$key"
+  printf '%s' "$key"
 }
 
 case "${1:-}" in
