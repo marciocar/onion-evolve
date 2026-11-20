@@ -2,7 +2,8 @@
 branch: feat/service-repos-owner-vps-ops-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: cebed87a802b6f5255c91c914aca2484e47589e5cc4a42c3685ae75ed7644509
+reviewed_code_sha256: 48382a7dea871a625eefb1295fbd49fc1bc8c16ed61edca30c79e9c722568699
 findings_total: 15
 findings_real: 13
 findings_blocking: 2
