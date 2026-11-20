@@ -25099,7 +25099,7 @@ run_vps_exposure_selftests() {
     for _f in "$@"; do : > "${_dd}/${_f}"; done
     _o="$(BACKUP_DIRS_OVERRIDE="${_dd}" bash "${_gg}" --format tsv 2>&1)"
     if grep -q 'BACKUP-EM-CLARO' <<< "${_o}"; then echo ACUSA
-    elif BACKUP_DIRS_OVERRIDE="${_dd}" bash "${_gg}" 2>&1 | grep -q 'fora do escopo'; then echo FORA
+    elif _o="$(BACKUP_DIRS_OVERRIDE="${_dd}" bash "${_gg}" 2>&1)"; grep -q 'fora do escopo' <<< "${_o}"; then echo FORA
     else echo CALA; fi
     rm -rf "${_dd}"
   }
