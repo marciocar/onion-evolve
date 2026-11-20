@@ -16,7 +16,9 @@
 #      só confere o texto: a frase é o prompt inteiro, sem moldura de outra sessão ou de sistema.
 #   3. O EXECUTOR (subcomandos `verify` e `consume`) recalcula repo, ref e sha no vivo, confere os dois hashes, o TTL,
 #      o livro de uso único DELE e, no transcript, que a entrada do prompt_id é de humano: origin.kind=human,
-#      promptSource typed|queued, sem isMeta. Mensagem de peer (origin.kind=peer, isMeta) nunca autoriza.
+#      promptSource typed|queued, sem isMeta. Mensagem de peer (origin.kind=peer, isMeta) nunca autoriza. A palavra
+#      digitada NO MEIO do turno (medido 20/11) chega ao hook com o prompt_id do turno em curso e vira attachment
+#      queued_command sem promptId: o executor a acha dentro desse turno (transcript_word) e julga a origem dela.
 #
 # ── HONESTIDADE (o teto, escrito no topo de propósito) ───────────────────────────────────────────────────────────
 # Isto é camada de CONFORMIDADE, NÃO fronteira de segurança. No mesmo usuário Unix o agente pode escrever o arquivo de
@@ -51,6 +53,7 @@ PHRASES = {"pode rodar"}
 APPROVAL_TTL_S = 600          # 10 min a partir da palavra
 REQUEST_MAX_AGE_S = 1800      # pedido sem palavra em 30 min caduca
 HUMAN_PROMPT_SOURCES = {"typed", "queued"}
+MIDTURN_SKEW_S = 30           # a mensagem do meio do turno nasce a até 30 s da gravação da aprovação (medido: < 1 s)
 FOREIGN_MARKERS = ("<cross-session-message", "<system-reminder", "<task-notification", "<teammate-message")
 # O que a v1 implementa. Ponto de extensão: o canal novo entra aqui com a sua verificação, nunca por fora.
 #   nível 2 → "slack-signed": a ponte de mensageria da família entrega a DM assinada; o portão por identidade da ponte
@@ -337,23 +340,110 @@ def ledger_path():
     return os.path.join(state_dir(), "ledger", "merge-executor.tsv")
 
 
-def ledger_hit(lines, appr):
-    """Uso único AMARRADO À PALAVRA: o livro guarda o hash da aprovação E o prompt_id dela. Uma aprovação regravada para o
-    mesmo prompt (o hook rodado de novo com o mesmo payload) tem hash novo, mas o prompt_id já está no livro."""
-    pid = (appr.get("evidence") or {}).get("prompt_id") or "\0"
+def ledger_hit(lines, appr, word_id):
+    """Uso único AMARRADO À PALAVRA: o livro guarda o hash da aprovação E o id da palavra (o prompt_id, ou prompt_id/uuid
+    da mensagem do meio do turno). Uma aprovação regravada para a mesma palavra tem hash novo, mas a palavra já está no
+    livro."""
+    wid = word_id or "\0"
     for line in lines:
         cols = line.rstrip("\n").split("\t")
-        if cols[0] == appr["hash"] or (len(cols) > 1 and cols[1] == pid):
+        if cols[0] == appr["hash"] or (len(cols) > 1 and cols[1] == wid):
             return True
     return False
 
 
-def ledger_has(appr):
+def ledger_has(appr, word_id):
     try:
         with open(ledger_path(), encoding="utf-8") as f:
-            return ledger_hit(f, appr)
+            return ledger_hit(f, appr, word_id)
     except FileNotFoundError:
         return False
+
+
+def is_word(text):
+    """A frase sozinha, sem moldura de outra sessão ou de sistema."""
+    return norm_phrase(text) in PHRASES and not any(m in (text or "").casefold() for m in FOREIGN_MARKERS)
+
+
+def entry_ts(e):
+    ts = e.get("timestamp", "")
+    try:
+        return parse_utc(str(ts)[:19] + "Z"), ts
+    except ValueError:
+        raise LookupError("o prompt da palavra sem horário legível")
+
+
+def transcript_word(appr, req):
+    """Acha a PALAVRA no transcript e devolve (entrada normalizada, id da palavra, horário). Duas formas, medidas:
+
+    - TOPO (sessão parada): entrada type=user com o promptId do payload, a frase no message.content, origin.kind e
+      promptSource na própria entrada. O id da palavra é o prompt_id.
+    - MEIO DO TURNO (medido em 20/11, prompt_id d82f5d09 e 81ad8498): o hook recebe o prompt_id do TURNO EM CURSO, e a
+      mensagem vira type=attachment com attachment.type=queued_command, SEM promptId; a frase em attachment.prompt e a
+      origem em attachment.origin (human: commandMode=prompt, humanTurn=true; peer: origin.kind=peer, isMeta). Ela é a
+      palavra só se está DENTRO do turno do prompt_id (o último promptId visto antes dela é o do payload) e nasceu a
+      MIDTURN_SKEW_S da gravação da aprovação. O id da palavra é prompt_id/uuid da mensagem.
+    Escolhe-se, entre as candidatas que trazem a frase, a mais perto da aprovação; a origem se julga DEPOIS, na escolhida.
+    """
+    ev = appr.get("evidence") or {}
+    pid = str(ev.get("prompt_id") or "")
+    if not pid:
+        raise LookupError("a aprovação não traz o prompt_id da palavra")
+    try:
+        granted = parse_utc(((appr.get("approvals") or [{}])[0]).get("at", ""))
+    except (ValueError, TypeError):
+        raise LookupError("a aprovação sem horário legível")
+    cands = []
+    cur = None
+    with open(ev["transcript_path"], encoding="utf-8", errors="replace") as f:
+        for line in f:
+            # filtro barato de linha; a amarra ao turno fica num lugar só, adiante (cur != pid)
+            if pid not in line and '"queued_command"' not in line and '"promptId"' not in line:
+                continue
+            try:
+                e = json.loads(line)
+            except ValueError:
+                continue
+            if not isinstance(e, dict) or e.get("isSidechain"):
+                continue
+            if e.get("type") == "user" and e.get("promptId"):
+                cur = e.get("promptId")
+                if cur != pid:
+                    continue
+                # o MESMO promptId pode ter mais de uma entrada (medido em 18/11: a auto-compactação disparada no envio
+                # grava o resumo com o promptId do prompt, ANTES dele). Candidata é a que traz a frase.
+                c = (e.get("message") or {}).get("content")
+                text = c if isinstance(c, str) else "".join(x.get("text", "") for x in (c or []) if isinstance(x, dict) and x.get("type") == "text")
+                if is_word(text):
+                    when, ts = entry_ts(e)
+                    cands.append((abs(when - granted), when, ts, pid, {"origin": e.get("origin"), "promptSource": e.get("promptSource"),
+                                                                        "isMeta": e.get("isMeta"), "form": "topo"}))
+                continue
+            if e.get("type") != "attachment" or cur != pid:
+                continue
+            a = e.get("attachment")
+            if not isinstance(a, dict) or a.get("type") != "queued_command" or not isinstance(a.get("prompt"), str):
+                continue
+            if not is_word(a["prompt"]):
+                continue
+            when, ts = entry_ts(e)
+            if abs(when - granted) > MIDTURN_SKEW_S:
+                continue
+            src = str(a.get("source_uuid") or e.get("uuid") or "")
+            if not src:
+                continue
+            ps = a.get("promptSource", e.get("promptSource"))
+            human_turn = a.get("humanTurn") is True and a.get("commandMode") == "prompt"
+            cands.append((abs(when - granted), when, ts, pid + "/" + src, {
+                # sem humanTurn=true e commandMode=prompt não há promptSource humano; com eles, o ausente vale queued
+                # (a forma medida) e o presente se julga como está (suggestion_accepted recusa)
+                "origin": a.get("origin"), "promptSource": (("queued" if ps is None else ps) if human_turn else None),
+                "isMeta": e.get("isMeta") or a.get("isMeta"), "form": "meio do turno"}))
+    if not cands:
+        raise LookupError("a frase do prompt da palavra (prompt_id %s) não está no transcript, nem no topo nem no meio do turno" % pid[:8])
+    cands.sort(key=lambda x: x[0])
+    _, when, ts, word_id, found = cands[0]
+    return found, word_id, when, ts
 
 
 def transcript_human(appr, req):
@@ -363,41 +453,18 @@ def transcript_human(appr, req):
     root = projects_root()
     if not tp.startswith(root + os.sep) or os.path.basename(tp) != sid + ".jsonl":
         raise LookupError("o transcript da aprovação não é o desta sessão em %s" % root)
-    created = parse_utc(req["created_at"])
-    # o MESMO promptId pode ter mais de uma entrada (medido na revisão de 18/11: a auto-compactação disparada no envio
-    # grava o resumo com o promptId do prompt, ANTES dele). Julga-se a entrada que traz a frase; se nenhuma traz, recusa.
-    found = None
-    with open(tp, encoding="utf-8", errors="replace") as f:
-        for line in f:
-            if ev.get("prompt_id", "\0") not in line:
-                continue
-            try:
-                e = json.loads(line)
-            except ValueError:
-                continue
-            if e.get("type") != "user" or e.get("promptId") != ev.get("prompt_id"):
-                continue
-            c = (e.get("message") or {}).get("content")
-            text = c if isinstance(c, str) else "".join(x.get("text", "") for x in (c or []) if isinstance(x, dict) and x.get("type") == "text")
-            if norm_phrase(text) in PHRASES and not any(m in text.casefold() for m in FOREIGN_MARKERS):
-                found = e
-                break
-    if found is None:
-        raise LookupError("a frase do prompt da palavra (prompt_id %s) não está no transcript" % str(ev.get("prompt_id"))[:8])
+    found, word_id, when, ts = transcript_word(dict(appr, evidence=dict(ev, transcript_path=tp)), req)
     origin = found.get("origin") or {}
-    if origin.get("kind") != "human" or found.get("promptSource") not in HUMAN_PROMPT_SOURCES or found.get("isMeta"):
-        raise LookupError("o prompt da palavra não é humano digitado (origin.kind=%s, promptSource=%s, isMeta=%s): mensagem de outra sessão ou sugestão aceita nunca autoriza"
-                          % (origin.get("kind"), found.get("promptSource"), bool(found.get("isMeta"))))
-    ts = found.get("timestamp", "")
-    try:
-        when = parse_utc(ts[:19] + "Z")
-    except ValueError:
-        raise LookupError("o prompt da palavra sem horário legível")
+    if not isinstance(origin, dict) or origin.get("kind") != "human" or found.get("promptSource") not in HUMAN_PROMPT_SOURCES or found.get("isMeta"):
+        raise LookupError("o prompt da palavra (%s) não é humano digitado (origin.kind=%s, promptSource=%s, isMeta=%s): mensagem de outra sessão ou sugestão aceita nunca autoriza"
+                          % (found.get("form"), origin.get("kind") if isinstance(origin, dict) else "?", found.get("promptSource"), bool(found.get("isMeta"))))
+    created = parse_utc(req["created_at"])
     if when + 1 < created:
         raise LookupError("o prompt da palavra é anterior ao pedido")
     # o TTL conta da PALAVRA no transcript, não da gravação da aprovação (regravar a aprovação não renova o prazo)
     if time.time() > when + APPROVAL_TTL_S:
         raise LookupError("a autorização venceu (10 min desde a palavra, %s UTC): peça de novo" % ts[11:16])
+    return word_id
 
 
 def cmd_verify(argv):
@@ -407,8 +474,6 @@ def cmd_verify(argv):
         appr, req = load_live(sid)
         if req.get("requested_by", {}).get("id") != sid:
             raise LookupError("a aprovação é de outra sessão")
-        if ledger_has(appr):
-            raise LookupError("esta autorização já foi usada (livro do executor): peça de novo")
         if time.time() > parse_utc(appr["expires_at"]):
             raise LookupError("a autorização venceu (10 min desde %s UTC): peça de novo" % appr["approvals"][0]["at"][11:16])
         for need in req.get("approvals_required", []):
@@ -426,7 +491,9 @@ def cmd_verify(argv):
                 raise LookupError("falta a aprovação de '%s' (%s, nível ≥ %s)" % (need.get("role"), need.get("scope"), need.get("min_level")))
         if req.get("level") != 1:
             raise LookupError("nível %s declarado e não implementado na v1" % req.get("level"))
-        transcript_human(appr, req)
+        word_id = transcript_human(appr, req)
+        if ledger_has(appr, word_id):
+            raise LookupError("esta autorização já foi usada (livro do executor): peça de novo")
         if (req.get("executor") or {}).get("script_sha256") != script_sha(a.get("script", "")) or req.get("requires_tty") is not False:
             raise LookupError("o executor mudou desde o pedido (sha256 do script; rode do MESMO checkout em que pediu): peça de novo")
         t = req["target"]
@@ -451,16 +518,22 @@ def cmd_consume(argv):
     except (LookupError, ValueError, OSError) as e:
         print("✗ não consumi: %s." % e)
         return 1
+    # o id da palavra (prompt_id no topo, prompt_id/uuid no meio do turno); o consume só roda depois do verify ter
+    # aceito, e se o transcript não se ler agora, grava o prompt_id cru (gastar mais, nunca menos)
+    try:
+        word_id = transcript_human(appr, req)
+    except (LookupError, ValueError, KeyError, TypeError, OSError):
+        word_id = str((appr.get("evidence") or {}).get("prompt_id") or "-")
     ensure_dirs()
     outcome = re.sub(r"[\t\n]", " ", a.get("outcome", "used"))[:200]
     with open(ledger_path(), "a+", encoding="utf-8") as f:
         fcntl.flock(f, fcntl.LOCK_EX)
         f.seek(0)
-        if ledger_hit(f, appr):
+        if ledger_hit(f, appr, word_id):
             print("✗ esta autorização já foi usada (livro do executor): peça de novo.")
             return 1
         f.seek(0, os.SEEK_END)
-        f.write("%s\t%s\t%s\t%s\t%s\t%s\n" % (appr["hash"], (appr.get("evidence") or {}).get("prompt_id", "-"), utc(), req["act"], short_target(req), outcome))
+        f.write("%s\t%s\t%s\t%s\t%s\t%s\n" % (appr["hash"], word_id, utc(), req["act"], short_target(req), outcome))
         f.flush()
         os.fsync(f.fileno())
     try:
