@@ -2550,6 +2550,148 @@ run_aside_router_selftests() {
   fi
 }
 
+# ---------------------------------------------------------------------------
+# Rota `tarefa:` do Aparte do Maestro (2026-11-20). Medição que a gerou: 43 de 1441 turnos do maestro levaram a
+# sessão a chamar uma Skill; nos 232 apartes roteados, 3. A rota manda executar PELA maquinaria e cita só peça do
+# inventário vivo. Cinco contratos, cada um com o mutante que o mata (provado numa cópia limpa que passa antes):
+#   (a) reconhecimento: pos-tarefa*/pos-faca* → APARTE tarefa; neg-tarefa* mudas; em C e em UTF-8 (o hook roda no
+#       locale da sessão, e `grep -i` em C não dobra Ç);
+#   (b) o mapa do core só tem peça que existe (`task-map --check`);
+#   (c) a rota impressa cita só comando/skill cujo arquivo existe;
+#   (d) a rota DERIVA do inventário: sem commands/meta/forge.md na cópia, /meta:forge some da rota;
+#   (e) o hook entrega a rota tarefa no JSON do UserPromptSubmit.
+_art_recognition() {  # $1=motor $2=dir de fixtures → imprime os casos que falharam ("" = ok)
+  local eng="$1" fx="$2" f out miss="" loc locs="C"
+  locale -a 2>/dev/null | grep -qiE '^c\.utf-?8$' && locs="C C.UTF-8"
+  for loc in $locs; do
+    for f in "$fx"/pos-tarefa*.txt "$fx"/pos-faca*.txt; do
+      [ -f "$f" ] || { miss="${miss} fixture-ausente:$(basename "$f")"; continue; }
+      out="$(LC_ALL="$loc" bash "$eng" detect < "$f" 2>/dev/null)"
+      case "$out" in "APARTE tarefa"*) ;; *) miss="${miss} ${loc}:$(basename "$f")(sem-rota)" ;; esac
+    done
+    for f in "$fx"/neg-tarefa*.txt; do
+      [ -f "$f" ] || { miss="${miss} fixture-ausente:$(basename "$f")"; continue; }
+      out="$(LC_ALL="$loc" bash "$eng" detect < "$f" 2>/dev/null)"
+      [ -z "$out" ] || miss="${miss} ${loc}:$(basename "$f")(falso-positivo)"
+    done
+  done
+  printf '%s' "$miss"
+}
+_art_cited_missing() {  # $1=motor $2=raiz .claude → imprime os comandos citados na rota sem arquivo ("" = ok)
+  local eng="$1" root="$2" out ref miss="" n=0
+  out="$(bash "$eng" detect 'tarefa: x' 2>/dev/null)"
+  while IFS= read -r ref; do
+    [ -n "$ref" ] || continue; n=$((n + 1))
+    ref="${ref#/}"
+    [ -f "${root}/commands/${ref%%:*}/${ref#*:}.md" ] || miss="${miss} /${ref}"
+  done < <(grep -oE '/[a-z][a-z-]*:[a-z][a-z-]*' <<< "$out")
+  while IFS= read -r ref; do
+    [ -n "$ref" ] || continue; n=$((n + 1))
+    ref="${ref#skill }"
+    [ -f "${root}/skills/${ref}/SKILL.md" ] || miss="${miss} skill:${ref}"
+  done < <(grep -oE 'skill [a-z][a-z-]*' <<< "$out")
+  [ "$n" -gt 0 ] || miss="${miss} rota-sem-nenhuma-peça"
+  printf '%s' "$miss"
+}
+run_aside_router_task_selftests() {
+  local src_eng="${REPO_ROOT}/.claude/validation/aside-router.sh" src_hk="${REPO_ROOT}/.claude/hooks/aside-router-hook.sh"
+  local fx="${REPO_ROOT}/.claude/validation/fixtures/aside" d eng hk out miss rc line rel
+  [ -f "$src_eng" ] && [ -f "$src_hk" ] || { record_fail "aside-router-task" "motor ou hook ausente"; return; }
+
+  # Cópia mínima: motor + hook + as peças que o mapa cita (lidas do próprio mapa).
+  d="$(mktemp -d)"; mkdir -p "${d}/.claude/validation" "${d}/.claude/hooks"
+  cp "$src_eng" "${d}/.claude/validation/"; cp "$src_hk" "${d}/.claude/hooks/"
+  eng="${d}/.claude/validation/aside-router.sh"; hk="${d}/.claude/hooks/aside-router-hook.sh"
+  while IFS=$'\t' read -r _ _ line; do
+    rel="${line#"${REPO_ROOT}/.claude/"}"
+    [ -f "$line" ] || continue
+    mkdir -p "${d}/.claude/$(dirname "$rel")"; cp "$line" "${d}/.claude/${rel}"
+  done < <(bash "$src_eng" task-map 2>/dev/null)
+
+  # --- no repo real ---
+  miss="$(_art_recognition "$src_eng" "$fx")"
+  if [ -z "$miss" ]; then record_pass "aside-router-task: (a) tarefa:/faça: roteiam com e sem acento, maiúscula, em C e UTF-8; no meio ou sem ':' fica mudo"
+  else record_fail "aside-router-task: (a) reconhecimento" "casos:${miss}"; fi
+  rc=0; out="$(bash "$src_eng" task-map --check 2>&1)" || rc=$?
+  if [ "$rc" -eq 0 ]; then record_pass "aside-router-task: (b) toda peça do mapa da rota tarefa existe no core"
+  else record_fail "aside-router-task: (b) mapa envelhecido" "$(grep MISSING <<< "$out" | cut -f2 | tr '\n' ' ')"; fi
+  miss="$(_art_cited_missing "$src_eng" "${REPO_ROOT}/.claude")"
+  if [ -z "$miss" ]; then record_pass "aside-router-task: (c) a rota impressa cita só comando/skill com arquivo"
+  else record_fail "aside-router-task: (c) rota cita peça inexistente" "${miss}"; fi
+
+  # --- cópia limpa passa antes de qualquer mutante (senão o mutante não prova nada) ---
+  if [ -n "$(_art_recognition "$eng" "$fx")" ] || ! bash "$eng" task-map --check >/dev/null 2>&1 \
+     || [ -n "$(_art_cited_missing "$eng" "${d}/.claude")" ] \
+     || ! bash "$eng" detect 'tarefa: x' | grep -qF '/meta:forge ·'; then
+    record_fail "aside-router-task: guarda-da-guarda" "a cópia limpa já reprova — os mutantes não provariam nada"; rm -rf "$d"; return
+  fi
+
+  # (d) derivação: sem o arquivo do /meta:forge na cópia, a rota não o cita (e segue citando os outros)
+  mv "${d}/.claude/commands/meta/forge.md" "${d}/.claude/forge.md.off"
+  out="$(bash "$eng" detect 'tarefa: x')"
+  if ! grep -qF '/meta:forge ·' <<< "$out" && grep -qF '/meta:decide' <<< "$out"; then
+    record_pass "aside-router-task: (d) a rota deriva do inventário vivo (peça ausente some da rota, as outras ficam)"
+  else record_fail "aside-router-task: (d) derivação" "/meta:forge citado sem arquivo, ou a rota esvaziou: ${out:0:200}"; fi
+  mv "${d}/.claude/forge.md.off" "${d}/.claude/commands/meta/forge.md"
+
+  # (e) hook ponta a ponta, payload no formato real do UserPromptSubmit
+  local payload='{"session_id":"s1","transcript_path":"/tmp/t","cwd":"/x","hook_event_name":"UserPromptSubmit","prompt":"tarefa: rever os apartes"}'
+  rc=0; out="$(CLAUDE_PROJECT_DIR="$d" bash "$hk" <<< "$payload")" || rc=$?
+  if [ "$rc" -eq 0 ] && grep -qF 'APARTE tarefa' <<< "$out" && grep -qF '"hookEventName":"UserPromptSubmit"' <<< "$out"; then
+    record_pass "aside-router-task: (e) o hook entrega a rota tarefa no additionalContext"
+  else record_fail "aside-router-task: (e) hook" "out='${out:0:200}' rc=${rc}"; fi
+
+  # --- mutantes: cada um tem de MORRER (o contrato acusa) ---
+  local orig="${d}/aside-router.sh.orig" name pat
+  cp "$eng" "$orig"
+  _art_mutant() {  # $1=nome $2=sed → aplica no motor da cópia; 0 se a mutação mudou o arquivo
+    cp "$orig" "$eng"; sed -i "$2" "$eng"; ! cmp -s "$orig" "$eng"
+  }
+  # M1 reconhecimento: o ramo TASK não leva mais à rota
+  if _art_mutant M1 's/then key=TASK/then key=NONE/'; then
+    [ -n "$(_art_recognition "$eng" "$fx")" ] && record_pass "aside-router-task: (M1) ramo tarefa desligado → (a) acusa" \
+      || record_fail "aside-router-task: (M1)" "mutante sobreviveu: (a) não viu o ramo tarefa sumir"
+  else record_fail "aside-router-task: (M1) guarda-da-guarda" "mutação não aplicou"; fi
+  # M2 ancoragem: sem o ^, 'faça a tarefa: …' no meio da frase dispara
+  if _art_mutant M2 "s/'\\^(tarefa|task|/'(tarefa|task|/"; then
+    [ -n "$(_art_recognition "$eng" "$fx")" ] && record_pass "aside-router-task: (M2) âncora ^ removida → (a) acusa o falso-positivo" \
+      || record_fail "aside-router-task: (M2)" "mutante sobreviveu: (a) não viu o falso-positivo no meio da frase"
+  else record_fail "aside-router-task: (M2) guarda-da-guarda" "mutação não aplicou"; fi
+  # M3 locale: sem o Ç explícito, 'FAÇA:' some em LC_ALL=C (grep -i não dobra multibyte em C)
+  if _art_mutant M3 's/fa(ç|Ç|c)a/fa(ç|c)a/'; then
+    [ -n "$(_art_recognition "$eng" "$fx")" ] && record_pass "aside-router-task: (M3) Ç maiúsculo removido → (a) acusa em LC_ALL=C" \
+      || record_fail "aside-router-task: (M3)" "mutante sobreviveu: (a) não mede no locale C"
+  else record_fail "aside-router-task: (M3) guarda-da-guarda" "mutação não aplicou"; fi
+  # M4 derivação: sem o filtro de existência, a peça ausente volta à rota
+  if _art_mutant M4 '/\[ -f "\$(ref_path "\$ref")" \] || continue/d'; then
+    mv "${d}/.claude/commands/meta/forge.md" "${d}/.claude/forge.md.off"
+    out="$(bash "$eng" detect 'tarefa: x')"
+    mv "${d}/.claude/forge.md.off" "${d}/.claude/commands/meta/forge.md"
+    grep -qF '/meta:forge ·' <<< "$out" && record_pass "aside-router-task: (M4) filtro de existência removido → (d) acusa a peça fantasma" \
+      || record_fail "aside-router-task: (M4)" "mutante sobreviveu: a rota não citou a peça ausente mesmo sem filtro"
+  else record_fail "aside-router-task: (M4) guarda-da-guarda" "mutação não aplicou"; fi
+  # M5 mapa envelhecido: linha nova com comando que não existe → (b) acusa
+  if _art_mutant M5 's/^dúvida de desenho contra o mercado|meta:peek'"'"'$/dúvida de desenho contra o mercado|meta:peek\nfantasma|meta:ghost-cmd'"'"'/'; then
+    # morre só pelo motivo certo: rc 1 E a linha MISSING do fantasma (um sed que quebrasse a sintaxe também daria rc≠0)
+    rc=0; out="$(bash "$eng" task-map --check 2>&1)" || rc=$?
+    if [ "$rc" -eq 1 ] && grep -qP '^MISSING\tmeta:ghost-cmd\t' <<< "$out"; then
+      record_pass "aside-router-task: (M5) peça inexistente no mapa → (b) acusa"
+    else record_fail "aside-router-task: (M5)" "mutante sobreviveu ou morreu por outro motivo: rc=${rc} out='${out:0:200}'"; fi
+  else record_fail "aside-router-task: (M5) guarda-da-guarda" "mutação não aplicou"; fi
+  # M6 rota com comando escrito à mão fora do mapa → (c) acusa
+  if _art_mutant M6 's/Sem encaixe, diga/Ou \/meta:fantasma. Sem encaixe, diga/'; then
+    [ -n "$(_art_cited_missing "$eng" "${d}/.claude")" ] && record_pass "aside-router-task: (M6) comando inexistente na prosa da rota → (c) acusa" \
+      || record_fail "aside-router-task: (M6)" "mutante sobreviveu: (c) não viu /meta:fantasma"
+  else record_fail "aside-router-task: (M6) guarda-da-guarda" "mutação não aplicou"; fi
+  # M7 hook sem motor: a rota some do JSON → (e) acusa
+  cp "$orig" "$eng"; mv "$eng" "${eng}.off"
+  out="$(CLAUDE_PROJECT_DIR="$d" bash "$hk" <<< "$payload")" || true
+  mv "${eng}.off" "$eng"
+  grep -qF 'APARTE tarefa' <<< "$out" && record_fail "aside-router-task: (M7)" "mutante sobreviveu: hook entregou rota sem motor" \
+    || record_pass "aside-router-task: (M7) motor ausente → (e) acusa (o hook fica mudo)"
+  rm -rf "$d"
+}
+
 # Modo projection-name — REGRA 30 / P6 do projection-safety.sh. A invariante do TRECHO
 # PROJETADO: o que vem antes de " (" no `name:` do membro tem de ser o próprio slug.
 #
@@ -39076,6 +39218,7 @@ printf "%s/%s" "${PASS}" "${SKIP}"' 2>/dev/null || true)"
 _family run_selftest_outcomes_selftests
 _family run_shell_pipefail_robustness_selftests
 _family run_aside_router_selftests
+_family run_aside_router_task_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 _family run_vendor_scrub_selftests

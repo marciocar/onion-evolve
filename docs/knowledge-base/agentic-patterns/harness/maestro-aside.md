@@ -48,11 +48,12 @@ Marcador tipado **ancorado no início** da mensagem, case-insensitive, `:` canô
 | `+etapa:` | adicionar etapa | leve (propor se muda escopo commitado) |
 | `-etapa:` | remover/pular etapa | **propor→confirmar (W6)** |
 | `paralelo:` | pesquisa/atividade em paralelo | — (I3 se escrever) |
+| `tarefa:` | tarefa a executar **pela maquinaria do Onion** | — (Workflow só com opt-in) |
 | `guarda-regra:` | instalar guardrail durável de comportamento | **propor→confirmar (Ato 3)** |
 
 **Aliases naturais** (opcionais; o tipado é o canônico): `pergunta:`→`dúvida:` · `dica:`/`orienta:`→`corrige:` ·
 `fyi:`/`avisa:`→`nota:` · `lembre-se,`/`relembra:`→`guarda:` · `em paralelo,`/`enquanto isso,`/`pesquisa:`→`paralelo:` ·
-`mandou bem,`→`reforço:`. Os fluídos aceitam `,` além de `:`.
+`mandou bem,`→`reforço:` · `task:`/`faça:`/`faca:`→`tarefa:`. Os fluídos aceitam `,` além de `:`.
 
 ## A tabela de roteamento
 
@@ -68,7 +69,24 @@ Cada marcador aponta o mecanismo **nativo do Claude Code** + o **mecanismo Onion
 | `+etapa:` | TodoWrite / plano | `STATE.md` bloco `NEXT` / `plan.md` |
 | `-etapa:` | — | `STATE.md` `NEXT` (propor remoção) |
 | `paralelo:` | **`Ctrl+B`** (background) · `/tasks` · subagentes bg | [`onion-orchestration`](../../../../.claude/skills/onion-orchestration/SKILL.md) + `Workflow` (fan-out) |
+| `tarefa:` | Skill / slash command | o mapa intenção → peça do motor (`TASK_MAP`): só cita a peça cujo arquivo existe |
 | `guarda-regra:` | `.claude/rules/*.md` (path-scoped) ou hook | diário (`decision`); **forcing-function, não prosa "never do X"** |
+
+### A rota `tarefa:` (2026-11-20)
+
+Nasceu de medição nos transcripts do core (19/10 a 20/11): de 1441 turnos de texto do maestro, **43** levaram a
+sessão a chamar uma Skill; nos **232** apartes roteados, **3**. A maquinaria existe, mas a tarefa é feita à mão.
+A rota `tarefa:` pede quatro coisas: (1) escolher a peça do inventário pela intenção (decisão → `/meta:decide`,
+peça nova → `/meta:forge`, guarda → `/meta:forge-guard`, feature → `/engineer:plan`, objeto externo →
+`/meta:dissect`, pesquisa → skill `onion-research`, plano longo → `/meta:drive`, dúvida de desenho contra o mercado
+→ `/meta:peek`), e dizer qual peça faltou se nada encaixa; (2) declarar o custo estimado antes de rodar, com
+Workflow só por opt-in; (3) dogfood, rodando o artefato; (4) fechar com o comando rodado e a saída observada.
+
+O mapa é **dado** (`TASK_MAP` no motor), não prosa: a rota impressa só cita a peça cujo arquivo existe na
+instalação (o plugin e as portas não levam tudo), e `aside-router.sh task-map --check` reprova no core a linha
+cujo comando sumiu. A família `aside_router_task` do `lint-selftest.sh` cobre reconhecimento (com e sem acento,
+maiúscula, `LC_ALL=C` e UTF-8, no meio da frase mudo), mapa, rota citada, derivação e hook, com um mutante por
+contrato.
 
 ### A raia "agora vs depois" (o consenso *STEER, don't stop*)
 
