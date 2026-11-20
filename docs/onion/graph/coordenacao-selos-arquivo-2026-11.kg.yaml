@@ -862,6 +862,70 @@ nodes:
       locator: "pergunta com opções de 2026-11-20: «O recibo de entrega entre as máquinas bloqueia o corte?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
       locality: "pessoa"
+  - id: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «Selar e começar, documentando para explicação e auditoria»"
+    label: "Catraca de decisões (Delphi catraca-1120, 7 sessões): classe A/B/C pelo ato medido, separada da força da prova; lista fixa sempre do maestro; livro só de acréscimo com teto declarado; curar o pode rodar, 30 dias observando, depois ligar; documentar para explicação e auditoria."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «Selar e começar, documentando para explicação e auditoria»; descartadas: «Selar com ajustes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «Selo a síntese do Delphi da catraca de decisões automáticas?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
+  - id: D_RATCHET_CLASS_B_VALID_NOW_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «Sim, B vale já»"
+    label: "O pode rodar do maestro (classe B) vale já, antes de o livro morar fora da máquina: o livro serve para descer de classe, não para o maestro aprovar; no repo da vps-ops vale a regra mais estrita dela."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «Sim, B vale já»; descartadas: «Não, esperar o livro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «O pode rodar (classe B) vale já, antes de o livro morar fora da máquina?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
+  - id: D_BRIDGE_111_PROCEEDS_MODS_CELLS_GO_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «#111 segue; liberar mods»"
+    label: "O PR #111 da ponte segue para merge e deploy como está (atos perigosos pedem clique; identidade do maestro vem do evento do Slack conferido pelo portão); a curadoria está liberada para medir as 3 células de mods no laboratório."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «#111 segue; liberar mods»; descartadas: «Esperar as medições»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «Objeção da slm: o #111 espera as medições de mods ou segue?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
+  - id: D_RATCHET_AUTO_ONLY_NON_STATE_CHANGING_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «Só o que não muda estado»"
+    label: "Até existir o executor separado (usuário ou contêiner só de execução, sem sudo e com token próprio limitado), a classe A automática vale só para ato que não muda estado: ler no privilégio de quem pede, responder no fio, medir, re-carimbar o grafo."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «Só o que não muda estado»; descartadas: «Primeiro criar a separação»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «Até existir o executor separado, o automático vale para quais atos? (medido: sessões rodam como o usuário do maestro, sudo sem senha, token gh de dono, sem sandbox)»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
 edges:
   - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
     to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
@@ -1003,4 +1067,16 @@ edges:
     edge_type: TRACES_TO
   - from: D_HUB_AWS_CUT_GATED_BY_RECEIPT_1120
     to: D_HUB_AWS_SHADOW_5_BUSINESS_DAYS_1120
+    edge_type: TRACES_TO
+  - from: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
+    to: D_SESSION_MACHINERY_REVIEW_AND_TEST_BEFORE_CHANGE_1120
+    edge_type: TRACES_TO
+  - from: D_RATCHET_CLASS_B_VALID_NOW_1120
+    to: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
+    edge_type: TRACES_TO
+  - from: D_BRIDGE_111_PROCEEDS_MODS_CELLS_GO_1120
+    to: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
+    edge_type: TRACES_TO
+  - from: D_RATCHET_AUTO_ONLY_NON_STATE_CHANGING_1120
+    to: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
     edge_type: TRACES_TO
