@@ -766,6 +766,102 @@ nodes:
       locator: "pergunta com opções de 2026-11-20: «Isolamento e posse: qual é o padrão?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
       locality: "pessoa"
+  - id: D_HUB_AWS_SHADOW_5_BUSINESS_DAYS_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «5 dias úteis»"
+    label: "Migração do brain-granaai para conta/VPC própria na AWS da Grana.Ai (Delphi hub-to-aws-1120, 4 aceites): a máquina nova fica 5 dias úteis em sombra passiva antes do corte."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «5 dias úteis»; descartadas: «3 dias úteis» · «7 dias corridos»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «Por quantos dias a máquina nova fica em sombra passiva antes do corte?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
+  - id: D_SERVICE_REPOS_OWNER_VPS_OPS_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «Sim, registrar»"
+    label: "Os repos de serviço da VPS passam a ter a sessão onion-vps-ops como dona registrada (owner_session); ela merja os próprios PRs pelo caminho verificado; deploy e produção seguem do maestro."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «Sim, registrar»; descartadas: «Não, fica comigo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «Os repos de serviço da VPS passam a ter a vps-ops como dona registrada?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
+  - id: D_USER_TOKEN_READ_ONLY_WRITE_AS_BRAIN_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «Rever: ler com o token da pessoa, com conexão super fácil e ajudada»"
+    label: "Revisa a regra de 13/11 (nunca a credencial pessoal): o token da própria pessoa serve só para LER e descobrir o alcance dela, a pedido dela; toda escrita sai como Brain a pedido de @fulano, com registro por ato; conectar tem de ser super fácil e guiado."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «Rever: ler com o token da pessoa, com conexão super fácil e ajudada»; descartadas: «Manter nunca» · «Liberar ler e escrever»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «Regra de 13/11 (nunca a credencial pessoal): delegação vs impersonação; no Slack o token da pessoa é o único que alcança o privado dela. Como fica a regra?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
+  - id: D_DRIVE_OAUTH_PER_PERSON_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «OAuth por pessoa»"
+    label: "Google Drive: app interno da empresa com OAuth por pessoa (leitura); o Brain vê só o que a pessoa vê; delegação em todo o domínio rejeitada por fazer do Brain superusuário."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «OAuth por pessoa»; descartadas: «Delegação no domínio todo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «No Google Drive, como o Brain acessa os arquivos de cada pessoa?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
+  - id: D_SLACK_USER_TOKEN_SPIKE_GO_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «Sim, rodar»"
+    label: "Rodar já o spike no Slack: app interno novo, separado do de produção; uma pessoa autoriza a leitura com o próprio token; provar que lê o privado onde está, é recusada pelo Slack no privado onde não está e lê o público."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «Sim, rodar»; descartadas: «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «Rodo o spike no Slack agora?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
+  - id: D_HUB_AWS_CUT_GATED_BY_RECEIPT_1120
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "decisão do maestro em 2026-11-20, por pergunta com opções (/meta:decide): escolhida «Recibo trava o corte»"
+    label: "Migração do brain-granaai para a AWS: o corte só acontece depois de medir ida e volta com recibo entre as máquinas; o recibo mínimo é id da mensagem e hora, só forma, construído pela messaging em paralelo à preparação da AWS."
+    narrative: "Selado por /meta:decide em 2026-11-20: escolhida «Recibo trava o corte»; descartadas: «Dead-letter basta»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-20: «O recibo de entrega entre as máquinas bloqueia o corte?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-20"
+      locality: "pessoa"
 edges:
   - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
     to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
@@ -889,4 +985,22 @@ edges:
     edge_type: TRACES_TO
   - from: D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120
     to: D_SESSION_CAP_10_PLUS_5_AGENTS_1119
+    edge_type: TRACES_TO
+  - from: D_HUB_AWS_SHADOW_5_BUSINESS_DAYS_1120
+    to: D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120
+    edge_type: TRACES_TO
+  - from: D_SERVICE_REPOS_OWNER_VPS_OPS_1120
+    to: D_SESSION_ONE_OWNERSHIP_REGISTRY_BY_NAME_1120
+    edge_type: TRACES_TO
+  - from: D_USER_TOKEN_READ_ONLY_WRITE_AS_BRAIN_1120
+    to: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
+    edge_type: TRACES_TO
+  - from: D_DRIVE_OAUTH_PER_PERSON_1120
+    to: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
+    edge_type: TRACES_TO
+  - from: D_SLACK_USER_TOKEN_SPIKE_GO_1120
+    to: D_COMPANY_BRAIN_PIECE_REPO_AND_SESSION_1119
+    edge_type: TRACES_TO
+  - from: D_HUB_AWS_CUT_GATED_BY_RECEIPT_1120
+    to: D_HUB_AWS_SHADOW_5_BUSINESS_DAYS_1120
     edge_type: TRACES_TO
