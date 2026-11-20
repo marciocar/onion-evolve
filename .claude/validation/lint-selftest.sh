@@ -61013,7 +61013,8 @@ SO_TMUX
   _so_case_own "(o4) preflight: a lista privada dá sim, sem vazar o slug" _so_o4 \
     "    if [ \"\${mk}\" != adopter ] || [ \"\${mr}\" != \"n/a\" ]; then" "    if true; then"
   # (q) PARIDADE com a catraca: a busca no registro do ownership.sh (`row`) dá o MESMO «kind<TAB>owner_session» que o awk
-  #     do _own_repo_gate, EXTRAÍDO do ops/pr-merge-verified.sh (core-only) e rodado sobre o mesmo registro, para cada slug
+  #     do _own_repo_gate (no _pmv_member_row, que a catraca chama para o alvo), EXTRAÍDO do ops/pr-merge-verified.sh (core-only)
+  #     e rodado sobre o mesmo registro, para cada slug
   printf 'members:\n  - id: s\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: a\n    kind: adopter\n    owner_session: "sa"   # dona\n    remote: https://github.com/Onion-Bancada/A.git (privado)\n  - id: b\n    kind: adopter\n    remote: github.com/onion-bancada/b\n  - id: d\n    kind: door\n    owner_session: sd\n    remote: https://www.github.com/onion-bancada/d/\n  - id: x\n    kind: adopter\n    owner_session: sx#c\n    remote: github.com/onion-bancada/x\n  - id: qk\n    kind: "source"\n    owner_session: sq\n    remote: github.com/onion-bancada/qk\n' > "${sb}/par.yaml"
   _so_q() {  # $1 = o leitor sob teste
     [ -f "${pmv}" ] || { SO_WHY="pr-merge-verified.sh ausente"; return 1; }
@@ -61021,8 +61022,10 @@ SO_TMUX
     prog="$(python3 -I -c '
 import sys
 s = open(sys.argv[1], encoding="utf-8").read()
-g = s.index("_own_repo_gate() {"); a = s.index("_row=\"$(awk -v want=\"${_t}\" '"'"'", g) + len("_row=\"$(awk -v want=\"${_t}\" '"'"'")
-b = s.index("'"'"' <<< \"${_m}\")\"", a)
+# (D_SERVICE_REPOS_OWNER_VPS_OPS_1120) o awk da catraca mora no _pmv_member_row, que o _own_repo_gate chama para o alvo
+g = s.index("_own_repo_gate() {"); s.index("_row=\"$(_pmv_member_row \"${_t}\" \"${_m}\")\"", g)
+f = s.index("_pmv_member_row() {"); a = s.index("awk -v want=\"$1\" '"'"'", f) + len("awk -v want=\"$1\" '"'"'")
+b = s.index("'"'"' <<< \"$2\"", a)
 print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="não extraí o awk da catraca"; return 1; }
     for s in onion-bancada/core onion-bancada/a onion-bancada/b onion-bancada/d onion-bancada/x onion-bancada/qk onion-bancada/nada; do
       a="$(awk -v want="${s}" "${prog}" < "${sb}/par.yaml")"
