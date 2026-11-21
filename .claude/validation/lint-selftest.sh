@@ -55957,14 +55957,16 @@ PY
   # hook sem o bit) e chamar o motor; ponta a ponta: a mensagem com SAC-256 solto sai com o lembrete e rc 0
   local gh="${REPO_ROOT}/.githooks/commit-msg" _mode _cf _co _crc=0
   _mode="$(git -C "${REPO_ROOT}" ls-files -s .githooks/commit-msg 2>/dev/null | awk '{print $1}')"
-  # CORE-ONLY: o .githooks/ não viaja ao adotante nem às portas (o hook vendorizado sim); fora do core, pula
-  if [ "${SELFTEST_ROLE:-source}" != "source" ]; then record_skip "house-code-gloss: (reg-commit) papel '${SELFTEST_ROLE}': o .githooks/commit-msg é core-only → pulado"
+  # CORE-ONLY: o .githooks/ não viaja ao adotante nem às portas (o hook vendorizado sim). A porta onion-core tem
+  # papel `source` e não leva o .githooks/ (materialize-door.sh), então o predicado é a AUSÊNCIA do diretório,
+  # como na hook-chain-order; com o .githooks/ presente, faltar o commit-msg é falha
+  if [ "${SELFTEST_ROLE:-source}" != "source" ] || [ ! -d "${REPO_ROOT}/.githooks" ]; then record_skip "house-code-gloss: (reg-commit) sem .githooks/ (papel '${SELFTEST_ROLE:-source}'): o .githooks/commit-msg é core-only → pulado"
   elif [ ! -f "${gh}" ]; then record_fail "house-code-gloss" "(reg-commit) .githooks/commit-msg ausente — a glosa de sigla no commit nunca dispara"
   elif [ -n "${_mode}" ] && [ "${_mode}" != "100755" ]; then record_fail "house-code-gloss" "(reg-commit) .githooks/commit-msg commitado com modo ${_mode} (o git ignora hook sem o bit; precisa 100755)"
   elif [ ! -x "${gh}" ]; then record_fail "house-code-gloss" "(reg-commit) .githooks/commit-msg sem o bit de execução"
   else
     _cf="$(mktemp)"; printf 'feat(x): fecha o SAC-256\n' > "${_cf}"
-    _co="$(cd "${REPO_ROOT}" && bash "${gh}" "${_cf}" 2>&1)" || _crc=$?
+    _co="$(cd "${REPO_ROOT}" && bash "${gh}" "${_cf}" 2>&1 </dev/null)" || _crc=$?
     rm -f "${_cf}"
     if [ "${_crc}" -eq 0 ] && grep -q 'SAC-256 →' <<< "${_co}"; then record_pass "house-code-gloss: (reg-commit) .githooks/commit-msg executável chama o motor: SAC-256 solto lembra, rc 0"
     else record_fail "house-code-gloss" "(reg-commit) o .githooks/commit-msg não lembrou: rc=${_crc} [${_co:0:160}]"; fi

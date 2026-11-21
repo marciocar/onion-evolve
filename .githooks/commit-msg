@@ -8,8 +8,16 @@
 # D_PLAIN_LANGUAGE_STITCH_1121). O motor é o mesmo do glossário da casa: .claude/hooks/house-code-gloss.sh
 # no modo `commit-msg`, com o glossário .claude/validation/house-codes.tsv.
 #
-# LEMBRA, NUNCA BARRA: sai 0 sempre. O lembrete vai para o stderr do `git commit`, e a cura é o
-# `git commit --amend`. Sem o hook do glossário, sem python3 ou sem o arquivo da mensagem: sai 0 calado.
+# LEMBRA, NUNCA BARRA: o lembrete vai para o stderr do `git commit`, e a cura é o `git commit --amend`.
+# Sem o hook do glossário, sem python3 ou sem o arquivo da mensagem: sai 0 calado. A ÚNICA saída não-zero é
+# a do bloco trampolim abaixo, comum a todos os .githooks/ e exigido idêntico pela lint-selftest: com o
+# core.hooksPath ABSOLUTO, uma worktree cujo .githooks/commit-msg perdeu o bit de execução barra o commit
+# (rc 1, com a mensagem do chmod) em vez de rodar o hook errado em silêncio.
+# LIMITES DO GIT, declarados: (1) o git não diz ao hook qual limpeza vai aplicar; no `-m`/`-F` a limpeza é
+# `whitespace` e a linha que começa com o commentChar (`#12 …`) entra no commit, mas o hook a trata como
+# comentário e não a julga; (2) com core.commentChar `auto` ou de mais de um caractere, o hook usa `#`, e o
+# comentário e o diff do `-v` podem ser cobrados como prosa; (3) parágrafo final todo em `Chave: valor`
+# (inclusive `Causa: …` colado à assinatura) é trailer, como no `git interpret-trailers`, e sai do julgamento.
 # O `--no-verify` pula este hook junto com o pre-commit (comportamento do git).
 # CORE-ONLY: o glossário é da casa; o template do adotante não ganha este hook.
 # =============================================================================
