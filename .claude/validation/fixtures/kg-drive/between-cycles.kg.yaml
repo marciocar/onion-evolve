@@ -1,0 +1,90 @@
+# Fixture kg-drive (SAC-483, achado do revisor isolado): U_ENTRE depende do ciclo A1<->A2 e é citado pelo ciclo
+# B1<->B2. Ele NÃO está em ciclo: tem de sair «preso a jusante», não «no ciclo».
+meta:
+  schema_version: 1
+nodes:
+  - id: R_PRONTO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    verified_against: plano
+    trace: a.sh
+    label: "R_PRONTO"
+  - id: A1
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    verified_against: plano
+    trace: a.sh
+    label: "A1"
+  - id: A2
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    verified_against: plano
+    trace: a.sh
+    label: "A2"
+  - id: B1
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    verified_against: plano
+    trace: a.sh
+    label: "B1"
+  - id: B2
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    verified_against: plano
+    trace: a.sh
+    label: "B2"
+  - id: U_ENTRE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    verified_against: plano
+    trace: a.sh
+    label: "U_ENTRE"
+  - id: X_FECHADO
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    verified_against: plano
+    trace: a.sh
+    label: "X_FECHADO"
+edges:
+  - from: A1
+    edge_type: DEPENDS_ON
+    to: A2
+  - from: A2
+    edge_type: DEPENDS_ON
+    to: A1
+  - from: B1
+    edge_type: DEPENDS_ON
+    to: B2
+  - from: B2
+    edge_type: DEPENDS_ON
+    to: B1
+  - from: B1
+    edge_type: DEPENDS_ON
+    to: U_ENTRE
+  - from: U_ENTRE
+    edge_type: DEPENDS_ON
+    to: A1
+  - from: R_PRONTO
+    edge_type: DEPENDS_ON
+    to: X_FECHADO
