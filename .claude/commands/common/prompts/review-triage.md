@@ -46,6 +46,16 @@ descartado: é achado real que não segura o merge.
 **Na dúvida, escreva o cenário.** Se o cenário concreto não sai, é LIMITE. Em re-revisão, **não reabra**
 limite já declarado: confira só se o bloqueio anterior foi curado.
 
+## Item opcional: clareza em texto que um humano lê
+
+Quando o artefato revisado é **superfície de leitura humana** (resposta ao maestro, doc, commit, descrição
+de PR, card, superfície pública), o revisor **pode** apontar falha de Linguagem Simples, sempre como
+**LIMITE** e nunca como bloqueio: o resultado não está na 1ª linha (R1), um parágrafo trata de mais de um
+assunto (C3) ou uma sigla da casa aparece sem explicação (C1). Em tráfego de máquina (JSON, TSV, log, saída
+de script) o item não se aplica. A régua inteira e o porquê:
+[`plain-language-by-surface.md`](../../../../docs/knowledge-base/concepts/plain-language-by-surface.md)
+(decisão `D_PLAIN_LANGUAGE_STITCH_1121`).
+
 ## No resíduo da REGRA 56
 
 A REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) ganhou o campo `findings_blocking`: quantos
@@ -66,4 +76,6 @@ trabalho de quem lê o resíduo, não de script.
 >
 > Só `(blocking)` segura o merge (ou o de acordo). Na dúvida, escreva o cenário: se ele não sai, é limite.
 > Numa re-revisão, não reabra limite já declarado; confira só se o bloqueio anterior foi curado.
+> Opcional, só em texto que um humano lê: falha de clareza (resultado fora da 1ª linha, parágrafo com
+> dois assuntos, sigla sem explicação) entra como `(non-blocking)`, nunca como bloqueio.
 > Termine com a contagem `blocking=N non_blocking=M`.
