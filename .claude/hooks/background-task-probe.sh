@@ -94,6 +94,10 @@ while IFS= read -r p; do
   [ -L "$p" ] && continue
   [ -f "$p" ] && pending+=("$p")
 done < <({
+  # SENTINELA: a lista de términos pode ser VAZIA (sessão sem nenhuma tarefa terminada). Sem esta linha, o `NR==FNR`
+  # do awk abaixo valia também para o 2º arquivo, todo lançamento ia para `done` e a tarefa viva sumia em silêncio
+  # (achado no dogfood do reinício gracioso, restart-drain.sh, 2026-11-21: sessão de bancada com uma tarefa e nenhum término).
+  echo '#sem-termino'
   grep -oE '<output-file>[^<]*</output-file>[^<]*<status>(completed|failed|killed|stopped)</status>' "$tp" 2>/dev/null \
     | sed 's/^<output-file>//; s/<\/output-file>.*//'
   grep -oE 'Successfully stopped task: [A-Za-z0-9_-]+' "$tp" 2>/dev/null \

@@ -38,6 +38,8 @@
 #             claude agents --json) e o `stat` de <pasta>/projects/*/<sessionId>.jsonl. NADA mais se lê lá dentro:
 #             nem conteúdo de transcript (os subagentes dessas sessões ficam fora, declarado), nem credencial, nem
 #             settings. Pasta declarada e ausente, ou lista de peers que falha, é lacuna nomeada.
+#   reinício  o marcador «sem despacho novo» (<sid>.draining) e o bilhete de retomada (<sid>.tsv) do reinício gracioso (restart-drain.sh), em
+#             ONION_RESTART_DIR (padrão: o irmão `restart/` do diretório de estado). Só avisa; entram no sha.
 #
 # ── CLASSES (saída de máquina, em inglês) ───────────────────────────────────────────────────────
 #   PARKED           tem linha viva no parked.tsv. Vence tudo: parada por ordem NUNCA vira ociosa.
@@ -905,6 +907,24 @@ sessions_measured = peers_ok or beacons_n > 0 or (os.path.isfile(beacon_tool) an
 ORD = {c: i for i, c in enumerate(('IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'ACTIVE', 'PARK_UNMEASURED', 'PARKED', 'UNREACHABLE'))}
 sess_sorted = sorted(S.values(), key=lambda s: (ORD[s['cls']], s['cwd'], s['name'], s['sid']))
 
+# ── reinício gracioso (restart-drain.sh, 2026-11-21): o marcador «sem despacho novo» e o bilhete de retomada ──────────
+# Escritos pelo .claude/utils/orchestration/restart-drain.sh em ONION_RESTART_DIR (padrão: o irmão `restart/` do diretório
+# de estado da batuta). Só LÊ e avisa (nível 0): quem apaga o marcador e arquiva o bilhete é o `--resume-check`.
+restart_dir = os.environ.get('ONION_RESTART_DIR') or os.path.join(os.path.dirname(state_dir.rstrip('/')), 'restart')
+RS = []
+for f in sorted(glob.glob(os.path.join(glob.escape(restart_dir), '*.draining'))):
+    k = os.path.basename(f)[:-len('.draining')]
+    try: since_m, nm = (open(f, encoding='utf-8').readline().rstrip('\n').split('\t') + ['?', '?'])[:2]
+    except OSError: since_m, nm = '?', '?'
+    RS.append(('draining', k)); warns.append(f'sessão {nm} ({k[:8]}) em drenagem para reinício desde {since_m}: SEM DESPACHO NOVO para ela')
+for f in sorted(glob.glob(os.path.join(glob.escape(restart_dir), '*.tsv'))):
+    if '.resumed.' in os.path.basename(f): continue
+    k = os.path.basename(f)[:-len('.tsv')]
+    try: n_ag = sum(1 for l in open(f, encoding='utf-8') if l.startswith('agent\t'))
+    except OSError: n_ag = '?'
+    RS.append(('ticket', k)); warns.append(f'bilhete de retomada pendente de {k[:8]} ({n_ag} agente(s) a retomar): '
+                                           f'bash .claude/utils/orchestration/restart-drain.sh --resume-check --session {k}')
+
 # ── o que mudou: eventos datados depois de --since, e o sha do estado ───────────────────
 events = []
 if since_ts is not None:
@@ -923,7 +943,7 @@ state = {'s': sorted((s['sid'], s['cls'], len(s['queue'])) for s in S.values()),
          'measured': [prs_measured, signals_measured, asks_measured, park_st],
          'cp': len(checkpoints), 'gaps': sorted(gaps), 'cfg': sorted(c for c, _, _ in CFG),
          'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT],
-         'pc': sorted((p['id'], p['cls'], p['owner']) for p in PIECES),
+         'pc': sorted((p['id'], p['cls'], p['owner']) for p in PIECES), 'rs': sorted(RS),
          'hy': sorted((h[0], h[1]['sid'] if h[1] else '', h[1]['name'] if h[1] else '') for h in HY)}
 sha = hashlib.sha256(json.dumps(state, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 # «sem mudança» só quando o sha BATE (achado do refutador, 2026-11-12): com só --since, uma sessão que caiu ou um PR que
