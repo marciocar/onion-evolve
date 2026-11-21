@@ -14,6 +14,24 @@ Regra do maestro, 2026-11-09: *«a data vem quando alguém valida a estimativa e
 Data de issue na fila depende de quando alguém decide começar. Medido no core em 2026-11-09, em simulação retroativa de 8 datas: a data
 final acertou 19,6% (9 de 46) para issue em fila e 0 de 174 quando supunha início imediato.
 
+## Data é previsão, não espera (2026-11-21)
+
+Reforço do maestro: «nem toda data é espera; isso não pode ser memória, tem de ser doutrina e maquinaria». Toda data
+de issue ou de nó é **previsão** por padrão: diz quando se previu terminar, não quando se pode começar. Ela só vira
+**espera** quando o item declara a causa que trava, no título, no corpo ou na narrativa:
+
+| Causa declarada | Exemplo de marcador |
+|---|---|
+| prazo pré-registrado de terceiros | «pré-registro», «pré-registrado» |
+| aguarda pessoa nomeada | «aguarda <quem>», «bloqueado no maestro», «· maestro» |
+| gatilho medido | «gatilho: <o que se mede>» |
+| janela de observação | «janela de observação até <data>» |
+
+Sem marcador, o item com data futura é **adiantável**. Ao terminar uma tarefa, a sessão consulta a orquestração (a
+própria fila e a do core) e pergunta, item por item, se faz sentido adiantar o que tem data futura. O pulso da batuta
+(`.claude/validation/baton-pulse.sh`) aplica a regra: lista o adiantável na oferta com a data prevista e conta à parte
+o que está em espera declarada. A cláusula 11 da [doutrina da batuta](baton-doctrine.md) é a irmã desta.
+
 ## De onde vem (primárias, conferidas em 2026-11-09)
 
 **Scrum Guide (edição de novembro de 2020, <https://scrumguides.org/scrum-guide.html>)** põe o dimensionamento no refinamento e o compromisso no planejamento:

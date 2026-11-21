@@ -165,6 +165,11 @@ Três partes, todas no `baton-pulse.sh`, todas de nível 0 (medem e informam; ni
   confere «5 agentes» no rótulo). As vagas da sessão `--self` são 5 menos os `AGENT_RUNNING` dela. O `AGENT_STALLED` sai
   no aviso dele e não ocupa vaga: medido em 2026-11-21, a sessão do core tinha parados de dias atrás, que zerariam as
   vagas. Vaga livre com card pronto da própria sessão é oferta. Sem `--self`, as vagas são lacuna.
+- **Data é previsão (cláusula 11 da doutrina).** Card com `dueDate` futura e nó `open` com `x_due` futura são trabalho
+  pronto e saem na oferta como «adiantável (prevista <data>)». Só são espera quando o título, o corpo do card ou o
+  rótulo e a narrativa do nó trazem o marcador da causa que trava («aguarda», «bloqueado no maestro», «· maestro»,
+  «pré-registro», «janela de observação», «gatilho»); aí saem da fila e entram na contagem de espera declarada. A sessão
+  `IDLE_WITH_QUEUE` com nó adiantável também recebe a oferta, e a batida não cala enquanto ela existir.
 - **Oferta e `/loop` (SAC-508).** No `--quiet`, a batida não cala enquanto houver oferta (veja «Modo `/loop`»).
 - **`--record` (SAC-509, desligado por padrão).** Acrescenta a `~/.local/state/onion/baton/pulses.tsv` (0600) uma linha
   por sessão: `epoch · sha · sessão (nome·sid) · classe · min ociosa · fila · backlog · oferta (yes/no) · aceita`. Fila e
