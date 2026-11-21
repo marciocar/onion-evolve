@@ -3,14 +3,15 @@ name: baton
 description: |
   O pulso da batuta (baton): mede as sessões vivas do repo e da família, a fila pronta de dono declarado de cada uma, os
   PRs com CI, as worktrees, a carga e o que espera o maestro; pergunta a cada sessão viva o estado em 3 linhas e
-  reporta num formato fixo. Nível 0: só mede e lê. Armável no /loop em modo silencioso (fala só quando muda).
+  reporta num formato fixo. Nível 0: mede, lê e oferta o card pronto (sem despachar). Armável no /loop em modo
+  silencioso (fala quando muda ou quando há oferta pendente).
 category: meta
 tags:
   - orchestration
   - sessions
   - baton
-version: "1.0.0"
-updated: "2026-11-12"
+version: "1.1.0"
+updated: "2026-11-21"
 related_commands:
   - /meta:decide
   - /meta:backlog
@@ -23,7 +24,8 @@ allowed-tools: Read, Grep, Glob, Bash, SendMessage, ListAgents, TodoWrite
 A **batuta (baton)** é a cunhagem da casa para quem rege as sessões. Pedido do maestro em 2026-11-12: «as sessões ficam
 ociosas esperando algo mas poderiam tocar outras tarefas que são necessárias, e a batuta serviria para isso». Este
 comando é a **fase 1**: o medidor, a pergunta às sessões e o relatório fixo. O casamento entre a sessão ociosa e a fila
-pronta, medido por um dia, é a **fase 2**, desenhada aqui e **não** construída (seção «Fase 2»).
+pronta é a **fase 2**, construída em 2026-11-21 (seção «Fase 2»): o backlog do task manager por prefixo de dono, as
+vagas de agente, a oferta que não deixa o `/loop` calar e o `--record` para medir o ganho.
 
 A doutrina vive na [cláusula 7 da doutrina da batuta](../common/prompts/baton-doctrine.md) (o pulso: o que mede, quando
 fala, quem responde, o nível 0, o parado por ordem, puxar e não empurrar). **Referencie, não copie.**
@@ -34,7 +36,7 @@ fala, quem responde, o nível 0, o parado por ordem, puxar e não empurrar). **R
   `docs/evolution/research/automation-levels-2026-11/`, core-only): só mede e lê. Não grava grafo, não despacha, não
   manda tarefa. A pergunta de 3 linhas às sessões é leitura: pede o estado, não dá ordem.
 - **Não empurra tarefa.** Uma sessão `IDLE_WITH_QUEUE` recebe, no máximo, a **oferta** do que é dela por dono declarado
-  (e isso é a fase 2). Quem decide pegar é a sessão dona ou o maestro.
+  (a fase 2). Quem decide pegar é a sessão dona ou o maestro.
 - **Não acorda sessão parada por ordem.** `PARKED` não recebe mensagem. Parar e soltar é ato do maestro, no arquivo de
   estado (abaixo).
 - **Core-only nesta fase.** Ele nasce no conjunto `pending` do `roles.yaml` (vai para fonte e hub, não para
@@ -60,6 +62,7 @@ que não foi medido: **ausência de linha com lacuna não é zero**. Os PRs, as 
 |---|---|---|
 | `ACTIVE` | o harness diz busy, ou houve atividade há menos de `--idle-min` (20) | pergunta o estado em 3 linhas |
 | `IDLE_WITH_QUEUE` | ociosa e com fila pronta de dono declarado (nó `open` com `owner:` dela, pergunta reservada por ela, PR da branch dela) | pergunta o estado e **cita** a fila dela; não manda fazer |
+| `IDLE_WITH_BACKLOG` | ociosa, sem fila no grafo, e com card aberto do task manager cujo título começa pelo prefixo dela (`[core]`, `[kg-ssot]`…) | pergunta o estado e **cita** os cards (a oferta); não manda fazer |
 | `IDLE_NO_QUEUE` | ociosa e sem fila declarada | pergunta o estado; a falta de fila vai para o maestro |
 | `PARKED` | linha viva no `parked.tsv` | **não** manda mensagem; reporta o motivo e o prazo |
 | `UNREACHABLE` | pid morto, sessão de fundo sem processo, farol órfão, ou farol vivo fora da lista do harness | não pergunta; reporta |
@@ -129,7 +132,9 @@ mercado é **evento primeiro, batimento de reserva**:
   sem relatório). Com mudança, ele
   lista o que mudou, as `IDLE_WITH_QUEUE` e os PRs com CI vermelho; só então siga o procedimento acima, e só para as
   sessões que mudaram. Guarde o `sha` da saída para a próxima batida. Isto evita a fadiga de alerta.
-- **No /loop o pulso também não empurra:** a oferta de fila é a fase 2, e a sessão `PARKED` segue sem mensagem.
+- **Oferta pendente não cala:** enquanto houver `IDLE_WITH_BACKLOG` ou vaga de agente com card pronto, a batida fala
+  mesmo com o sha igual, e lista cada oferta (card, dono, sessão).
+- **No /loop o pulso também não empurra:** a oferta é informação, e a sessão `PARKED` segue sem mensagem.
 
 ## Estado declarado pelo maestro (lido, nunca escrito por este comando)
 
@@ -140,14 +145,33 @@ Em `~/.local/state/onion/baton/` (ou `BATON_STATE_DIR`), fora do repo, por usuá
 - `owners.tsv` — `id|nome|cwd<TAB>rótulo`, quando o rótulo derivado (nome, pasta, pasta sem `onion-`, `core` para o
   checkout da fonte) não casa o `owner:` dos grafos. O pulso lista a fila sem sessão casada justamente para isso.
 
-## Fase 2 (desenhada, não construída) — o destino (peça 5, especificada)
+## Fase 2 (construída em 2026-11-21) — a oferta e a medida (peça 5)
 
-O pulso **não grava** nada por padrão (nível 0). A fase 2 casa a sessão ociosa com a fila e mede o ganho por um dia. O
-destino proposto é um **TSV de pulsos** em `~/.local/state/onion/baton/pulses.tsv`, uma linha por sessão por batida:
-`epoch · sha · sessão · classe · minutos ociosa · tamanho da fila · oferta feita (sim/não) · aceita (sim/não)`. A
-grandeza é **horas ociosas com fila** antes e depois da oferta. A gravação entra como flag explícita (`--record`) quando
-a fase 2 for aprovada, nunca ligada por padrão; o nó da fase está no grafo da forja
-(`docs/evolution/research/forge-baton-2026-11/`, core-only).
+Três partes, todas no `baton-pulse.sh`, todas de nível 0 (medem e informam; ninguém é despachado):
+
+- **Backlog por prefixo de dono (SAC-507).** O medidor lê os cards abertos do task manager por
+  `tm.sh item.list --state-type backlog,unstarted,triage --limit 100`. O brief pedia `search.query ""`, mas a revisão
+  isolada mediu que essa busca traz 100 cards abertos e fechados misturados e esconde os abertos mais antigos. O `tm.sh`
+  lê a chave do `.env` como dado; o pulso não abre o `.env`. Hoje só o adapter do Linear tem o verbo: nos outros
+  providers a leitura falha e vira lacuna. Card cujo título começa por `[<rótulo>]` (ou `[a/b]`, para dois donos) é
+  trabalho pronto da sessão com esse rótulo. Título com «· maestro» ou «bloqueado no maestro» espera o maestro e não
+  conta. Em andamento (`started`) também não conta, porque já tem quem toque. Um card é ofertado uma vez só, e a sessão
+  ociosa vem antes da vaga de agente. **Uma leitura por batida no máximo**, com cache curto em
+  `~/.local/state/onion/baton/backlog-cache-<repo>.json` (300 s, `BATON_BACKLOG_TTL_S`; arquivo só do usuário, gravado só
+  se a resposta é JSON com a lista de cards). Leitura que falha é lacuna declarada, nunca «zero cards». Só o rc entra no
+  sha (assim a queda do provedor não faz a batida falar a cada vez); o stderr sai num aviso, com token mascarado.
+  `--no-backlog` desliga. Teto declarado: 100 cards abertos; bateu nele, o pulso avisa.
+- **Vagas de agente.** O teto é 5 (`AGENT_CAP_DEFAULT`, da mesma `D_SESSION_CAP_10_PLUS_5_AGENTS_1119`; o `--check-cap`
+  confere «5 agentes» no rótulo). As vagas da sessão `--self` são 5 menos os `AGENT_RUNNING` dela. O `AGENT_STALLED` sai
+  no aviso dele e não ocupa vaga: medido em 2026-11-21, a sessão do core tinha parados de dias atrás, que zerariam as
+  vagas. Vaga livre com card pronto da própria sessão é oferta. Sem `--self`, as vagas são lacuna.
+- **Oferta e `/loop` (SAC-508).** No `--quiet`, a batida não cala enquanto houver oferta (veja «Modo `/loop`»).
+- **`--record` (SAC-509, desligado por padrão).** Acrescenta a `~/.local/state/onion/baton/pulses.tsv` (0600) uma linha
+  por sessão: `epoch · sha · sessão (nome·sid) · classe · min ociosa · fila · backlog · oferta (yes/no) · aceita`. Fila e
+  backlog vão em colunas separadas, e quem não pode pegar (`PARKED`, `UNREACHABLE`) sai com backlog 0. A coluna «aceita» sai `-`:
+  o pulso não vê se a sessão pegou o card; a aceitação se lê cruzando batidas (o card sai do backlog, a classe vira
+  `ACTIVE`). A grandeza é **horas ociosas com trabalho pronto** antes e depois da oferta. O nó da fase está no grafo da
+  forja (`docs/evolution/research/forge-baton-2026-11/`, core-only).
 
 ## Peça 4 (orquestração faseada): ausente por desenho
 
@@ -164,7 +188,8 @@ diretório de estado com gravação, e aí a lente se deriva do caminho.
 
 ## O que este comando NÃO faz
 
-- Não despacha, não atribui e não manda fazer; não acorda `PARKED`; não grava grafo nem estado.
+- Não despacha, não atribui e não manda fazer; não acorda `PARKED`; não grava grafo. Estado só com `--record` (o TSV
+  de pulsos) e o cache do backlog, ambos fora do repo.
 - Não lê transcript: o mtime é `stat`. Não lê `.env` nem segredo.
 - Não substitui o [`/meta:decide`](decide.md): o pulso diz quem está parado e com o quê; decidir é lá.
 - Não mede o que o harness e o git não veem: uma sessão que só espera um processo longo sai ociosa quando a lista de

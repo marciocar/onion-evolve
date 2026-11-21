@@ -60146,7 +60146,7 @@ BP_PY
   _bpr() {  # $1 = medidor sob teste, resto = args
     local w="$1"; shift
     env -u CLAUDE_CODE_SESSION_ID -u BATON_CONFIG_DIRS -u CLAUDE_CONFIG_DIR LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${BP_PROJ:-${sb}/proj}" \
-      BATON_PROC="${BP_PROC:-${sb}/proc-empty}" BATON_OWNERSHIP="${BP_OWN:-${REPO_ROOT}/.claude/utils/orchestration/ownership.sh}" \
+      BATON_PROC="${BP_PROC:-${sb}/proc-empty}" BATON_TM="${BP_TM:-${sb}/sem-tm.sh}" BATON_OWNERSHIP="${BP_OWN:-${REPO_ROOT}/.claude/utils/orchestration/ownership.sh}" \
       ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista-privada.tsv" \
       BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${r}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
   }
@@ -60169,7 +60169,7 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     grep -q "^session${T}sid-alpha${T}IDLE_WITH_QUEUE${T}alpha${T}60${T}1${T}" <<< "${a}" && grep -q "^session${T}sid-busy${T}ACTIVE${T}" <<< "${a}" \
       && grep -q "^session${T}sid-dead${T}UNREACHABLE${T}" <<< "${a}"; }
   _bpcase "(a) sessão ociosa com fila de dono declarado sai IDLE_WITH_QUEUE" \
-    "cls = 'IDLE_WITH_QUEUE' if q else 'IDLE_NO_QUEUE'" "cls = 'IDLE_NO_QUEUE'" _bp_a
+    "cls = 'IDLE_WITH_QUEUE' if q else ('IDLE_WITH_BACKLOG' if s['backlog'] else 'IDLE_NO_QUEUE')" "cls = 'IDLE_NO_QUEUE'" _bp_a
   # (b) parada por ordem NUNCA vira ociosa, nem com fila (D_G é dela)
   _bp_b() { local a; a="$(_bpr "$1" --tsv)"; BP_WHY="$(grep 'sid-gamma' <<< "${a}" | tr '\t' ' ')"
     grep -q "^session${T}sid-gamma${T}PARKED${T}.*ordem do maestro: parada até a revisão (até nova ordem)" <<< "${a}" && ! grep -q "^session${T}sid-gamma${T}IDLE" <<< "${a}"; }
@@ -60351,7 +60351,7 @@ BP_AG
     "if self_sid and self_sid not in live_sids: live_sids.append(self_sid)" "pass" _bp_z
   # (aa) diretório de transcripts que não existe é lacuna declarada, nunca «nenhum parado» (o M3 do refutador)
   _bp_aa() { local a; a="$(BP_PROJ="${sb}/proj-missing" _bpr "$1" --tsv)"; BP_WHY="$(grep -E '^(gap|agent)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
-    grep -q "^gap${T}.*subagentes NÃO MEDIDOS: .*proj-missing ausente" <<< "${a}" && ! grep -q '^agent' <<< "${a}"; }
+    grep -q "^gap${T}.*subagentes NÃO MEDIDOS: .*proj-missing ausente" <<< "${a}" && ! grep -q "^agent${T}" <<< "${a}"; }  # ^agent_slots (fase 2) não é subagente
   _bpcase "(aa) sem diretório de transcripts, os subagentes saem NÃO MEDIDOS" \
     "else: gaps.append(f'subagentes NÃO MEDIDOS" "else: (lambda *a: None)(f'subagentes NÃO MEDIDOS" _bp_aa
   # (ab)-(ac) agente de Workflow (2026-11-12, 1ª medida depois do #1617: 160 falsos SILENT na sessão do kg-ssot). Ele
@@ -60570,7 +60570,7 @@ BP_HY
   _bp_au() { local x y; x="$(_bphy "$1" --max-interactive 6 | awk -F'\t' '$1=="sha"{print $2}')"; y="$(_bphy "$1" --max-interactive 9 | awk -F'\t' '$1=="sha"{print $2}')"
     BP_WHY="sha teto 6=${x} · teto 9=${y}"; [ -n "${x}" ] && [ -n "${y}" ] && [ "${x}" != "${y}" ]; }
   _bpcase "(au) aviso de higiene muda o sha" \
-    "for h in HY)}" "for h in [])}" _bp_au
+    "for h in HY)," "for h in [])," _bp_au
   # (av)-(ax) curas da 2ª passada de revisão (2026-11-16): dedupe do teto por sessão, timeout do rev-parse por cwd, fora-de-git
   mkdir -p "${sb}/plain"
   python3 - "${sb}" "${r}" <<'BP_V'
@@ -60724,6 +60724,109 @@ BP_AY
     [ "${rc}" = 1 ] && grep -q "baton.md: diz .--max-interactive. padrão 4" <<< "${a}"; }
   _bpcase "(bj) «(padrão 4)» na prosa reprova (toda forma de citar a flag)" \
     "r'--max-interactive\`?[^\d]{0,30}?(\d+)'" "r'--max-interactive\`[,]?\s*(?:\(|padrão\s+)(\d+)'" _bp_bj
+  # (ca)-(ck) fase 2 (SAC-507/508/509): backlog do task manager por prefixo de dono, vagas de agente, oferta que não
+  #     deixa a batida calar e o --record. O tm.sh é FALSO: devolve um JSON fixo e conta as chamadas (cache).
+  local bl="${sb}/bl"; mkdir -p "${bl}" "${sb}/state-bl"; cp "${sb}/state/"*.tsv "${sb}/state-bl/" 2>/dev/null
+  python3 - "${bl}" <<'BP_BL'
+import json, sys
+d = sys.argv[1]
+I = [('SAC-901', '[beta] pronto para pegar', 'unstarted'), ('SAC-902', '[beta] decidir o desenho · maestro', 'unstarted'),
+     ('SAC-903', '[beta] bloqueado no maestro: chave', 'started'), ('SAC-904', '[beta] já feito', 'completed'),
+     ('SAC-905', '[alpha] card do alpha', 'backlog'), ('SAC-906', '[nobody2] sem sessão', 'unstarted'),
+     ('SAC-907', 'sem prefixo de dono', 'unstarted'), ('SAC-908', '[busy] card da sessão ocupada', 'unstarted'),
+     ('SAC-909', '[beta/busy] card de dois donos', 'unstarted'), ('SAC-910', '[beta] em andamento', 'started')]
+json.dump({'query': '', 'count': len(I), 'issues': [{'identifier': i, 'title': ti, 'state': {'name': st, 'type': st}} for i, ti, st in I]},
+          open(f'{d}/issues.json', 'w'))
+BP_BL
+  printf '#!/bin/sh\necho x >> "%s/calls"\n[ "$1 $2 $3" = "item.list --state-type backlog,unstarted,triage" ] || exit 9\ncat "%s/issues.json"\n' "${bl}" "${bl}" > "${bl}/tm.sh"
+  printf '#!/bin/sh\necho "erro req-$(date +%%N) Authorization: Bearer lin_api_FAKESECRET123" >&2\nexit 1\n' > "${bl}/tm-varerr.sh"
+  printf '#!/bin/sh\necho "nao e json"\n' > "${bl}/tm-junk.sh"
+  printf '#!/bin/sh\necho "tm: provedor fora do ar" >&2\nexit 1\n' > "${bl}/tm-fail.sh"
+  _bpbl() { local st="${sb}/st-bl-$(date +%N)"; cp -r "${sb}/state-bl" "${st}"; BP_TM="${BP_TM:-${bl}/tm.sh}" BP_STATE="${st}" _bpr "$@"; }
+  # (ca) ociosa sem fila declarada e com card pronto do prefixo dela sai IDLE_WITH_BACKLOG, com a oferta
+  _bp_ca() { local a; a="$(_bpbl "$1" --tsv)"; BP_WHY="$(grep -E '^(session.sid-beta|offer|backlog)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-beta${T}IDLE_WITH_BACKLOG${T}" <<< "${a}" && grep -q "^offer${T}SAC-901${T}IDLE_WITH_BACKLOG${T}beta·sid-beta${T}" <<< "${a}"; }
+  _bpcase "(ca) ociosa com card pronto do prefixo dela sai IDLE_WITH_BACKLOG com a oferta" \
+    "('IDLE_WITH_BACKLOG' if s['backlog'] else 'IDLE_NO_QUEUE')" "'IDLE_NO_QUEUE'" _bp_ca
+  # (cb) «· maestro» e «bloqueado no maestro» no título não são trabalho pronto
+  _bp_cb() { local a; a="$(_bpbl "$1" --tsv)"; BP_WHY="$(grep -E '^(session.sid-beta|offer)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-beta${T}.*backlog: SAC-901; SAC-909\$" <<< "${a}" && ! grep -qE "^offer${T}SAC-90[23]${T}" <<< "${a}"; }
+  _bpcase "(cb) card que espera o maestro não é pronto" \
+    "or BL_NOT_READY.search(title)" "or False" _bp_cb
+  # (cc) card concluído ou em andamento (started) não é pronto: só backlog, unstarted e triage
+  _bp_cc() { local a; a="$(_bpbl "$1" --tsv)"; BP_WHY="$(grep -E '^(session.sid-beta|offer)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-beta${T}" <<< "${a}" && ! grep -qE "SAC-9(04|10)" <<< "${a}"; }
+  _bpcase "(cc) card concluído ou em andamento não é pronto" \
+    "if stype not in BL_READY_TYPES or" "if False or" _bp_cc
+  # (cd) no máximo UMA leitura por batida e cache curto: duas batidas seguidas no mesmo estado chamam o tm.sh uma vez
+  _bp_cd() { local st="${sb}/st-cd-$(date +%N)" a; cp -r "${sb}/state-bl" "${st}"; rm -f "${bl}/calls"
+    BP_TM="${bl}/tm.sh" BP_STATE="${st}" _bpr "$1" --tsv >/dev/null; a="$(BP_TM="${bl}/tm.sh" BP_STATE="${st}" _bpr "$1" --tsv)"
+    BP_WHY="chamadas=$(wc -l < "${bl}/calls" 2>/dev/null) · $(grep '^backlog' <<< "${a}" | tr '\t' ' ')"
+    [ "$(wc -l < "${bl}/calls")" = 1 ] && grep -q "^backlog${T}-${T}MEASURED${T}.*cache de 0s" <<< "${a}" && [ "$(stat -c %a "${st}"/backlog-cache-*.json)" = 600 ]; }
+  _bpcase "(cd) uma leitura do task manager por batida, com cache curto só do usuário" \
+    '-lt "${_bttl}" ]; then' '-lt 0 ]; then' _bp_cd
+  # (ce) leitura que falha é lacuna declarada, nunca «zero cards»
+  _bp_ce() { local a; a="$(BP_TM="${bl}/tm-fail.sh" _bpbl "$1" --tsv)"; BP_WHY="$(grep -E '^(gap|backlog)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^backlog${T}-${T}UNMEASURED${T}" <<< "${a}" && grep -q "^gap${T}.*backlog do task manager NÃO MEDIDO (falhou: tm.sh item.list (rc 1))" <<< "${a}" \
+      && grep -q "^warn${T}.*stderr do tm.sh: tm: provedor fora do ar" <<< "${a}" \
+      && ! grep -q "^session${T}[^${T}]*${T}IDLE_WITH_BACKLOG" <<< "${a}"; }
+  _bpcase "(ce) leitura do task manager que falha é lacuna, nunca zero" \
+    "if not backlog_ok: gaps.append(f'backlog do task manager" "if False: gaps.append(f'backlog do task manager" _bp_ce
+  # (cf) com oferta pendente o --quiet NÃO cala, mesmo com o sha igual, e lista card, dono e sessão
+  _bp_cf() { local st="${sb}/st-cf-$(date +%N)" sha q; cp -r "${sb}/state-bl" "${st}"
+    sha="$(BP_TM="${bl}/tm.sh" BP_STATE="${st}" _bpr "$1" --tsv | awk -F'\t' '$1=="sha"{print $2}')"
+    q="$(BP_TM="${bl}/tm.sh" BP_STATE="${st}" _bpr "$1" --quiet --last-sha "${sha:-0}")"; BP_WHY="sha=${sha} · $(grep -E 'OFERTA|sem mudança' <<< "${q}" | head -3 | tr '\n' '|')"
+    [ -n "${sha}" ] && ! grep -q '· sem mudança' <<< "${q}" && grep -q "OFERTA (IDLE_WITH_BACKLOG): SAC-901 «\[beta\] pronto para pegar» · dono beta · sessão beta·sid-beta" <<< "${q}"; }
+  _bpcase "(cf) oferta pendente não deixa o --quiet calar" \
+    "or bool(events) or bool(OFFERS)" "or bool(events)" _bp_cf
+  # (cg) vagas de agente da sessão --self: 5 menos os AGENT_RUNNING dela; com vaga e card pronto dela, oferta por vaga
+  _bp_cg() { local a; a="$(_bpbl "$1" --tsv --self sid-busy)"; BP_WHY="$(grep -E '^(agent_slots|offer)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^agent_slots${T}sid-busy${T}MEASURED${T}-${T}${T}5${T}" <<< "${a}" && grep -q "^offer${T}SAC-908${T}vaga de agente${T}busy·sid-busy${T}" <<< "${a}"; }
+  _bpcase "(cg) vaga de agente com card pronto da própria sessão é oferta" \
+    "slots = max(0, int(agent_cap) - busy_ag)" "slots = 0" _bp_cg
+  # (ch) as vagas descontam os AGENT_RUNNING da sessão (o STALLED não ocupa vaga): alpha tem agentes nos fixtures
+  _bp_ch() { local a n busy; a="$(_bpbl "$1" --tsv --self sid-alpha)"
+    busy="$(awk -F'\t' '$1=="agent" && $4=="sid-alpha" && $3=="AGENT_RUNNING"' <<< "${a}" | wc -l)"
+    n="$(awk -F'\t' '$1=="agent_slots"{print $6}' <<< "${a}")"; BP_WHY="busy=${busy} vagas=${n}"
+    [ "${busy}" -gt 0 ] && [ "${n}" = "$(( busy >= 5 ? 0 : 5 - busy ))" ]; }
+  _bpcase "(ch) as vagas descontam os agentes ocupados da própria sessão" \
+    "a['cls'] in ('AGENT_RUNNING',))" "a['cls'] in ('AGENT_RUNNING', 'AGENT_STALLED', 'AGENT_DONE'))" _bp_ch
+  # (ci) sem --self as vagas são lacuna, nunca «5 livres»
+  _bp_ci() { local a; a="$(_bpbl "$1" --tsv)"; BP_WHY="$(grep -E '^agent_slots' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^agent_slots${T}-${T}UNMEASURED${T}" <<< "${a}" && grep -q "^gap${T}.*vagas de agente NÃO MEDIDAS: sem --self" <<< "${a}"; }
+  _bpcase "(ci) sem --self as vagas de agente são lacuna" \
+    "if slots_note.startswith('vagas de agente NÃO'): gaps.append(slots_note)" "pass" _bp_ci
+  # (cj) --record grava pulses.tsv (cabeçalho e uma linha por sessão, 0600); sem a flag, nada se grava
+  _bp_cj() { local s1="${sb}/st-cj1-$(date +%N)" s2="${sb}/st-cj2-$(date +%N)" a; cp -r "${sb}/state-bl" "${s1}"; cp -r "${sb}/state-bl" "${s2}"
+    BP_TM="${bl}/tm.sh" BP_STATE="${s1}" _bpr "$1" --tsv >/dev/null; a="$(BP_TM="${bl}/tm.sh" BP_STATE="${s2}" _bpr "$1" --tsv --record)"
+    BP_WHY="sem flag: $(ls "${s1}" | tr '\n' ' ') · com flag: $(head -3 "${s2}/pulses.tsv" 2>/dev/null | tr '\t\n' ' |')"
+    [ ! -e "${s1}/pulses.tsv" ] && grep -q "^epoch${T}sha${T}session${T}class${T}idle_min${T}queue${T}backlog${T}offer${T}accepted\$" <<< "$(head -1 "${s2}/pulses.tsv")" \
+      && grep -q "^${NOW}${T}[0-9a-f]*${T}beta·sid-beta${T}IDLE_WITH_BACKLOG${T}60${T}0${T}2${T}yes${T}-\$" "${s2}/pulses.tsv" \
+      && grep -q "^${NOW}${T}[0-9a-f]*${T}gamma·sid-gamm${T}PARKED${T}60${T}[0-9]*${T}0${T}no${T}-\$" "${s2}/pulses.tsv" && [ "$(stat -c %a "${s2}/pulses.tsv")" = 600 ]; }
+  _bpcase "(cj) --record grava pulses.tsv só com a flag" \
+    "if record == '1':" "if True:" _bp_cj
+  # (cl) um card sai UMA vez: o [beta/busy] é ofertado à ociosa beta e não de novo pela vaga de agente da busy (revisão isolada)
+  _bp_cl() { local a; a="$(_bpbl "$1" --tsv --self sid-busy)"; BP_WHY="$(grep -E '^offer' <<< "${a}" | cut -f1-4 | tr '\t' ' ' | tr '\n' '|')"
+    [ "$(grep -c "^offer${T}SAC-909${T}" <<< "${a}")" = 1 ] && grep -q "^offer${T}SAC-909${T}IDLE_WITH_BACKLOG${T}beta·sid-beta${T}" <<< "${a}"; }
+  _bpcase "(cl) um card é ofertado uma vez só (a ociosa antes da vaga de agente)" \
+    "if c[0] not in offered_cards][:slots]" "if True][:slots]" _bp_cl
+  # (cm) com o provedor fora do ar o sha fica estável (o stderr com request-id não entra nele) e o token sai mascarado
+  _bp_cm() { local x y a; a="$(BP_TM="${bl}/tm-varerr.sh" _bpbl "$1" --tsv)"; x="$(awk -F'\t' '$1=="sha"{print $2}' <<< "${a}")"
+    y="$(BP_TM="${bl}/tm-varerr.sh" _bpbl "$1" --tsv | awk -F'\t' '$1=="sha"{print $2}')"; BP_WHY="sha ${x} · ${y} · $(grep 'stderr do tm' <<< "${a}" | cut -c1-160)"
+    [ -n "${x}" ] && [ "${x}" = "${y}" ] && ! grep -q 'FAKESECRET' <<< "${a}" && grep -q 'stderr do tm.sh: erro req-' <<< "${a}"; }
+  _bpcase "(cm) provedor caído não muda o sha a cada batida, e o token do stderr sai mascarado" \
+    'BL_SRC="falhou: tm.sh item.list (rc $?)"' 'BL_SRC="falhou: tm.sh item.list (rc $?) $(head -c 200 "${TMPD}/backlog.err")"' _bp_cm
+  # (cn) resposta torta com rc 0 não fica no cache (a próxima batida relê, em vez de esperar o TTL)
+  _bp_cn() { local st="${sb}/st-cn-$(date +%N)" a; cp -r "${sb}/state-bl" "${st}"; a="$(BP_TM="${bl}/tm-junk.sh" BP_STATE="${st}" _bpr "$1" --tsv)"
+    BP_WHY="cache: $(ls "${st}" | tr '\n' ' ') · $(grep '^backlog' <<< "${a}" | tr '\t' ' ')"
+    ! ls "${st}"/backlog-cache-*.json >/dev/null 2>&1 && grep -q "^backlog${T}-${T}UNMEASURED${T}" <<< "${a}"; }
+  _bpcase "(cn) resposta que não é JSON com «issues» não entra no cache" \
+    "if python3 -I -c 'import json,sys;" "if true || python3 -I -c 'import json,sys;" _bp_cn
+  # (ck) as vagas de agente vêm da mesma decisão do teto: o --check-cap confere «5 agentes» no rótulo
+  _bp_ck() { local a; a="$(bash "$1" "${REPO_ROOT}" --check-cap 2>&1)"; local rc=$?; BP_WHY="rc ${rc}: $(tr '\n' '|' <<< "${a}")"
+    [ "${rc}" = 0 ] && grep -q "vagas de agente: 5" <<< "${a}"; }
+  _bpcase "(ck) as vagas de agente batem com a decisão (5 agentes)" \
+    'AGENT_CAP_DEFAULT="' 'AGENT_CAP_DEFAULT="9' _bp_ck
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
