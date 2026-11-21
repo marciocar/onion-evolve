@@ -235,7 +235,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,gokapi_oidc,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature,session_open"
+SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,gokapi_oidc,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature,session_open,update_persona_hub"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -14241,6 +14241,85 @@ priv grep -q '^ONION_KG_TOKEN=..' "${MCP_CONF}" || die 1@@true || die 1
 if [ "${apply}" = 0 ]; then say "ENSAIO@@if false; then say "ENSAIO
 IFS= read -rs v < "${TTY}" || v=""; printf@@IFS= read -rs v < "${TTY}" || v=""; echo "$v" >&2; printf
 miss="$(missing_creds | tr '\n' ' ')"; [ -z "${miss}" ] || die 1@@miss=""; [ -z "${miss}" ] || die 1
+MUT
+  rm -rf "${d}"
+}
+
+# ── update-persona-hub (2026-11-21, SAC-447): o wrapper ops/update-persona-hub.sh (core-only) ──
+# (a) a bancada (ops/testing/update-persona-hub-selftest.sh, git de verdade e systemd falso) passa com a contagem exata;
+# (m) cada peça do wrapper derrubada numa CÓPIA (o original nunca é tocado) faz a seção do caso reprovar com asserção
+# caída. A cópia limpa passa antes, no (a). TETOS DECLARADOS (sem mutante aqui): o guarda das variáveis ONION_UPH_* fora
+# do modo de teste (sem ele, o caso rodaria o ensaio contra a produção desta máquina, com fetch e sudo reais) e a
+# conferência do backup da unit (defesa dupla: o printf que o escreve já falha a rc).
+run_update_persona_hub_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/update-persona-hub.sh" st="${REPO_ROOT}/ops/testing/update-persona-hub-selftest.sh"
+  if [ ! -f "${wr}" ] || [ ! -f "${st}" ]; then record_skip "update-persona-hub: sem ops/update-persona-hub.sh (core-only) — nada a testar"; return; fi
+  [ "$(id -u)" = 0 ] && { record_skip "update-persona-hub: rodando como root (o wrapper recusa root) → pulado"; return; }
+  command -v flock >/dev/null 2>&1 || { record_skip "update-persona-hub: flock ausente → pulado"; return; }
+  local d; d="$(mktemp -d /tmp/update-persona-hub-lint.XXXXXX)"
+  cp "${wr}" "${d}/update-persona-hub.sh"
+  local want=68 o rc
+  if o="$(bash "${st}" "${d}/update-persona-hub.sh" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
+    record_pass "update-persona-hub: (a) bancada do wrapper — ${want} casos (worktree própria do worker, ensaio que não escreve, unit gerada, prova no boot da invocação, persona pelo slack-persona.sh)"
+  else record_fail "update-persona-hub: (a) bancada" "rc=${rc}: $(grep -E '✗|^selftest' <<< "${o}" | head -4 | tr '\n' '|')"; rm -rf "${d}"; return; fi
+  local m from to sec n mo
+  while IFS= read -r m; do
+    [ -n "${m}" ] || continue
+    from="${m%%@@*}"; to="${m#*@@}"; sec="${to#*@@}"; to="${to%%@@*}"
+    n="$(grep -cF -- "${from}" "${wr}" || true)"
+    if [ "${n}" != 1 ]; then record_fail "update-persona-hub: (m)" "âncora aparece ${n}× (tem de ser 1): ${from:0:70}"; continue; fi
+    FROM="${from}" TO="${to}" perl -pe 's/\Q$ENV{FROM}\E/$ENV{TO}/' "${wr}" > "${d}/update-persona-hub.sh"
+    if cmp -s "${wr}" "${d}/update-persona-hub.sh"; then record_fail "update-persona-hub: (m)" "o mutante não mudou a cópia: ${from:0:70}"; continue; fi
+    if mo="$(UPH_SECTIONS="${sec}" bash "${st}" "${d}/update-persona-hub.sh" 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -ne 0 ] && grep -q '^  ✗' <<< "${mo}"; then record_pass "update-persona-hub: (m) mutante reprova: ${from:0:60}"
+    else record_fail "update-persona-hub: (m)" "o mutante SOBREVIVEU (rc=${rc}): ${from:0:70}"; fi
+  done <<'MUT'
+flock -n 9 || die 2@@true || die 2@@lock
+flock -n 8 || die 2@@true || die 2@@lock
+|| die 1 "o bridge servido tem mudança rastreada: triagem primeiro (o escritor dele é o ops/update-bridge.sh)"@@|| true@@persona
+priv cmp -s "${SERVED}/${UNIT_PER_REL}" "${UNIT_DIR}/${UNIT_PER}.service" \@@true \@@persona
+if [ "${FORCE}" = 0 ] && [ -n "${st}" ] && [ -n "${mv}" ] && [ "${st}" -gt "${mv}" ]; then@@if false; then@@persona
+if [ "${APPLY}" = 0 ]; then@@if false; then@@persona
+[ -n "${inv}" ] && [ "${inv}" != "${old_inv}" ] || die 1 "o start não trouxe@@true || die 1 "o start não trouxe@@persona
+[ "${nr}" = 0 ] || die 1 "a persona reiniciou sozinha@@true || die 1 "a persona reiniciou sozinha@@persona
+for v in $(priv stat -c %Y "${d}/.git/HEAD" "${d}/.git/refs/heads/main" "${d}/.git/ORIG_HEAD" "${d}/node_modules/.package-lock.json" 2>/dev/null); do@@for v in $(priv stat -c %Y "${d}/.git/HEAD" 2>/dev/null); do@@persona
+case "${MODE}" in "") ;; --apply) APPLY=1 ;; --restart) APPLY=1; FORCE=1 ;; *) usage ;; esac@@case "${MODE}" in "") ;; --apply) APPLY=1 ;; --restart) APPLY=1 ;; *) usage ;; esac@@persona
+if [ -L "${WORKER}" ] || [ "$(realpath -e "${WORKER}" 2>/dev/null)" = "$(realpath -e "${HUB_REPO}" 2>/dev/null)" ]; then@@if false; then@@worker
+if [ ! -f "${WORKER}/.git" ] || [ -L "${WORKER}/.git" ]; then@@if false; then@@worker
+[ "${back}" = "${WORKER}/.git" ] || WORKER_PROBLEMS+=@@true || WORKER_PROBLEMS+=@@worker
+if [ -e "${HUB_REPO}/${f}" ] && [ ! -e "${WORKER}/${f}" ]; then@@if false; then@@worker
+elif [ -n "${deleted}" ]; then WORKER_PROBLEMS+=@@elif false; then WORKER_PROBLEMS+=@@worker
+systemctl is-active -q "${UNIT_HUB}" || die 1 "o worker do hub não está ativo@@true || die 1 "o worker do hub não está ativo@@repo
+[ "$(git -C "${APP}" rev-parse --abbrev-ref HEAD 2>/dev/null)" = main ] || die 1@@true || die 1@@repo
+|| die 1 "o clone de código do worker tem mudança rastreada: triagem primeiro"@@|| true@@repo
+git -C "${APP}" cat-file -e "${SERVED_HEAD}^{commit}" 2>/dev/null || die 1@@true || die 1@@repo
+git -C "${APP}" merge-base --is-ancestor "${a0}" "${SERVED_HEAD}" || die 1@@true || die 1@@repo
+[ "${n}" = 1 ] || { echo "a unit do repo tem ${n} linha(s) Environment=BRAIN_HUB_DIR=@@true || { echo "a unit do repo tem ${n} linha(s) Environment=BRAIN_HUB_DIR=@@repo
+[[ "${id}" =~ ${ID_RE} ]] || { echo@@true || { echo@@repo
+local why; why="$(hub_unit_allowlist <<< "${out}")" || { echo "${why}" >&2; return 1; }@@local why; why=""@@repo
+("Service", "WorkingDirectory"): {app}@@("Service", "WorkingDirectory"): {app, "/tmp"}@@repo
+("Service", "Type"): {"simple"}, ("Service", "User"): {"marcio"},@@("Service", "Type"): {"simple"}, ("Service", "User"): {"marcio", "root"},@@repo
+("Service", "ExecStart"): {exe},@@("Service", "ExecStart"): {exe, "/bin/sh -c id"},@@repo
+bad.append("linha %d: não é diretiva de seção conhecida (espaço na frente?): %s" % (n, t[:60])); continue@@continue@@repo
+if not e or e.group(1) not in ENV or not re.fullmatch(ENV[e.group(1)], e.group(2)):@@if not e:@@repo
+priv systemd-analyze verify "${TMPD}/${UNIT_HUB}.service" >/dev/null 2>&1 || die 1@@true || die 1@@repo
+out="$(sed -E "s|^#?Environment=BRAIN_HUB_MAESTRO_USER_ID=.*$|Environment=BRAIN_HUB_MAESTRO_USER_ID=${id}|" <<< "${out}")"@@out="${out}"@@apply
+if [ "${APPLY}" != 1 ]; then@@if false; then@@apply
+sed "s|${id}|$(mask "${id}")|g"@@cat@@apply
+if ! git -C "${APP}" diff --quiet "${a0}" HEAD -- package-lock.json; then@@if true; then@@apply
+if [ "${FORCE}" = 0 ] && [ "${a0}" = "${SERVED_HEAD}" ] && [ "${unit_same}" = 1 ]@@if [ "${unit_same}" = 1 ]@@apply
+UNDO="git -C ${APP_PROD} reset --hard ${a0} && (cd ${APP_PROD} && npm ci@@UNDO="git -C ${APP_PROD} reset --hard ${a0} && (npm ci@@proof
+if [ -z "${l}" ]; then bad="${bad} sem a linha@@if false; then bad="${bad} sem a linha@@proof
+grep -qF "\"hub\":\"${WORKER_PROD}\"" <<< "${l}" || bad=@@true || bad=@@proof
+[ "$(stat -c '%a %G' "${SOCK}" 2>/dev/null)" = "660 ${SOCK_GROUP}" ] || bad=@@true || bad=@@proof
+[ "${nr}" = 0 ] || bad="${bad} NRestarts=@@true || bad="${bad} NRestarts=@@proof
+[ -n "${inv}" ] && [ "${inv}" != "${old_inv}" ] || hub_fail@@true || hub_fail@@proof
+(cd "${APP}" && npm ci --ignore-scripts --no-audit --no-fund) || hub_fail@@(cd "${APP}" && npm ci --ignore-scripts --no-audit --no-fund) || true@@proof
+REARM=0; DEPS_TOUCHED=1@@DEPS_TOUCHED=1@@proof
+REARM=1  # o npm ci terminou inteiro@@REARM=0  # o npm ci terminou inteiro@@proof
+| grep -qF "BRAIN_HUB_DIR=${WORKER_PROD}" || hub_fail@@| true || hub_fail@@proof
 MUT
   rm -rf "${d}"
 }
@@ -46092,6 +46171,7 @@ _family run_migrate_python_service_selftests
 _family run_stt_service_selftests
 _family run_gokapi_oidc_selftests
 _family run_slack_persona_selftests
+_family run_update_persona_hub_selftests
 _family run_update_bridge_selftests
 _family run_version_drift_selftests
 _family run_currency_census_selftests

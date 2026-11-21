@@ -79,6 +79,11 @@
 #     wrapper próprio: slack-persona.sh instala a unit onion-slack-persona a partir do bridge servido, guarda os tokens
 #     cifrados em /etc/credstore.encrypted/onion-slack-persona.* (systemd-creds, D_MESSAGING_SEGREDOS_VAULTWARDEN_SYSTEMD_1106),
 #     a config em /etc/onion-slack-persona, o backup da unit em /var/backups/onion-slack-persona, e liga provando a conexão.
+#   · o UPDATE da persona do Slack e do worker do hub (2026-11-21, SAC-447) tem wrapper próprio: update-persona-hub.sh
+#     religa a persona quando o bridge servido mudou depois do boot dela (pelo start do slack-persona.sh, que segue dono
+#     da unit onion-slack-persona) e atualiza o worker do hub: o clone de código /home/marcio/onion-brain-hub-app (até o
+#     sha servido), a unit onion-brain-hub (gerada da cópia do repo, com BRAIN_HUB_DIR na worktree própria do worker) e
+#     o restart com a prova no boot da invocação. Uma linha por caminho que só ele escreve.
 #   · as CÓPIAS DE ROOT dos atos de VPS delegados (2026-11-13, D_DELEGATE_VPS_SERVICE_SCRIPTS_1113) e a regra de sudoers
 #     que as aponta: delegated-ops.sh install as copia da origin/main (root:root 0755) e valida a regra com visudo. É do
 #     maestro (o ato `install`); o verify é leitura. O resto de /etc/sudoers.d não tem wrapper: é do maestro.
@@ -98,6 +103,7 @@ deploy	unit	onion-chat.socket	ops/chat-runner.sh
 deploy	unit	onion-chat@*	ops/chat-runner.sh
 deploy	unit	onion-vps-stt	ops/stt-service.sh
 deploy	unit	onion-slack-persona	ops/slack-persona.sh
+deploy	unit	onion-brain-hub	ops/update-persona-hub.sh
 deploy	path	/var/www/onion-landing	ops/deploy-site.sh
 deploy	path	/var/www	-
 deploy	path	/etc/docker	ops/docker-engine-migrate.sh
@@ -129,6 +135,8 @@ deploy	path	/etc/systemd/system/onion-slack-persona.service	ops/slack-persona.sh
 deploy	path	/etc/onion-slack-persona	ops/slack-persona.sh
 deploy	path	/etc/credstore.encrypted/onion-slack-persona.*	ops/slack-persona.sh
 deploy	path	/var/backups/onion-slack-persona	ops/slack-persona.sh
+deploy	path	/etc/systemd/system/onion-brain-hub.service	ops/update-persona-hub.sh
+deploy	path	/home/marcio/onion-brain-hub-app	ops/update-persona-hub.sh
 deploy	path	/var/lib/onion-bridge	-
 deploy	path	/var/lib/onion-bridge/chat-homes	ops/chat-runner.sh
 deploy	path	/var/lib/onion-bridge/workspaces	ops/workspace-adopt-sync.sh
@@ -174,6 +182,7 @@ ato	script	ops/bridge-hardening.sh	--apply
 ato	script	ops/chat-runner.sh	--apply
 ato	script	ops/stt-service.sh	--apply
 ato	script	ops/slack-persona.sh	--apply,creds,start
+ato	script	ops/update-persona-hub.sh	--apply
 ato	script	ops/publish-door.sh	--push
 ato	script	ops/pr-merge-verified.sh	@foreign,--maestro,--dispensa,--ci-inoperante
 ato	script	ops/delegated-ops.sh	install
