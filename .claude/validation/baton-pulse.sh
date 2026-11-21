@@ -5,8 +5,9 @@
 # Responde por medição o que a sessão responderia de memória quando o maestro pergunta «como estão as sessões?»
 # e, no /loop, «tem sessão parada com trabalho pronto?». Pedido do maestro em 2026-11-12: «as sessões ficam ociosas
 # esperando algo mas poderiam tocar outras tarefas que são necessárias, e a batuta serviria para isso».
-# É o NÍVEL 0 da escada selada (D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111): só MEDE e LÊ. Não grava grafo, não
-# manda mensagem, não despacha. Quem pergunta às sessões é a sessão que roda o /meta:baton (SendMessage), nunca este script.
+# É o NÍVEL 0 da escada selada (D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111): MEDE, LÊ e, desde a fase 2, OFERTA (informa
+# o card pronto; não despacha). Não grava grafo, não manda mensagem. Grava só o cache curto do backlog e, com --record,
+# o TSV de pulsos, ambos fora do repo. Quem pergunta às sessões é a sessão que roda o /meta:baton (SendMessage), nunca este script.
 #
 # ── DESCOBERTA POR REFERÊNCIA, COM FONTE EM CADA LINHA ──────────────────────────────────────────
 #   sessões   (1) a lista de peers do harness: `claude agents --json` (a interface suportada; a mesma que a linha de
@@ -47,6 +48,25 @@
 #   IDLE_NO_QUEUE    ociosa e sem fila declarada.
 #   PARK_UNMEASURED  o parked.tsv EXISTE e não se lê (permissão, diretório): fail-closed, toda sessão alcançável sai
 #                    aqui e nenhuma recebe oferta. Ilegível nunca vira «ninguém parado».
+#   IDLE_WITH_BACKLOG (fase 2, SAC-507, 2026-11-21) ociosa, sem fila declarada no grafo, e com card ABERTO do task manager
+#                    cujo título começa pelo prefixo de dono dela ([core], [messaging], [vps-ops], [kg-ssot], [slm],
+#                    [company-brain]: `[<rótulo>]` casa um rótulo da sessão). «· maestro» ou «bloqueado no maestro» no
+#                    título NÃO é pronto (espera o maestro). Pronto é só backlog, unstarted ou triage: em andamento
+#                    (started) já tem quem toque, e concluído ou cancelado acabou. `[a/b]` vale para os dois donos.
+#   BACKLOG          `tm.sh item.list --state-type backlog,unstarted,triage --limit 100` (só os abertos, numa leitura;
+#                    a revisão isolada mediu que `search.query ""` traz 100 abertos e fechados misturados e esconde os
+#                    abertos antigos). O tm.sh lê a chave do .env como DADO; este script não abre o .env. Hoje só o
+#                    adapter do Linear tem o verbo: nos outros a leitura falha e vira lacuna. No máximo UMA leitura por
+#                    batida, com cache curto em <estado>/backlog-cache-<repo>.json (padrão 300 s, BATON_BACKLOG_TTL_S),
+#                    gravado só se a resposta é JSON com «issues». Leitura que falha é lacuna declarada (só o rc entra
+#                    no sha; o stderr sai num aviso, com token mascarado), nunca «zero cards»; --no-backlog
+#                    desliga. VAGAS DE AGENTE: AGENT_CAP_DEFAULT (5, a mesma decisão do teto de sessões) menos os
+#                    AGENT_RUNNING desta sessão (--self; o STALLED sai no aviso dele, não ocupa vaga). Vaga com card pronto da própria sessão é OFERTA.
+#   OFERTA           informação, nunca despacho: card, dono e sessão. No --quiet a batida NÃO cala enquanto houver
+#                    IDLE_WITH_BACKLOG ou vaga com trabalho pronto (SAC-508).
+#   --record (SAC-509, desligado por padrão): acrescenta a <estado>/pulses.tsv uma linha por sessão medida:
+#                    epoch · sha · sessão · classe · min ociosa · tamanho da fila · oferta feita · aceita. «aceita» sai `-`:
+#                    o pulso não sabe se a sessão pegou o card; quem fecha é a batida seguinte, cruzando as linhas.
 #   SUBAGENTES (SAC-421, 2026-11-12) de cada sessão viva e desta: <projects>/*/<sessão>/subagents/agent-<id>.jsonl e os
 #   da ferramenta Workflow em subagents/workflows/<run>/agent-<id>.jsonl (o <id>.output em /tmp/claude-<uid>/…/tasks/ é
 #   symlink para o primeiro). Lê o CONTEÚDO do transcript do subagente. Pendente = tool_use sem tool_result do MESMO id;
@@ -95,12 +115,13 @@
 #
 # Uso:  bash .claude/validation/baton-pulse.sh [<repo>] [--markdown|--tsv] [--quiet] [--since <iso|epoch>]
 #                [--last-sha <sha>] [--idle-min N] [--stall-min N] [--peers <arquivo.json|->] [--no-peers] [--no-family]
-#                [--skip-repo <caminho>]... [--no-gh] [--self <sessionId>] [--max-interactive N]
+#                [--skip-repo <caminho>]... [--no-gh] [--self <sessionId>] [--max-interactive N] [--no-backlog] [--record]
 #       bash .claude/validation/baton-pulse.sh [<repo>] --check-cap   (o teto: decisão vigente × medidor × docs; rc 0|1)
 # Env (bancada; todo override ativo é DECLARADO na saída):
 #   BATON_NOW=<epoch>  BATON_STATE_DIR=<dir> (padrão ~/.local/state/onion/baton)  BATON_PROJECTS_DIR=<dir>
 #   BATON_DECIDE_TSV=<arquivo> (saída pronta do decide-census --tsv)  BATON_CLAUDE=<binário>  ONION_ASK_DIR=<dir>
 #   BATON_PROC=<dir> (um /proc falso: a bancada da higiene)  BATON_TOPLEVEL_TIMEOUT_S=<seg> (teto do rev-parse por cwd, padrão 5)
+#   BATON_TM=<tm.sh> (bancada: um task manager falso)  BATON_BACKLOG_TTL_S=<seg> (cache do backlog, padrão 300)
 #   BATON_CONFIG_DIRS=<dir[:dir]> (pastas de config extras; fonte de produção, não override: sai na linha «pastas de config»)
 # Exit: 0 = medido (inclusive com lacunas DECLARADAS) · 2 = entrada quebrada (opção, data, python3/PyYAML ausente).
 #       --check-cap: 0 = decisão, medidor e docs dizem o mesmo teto · 1 = desencontro (cada um nomeado) · 2 = entrada quebrada.
@@ -112,6 +133,9 @@ set -uo pipefail
 # D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116). Mudou a decisão: troque os dois aqui e rode --check-cap.
 SESSION_CAP_DEFAULT="10"
 SESSION_CAP_DECISION="D_SESSION_CAP_10_PLUS_5_AGENTS_1119"
+# As vagas de agente de execução vêm da MESMA decisão («10 sessões + 5 agentes»); o --check-cap confere as duas.
+AGENT_CAP_DEFAULT="5"
+BACKLOG="1"; RECORD="0"
 CHECKCAP="0"
 REPO=""; MAXI="${SESSION_CAP_DEFAULT}"; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; STALL="15"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "baton-pulse: $1 exige um valor" >&2; exit 2; }; }
@@ -132,6 +156,8 @@ while [ $# -gt 0 ]; do
     --max-interactive) _need "$@"; shift; MAXI="$1" ;;
     --self) _need "$@"; shift; SELF="$1" ;;
     --check-cap) CHECKCAP="1" ;;
+    --no-backlog) BACKLOG="0" ;;
+    --record) RECORD="1" ;;
     --*) echo "baton-pulse: opção desconhecida: $1" >&2; exit 2 ;;
     *) REPO="$1" ;;
   esac
@@ -151,9 +177,9 @@ REPO="${REPO:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 #    decisão no grafo; a prosa (baton.md e baton-doctrine.md) é cópia conferida. Desencontro = rc 1, cada um nomeado.
 if [ "${CHECKCAP}" = 1 ]; then
   command -v python3 >/dev/null 2>&1 || { echo "baton-pulse --check-cap: python3 ausente" >&2; exit 2; }
-  PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${SESSION_CAP_DEFAULT}" "${SESSION_CAP_DECISION}" <<'PYCAP'
+  PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${SESSION_CAP_DEFAULT}" "${SESSION_CAP_DECISION}" "${AGENT_CAP_DEFAULT}" <<'PYCAP'
 import sys, os, re, glob
-repo, cap, dec = sys.argv[1:4]
+repo, cap, dec, acap = sys.argv[1:5]
 try:
     import yaml
 except ImportError:
@@ -175,6 +201,8 @@ else:
     # 15 não pode passar por eles (achado da revisão isolada, 2026-11-21)
     if not re.search(rf'(?<!\d){re.escape(cap)}\s+sess', str(n.get('label') or '')):
         bad.append(f'o rótulo de {dec} não diz o teto «{cap} sessões»: «{str(n.get("label") or "")[:120]}»')
+    if not re.search(rf'(?<!\d){re.escape(acap)}\s+agentes', str(n.get('label') or '')):
+        bad.append(f'o rótulo de {dec} não diz as vagas «{acap} agentes» (AGENT_CAP_DEFAULT): «{str(n.get("label") or "")[:120]}»')
 for rel in ('.claude/commands/meta/baton.md', '.claude/commands/common/prompts/baton-doctrine.md'):
     p = os.path.join(repo, rel)
     try: txt = open(p, encoding='utf-8').read()
@@ -190,7 +218,7 @@ for rel in ('.claude/commands/meta/baton.md', '.claude/commands/common/prompts/b
 if bad:
     for b in bad: print(f'CAP_MISMATCH\t{b}')
     sys.exit(1)
-print(f'CAP_OK\t{cap}\t{dec}\tdecisão vigente, medidor, baton.md e baton-doctrine.md dizem o mesmo')
+print(f'CAP_OK\t{cap}\t{dec}\tdecisão vigente, medidor, baton.md e baton-doctrine.md dizem o mesmo (vagas de agente: {acap})')
 PYCAP
   exit $?
 fi
@@ -261,14 +289,49 @@ if [ -f "${_ll}" ]; then
   bash "${_ll}" check >/dev/null 2>&1; case "$?" in 0) LOAD_LINE="${LOAD_LINE} · lease livre" ;; 3) LOAD_LINE="${LOAD_LINE} · lease OCUPADO (load ≥ HIGH)" ;; *) LOAD_LINE="${LOAD_LINE} · lease não mediu" ;; esac
 else LOAD_LINE="${LOAD_LINE} · lease ausente neste papel"; fi
 
-OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE|PROC|TOPLEVEL_TIMEOUT_S)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
+# ── backlog do task manager (fase 2, SAC-507): no máximo UMA leitura por batida, com cache curto ──
+# O tm.sh resolve o provider e lê a chave do .env como DADO (tm.sh, «Segredo»): este script nunca abre o .env.
+# Saída: BL_FILE (a lista de cards em JSON) e BL_SRC (de onde veio, ou o motivo da lacuna).
+BL_FILE=""; BL_SRC=""; BL_ERR=""
+_bttl="${BATON_BACKLOG_TTL_S:-300}"; case "${_bttl}" in ''|*[!0-9]*) _bttl=300 ;; esac
+# o cache tem chave do repo: outro <repo> (outro .env, outro provider) não reusa os cards deste
+_bcache="${_bsd}/backlog-cache-$(printf '%s' "$(git -C "${REPO}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" | sha256sum | cut -c1-12).json"
+if [ "${BACKLOG}" = 0 ]; then BL_SRC="desligado (--no-backlog)"
+else
+  _now="${BATON_NOW:-$(date +%s)}"
+  _bm="$(stat -c %Y "${_bcache}" 2>/dev/null || echo 0)"
+  if [ -r "${_bcache}" ] && [ $((_now - _bm)) -ge 0 ] && [ $((_now - _bm)) -lt "${_bttl}" ]; then
+    BL_FILE="${_bcache}"; BL_SRC="cache de $((_now - _bm))s (teto ${_bttl}s)"
+  else
+    _tm="${BATON_TM:-$(git -C "${REPO}" rev-parse --show-toplevel 2>/dev/null)/.claude/utils/task-manager/tm.sh}"
+    if [ ! -f "${_tm}" ]; then BL_SRC="falhou: ${_tm} ausente"
+    elif (cd "${REPO}" && timeout 30 bash "${_tm}" item.list --state-type backlog,unstarted,triage --limit 100) > "${TMPD}/backlog.json" 2> "${TMPD}/backlog.err"; then
+      BL_FILE="${TMPD}/backlog.json"; BL_SRC="tm.sh item.list (leitura desta batida)"
+      # o cache só grava leitura que terminou E é JSON com «issues» (resposta torta não fica 300 s no cache):
+      # escrita atômica, só do usuário (títulos de card ficam fora do repo)
+      if python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if isinstance(d, dict) and isinstance(d.get("issues"), list) else 1)' "${BL_FILE}" 2>/dev/null \
+         && mkdir -p "${_bsd}" 2>/dev/null && (umask 077; cp "${BL_FILE}" "${_bcache}.tmp.$$") 2>/dev/null; then
+        # chmod explícito: a ACL padrão do diretório vence o umask (medido 2026-11-21: o cache nasceu 644 numa pasta com ACL)
+        chmod 600 "${_bcache}.tmp.$$" 2>/dev/null
+        [ -z "${BATON_NOW:-}" ] || touch -d "@${BATON_NOW}" "${_bcache}.tmp.$$" 2>/dev/null
+        mv -f "${_bcache}.tmp.$$" "${_bcache}" 2>/dev/null || rm -f "${_bcache}.tmp.$$"
+      fi
+    else
+      # só o rc entra na fonte (e por ela no sha): stderr com request-id ou hora mudaria o sha a cada batida da queda
+      BL_SRC="falhou: tm.sh item.list (rc $?)"
+      BL_ERR="$(head -c 200 "${TMPD}/backlog.err" | tr '\n\t' '  ')"
+    fi
+  fi
+fi
+
+OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE|PROC|TOPLEVEL_TIMEOUT_S|TM|BACKLOG_TTL_S)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${QUIET}" "${SINCE}" "${LAST}" "${IDLE}" "${PEERS}" "${PEERS_SRC}" \
   "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" "${STALL}" "${MAXI}" \
-  "${TMPD}/cfg.tsv" "${CFG_SRC}" "${SESSION_CAP_DECISION}" <<'PY'
+  "${TMPD}/cfg.tsv" "${CFG_SRC}" "${SESSION_CAP_DECISION}" "${BL_FILE}" "${BL_SRC}" "${AGENT_CAP_DEFAULT}" "${RECORD}" "${BL_ERR}" <<'PY'
 import sys, os, re, json, glob, time, hashlib, subprocess, datetime
 (repo, fmt, quiet, since, last_sha, idle_min, peers_file, peers_src, family, skip, self_sid, here, dc_file, dc_rc,
- load_line, ovr, stall_min, max_inter, cfg_file, cfg_src, cap_decision) = sys.argv[1:22]
+ load_line, ovr, stall_min, max_inter, cfg_file, cfg_src, cap_decision, bl_file, bl_src, agent_cap, record, bl_err) = sys.argv[1:27]
 stall_s = int(stall_min) * 60
 quiet = quiet == '1'; idle_s = int(idle_min) * 60
 self_sid = self_sid or os.environ.get('CLAUDE_CODE_SESSION_ID', '')
@@ -295,6 +358,36 @@ def parse_since(s):
     d = d.replace(hour=int(m.group(2) or 0), minute=int(m.group(3) or 0), second=int(m.group(4) or 0))
     return int(d.timestamp())
 since_ts = parse_since(since)
+
+# ── backlog do task manager (fase 2, SAC-507): cards ABERTOS com prefixo de dono no título ───────────────
+# O título manda: `[<rótulo>] ...` casa um rótulo da sessão. «· maestro» ou «bloqueado no maestro» é espera do maestro,
+# não trabalho pronto. Estado concluído/cancelado sai. Leitura que falhou é LACUNA (backlog_ok False), nunca lista vazia.
+BL_PREFIX = re.compile(r'^\s*\[([A-Za-z0-9_./, -]+)\]')
+BL_READY_TYPES = ('backlog', 'unstarted', 'triage')
+def mask_secret(x):   # defesa em profundidade: o stderr do tm.sh vai ao chat e ao /loop
+    return re.sub(r'(?i)(bearer\s+|token[=:]\s*|key[=:]\s*|authorization:\s*)\S+|\b(ghp|gho|ghs|lin_api|sk-ant|xox[bp])[_-]?[A-Za-z0-9_-]{6,}', '[REDACTED]', x or '')
+BL_NOT_READY = re.compile(r'·\s*maestro\b|bloqueado no maestro', re.I)
+BACKLOG, backlog_ok, backlog_skipped, bl_warns = {}, False, 0, []   # rótulo → [(id, título)]; avisos vão a warns adiante
+if bl_file:
+    try:
+        _bd = json.load(open(bl_file, encoding='utf-8'))
+        _iss = _bd.get('issues') if isinstance(_bd, dict) else None
+        if not isinstance(_iss, list): raise ValueError('sem a lista «issues»')
+        backlog_ok = True
+        if _bd.get('truncated') or len(_iss) >= 100: bl_warns.append(f'backlog: a leitura bateu no teto de 100 cards abertos ({len(_iss)}): card além dele não é visto')
+        for it in _iss:
+            if not isinstance(it, dict): continue
+            title = str(it.get('title') or ''); st = it.get('state') or {}
+            stype = str((st.get('type') if isinstance(st, dict) else '') or '').lower()
+            m = BL_PREFIX.match(title)
+            if not m: continue
+            if stype not in BL_READY_TYPES or BL_NOT_READY.search(title): backlog_skipped += 1; continue
+            for own in {o.strip().lower() for o in re.split(r'[/,]', m.group(1)) if o.strip()}:
+                BACKLOG.setdefault(own, []).append((str(it.get('identifier') or it.get('id') or '?'), title))
+    except Exception as e:
+        bl_src = f'ilegível: {e}'
+backlog_measured = backlog_ok
+if bl_err: bl_warns.append(f'backlog: stderr do tm.sh: {mask_secret(bl_err)}')
 def git(*a, cwd=None, timeout=None):
     # timeout=None (o default de toda chamada) = sem teto, comportamento inalterado; só a varredura de cwd dos peers
     # passa um teto curto (cwd em mount travado pendura o pulso inteiro). Estouro → (None, '') e quem chamou nomeia a LACUNA.
@@ -310,6 +403,7 @@ def tilde(x): return re.sub(r'^/home/[^/]+|^/root(?=/|$)', '~', x or '')
 def mins(sec): return None if sec is None else max(0, sec) // 60
 
 gaps, warns = [], []
+warns.extend(bl_warns)   # o backlog é lido antes desta linha (warns ainda não existia: medido no pré-voo)
 if ovr: warns.append(f'override ativo, esta NÃO é a medição de produção: {ovr}')
 _, common = git('rev-parse', '--path-format=absolute', '--git-common-dir')
 main_checkout = real(os.path.dirname(common)) if common else real(repo)
@@ -572,6 +666,7 @@ for ln in wtl.splitlines():
     elif ln.startswith('branch refs/heads/') and cur: wt_branch[ln[18:]] = cur
 
 claimed_owner = set(); claimed_pr = set()
+def l_ok_labels(labels): return bool(labels) and backlog_ok
 for s in S.values():
     labels, lab_src = labels_of(s); s['labels'], s['lab_src'] = labels, lab_src
     s['grant'] = grant_of(s, labels)
@@ -586,6 +681,7 @@ for s in S.values():
            (pr['branch'] in wt_branch and s['cwd'] and wt_branch[pr['branch']] == s['cwd'] and s['cwd'] != main_checkout):
             q.append(f'{pr["ref"]} (CI {pr["ci"]})'); claimed_pr.add(pr['ref'])
     s['queue'] = q
+    s['backlog'] = [c for l in labels for c in BACKLOG.get(str(l).lower(), [])] if l_ok_labels(labels) else []
     pk, why, warn = parked_of(s, labels)
     if warn: warns.append(warn)
     alive = pid_alive(s['pid']) if s['pid'] is not None else None
@@ -602,7 +698,7 @@ for s in S.values():
     elif s['status'] == 'busy': cls, note = 'ACTIVE', 'harness: busy'
     elif idle_for is not None and idle_for < idle_s: cls, note = 'ACTIVE', f'atividade há {mins(idle_for)}min ({s["act_src"]})'
     else:
-        cls = 'IDLE_WITH_QUEUE' if q else 'IDLE_NO_QUEUE'
+        cls = 'IDLE_WITH_QUEUE' if q else ('IDLE_WITH_BACKLOG' if s['backlog'] else 'IDLE_NO_QUEUE')
         note = (f'sem atividade há {mins(idle_for)}min ({s["act_src"]})' if idle_for is not None else 'ociosa pelo harness; duração NÃO medida')
         if s['state'] == 'blocked' or s['status'] == 'waiting': note += ' · espera o maestro'
     s['cls'], s['note'] = cls, note
@@ -899,11 +995,39 @@ for g in hy_gaps: gaps.append(f'higiene das sessões NÃO MEDIDA (HYGIENE_UNMEAS
 hy_line = f'higiene: {len(inter)} interativa(s) viva(s) · ' + (' · '.join(f'{c} {sum(1 for h in HY if h[0] == c)}' for c in HORD) if peers_ok else 'NÃO MEDIDA')
 
 orphan_queue = {o: v for o, v in owned.items() if o != 'maestro' and o not in claimed_owner}
-CLASSES = ('ACTIVE', 'IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'PARKED', 'UNREACHABLE', 'PARK_UNMEASURED')
+CLASSES = ('ACTIVE', 'IDLE_WITH_QUEUE', 'IDLE_WITH_BACKLOG', 'IDLE_NO_QUEUE', 'PARKED', 'UNREACHABLE', 'PARK_UNMEASURED')
 cnt = {c: sum(1 for s in S.values() if s['cls'] == c) for c in CLASSES}
 sessions_measured = peers_ok or beacons_n > 0 or (os.path.isfile(beacon_tool) and 'NÃO MEDIDO' not in beacon_desc)
-ORD = {c: i for i, c in enumerate(('IDLE_WITH_QUEUE', 'IDLE_NO_QUEUE', 'ACTIVE', 'PARK_UNMEASURED', 'PARKED', 'UNREACHABLE'))}
+ORD = {c: i for i, c in enumerate(('IDLE_WITH_QUEUE', 'IDLE_WITH_BACKLOG', 'IDLE_NO_QUEUE', 'ACTIVE', 'PARK_UNMEASURED', 'PARKED', 'UNREACHABLE'))}
 sess_sorted = sorted(S.values(), key=lambda s: (ORD[s['cls']], s['cwd'], s['name'], s['sid']))
+
+# ── ofertas (fase 2, SAC-507/508): informação, nunca despacho ───────────────────────────────────────────
+# (1) sessão IDLE_WITH_BACKLOG: os cards prontos dela. (2) vagas de agente desta sessão (--self): teto AGENT_CAP_DEFAULT
+# menos os AGENT_RUNNING desta sessão. O STALLED NÃO conta: medido em 2026-11-21, a sessão do core tinha parados de dias
+# atrás, que zerariam as vagas para sempre; o parado sai no aviso dele, não na conta da vaga.
+# Vaga com card pronto da própria sessão é oferta; sem --self ou sem transcripts, as vagas são LACUNA, nunca «5 livres».
+if not backlog_ok: gaps.append(f'backlog do task manager NÃO MEDIDO ({bl_src}): nenhuma sessão sai IDLE_WITH_BACKLOG por isso, não por falta de card')
+OFFERS = []   # (sessão, dono, card, título, via, sid). Um card sai UMA vez: a sessão ociosa vem antes da vaga de agente
+offered_cards = set()
+def stag(s): return f'{s["name"] or "—"}·{s["sid"][:8]}'   # nome E sid: duas sessões com o mesmo nome não se confundem
+for s in sess_sorted:
+    if s['cls'] == 'IDLE_WITH_BACKLOG':
+        for cid, title in s['backlog']:
+            if cid in offered_cards: continue
+            offered_cards.add(cid); OFFERS.append((stag(s), '/'.join(s['labels']), cid, title, 'IDLE_WITH_BACKLOG', s['sid']))
+slots, slots_note = None, ''
+self_s = S.get(self_sid) if self_sid else None
+if not self_sid: slots_note = 'vagas de agente NÃO MEDIDAS: sem --self (nem CLAUDE_CODE_SESSION_ID), não sei de que sessão contar'
+elif not agents_measured: slots_note = 'vagas de agente NÃO MEDIDAS: transcripts de subagente ilegíveis'
+else:
+    busy_ag = sum(1 for a in AG if a['sid'] == self_sid and a['cls'] in ('AGENT_RUNNING',))
+    slots = max(0, int(agent_cap) - busy_ag)
+    slots_note = f'vagas de agente desta sessão: {slots} de {agent_cap} ({busy_ag} ocupada(s) por AGENT_RUNNING; teto AGENT_CAP_DEFAULT)'
+    if slots > 0 and self_s is not None and self_s['cls'] not in ('IDLE_WITH_BACKLOG', 'PARKED', 'PARK_UNMEASURED', 'UNREACHABLE'):
+        for cid, title in [c for c in self_s.get('backlog', []) if c[0] not in offered_cards][:slots]:
+            offered_cards.add(cid); OFFERS.append((stag(self_s), '/'.join(self_s['labels']), cid, title, 'vaga de agente', self_sid))
+if slots_note.startswith('vagas de agente NÃO'): gaps.append(slots_note)
+backlog_orphan = sorted(l for l in BACKLOG if not any(l in [str(x).lower() for x in s.get('labels', [])] for s in S.values()))
 
 # ── o que mudou: eventos datados depois de --since, e o sha do estado ───────────────────
 events = []
@@ -924,18 +1048,40 @@ state = {'s': sorted((s['sid'], s['cls'], len(s['queue'])) for s in S.values()),
          'cp': len(checkpoints), 'gaps': sorted(gaps), 'cfg': sorted(c for c, _, _ in CFG),
          'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT],
          'pc': sorted((p['id'], p['cls'], p['owner']) for p in PIECES),
-         'hy': sorted((h[0], h[1]['sid'] if h[1] else '', h[1]['name'] if h[1] else '') for h in HY)}
+         'hy': sorted((h[0], h[1]['sid'] if h[1] else '', h[1]['name'] if h[1] else '') for h in HY),
+         'of': sorted((o[0], o[2], o[4]) for o in OFFERS)}
 sha = hashlib.sha256(json.dumps(state, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 # «sem mudança» só quando o sha BATE (achado do refutador, 2026-11-12): com só --since, uma sessão que caiu ou um PR que
 # ficou vermelho sem evento datado passava calado. Sem --last-sha não há base, e a batida fala.
-changed = (not last_sha) or last_sha != sha or bool(events)
+# oferta pendente NÃO deixa a batida calar (SAC-508): sessão ociosa com card pronto é exatamente o que o /loop quer ver
+changed = (not last_sha) or last_sha != sha or bool(events) or bool(OFFERS)
+
+# ── --record (SAC-509, desligado por padrão): uma linha por sessão medida em <estado>/pulses.tsv ─────────
+if record == '1':
+    rec_p = os.path.join(state_dir, 'pulses.tsv'); offered = {o[5] for o in OFFERS}
+    try:
+        os.makedirs(state_dir, exist_ok=True)
+        new = not os.path.exists(rec_p)
+        fd = os.open(rec_p, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+        os.fchmod(fd, 0o600)   # a ACL padrão do diretório vence o modo do open (medido no cache do backlog)
+        with os.fdopen(fd, 'a', encoding='utf-8') as fh:
+            # fila (grafo/perguntas/PRs) e backlog (cards) em colunas separadas: a grandeza «horas ociosas com trabalho
+            # pronto» não pode somar o backlog de quem não pode pegá-lo (PARKED, UNREACHABLE saem com backlog 0)
+            if new: fh.write('epoch\tsha\tsession\tclass\tidle_min\tqueue\tbacklog\toffer\taccepted\n')
+            for s in sess_sorted:
+                reach = s['cls'] not in ('PARKED', 'UNREACHABLE', 'PARK_UNMEASURED')
+                fh.write('\t'.join(str(x).replace('\t', ' ') for x in (now, sha, stag(s), s['cls'], '' if s['idle_for'] is None else mins(s['idle_for']),
+                         len(s['queue']), len(s.get('backlog', [])) if reach else 0, 'yes' if s['sid'] in offered else 'no', '-')) + '\n')
+        warns.append(f'--record: {len(sess_sorted)} linha(s) em {tilde(rec_p)} («accepted» sai «-»: o pulso não vê a aceitação)')
+    except OSError as e:
+        gaps.append(f'--record NÃO gravou ({tilde(rec_p)}): {e}')
 
 def tsvc(x): return str(x).replace('\t', ' ').replace('\n', ' ')
 if fmt == '--tsv':
     print('kind\tref\tclass\trepo\tidle_min\tqueue\tsource\tdetail')
     for s in sess_sorted:
         print('\t'.join(tsvc(x) for x in ('session', s['sid'], s['cls'], os.path.basename(s['cwd']), '' if s['idle_for'] is None else mins(s['idle_for']),
-              len(s['queue']), '+'.join(s['src']), f'{s["name"]} · {s["note"]} · rótulo {"/".join(s["labels"]) or "—"}' + (f' · batuta-de-projeto: {"sim" if s["grant"][1] else "não"} ({s["grant"][0]}, por {s["grant"][2]})' if s.get('grant') else '') + f' · fila: {"; ".join(s["queue"]) or "—"}')))
+              len(s['queue']), '+'.join(s['src']), f'{s["name"]} · {s["note"]} · rótulo {"/".join(s["labels"]) or "—"}' + (f' · batuta-de-projeto: {"sim" if s["grant"][1] else "não"} ({s["grant"][0]}, por {s["grant"][2]})' if s.get('grant') else '') + f' · fila: {"; ".join(s["queue"]) or "—"}' + f' · backlog: {"; ".join(c for c, _ in s.get("backlog", [])) or "—"}')))
     for o, v in sorted(orphan_queue.items()): print(f'orphan_queue\t{tsvc(o)}\t-\t-\t\t{len(v)}\tgrafo\t' + tsvc('; '.join(n for _, n, _ in v)))
     for p in prs: print('\t'.join(tsvc(x) for x in ('pr', p['ref'], 'CI_' + p['ci'].upper().replace(' ', '_'), p['branch'], '' if p['age'] is None else mins(p['age']), '', 'decide-census', p['state'])))
     for t in threads: print('\t'.join(tsvc(x) for x in ('thread', t['ref'], 'STOPPED' if t['stopped'] else 'MOVING', t['path'], '', '', 'decide-census', f'{t["label"]} · {t["state"]} · {t["actor"]}')))
@@ -949,6 +1095,10 @@ if fmt == '--tsv':
     print(f'maestro\tseal_candidates\t-\t-\t\t{len(seals)}\tdecide-census\tcheckpoints {len(checkpoints)} · nós open owner:maestro {len(owned.get("maestro", []))}')
     print(f'load\t-\t-\t-\t\t\t/proc/loadavg+lease\t{tsvc(load_line)}')
     print(f'config_dirs\t-\t-\t-\t\t{len(CFG)}\t{tsvc(cfg_src)}\t' + tsvc(', '.join(tilde(c) for c, _, _ in CFG) or '—'))
+    print(f'backlog\t-\t{"MEASURED" if backlog_ok else "UNMEASURED"}\t-\t\t{sum(len(v) for v in BACKLOG.values())}\t{tsvc(bl_src)}\t'
+          + tsvc(f'prontos por dono: {", ".join(f"{k} {len(v)}" for k, v in sorted(BACKLOG.items())) or "—"} · fora (maestro/fechado): {backlog_skipped} · dono sem sessão: {", ".join(backlog_orphan) or "—"}'))
+    print(f'agent_slots\t{tsvc(self_sid[:8] if self_sid else "-")}\t{"MEASURED" if slots is not None else "UNMEASURED"}\t-\t\t{"" if slots is None else slots}\tAGENT_CAP_DEFAULT\t{tsvc(slots_note)}')
+    for o in OFFERS: print('\t'.join(tsvc(x) for x in ('offer', o[2], o[4], o[0], '', '', o[1], o[3])))
     print(f'stale_beacons\t-\t-\t-\t\t{len(stale_traces)}\tfarol\trastro fora do TTL, sem peer')
     for e in events: print(f'change\t-\t-\t-\t\t\tsince\t{tsvc(e)}')
     for g in gaps: print(f'gap\t-\t-\t-\t\t\t-\t{tsvc(g)}')
@@ -962,12 +1112,15 @@ ag_line = ('subagentes: ' + ' · '.join(f'{c} {acnt[c]}' for c in AORD)) if agen
 if quiet and not changed:
     unm = ' · '.join(x for x, ok in (('⚠️ PRs NÃO medidos', prs_measured), ('⚠️ sinais NÃO medidos', signals_measured),
                                        ('⚠️ perguntas NÃO medidas', asks_measured), ('⚠️ parada NÃO medida', not park_unknown)) if not ok)
+    if not backlog_ok: unm = (unm + ' · ' if unm else '') + '⚠️ backlog NÃO medido'
     print(f'{head} · sem mudança (sha igual ao --last-sha' + (f', nenhum evento desde {iso(since_ts)}' if since_ts is not None else '') + f') · {cls_line} · {ag_line} · {pc_line} · {hy_line}' + (f' · {unm}' if unm else ''))
     sys.exit(0)
 print(f'# {head}')
 print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} · transcript={"stat de " + proj_dir if proj_ok else "não medido"} · '
       f'em voo=decide-census rc {dc_rc} · perguntas={ask_dir} · parked={park_p}{" (" + str(len(park_rows)) + " linha(s))" if park_rows is not None else (" (ausente: ninguém parado por ordem)" if park_st == "absent" else " (" + park_st + ": NÃO MEDIDO)")} · '
       f'rótulos={own_p if own_rows is not None else ("derivados" if own_st == "absent" else "derivados (" + own_st + ")")} · ociosa após {idle_min}min · papel={role or "?"}')
+print(f'backlog: {sum(len(v) for v in BACKLOG.values())} card(s) pronto(s) com dono ({bl_src})' if backlog_ok else f'backlog: NÃO MEDIDO ({bl_src})')
+print(slots_note)
 print(f'pastas de config extras: {len(CFG)} ({cfg_src})' + (': ' + ', '.join(tilde(c) for c, _, _ in CFG) + ' · delas só a lista de peers e o stat dos transcripts; subagentes delas NÃO lidos (conteúdo)' if CFG else ''))
 print(f'classes: {cls_line}')
 print(ag_line)
@@ -986,6 +1139,8 @@ if quiet:
     print(f'- sha do estado: {sha}')
     for s in sess_sorted:
         if s['cls'] == 'IDLE_WITH_QUEUE': print(f'- IDLE_WITH_QUEUE: {s["name"] or s["sid"][:8]} ({os.path.basename(s["cwd"])}) · {len(s["queue"])} item(ns) de fila')
+    if OFFERS: print(f'- oferta pendente: {len(OFFERS)} (a batida não cala enquanto houver; oferta é informação, não despacho)')
+    for o in OFFERS: print(f'- OFERTA ({o[4]}): {o[2]} «{o[3]}» · dono {o[1]} · sessão {o[0]}')
     for p in prs:
         if p['ci'] == 'RED': print(f'- {p["ref"]} com CI vermelho ({p["branch"]})')
     for a in AG:
@@ -1003,6 +1158,10 @@ for s in sess_sorted:
     gr = f' · batuta-de-projeto: {"sim" if s["grant"][1] else "não"} ({s["grant"][0]}, por {s["grant"][2]})' if s.get('grant') else ''
     print(f'| {s["cls"]} | {s["name"] or "—"} `{s["sid"][:8]}`{me} | {os.path.basename(s["cwd"]) or "—"} | {s["note"]} | {qd} | {"+".join(s["src"])} · rótulo {"/".join(s["labels"]) or "—"}{gr} |')
 if not S: print('| — | nenhuma sessão nas fontes medidas | | | | |')
+print('\n## Ofertas (fase 2: card pronto de dono declarado no título; informação, nunca despacho)')
+for o in OFFERS: print(f'- {o[4]} · sessão {o[0]} · dono {o[1]} · {o[2]} «{o[3]}»')
+if not OFFERS: print('- nenhuma' if backlog_ok else '- NÃO MEDIDO (backlog ilegível): não é «nenhuma»')
+if backlog_orphan: print(f'- dono com card pronto e sem sessão medida: {", ".join(backlog_orphan)}')
 print('\n## Subagentes das sessões vivas (transcript em <projects>/*/<sessão>/subagents/ e subagents/workflows/<run>/)')
 if not agents_measured: print('- NÃO MEDIDO (sem diretório de transcripts): não é «nenhum parado»')
 for a in AG:
