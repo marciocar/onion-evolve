@@ -56284,6 +56284,20 @@ run_background_task_probe_selftests() {
     record_pass "bg-probe: (i) find que falha vira NAO MEDIDO, nunca 'sem processo' (achado do 2o dogfood)"
   else record_fail "bg-probe: (i) nao-medido" "linha=[${li}]"; fi
 
+  # (m) sessao com UMA tarefa viva e NENHUM termino: a lista de terminos vazia nao pode engolir o lancamento
+  #     (achado no dogfood do reinício gracioso, 2026-11-21: o NR==FNR do awk valia para o 2o arquivo). Prova por mutante.
+  local tpm="${d}/run/${sid}/m.jsonl" lm cm rc_mi=1 rc_mm=1
+  _bgp_launch bgpaaaa > "${tpm}"
+  cp "${sut}" "${d}/bgp-c.sh"; grep -v "^  echo '#sem-termino'\$" "${sut}" > "${d}/bgp-m.sh"
+  for cm in c m; do
+    lm="$(printf '{"transcript_path":"%s"}' "${tpm}" | BG_PROBE_STATE_DIR="${d}/state-m" LC_ALL=C bash "${d}/bgp-${cm}.sh" 2>&1 \
+      | jq -r '.hookSpecificOutput.additionalContext // empty' 2>/dev/null | awk 'index($0, "tarefa bgpaaaa:")')" || lm=""
+    if [[ "${lm}" == *"PID ${pa} "* ]]; then if [ "${cm}" = c ]; then rc_mi=0; else rc_mm=0; fi; fi
+  done
+  if [ "${rc_mi}" = 0 ]; then record_pass "bg-probe: (m) tarefa viva aparece mesmo sem nenhuma notificacao de termino na sessao"
+  else record_fail "bg-probe: (m) sem termino" "a tarefa viva sumiu sem nenhum termino na sessao"; fi
+  _prove_mutation "bg-probe: (m) sem termino (MUT)" "${d}/bgp-c.sh" "${d}/bgp-m.sh" "${rc_mi}" "${rc_mm}"
+
   # (g) nunca veta e nunca le .env (contrato declarado, conferido no texto do SUT)
   if ! LC_ALL=C grep -qE '(^|[^#])\<exit[[:space:]]+[1-9]' "${sut}" && ! LC_ALL=C grep -qE '(source|\.)[[:space:]]+[^[:space:]]*\.env\>' "${sut}"; then
     record_pass "bg-probe: (g) sem exit nao-zero nem leitura de .env no SUT"
@@ -62183,6 +62197,196 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   rm -rf "${sb}"
 }
 _family run_session_open_selftests
+
+# ---------------------------------------------------------------------------
+# restart_drain — o reinício gracioso (restart-drain.sh, 2026-11-21): o medidor e escritor
+# .claude/utils/orchestration/restart-drain.sh grava o marcador «sem despacho novo», mede os agentes desta sessão
+# pelo baton-pulse.sh --tsv e as tarefas de fundo pela sonda background-task-probe.sh, espera com teto e grava o
+# bilhete de retomada; o --resume-check lista quem retomar e apaga o marcador; o baton-pulse.sh avisa do marcador.
+# Transcripts FALSOS em <proj>/p/<sid>/subagents/ e um `sleep` real como tarefa de fundo. Cada caso reprova contra o
+# mutante dele.
+run_restart_drain_selftests() {
+  echo ""
+  echo "▸ restart_drain — marcador, medição, espera com teto, bilhete e retomada no restart-drain.sh"
+  local sut="${REPO_ROOT}/.claude/utils/orchestration/restart-drain.sh" pulse="${REPO_ROOT}/.claude/validation/baton-pulse.sh"
+  local probe="${REPO_ROOT}/.claude/hooks/background-task-probe.sh"
+  [ -f "${sut}" ] && [ -f "${pulse}" ] && [ -f "${probe}" ] || { record_fail "restart_drain: SUT ausente" "${sut}, ${pulse} ou ${probe}"; return; }
+  command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
+    || { record_skip "restart_drain: python3/PyYAML ausentes (SUT não exercido)"; return; }
+  local sb r w T SID="rsid-0000-4000-8000-aaaa" SID2="rsid-0000-4000-8000-bbbb" SID3="rsid-0000-4000-8000-cccc" G=(git -c user.name=bancada -c user.email=bancada@example.invalid -c commit.gpgsign=false)
+  T="$(printf '\t')"; sb="$(TMPDIR=/tmp mktemp -d)"; "${G[@]}" -C "${sb}" init -q r; r="$(cd "${sb}/r" && pwd -P)"
+  "${G[@]}" -C "${r}" commit -q --allow-empty -m c1; "${G[@]}" -C "${r}" worktree add -q -b feat/rs-x "${sb}/wt-x" >/dev/null 2>&1
+  w="$(cd "${sb}/wt-x" && pwd -P)"
+  local tk="${sb}/run/${SID}/tasks" ag="${sb}/proj/p/${SID}/subagents" ag2="${sb}/proj/p/${SID2}/subagents"
+  mkdir -p "${tk}" "${ag}" "${ag2}" "${sb}/state/baton"
+  local pbg; sleep 300 > "${tk}/rsbg1.output" 2>&1 & pbg=$!
+  python3 - "${sb}" "${SID}" "${SID2}" "${w}" "${tk}" "${SID3}" <<'RS_PY'
+import json, os, sys, time
+sb, sid, sid2, w, tk, sid3 = sys.argv[1:]
+J = lambda o: json.dumps(o, separators=(',', ':'), ensure_ascii=False)   # compacto, como o harness grava
+def a(*b): return J({'type': 'assistant', 'cwd': sb + '/r', 'gitBranch': 'main', 'message': {'role': 'assistant', 'content': list(b)}})
+def u(*b): return J({'type': 'user', 'cwd': sb + '/r', 'gitBranch': 'main', 'message': {'role': 'user', 'content': list(b)}})
+tu = lambda i, c: {'type': 'tool_use', 'id': i, 'name': 'Bash', 'input': {'command': c}}
+tr = lambda i: {'type': 'tool_result', 'tool_use_id': i, 'content': 'ok'}
+txt = lambda t: {'type': 'text', 'text': t}
+# o transcript da sessão: título e o lançamento de uma tarefa de fundo (a chave harness-only backgroundTaskId)
+main = [J({'type': 'custom-title', 'customTitle': 'velho-nome'}), J({'type': 'custom-title', 'customTitle': 'sessao-x'}),
+        J({'type': 'user', 'message': {'role': 'user', 'content': [{'type': 'tool_result', 'content':
+            f'Command running in background with ID: rsbg1. Output is being written to: {tk}/rsbg1.output. You will be notified when it completes.'}]},
+            'toolUseResult': {'stdout': '', 'backgroundTaskId': 'rsbg1'}})]
+open(f'{sb}/proj/p/{sid}.jsonl', 'w').write('\n'.join(main) + '\n')
+open(f'{sb}/proj/p/{sid2}.jsonl', 'w').write(J({'type': 'custom-title', 'customTitle': 'sessao y (3)'}) + '\n')
+d = f'{sb}/proj/p/{sid}/subagents'
+F = {'arun':  [u(txt('brief')), a(tu('t1', 'ls')), u(tr('t1')), a(tu('t2', f'cd {w} && bash .claude/validation/pre-commit-check.sh'))],
+     'adone': [u(txt('brief')), a(tu('t1', 'ls')), u(tr('t1')), a(txt('relatório final'))],
+     'aold':  [u(txt('brief')), a(tu('t1', 'gh pr checks 9 --watch'))],
+     # rodando SEM pendência (escrita recente), e a última chamada levava um segredo: o comando cru nunca vai ao bilhete
+     'arsec': [u(txt('brief')), a(tu('t1', 'curl -H "Authorization: Bearer ghp_SEGREDOBANCADA123456" https://x.invalid')), u(tr('t1'))]}
+for k, L in F.items():
+    open(f'{d}/agent-{k}.jsonl', 'w').write('\n'.join(L) + '\n')
+    open(f'{d}/agent-{k}.meta.json', 'w').write(json.dumps({'description': f'agente {k}'}))
+old = time.time() - 10 * 86400; os.utime(f'{d}/agent-aold.jsonl', (old, old))
+d2 = f'{sb}/proj/p/{sid2}/subagents'
+open(f'{d2}/agent-bdone.jsonl', 'w').write('\n'.join(F['adone']) + '\n')
+# sessão 3: um agente com transcript ilegível (AGENT_UNMEASURED) — o não medido segura a espera
+os.makedirs(f'{sb}/proj/p/{sid3}/subagents')
+open(f'{sb}/proj/p/{sid3}.jsonl', 'w').write(J({'type': 'custom-title', 'customTitle': 'sessao-z'}) + '\n')
+open(f'{sb}/proj/p/{sid3}/subagents/agent-cbroken.jsonl', 'w').write('{nao e json\n')
+RS_PY
+  : > "${sb}/session-open.sh"
+  printf '#!/bin/sh\necho falhou >&2\nexit 1\n' > "${sb}/pulse-broken.sh"
+  # medidor que mede na 1ª chamada e falha da 2ª em diante (a falha DURANTE a espera); o contador vem do ambiente
+  printf '#!/bin/sh\nn=$(cat "$RS_FLAKY_CNT" 2>/dev/null || echo 0); echo $((n+1)) > "$RS_FLAKY_CNT"\n[ "$n" -eq 0 ] && exec bash "%s" "$@"\necho falhou na espera >&2; exit 1\n' "${pulse}" > "${sb}/pulse-flaky.sh"
+  _rsr() {  # $1 = SUT, resto = args; ambiente da bancada
+    local s="$1"; shift
+    env -u CLAUDE_CODE_SESSION_ID LC_ALL=C ONION_RESTART_DIR="${RS_DIR:-${sb}/rdir}" RESTART_PROJECTS_DIR="${sb}/proj" \
+      RESTART_PULSE="${RS_PULSE:-${pulse}}" RESTART_PROBE="${probe}" RESTART_SESSION_OPEN="${RS_SO:-${sb}/session-open.sh}" \
+      BATON_STATE_DIR="${sb}/state/baton" BATON_PROC="${sb}/proc-empty" ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista.tsv" \
+      bash "${s}" --repo "${r}" "$@" 2>&1
+  }
+  _rscase() {  # <nome> <OLD> <NEW> <função> [arquivo-alvo: sut|pulse]
+    local name="$1" old="$2" new="$3" fn="$4" src="${sut}" rc_i=1 rc_m=1 k="${sb}/k$(date +%N)"
+    [ "${5:-sut}" = pulse ] && src="${pulse}"
+    mkdir -p "${k}"; cp "${src}" "${k}/c.sh"
+    RS_DIR="${k}/rd-c" "${fn}" "${k}/c.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "restart_drain: ${name}"; else record_fail "restart_drain: ${name}" "${RS_WHY:-caso não satisfeito}"; fi
+    cp "${k}/c.sh" "${k}/m.sh"
+    OLD="${old}" NEW="${new}" python3 -c '
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+' "${k}/m.sh"
+    RS_DIR="${k}/rd-m" "${fn}" "${k}/m.sh" && rc_m=0
+    _prove_mutation "restart_drain: ${name} (MUT)" "${k}/c.sh" "${k}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  # (a) --now: o agente em curso entra no bilhete com a worktree e a branch que o comando dele cita; o terminado não
+  _rs_a() { local o rc=0; o="$(_rsr "$1" --session "${SID}" --now)" || rc=$?; local t="${RS_DIR}/${SID}.tsv"
+    RS_WHY="rc=${rc} · $(tr '\t\n' ' |' < "${t}" 2>/dev/null | head -c 400)"
+    [ "${rc}" = 0 ] && grep -q "^agent${T}arun${T}AGENT_RUNNING${T}agente arun${T}${w}${T}feat/rs-x${T}" "${t}" \
+      && grep -q "^agent${T}arun${T}.*${T}Bash: cd ${w} && bash" "${t}" && ! grep -q "^agent${T}adone${T}" "${t}"; }
+  _rscase "(a) agente em curso no bilhete com worktree, branch e último passo; terminado fora" \
+    "        if hit: wt, br = hit[0], WT[hit[0]]; break" "        if False: break" _rs_a
+  # (b) agente antigo (pendência de 10 dias) sai em «Antigos», nunca como agente a retomar
+  _rs_b() { _rsr "$1" --session "${SID}" --now >/dev/null || true; local t="${RS_DIR}/${SID}.tsv" m="${RS_DIR}/${SID}.md"
+    RS_WHY="$(grep -c . "${t}" 2>&1) linha(s) · $(grep -A3 'Antigos' "${m}" 2>&1 | tr '\n' '|')"
+    ! grep -q "^agent${T}aold${T}" "${t}" && grep -q '^- aold \[AGENT_STALLED' "${m}"; }
+  _rscase "(b) agente parado há dias vai para «Antigos», fora da retomada" \
+    "(old if g['cls'] != 'AGENT_RUNNING' and g['age'] is not None and g['age'] > opt['stale'] else live)" "live" _rs_b
+  # (c) a tarefa de fundo viva (um sleep real que segura o .output) entra no bilhete
+  _rs_c() { _rsr "$1" --session "${SID}" --now >/dev/null || true; local t="${RS_DIR}/${SID}.tsv"; RS_WHY="$(grep '^task' "${t}" 2>&1 | head -c 300)"
+    grep -q "^task${T}rsbg1${T}sessão: PID ${pbg} " "${t}"; }
+  _rscase "(c) tarefa de fundo viva entra no bilhete com o PID" \
+    "            if alive is False: continue" "            if True: continue" _rs_c
+  # (d) drenagem com agente em curso e teto curto: rc 3 e o bilhete diz que o teto venceu
+  _rs_d() { local o rc=0; o="$(_rsr "$1" --session "${SID}" --timeout-s 1 --poll-s 1)" || rc=$?; RS_WHY="rc=${rc} · $(tail -n 3 <<< "${o}" | head -c 300)"
+    [ "${rc}" = 3 ] && grep -q '^- gravado: .*resultado: teto de 1s vencido com 2 agente(s) e 1 tarefa(s)' "${RS_DIR}/${SID}.md"; }
+  _rscase "(d) teto vencido com trabalho em curso sai rc 3 e o bilhete diz o que corria" \
+    "    return [g for g in live if g['cls'] in ('AGENT_RUNNING', 'AGENT_STALLED', 'AGENT_UNMEASURED')], [t for t in tasks if t['alive'] is not False]" "    return [], []" _rs_d
+  # (e) sessão sem nada em curso: drenagem zera, rc 0
+  _rs_e() { local o rc=0; o="$(_rsr "$1" --session "${SID2}" --timeout-s 1 --poll-s 1)" || rc=$?; RS_WHY="rc=${rc} · $(tail -n 3 <<< "${o}" | head -c 300)"
+    [ "${rc}" = 0 ] && grep -q 'resultado: zerou' "${RS_DIR}/${SID2}.md"; }
+  _rscase "(e) sessão sem trabalho em curso zera e sai rc 0" \
+    "        if not ba and not bt: outcome" "        if False: outcome" _rs_e
+  # (f) o comando de retomada usa o ÚLTIMO título do transcript (lido como JSON) e o session-open.sh; sem ele, claude --resume
+  _rs_f() { local o p; o="$(_rsr "$1" --session "${SID}" --now)"; p="$(RS_SO="${sb}/nao-existe.sh" _rsr "$1" --session "${SID}" --now)"
+    RS_WHY="$(grep '▶' <<< "${o}") · $(grep '▶' <<< "${p}")"
+    grep -q "^▶ retomar: bash ops/session-open.sh sessao-x --resume ${SID}\$" <<< "${o}" && grep -q "^▶ retomar: claude --resume ${SID} " <<< "${p}"; }
+  _rscase "(f) retomada pelo nome do título via session-open.sh; sem o abridor, claude --resume" \
+    "and isinstance(d.get('customTitle'), str): t = d['customTitle']" "and isinstance(d.get('customTitle'), str): t = t or d['customTitle']" _rs_f
+  # (g) medidor de agentes que falha: drenagem recusa (rc 2), nunca grava bilhete «nenhum agente» às cegas
+  _rs_g() { local o rc=0; o="$(RS_PULSE="${sb}/pulse-broken.sh" _rsr "$1" --session "${SID}" --timeout-s 1)" || rc=$?
+    RS_WHY="rc=${rc} · $(head -c 300 <<< "${o}")"
+    [ "${rc}" = 2 ] && grep -q 'agentes NÃO MEDIDOS' <<< "${o}" && [ ! -e "${RS_DIR}/${SID}.tsv" ]; }
+  _rscase "(g) medição impossível recusa a drenagem, sem bilhete vazio" \
+    "    if not opt['now']: die('medição impossível" "    if False: die('medição impossível" _rs_g
+  # (h) na volta: --resume-check manda SendMessage ao id, apaga o marcador e arquiva; a 2ª vez sai rc 4
+  _rs_h() { _rsr "$1" --session "${SID}" --now >/dev/null || true; local o rc2=0 mk1=sim
+    o="$(_rsr "$1" --resume-check --session "${SID}")"; [ -e "${RS_DIR}/${SID}.draining" ] || mk1=nao
+    _rsr "$1" --resume-check --session "${SID}" >/dev/null || rc2=$?
+    RS_WHY="rc2=${rc2} marcador-apos-1a=${mk1} · $(ls "${RS_DIR}" 2>&1 | tr '\n' ' ') · $(head -c 300 <<< "${o}")"
+    grep -q '· SendMessage to=arun — «Reinício da sessão: retome de onde parou' <<< "${o}" && [ "${mk1}" = nao ] \
+      && [ "${rc2}" = 4 ] && grep -q "^${SID}\.[0-9]*\.resumed\.md\$" <<< "$(ls "${RS_DIR}")"; }
+  _rscase "(h) --resume-check lista quem retomar, apaga o marcador e arquiva o bilhete" \
+    "        if os.path.exists(mk): os.remove(mk)
+        for ext" "        for ext" _rs_h
+  # (j) segredo: o agente rodando sem pendência tinha um Bearer na última chamada; o bilhete leva só a ferramenta
+  _rs_j() { _rsr "$1" --session "${SID}" --now >/dev/null || true; local t="${RS_DIR}/${SID}.tsv"
+    RS_WHY="$(grep "arsec" "${t}" 2>&1 | head -c 300) · segredo no md/tsv: $(grep -c SEGREDOBANCADA "${t}" "${RS_DIR}/${SID}.md" 2>&1 | tr '\n' ' ')"
+    grep -q "^agent${T}arsec${T}AGENT_RUNNING${T}.*${T}Bash\$" "${t}" && ! grep -q SEGREDOBANCADA "${t}" "${RS_DIR}/${SID}.md"; }
+  _rscase "(j) comando cru (com segredo) nunca vai ao bilhete: sem pendência, só a ferramenta" \
+    "                    fp = inp.get('file_path') or inp.get('path') or ''" "                    fp = inp.get('command') or inp.get('file_path') or ''" _rs_j
+  # (k) o medidor falha DURANTE a espera: rc 5, e a última medição boa fica no bilhete (agente e tarefa)
+  _rs_k() { local o rc=0 c="${RS_DIR}.cnt"; mkdir -p "${RS_DIR}"; rm -f "${c}"
+    o="$(RS_PULSE="${sb}/pulse-flaky.sh" RS_FLAKY_CNT="${c}" _rsr "$1" --session "${SID}" --timeout-s 60 --poll-s 1)" || rc=$?
+    RS_WHY="rc=${rc} · $(tail -n 4 <<< "${o}" | head -c 300)"
+    [ "${rc}" = 5 ] && grep -q 'resultado: medição falhou durante a espera' "${RS_DIR}/${SID}.md" \
+      && grep -q "^agent${T}arun${T}" "${RS_DIR}/${SID}.tsv" && grep -q "^task${T}rsbg1${T}" "${RS_DIR}/${SID}.tsv"; }
+  _rscase "(k) falha do medidor durante a espera sai rc 5 com a última medição boa" \
+    "            gaps = gaps + g2 + tg2; mid_fail = True" "            gaps = []; mid_fail = False" _rs_k
+  # (l) --now com o medidor de agentes quebrado: rc 5, «agentes NÃO MEDIDOS» (nunca «nenhum»), as tarefas ainda medidas,
+  #     e a retomada repete a lacuna e sai rc 5
+  _rs_l() { local o rc=0 rc2=0 q; o="$(RS_PULSE="${sb}/pulse-broken.sh" _rsr "$1" --session "${SID}" --now)" || rc=$?
+    q="$(_rsr "$1" --resume-check --session "${SID}")" || rc2=$?
+    RS_WHY="rc=${rc} rc2=${rc2} · $(grep -E 'NÃO MEDID' <<< "${q}" | head -c 300)"
+    [ "${rc}" = 5 ] && [ "${rc2}" = 5 ] && grep -q '⚠️ NÃO MEDIDO na gravação: baton-pulse rc 1: agentes NÃO MEDIDOS' <<< "${q}" \
+      && grep -q 'tarefa rsbg1: morreu' <<< "${q}" \
+      && grep -q 'resumed.md$' <<< "$(ls "${RS_DIR}")" && grep -q 'agentes NÃO MEDIDOS (ver «Não medido»)' "${RS_DIR}"/*.resumed.md; }
+  _rscase "(l) --now sem medir agentes grava a lacuna, nunca «nenhum», e a retomada a repete com rc 5" \
+    "    sys.exit(5 if ngaps else 0)" "    sys.exit(0)" _rs_l
+  # (m) drenagem de sessão sem transcript (id errado) recusa ANTES do marcador: rc 2 e nenhum marcador
+  _rs_m() { local o rc=0; o="$(_rsr "$1" --session "nao-existe-0000" --timeout-s 1)" || rc=$?
+    RS_WHY="rc=${rc} · $(ls "${RS_DIR}" 2>&1 | tr '\n' ' ') · $(head -c 200 <<< "${o}")"
+    [ "${rc}" = 2 ] && [ ! -e "${RS_DIR}/nao-existe-0000.draining" ] && grep -q 'não achado' <<< "${o}"; }
+  _rscase "(m) sessão sem transcript recusa a drenagem antes de gravar o marcador" \
+    "if pre_gaps and not opt['now']:" "if False:" _rs_m
+  # (n) título fora do padrão de nome do session-open.sh («sessao y (3)») vira claude --resume, nunca um comando quebrado
+  _rs_n() { local o; o="$(_rsr "$1" --session "${SID2}" --now)"; RS_WHY="$(grep '▶' <<< "${o}")"
+    grep -q "^▶ retomar: claude --resume ${SID2} (título «sessao y (3)» fora do padrão" <<< "${o}"; }
+  _rscase "(n) título com espaço não monta comando quebrado: retomada direta pelo id" \
+    "if os.path.isfile(SO) and NAME and NAME_RE.fullmatch(NAME):" "if os.path.isfile(SO) and NAME:" _rs_n
+  # (o) agente NÃO MEDIDO (transcript ilegível) segura a espera até o teto: nunca «zerou» por não ter medido
+  _rs_o() { local o rc=0; o="$(_rsr "$1" --session "${SID3}" --timeout-s 1 --poll-s 1)" || rc=$?; RS_WHY="rc=${rc} · $(tail -n 3 <<< "${o}" | head -c 300)"
+    [ "${rc}" = 3 ] && grep -q 'resultado: teto de 1s vencido com 1 agente(s) e 0 tarefa(s)' "${RS_DIR}/${SID3}.md" \
+      && grep -q "^agent${T}cbroken${T}AGENT_UNMEASURED${T}" "${RS_DIR}/${SID3}.tsv"; }
+  _rscase "(o) agente não medido segura a espera (fail-closed), nunca vira «zerou»" \
+    "('AGENT_RUNNING', 'AGENT_STALLED', 'AGENT_UNMEASURED')], [t for t" "('AGENT_RUNNING', 'AGENT_STALLED')], [t for t" _rs_o
+  # (i) a batida lê o marcador e o bilhete: o baton-pulse.sh avisa «SEM DESPACHO NOVO» e manda o --resume-check
+  mkdir -p "${sb}/rd-pulse"; printf '2026-11-21T00:00:00Z\tsessao-x\tdrain\n' > "${sb}/rd-pulse/${SID}.draining"
+  printf 'session\t%s\tsessao-x\t2026-11-21T00:00:00Z\tzerou\tx\nagent\tarun\tAGENT_RUNNING\n' "${SID}" > "${sb}/rd-pulse/${SID}.tsv"
+  _rs_i() { local o; o="$(env -u CLAUDE_CODE_SESSION_ID LC_ALL=C ONION_RESTART_DIR="${sb}/rd-pulse" BATON_STATE_DIR="${sb}/state/baton" \
+      BATON_PROJECTS_DIR="${sb}/proj" BATON_PROC="${sb}/proc-empty" BATON_DECIDE_TSV=/dev/null ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista.tsv" \
+      bash "$1" "${r}" --tsv --no-peers --no-family --no-gh 2>&1)"
+    RS_WHY="$(grep '^warn' <<< "${o}" | head -c 400)"
+    grep -q "^warn${T}.*sessão sessao-x (rsid-000) em drenagem para reinício desde 2026-11-21T00:00:00Z: SEM DESPACHO NOVO" <<< "${o}" \
+      && grep -q "^warn${T}.*bilhete de retomada pendente de rsid-000 (1 agente(s) a retomar): bash .claude/utils/orchestration/restart-drain.sh --resume-check --session ${SID}" <<< "${o}"; }
+  _rscase "(i) a batida avisa do marcador «sem despacho novo» e do bilhete pendente" \
+    "    RS.append(('draining', k)); warns.append(" "    RS.append(('draining', k)); (lambda *x: None)(" _rs_i pulse
+
+  kill "${pbg}" 2>/dev/null || true; wait "${pbg}" 2>/dev/null || true
+  unset -f _rsr _rscase _rs_a _rs_b _rs_c _rs_d _rs_e _rs_f _rs_g _rs_h _rs_i _rs_j _rs_k _rs_l _rs_m _rs_n _rs_o
+  rm -rf "${sb}"
+}
+_family run_restart_drain_selftests
 
 # ---------------------------------------------------------------------------
 # peek — o /meta:peek (espiar o mercado na dúvida, 2026-11-13): o EXECUTOR do nível 1
