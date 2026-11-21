@@ -62185,7 +62185,7 @@ BP_PY
     env -u CLAUDE_CODE_SESSION_ID -u BATON_CONFIG_DIRS -u CLAUDE_CONFIG_DIR LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${BP_PROJ:-${sb}/proj}" \
       BATON_PROC="${BP_PROC:-${sb}/proc-empty}" BATON_TM="${BP_TM:-${sb}/sem-tm.sh}" BATON_OWNERSHIP="${BP_OWN:-${REPO_ROOT}/.claude/utils/orchestration/ownership.sh}" \
       ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista-privada.tsv" \
-      BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${r}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
+      BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${BP_REPO:-${r}}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
   }
   _bpcase() {  # <nome> <OLD> <NEW> <função> [sem-farol]
     local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1 k="${sb}/k$(date +%N)/.claude/validation"
@@ -62775,7 +62775,7 @@ I = [('SAC-901', '[beta] pronto para pegar', 'unstarted'), ('SAC-902', '[beta] d
 json.dump({'query': '', 'count': len(I), 'issues': [{'identifier': i, 'title': ti, 'state': {'name': st, 'type': st}} for i, ti, st in I]},
           open(f'{d}/issues.json', 'w'))
 BP_BL
-  printf '#!/bin/sh\necho x >> "%s/calls"\n[ "$1 $2 $3" = "item.list --state-type backlog,unstarted,triage" ] || exit 9\ncat "%s/issues.json"\n' "${bl}" "${bl}" > "${bl}/tm.sh"
+  printf '#!/bin/sh\necho x >> "%s/calls"\n[ "$1 $2 $3 $4" = "item.list --state-type backlog,unstarted,triage --with-description" ] || exit 9\ncat "${BP_ISSUES:-%s/issues.json}"\n' "${bl}" "${bl}" > "${bl}/tm.sh"
   printf '#!/bin/sh\necho "erro req-$(date +%%N) Authorization: Bearer lin_api_FAKESECRET123" >&2\nexit 1\n' > "${bl}/tm-varerr.sh"
   printf '#!/bin/sh\necho "nao e json"\n' > "${bl}/tm-junk.sh"
   printf '#!/bin/sh\necho "tm: provedor fora do ar" >&2\nexit 1\n' > "${bl}/tm-fail.sh"
@@ -62789,12 +62789,12 @@ BP_BL
   _bp_cb() { local a; a="$(_bpbl "$1" --tsv)"; BP_WHY="$(grep -E '^(session.sid-beta|offer)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
     grep -q "^session${T}sid-beta${T}.*backlog: SAC-901; SAC-909\$" <<< "${a}" && ! grep -qE "^offer${T}SAC-90[23]${T}" <<< "${a}"; }
   _bpcase "(cb) card que espera o maestro não é pronto" \
-    "or BL_NOT_READY.search(title)" "or False" _bp_cb
+    "if WAIT_TITLE.search(title) or" "if False or" _bp_cb
   # (cc) card concluído ou em andamento (started) não é pronto: só backlog, unstarted e triage
   _bp_cc() { local a; a="$(_bpbl "$1" --tsv)"; BP_WHY="$(grep -E '^(session.sid-beta|offer)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
     grep -q "^session${T}sid-beta${T}" <<< "${a}" && ! grep -qE "SAC-9(04|10)" <<< "${a}"; }
   _bpcase "(cc) card concluído ou em andamento não é pronto" \
-    "if stype not in BL_READY_TYPES or" "if False or" _bp_cc
+    "if stype not in BL_READY_TYPES: backlog_skipped" "if False: backlog_skipped" _bp_cc
   # (cd) no máximo UMA leitura por batida e cache curto: duas batidas seguidas no mesmo estado chamam o tm.sh uma vez
   _bp_cd() { local st="${sb}/st-cd-$(date +%N)" a; cp -r "${sb}/state-bl" "${st}"; rm -f "${bl}/calls"
     BP_TM="${bl}/tm.sh" BP_STATE="${st}" _bpr "$1" --tsv >/dev/null; a="$(BP_TM="${bl}/tm.sh" BP_STATE="${st}" _bpr "$1" --tsv)"
@@ -62859,6 +62859,53 @@ BP_BL
     ! ls "${st}"/backlog-cache-*.json >/dev/null 2>&1 && grep -q "^backlog${T}-${T}UNMEASURED${T}" <<< "${a}"; }
   _bpcase "(cn) resposta que não é JSON com «issues» não entra no cache" \
     "if python3 -I -c 'import json,sys;" "if true || python3 -I -c 'import json,sys;" _bp_cn
+  # (co)-(cr) DATA É PREVISÃO (cláusula 11 da doutrina, 2026-11-21): data futura sem marcador de espera é trabalho
+  #     pronto e sai como «adiantável»; com o marcador (no título, no corpo do card ou na narrativa do nó) é espera.
+  #     Repo e cards PRÓPRIOS destes casos (r2 e issues-dates.json), para não mexer nas filas dos casos de cima.
+  local r2="${sb}/r2"; cp -r "${r}" "${r2}"
+  printf 'meta:\n  id: datas\n  schema_version: "1"\nnodes:\n  - id: D_ADV\n    node_type: decision\n    status: open\n    owner: alpha\n    x_due: "2099-01-01"\n    label: "adiantar o relatório"\n    narrative: |-\n      Gatilho: decisão do maestro.\n      Pedido a core pela triagem: fazer agora.\n  - id: D_WAIT\n    node_type: decision\n    status: open\n    owner: alpha\n    x_due: "2099-02-01"\n    label: "rever o painel"\n    x_wait: "gatilho: medir 7 dias de uso antes"\n' > "${r2}/docs/datas.kg.yaml"
+  "${G[@]}" -C "${r2}" add -A; "${G[@]}" -C "${r2}" commit -q -m datas
+  python3 - "${bl}" <<'BP_DT'
+import json, sys
+d = sys.argv[1]
+I = [{'identifier': 'SAC-911', 'title': '[beta] previsto para depois', 'state': {'type': 'unstarted'}, 'dueDate': '2099-01-01'},
+     {'identifier': 'SAC-912', 'title': '[beta] com data e espera', 'state': {'type': 'unstarted'}, 'dueDate': '2099-01-01',
+      'description': 'Contexto do card.\nAguarda: o fornecedor devolver o contrato.'},
+     {'identifier': 'SAC-913', 'title': '[beta] sem data', 'state': {'type': 'unstarted'}, 'description': 'Aguarda: o lock do hook.'},
+     {'identifier': 'SAC-914', 'title': '[beta] prosa técnica', 'state': {'type': 'unstarted'}, 'dueDate': '2099-03-01',
+      'description': 'O hook aguarda o lock; a Etapa 0 foi pré-registrada.'},
+     {'identifier': 'SAC-915', 'title': '[beta] data inválida', 'state': {'type': 'unstarted'}, 'dueDate': '2026-13-45'}]
+json.dump({'count': len(I), 'issues': I}, open(f'{d}/issues-dates.json', 'w'))
+BP_DT
+  _bpdt() { BP_REPO="${r2}" BP_ISSUES="${bl}/issues-dates.json" _bpbl "$@"; }
+  # (co) card com data futura e sem marcador: pronto, ofertado como adiantável com a data prevista
+  _bp_co() { local a; a="$(_bpdt "$1" --tsv)"; BP_WHY="$(grep -E '^(offer|backlog)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^offer${T}SAC-911${T}IDLE_WITH_BACKLOG${T}beta·sid-beta${T}.*adiantável (prevista 2099-01-01)" <<< "${a}"; }
+  _bpcase "(co) card com data futura sem espera declarada é adiantável" \
+    "            if _due: ADV[str(it.get('identifier')" "            if False: ADV[str(it.get('identifier')" _bp_co
+  # (cp) card com data futura e «aguarda» no corpo: espera declarada, fora da fila e da oferta, contado
+  _bp_cp() { local a; a="$(_bpdt "$1" --tsv)"; BP_WHY="$(grep -E '^(offer|backlog)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    ! grep -q "SAC-912" <<< "${a}" && grep -q "^backlog${T}.*espera declarada: cards 1, nós 1" <<< "${a}"; }
+  _bpcase "(cp) marcador de espera no corpo do card tira o card da oferta" \
+    "(_due and WAIT_DECL.search(str(it.get('description') or '')))" "(False)" _bp_cp
+  # (cq) nó com x_due futura e sem marcador: a sessão IDLE_WITH_QUEUE recebe a oferta «adiantável», e o --quiet não cala
+  _bp_cq() { local a; a="$(_bpdt "$1" --tsv)"; BP_WHY="$(grep -E '^(offer|session.sid-alpha)' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^offer${T}D_ADV${T}IDLE_WITH_QUEUE${T}alpha·sid-alph${T}.*adiantar o relatório · adiantável (prevista 2099-01-01)" <<< "${a}" \
+      && grep -q "^session${T}sid-alpha${T}IDLE_WITH_QUEUE${T}.*nó D_ADV (datas.kg.yaml, owner alpha) · adiantável, prevista 2099-01-01" <<< "${a}"; }
+  _bpcase "(cq) nó com data futura sem espera é adiantável e vira oferta" \
+    "    if s['cls'] == 'IDLE_WITH_QUEUE':   # nó com data" "    if False:   # nó com data" _bp_cq
+  # (cr) nó com x_due futura e «gatilho» na narrativa: espera declarada, fora da fila
+  _bp_cr() { local a; a="$(_bpdt "$1" --tsv)"; BP_WHY="$(grep -E '^session.sid-alpha' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^session${T}sid-alpha${T}" <<< "${a}" && ! grep -q "D_WAIT" <<< "${a}"; }
+  _bpcase "(cr) marcador de espera na narrativa do nó tira o nó da fila" \
+    "if n.get('x_wait') or WAIT_TITLE" "if WAIT_TITLE" _bp_cr
+  # (cs) card SEM data com «Aguarda:» no corpo segue pronto (o corpo só conta com data futura: achado da revisão isolada);
+  #      prosa técnica («o hook aguarda», «pré-registrada») num card com data não é espera; data inválida não é adiantável
+  _bp_cs() { local a; a="$(_bpdt "$1" --tsv)"; BP_WHY="$(grep -E '^(offer|backlog)' <<< "${a}" | cut -f2,8 | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^offer${T}SAC-913${T}" <<< "${a}" && grep -q "^offer${T}SAC-914${T}.*adiantável (prevista 2099-03-01)" <<< "${a}" \
+      && grep -q "^offer${T}SAC-915${T}" <<< "${a}" && ! grep -q "SAC-915.*adiantável" <<< "${a}"; }
+  _bpcase "(cs) só a espera declarada conta: card sem data, prosa técnica e data inválida" \
+    "(_due and WAIT_DECL.search(" "(True and WAIT_DECL.search(" _bp_cs
   # (ck) as vagas de agente vêm da mesma decisão do teto: o --check-cap confere «5 agentes» no rótulo
   _bp_ck() { local a; a="$(bash "$1" "${REPO_ROOT}" --check-cap 2>&1)"; local rc=$?; BP_WHY="rc ${rc}: $(tr '\n' '|' <<< "${a}")"
     [ "${rc}" = 0 ] && grep -q "vagas de agente: 5" <<< "${a}"; }

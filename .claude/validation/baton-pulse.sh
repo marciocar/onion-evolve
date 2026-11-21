@@ -55,7 +55,7 @@
 #                    [company-brain]: `[<rótulo>]` casa um rótulo da sessão). «· maestro» ou «bloqueado no maestro» no
 #                    título NÃO é pronto (espera o maestro). Pronto é só backlog, unstarted ou triage: em andamento
 #                    (started) já tem quem toque, e concluído ou cancelado acabou. `[a/b]` vale para os dois donos.
-#   BACKLOG          `tm.sh item.list --state-type backlog,unstarted,triage --limit 100` (só os abertos, numa leitura;
+#   BACKLOG          `tm.sh item.list --state-type backlog,unstarted,triage --with-description --limit 100` (só os abertos, numa leitura;
 #                    a revisão isolada mediu que `search.query ""` traz 100 abertos e fechados misturados e esconde os
 #                    abertos antigos). O tm.sh lê a chave do .env como DADO; este script não abre o .env. Hoje só o
 #                    adapter do Linear tem o verbo: nos outros a leitura falha e vira lacuna. No máximo UMA leitura por
@@ -64,6 +64,15 @@
 #                    no sha; o stderr sai num aviso, com token mascarado), nunca «zero cards»; --no-backlog
 #                    desliga. VAGAS DE AGENTE: AGENT_CAP_DEFAULT (5, a mesma decisão do teto de sessões) menos os
 #                    AGENT_RUNNING desta sessão (--self; o STALLED sai no aviso dele, não ocupa vaga). Vaga com card pronto da própria sessão é OFERTA.
+#   DATA É PREVISÃO (2026-11-21, reforço do maestro: «nem toda data é espera»): card com dueDate futura e nó open com
+#                    x_due futura são trabalho PRONTO e saem como «adiantável (prevista <data>)», salvo quando a espera
+#                    está DECLARADA: no título (WAIT_TITLE: «· maestro», «bloqueado no/por», «aguarda <quem>», «esperando»,
+#                    «janela de observação»), numa linha do corpo do card que COMEÇA pela causa (WAIT_DECL: «Aguarda:»,
+#                    «Espera:», «Bloqueado no maestro», «Pré-registro:», «Janela de observação:», «Gatilho:»), ou no campo
+#                    estruturado `x_wait:` do nó. A narrativa do nó NÃO conta: a revisão isolada mediu que o selo do
+#                    /meta:decide acrescenta o pedido sob o «Gatilho: …» antigo, e o nó destravado sumiria. A regra só
+#                    vale para item com data futura (card sem data segue a regra do título da fase 2). «Hoje» é a data no
+#                    fuso BATON_TZ (padrão America/Sao_Paulo). Doutrina: baton-doctrine.md, cláusula 11.
 #   OFERTA           informação, nunca despacho: card, dono e sessão. No --quiet a batida NÃO cala enquanto houver
 #                    IDLE_WITH_BACKLOG ou vaga com trabalho pronto (SAC-508).
 #   --record (SAC-509, desligado por padrão): acrescenta a <estado>/pulses.tsv uma linha por sessão medida:
@@ -307,10 +316,10 @@ else
   else
     _tm="${BATON_TM:-$(git -C "${REPO}" rev-parse --show-toplevel 2>/dev/null)/.claude/utils/task-manager/tm.sh}"
     if [ ! -f "${_tm}" ]; then BL_SRC="falhou: ${_tm} ausente"
-    elif (cd "${REPO}" && timeout 30 bash "${_tm}" item.list --state-type backlog,unstarted,triage --limit 100) > "${TMPD}/backlog.json" 2> "${TMPD}/backlog.err"; then
+    elif (cd "${REPO}" && timeout 30 bash "${_tm}" item.list --state-type backlog,unstarted,triage --with-description --limit 100) > "${TMPD}/backlog.json" 2> "${TMPD}/backlog.err"; then
       BL_FILE="${TMPD}/backlog.json"; BL_SRC="tm.sh item.list (leitura desta batida)"
       # o cache só grava leitura que terminou E é JSON com «issues» (resposta torta não fica 300 s no cache):
-      # escrita atômica, só do usuário (títulos de card ficam fora do repo)
+      # escrita atômica, só do usuário: títulos E corpos de card (podem trazer dado pessoal) ficam fora do repo, em 0600
       if python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if isinstance(d, dict) and isinstance(d.get("issues"), list) else 1)' "${BL_FILE}" 2>/dev/null \
          && mkdir -p "${_bsd}" 2>/dev/null && (umask 077; cp "${BL_FILE}" "${_bcache}.tmp.$$") 2>/dev/null; then
         # chmod explícito: a ACL padrão do diretório vence o umask (medido 2026-11-21: o cache nasceu 644 numa pasta com ACL)
@@ -368,8 +377,26 @@ BL_PREFIX = re.compile(r'^\s*\[([A-Za-z0-9_./, -]+)\]')
 BL_READY_TYPES = ('backlog', 'unstarted', 'triage')
 def mask_secret(x):   # defesa em profundidade: o stderr do tm.sh vai ao chat e ao /loop
     return re.sub(r'(?i)(bearer\s+|token[=:]\s*|key[=:]\s*|authorization:\s*)\S+|\b(ghp|gho|ghs|lin_api|sk-ant|xox[bp])[_-]?[A-Za-z0-9_-]{6,}', '[REDACTED]', x or '')
-BL_NOT_READY = re.compile(r'·\s*maestro\b|bloqueado no maestro', re.I)
-BACKLOG, backlog_ok, backlog_skipped, bl_warns = {}, False, 0, []   # rótulo → [(id, título)]; avisos vão a warns adiante
+# espera DECLARADA: a causa que trava escrita no card ou no nó. Sem ela, data é previsão e o item é adiantável.
+# Título: a espera dita no nome do card (vale para todo card, como na fase 2). Corpo: só a linha que COMEÇA pela causa,
+# na forma «Causa: …» (prosa técnica como «o hook aguarda o lock» ou «Etapa 0 pré-registrada» não é espera declarada).
+WAIT_TITLE = re.compile(r'·\s*maestro\b|bloqueado (?:no|por)\b|\baguard(?:a|am|amos|ando|ar)\b|\besperando\b|janela\s+de\s+observa[cç][aã]o', re.I)
+WAIT_DECL = re.compile(r'^\s*(?:[-*]\s*)?(?:aguarda|espera|bloqueado (?:no|por)[^:\n]*|pr[ée]-?registro|janela\s+de\s+observa[cç][aã]o|gatilho)\s*:', re.I | re.M)
+BL_NOT_READY = WAIT_TITLE
+try:
+    import zoneinfo; _tz = zoneinfo.ZoneInfo(os.environ.get('BATON_TZ') or 'America/Sao_Paulo')
+except Exception:
+    _tz = datetime.timezone.utc
+today_iso = datetime.datetime.fromtimestamp(now, _tz).strftime('%Y-%m-%d')
+def future_date(v):
+    """A data (AAAA-MM-DD, válida) se for futura em relação a hoje no fuso BATON_TZ, senão ''."""
+    m = re.match(r'(\d{4}-\d{2}-\d{2})', str(v or ''))
+    if not m: return ''
+    try: datetime.date.fromisoformat(m.group(1))
+    except ValueError: return ''   # «2026-13-45» não é data: não vira adiantável
+    return m.group(1) if m.group(1) > today_iso else ''
+ADV = {}   # card ou nó adiantável → data prevista
+BACKLOG, backlog_ok, backlog_skipped, bl_warns, backlog_wait = {}, False, 0, [], 0   # rótulo → [(id, título)]; avisos vão a warns adiante
 if bl_file:
     try:
         _bd = json.load(open(bl_file, encoding='utf-8'))
@@ -383,7 +410,12 @@ if bl_file:
             stype = str((st.get('type') if isinstance(st, dict) else '') or '').lower()
             m = BL_PREFIX.match(title)
             if not m: continue
-            if stype not in BL_READY_TYPES or BL_NOT_READY.search(title): backlog_skipped += 1; continue
+            if stype not in BL_READY_TYPES: backlog_skipped += 1; continue
+            _due = future_date(it.get('dueDate'))
+            # o corpo só conta para card COM data futura (card sem data segue a regra do título; achado da revisão isolada)
+            if WAIT_TITLE.search(title) or (_due and WAIT_DECL.search(str(it.get('description') or ''))):
+                backlog_wait += 1; continue
+            if _due: ADV[str(it.get('identifier') or it.get('id') or '?')] = _due
             for own in {o.strip().lower() for o in re.split(r'[/,]', m.group(1)) if o.strip()}:
                 BACKLOG.setdefault(own, []).append((str(it.get('identifier') or it.get('id') or '?'), title))
     except Exception as e:
@@ -589,6 +621,7 @@ elif os.path.lexists(ask_dir):
 # ── fila de dono declarado: nós open com owner: em todo grafo rastreado ─────────────────
 _, ls = git('-c', 'core.quotePath=false', 'ls-files', '--', '*.kg.yaml')
 owned = {}   # owner → [(grafo, id, impact)]
+node_wait = 0; NODE_LABEL = {}
 for g in ls.splitlines():
     if not g or 'fixtures' in g.split('/') or 'vendor' in g.split('/'): continue
     p = os.path.join(repo, g)
@@ -599,6 +632,11 @@ for g in ls.splitlines():
     except Exception: warns.append(f'grafo que não parseia (fila dele não lida): {g}'); continue
     for n in (d.get('nodes') or []):
         if isinstance(n, dict) and n.get('status') == 'open' and n.get('owner'):
+            _due = future_date(n.get('x_due'))
+            if _due:
+                if n.get('x_wait') or WAIT_TITLE.search(str(n.get('label') or '')): node_wait += 1; continue
+                ADV[str(n.get('id'))] = _due
+            NODE_LABEL[str(n.get('id'))] = str(n.get('label') or '')
             owned.setdefault(str(n['owner']), []).append((g, str(n.get('id')), n.get('impact') or 0))
 
 # ── rótulo e parada por ordem (estado declarado pelo maestro, lido) ─────────────────────
@@ -675,7 +713,9 @@ for s in S.values():
     q = []
     for l in labels:
         if l == 'maestro': continue
-        for (g, nid, imp) in owned.get(l, []): q.append(f'nó {nid} ({os.path.basename(g)}, owner {l})'); claimed_owner.add(l)
+        for (g, nid, imp) in owned.get(l, []):
+            q.append(f'nó {nid} ({os.path.basename(g)}, owner {l})' + (f' · adiantável, prevista {ADV[nid]}' if nid in ADV else '')); claimed_owner.add(l)
+            if nid in ADV: s.setdefault('adv_nodes', []).append(nid)
     for a in asks:
         if a['sid'] == s['sid'] and a['live']: q.append(f'pergunta reservada {a["key"]}')
     for pr in prs:
@@ -1034,7 +1074,11 @@ for s in sess_sorted:
     if s['cls'] == 'IDLE_WITH_BACKLOG':
         for cid, title in s['backlog']:
             if cid in offered_cards: continue
-            offered_cards.add(cid); OFFERS.append((stag(s), '/'.join(s['labels']), cid, title, 'IDLE_WITH_BACKLOG', s['sid']))
+            offered_cards.add(cid); OFFERS.append((stag(s), '/'.join(s['labels']), cid, title, 'IDLE_WITH_BACKLOG', s['sid'], ADV.get(cid, '')))
+    if s['cls'] == 'IDLE_WITH_QUEUE':   # nó com data futura e sem espera declarada: adiantável, então é oferta (o pulso não cala)
+        for nid in s.get('adv_nodes', []):
+            if nid in offered_cards: continue
+            offered_cards.add(nid); OFFERS.append((stag(s), '/'.join(s['labels']), nid, NODE_LABEL.get(nid, ''), 'IDLE_WITH_QUEUE', s['sid'], ADV[nid]))
 slots, slots_note = None, ''
 self_s = S.get(self_sid) if self_sid else None
 if not self_sid: slots_note = 'vagas de agente NÃO MEDIDAS: sem --self (nem CLAUDE_CODE_SESSION_ID), não sei de que sessão contar'
@@ -1045,7 +1089,7 @@ else:
     slots_note = f'vagas de agente desta sessão: {slots} de {agent_cap} ({busy_ag} ocupada(s) por AGENT_RUNNING; teto AGENT_CAP_DEFAULT)'
     if slots > 0 and self_s is not None and self_s['cls'] not in ('IDLE_WITH_BACKLOG', 'PARKED', 'PARK_UNMEASURED', 'UNREACHABLE'):
         for cid, title in [c for c in self_s.get('backlog', []) if c[0] not in offered_cards][:slots]:
-            offered_cards.add(cid); OFFERS.append((stag(self_s), '/'.join(self_s['labels']), cid, title, 'vaga de agente', self_sid))
+            offered_cards.add(cid); OFFERS.append((stag(self_s), '/'.join(self_s['labels']), cid, title, 'vaga de agente', self_sid, ADV.get(cid, '')))
 if slots_note.startswith('vagas de agente NÃO'): gaps.append(slots_note)
 backlog_orphan = sorted(l for l in BACKLOG if not any(l in [str(x).lower() for x in s.get('labels', [])] for s in S.values()))
 
@@ -1069,7 +1113,7 @@ state = {'s': sorted((s['sid'], s['cls'], len(s['queue'])) for s in S.values()),
          'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT],
          'pc': sorted((p['id'], p['cls'], p['owner']) for p in PIECES), 'rs': sorted(RS),
          'hy': sorted((h[0], h[1]['sid'] if h[1] else '', h[1]['name'] if h[1] else '') for h in HY),
-         'of': sorted((o[0], o[2], o[4]) for o in OFFERS)}
+         'of': sorted((o[0], o[2], o[4], o[6]) for o in OFFERS)}
 sha = hashlib.sha256(json.dumps(state, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 # «sem mudança» só quando o sha BATE (achado do refutador, 2026-11-12): com só --since, uma sessão que caiu ou um PR que
 # ficou vermelho sem evento datado passava calado. Sem --last-sha não há base, e a batida fala.
@@ -1116,9 +1160,9 @@ if fmt == '--tsv':
     print(f'load\t-\t-\t-\t\t\t/proc/loadavg+lease\t{tsvc(load_line)}')
     print(f'config_dirs\t-\t-\t-\t\t{len(CFG)}\t{tsvc(cfg_src)}\t' + tsvc(', '.join(tilde(c) for c, _, _ in CFG) or '—'))
     print(f'backlog\t-\t{"MEASURED" if backlog_ok else "UNMEASURED"}\t-\t\t{sum(len(v) for v in BACKLOG.values())}\t{tsvc(bl_src)}\t'
-          + tsvc(f'prontos por dono: {", ".join(f"{k} {len(v)}" for k, v in sorted(BACKLOG.items())) or "—"} · fora (maestro/fechado): {backlog_skipped} · dono sem sessão: {", ".join(backlog_orphan) or "—"}'))
+          + tsvc(f'prontos por dono: {", ".join(f"{k} {len(v)}" for k, v in sorted(BACKLOG.items())) or "—"} · fora de estado pronto: {backlog_skipped} · espera declarada: cards {backlog_wait}, nós {node_wait} · adiantáveis: {len(ADV)} · dono sem sessão: {", ".join(backlog_orphan) or "—"}'))
     print(f'agent_slots\t{tsvc(self_sid[:8] if self_sid else "-")}\t{"MEASURED" if slots is not None else "UNMEASURED"}\t-\t\t{"" if slots is None else slots}\tAGENT_CAP_DEFAULT\t{tsvc(slots_note)}')
-    for o in OFFERS: print('\t'.join(tsvc(x) for x in ('offer', o[2], o[4], o[0], '', '', o[1], o[3])))
+    for o in OFFERS: print('\t'.join(tsvc(x) for x in ('offer', o[2], o[4], o[0], '', '', o[1], o[3] + (f' · adiantável (prevista {o[6]})' if o[6] else ''))))
     print(f'stale_beacons\t-\t-\t-\t\t{len(stale_traces)}\tfarol\trastro fora do TTL, sem peer')
     for e in events: print(f'change\t-\t-\t-\t\t\tsince\t{tsvc(e)}')
     for g in gaps: print(f'gap\t-\t-\t-\t\t\t-\t{tsvc(g)}')
@@ -1139,7 +1183,7 @@ print(f'# {head}')
 print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} · transcript={"stat de " + proj_dir if proj_ok else "não medido"} · '
       f'em voo=decide-census rc {dc_rc} · perguntas={ask_dir} · parked={park_p}{" (" + str(len(park_rows)) + " linha(s))" if park_rows is not None else (" (ausente: ninguém parado por ordem)" if park_st == "absent" else " (" + park_st + ": NÃO MEDIDO)")} · '
       f'rótulos={own_p if own_rows is not None else ("derivados" if own_st == "absent" else "derivados (" + own_st + ")")} · ociosa após {idle_min}min · papel={role or "?"}')
-print(f'backlog: {sum(len(v) for v in BACKLOG.values())} card(s) pronto(s) com dono ({bl_src})' if backlog_ok else f'backlog: NÃO MEDIDO ({bl_src})')
+print(f'backlog: {sum(len(v) for v in BACKLOG.values())} card(s) pronto(s) com dono ({bl_src}) · espera declarada: cards {backlog_wait}, nós {node_wait} · adiantáveis: {len(ADV)}' if backlog_ok else f'backlog: NÃO MEDIDO ({bl_src}) · espera declarada nos nós: {node_wait} · nós adiantáveis: {len(ADV)}')
 print(slots_note)
 print(f'pastas de config extras: {len(CFG)} ({cfg_src})' + (': ' + ', '.join(tilde(c) for c, _, _ in CFG) + ' · delas só a lista de peers e o stat dos transcripts; subagentes delas NÃO lidos (conteúdo)' if CFG else ''))
 print(f'classes: {cls_line}')
@@ -1160,7 +1204,7 @@ if quiet:
     for s in sess_sorted:
         if s['cls'] == 'IDLE_WITH_QUEUE': print(f'- IDLE_WITH_QUEUE: {s["name"] or s["sid"][:8]} ({os.path.basename(s["cwd"])}) · {len(s["queue"])} item(ns) de fila')
     if OFFERS: print(f'- oferta pendente: {len(OFFERS)} (a batida não cala enquanto houver; oferta é informação, não despacho)')
-    for o in OFFERS: print(f'- OFERTA ({o[4]}): {o[2]} «{o[3]}» · dono {o[1]} · sessão {o[0]}')
+    for o in OFFERS: print(f'- OFERTA ({o[4]}): {o[2]} «{o[3]}» · dono {o[1]} · sessão {o[0]}' + (f' · adiantável (prevista {o[6]})' if o[6] else ''))
     for p in prs:
         if p['ci'] == 'RED': print(f'- {p["ref"]} com CI vermelho ({p["branch"]})')
     for a in AG:
@@ -1179,9 +1223,13 @@ for s in sess_sorted:
     print(f'| {s["cls"]} | {s["name"] or "—"} `{s["sid"][:8]}`{me} | {os.path.basename(s["cwd"]) or "—"} | {s["note"]} | {qd} | {"+".join(s["src"])} · rótulo {"/".join(s["labels"]) or "—"}{gr} |')
 if not S: print('| — | nenhuma sessão nas fontes medidas | | | | |')
 print('\n## Ofertas (fase 2: card pronto de dono declarado no título; informação, nunca despacho)')
-for o in OFFERS: print(f'- {o[4]} · sessão {o[0]} · dono {o[1]} · {o[2]} «{o[3]}»')
+for o in OFFERS: print(f'- {o[4]} · sessão {o[0]} · dono {o[1]} · {o[2]} «{o[3]}»' + (f' · adiantável (prevista {o[6]})' if o[6] else ''))
 if not OFFERS: print('- nenhuma' if backlog_ok else '- NÃO MEDIDO (backlog ilegível): não é «nenhuma»')
 if backlog_orphan: print(f'- dono com card pronto e sem sessão medida: {", ".join(backlog_orphan)}')
+# cláusula 11: ao terminar uma tarefa, a sessão revisa item a item o que tem data futura e pode ser adiantado
+print('\n## Adiantáveis (data é previsão: ao terminar uma tarefa, revise item a item se faz sentido adiantar)')
+for k, v in sorted(ADV.items(), key=lambda kv: (kv[1], kv[0])): print(f'- {k} · prevista {v}' + (f' · «{NODE_LABEL[k]}»' if k in NODE_LABEL else ''))
+if not ADV: print('- nenhum item com data futura sem espera declarada')
 print('\n## Subagentes das sessões vivas (transcript em <projects>/*/<sessão>/subagents/ e subagents/workflows/<run>/)')
 if not agents_measured: print('- NÃO MEDIDO (sem diretório de transcripts): não é «nenhum parado»')
 for a in AG:

@@ -137,6 +137,19 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
     segue fora do pulso** (degrau 3): a batuta-de-projeto diz *quem rege o quê*, não manda a sessão fazer. Decisão
     `D_LAYERED_BATON_GRANT_1116` (`docs/evolution/research/forge-baton-2026-11/`).
 
+11. **Toda data é PREVISÃO por padrão; só é ESPERA quando o card ou o nó declara a causa que trava.** Reforço do
+    maestro em 2026-11-21: «nem toda data é espera; isso não pode ser memória, tem de ser doutrina e maquinaria». A
+    causa que trava é uma destas quatro, escrita no título, no corpo do card ou no rótulo e na narrativa do nó: um
+    prazo pré-registrado de terceiros, a espera de uma pessoa nomeada («aguarda <quem>», «bloqueado no maestro»), um
+    gatilho medido, ou uma janela de observação. Sem ela, a data diz quando se previu terminar, não quando se pode
+    começar, e o item é **adiantável**. **Ao terminar uma tarefa**, a sessão consulta a orquestração (a própria fila e a
+    do core) e pergunta, item por item, se faz sentido adiantar o que tem data futura. A maquinaria é o
+    `baton-pulse.sh`: card com `dueDate` futura e nó `open` com `x_due` futura contam como trabalho pronto e saem na
+    oferta como «adiantável (prevista <data>)»; com o marcador de espera (`WAIT_MARKERS`: «aguarda», «bloqueado no
+    maestro», «· maestro», «pré-registro», «janela de observação», «gatilho»), saem da fila e entram na contagem de
+    espera declarada. Enquanto houver sessão ociosa com item adiantável, a batida não cala. A forma da data continua a
+    da [doutrina da data no compromisso](commitment-date-doctrine.md).
+
 ## O que ela NÃO promete (fronteira declarada)
 
 - **O pulso não vê o que o harness e o git não veem.** Sem a lista de peers, a classe sai só pela idade do farol, e uma
