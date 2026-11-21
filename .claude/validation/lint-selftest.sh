@@ -60510,7 +60510,7 @@ BP_PY
   printf '# bancada: concessão de batuta-de-projeto\nalpha\tinterno\tsim\tcore\n' > "${sb}/state/grants.tsv"
   _bpr() {  # $1 = medidor sob teste, resto = args
     local w="$1"; shift
-    env -u CLAUDE_CODE_SESSION_ID LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${BP_PROJ:-${sb}/proj}" \
+    env -u CLAUDE_CODE_SESSION_ID -u BATON_CONFIG_DIRS -u CLAUDE_CONFIG_DIR LC_ALL=C BATON_NOW="${NOW}" BATON_STATE_DIR="${BP_STATE:-${sb}/state}" BATON_PROJECTS_DIR="${BP_PROJ:-${sb}/proj}" \
       BATON_PROC="${BP_PROC:-${sb}/proc-empty}" BATON_OWNERSHIP="${BP_OWN:-${REPO_ROOT}/.claude/utils/orchestration/ownership.sh}" \
       ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista-privada.tsv" \
       BATON_DECIDE_TSV="${sb}/dc.tsv" ONION_ASK_DIR="${sb}/asks" bash "${w}" "${r}" --no-family --peers "${sb}/peers.json" "$@" 2>&1
@@ -60925,7 +60925,7 @@ BP_HY
   _bp_as2() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E 'SESSION_CAP' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
     ! grep -q "SESSION_CAP" <<< "${a}"; }
   _bpcase "(as2) o teto padrão é 10: 7 interativas não disparam SESSION_CAP sem flag" \
-    'MAXI="10"' 'MAXI="4"' _bp_as2
+    'SESSION_CAP_DEFAULT="10"' 'SESSION_CAP_DEFAULT="4"' _bp_as2
   # (at) sem environ legível e com a árvore cortada: lacuna HYGIENE_UNMEASURED, nunca «fora do tmux» nem «em tmux»
   _bp_at() { local a; a="$(_bphy "$1")"; BP_WHY="$(grep -E "h-unread|HYGIENE" <<< "${a}" | tr '\t' ' ')"
     grep -q "^gap${T}.*HYGIENE_UNMEASURED.*h-unread (pid 4007).*tmux NÃO medido" <<< "${a}" && ! grep -q "^hygiene${T}sid-h-unread${T}" <<< "${a}"; }
@@ -60995,6 +60995,100 @@ BP_AY
       && ! grep -q 'session-open.sh ay-sess' <<< "${a}"; }
   _bpcase "(ay) cwd raiz de repo em ~/<nome>: a cura cita o abridor com o BASENAME do repo, não o name da sessão" \
     "if not cwd or os.path.dirname(cwd) != home_dir: return None" "if not cwd or True: return None" _bp_ay
+  # (az)-(az3) SAC-484: o teto de sessões dito em UM lugar. O número do código é SESSION_CAP_DEFAULT; a autoridade é a
+  #     decisão no grafo; baton.md e baton-doctrine.md são cópia conferida. O --check-cap reprova o desencontro.
+  #     (az) o repo real está alinhado (é a trava viva do desencontro: doc com outro número reprova aqui, no CI)
+  _bp_az() { local a; a="$(bash "$1" "${REPO_ROOT}" --check-cap 2>&1)"; local rc=$?; BP_WHY="rc ${rc}: $(tr '\n' '|' <<< "${a}")"
+    [ "${rc}" = 0 ] && grep -q "^CAP_OK${T}" <<< "${a}"; }
+  _bpcase "(az) teto: decisão vigente, medidor, baton.md e baton-doctrine.md dizem o mesmo" \
+    'SESSION_CAP_DEFAULT="' 'SESSION_CAP_DEFAULT="9' _bp_az
+  local cr="${sb}/caprepo" dec; dec="$(sed -n 's/^SESSION_CAP_DECISION="\([^"]*\)"$/\1/p' "${sut}")"
+  mkdir -p "${cr}/.claude/commands/meta" "${cr}/.claude/commands/common/prompts" "${cr}/docs/onion/graph"
+  cp "${REPO_ROOT}/.claude/commands/common/prompts/baton-doctrine.md" "${cr}/.claude/commands/common/prompts/"
+  cp "${REPO_ROOT}"/docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml "${cr}/docs/onion/graph/"
+  # (az2) a página do comando volta a dizer «padrão 4» (o desencontro medido em 2026-11-21): rc 1 nomeando baton.md
+  python3 -c 'import re,sys; s=open(sys.argv[1],encoding="utf-8").read(); open(sys.argv[2],"w",encoding="utf-8").write(re.sub(r"(--max-interactive`,\s*padrão )\d+", r"\g<1>4", s, count=1))' \
+    "${REPO_ROOT}/.claude/commands/meta/baton.md" "${cr}/.claude/commands/meta/baton.md"
+  _bp_az2() { local a; a="$(bash "$1" "${cr}" --check-cap 2>&1)"; local rc=$?; BP_WHY="rc ${rc}: $(tr '\n' '|' <<< "${a}")"
+    [ "${rc}" = 1 ] && grep -q "^CAP_MISMATCH${T}.claude/commands/meta/baton.md: diz .--max-interactive. padrão 4" <<< "${a}"; }
+  _bpcase "(az2) a página do comando com outro teto reprova (rc 1, nomeada)" \
+    "        if x != cap: bad.append" "        if False: bad.append" _bp_az2
+  # (az3) a decisão citada pelo medidor foi superada no grafo: rc 1, mesmo com a prosa alinhada
+  cp "${REPO_ROOT}/.claude/commands/meta/baton.md" "${cr}/.claude/commands/meta/baton.md"
+  printf 'meta:\n  id: sup\n  schema_version: "1"\nnodes: []\nedges:\n  - from: D_CAP_NEWER\n    to: %s\n    edge_type: SUPERSEDES\n' "${dec}" > "${cr}/docs/onion/graph/sup.kg.yaml"
+  _bp_az3() { local a; a="$(bash "$1" "${cr}" --check-cap 2>&1)"; local rc=$?; BP_WHY="rc ${rc}: $(tr '\n' '|' <<< "${a}")"
+    [ "${rc}" = 1 ] && grep -q "^CAP_MISMATCH${T}a decisão citada ${dec} foi SUPERADA por D_CAP_NEWER" <<< "${a}"; }
+  _bpcase "(az3) a decisão citada superada no grafo reprova" \
+    "e.get('edge_type') == 'SUPERSEDES'" "e.get('edge_type') == 'NEVER'" _bp_az3
+  # (bd)-(bg) SAC-484: pastas de config declaradas. O hub roda com CLAUDE_CONFIG_DIR próprio e ficava invisível.
+  #     Um harness falso responde `agents --json` pela pasta do CLAUDE_CONFIG_DIR; a pasta tem projects/ com o
+  #     transcript (só stat) e um subagente parado que NÃO pode ser lido (conteúdo de outra conta).
+  local cfg="${sb}/cfg-hub"; mkdir -p "${cfg}/projects/p/sid-hub/subagents" "${sb}/hub" "${sb}/state-cfg" "${sb}/bin"
+  cp "${sb}/state/"*.tsv "${sb}/state-cfg/" 2>/dev/null
+  printf '%s\n# comentário\n%s\n' "${cfg}" "${sb}/cfg-ausente" > "${sb}/state-cfg/config-dirs.tsv"
+  printf '[{"pid": %s, "cwd": "%s/hub", "kind": "interactive", "sessionId": "sid-hub", "name": "hub", "status": "idle"}]\n' "$$" "${sb}" > "${sb}/hub-agents.json"
+  # o harness falso responde pela pasta: <pasta>.agents.json; sem CLAUDE_CONFIG_DIR (ou sem o arquivo) sai 1
+  cp "${sb}/hub-agents.json" "${cfg}.agents.json"
+  printf '#!/bin/sh\n[ "$1 $2" = "agents --json" ] || exit 9\nf="${CLAUDE_CONFIG_DIR:-}.agents.json"\n[ -n "${CLAUDE_CONFIG_DIR:-}" ] && [ -f "$f" ] || exit 1\ncat "$f"\n' > "${sb}/bin/fake-claude"
+  chmod +x "${sb}/bin/fake-claude"
+  : > "${cfg}/projects/p/sid-hub.jsonl"; touch -d "@$((NOW - 3600))" "${cfg}/projects/p/sid-hub.jsonl"
+  printf '%s\n' '{"type":"user","message":{"role":"user","content":[{"type":"text","text":"brief"}]}}' \
+    '{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"h1","name":"Bash","input":{"command":"sleep 999"}}]}}' \
+    > "${cfg}/projects/p/sid-hub/subagents/agent-ahub.jsonl"
+  touch -d "@$((NOW - 7200))" "${cfg}/projects/p/sid-hub/subagents/agent-ahub.jsonl"
+  _bpcfg() { BATON_CLAUDE="${sb}/bin/fake-claude" BP_STATE="${sb}/state-cfg" _bpr "$@"; }
+  # (bd) a sessão da pasta declarada aparece, pela lista de peers dela, com a fonte nomeada
+  _bp_bd() { local a; a="$(_bpcfg "$1" --tsv)"; BP_WHY="$(grep -E 'sid-hub|config_dirs' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-hub${T}IDLE_NO_QUEUE${T}hub${T}" <<< "${a}" && grep -q "^session${T}sid-hub${T}.*${T}peers@[^${T}]*cfg-hub${T}" <<< "${a}" \
+      && grep -q "^config_dirs${T}.*${T}1${T}.*config-dirs.tsv" <<< "${a}"; }
+  _bpcase "(bd) sessão com CLAUDE_CONFIG_DIR declarado aparece pela lista de peers da pasta" \
+    'elif CLAUDE_CONFIG_DIR="${_cd}" timeout 20' 'elif CLAUDE_CONFIG_DIR="" timeout 20' _bp_bd
+  # (be) a atividade dela vem do stat do transcript em <pasta>/projects (60 min), não fica «duração NÃO medida»
+  _bp_be() { local a; a="$(_bpcfg "$1" --tsv)"; BP_WHY="$(grep 'sid-hub' <<< "${a}" | tr '\t' ' ')"
+    grep -q "^session${T}sid-hub${T}IDLE_NO_QUEUE${T}hub${T}60${T}.*transcript.mtime" <<< "${a}"; }
+  _bpcase "(be) atividade da sessão da pasta declarada pelo stat do transcript dela" \
+    "stat_dirs = ([proj_dir] if proj_ok else []) + [pj for _, _, pj in CFG if pj]" "stat_dirs = ([proj_dir] if proj_ok else [])" _bp_be
+  # (bf) o subagente da pasta declarada NÃO é lido (seria ler conteúdo de transcript de outra config)
+  _bp_bf() { local a; a="$(_bpcfg "$1" --tsv)"; BP_WHY="$(grep -E '^agent' <<< "${a}" | cut -f1-4 | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-hub${T}" <<< "${a}" && ! grep -q "^agent${T}ahub${T}" <<< "${a}"; }
+  _bpcase "(bf) subagente da pasta declarada não é lido (só stat e peers)" \
+    "        base = os.path.join(glob.escape(proj_dir), '*', glob.escape(sid), 'subagents')" \
+    "        base = os.path.join(glob.escape(CFG[0][2] if CFG else proj_dir), '*', glob.escape(sid), 'subagents')" _bp_bf
+  # (bg) pasta declarada que não existe é lacuna nomeada, nunca «zero sessões» calado
+  _bp_bg() { local a; a="$(_bpcfg "$1" --tsv)"; BP_WHY="$(grep -E '^gap' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^gap${T}.*pasta de config declarada .*cfg-ausente ausente: a pasta declarada não existe" <<< "${a}"; }
+  _bpcase "(bg) pasta de config declarada ausente é lacuna nomeada" \
+    "    if not os.path.isdir(cdr): gaps.append(" "    if not os.path.isdir(cdr) and False: gaps.append(" _bp_bg
+  # (bh) o mesmo processo visto pela lista padrão E pela da pasta declarada (o pulso rodando com CLAUDE_CONFIG_DIR igual
+  #      a ela) entra uma vez: sem «mesmo checkout» nem «dois terminais» para um processo só (achado da revisão isolada)
+  local cdup="${sb}/cfg-dup"; mkdir -p "${cdup}" "${sb}/state-dup" "${sb}/proc-dup/$$"
+  cp "${sb}/state/"*.tsv "${sb}/state-dup/" 2>/dev/null; printf '%s\n' "${cdup}" > "${sb}/state-dup/config-dirs.tsv"
+  printf '[{"pid": %s, "cwd": "%s", "kind": "interactive", "sessionId": "sid-dup1", "name": "dup1", "status": "idle"}]\n' "$$" "${r}" > "${cdup}.agents.json"
+  cp "${cdup}.agents.json" "${sb}/peers-dup.json"
+  printf '%s (claude) S 1 1 1 0 -1\n' "$$" > "${sb}/proc-dup/$$/stat"; echo claude > "${sb}/proc-dup/$$/comm"
+  printf 'TMUX=/tmp/tmux-1/default,1,0\0' > "${sb}/proc-dup/$$/environ"
+  _bp_bh() { local a; a="$(BATON_CLAUDE="${sb}/bin/fake-claude" BP_STATE="${sb}/state-dup" BP_PROC="${sb}/proc-dup" _bpr "$1" --tsv --peers "${sb}/peers-dup.json")"
+    BP_WHY="$(grep -E 'sid-dup1|hygiene' <<< "${a}" | tr '\t' ' ' | tr '\n' '|')"
+    grep -q "^session${T}sid-dup1${T}.*${T}peers+peers@" <<< "${a}" && ! grep -q "SESSION_SAME_CHECKOUT" <<< "${a}"; }
+  _bpcase "(bh) o mesmo processo em duas listas conta uma vez na higiene" \
+    "        if k not in seen_proc: PROCS.append(x); seen_proc.add(k)" "        PROCS.append(x)" _bp_bh
+  # (bi) o rótulo da decisão diz o teto ANCORADO a «sessões»: um teto 5 (o «5 agentes» do mesmo rótulo) reprova,
+  #      mesmo com a prosa trocada junto (achado da revisão isolada: o número solto passava por 5, 12 e 15)
+  local c5="${sb}/caprepo5"; cp -r "${cr}" "${c5}"; rm -f "${c5}/docs/onion/graph/sup.kg.yaml"
+  sed -i '0,/padrão 10,/s//padrão 5,/' "${c5}/.claude/commands/meta/baton.md"
+  sed -i 's/`--max-interactive` (10)/`--max-interactive` (5)/' "${c5}/.claude/commands/common/prompts/baton-doctrine.md"
+  _bp_bi() { local a m="${sb}/cap5-$(date +%N).sh"; sed 's/^SESSION_CAP_DEFAULT="[0-9]*"/SESSION_CAP_DEFAULT="5"/' "$1" > "${m}"
+    a="$(bash "${m}" "${c5}" --check-cap 2>&1)"; local rc=$?; BP_WHY="rc ${rc}: $(tr '\n' '|' <<< "${a}")"
+    [ "${rc}" = 1 ] && grep -q "não diz o teto «5 sessões»" <<< "${a}" && ! grep -q "padrão [0-9]*, o medidor usa 5" <<< "${a}"; }
+  _bpcase "(bi) o teto no rótulo da decisão casa ancorado a «sessões», não qualquer número" \
+    "\s+sess', str(n.get('label')" "(?!\d)', str(n.get('label')" _bp_bi
+  # (bj) a prosa com outra forma de citar o teto («(padrão 4)») também reprova
+  local cj="${sb}/caprepoj"; cp -r "${cr}" "${cj}"; rm -f "${cj}/docs/onion/graph/sup.kg.yaml"
+  printf '\nNota velha: acima de `--max-interactive` (padrão 4).\n' >> "${cj}/.claude/commands/meta/baton.md"
+  _bp_bj() { local a; a="$(bash "$1" "${cj}" --check-cap 2>&1)"; local rc=$?; BP_WHY="rc ${rc}: $(tr '\n' '|' <<< "${a}")"
+    [ "${rc}" = 1 ] && grep -q "baton.md: diz .--max-interactive. padrão 4" <<< "${a}"; }
+  _bpcase "(bj) «(padrão 4)» na prosa reprova (toda forma de citar a flag)" \
+    "r'--max-interactive\`?[^\d]{0,30}?(\d+)'" "r'--max-interactive\`[,]?\s*(?:\(|padrão\s+)(\d+)'" _bp_bj
   rm -rf "${sb}"
 }
 _family run_baton_pulse_selftests
