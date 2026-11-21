@@ -1677,8 +1677,8 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
-| 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
+| 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, agora que a superfície de escrita põe o grafo do conhecimento e o grafo técnico em repos diferente |
+| 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): parqueada com gatilho pela decisão D_CROSS_REPO_CONTRACT_1104 d |
 | 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
 
 ## door-role-parity-2026-09 — 3 item(ns)

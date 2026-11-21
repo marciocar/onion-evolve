@@ -2,7 +2,8 @@
 branch: docs/kg-ssot-queue-parked-1121
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 78e54dc6165d73fcd9229b6031fea9de00a2ca84d514a58aca02ae0065abe2da
+reviewed_code_sha256: 887d97cbe3fce4cd9bf0b789c55c7ebc96d35a3bcbdafac7ccb2a680266a63ca
 findings_total: 7
 findings_real: 6
 findings_blocking: 0
