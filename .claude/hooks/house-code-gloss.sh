@@ -29,6 +29,15 @@
 #           200 KB cala (o motor custa ~1 s a cada 100 KB). Edit cujo old_string não está no arquivo é
 #           julgado só pelo trecho novo. Mensagem estruturada (objeto) e Bash que escreve .md não são lidos.
 #
+#   commit-msg (git)          — o 4º caminho (2026-11-21, Linguagem Simples por superfície, item C1; decisão
+#           D_PLAIN_LANGUAGE_STITCH_1121): o assunto e o corpo do commit. Chamado pelo .githooks/commit-msg com o
+#           arquivo da mensagem; julga só a prosa (sem comentário do git, sem o diff da tesoura, sem o prefixo
+#           Conventional, sem o bloco final de trailers e a assinatura da casa) e escreve o lembrete no stderr.
+#           SEMPRE exit 0: o commit sai como foi escrito, e a cura é o --amend. O modo tool também passou a
+#           ler o SINAL entre sessões: o .md escrito por Write/Edit em docs/evolution/inbox/ ou em
+#           docs/evolution/federation/outbox/ (menos o README), que a outra sessão repassa ao maestro.
+#           TETO: sinal escrito por Bash (o carteiro co-relay/co-deliver copia o arquivo) não é lido.
+#
 # COMO    : o glossário é .claude/validation/house-codes.tsv (fonte única; nada embutido aqui). O
 #           que conta como glosa, o domínio de cada sigla e o que não é prosa (código, citação, caminho,
 #           URL, "REGRA N (Título)") moram em lib/house_codes.py. A "resposta" é cada bloco de texto do
@@ -40,7 +49,7 @@
 #           exit 0 (a guarda erra para o lado de calar).
 #
 # USO     : registrado em .claude/settings.json (UserPromptSubmit com `prompt`, Stop com `stop`, PreToolUse
-#           `SendMessage|Write|Edit` com `tool`).
+#           `SendMessage|Write|Edit` com `tool`); o modo commit-msg, pelo .githooks/commit-msg.
 #           --selftest prova as polaridades; --scan <transcript.jsonl> simula os dois modos em cada turno
 #           de uma sessão real (dogfood; a taxa de bloqueio sai no fim).
 # =============================================================================
@@ -293,6 +302,12 @@ if mode == "text":
 # SIGNAL-DRAFT, ACCEPT-*, BRIEF-* — todos prosa de estudo, todos em CAIXA ALTA; o README é índice)
 PREREG = re.compile(r"(?:^|/)docs/evolution/(?:dissect|research)/(?:[^/]+/)+([A-Z0-9][A-Z0-9_-]*)\.md$")
 
+# o sinal entre sessões (2026-11-21, D_PLAIN_LANGUAGE_STITCH_1121): o .md que uma sessão deixa na caixa de entrada
+# (docs/evolution/inbox/, inclusive _processed/) ou na staging de saída da federação (docs/evolution/federation/
+# outbox/<membro>/) é mensagem que não passa pelo SendMessage, e a outra sessão a repassa ao maestro do mesmo jeito.
+# Qualquer basename, menos o README (índice).
+SIGNAL = re.compile(r"(?:^|/)docs/evolution/(?:inbox|federation/outbox)/(?:[^/]+/)*([^/]+)\.md$")
+
 CAP = 200000   # bytes: acima disto o PreToolUse sai calado (o motor custa ~1 s a cada 100 KB; medido 2026-10-26)
 
 def tool_target(d):
@@ -313,9 +328,13 @@ def tool_target(d):
         return None
     fp = ti.get("file_path")
     mt = PREREG.search(fp) if isinstance(fp, str) else None
-    if not mt or mt.group(1) == "README":
+    ms = SIGNAL.search(fp) if isinstance(fp, str) and not mt else None
+    if mt and mt.group(1) != "README":
+        where = "o .md de estudo %s" % os.path.basename(fp)
+    elif ms and ms.group(1) != "README":
+        where = "o sinal entre sessões %s" % os.path.basename(fp)
+    else:
         return None
-    where = "o .md de estudo %s" % os.path.basename(fp)
     if name == "Write":
         c = ti.get("content")
         return (where, c, [c]) if isinstance(c, str) else None
@@ -331,6 +350,64 @@ def tool_target(d):
     except Exception:
         full = new
     return (where, full, [new])
+
+# a mensagem de commit (2026-11-21, D_PLAIN_LANGUAGE_STITCH_1121): o assunto e o corpo são superfície de leitura
+# humana (o maestro lê o log, o PR e o anúncio da porta). Só a PROSA é julgada: sai o comentário do git (o
+# core.commentChar, que o .githooks/commit-msg passa em ONION_COMMIT_COMMENT_CHAR), tudo depois da tesoura do
+# `--verbose`, o prefixo Conventional do assunto (contrato de máquina; o escopo `fix(I3):` não é prosa) e o
+# bloco final de trailers (`Chave: valor` em todas as linhas, como o git interpret-trailers os lê) e a linha de
+# assinatura da casa. Lembrete em stderr, rc 0 SEMPRE: o commit sai como foi escrito e a cura é o --amend.
+CONV = re.compile(r"^(?:(?:fixup|squash|amend)! )*[a-z]+(?:\([^()\n]*\))?!?:[ \t]*")
+TRAILER = re.compile(r"^[A-Za-z][A-Za-z0-9-]*:[ \t]")
+
+def commit_prose(raw, cc):
+    lines = raw.replace("\r\n", "\n").split("\n")
+    out = []
+    for ln in lines:
+        if cc and ln.startswith(cc):
+            if re.fullmatch(r"%s -+ >8 -+" % re.escape(cc), ln.rstrip()):
+                break                                  # a tesoura do --verbose: o diff abaixo não é mensagem
+            continue
+        out.append(ln)
+    while out and not out[-1].strip():
+        out.pop()
+    # o último parágrafo, se for só trailers (e a assinatura da casa), não é prosa
+    k = len(out)
+    while k > 0 and out[k - 1].strip():
+        k -= 1
+    last = out[k:]
+    if k > 0 and last and all(TRAILER.match(x) or x.startswith("Orquestrado com") for x in last):
+        out = out[:k]
+    out = [x for x in out if not x.startswith("Orquestrado com")]
+    for i, ln in enumerate(out):
+        if ln.strip():
+            out[i] = CONV.sub("", ln, count=1)       # só o assunto (a 1ª linha com texto) leva o prefixo
+            break
+    return "\n".join(out)
+
+if mode == "commit":
+    try:
+        if os.path.getsize(tp) > CAP:
+            sys.exit(0)
+        raw = open(tp, encoding="utf-8", errors="replace").read()
+    except Exception:
+        sys.exit(0)
+    cc = os.environ.get("ONION_COMMIT_COMMENT_CHAR", "#") or "#"
+    if cc == "auto" or len(cc) != 1:
+        cc = "#"                       # `auto` escolhe o caractere em tempo de commit; o `#` é o padrão do git
+    text = commit_prose(raw, cc)
+    if not text.strip():
+        sys.exit(0)
+    fs = sorted(hc.findings(text, gl, titles, root), key=lambda x: (x["opacity"] != "alta", x["token"]))
+    if not fs:
+        sys.exit(0)
+    msg = ["📖 Glossário da casa — a mensagem de commit leva sigla SEM glosa, e o commit é lido por gente (o "
+           "maestro, o PR, o anúncio da porta). Glose na 1ª menção (ex.: \"a tarefa da glosa (SAC-256)\") ou "
+           "troque a sigla pela glosa; corrija com git commit --amend. Lembrete, não bloqueio:"]
+    for x in fs[:10]:
+        msg.append("  · %s → %s" % (x["token"], x["gloss"]))
+    sys.stderr.buffer.write(("\n".join(msg) + "\n").encode("utf-8", "replace"))
+    sys.exit(0)
 
 if mode == "tool":
     try:
@@ -442,6 +519,12 @@ try: print(json.load(sys.stdin).get("session_id",""))
 except Exception: print("")' 2>/dev/null || true; }
 
 if [ "${1:-}" = "--scan" ]; then _engine scan "${2:-}"; exit 0; fi
+# o .githooks/commit-msg chama `commit-msg <arquivo da mensagem>`: nada vem pelo stdin, e o rc é 0 sempre
+if [ "${1:-}" = "commit-msg" ]; then
+  [ -n "${2:-}" ] && [ -f "${2}" ] || exit 0
+  _engine commit "${2}" "" || true
+  exit 0
+fi
 
 if [ "${1:-}" = "--selftest" ]; then
   fails=0
@@ -722,6 +805,47 @@ PY
   _big="$(python3 -I -c 'print("SAC-256 " * 30000)')"
   _tool "{\"tool_name\":\"SendMessage\",\"tool_input\":{\"to\":\"main\",\"message\":\"${_big}\"}}"
   if ! grep -q Traceback <<< "${_o11}" && grep -q 'SAC-256 →' <<< "${_o11}" && [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t11) surrogate no destinatário sem Traceback; texto acima do teto cala (rc 0)"; else _ko "(t11) surrogate [${_o11}] · teto rc=${_rc} [${_o:0:120}]"; fi
+  # ── o sinal entre sessões (2026-11-21): inbox e outbox da federação, por Write/Edit ──
+  # (t12) Write de sinal na inbox e na outbox com SAC-256 solto → lembrete que nomeia o sinal; o README cala
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/inbox/2026-11-21-x.md","content":"# Sinal\n\nFechei o SAC-256."}}'
+  _o12="${_o}"; _rc12="${_rc}"
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/federation/outbox/membro-x/2026-11-21-y.md","content":"# Resposta\n\nFechei o SAC-256."}}'
+  _o12b="${_o}"; _rc12b="${_rc}"
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/inbox/README.md","content":"# Caixa\n\nFechei o SAC-256."}}'
+  if [ "${_rc12}" -eq 0 ] && grep -q 'sinal entre sessões 2026-11-21-x.md' <<< "${_o12}" && grep -q 'SAC-256 →' <<< "${_o12}" \
+     && [ "${_rc12b}" -eq 0 ] && grep -q 'sinal entre sessões 2026-11-21-y.md' <<< "${_o12b}" && [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then
+    _ok "(t12) sinal na inbox e na outbox com SAC-256 solto: lembrete (rc 0); README da caixa cala"
+  else _ko "(t12) inbox rc=${_rc12} [${_o12}] · outbox rc=${_rc12b} [${_o12b}] · README rc=${_rc} [${_o}]"; fi
+  # (t13) o sinal glosado cala, e um caminho parecido fora da caixa (docs/evolution/inboxes/) também
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/inbox/_processed/2026-11-21-x.md","content":"Fechei a tarefa da glosa entre sessões (SAC-256)."}}'
+  _o13="${_o}${_rc}"
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/inboxes/2026-11-21-x.md","content":"Fechei o SAC-256."}}'
+  if [ "${_o13}" = "0" ] && [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t13) sinal glosado cala; caminho fora da caixa (inboxes/) cala (rc 0)"; else _ko "(t13) glosado [${_o13}] · fora rc=${_rc} [${_o}]"; fi
+  # ── a mensagem de commit (2026-11-21): modo commit-msg, chamado pelo .githooks/commit-msg ──
+  _cm() { local f="${_d}/COMMIT_EDITMSG"; printf '%s' "$1" > "${f}"; _rc=0; _o="$(bash "${BASH_SOURCE[0]}" commit-msg "${f}" 2>&1)" || _rc=$?; }
+  # (c1) SAC-256 solto no assunto → lembrete com a glosa no stderr, rc 0
+  _cm $'feat(radar): fecha o SAC-256\n\nO corpo explica.\n'
+  if [ "${_rc}" -eq 0 ] && grep -q 'mensagem de commit' <<< "${_o}" && grep -q 'SAC-256 → a tarefa do task manager' <<< "${_o}"; then _ok "(c1) commit com SAC-256 solto no assunto: lembrete (rc 0)"; else _ko "(c1) rc=${_rc} [${_o}]"; fi
+  # (c2) I3 solto no CORPO também lembra (o corpo é prosa, não só o assunto)
+  _cm $'docs(kg): o grafo ganha o nó\n\nO I3 segue valendo aqui.\n'
+  if [ "${_rc}" -eq 0 ] && grep -q 'I3 →' <<< "${_o}"; then _ok "(c2) I3 solto no corpo: lembrete (rc 0)"; else _ko "(c2) rc=${_rc} [${_o}]"; fi
+  # (c3) o que não é prosa cala: escopo Conventional, comentário do git, trailer final, assinatura e o diff da tesoura
+  _cm $'fix(I3): a tarefa da glosa fecha\n\nCorpo sem sigla.\n\nRefs: SAC-256\nCo-Authored-By: x <x@y>\nOrquestrado com 🧅 Onion Evolve\n# SAC-257 no comentário do git\n# ------------------------ >8 ------------------------\n+ O I3 e o SAC-258 no diff\n'
+  if [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(c3) escopo, comentário, trailer, assinatura e diff da tesoura calam (rc 0)"; else _ko "(c3) rc=${_rc} [${_o}]"; fi
+  # (c4) parágrafo final que MISTURA prosa e "Chave: valor" não é bloco de trailers: a sigla dele lembra
+  _cm $'fix: a guarda\n\nNota: fechei o SAC-256 hoje\ne segui sem glosa.\n'
+  if [ "${_rc}" -eq 0 ] && grep -q 'SAC-256 →' <<< "${_o}"; then _ok "(c4) parágrafo final misto não é trailer: lembra (rc 0)"; else _ko "(c4) rc=${_rc} [${_o}]"; fi
+  # (c5) core.commentChar trocado: a linha com ';' some, a linha com '#' é mensagem e lembra
+  _rc=0; printf '%s' $'fix: a guarda\n\n; I3 no comentário\n#12 e o SAC-256 na mensagem\n' > "${_d}/COMMIT_EDITMSG"
+  _o="$(ONION_COMMIT_COMMENT_CHAR=';' bash "${BASH_SOURCE[0]}" commit-msg "${_d}/COMMIT_EDITMSG" 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 0 ] && grep -q 'SAC-256 →' <<< "${_o}" && ! grep -q 'I3 →' <<< "${_o}"; then _ok "(c5) commentChar ';': o ';' é comentário, o '#' é mensagem (rc 0)"; else _ko "(c5) rc=${_rc} [${_o}]"; fi
+  # (c6) arquivo ausente, vazio, binário e só comentário: rc 0, mudo, sem Traceback
+  _rc=0; _o6c="$(bash "${BASH_SOURCE[0]}" commit-msg "${_d}/nao-existe" 2>&1)" || _rc=$?; _o6c="${_o6c}${_rc}"
+  _cm ''; _o6c="${_o6c}${_o}${_rc}"
+  _cm $'\xff\xfe\x00SAC'; _o6c="${_o6c}${_o}${_rc}"
+  _cm $'# só comentário com SAC-256\n'; _o6c="${_o6c}${_o}${_rc}"
+  _rc=0; _o="$(bash "${BASH_SOURCE[0]}" commit-msg 2>&1 </dev/null)" || _rc=$?; _o6c="${_o6c}${_o}${_rc}"
+  if [ "${_o6c}" = "00000" ]; then _ok "(c6) mensagem ausente, vazia, binária, só comentário e sem argumento: mudo, rc 0"; else _ko "(c6) [${_o6c}]"; fi
   unset ONION_HOUSE_CODE_STATE_DIR
   rm -rf "${_d}"
 
