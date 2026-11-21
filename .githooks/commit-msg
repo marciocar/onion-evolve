@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Onion — commit-msg hook (core)
+# -----------------------------------------------------------------------------
+# Sigla da casa no assunto ou no corpo do commit vem com a glosa: o commit é superfície de leitura humana
+# (o maestro lê o log, o PR e o anúncio da porta), e a régua de Linguagem Simples por superfície pede a
+# glosa na 1ª menção (item C1; docs/knowledge-base/concepts/plain-language-by-surface.md, decisão
+# D_PLAIN_LANGUAGE_STITCH_1121). O motor é o mesmo do glossário da casa: .claude/hooks/house-code-gloss.sh
+# no modo `commit-msg`, com o glossário .claude/validation/house-codes.tsv.
+#
+# LEMBRA, NUNCA BARRA: sai 0 sempre. O lembrete vai para o stderr do `git commit`, e a cura é o
+# `git commit --amend`. Sem o hook do glossário, sem python3 ou sem o arquivo da mensagem: sai 0 calado.
+# O `--no-verify` pula este hook junto com o pre-commit (comportamento do git).
+# CORE-ONLY: o glossário é da casa; o template do adotante não ganha este hook.
+# =============================================================================
+# >>> onion-hook-trampoline >>>
+# TRAMPOLIM DE WORKTREE: com core.hooksPath ABSOLUTO (o Claude Code o grava ao criar worktree de
+# agente), toda worktree rodaria o hook do checkout PRINCIPAL e um PR que muda este hook não seria
+# provado por ele mesmo. Só age quando ESTE hook mora no `.githooks/` do checkout principal deste
+# repo (identidade de diretório; hook em `.git/hooks`, husky ou diretório central não trampolina).
+# Aí, se a árvore atual tem o MESMO hook, executável e de conteúdo diferente, ele assume com os
+# mesmos argumentos e stdin. Árvore sem o hook: segue este (o gate nunca deixa de rodar). Hook da
+# árvore presente e NÃO executável: FALHA FECHADO (revisão do adotante sge, 2026-10-26). Antes caía em
+# silêncio no do principal: o hook sob teste não rodava, e o bit perdido chegava à main, onde o git
+# IGNORA hook não executável e o gate inteiro some. Rodá-lo por `bash` esconderia o mesmo bit perdido.
+# ⚠️ LIMITE DO GIT, declarado (revisão adversarial do adotante sge, 2026-10-27): a falha fechada só existe
+# com o hooksPath ABSOLUTO, porque é só aí que ESTE arquivo roda numa worktree. Com o RELATIVO (o
+# `.githooks` da ativação) o git resolve o hook DENTRO da worktree, acha-o não executável, o IGNORA (só
+# um `hint:`) e o commit sai rc 0 sem este bloco nem o gate rodarem; nenhum código de hook alcança esse
+# caso. Quem o pega por outro caminho é a prova do gate (`prove-gate-blocks.sh`, rc 3 "não é executável
+# (o git o ignora)") e o `chmod +x` da instalação. O bit perdido COMMITADO (modo 100644) segue sem guarda
+# no commit do relativo; confira com `git ls-files -s .githooks/pre-commit` (tem de dizer 100755).
+# A variável guarda o alvo contra laço e é limpa logo abaixo, para não vazar a um git aninhado.
+_onion_top="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+_onion_cmn="$(CDPATH= cd "$(git rev-parse --git-common-dir 2>/dev/null || echo /nonexistent)" 2>/dev/null && cd .. && pwd || true)"
+_onion_tt="${_onion_top}/.githooks/${0##*/}"
+if [ -n "${_onion_top}" ] && [ -n "${_onion_cmn}" ] && [ "${0%/*}" -ef "${_onion_cmn}/.githooks" ] \
+   && [ "${ONION_HOOK_TRAMPOLINED:-}" != "${_onion_tt}" ] && [ -f "${_onion_tt}" ] && ! [ "${_onion_tt}" -ef "$0" ]; then
+  if ! [ -x "${_onion_tt}" ]; then
+    echo "❌ ${0##*/} bloqueado: ${_onion_tt} existe e NÃO é executável — o git o ignoraria e o gate desta árvore não roda. Corrija: chmod +x '${_onion_tt}' (e commite o modo 100755)." >&2
+    exit 1
+  fi
+  if ! cmp -s "${_onion_tt}" "$0"; then
+    export ONION_HOOK_TRAMPOLINED="${_onion_tt}"
+    exec "${_onion_tt}" "$@"
+  fi
+fi
+unset _onion_top _onion_cmn _onion_tt ONION_HOOK_TRAMPOLINED
+# <<< onion-hook-trampoline <<<
+_onion_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+_onion_gloss="${_onion_root}/.claude/hooks/house-code-gloss.sh"
+if [ -n "${_onion_root}" ] && [ -f "${_onion_gloss}" ] && [ -n "${1:-}" ] && [ -f "${1}" ]; then
+  ONION_COMMIT_COMMENT_CHAR="$(git config --get core.commentChar 2>/dev/null || echo '#')" \
+    bash "${_onion_gloss}" commit-msg "${1}" || true
+fi
+exit 0
