@@ -92,7 +92,10 @@ isso é o anti-thrashing funcionando, não defeito. (AUDIT é batch-confirm.)
 bash .claude/validation/kg-drive-project.sh <grafo>        # FILA-PRONTA + BLOQUEADOS
 ```
 `DONE` → nada a conduzir, encerre. `DEADLOCK` → **PARE** (predecessor travado; o bloqueador vira item
-de alta atenção). `READY` → siga.
+de alta atenção). `CICLO` → há fila-pronta, mas um ciclo `DEPENDS_ON` prende abertos para sempre:
+**reporte o ciclo** (o censo nomeia os nós dele e os presos a jusante) e quebre-o antes de fechar o lote;
+`--check` sai ≠0. `READY` → siga. Erro **«NÃO MEDI»** (rc 2) é radar ausente ou que não rodou, não
+grafo reprovado: conserte a casa, não o grafo.
 
 **Complete o censo com os fios em-voo — e leia ESTADO, nunca nome.** `git worktree list` e `gh pr list`
 dizem **onde** olhar; o que foi feito só o **status dos nós** responde. Rode o censo em cada grafo em
@@ -135,6 +138,9 @@ Toda execução: **rodou o artefato de verdade** + o **modo-de-falha** (não só
 bash .claude/validation/kg-drive-project.sh <grafo> --close-lot "<o lote numa linha, NOMEANDO cada flip auto-selado>"
 ```
 Escreve `x_drive_checkpoint: pending` + a nota no `meta:` (lê e relê por YAML; meta em flow-style recusa).
+**Valida antes e depois** (como o `kg-decide-seal.sh`): grafo que o radar já reprova, ou que não se pôde
+medir, não recebe nada (rc 2); escrita que deixa o grafo reprovado é **desfeita byte a byte** (rc 3).
+O `--seal` segue a mesma regra.
 O `STATE.md` local é rascunho, **nunca** o controle nem o lugar de nomear flip — ele é gitignorado e o
 maestro não o vê. Consolide: PRs-verdes **para merge humano** · vereditos **DRIFTED/REFUTED para selo** · decisões propostas · C-gated. Feche a reconciliação:
 ```bash

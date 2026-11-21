@@ -132,8 +132,14 @@ Projeta a **FILA-PRONTA** de um plano-grafo: nós `status: open` cujos predecess
 **fecharam** (não estão mais no conjunto de abertos), por **atenção** (a régua do radar), anotados com
 `drive_kind`. Consome `kg-radar --open-tsv` + `--triples` (não reparseia YAML). Vereditos:
 - **DONE** — 0 abertos (plano sem trabalho).
-- **READY** — há fila-pronta.
+- **READY** — há fila-pronta e nenhum ciclo entre abertos.
+- **CICLO** — há fila-pronta, mas um ciclo `DEPENDS_ON` entre abertos prende os seus nós (e os de
+  jusante) para sempre; o censo nomeia os dois grupos e `--check` sai **exit 1**. Até 2026-11-21
+  (SAC-483) esse caso saía READY e o ciclo passava calado, porque só a fila vazia acusava.
 - **DEADLOCK** — há aberto(s) mas fila-pronta VAZIA (predecessor travado/ciclo/onda mal-modelada); `--check` sai **exit 1**.
+
+O radar que dá a legibilidade é o **irmão** do script, e só o rc 1 dele é reprova: radar ausente ou
+que sai com outro rc é **«não medi»** (rc 2, dito assim), nunca «o grafo reprova».
 
 `DEPENDS_ON` aqui é **GUARDA** ("não faça B antes de A"), **não ordenação** — a topológica dirigida é
 Fase 2 (transformar atenção em precedência é *"o defeito fundador da REGRA 49 cometido na autoria"*,
