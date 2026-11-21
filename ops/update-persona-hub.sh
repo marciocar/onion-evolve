@@ -430,7 +430,8 @@ do_hub() {
   if [ "${TEST}" = 1 ]; then install -m 644 "${TMPD}/${UNIT_HUB}.service" "${UNIT_DIR}/${UNIT_HUB}.service"
   else sudo -n install -m 644 -o root -g root "${TMPD}/${UNIT_HUB}.service" "${UNIT_DIR}/${UNIT_HUB}.service"; fi || hub_fail "install da unit falhou"
   priv systemctl daemon-reload || hub_fail "daemon-reload falhou"
-  systemctl show -p Environment "${UNIT_HUB}" 2>/dev/null | grep -qF "BRAIN_HUB_DIR=${WORKER_PROD}" || hub_fail "a unit carregada não traz BRAIN_HUB_DIR=${WORKER_PROD}"
+  local loaded_env; loaded_env="$(systemctl show -p Environment "${UNIT_HUB}" 2>/dev/null)"
+  grep -qF "BRAIN_HUB_DIR=${WORKER_PROD}" <<< "${loaded_env}" || hub_fail "a unit carregada não traz BRAIN_HUB_DIR=${WORKER_PROD}"
   priv systemctl reset-failed "${UNIT_HUB}" 2>/dev/null || true
   priv systemctl start "${UNIT_HUB}" || hub_fail "systemctl start recusou"
   REARM=0

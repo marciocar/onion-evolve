@@ -13787,7 +13787,7 @@ grep -qF "\"hub\":\"${WORKER_PROD}\"" <<< "${l}" || bad=@@true || bad=@@proof
 (cd "${APP}" && npm ci --ignore-scripts --no-audit --no-fund) || hub_fail@@(cd "${APP}" && npm ci --ignore-scripts --no-audit --no-fund) || true@@proof
 REARM=0; DEPS_TOUCHED=1@@DEPS_TOUCHED=1@@proof
 REARM=1  # o npm ci terminou inteiro@@REARM=0  # o npm ci terminou inteiro@@proof
-| grep -qF "BRAIN_HUB_DIR=${WORKER_PROD}" || hub_fail@@| true || hub_fail@@proof
+grep -qF "BRAIN_HUB_DIR=${WORKER_PROD}" <<< "${loaded_env}" || hub_fail@@true || hub_fail@@proof
 MUT
   rm -rf "${d}"
 }
