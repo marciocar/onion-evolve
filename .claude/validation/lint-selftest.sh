@@ -39945,6 +39945,8 @@ run_drive_selftests() {
     # muda nada; e a linha COMENTADA no meta da fixture pendente não pode ser a que dispara.
     "checkpoint-pending|CHECKPOINT-PENDENTE: pronto=2 bloqueado=1|1"
     "checkpoint-sealed|READY: pronto=2 bloqueado=1|0"
+    # SAC-483 (a): ciclo DEPENDS_ON COM outro nó pronto — antes dizia READY e o ciclo passava calado
+    "partial-cycle|CICLO: pronto=1 bloqueado=3|1"
   )
   local c name want wantrc rc out f
   for c in "${cases[@]}"; do
@@ -40007,6 +40009,107 @@ run_drive_selftests() {
   if [ "${rc}" -eq 2 ] && cmp -s "${fx}/ready-and-blocked.kg.yaml" "${d2}/flow.kg.yaml"; then record_pass "drive: meta flow-style RECUSA a escrita e nao toca o arquivo"
   else record_fail "drive: flow-style" "rc=${rc}"; fi
   rm -rf "${d2}"
+  _drive_sac483_selftests "${ds}" "${fx}"
+}
+
+# SAC-483 — três defeitos do censo/escritor do /meta:drive, cada um com caso e mutante (_prove_mutation).
+#   (a) ciclo DEPENDS_ON com outro nó pronto passava calado sob READY;
+#   (b) --close-lot/--seal escreviam num grafo que o radar já reprovava, e não desfaziam;
+#   (c) radar ausente (ou que não rodou) era lido como «o grafo reprova».
+# O motor roda numa cópia FORA do repo, com o radar irmão ao lado: é o lugar onde (c) mordia, porque o
+# radar era resolvido relativo à raiz de quem chamava.
+_drive_sac483_selftests() {
+  local ds="$1" fx="$2" sb rc out m
+  sb="$(mktemp -d)"
+  mkdir -p "${sb}/ok" "${sb}/mut" "${sb}/g"
+  for m in ok mut; do
+    cp "${ds}" "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${sb}/${m}/"; _lib_beside "${sb}/${m}"
+  done
+  # radares falsos: um que some (rc de ambiente), um que passa e depois reprova (prova o desfazer)
+  printf '#!/usr/bin/env bash\necho "kg-radar: lib ausente" >&2; exit 2\n' > "${sb}/radar-rc2.sh"
+  printf '#!/usr/bin/env bash\nc="%s/count"; n=$(cat "$c" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "$c"\n[ "$n" -ge 2 ] && { echo "  ✗ reprova pos-escrita (falso)"; exit 1; }; exit 0\n' "${sb}" > "${sb}/radar-late.sh"
+  local cyc="${fx}/partial-cycle.kg.yaml" good="${fx}/ready-and-blocked.kg.yaml"
+  # grafo de bloco legível pelo escritor + um irmão órfão (o radar reprova: nó sem aresta)
+  { printf 'meta:\n  schema_version: 1\n'; sed -n '/^nodes:/,$p' "${good}"; } > "${sb}/g/lote.kg.yaml"
+  python3 - "${sb}/g/lote.kg.yaml" "${sb}/g/orfao.kg.yaml" <<'ORF_PY'
+import sys
+t = open(sys.argv[1], encoding='utf-8').read()
+orf = "  - id: N_ORFAO_SAC483\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 1.0\n    verified_against: plano\n    trace: o.sh\n    label: \"orfao\"\n"
+open(sys.argv[2], 'w', encoding='utf-8').write(t.replace("edges:\n", orf + "edges:\n", 1))
+ORF_PY
+  cp "${sb}/g/orfao.kg.yaml" "${sb}/g/orfao.orig"; cp "${sb}/g/lote.kg.yaml" "${sb}/g/lote.orig"
+  _r() { ( cd "${sb}/g" && "$@" ) 2>&1; }   # roda FORA do repo (cwd sem .claude/validation/)
+
+  # (a) caso: CICLO nomeia os dois nós do ciclo e o preso a jusante; mutante: o veredito CICLO desligado
+  local ra=0 ma=0
+  out="$(_r bash "${sb}/ok/kg-drive-project.sh" "${cyc}" --check)" || ra=$?
+  if [ "${ra}" -eq 1 ] && grep -q 'CICLO: pronto=1' <<< "${out}" && grep -q 'entre abertos: X_ESPERA_Y,Y_ESPERA_X · presos a jusante: Z_ESPERA_X' <<< "${out}"; then ra=0
+    record_pass "drive: (SAC-483 a) ciclo parcial sai CICLO, rc 1, nomeando o ciclo e o preso a jusante"
+  else record_fail "drive: (SAC-483 a)" "rc=${ra}: ${out}"; ra=1; fi
+  # (a2) nó ENTRE dois ciclos (depende de um, é citado pelo outro) é preso a jusante, não «no ciclo»
+  # (achado do revisor isolado: a poda nos dois sentidos o nomeava como culpado)
+  out="$(_r bash "${sb}/ok/kg-drive-project.sh" "${fx}/between-cycles.kg.yaml" --check)" || true
+  if grep -q 'entre abertos: A1,A2,B1,B2 · presos a jusante: U_ENTRE' <<< "${out}"; then
+    record_pass "drive: (SAC-483 a2) nó entre dois ciclos sai preso a jusante, não «no ciclo»"
+  else record_fail "drive: (SAC-483 a2)" "${out}"; fi
+  sed 's/elif \[ -n "\$CYC" \]; then echo "CICLO"/elif false; then echo "CICLO"/' "${sb}/ok/kg-drive-project.sh" > "${sb}/mut/kg-drive-project.sh"
+  out="$(_r bash "${sb}/mut/kg-drive-project.sh" "${cyc}" --check)" || ma=$?
+  { [ "${ma}" -eq 1 ] && grep -q 'CICLO: pronto=1' <<< "${out}"; } && ma=0 || ma=1
+  _prove_mutation "drive: (SAC-483 a-MUT) sem o veredito CICLO o ciclo parcial volta a passar calado" "${sb}/ok/kg-drive-project.sh" "${sb}/mut/kg-drive-project.sh" "${ra}" "${ma}"
+
+  # (b1) caso: --close-lot e --seal num grafo que JÁ reprova: rc 2, NADA escrito; mutante: sem a validação ANTES
+  local rb=0 mb=0 r2=0
+  out="$(_r bash "${sb}/ok/kg-drive-project.sh" orfao.kg.yaml --close-lot "lote x")" || rb=$?
+  _r bash "${sb}/ok/kg-drive-project.sh" orfao.kg.yaml --seal >/dev/null || r2=$?
+  if [ "${rb}" -eq 2 ] && [ "${r2}" -eq 2 ] && cmp -s "${sb}/g/orfao.orig" "${sb}/g/orfao.kg.yaml" && grep -q 'JÁ reprova.*nada escrito' <<< "${out}"; then rb=0
+    record_pass "drive: (SAC-483 b1) --close-lot/--seal em grafo que o radar já reprova recusam ANTES de escrever (rc 2, intacto)"
+  else record_fail "drive: (SAC-483 b1)" "rc=${rb}/${r2} intacto=$(cmp -s "${sb}/g/orfao.orig" "${sb}/g/orfao.kg.yaml" && echo sim || echo NAO): ${out}"; rb=1; fi
+  cp "${sb}/g/orfao.orig" "${sb}/g/orfao.kg.yaml"
+  sed '/JÁ reprova integridade\/schema no radar antes da escrita/s/^.*$/    1) : ;;/' "${sb}/ok/kg-drive-project.sh" > "${sb}/mut/kg-drive-project.sh"
+  out="$(_r bash "${sb}/mut/kg-drive-project.sh" orfao.kg.yaml --close-lot "lote x")" || mb=$?
+  { [ "${mb}" -eq 2 ] && grep -q 'nada escrito' <<< "${out}"; } && mb=0 || mb=1
+  cp "${sb}/g/orfao.orig" "${sb}/g/orfao.kg.yaml"
+  _prove_mutation "drive: (SAC-483 b1-MUT) sem validar antes, a escrita chega a um grafo já reprovado" "${sb}/ok/kg-drive-project.sh" "${sb}/mut/kg-drive-project.sh" "${rb}" "${mb}"
+
+  # (b2) caso: o radar passa antes e reprova depois — a escrita é DESFEITA byte a byte (rc 3); mutante: sem o _undo
+  local rd=0 md=0
+  rm -f "${sb}/count"
+  out="$(_r env KG_DRIVE_RADAR="${sb}/radar-late.sh" bash "${sb}/ok/kg-drive-project.sh" lote.kg.yaml --close-lot "lote y")" || rd=$?
+  if [ "${rd}" -eq 3 ] && cmp -s "${sb}/g/lote.orig" "${sb}/g/lote.kg.yaml" && grep -q 'escrita DESFEITA' <<< "${out}"; then rd=0
+    record_pass "drive: (SAC-483 b2) radar que reprova DEPOIS da escrita desfaz o checkpoint byte a byte (rc 3)"
+  else record_fail "drive: (SAC-483 b2)" "rc=${rd} intacto=$(cmp -s "${sb}/g/lote.orig" "${sb}/g/lote.kg.yaml" && echo sim || echo NAO): ${out}"; rd=1; fi
+  cp "${sb}/g/lote.orig" "${sb}/g/lote.kg.yaml"; rm -f "${sb}/count"
+  sed 's/1) _undo; echo "ERRO: depois de escrever/1) echo "ERRO: depois de escrever/' "${sb}/ok/kg-drive-project.sh" > "${sb}/mut/kg-drive-project.sh"
+  _r env KG_DRIVE_RADAR="${sb}/radar-late.sh" bash "${sb}/mut/kg-drive-project.sh" lote.kg.yaml --close-lot "lote y" >/dev/null || md=$?
+  { [ "${md}" -eq 3 ] && cmp -s "${sb}/g/lote.orig" "${sb}/g/lote.kg.yaml"; } && md=0 || md=1
+  cp "${sb}/g/lote.orig" "${sb}/g/lote.kg.yaml"; rm -f "${sb}/count"
+  _prove_mutation "drive: (SAC-483 b2-MUT) sem o desfazer, o checkpoint fica gravado num grafo reprovado" "${sb}/ok/kg-drive-project.sh" "${sb}/mut/kg-drive-project.sh" "${rd}" "${md}"
+
+  # (c1) caso: grafo íntegro, rodado FORA do repo — o radar irmão mede (READY rc 0); mutante: radar relativo à raiz
+  local rc1=0 mc1=0
+  out="$(_r bash "${sb}/ok/kg-drive-project.sh" lote.kg.yaml --check)" || rc1=$?
+  if [ "${rc1}" -eq 0 ] && grep -q 'READY: pronto=2' <<< "${out}"; then
+    record_pass "drive: (SAC-483 c1) fora do repo o radar é o irmão do script: grafo íntegro sai READY, não «reprova»"
+  else record_fail "drive: (SAC-483 c1)" "rc=${rc1}: ${out}"; rc1=1; fi
+  sed 's|RADAR="${KG_DRIVE_RADAR:-${HERE}/kg-radar.sh}"|RADAR="${KG_DRIVE_RADAR:-.claude/validation/kg-radar.sh}"|' "${sb}/ok/kg-drive-project.sh" > "${sb}/mut/kg-drive-project.sh"
+  out="$(_r bash "${sb}/mut/kg-drive-project.sh" lote.kg.yaml --check)" || mc1=$?
+  { [ "${mc1}" -eq 0 ] && grep -q 'READY: pronto=2' <<< "${out}"; } && mc1=0 || mc1=1
+  _prove_mutation "drive: (SAC-483 c1-MUT) com o radar relativo à raiz, fora do repo o grafo íntegro não se mede" "${sb}/ok/kg-drive-project.sh" "${sb}/mut/kg-drive-project.sh" "${rc1}" "${mc1}"
+
+  # (c2) caso: radar ausente E radar que sai rc 2 viram «NÃO MEDI», nunca «reprova»; mutante: todo ≠0 vira reprova
+  local rc2=0 mc2=0 o1 o2 x1=0 x2=0
+  o1="$(_r env KG_DRIVE_RADAR="${sb}/nao-existe.sh" bash "${sb}/ok/kg-drive-project.sh" lote.kg.yaml --check)" || x1=$?
+  o2="$(_r env KG_DRIVE_RADAR="${sb}/radar-rc2.sh" bash "${sb}/ok/kg-drive-project.sh" lote.kg.yaml --check)" || x2=$?
+  if [ "${x1}" -eq 2 ] && [ "${x2}" -eq 2 ] && grep -q 'NÃO MEDI' <<< "${o1}" && grep -q 'NÃO MEDI.*rc=2' <<< "${o2}" \
+     && ! grep -q 'reprova integridade' <<< "${o1}${o2}"; then
+    record_pass "drive: (SAC-483 c2) radar ausente ou com rc de ambiente é «NÃO MEDI» (rc 2), nunca «o grafo reprova»"
+  else record_fail "drive: (SAC-483 c2)" "rc=${x1}/${x2}: ${o1} || ${o2}"; rc2=1; fi
+  sed 's/case "$rc" in 0) return 0 ;; 1) return 1 ;; \*)/case "$rc" in 0) return 0 ;; *) return 1 ;; 999)/' "${sb}/ok/kg-drive-project.sh" > "${sb}/mut/kg-drive-project.sh"
+  o2="$(_r env KG_DRIVE_RADAR="${sb}/radar-rc2.sh" bash "${sb}/mut/kg-drive-project.sh" lote.kg.yaml --check)" || true
+  { grep -q 'NÃO MEDI' <<< "${o2}" && ! grep -q 'reprova integridade' <<< "${o2}"; } && mc2=0 || mc2=1
+  _prove_mutation "drive: (SAC-483 c2-MUT) lendo todo rc≠0 como reprova, o radar quebrado acusa o grafo" "${sb}/ok/kg-drive-project.sh" "${sb}/mut/kg-drive-project.sh" "${rc2}" "${mc2}"
+  unset -f _r
+  rm -rf "${sb}"
 }
 
 # REGRA 34 pós-cutover (derivação commitada) — a regra HARD nova entrou sem rede

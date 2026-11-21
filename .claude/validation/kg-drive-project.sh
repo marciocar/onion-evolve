@@ -23,6 +23,28 @@
 #             --check   → só o veredito; exit 1 se há ABERTOS mas a FILA-PRONTA está
 #                         VAZIA (tudo bloqueado = anomalia de plano/deadlock) OU se o grafo
 #                         carrega um CHECKPOINT PENDENTE (meta.x_drive_checkpoint: pending)
+#                         OU se há CICLO em DEPENDS_ON entre abertos (veredito CICLO, mesmo com
+#                         outro nó pronto: o ciclo prende os seus nós para sempre)
+#             --close-lot "<nota>" | --seal → escreve o checkpoint (P5 / selo do maestro)
+# Exit      : 0 ok · 1 veredito de parada (--check) · 2 recusado, NADA escrito (inclui radar
+#             ausente ou que não rodou: isso é «não medi», nunca «o grafo reprovou») ·
+#             3 escrito, o radar reprovou, escrita DESFEITA byte a byte · 9 o desfazer falhou
+# Env (bancada; NUNCA em produção — o override ativo é declarado em stderr):
+#   KG_DRIVE_RADAR=<script>   radar alternativo (a bancada injeta um que some ou reprova)
+#
+# SAC-483 (2026-11-21), três curas medidas num grafo de brinquedo:
+#   · CICLO PARCIAL: o censo dizia READY com dois nós presos num ciclo, porque o DEADLOCK só
+#     olhava a fila vazia. Agora o ciclo entre abertos é detectado (poda de Kahn nos dois
+#     sentidos) e nomeado, com os nós a jusante que ele prende.
+#   · ESCREVER ANTES DE VALIDAR: --close-lot/--seal gravavam num grafo que o radar já
+#     reprovava e só depois avisavam, sem desfazer. Agora o radar roda ANTES (grafo que já
+#     reprova: nada escrito, rc 2) e DEPOIS (reprovou: desfaz byte a byte, rc 3), como o
+#     kg-decide-seal.sh.
+#   · RADAR AUSENTE LIDO COMO REPROVA: o radar era resolvido relativo à raiz do repo e o rc
+#     dele era lido como binário, com o stderr no lixo. Rodado fora do core (grafo em pasta
+#     sem o radar), a mensagem acusava um grafo íntegro. Agora o radar é o IRMÃO deste script
+#     (como em kg-seal-exception.sh, kg-decide-seal.sh), e só rc 1 é reprova; ausência ou
+#     outro rc é «não medi».
 #
 # P0.5 MECANIZADO (2026-10-04): o checkpoint do lote vive NO GRAFO, versionado, em
 #             `meta.x_drive_checkpoint: pending|sealed` (+ `meta.x_drive_checkpoint_note:`). Antes ele
@@ -33,8 +55,11 @@
 #             qualquer outro veredito: é o passo ANTERIOR ao censo.
 # =============================================================================
 set -uo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; cd "$ROOT"
-RADAR=".claude/validation/kg-radar.sh"
+# o radar é o IRMÃO deste script, não um caminho relativo à raiz de quem chama (SAC-483)
+RADAR="${KG_DRIVE_RADAR:-${HERE}/kg-radar.sh}"
+[ -n "${KG_DRIVE_RADAR:-}" ] && echo "kg-drive-project: ⚠️ override ativo — KG_DRIVE_RADAR=${KG_DRIVE_RADAR} (não é o gate de produção)" >&2
 
 GRAPH_DEFAULT="docs/onion/graph/fios-abertos.kg.yaml"; GRAPH="$GRAPH_DEFAULT"; MODE="project"; NOTE=""
 while [ $# -gt 0 ]; do
@@ -54,6 +79,23 @@ done
   [ "$GRAPH" = "$GRAPH_DEFAULT" ] && echo "       (esse é só o DEFAULT — o plano-grafo do CORE, que não existe num repo que apenas instalou o plugin)" >&2
   echo "       passe o grafo deste repo: $(basename "$0") <grafo.kg.yaml> [--check]   ·   ache com: git ls-files '*.kg.yaml'" >&2
   exit 2; }
+
+# ── O GATE DO RADAR: três respostas, não duas ────────────────────────────────────────────────
+# 0 = íntegro · 1 = o radar MEDIU e reprovou · 2 = NÃO MEDI (radar ausente, ou saiu com rc que não
+# é veredito). O rc 1 do radar é a reprova de integridade/schema; o 2 dele é uso/ambiente. Ler
+# qualquer ≠0 como «reprova» foi o defeito (c) da SAC-483: acusava o grafo pelo que faltava na casa.
+RADAR_OUT=""
+_radar_gate() {
+  if [ ! -f "$RADAR" ]; then
+    RADAR_OUT="radar ausente: $RADAR"; return 2
+  fi
+  local rc=0
+  RADAR_OUT="$(bash "$RADAR" "$GRAPH" --integrity --schema 2>&1)" || rc=$?
+  case "$rc" in 0) return 0 ;; 1) return 1 ;; *) RADAR_OUT="radar saiu rc=$rc: $(printf '%s\n' "$RADAR_OUT" | tail -3 | tr '\n' ' ')"; return 2 ;; esac
+}
+_radar_why() {   # as linhas ✗ da reprova, ou o fim da saída
+  printf '%s\n' "$RADAR_OUT" | grep -m5 '✗' >&2 || printf '%s\n' "$RADAR_OUT" | tail -5 >&2
+}
 
 # ── O CHECKPOINT (P0.5/P5) é lido e escrito por YAML de verdade ──────────────────────────────
 # ⚠️ A 1a versão lia com awk e o Elenxo mediu 7 formas YAML válidas em que ela errava (aspas simples,
@@ -102,15 +144,38 @@ print("checkpoint %s em %s" % (want, path))
 CKPT_PY
 }
 if [ "$MODE" = "close" ] || [ "$MODE" = "seal" ]; then
-  _ckpt "$MODE" || exit 2
-  bash "$RADAR" "$GRAPH" --integrity --schema >/dev/null 2>&1 \
-    || { echo "ERRO: depois de escrever o checkpoint, $GRAPH reprova no radar — revise" >&2; exit 2; }
+  # VALIDA ANTES de escrever (SAC-483): grafo que o radar já reprova, ou que não se pôde medir,
+  # não recebe checkpoint — o censo o recusaria logo depois, e o lote ficaria gravado num grafo ilegível.
+  _radar_gate; _g=$?
+  case "$_g" in
+    1) echo "ERRO: $GRAPH JÁ reprova integridade/schema no radar antes da escrita — corrija antes; nada escrito" >&2; _radar_why; exit 2 ;;
+    2) echo "ERRO: NÃO MEDI a integridade de $GRAPH ($RADAR_OUT) — sem gate não escrevo o checkpoint; nada escrito (não é reprova do grafo)" >&2; exit 2 ;;
+  esac
+  BK="$(mktemp)"; trap 'rm -f "$BK"' EXIT
+  cp -p "$GRAPH" "$BK"; H0="$(sha256sum "$GRAPH" | cut -d' ' -f1)"
+  _undo() {
+    cp -p "$BK" "$GRAPH"
+    # se o desfazer falhar, a cópia boa NÃO pode sumir com o trap: ela é a única restauração que não
+    # perde o que estava sem commit (o drive-automate grava o meta antes de chamar o --close-lot)
+    [ "$(sha256sum "$GRAPH" | cut -d' ' -f1)" = "$H0" ] \
+      || { trap - EXIT; echo "❌ kg-drive-project: o DESFAZER falhou em $GRAPH — a cópia íntegra ficou em $BK (cp -p \"$BK\" \"$GRAPH\"). NÃO COMMITE." >&2; exit 9; }
+  }
+  _ckpt "$MODE" || { cmp -s "$BK" "$GRAPH" || _undo; exit 2; }
+  # E DEPOIS: a escrita que deixa o grafo reprovado é desfeita byte a byte, como no kg-decide-seal.sh
+  _radar_gate; _g=$?
+  case "$_g" in
+    1) _undo; echo "ERRO: depois de escrever o checkpoint, $GRAPH reprova no radar — escrita DESFEITA (byte a byte):" >&2; _radar_why; exit 3 ;;
+    2) _undo; echo "ERRO: NÃO MEDI $GRAPH depois da escrita ($RADAR_OUT) — escrita DESFEITA (byte a byte)" >&2; exit 2 ;;
+  esac
   exit 0
 fi
 
 # Passo 0 — LEGIBILIDADE antes de conduzir (não se dirige grafo que o motor não lê)
-bash "$RADAR" "$GRAPH" --integrity --schema >/dev/null 2>&1 \
-  || { echo "ERRO: $GRAPH reprova integridade/schema no radar — corrija antes de conduzir" >&2; exit 2; }
+_radar_gate; _g=$?
+case "$_g" in
+  1) echo "ERRO: $GRAPH reprova integridade/schema no radar — corrija antes de conduzir" >&2; _radar_why; exit 2 ;;
+  2) echo "ERRO: NÃO MEDI a integridade de $GRAPH ($RADAR_OUT) — o radar não rodou; isto NÃO é reprova do grafo" >&2; exit 2 ;;
+esac
 
 OPEN="$(mktemp)"; EDGES="$(mktemp)"; trap 'rm -f "$OPEN" "$EDGES"' EXIT
 bail() { echo "ERRO: radar falhou em $GRAPH ($1)" >&2; exit 2; }
@@ -120,6 +185,8 @@ bash "$RADAR" "$GRAPH" --triples  2>/dev/null > "$EDGES" || bail --triples
 # Motor — 1 awk lê ABERTOS + ARESTAS + o GRAFO (só p/ drive_kind opcional) e emite:
 #   READY   \t atenção \t id \t drive_kind
 #   BLOCKED \t atenção \t id \t drive_kind \t bloqueador(es)
+#   CYCLE   \t id   (nó NUM ciclo DEPENDS_ON entre abertos)
+#   STUCK   \t id   (nó a jusante de um ciclo: preso por ele, sem estar nele)
 RESULT="$(awk '
   function infer(nt) {   # drive_kind default pelo node_type (o campo drive_kind: sobrepõe)
     if (nt=="question") return "research"
@@ -148,18 +215,48 @@ RESULT="$(awk '
       for (i=1;i<=n;i++) { p=preds[i]; if (p!="" && (p in open)) blk = blk (blk==""?"":",") p }
       if (blk=="") printf "READY\t%.2f\t%s\t%s\n", att[id], id, kind
       else         printf "BLOCKED\t%.2f\t%s\t%s\t%s\n", att[id], id, kind, blk
+      nb[id]=n; for (i=1;i<=n;i++) { if (preds[i]!="" && (preds[i] in open)) { E[id, i]=preds[i] } }
     }
+    # CICLO (SAC-483): o DEADLOCK só via a fila VAZIA; um ciclo com outro nó pronto passava
+    # calado sob READY. (1) Poda de Kahn só entre abertos: tira, em ondas, quem não depende de
+    # nenhum aberto restante; o que sobra está num ciclo OU a jusante dele. (2) dessa sobra, é
+    # «no ciclo» só quem ALCANÇA A SI MESMO pelas arestas DEPENDS_ON (busca por nó, a sobra é
+    # pequena). A 1a versão podava também no sentido inverso, e o revisor isolado mediu o furo: um
+    # nó ENTRE dois ciclos (depende de um, é citado pelo outro) sobrevivia às duas podas e saía
+    # «no ciclo» — quem fosse quebrar o ciclo iria atrás do nó errado.
+    for (id in open) left[id]=1
+    do { ch=0
+      for (id in left) { live=0
+        for (i=1;i<=nb[id];i++) if (((id, i) in E) && (E[id, i] in left)) { live=1; break }
+        if (!live) { delete left[id]; ch=1 } }
+    } while (ch)
+    for (id in left) {
+      split("", seen); top=0
+      for (i=1;i<=nb[id];i++) if (((id, i) in E) && (E[id, i] in left)) stk[++top]=E[id, i]
+      while (top > 0) { v=stk[top--]
+        if (v==id) { cyc[id]=1; break }
+        if (v in seen) continue
+        seen[v]=1
+        for (i=1;i<=nb[v];i++) if (((v, i) in E) && (E[v, i] in left)) stk[++top]=E[v, i]
+      }
+    }
+    for (id in left) printf "%s\t%s\n", ((id in cyc) ? "CYCLE" : "STUCK"), id
   }
 ' "$OPEN" "$EDGES" "$GRAPH")"
 
+CYC="$(printf '%s\n' "$RESULT" | awk -F'\t' '$1=="CYCLE"{print $2}' | sort | paste -sd, -)"
+STK="$(printf '%s\n' "$RESULT" | awk -F'\t' '$1=="STUCK"{print $2}' | sort | paste -sd, -)"
+RESULT="$(printf '%s\n' "$RESULT" | awk -F'\t' '$1=="READY"||$1=="BLOCKED"')"
 n_open=$(printf '%s\n' "$RESULT" | grep -c . || true)
 n_ready=$(printf '%s\n' "$RESULT" | awk -F'\t' '$1=="READY"' | grep -c . || true)
 n_blocked=$(printf '%s\n' "$RESULT" | awk -F'\t' '$1=="BLOCKED"' | grep -c . || true)
 
-# veredito: DEADLOCK = há abertos mas nenhum pronto (tudo bloqueado); DONE = 0 abertos
+# veredito: DEADLOCK = há abertos mas nenhum pronto (tudo bloqueado); CICLO = há pronto, mas um
+# ciclo DEPENDS_ON prende outros abertos para sempre; DONE = 0 abertos
 verdict() {
   if [ "$n_open" -eq 0 ]; then echo "DONE"                 # plano sem trabalho aberto
   elif [ "$n_ready" -eq 0 ]; then echo "DEADLOCK"          # anomalia: tudo bloqueado
+  elif [ -n "$CYC" ]; then echo "CICLO"                    # anomalia: ciclo parcial (SAC-483)
   else echo "READY"; fi
 }
 V="$(verdict)"
@@ -178,7 +275,8 @@ if [ "$MODE" = "check" ]; then
   printf 'drive %s — %s: pronto=%s bloqueado=%s (aberto=%s)\n' \
     "$(basename "$GRAPH" .kg.yaml)" "$V" "$n_ready" "$n_blocked" "$n_open"
   [ "$V" = "CHECKPOINT-PENDENTE" ] && printf '  lote anterior NÃO selado: %s\n' "${CKPT_NOTE:-(sem x_drive_checkpoint_note)}"
-  case "$V" in DEADLOCK|CHECKPOINT-PENDENTE) exit 1 ;; *) exit 0 ;; esac
+  [ -n "$CYC" ] && printf '  ciclo DEPENDS_ON entre abertos: %s%s\n' "$CYC" "${STK:+ · presos a jusante: $STK}"
+  case "$V" in DEADLOCK|CICLO|CHECKPOINT-PENDENTE) exit 1 ;; *) exit 0 ;; esac
 fi
 
 # projeção legível — a FILA-PRONTA que o driver consome
@@ -200,10 +298,17 @@ if [ "$n_blocked" -gt 0 ]; then
     | while IFS=$'\t' read -r _s att id kind blk; do printf '  - [%s] `%s` (atenção %.1f) — bloqueado por: %s\n' "$kind" "$id" "${att:-0}" "$blk"; done
 else printf '  _nada bloqueado._\n'; fi
 
+if [ -n "$CYC" ]; then
+  printf '\n## Ciclo em DEPENDS_ON (estes nós nunca entram na fila-pronta)\n'
+  printf '  - no ciclo: %s\n' "$CYC"
+  [ -n "$STK" ] && printf '  - presos a jusante: %s\n' "$STK"
+fi
+
 printf '\n## Ação\n'
 case "$V" in
   CHECKPOINT-PENDENTE) printf '  ⛔ P0.5: o lote anterior NÃO foi selado (meta.x_drive_checkpoint: pending) — %s. PARE: o maestro sela (troca para sealed) antes de nova passada. `--check` sai ≠0.\n' "${CKPT_NOTE:-sem nota}" ;;
   DONE)     printf '  ✅ plano sem trabalho aberto — nada a conduzir.\n' ;;
   DEADLOCK) printf '  ⛔ há aberto(s) mas a fila-pronta está VAZIA: um predecessor DEPENDS_ON está travado (predecessor UNVERIFIABLE, ciclo, ou onda mal-modelada). Resolva o bloqueador antes de seguir. `--check` sai ≠0.\n' ;;
+  CICLO)    printf '  ⛔ há fila-pronta, mas um ciclo DEPENDS_ON (%s) prende abertos para sempre: é plano mal-modelado, não espera. Reporte e quebre o ciclo (o bloqueador vira item de alta atenção); a fila-pronta acima segue legível. `--check` sai ≠0.\n' "$CYC" ;;
   READY)    printf '  ▶ conduza o topo da fila-pronta (P2 do laço); os bloqueados voltam sozinhos quando o predecessor fechar.\n' ;;
 esac
