@@ -53,6 +53,9 @@ economizam o autor e **gastam a cognição do leitor** (ele para e rebusca o sig
 relacionados, dar um mini-glossário (tabela id → o quê). Vale para chat, docs, comentários, commits, PRs e
 mensagens ao usuário. Autoridade: meta-spec [`code-standards.md`](../../../docs/meta-specs/code-standards.md) §7.
 
+Onde um humano lê (maestro, docs, commit, card, público), vale a régua de Linguagem Simples (ABNT NBR ISO
+24495-1:2024) por superfície: [`plain-language-by-surface.md`](../../../docs/knowledge-base/concepts/plain-language-by-surface.md).
+
 ## Exemplo correto
 
 ```typescript
