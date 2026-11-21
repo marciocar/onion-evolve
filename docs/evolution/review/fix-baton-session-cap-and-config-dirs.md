@@ -2,7 +2,8 @@
 branch: fix/baton-session-cap-and-config-dirs
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e72fc7425c2edea0034a43e9b3e124f82493475c07bde4139973798a5cc60771
+reviewed_code_sha256: eb82a80861d946bc7e4b8a8199ba280d0b868c1afcc5f64d96fd5b6939218159
 findings_total: 11
 findings_real: 6
 findings_blocking: 2
