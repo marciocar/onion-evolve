@@ -203,11 +203,11 @@ nodes:
     owner: kg-ssot
     impact: 3
     confidence: 0.5
-    verified_against: "relato do kg-ssot ao core em 2026-11-16, conferido pelo core na origin/main do repo dele: a decisão D_CROSS_REPO_CONTRACT_1104 existe (grafo cross-repo-edge-2026-11) e diz que o contrato não muda agora; a proposta fica parqueada com gatilho e a consulta de quem cita segue sem alarme. Revisão do gatilho em 2026-12-04."
+    verified_against: "relato do kg-ssot ao core em 2026-11-16, re-conferido pelo core em 2026-11-21 por peer-ref-check (rc 0) na origin/main do onion-kg-ssot @ 80bc3956: docs/evolution/research/cross-repo-edge-2026-11/cross-repo-edge-2026-11.kg.yaml#D_CROSS_REPO_CONTRACT_1104, status done, selada por /meta:decide em 2026-11-05 («Consulta sem alarme, contrato parqueado com gatilho»): o contrato não muda agora e a proposta de aresta entre repos fica parqueada com gatilho. Revisão do gatilho no review_after de 2026-12-04."
     evidence_class: measurement
-    verified_at: "2026-11-16"
+    verified_at: "2026-11-21"
     label: "Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes?"
-    narrative: "Só abre de fato se Q_MA_WRITE_SURFACE escolher uma superfície com mais de um repo (B, C ou a E do maestro, que liga os repos por vendorização com pin). Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_CROSS_REPO_1028: as peças existem desde a 4.35.0; falta ferramenta, não contrato."
+    narrative: "Só abre de fato se Q_MA_WRITE_SURFACE escolher uma superfície com mais de um repo (B, C ou a E do maestro, que liga os repos por vendorização com pin). Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_CROSS_REPO_1028: as peças existem desde a 4.35.0; falta ferramenta, não contrato. A superfície de escrita escolheu um repo por responsabilidade em 2026-11-04, e a pergunta abriu. PARQUEADO COM GATILHO desde 2026-11-05 (D_CROSS_REPO_CONTRACT_1104, no repo onion-kg-ssot, em docs/evolution/research/cross-repo-edge-2026-11/): o contrato não muda agora, e a ferramenta entra como consulta de quem cita, sem alarme. A regra de 3 ou mais casos de perda de citação entre repos já disparou (5 casos, medidos e pontuados por agente separado) e foi ela que abriu a pesquisa; o gatilho que REABRE o parque é outro: um caso confirmado de objeção perdida (tipo 2, objeção que só existe em mensagem; eram 0 em 281 mensagens) ou um adotante externo que precise validar a forma. A sessão do kg-ssot confere o gatilho em cada review_after (o próximo é 2026-12-04). A decisão saiu da sessão do kg-ssot sob a autonomia dada pelo maestro em 2026-11-04, ouvidos o core e a curadoria. Segue open: parqueado, não fechado."
   - id: Q_MA_WIKI_BRIDGE
     node_type: question
     layer: audit
