@@ -29,9 +29,8 @@ Nada de gate pesado. A norma entra por **costura**, ligada ao que o Onion já fa
 
 1. **Esta régua**, para quem escreve e para quem revisa. É doutrina, sem bloqueio.
 2. **A glosa de sigla** (uma sigla da casa vem explicada na primeira menção) vai além da resposta ao maestro
-   e chega ao corpo do commit e aos sinais entre sessões. Isso muda um hook e por isso vai num PR de guarda
-   à parte, que o maestro aprova. Até ele entrar, a glosa nessas superfícies é doutrina, sem lembrete
-   automático.
+   e chega ao commit (pelo `.githooks/commit-msg`) e ao sinal entre sessões escrito na caixa de entrada ou
+   na saída da federação. É lembrete, nunca bloqueio: o commit errado se corrige com `git commit --amend`.
 3. **Um item opcional na triagem de revisão**: em texto que um humano lê, o revisor pode apontar o problema
    de clareza como **LIMITE**. Limite é achado real que não segura o merge.
 
@@ -119,13 +118,13 @@ A régua não reconstrói nada disto. Ela aponta para lá:
 |---|---|
 | idioma, tom, "você" (parte do C4) | skill `language-standards` e CLAUDE.md |
 | rótulo de id opaco na 1ª menção (C1) | `language-standards`, seção "Legibilidade — referências opacas" |
-| glosa de sigla da casa (C1) | glossário `house-codes.tsv` e hook `house-code-gloss.sh`: lembra na resposta ao maestro, na mensagem `SendMessage` e no `.md` de estudo |
+| glosa de sigla da casa (C1) | glossário `house-codes.tsv` e hook `house-code-gloss.sh`: lembra na resposta ao maestro, na mensagem `SendMessage`, no `.md` de estudo, no commit e no sinal em `docs/evolution/inbox/` ou `docs/evolution/federation/outbox/` |
 | revisita e retirada (U1) | `review_after` dos grafos, REGRA 67 (Grafo de pesquisa com REVISITA carimbada), `/meta:kg-freshness`, `/meta:kb-freshness` |
 | consulta ao leitor (U2) | pergunta ao maestro com opções (`AskUserQuestion`, `/meta:decide`) |
 | estrutura (L1) | títulos e listas em markdown, nos docs e nos cards |
 
-O que faltava: R1, R2, C2, C3 e C5 escritos como régua, e a glosa de sigla no commit e nas mensagens que
-não passam por `SendMessage`.
+O que faltava: R1, R2, C2, C3 e C5 escritos como régua. A glosa de sigla no commit e no sinal entre sessões
+entrou junto com esta régua.
 
 ## 6. Como medir
 
