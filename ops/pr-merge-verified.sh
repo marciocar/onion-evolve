@@ -222,6 +222,10 @@ _claude_ancestor_cwd() { # o cwd do processo do Claude Code mais próximo entre 
   done
 }
 _PMV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# o caminho ABSOLUTO do próprio script, fixado ANTES do `cd` de _pmv_cd_script_repo (revisão isolada de 2026-11-21, B1):
+# chamado por caminho relativo de fora de um checkout, o BASH_SOURCE[0] relativo deixava de resolver depois do cd, e o
+# _rm_script vazio fazia o _fallback_guard_gate passar o PR de guarda sem o resíduo. Daqui em diante, só _PMV_SELF.
+_PMV_SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 _PMV_COMMON="$(git -C "${_PMV_DIR}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
 # ── RODADO DE FORA DE UM CHECKOUT (2026-11-21) ─────────────────────────────────────────────────────────────────────
 # De ~ (ou de qualquer pasta que não é árvore git), o gh sem --repo não resolve o repo e o script morria na âncora com
@@ -230,6 +234,9 @@ _PMV_COMMON="$(git -C "${_PMV_DIR}" rev-parse --path-format=absolute --git-commo
 # --repo, entra só se o origin do checkout do script é esse mesmo repo (o gh já resolve pelo --repo; o git precisa do
 # clone certo, e outro clone seria o errado). cwd DENTRO de uma árvore git não muda nada: lá o cwd é o dado de sempre
 # (o modo "repo sem CI", o adotante, a catraca). A sessão do core segue medida pelo cwd do processo do Claude Code.
+# Efeito declarado: de fora de um checkout, o modo "repo sem CI" (que antes recusava "não roda dentro de um clone") passa
+# a julgar a árvore do checkout do script, que é o repo do alvo (sem --repo, ou com --repo igual ao origin dele); para o
+# core ele segue recusado. Daqui em diante o caminho do script é _PMV_SELF, nunca o BASH_SOURCE[0] relativo.
 _pmv_cd_script_repo() {
   git rev-parse --is-inside-work-tree >/dev/null 2>&1 && return 0
   [ -n "${_PMV_COMMON}" ] || return 0
@@ -724,7 +731,7 @@ _guard_pr_gate() {
 }
 # o «pode rodar» confere a autorização ANTES do gate de guarda: repo, ref, PR e o sha lido agora; o sha que mudou GASTA
 # a autorização (ela valia para o merge do sha X, não para a sequência) e recusa em uma linha
-_ot_target_args() { printf '%s\n' --act merge --repo "${_OT_REPO}" --ref "refs/heads/${HEAD_REF}" --sha "${HEAD_SHA}" --pr "${PR}" --session "${_OT_SID}" --script "${BASH_SOURCE[0]}"; }
+_ot_target_args() { printf '%s\n' --act merge --repo "${_OT_REPO}" --ref "refs/heads/${HEAD_REF}" --sha "${HEAD_SHA}" --pr "${PR}" --session "${_OT_SID}" --script "${_PMV_SELF}"; }
 _one_touch_gate() {
   [ "${OT_USE}" -eq 1 ] || return 0
   local _o _rc; _o="$(_ot_engine verify $(_ot_target_args))"; _rc=$?
@@ -749,7 +756,7 @@ _delegated_foreign_gate() {
   # (5ª passada, item 1) o script que roda a forma delegada é o de origin/main, byte a byte: a cópia editada na árvore
   # (um `return 0` no gate) não é a revisada
   local _mine _main
-  _mine="$(git -C "${_PMV_DIR}" hash-object -- "${BASH_SOURCE[0]}" 2>/dev/null)"
+  _mine="$(git -C "${_PMV_DIR}" hash-object -- "${_PMV_SELF}" 2>/dev/null)"
   _main="$(git -C "${_PMV_DIR}" rev-parse -q --verify "origin/main:ops/pr-merge-verified.sh" 2>/dev/null)"
   [ -n "${_mine}" ] && [ "${_mine}" = "${_main}" ] \
     || die "o merge alheio delegado roda só o ops/pr-merge-verified.sh de origin/main, byte a byte; este (${_mine:0:12}) difere (${_main:0:12}). Rode de um checkout em origin/main. Nada foi feito."
@@ -760,7 +767,7 @@ _delegated_foreign_gate() {
   [ "${ALLOW_DRAFT}" -eq 0 ] || die "--foreign-repo não aceita --allow-draft: ${_why}. Nada foi feito."
   local _t _cdir _core _m _kind
   _t="$(_slug_norm "${REPO_ARG[1]}")"
-  _cdir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  _cdir="$(cd "$(dirname "${_PMV_SELF}")/.." && pwd)"
   _core="${_PMV_CORE_SLUG}"   # do members.yaml do checkout, nunca da config do git (F1)
   [ -n "${_core}" ] && [ "${_t}" = "${_core}" ] \
     && die "--foreign-repo com o próprio core ('${_t}'): o merge do core segue sem a flag. Nada foi feito."
@@ -1055,7 +1062,7 @@ _rebase_trail() { # $1=head antigo $2=head novo (ou "—") $3=causa $4=N/MAX $5=
 SKIP_CI=0; SKIP_DECISION=""; GATE_SHA=""
 # uma linha por nome, a check-run mais recente (ver "UMA LINHA POR NOME" adiante, no gate)
 _LATEST_PER_NAME_JQ='[.check_runs[]] | group_by(.name) | map(max_by(.id)) | .[] | .name + "\t" + .status + "\t" + (.conclusion // "-")'
-_SKIP_HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_SKIP_HERE="$(cd "$(dirname "${_PMV_SELF}")" && pwd)"
 _ALARM_TITLE="🚨 main quebrado — a bancada completa reprovou no push ao main"   # o TITLE de ops/testing/main-bench-alarm.sh
 _skip_ci_decide() { # $1=head julgado (antes do rebase) $2=head novo $3=worktree $4=HEAD da worktree antes do rebase
   local _old="$1" _new="$2" _w="$3" _wb="$4" _slug _req _runs _r _bad _al _omb _nmb _bd _pf _x _hit=""
@@ -1533,7 +1540,7 @@ _REVIEW_OFF=""; _REVIEW_PRIOR_REPROVOU=""
 # _RV_STATE: none (nenhum veredito lido neste head) · success (o mais recente é verde) · other (não é verde: o caminho
 # de sempre decide). _REVIEW_POS: a anotação da marca POSITIVA (o revisor rodou e aprovou), emitida pelo juiz da base.
 _RV_STATE="none"; _REVIEW_POS=""; _POS_PROV=""
-_rm_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/review/review-mode-decide.sh"
+_rm_script="$(cd "$(dirname "${_PMV_SELF}")" && pwd)/review/review-mode-decide.sh"
 if [ -n "$head_runs" ] && [ -f "${_rm_script}" ]; then
   _rm_marker="$(bash "${_rm_script}" --print-marker)"
   _rv_runs="$(gh api "repos/${OWNER_REPO}/commits/${GATE_SHA}/check-runs?check_name=onion-review-verdict&filter=all&per_page=100" \
@@ -1616,7 +1623,7 @@ _fallback_guard_gate() {
   fi
   [ -f "${_rm_script}" ] || return 0
   local _here _slug _core _gh _grc=0 _gout
-  _here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  _here="$(cd "$(dirname "${_PMV_SELF}")" && pwd)"
   _slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
   # sem --repo, o script roda contra o repo do checkout (o core); com --repo, só vale se for o próprio core
   _core="$(git -C "${_here}/.." remote get-url origin 2>/dev/null | sed -E 's#^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/)##; s#\.git$##; s#/+$##' | tr '[:upper:]' '[:lower:]')"
@@ -2005,7 +2012,12 @@ if [ "$rc" -ne 0 ]; then
           *) say "⚠️  não li a branch remota (git ls-remote rc=${_lsr}); confira e, se sobrou:  git push origin --delete ${HEAD_REF}" ;;
         esac
         # (2026-11-21) a branch LOCAL que sobrou e a worktree que a prende, lidas do git (dado), não da prosa do gh
-        if git show-ref --verify --quiet "refs/heads/${HEAD_REF}" 2>/dev/null; then
+        # só quando o checkout de onde rodo É o repo do PR (o alvo dito pelo --repo, senão pelo GH_REPO, igual ao origin
+        # daqui; sem nenhum dos dois o gh resolveu pelo próprio checkout): em outro clone uma branch homônima não tem nada a
+        # ver com o PR, e o comando sugerido seria destrutivo lá (revisão isolada, A3 e a reconferência)
+        _pmv_local_is_target=1; _pmv_t="${GH_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _pmv_t="${REPO_ARG[1]}"
+        [ -n "${_pmv_t}" ] && [ "$(_slug_norm "${_pmv_t}")" != "$(_slug_norm "$(git remote get-url origin 2>/dev/null)")" ] && _pmv_local_is_target=0
+        if [ "${_pmv_local_is_target}" -eq 1 ] && git show-ref --verify --quiet "refs/heads/${HEAD_REF}" 2>/dev/null; then
           _pmv_branch_wt="$(git worktree list --porcelain 2>/dev/null | awk -v b="branch refs/heads/${HEAD_REF}" '/^worktree /{w=substr($0,10)} $0==b{print w; exit}')"
           if [ -n "${_pmv_branch_wt}" ]; then
             say "⚠️  a branch local ${HEAD_REF} ficou, presa na worktree ${_pmv_branch_wt}. O merge vale; limpe depois, quando ela não estiver mais em uso:"
@@ -2063,7 +2075,7 @@ case "$state" in
     # SEMPRE (SAC-143, 2026-10-15): a worktree que tem `main` em uso — o checkout principal, de onde o harness lê os
     # hooks — sobe por fast-forward. Sem isto, hook mergeado não valia na sessão (36 commits atrás, medido). É a
     # mesma cortesia do --sync: nunca muda o rc do merge.
-    [ -f "$(dirname "${BASH_SOURCE[0]}")/sync-main-worktree.sh" ] && say "$(bash "$(dirname "${BASH_SOURCE[0]}")/sync-main-worktree.sh")"
+    [ -f "$(dirname "${_PMV_SELF}")/sync-main-worktree.sh" ] && say "$(bash "$(dirname "${_PMV_SELF}")/sync-main-worktree.sh")"
     if [ "${DO_SYNC:-0}" = 1 ]; then
       say "sync: merge provado — checkout main + pull"
       if git checkout main -q && git pull --ff-only origin main -q; then
