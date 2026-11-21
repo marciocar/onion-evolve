@@ -318,6 +318,7 @@ trust_topology	1
 two_tier_bench	158
 update_base_and_deny	6
 update_bridge	21
+update_persona_hub	90
 upstream_portal_fixes	1
 vendor_baseline_removido	3
 vendor_branch	10
