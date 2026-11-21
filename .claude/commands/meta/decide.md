@@ -114,6 +114,9 @@ conta as quatro classes. A classe só sai onde a medição a prova; a **pista de
      `bash .claude/validation/kg-decide-seal.sh <grafo> <NODE_ID> --chosen "<opção>" --rejected "<a|b>" --date <hoje> --question "<pergunta>"`
    - decisão sem nó: `--new D_<ID> --label "<afirmação>" --link <nó de onde veio>` no grafo do tema;
    - resposta livre ("Other"): a mesma chamada com `--other`; ambígua → não sela, pergunta de novo.
+   - decisão do **core** na ausência do maestro, dentro da autorização dele: a mesma chamada com
+     `--decided-by core` (o padrão é `maestro`); o selo diz quem decidiu e fica marcado para a revisão dele.
+     Não se mistura com `--other` nem com `--batch`.
    - **checkpoint** do `/meta:drive` respondido "selar": o selo é do mecanismo dele,
      `bash .claude/validation/kg-drive-project.sh <grafo> --seal` (o selador desta peça não escreve
      `meta`); **merge** deste repo respondido "Eu faço agora": rode o comando da linha (o caminho
