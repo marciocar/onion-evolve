@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install kg-ssot==4.55.0
+      - run: pip install kg-ssot==4.56.0
       - run: kg-gate
 ```
 

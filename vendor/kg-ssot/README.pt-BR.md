@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:3cdfa81bc68c00df -->
+<!-- translation-of: README.md sha256:6a38380f76cb8b11 -->
 <div align="center">
 
 # KG-SSOT
@@ -11,8 +11,8 @@ de citar a fonte, uma decisão registra o que substituiu e em que se apoia, e um
 <sub>Tradução do original em inglês; quando os dois divergirem, vale o inglês.</sub>
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.55.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.55.0-6f42c1)](spec/release.json)
-[![Conformidade: 745/745](https://img.shields.io/badge/conformidade-745%2F745-2ea44f)](spec/conformance/README.pt-BR.md)
+[![Contrato: v4 · release 4.56.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.56.0-6f42c1)](spec/release.json)
+[![Conformidade: 787/787](https://img.shields.io/badge/conformidade-787%2F787-2ea44f)](spec/conformance/README.pt-BR.md)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
 [![npm](https://img.shields.io/npm/v/kg-ssot)](https://www.npmjs.com/package/kg-ssot)
@@ -21,9 +21,9 @@ de citar a fonte, uma decisão registra o que substituiu e em que se apoia, e um
 
 [Documentação](https://marciocar.github.io/kg-ssot/) · [Manual em português](docs/manual/pt-BR/README.md) · [Adotar](ADOPTING.pt-BR.md) · [O contrato](docs/manual/pt-BR/04-contrato.md) · [Suíte de conformidade](spec/conformance/README.pt-BR.md) · [Changelog](CHANGELOG.pt-BR.md) · [Para agentes de IA](llms.txt)
 
-![O KG-SSOT em 50 segundos: uma afirmação sustentada por um teste que roda, uma refatoração que apaga o teste, o grafo acusando a fonte que sumiu e a decisão a revisitar subindo para o topo do backlog](docs/demo/kg-ssot-showcase.pt-BR.gif)
+![O KG-SSOT em 50 segundos: uma afirmação sustentada por um teste que roda, uma refatoração que apaga o teste, o grafo acusando a fonte que sumiu e a decisão a revisitar subindo para o topo do backlog](https://raw.githubusercontent.com/marciocar/kg-ssot/main/docs/demo/kg-ssot-showcase.pt-BR.gif)
 
-[O contrato em 40 segundos](docs/demo/kg-ssot-demo.pt-BR.gif): uma afirmação sem fonte é recusada, depois corrigida, consultada e posta sob o gate.
+[O contrato em 40 segundos](https://github.com/marciocar/kg-ssot/blob/main/docs/demo/kg-ssot-demo.pt-BR.gif): uma afirmação sem fonte é recusada, depois corrigida, consultada e posta sob o gate.
 
 </div>
 
@@ -107,7 +107,7 @@ As ferramentas imprimem em inglês por padrão e em português do Brasil quando 
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | o arquivo `.mcpb` da [última release](https://github.com/marciocar/kg-ssot/releases/latest) | O servidor MCP como extensão de um clique |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | O mesmo servidor para qualquer cliente MCP |
 | [Contêiner](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | O servidor MCP como serviço ao lado de um cliente sem Python, como o LibreChat |
-| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.55.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
+| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.56.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
 
 ## Um nó, por dentro
 
@@ -164,7 +164,7 @@ No Claude Code, ela vem também como plugin: `/plugin marketplace add marciocar/
 flowchart LR
   subgraph product["Produto (uma tag kg-ssot-vX.Y.Z)"]
     C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
-    S["Suíte de conformidade<br/>745 casos em dados puros"]
+    S["Suíte de conformidade<br/>787 casos em dados puros"]
     R["Leitor de referência<br/>kg_validate.py"]
     S -- "todo leitor passa" --> R
     C --> R
@@ -207,7 +207,7 @@ flowchart LR
 | **Citações entre repositórios** | O `kg_refs.py` responde quem cita um nó antes de você apagá-lo, e o que mudou no que você cita, sobre uma lista declarada de clones locais. É consulta, não alarme: a mudança nunca altera o código de saída, e a resposta vazia de uma varredura parcial diz isso (`kg-ssot.refs/1`). Acha citação errada, não citação que falta |
 | **Busca por sentido** | O `kg_query.py --text <termo> --semantic "<pergunta>"` acha o nó quando a pergunta usa outras palavras, fundindo a busca por texto e um modelo de embedding multilíngue local por RRF; opcional (`kg-ssot[vector]`), fixado por sha256 e fora de todo veredito |
 | **Pacote de auditoria por pergunta** | O `kg_audit.py` exporta uma linha por item de questionário (o perfil `x_questionnaire`), com a pergunta, a resposta, o veredito, a evidência exigida e a dada, com a data e o vencimento, os pedidos de evidência (`role: evidence_request` e `evidence_requirement`), as contradições, o dono e as lacunas que ele calcula, em CSV, XLSX (sem dependência) ou JSON (`kg-ssot.audit/1`) |
-| **Suíte em dados puros** | 745 casos com metaschema próprio, no estilo da JSON-Schema-Test-Suite |
+| **Suíte em dados puros** | 787 casos com metaschema próprio, no estilo da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adote sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar e colar, sem código compartilhado: um carimbo sha256 por arquivo |
 | **Migrador por perfil** | `kg_migrate.py` propõe a `provenance` que o contrato pede, a partir de regras que o adotante declara, mostra o plano antes e grava com invariância nó a nó |
@@ -226,7 +226,7 @@ flowchart LR
 
 ## Estado
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.55.0`. O leitor de referência passa em 745 de 745 casos de `latest/`.
+- **Vigente:** contrato v4, release `kg-ssot-v4.56.0`. O leitor de referência passa em 787 de 787 casos de `latest/`.
 - **Em uso:** três adotantes rodam o gate no CI, um deles em produção.
 - **Próximo:** o v5 vai reprovar um `method` fora da forma `<classe>: <detalhe>`, que hoje só avisa.
 - **Aberto:** a camada semântica (frescor, contradição, completude de domínio) vive em `optional/`, e o leitor de

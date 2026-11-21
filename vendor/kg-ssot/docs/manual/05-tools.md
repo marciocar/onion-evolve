@@ -249,7 +249,7 @@ The last lines:
 
 ```text
 —
-latest: 745/745 (gates the rc)
+latest: 787/787 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -2632,3 +2632,48 @@ line endings, with the reason in `refused` in the `--json`); rc 2 on broken inpu
 of this product's own corpus (37 graphs read): 1,230 aliases swapped in 21 graphs (412 `testemunho`, 333 `leitura`,
 264 `juízes`, 157 `medição`, 64 `derivado`), 1 value in the tail, 1,138 `confirmed` nodes touched, and the conformance
 suite and every graph's verdict unchanged.
+
+### `format`: a graph moves from `.kg.yaml` to `.kg.json`, and who cites it follows (4.56.0)
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py format --to json docs/graph/product.kg.yaml           # the plan
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py format --to json --apply docs/graph/product.kg.yaml   # writes it
+```
+
+The same data model has two serializations, and each graph lives in one of them. Converting a graph by hand breaks its
+citers: an `external_edges` end, a `trace` or a `verified_against` that names `docs/graph/product.kg.yaml` now points
+at a file that is gone, and `kg_validate.py --corpus` fails them with `integrity.dangling-external`. `format` does the
+move and the follow-up together:
+
+- **The graph goes through the contract's parse** (the canonical document, with JSON keys), is written as JSON, and is
+  read back by the reader in the JSON profile; the document must come back equal. A value JSON cannot hold (NaN,
+  infinity, a lone surrogate) refuses the graph, and so do a destination `.kg.json` that already exists and a graph
+  that git does not track or that has uncommitted changes (the `.kg.yaml` leaves, so git must hold exactly what leaves).
+  Comments do not go to JSON: the plan counts the graph's lines that start with `#` (an approximate count, since a
+  `#` line inside a block scalar also counts).
+- **Every citer in the tracked corpus is rewritten by text:** any string value of a tracked `.kg.yaml` or `.kg.json`
+  that starts with the old path, alone, followed by `#`, or followed by `:` and a digit (a `trace` line), also in the
+  `<repo>:<path>` form with this repository's name (the last part of the `origin` URL, or `--repo-name`). Each
+  occurrence is tried alone and kept only if it changes exactly that one string, so comments and quoting stay. A path
+  in the middle of prose, or followed by `:` and text, stays as written and is counted, and the files outside the graphs
+  that mention the path (docs, workflows) are listed for review by hand. A `trace` with a line number keeps the number,
+  which pointed into the YAML file: the plan counts those for review.
+- **The gate runs on every file touched, before and after,** with the corpus: neither the converted graph nor any citer
+  may gain a MUST code or a SHOULD warning (the `yaml.*` codes of the YAML profile are left out on both sides). A citer
+  that cannot be rewritten (a pointer written with an escape or a line continuation, one shared through a YAML anchor,
+  a vendored folder, uncommitted changes, so that git can restore it) or a file that would fail refuses the graphs it
+  cites, and the plan runs again without them, so a refused graph leaves no citer half rewritten.
+- **`plan` (the default) writes nothing;** `--apply` writes the citers, moves the graph with `git mv` and writes the
+  JSON body, so the tracked corpus sees the `.kg.json` at once and git keeps the old `.kg.yaml`. Every `git mv` runs
+  before any other write, after a check that every citer and destination folder accepts writes. If a move or a write
+  fails (a locked index, a full disk), everything is undone: the citers go back to their original text and the graphs
+  move back. If the undo itself fails, the error names what stayed moved and how to restore it. Several graphs in one call may cite each other, and their pointers move together.
+  `--json` gives the plan as data.
+
+rc 0 when the plan comes out or `apply` finishes with nothing refused; rc 1 when `apply` refused a graph; rc 2 on broken
+input (a file that is not a `.kg.yaml`, one outside `--root`, or a `git mv` that failed). A citer that does not parse
+and mentions the path, or holds a backslash, goes to the reviewer. Run on a copy of this product's own corpus on
+2026-11-19: the main graph alone moved with 29 citers rewritten (117 lines, each differing only in the path), all 49
+working graphs at once
+moved with no pointer to a `.kg.yaml` left behind, and in both cases every one of the 842 tracked graphs kept its
+verdict and codes under `--corpus`; with the citers left unrewritten, 26 of them fail with `integrity.dangling-external`.

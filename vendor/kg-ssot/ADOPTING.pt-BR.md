@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:54093bb38425a5e2 -->
+<!-- translation-of: ADOPTING.md sha256:d926ac87bcf7a9de -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -425,6 +425,21 @@ release inteira acrescenta os 25 casos de conformidade de `spec/conformance/fixt
 lê por onde"): quem não é dev lê só pelo `kg-mcp` por HTTP atrás de um proxy que autentica, e as ferramentas de linha
 de comando, o `kg_audit.py` e o `kg-mcp` por stdio ou com um armazém único leem todo nível, então entregue-os só a
 dev.
+
+Da `kg-ssot-v4.55.0` para a `kg-ssot-v4.56.0`, entra o contrato v4.26, só SHOULD: nenhum grafo que passava reprova, e
+nenhum veredito MUST muda. O perfil canônico novo é o `x_processing_purpose`, no `meta`: a finalidade do tratamento do
+dado que o grafo guarda, como uma lista de ponteiros para um vocabulário com versão fixada (`ref`, `scheme`, `release`,
+`label`), julgada só pela forma, sem catálogo de finalidades no contrato (manual, capítulo 3). O schema SHOULD muda,
+então o gate imprime o aviso `· identidade` na primeira rodada e passa (salvo com `--strict-identity`), e o
+`kg_gate.py --update` grava a identidade nova. Um grafo que já traz um `x_processing_purpose` fora da forma, ou num nó,
+ganha um aviso SHOULD que a base por grafo ou por nó vê como dívida nova: conserte a forma, ou registre com o motivo,
+`python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contrato v4.26: a finalidade do
+tratamento, dívida que já existia"`. Um grafo sem a chave não vê nada novo. Uma ferramenta ganha um subcomando e não
+muda veredito: o `kg_migrate.py format --to json` passa o grafo de `.kg.yaml` a `.kg.json` e reescreve os ponteiros dos
+grafos que o citam, com o gate antes e depois em todo arquivo tocado (manual, capítulo 5). O vendor não traz arquivo
+novo, e o perfil `gate` segue com 21 arquivos. A release inteira acrescenta os 42 casos de conformidade de
+`spec/conformance/fixtures/latest/form/purpose/` (a suíte passa de 745 para 787), e os links do README e do manual em
+português do Brasil que a cópia vendorizada não resolvia estão corrigidos.
 
 Da `kg-ssot-v4.54.0` para a `kg-ssot-v4.55.0`, entra o contrato v4.25, só SHOULD: nenhum grafo que passava reprova, e
 nenhum veredito MUST muda. O perfil canônico novo é o `x_ritual`, o ritual do agente, num nó `rule` ou `policy`, com o

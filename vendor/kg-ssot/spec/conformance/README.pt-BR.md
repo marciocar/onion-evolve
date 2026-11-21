@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:fcd85956787be1a9 -->
+<!-- translation-of: spec/conformance/README.md sha256:27374e00e559a01c -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -100,6 +100,8 @@ O que o v4 mudou de severidade, e o que entrou:
 | `form.misplaced.node.x_downgrade` (a trilha de rebaixamento no nó, v4.24) | — | SHOULD |
 | `form.required`, `form.enum`, `form.pattern`, `form.type`, `form.range` ou `form.unknown-key` em `node.x_ritual` ou nas chaves dele, `form.exclusive.node.x_ritual.calendar` e, num nó com o perfil, `form.required.node.owner` e `form.required.node.x_ritual.cadence` (o ritual do agente fora da forma, v4.25) | — | SHOULD |
 | `form.misplaced.node.x_ritual` (o ritual do agente num nó que não é `rule` nem `policy`, v4.25) | — | SHOULD |
+| `form.type`, `form.range`, `form.required`, `form.pattern` ou `form.unknown-key` em `meta.x_processing_purpose` ou nas chaves dele (a finalidade do tratamento fora da forma, v4.26) | — | SHOULD |
+| `form.misplaced.node.x_processing_purpose` (a finalidade do tratamento no nó, v4.26) | — | SHOULD |
 | `form.pattern.node.provenance.method` (fora da forma `'<classe>: <detalhe>'`, com a classe em `measurement`, `reading`, `judges`, `derived` ou `testimony` ou, desde o v4.16, nos alias em português `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, que alertam como `form.deprecated.node.provenance.method` desde o v4.21) | — | SHOULD (MUST no v5) |
 | `form.unknown-key.node.provenance.<chave>` (chave desconhecida dentro de `provenance`) | SHOULD | SHOULD |
 
@@ -269,6 +271,8 @@ O v4.24 põe no SHOULD a trilha de rebaixamento (`latest/form/downgrade/`), julg
 
 O v4.25 põe no SHOULD o ritual do agente (`latest/form/ritual/`), julgado só quando presente e só pela forma, nunca pelo relógio: `x_ritual` num nó `rule` ou `policy`, com `purpose` (texto não vazio), `kind` (`deterministic` ou `judgment`), `autonomy` (`notify` ou `act`) e `emits` (um `type` CloudEvents com prefixo DNS reverso) obrigatórios, e `sources`, `delivery` (listas de mapas com `channel` em slug), `promote` (`on_failure`, `on_change` ou `every_run`) e `calendar` opcionais. Com o perfil, o nó sem `owner` alerta como `form.required.node.owner`, e o nó sem `reverify_every` e sem `reverify_on` como `form.required.node.x_ritual.cadence`, o `required` de um nome que não é chave. O `calendar` é `{rrule, dtstart, tz}`: `rrule` é o valor da RRULE da RFC 5545 num subconjunto estrito (maiúsculas, `FREQ` primeiro e uma vez, os 14 nomes, sem parte repetida, nunca `COUNT` com `UNTIL`, as faixas, as regras entre partes da prosa da RFC, `UNTIL` como data e hora em UTC quando o `dtstart` está em UTC ou tem `tz`), e toda regra alerta como `form.pattern.node.x_ritual.calendar.rrule`; `dtstart` é data e hora na forma básica, no calendário; o `tz` com `dtstart` em UTC alerta como `form.exclusive.node.x_ritual.calendar`, e o `dtstart` local sem `tz` como `form.required.node.x_ritual.calendar.tz`; o `tz` tem a forma de nome de fuso da IANA (partes de até 14 caracteres, nenhuma começando por `-`, nunca `.`, `..` nem `Etc/Unknown`, a regra da `theory.html` da base tz, e cada parte começando por letra ou `_`, o que exclui `+0300`), e se ele existe na base não é julgado (`UTC-3`, `GMT+3` e `EST5` passam pela forma). O ano `0000` alerta, como em toda data do contrato. Os 53 valores RRULE distintos dos exemplos da RFC 5545 são um caso válido, com o `UNTIL` que a errata 3883 corrige. Os padrões são gerados de uma tabela da gramática, sem lookahead, e o grupo roda também na bancada do leitor JavaScript. Em outro tipo de nó, `x_ritual` alerta como `form.misplaced.node.x_ritual`; na aresta, é chave `x_` livre. Nada que passava reprova.
 
+O v4.26 põe no SHOULD a finalidade do tratamento (`latest/form/purpose/`), julgada só quando presente e só pela forma: no `meta`, `x_processing_purpose`, uma lista não vazia de ponteiros para um vocabulário com versão fixada, nunca um catálogo dentro do contrato. Cada item é um mapa com `ref` (obrigatório: um IRI absoluto `https://`, para um vocabulário externo como o DPV do grupo comunitário de privacidade do W3C, ou a forma `<caminho>.kg.yaml#<id>` do `externalRef`, para um nó `x_term` do vocabulário do próprio adotante no mesmo repo), `scheme` (obrigatório: o slug do vocabulário, na forma do `x_term.scheme`), `release` (o IRI `https://` do release datado do vocabulário, obrigatório quando o `ref` é IRI, porque é ele que fixa a versão) e `label` (texto não vazio, opcional; nunca dado pessoal nem nome de cliente, porque vai para o git). Outra chave sem `x_` dentro do item alerta como `form.unknown-key`. Fora da forma alerta como `form.type.meta.x_processing_purpose` (não é lista), `form.range.meta.x_processing_purpose` (a lista vazia), `form.type.meta.x_processing_purpose.item` (o item que não é mapa), `form.required.meta.x_processing_purpose.<chave>` e `form.pattern` ou `form.type` em `meta.x_processing_purpose.<chave>`. A forma do IRI é simples (`https://` seguido de texto sem espaço, na classe de espaço do v4.23) e não valida o IRI. Do `ref` local só a forma é julgada: se o arquivo e o nó existem, e se o nó tem `x_term`, não é deste perfil. No nó, `x_processing_purpose` alerta como `form.misplaced.node.x_processing_purpose`; na aresta, é chave `x_` livre. Nada que passava reprova.
+
 O mesmo código pode ser MUST num caso e SHOULD em outro, porque a severidade é do caso, não do código.
 
 ## Pastas
@@ -290,7 +294,7 @@ estiverem seladas, isto é, mergeadas no grafo do produto, **e** o schema de `sp
 (por exemplo, `trigger` em `integrity-trigger`). O PR da promoção esvazia `pending_on` e cita o nó selado. Nada
 antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 745 casos contra o contrato v4, 32 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 787 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 cujo veredito o
 v4 muda viraram casos `bad-*`. Todo caso usa `method` válido na classe canônica em inglês (`measurement: caso de conformidade`, desde o v4.21), para que os avisos de

@@ -183,6 +183,7 @@ is free, and any other key warns. Enum values are codes, in English, whatever th
 | `x_dispose_by` · `x_dispose_basis` · `x_hold` | meta | the disposal deadline of the whole graph, its basis, and its suspension (v4.23) |
 | `x_downgrade` | meta | the trail of the level downgrades of the whole graph: from, to, reason, approver, reference, and date (v4.24) |
 | `x_ritual` | node (`rule`, `policy`) | an agent ritual: a recurring obligation that an executor runs and checks, with its calendar (v4.25) |
+| `x_processing_purpose` | meta | the purpose of processing of the data the graph holds, as a pointer to a vocabulary with a pinned version (v4.26) |
 
 ### `x_term`
 
@@ -462,6 +463,48 @@ graph, and in the order of the levels, which belongs to the organization's polic
 of `kg_gate.py --classification-downgrade` (chapter 5), which compares each graph with the base and asks that the last
 entry record this drop, be appended after the trail of the base, which stays as it was, and name an approver who did
 not change the level.
+
+### `x_processing_purpose` (v4.26)
+
+The purpose of processing of the data the graph holds, as a pointer to a vocabulary with a pinned version. The
+contract carries no catalog of purposes: it judges only the form of the pointer, and the meaning stays in the
+vocabulary, either an external one, such as the DPV (Data Privacy Vocabulary) of the W3C privacy community group, or
+the adopter's own. It is a list, one item for each purpose:
+
+```yaml
+meta:
+  purpose: "the purpose of this graph"          # another key: the purpose of the GRAPH
+  x_processing_purpose:                         # the purpose of PROCESSING the data the graph holds
+    - ref: "https://w3id.org/dpv#ServiceProvision"
+      scheme: dpv
+      release: "https://w3id.org/dpv/2.0"
+    - ref: "docs/vocab/purposes.kg.yaml#T_PURPOSE_CUSTOMER_SUPPORT"
+      scheme: acme
+      label: "customer support"
+```
+
+| Key | Form |
+|---|---|
+| `ref` | required: an absolute `https://` IRI in a simple form (`https://` followed by text with no whitespace), for an external vocabulary, or the `<path>.kg.yaml#<id>` form of `externalRef`, for an `x_term` node of your own vocabulary in the same repository |
+| `scheme` | required: the slug of the vocabulary (lowercase, digits, and hyphen), as in `x_term.scheme`; it takes no dot, so it carries no version |
+| `release` | the `https://` IRI of the dated release of the vocabulary; required when `ref` is an IRI, because the namespace of a vocabulary such as the DPV does not change between versions, and the release is what pins one |
+| `label` | optional: the human text of the purpose, not empty; never personal data or a client's name, because it goes to git |
+
+A vocabulary of purposes shared by several repositories goes by the IRI form: the local form is valid only in the same
+repository, like `externalRef`. Another key without `x_` inside an item warns as `form.unknown-key`. The long name
+avoids the clash with `meta.purpose` (the purpose of the graph) and with `x_ritual.purpose` (the purpose of the
+ritual).
+
+The contract judges only the form, and only when the key is present: a value that is not a list warns as
+`form.type.meta.x_processing_purpose`, an empty list as `form.range.meta.x_processing_purpose`, an item that is not a
+map as `form.type.meta.x_processing_purpose.item`, a missing key as `form.required.meta.x_processing_purpose.<key>`
+(for example `form.required.meta.x_processing_purpose.release` on an IRI without a release), and a value out of form as
+`form.pattern.meta.x_processing_purpose.<key>` or `form.type.meta.x_processing_purpose.<key>`. Only the form of a local
+`ref` is judged: whether the file and the node exist, and whether the node has `x_term`, is not checked. Nor is the IRI
+validated: the host, a backslash, or a control character pass the simple form, and a `label` of invisible characters
+(U+200B, U+0085) passes as text, as in the other profiles. A repeated item does not warn. On a node,
+`x_processing_purpose` is not a profile and warns as `form.misplaced.node.x_processing_purpose`; on an edge, it is a
+free `x_` key. A graph without the key sees nothing new.
 
 ### `x_ritual` (v4.25)
 

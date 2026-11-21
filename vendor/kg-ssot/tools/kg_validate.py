@@ -99,7 +99,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.25"
+CONTRACT_VERSION = "4.26"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1976,6 +1976,14 @@ PROFILE_HINTS = {
                           "com.example.ritual.briefing.completed) are required; sources and delivery are lists of "
                           "{channel, ref} and {channel, to}, with channel a slug; promote is on_failure, on_change, or "
                           "every_run; calendar is {rrule, dtstart, tz}.",
+    # v4.26: a finalidade do tratamento como ponteiro para vocabulário com versão fixada, julgada só pela forma
+    ("meta", "x_processing_purpose"): "x_processing_purpose is the purpose of processing of the data the graph holds "
+                                      "(v4.26): a list that is not empty of maps with ref (an https:// IRI, or the "
+                                      "<path>.kg.yaml#<id> form of a node in your own vocabulary) and scheme (a slug); "
+                                      "release (the https:// IRI of the dated release of the vocabulary) is required "
+                                      "when ref is an IRI; label is optional text, never personal data.",
+    ("node", "x_processing_purpose"): "x_processing_purpose belongs in meta (v4.26): the unit is the graph, not the "
+                                      "node.",
 }
 
 

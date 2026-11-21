@@ -1752,5 +1752,277 @@ class Methods(unittest.TestCase):
         self.assertIn("nada foi gravado", out)
 
 
+
+def _node(nid, extra=""):
+    return (f"  - id: {nid}\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n"
+            f"    owner: t\n    label: \"Nó {nid}.\"\n{extra}")
+
+
+FMT_A = ('meta:\n  schema_version: "1"\n  id: a\nnodes:\n' + _node("A_ROOT") + _node("A_X")
+         + "edges:\n  - from: A_X\n    to: A_ROOT\n    edge_type: SUPPORTS\n")
+FMT_B = ('meta:\n  schema_version: "1"\n  id: b\n'
+         "# este grafo vem de a.kg.yaml (comentário: fica)\n"
+         "nodes:\n" + _node("B_1", '    trace: "a.kg.yaml:5"\n    narrative: "Ver a.kg.yaml para o resto."\n'
+                                   '    x_ref: "repo1:a.kg.yaml#A_X"\n') + _node("B_2")
+         + "edges:\n  - from: B_2\n    to: B_1\n    edge_type: SUPPORTS\n"
+         "external_edges:\n  - from: B_1\n    to: a.kg.yaml#A_X\n    edge_type: TRACES_TO\n")
+FMT_C = {"meta": {"schema_version": "1", "id": "c"},
+         "nodes": [{"id": "C_1", "node_type": "claim", "plane": "DEV", "status": "open", "impact": 1,
+                    "confidence": 0.5, "owner": "t", "label": "Nó C_1."}],
+         "edges": [], "external_edges": [{"from": "C_1", "to": "a.kg.yaml#A_ROOT", "edge_type": "TRACES_TO"}]}
+
+
+class Format(unittest.TestCase):
+    """kg_migrate.py format --to json: o grafo vira .kg.json pelo parse do contrato, e as pontas de quem cita (aresta
+    externa, trace, ponteiro qualificado pelo repositório) são reescritas por texto, com o gate antes e depois; a prosa
+    e o comentário ficam."""
+
+    def run_main(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                rc = kg_migrate.main([str(a) for a in argv])
+            except SystemExit as exc:
+                rc = exc.code
+        return rc, out.getvalue(), err.getvalue()
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = pathlib.Path(self.tmp.name)
+        files = {"a.kg.yaml": FMT_A, "b.kg.yaml": FMT_B, "c.kg.json": json.dumps(FMT_C, indent=1) + "\n",
+                 "README.md": "O grafo a.kg.yaml é a raiz.\n"}
+        self.write(files)
+
+    def write(self, files):
+        for name, text in files.items():
+            (self.dir / name).write_text(text, encoding="utf-8")
+        git = ["git", "-C", str(self.dir)]
+        subprocess.run(git + ["init", "-q"], check=True)
+        subprocess.run(git + ["remote", "add", "origin", "https://example.com/x/repo1.git"], capture_output=True)
+        subprocess.run(git + ["add", "-A"], check=True)
+        subprocess.run(git + ["-c", "user.name=t", "-c", "user.email=t@example.com", "commit", "-q", "-m", "x"],
+                       check=True)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def fmt(self, *extra, target="a.kg.yaml"):
+        rc, out, _ = self.run_main("format", "--to", "json", "--json", "--root", self.dir, *extra, self.dir / target)
+        return rc, json.loads(out)
+
+    def text(self, name):
+        return (self.dir / name).read_text(encoding="utf-8")
+
+    def test_o_plan_nao_grava_e_conta_pontas_prosa_e_arquivos_de_fora(self):
+        before = {n: self.text(n) for n in ("a.kg.yaml", "b.kg.yaml", "c.kg.json")}
+        rc, res = self.fmt()
+        self.assertEqual(rc, 0)
+        (row,) = res["targets"]
+        self.assertEqual((row["status"], row["to"]), ("convert", "a.kg.json"))
+        self.assertEqual(sorted(row["cited_by"]), ["b.kg.yaml", "c.kg.json"])
+        self.assertEqual(row["pointers"], 4)  # trace, x_ref qualificado e a aresta externa em b; a aresta em c
+        self.assertEqual(row["prose"], 1)  # a narrative de B_1
+        self.assertEqual(row["trace_lines"], 1)  # "a.kg.yaml:5": a linha é do YAML
+        self.assertEqual(row["other_files"], ["README.md"])
+        self.assertEqual(res["rewrites"], {"b.kg.yaml": 3, "c.kg.json": 1})
+        self.assertEqual(res["written"], [])
+        self.assertEqual({n: self.text(n) for n in before}, before)
+        self.assertFalse((self.dir / "a.kg.json").exists())
+
+    def test_apply_converte_sem_perda_e_so_troca_as_pontas(self):
+        canon = kg_validate.canonical(kg_validate.parse_v1(FMT_A)[1], json_keys=True)
+        rc, res = self.fmt("--apply")
+        self.assertEqual(rc, 0)
+        self.assertFalse((self.dir / "a.kg.yaml").exists())
+        back = kg_validate.parse_v1(kg_validate.JsonText(self.text("a.kg.json")))
+        self.assertEqual((back[2], back[1]), (None, canon))
+        b = self.text("b.kg.yaml")
+        self.assertEqual(b, FMT_B.replace('"a.kg.yaml:5"', '"a.kg.json:5"')
+                         .replace("repo1:a.kg.yaml#A_X", "repo1:a.kg.json#A_X")
+                         .replace("to: a.kg.yaml#A_X", "to: a.kg.json#A_X"))
+        self.assertIn("# este grafo vem de a.kg.yaml", b)  # o comentário fica
+        self.assertIn("Ver a.kg.yaml para o resto.", b)  # a prosa fica
+        self.assertEqual(json.loads(self.text("c.kg.json"))["external_edges"][0]["to"], "a.kg.json#A_ROOT")
+        self.assertIn("a.kg.yaml", self.text("README.md"))  # fora dos grafos, só apontado
+        self.assertEqual(sorted(res["written"]), ["a.kg.json", "b.kg.yaml", "c.kg.json"])
+
+    def test_o_veredito_com_corpus_fica_igual(self):
+        def verdicts():
+            subprocess.run(["git", "-C", str(self.dir), "add", "-A"], check=True)
+            corpus = kg_validate.corpus_index(self.dir)
+            must = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8")))
+            out = {}
+            for name in corpus:
+                text = self.text(name)
+                text = kg_validate.JsonText(text) if name.endswith(".json") else text
+                out[name.replace("a.kg.yaml", "a.kg.json")] = sorted(
+                    c for c in kg_validate.codes(text, must, corpus) if not c.startswith("yaml."))
+            return out
+        before = verdicts()
+        self.assertNotIn("integrity.dangling-external", before["b.kg.yaml"])
+        self.assertEqual(self.fmt("--apply")[0], 0)
+        self.assertEqual(verdicts(), before)
+
+    def test_controle_sem_reescrever_quem_cita_o_gate_recusa(self):
+        # o controle da bancada: se o citador não fosse reescrito, a ponta externa cairia, e o gate tem de ver
+        with mock.patch.object(kg_migrate, "ref_text", lambda text, *a: (text, None)):
+            rc, res = self.fmt("--apply")
+        self.assertEqual(rc, 1)
+        (row,) = res["targets"]
+        self.assertEqual(row["status"], "refused")
+        self.assertIn("integrity.dangling-external", row["reason"])
+        self.assertTrue((self.dir / "a.kg.yaml").exists())
+        self.assertFalse((self.dir / "a.kg.json").exists())
+        self.assertEqual(self.text("b.kg.yaml"), FMT_B)
+
+    def test_so_ponta_escapada_sem_mencao_literal_recusa_o_alvo(self):
+        # achado F1 da revisão: o citador sem o caminho literal no texto cru escapava do filtro e ficava pendurado
+        only = ('meta:\n  schema_version: "1"\n  id: e\nnodes:\n' + _node("E_1")
+                + 'edges: []\nexternal_edges:\n  - from: E_1\n    to: "a\\x2ekg.yaml#A_X"\n    edge_type: TRACES_TO\n')
+        slash = dict(FMT_C, external_edges=[{"from": "C_1", "to": "a.kg.yaml#A_ROOT", "edge_type": "TRACES_TO"}])
+        for name, text in (("e.kg.yaml", only),
+                           ("e.kg.json", json.dumps(slash).replace("a.kg.yaml#", "a.kg\\u002eyaml#"))):
+            with self.subTest(name):
+                self.tearDown()
+                self.setUp()
+                self.write({name: text})
+                self.assertNotIn("a.kg.yaml#", text)
+                rc, res = self.fmt("--apply")
+                self.assertEqual(rc, 1)
+                self.assertIn(name, res["targets"][0]["reason"])
+                self.assertTrue((self.dir / "a.kg.yaml").exists())
+
+    def test_prosa_que_comeca_pelo_caminho_e_dois_pontos_fica(self):
+        self.write({"b.kg.yaml": FMT_B.replace('"Ver a.kg.yaml para o resto."', '"a.kg.yaml: o grafo antigo."')})
+        rc, res = self.fmt("--apply")
+        self.assertEqual(rc, 0)
+        self.assertIn('"a.kg.yaml: o grafo antigo."', self.text("b.kg.yaml"))
+
+    def test_alvo_nao_rastreado_ou_sujo_e_recusado(self):
+        (self.dir / "a.kg.yaml").write_text(FMT_A + "# nota\n", encoding="utf-8")
+        rc, res = self.fmt("--apply")
+        self.assertEqual((rc, res["targets"][0]["status"]), (1, "refused"))
+        self.assertIn("# nota", self.text("a.kg.yaml"))
+
+    def test_ancora_com_comentario_nao_reescreve_o_comentario(self):
+        anchored = FMT_B.replace('    trace: "a.kg.yaml:5"\n', '    trace: &p "a.kg.yaml#A_X"\n').replace(
+            "to: a.kg.yaml#A_X", "to: *p")
+        self.write({"b.kg.yaml": anchored})
+        rc, res = self.fmt("--apply")
+        self.assertEqual(rc, 1)
+        self.assertIn("âncora YAML", res["targets"][0]["reason"])
+        self.assertEqual(self.text("b.kg.yaml"), anchored)
+
+    def test_ponteiro_escapado_recusa_o_alvo(self):
+        self.write({"b.kg.yaml": FMT_B.replace("to: a.kg.yaml#A_X", 'to: "a\\x2ekg.yaml#A_X"')})
+        rc, res = self.fmt("--apply")
+        self.assertEqual(rc, 1)
+        self.assertEqual(res["targets"][0]["status"], "refused")
+        self.assertIn("b.kg.yaml", res["targets"][0]["reason"])
+        self.assertTrue((self.dir / "a.kg.yaml").exists())
+        self.assertEqual(res["written"], [])
+
+    def test_o_que_o_json_nao_representa_e_recusado(self):
+        self.write({"a.kg.yaml": FMT_A.replace('    label: "Nó A_X."\n', '    label: "Nó A_X."\n    x_v: .nan\n')})
+        rc, res = self.fmt()
+        self.assertEqual(res["targets"][0]["status"], "refused")
+        self.assertRegex(res["targets"][0]["reason"], r"(Type|Value)Error")
+
+    def test_inteiro_inseguro_ganharia_must_no_json(self):
+        self.write({"a.kg.yaml": FMT_A.replace('    label: "Nó A_X."\n',
+                                               '    label: "Nó A_X."\n    x_v: 9007199254740993\n')})
+        rc, res = self.fmt("--apply")
+        self.assertEqual(rc, 1)
+        self.assertIn("MUST", res["targets"][0]["reason"])
+        self.assertTrue((self.dir / "a.kg.yaml").exists())
+
+    def test_destino_existente_e_entrada_quebrada(self):
+        self.write({"a.kg.json": "{}\n"})
+        self.assertEqual(self.fmt()[1]["targets"][0]["status"], "refused")
+        rc, out, _ = self.run_main("format", "--to", "json", "--json", "--root", self.dir, self.dir / "c.kg.json")
+        self.assertEqual((rc, json.loads(out)["reason"]), (2, "broken_input"))
+
+    def test_sem_o_nome_do_repositorio_o_qualificado_e_prosa(self):
+        rc, res = self.fmt("--repo-name", "outro")
+        self.assertEqual(res["targets"][0]["pointers"], 3)
+        self.assertEqual(res["targets"][0]["prose"], 2)
+
+    def test_git_mv_que_falha_nao_deixa_citador_pendurado(self):
+        # achado G1 da 2ª passada: com o índice do git travado, o citador era gravado antes do git mv falhar
+        lock = self.dir / ".git" / "index.lock"
+        lock.write_text("", encoding="utf-8")
+        try:
+            rc, out, _ = self.run_main("format", "--to", "json", "--json", "--apply", "--root", self.dir,
+                                       self.dir / "a.kg.yaml")
+        finally:
+            lock.unlink()
+        self.assertEqual((rc, json.loads(out)["reason"]), (2, "broken_input"))
+        self.assertEqual(self.text("b.kg.yaml"), FMT_B)
+        self.assertTrue((self.dir / "a.kg.yaml").exists())
+        self.assertFalse((self.dir / "a.kg.json").exists())
+
+    def test_citador_somente_leitura_recusa_antes_de_tocar(self):
+        # achado H1 da 3ª passada: o citador que não se grava ficava pendurado depois dos git mv
+        (self.dir / "b.kg.yaml").chmod(0o444)
+        try:
+            rc, out, _ = self.run_main("format", "--to", "json", "--json", "--apply", "--root", self.dir,
+                                       self.dir / "a.kg.yaml")
+        finally:
+            (self.dir / "b.kg.yaml").chmod(0o644)
+        if os.access(self.dir / "b.kg.yaml", os.W_OK) and os.geteuid() == 0:
+            self.skipTest("root grava em arquivo somente leitura")
+        self.assertEqual((rc, json.loads(out)["reason"]), (2, "broken_input"))
+        self.assertTrue((self.dir / "a.kg.yaml").exists())
+        self.assertFalse((self.dir / "a.kg.json").exists())
+
+    def test_escrita_que_falha_no_meio_desfaz_tudo(self):
+        real = pathlib.Path.write_bytes
+
+        def flaky(path, data):
+            if path.name == "c.kg.json":  # o segundo citador, depois do b.kg.yaml já gravado
+                raise OSError("disco cheio")
+            return real(path, data)
+        with mock.patch.object(pathlib.Path, "write_bytes", flaky):
+            rc, out, _ = self.run_main("format", "--to", "json", "--json", "--apply", "--root", self.dir,
+                                       self.dir / "a.kg.yaml")
+        self.assertEqual((rc, json.loads(out)["reason"]), (2, "broken_input"))
+        self.assertIn("tudo foi desfeito", json.loads(out)["error"])
+        self.assertEqual(self.text("b.kg.yaml"), FMT_B)
+        self.assertEqual(self.text("a.kg.yaml"), FMT_A)
+        self.assertFalse((self.dir / "a.kg.json").exists())
+        st = subprocess.run(["git", "-C", str(self.dir), "status", "--porcelain"], capture_output=True, text=True)
+        self.assertEqual(st.stdout, "")
+
+    def test_citador_sujo_recusa_o_alvo(self):
+        (self.dir / "b.kg.yaml").write_text(FMT_B + "# edição local\n", encoding="utf-8")
+        rc, res = self.fmt("--apply")
+        self.assertEqual((rc, res["targets"][0]["status"]), (1, "refused"))
+        self.assertIn("b.kg.yaml", res["targets"][0]["reason"])
+        self.assertIn("# edição local", self.text("b.kg.yaml"))
+
+    def test_citador_quebrado_com_barra_vai_para_revisao(self):
+        self.write({"e.kg.yaml": 'meta: [\n  to: "a\\x2ekg.yaml#A_X"\n'})
+        rc, res = self.fmt()
+        self.assertIn("e.kg.yaml", [r["file"] for r in res["review"]])
+
+    def test_apply_move_pelo_git(self):
+        self.assertEqual(self.fmt("--apply")[0], 0)
+        st = subprocess.run(["git", "-C", str(self.dir), "status", "--porcelain"], capture_output=True, text=True).stdout
+        self.assertIn("a.kg.yaml -> a.kg.json", st)
+        self.assertIn("a.kg.json", kg_validate.corpus_index(self.dir))
+
+    def test_dois_alvos_que_se_citam(self):
+        self.write({"a.kg.yaml": FMT_A + "external_edges:\n  - from: A_X\n    to: c2.kg.yaml#C2\n"
+                                         "    edge_type: TRACES_TO\n",
+                    "c2.kg.yaml": 'meta:\n  schema_version: "1"\n  id: c2\nnodes:\n' + _node("C2") + _node("C3")
+                    + "edges:\n  - from: C3\n    to: C2\n    edge_type: SUPPORTS\n"})
+        rc, out, _ = self.run_main("format", "--to", "json", "--json", "--apply", "--root", self.dir,
+                                   self.dir / "a.kg.yaml", self.dir / "c2.kg.yaml")
+        self.assertEqual(rc, 0, out)
+        a = json.loads(self.text("a.kg.json"))
+        self.assertEqual(a["external_edges"][0]["to"], "c2.kg.json#C2")
+        self.assertTrue((self.dir / "c2.kg.json").exists())
+
+
 if __name__ == "__main__":
     unittest.main()

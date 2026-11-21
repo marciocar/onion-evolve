@@ -1,0 +1,359 @@
+{
+  "description": "O perfil canônico da finalidade do tratamento do grafo inteiro (v4.26): x_processing_purpose, no meta, uma lista não vazia de ponteiros para um vocabulário com versão fixada, cada um com ref (IRI https:// ou a forma <caminho>.kg.yaml#<id> do externalRef), scheme (slug), release (IRI https://, obrigatório com ref IRI) e label (texto não vazio, opcional). É SHOULD: julgado só quando presente e só pela forma; o contrato não carrega catálogo de finalidades, e o ref local não é conferido. No nó, x_processing_purpose não é perfil e alerta como form.misplaced.node.x_processing_purpose: a unidade é o grafo. Na aresta, segue chave x_ livre.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-meta-purpose-dpv.kg.yaml",
+      "description": "a finalidade como IRI do DPV, com o slug do vocabulário e o release datado (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-purpose-local.kg.yaml",
+      "description": "a finalidade como nó x_term do vocabulário do próprio adotante, na forma do externalRef, sem release (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-purpose-both.kg.yaml",
+      "description": "duas finalidades, uma do DPV e uma do vocabulário da casa (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-purpose-kg-json.kg.yaml",
+      "description": "o ref local para um vocabulário em .kg.json (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-purpose-local-release.kg.yaml",
+      "description": "o ref local com release: opcional na forma local (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-purpose-dot-segment.kg.yaml",
+      "description": "o ref local num segmento que começa por ponto, como no externalRef (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-purpose-extension-key.kg.yaml",
+      "description": "o item com uma chave x_ a mais: a extensão segue livre (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-purpose-unicode-label.kg.yaml",
+      "description": "o label com texto fora do ASCII e espaço não separável no meio (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-meta-purpose-with-classification.kg.yaml",
+      "description": "a finalidade ao lado do nível e do prazo de expurgo: cada perfil é julgado sozinho (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-edge-purpose-free.kg.yaml",
+      "description": "x_processing_purpose na aresta não é perfil: segue chave x_ livre (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-purpose-not-list.kg.yaml",
+      "description": "a finalidade como mapa, não como lista (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_processing_purpose"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-empty.kg.yaml",
+      "description": "a lista vazia (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.meta.x_processing_purpose"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-item-not-map.kg.yaml",
+      "description": "o item como texto, não como mapa (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_processing_purpose.item"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-missing-ref.kg.yaml",
+      "description": "o item sem ref (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-missing-scheme.kg.yaml",
+      "description": "o item sem scheme (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_processing_purpose.scheme"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-iri-without-release.kg.yaml",
+      "description": "o ref IRI sem release: o namespace do DPV não muda entre versões, e é o release que fixa a versão (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_processing_purpose.release"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-http.kg.yaml",
+      "description": "o ref em http://, não https:// (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-space.kg.yaml",
+      "description": "o ref IRI com espaço (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-unicode-space.kg.yaml",
+      "description": "o ref IRI com espaço Unicode (NBSP e o BOM): a mesma classe de espaço do v4.23 nos dois leitores (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-bom.kg.yaml",
+      "description": "o ref IRI com só o BOM (U+FEFF) no meio: espaço na classe do v4.23, que o \\S do re do Python não pega (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "valid-meta-purpose-ref-nel.kg.yaml",
+      "description": "o ref IRI com U+0085 (NEL) no meio: fora da classe do v4.23, aceito nos dois leitores, embora o \\S do re o barre; a forma é simples e não valida o IRI (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-purpose-ref-scheme-only.kg.yaml",
+      "description": "o ref https:// sem nada depois (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-scheme-only.kg.yaml",
+      "description": "o item só com scheme: falta o ref, e o release não é cobrado sem um ref IRI (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-scheme-capital.kg.yaml",
+      "description": "o scheme com maiúscula só na primeira letra (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.scheme"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-label-bom.kg.yaml",
+      "description": "o label só com o BOM (U+FEFF): vazio pela classe do v4.23, que o \\S do re do Python não pega (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.label"
+      ]
+    },
+    {
+      "file": "valid-meta-purpose-label-nel.kg.yaml",
+      "description": "o label só com U+0085 (NEL): fora da classe do v4.23, aceito nos dois leitores, como nos perfis anteriores; o texto invisível é limite declarado (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-purpose-release-bom.kg.yaml",
+      "description": "o release com só o BOM (U+FEFF) no meio: espaço na classe do v4.23, que o \\S do re do Python não pega (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.release"
+      ]
+    },
+    {
+      "file": "valid-meta-purpose-release-nel.kg.yaml",
+      "description": "o release com U+0085 (NEL) no meio: fora da classe do v4.23, aceito nos dois leitores, embora o \\S do re o barre (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-purpose-ref-bare-term.kg.yaml",
+      "description": "o ref como nome solto do termo, sem IRI nem caminho (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-absolute-path.kg.yaml",
+      "description": "o ref local com / inicial: o caminho é relativo à raiz do repo (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-traversal.kg.yaml",
+      "description": "o ref local com .. (a travessia), como no externalRef (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-no-id.kg.yaml",
+      "description": "o ref local sem o #<id> do nó (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-not-kg.kg.yaml",
+      "description": "o ref local para um arquivo que não é grafo (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-ref-integer.kg.yaml",
+      "description": "o ref como número (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.meta.x_processing_purpose.ref"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-scheme-dot.kg.yaml",
+      "description": "a versão no scheme: o slug não aceita ponto, e a versão vai no release (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.scheme"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-scheme-uppercase.kg.yaml",
+      "description": "o scheme em maiúsculas (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.scheme"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-release-urn.kg.yaml",
+      "description": "o release fora da forma https:// (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.release"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-label-blank.kg.yaml",
+      "description": "o label só com espaço conta como vazio (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.label"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-label-nbsp.kg.yaml",
+      "description": "o label só com espaço Unicode (NBSP e o ideográfico) conta como vazio (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.x_processing_purpose.label"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-unknown-key.kg.yaml",
+      "description": "uma chave sem x_ fora do perfil, como version (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.meta.x_processing_purpose.version"
+      ]
+    },
+    {
+      "file": "warn-meta-purpose-second-item.kg.yaml",
+      "description": "o primeiro item na forma e o segundo sem scheme (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.meta.x_processing_purpose.scheme"
+      ]
+    },
+    {
+      "file": "warn-node-purpose.kg.yaml",
+      "description": "x_processing_purpose no nó: a unidade é o grafo (v4.26)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.misplaced.node.x_processing_purpose"
+      ]
+    }
+  ]
+}

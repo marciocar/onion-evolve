@@ -4,6 +4,11 @@
   kg_migrate.py plan  --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out PLANILHA.tsv] [grafo.kg.yaml ...]
   kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]
   kg_migrate.py methods plan|apply [--json] [--confirmed-out ARQ.tsv] [--manifest-out ARQ.tsv] [--root DIR] [--exclude GLOB] [grafo.kg.yaml ...]
+  kg_migrate.py format --to json [--apply] [--json] [--root DIR] [--repo-name NOME] grafo.kg.yaml ...
+
+O format troca o formato do grafo de .kg.yaml para .kg.json pelo parse do
+contrato e reescreve, pelo texto, as pontas de quem o cita (toda string de grafo rastreado que começa pelo caminho
+antigo, também qualificado pelo nome do repositório), com o gate antes e depois; a prosa e o comentário ficam.
 
 O perfil (spec/kg-migrate-profile.schema.json) declara regras em ordem: a primeira cujo when casa decide a ação do nó
 (propor provenance, rebaixar para unverifiable, ou só listar para quem revisa), e o bloco scopes dá verified_scope por
@@ -1519,11 +1524,385 @@ def tracked_graphs(root, exclude=(), defaults=True):
 def broken_input(args, exc):
     """Entrada quebrada (rc 2). No plan --json, o objeto no stdout, que o erro de uso do argparse (rc 2, só no stderr)
     nunca escreve: quem lê a máquina distingue os dois sem casar frase."""
-    if args.cmd in ("plan", "keys", "nest", "methods") and getattr(args, "json", False):
+    if args.cmd in ("plan", "keys", "nest", "methods", "format") and getattr(args, "json", False):
         print(json.dumps({"error": str(exc), "reason": "broken_input"}, ensure_ascii=False))
     else:
         print(_("BROKEN INPUT  {error}").format(error=exc))
     return 2
+
+
+# ── format: o grafo de .kg.yaml para .kg.json, com as pontas de quem cita ─────────────────────────────────────────────
+
+
+def format_body(doc):
+    """O texto .kg.json de um documento canônico (json_keys). ValueError quando o JSON não representa o valor: NaN,
+    infinito, surrogate solto (UnicodeEncodeError é ValueError)."""
+    body = json.dumps(doc, ensure_ascii=False, indent=1, allow_nan=False) + "\n"
+    body.encode("utf-8")
+    return body
+
+
+def ref_swap(value, renames):
+    """O valor com o caminho trocado quando ele COMEÇA pelo caminho de um grafo convertido (o caminho inteiro, ou
+    seguido de # ou de : com dígito, a forma da ponta externa e da linha do trace), senão None. Caminho no meio da frase,
+    ou seguido de : e texto, é prosa: fica."""
+    if isinstance(value, str):
+        for old, new in renames.items():
+            rest = value[len(old):]
+            if value.startswith(old) and (rest == "" or rest[0] == "#" or (rest[:1] == ":" and rest[1:2].isdigit())):
+                return new + rest
+    return None
+
+
+def trace_line(value, renames):
+    """A ponta com número de linha (caminho:12): a linha é do YAML e não vale no JSON, então o plano a conta."""
+    return isinstance(value, str) and any(value.startswith(old + ":") and ref_swap(value, {old: new}) is not None
+                                          for old, new in renames.items())
+
+
+def _strings(value, path=()):
+    """{caminho no documento: string}, de toda string sob value (valores, não chaves)."""
+    out = {}
+    if isinstance(value, dict):
+        for k, v in value.items():
+            out.update(_strings(v, path + (k,)))
+    elif isinstance(value, list):
+        for i, v in enumerate(value):
+            out.update(_strings(v, path + (i,)))
+    elif isinstance(value, str):
+        out[path] = value
+    return out
+
+
+def swapped(value, renames):
+    """Cópia do documento com toda string que é ponteiro para um grafo convertido trocada (ref_swap)."""
+    if isinstance(value, dict):
+        return {k: swapped(v, renames) for k, v in value.items()}
+    if isinstance(value, list):
+        return [swapped(v, renames) for v in value]
+    new = ref_swap(value, renames)
+    return value if new is None else new
+
+
+def _reparse(text, as_json):
+    _raw, doc, code = kg_validate.parse_v1(kg_validate.JsonText(text) if as_json else text)
+    return None if code or not isinstance(doc, dict) else doc
+
+
+def ref_text(text, as_json, renames, expected):
+    """O texto de quem cita com as pontas trocadas, por texto (os comentários e as aspas ficam): ocorrência por
+    ocorrência do caminho, e cada uma entra só se, sozinha, troca exatamente uma string do documento pelo valor que
+    expected tem ali (a menção em comentário não troca nenhuma; a âncora YAML troca mais de uma). No fim, o documento relido tem de ser igual a expected. Devolve (texto novo, None) ou (None, motivo)."""
+    hits = sorted((m.start(), m.end(), new) for old, new in renames.items() for m in re.finditer(re.escape(old), text))
+
+    def put(spans):
+        out, last = [], 0
+        for start, end, new in spans:
+            out.append(text[last:start] + new)
+            last = end
+        return "".join(out) + text[last:]
+
+    def disjoint(spans):
+        out, last = [], -1
+        for s in spans:
+            if s[0] >= last:
+                out.append(s)
+                last = s[1]
+        return out
+
+    base = _reparse(text, as_json)
+    have, want, keep = _strings(base), _strings(expected), []
+    for span in hits:
+        doc = _reparse(put([span]), as_json)
+        if doc is None:
+            continue
+        got = _strings(doc)
+        if got.keys() != have.keys():
+            continue
+        diff = [p for p in got if got[p] != have[p]]
+        if len(diff) == 1 and got[diff[0]] == want.get(diff[0]):
+            keep.append(span)
+    new = put(disjoint(keep))
+    if _reparse(new, as_json) != expected:
+        return None, _("a pointer to a converted graph is not written as its own plain text (escape, line continuation or YAML anchor)")
+    return new, None
+
+
+def _gate_counts(text, must, should, corpus):
+    """(MUST, SHOULD) do arquivo, sem os códigos yaml.*, que são do perfil YAML e somem com o formato."""
+    keep = lambda counts: collections.Counter({c: n for c, n in counts.items() if not c.startswith("yaml.")})  # noqa: E731
+    return (keep(kg_validate.code_counts(text, must, corpus)),  # o .kg.json chega como JsonText
+            keep(kg_validate.warning_counts(text, must, should, corpus)))
+
+
+def _gate_problem(before, after):
+    grown_must, grown_should = after[0] - before[0], after[1] - before[1]
+    if grown_must:
+        return _("the file would gain a new MUST code: {codes}").format(codes=", ".join(sorted(grown_must)))
+    if grown_should:
+        return _("the file would gain a SHOULD warning: {codes}").format(codes=", ".join(sorted(grown_should)))
+    return None
+
+
+def own_repo_name(root):
+    """O nome deste repositório, como outro grafo o escreve no ponteiro qualificado (<repo>:<caminho>#<id>): o último
+    trecho da URL do remote origin, sem .git; None sem origin."""
+    r = subprocess.run(["git", "-C", str(root), "remote", "get-url", "origin"], capture_output=True, text=True)
+    name = r.stdout.strip().rstrip("/").rsplit("/", 1)[-1].rsplit(":", 1)[-1] if r.returncode == 0 else ""
+    name = name[:-4] if name.endswith(".git") else name
+    return name or None
+
+
+def format_plan(targets, root, repo=None):
+    """O plano do format: {'targets': [...], 'rewrites': {arquivo: (texto novo, pontas)}, 'review': [...]}.
+
+    Cada alvo vira .kg.json pelo parse do contrato (canonical com json_keys), e a ida e volta pelo leitor tem de dar o
+    mesmo documento. Quem cita um alvo (toda string de um grafo rastreado que começa pelo caminho dele, ou por
+    <repo>:<caminho>, com repo o nome deste repositório) é reescrito por texto. Cada arquivo tocado, alvo ou quem cita, passa pelo gate com --corpus antes e depois, sem ganhar código MUST
+    nem aviso SHOULD. O alvo cujo citador não se reescreve, ou que reprovaria no gate, é recusado, e o plano refaz as
+    contas sem ele até nada mais mudar."""
+    root = pathlib.Path(root).resolve()
+    r = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "*.kg.yaml", "*.kg.json"], capture_output=True)
+    if r.returncode != 0:
+        raise Broken(_("{root} is not a git repository, and no graph was given").format(root=root))
+    names = [n for n in r.stdout.decode("utf-8", "surrogateescape").split("\0") if n and (root / n).is_file()]
+    vendors = kg_validate.find_vendor_dirs(root)
+    texts = {}
+    for n in names:
+        try:
+            texts[n] = (root / n).read_bytes().decode("utf-8")
+        except (OSError, UnicodeDecodeError):
+            texts[n] = None
+    rows, docs = {}, {}
+    for t in targets:
+        p = pathlib.Path(t)
+        if not p.name.endswith(".kg.yaml") or not p.is_file():
+            raise Broken(_("not a .kg.yaml file: {file}").format(file=t))
+        try:
+            rel = p.resolve().relative_to(root).as_posix()
+        except ValueError:
+            raise Broken(_("{file} is outside --root {root}").format(file=t, root=root))
+        if rel in rows:
+            continue
+        texts.setdefault(rel, p.read_bytes().decode("utf-8", "surrogateescape"))
+        row = rows[rel] = {"file": rel, "to": rel[: -len(".kg.yaml")] + ".kg.json", "status": "convert",
+                           "reason": None, "cited_by": [], "pointers": 0, "prose": 0, "trace_lines": 0,
+                           "comments": sum(1 for ln in texts[rel].splitlines() if ln.lstrip().startswith("#")),
+                           "other_files": []}
+        _raw, doc, code = kg_validate.parse_v1(texts[rel])
+        tracked = subprocess.run(["git", "-C", str(root), "ls-files", "--error-unmatch", "--", rel],
+                                 capture_output=True).returncode == 0
+        clean = tracked and subprocess.run(["git", "-C", str(root), "diff", "--quiet", "HEAD", "--", rel],
+                                           capture_output=True).returncode == 0
+        if not clean:  # o .kg.yaml sai no apply: só com o git guardando exatamente o que sai
+            row["status"], row["reason"] = "refused", _("the graph is not tracked by git or has uncommitted changes")
+        elif (root / row["to"]).exists():
+            row["status"], row["reason"] = "refused", _("{dest} already exists").format(dest=row["to"])
+        elif kg_validate.in_vendor(rel, vendors):
+            row["status"], row["reason"] = "refused", _("the graph is inside a vendored folder")
+        elif code or not isinstance(doc, dict):
+            row["status"], row["reason"] = "refused", _("graph that does not parse ({code})").format(
+                code=code or "parse.not-a-map")
+        else:
+            try:
+                canon = kg_validate.canonical(doc, json_keys=True)
+                body = format_body(canon)
+            except (TypeError, ValueError) as exc:
+                row["status"], row["reason"] = "refused", _("JSON cannot represent a value: {error}").format(
+                    error=type(exc).__name__)
+            else:
+                if _reparse(body, True) != canon:
+                    row["status"], row["reason"] = "refused", _("the round trip through the reader changes the graph")
+                else:
+                    docs[rel] = canon
+    must = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8")))
+    should = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_SHOULD.read_text(encoding="utf-8")))
+    before_index = kg_validate.index_texts([(n, t) for n, t in texts.items() if t is not None])
+
+    def forms(old):  # o caminho e, com o nome do repositório, o caminho qualificado
+        new = rows[old]["to"]
+        return {old: new, f"{repo}:{old}": f"{repo}:{new}"} if repo else {old: new}
+
+    def refuse(rel, why):
+        if rows[rel]["status"] == "convert":
+            rows[rel]["status"], rows[rel]["reason"] = "refused", why
+
+    while True:
+        renames = {rel: row["to"] for rel, row in rows.items() if row["status"] == "convert"}
+        if not renames:
+            rewrites, review = {}, []
+            break
+        swaps = {k: v for old in renames for k, v in forms(old).items()}
+        after_index = {renames.get(n, n): ids for n, ids in before_index.items()}
+        rewrites, review, cites, changed = {}, [], {}, False
+        for row in rows.values():
+            row.update(cited_by=[], pointers=0, prose=0, trace_lines=0)
+        for name, text in texts.items():
+            if name in renames:
+                continue
+            literal = text is not None and any(old in text for old in renames)
+            # a barra invertida também entra: escape e continuação de linha escondem o caminho do texto cru
+            if text is None or not (literal or "\\" in text):
+                continue
+            doc = _reparse(text, name.endswith(".json"))
+            if doc is None:  # com o caminho literal ou com barra invertida (a ponta escapada também se esconde aqui)
+                review.append((name, _("graph that does not parse and may cite a converted graph: review by hand")))
+                continue
+            strings = _strings(doc)
+            cited = {old for old in renames for s in strings.values() if ref_swap(s, forms(old)) is not None}
+            for old in renames:
+                rows[old]["prose"] += sum(1 for s in strings.values() if old in s and ref_swap(s, forms(old)) is None)
+            if not cited:
+                continue
+            cites[name] = cited
+            if kg_validate.in_vendor(name, vendors):
+                for old in cited:
+                    refuse(old, _("{file} cites it and is inside a vendored folder").format(file=name))
+                changed = True
+                continue
+            if subprocess.run(["git", "-C", str(root), "diff", "--quiet", "HEAD", "--", name],
+                              capture_output=True).returncode != 0:  # o desfazer restaura pelo git: citador limpo
+                for old in cited:
+                    refuse(old, _("{file} cites it and has uncommitted changes").format(file=name))
+                changed = True
+                continue
+            expected = swapped(doc, swaps)
+            new, why = ref_text(text, name.endswith(".json"), swaps, expected)
+            if why is None:
+                wrap = kg_validate.JsonText if name.endswith(".json") else str
+                why = _gate_problem(_gate_counts(wrap(text), must, should, before_index),
+                                    _gate_counts(wrap(new), must, should, after_index))
+            if why:
+                for old in cited:
+                    refuse(old, _("{file} cites it and cannot be rewritten: {why}").format(file=name, why=why))
+                changed = True
+                continue
+            rewrites[name] = (new, sum(1 for s in strings.values() if ref_swap(s, swaps) is not None))
+            for old in cited:
+                rows[old]["cited_by"].append(name)
+                rows[old]["pointers"] += sum(1 for s in strings.values() if ref_swap(s, forms(old)))
+                rows[old]["trace_lines"] += sum(1 for s in strings.values() if trace_line(s, forms(old)))
+        for rel in renames:
+            body = format_body(swapped(docs[rel], swaps))
+            why = _gate_problem(_gate_counts(texts[rel], must, should, before_index),
+                                _gate_counts(kg_validate.JsonText(body), must, should, after_index))
+            if why:
+                refuse(rel, why)
+                changed = True
+            else:
+                rows[rel]["body"] = body
+        if not changed:
+            break
+    for rel, row in rows.items():
+        if row["status"] != "convert":
+            row.pop("body", None)
+            continue
+        g = subprocess.run(["git", "-C", str(root), "grep", "-l", "-z", "-F", "-e", rel, "--", ".",
+                            ":(exclude)*.kg.yaml", ":(exclude)*.kg.json"], capture_output=True)
+        row["other_files"] = sorted(n for n in g.stdout.decode("utf-8", "surrogateescape").split("\0") if n)
+    return {"targets": list(rows.values()), "rewrites": rewrites, "review": review,
+            "originals": {n: texts[n] for n in list(rewrites) + [r["file"] for r in rows.values()
+                                                                  if r["status"] == "convert"]}}
+
+
+def format_apply(plan, root):
+    """Grava o plano: primeiro todo alvo vai por git mv para o .kg.json (o corpus rastreado já o vê, e o git guarda o
+    .kg.yaml, rastreado e limpo, com os comentários); se um git mv falha, os já feitos voltam e nada mais se grava
+    (Broken, rc 2), para nenhum citador ficar reescrito apontando para um .kg.json que não existe. Depois, o corpo JSON
+    de cada alvo e cada citador reescrito; a escrita que falha desfaz tudo (os citadores voltam ao texto original, os
+    alvos voltam pelo git mv), e o que não voltar é nomeado. Devolve a lista de arquivos gravados."""
+    root = pathlib.Path(root).resolve()
+    git = ["git", "-C", str(root)]
+    targets = [r for r in plan["targets"] if r["status"] == "convert"]
+    # antes de tocar em qualquer coisa: cada citador e cada pasta de destino tem de aceitar escrita
+    blocked = [n for n in plan["rewrites"] if not os.access(root / n, os.W_OK)]
+    blocked += [r["to"] for r in targets if not os.access((root / r["to"]).parent, os.W_OK)]
+    if blocked:
+        raise Broken(_("cannot write {files}, nothing was written").format(files=", ".join(sorted(blocked))))
+    moved, written = [], []
+
+    def undo(error):
+        """Volta o que já foi feito: o texto original de cada citador gravado, e cada alvo movido de volta com o seu
+        YAML. O que não voltar é nomeado, com o comando, no lugar de dizer que nada foi gravado."""
+        stuck = []
+        for name in written:
+            if name in plan["rewrites"]:
+                original = plan["originals"][name].encode("utf-8")
+                try:
+                    if (root / name).read_bytes() != original:  # a que falhou antes de mudar o arquivo fica
+                        (root / name).write_bytes(original)
+                except OSError:
+                    stuck.append(name)
+        for row in reversed(moved):
+            try:
+                (root / row["to"]).write_bytes(plan["originals"][row["file"]].encode("utf-8"))
+            except OSError:
+                pass
+            r = subprocess.run(git + ["mv", "--", row["to"], row["file"]], capture_output=True)
+            if r.returncode != 0:
+                stuck.append(row["to"])
+        if stuck:
+            return Broken(_("{error}; undoing failed for {files}: restore a citer with git checkout HEAD -- <citer>, and a "
+                            "moved graph with git rm --cached <the .kg.json> and git checkout HEAD -- <the .kg.yaml>").format(
+                error=error, files=", ".join(stuck)))
+        return Broken(_("{error}; everything was undone").format(error=error))
+
+    for row in targets:  # todos os git mv antes de qualquer outra escrita
+        r = subprocess.run(git + ["mv", "--", row["file"], row["to"]], capture_output=True, text=True)
+        if r.returncode != 0:
+            raise undo(_("git mv {file} failed: {error}").format(file=row["file"],
+                                                                  error=(r.stderr or r.stdout).strip()))
+        moved.append(row)
+    try:
+        for row in moved:
+            (root / row["to"]).write_bytes(row["body"].encode("utf-8"))
+        for name, (text, _n) in sorted(plan["rewrites"].items()):
+            written.append(name)  # antes da escrita: a que falhar no meio também volta ao original
+            (root / name).write_bytes(text.encode("utf-8"))
+    except OSError as exc:
+        raise undo(_("writing failed: {error}").format(error=exc))
+    return [r["to"] for r in moved] + written
+
+
+def format_command(args):
+    """kg_migrate.py format: o plano (ou, com --apply, a gravação) da troca de formato de .kg.yaml para .kg.json."""
+    plan = format_plan(args.graphs, args.root, args.repo_name or own_repo_name(args.root))
+    written = format_apply(plan, args.root) if args.apply else []
+    refused = [r for r in plan["targets"] if r["status"] != "convert"]
+    if args.json:
+        print(json.dumps({"targets": [{k: v for k, v in r.items() if k != "body"} for r in plan["targets"]],
+                          "rewrites": {n: c for n, (_t, c) in sorted(plan["rewrites"].items())},
+                          "review": [{"file": f, "reason": w} for f, w in plan["review"]],
+                          "written": written}, ensure_ascii=False))
+    else:
+        for r in plan["targets"]:
+            if r["status"] == "convert":
+                print(_("CONVERT").ljust(9) + f"  {r['file']} → {r['to']}")
+                print("    " + _("cited by {graphs} graph(s), {pointers} pointer(s) rewritten; {prose} mention(s) in "
+                              "prose left as they are").format(graphs=len(r["cited_by"]), pointers=r["pointers"],
+                                                               prose=r["prose"]))
+                if r["trace_lines"]:
+                    print("    " + _("{n} trace(s) carry a line number of the YAML file, which does not hold in the JSON "
+                                  "one: review them").format(n=r["trace_lines"]))
+                if r["comments"]:
+                    print("    " + _("{n} comment line(s) of the graph do not go to the JSON (git keeps them in the old "
+                                  "file)").format(n=r["comments"]))
+                if r["other_files"]:
+                    print("    " + _("files outside the graphs that mention it (review by hand): {files}").format(
+                        files=", ".join(r["other_files"])))
+            else:
+                print(_("REFUSED").ljust(9) + f"  {r['file']}")
+                print(f"    {r['reason']}")
+        for name, (_t, n) in sorted(plan["rewrites"].items()):
+            print(_("REWRITE").ljust(9) + "  " + _("{file} ({n} pointer(s))").format(file=name, n=n))
+        for name, why in plan["review"]:
+            print(_("REVIEW").ljust(9) + f"  {name}")
+            print(f"    {why}")
+        print(_("· {converted} graph(s) converted, {refused} refused, {rewritten} citing graph(s) rewritten{tail}").format(
+            converted=len(plan["targets"]) - len(refused), refused=len(refused), rewritten=len(plan["rewrites"]),
+            tail=_("; {n} file(s) written").format(n=len(written)) if args.apply
+            else _("; nothing was written (plan)")))
+    return 1 if args.apply and refused else 0
 
 
 def main(argv=None):
@@ -1535,6 +1914,15 @@ def main(argv=None):
         "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
         "  kg_migrate.py nest --map MAP.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
         "  kg_migrate.py methods plan|apply [--json] [--confirmed-out FILE.tsv] [--manifest-out FILE.tsv] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+        "  kg_migrate.py format --to json [--apply] [--json] [--root DIR] [--repo-name NAME] graph.kg.yaml ...\n"
+        "\n"
+        "format turns each graph given into a .kg.json through the contract's parse (the round trip through the reader must\n"
+        "give the same document; NaN, infinity or a lone surrogate is refused) and rewrites, by text, every string of a\n"
+        "tracked graph that starts with the old path (external_edges, trace, verified_against, provenance.source): the path\n"
+        "alone, or followed by # or :, also as <repo>:<path> with this repository's name. A path inside prose stays and is counted, and the files outside the graphs that mention\n"
+        "it are listed. Each file touched goes through the gate with the corpus before and after, and may not gain a MUST code\n"
+        "or a SHOULD warning; a graph whose citer cannot be rewritten, or that would fail, is refused. With --apply, the\n"
+        "citers are written, the .kg.json is written and the .kg.yaml leaves (git keeps it).\n"
         "\n"
         "methods swaps the Portuguese alias of the provenance.method class (medição, leitura, juízes, derivado, testemunho)\n"
         "for the canonical English one (measurement, reading, judges, derived, testimony), by text: only the class changes,\n"
@@ -1631,8 +2019,21 @@ def main(argv=None):
         m.add_argument("--no-default-excludes", action="store_true",
                        help=_("does not apply the defaults: {globs}").format(globs=", ".join(DEFAULT_EXCLUDE)))
         m.add_argument("graphs", nargs="*")
+    fm = sub.add_parser("format", help=_("turns .kg.yaml graphs into .kg.json and rewrites the pointers of who cites them"))
+    fm.add_argument("--to", required=True, choices=["json"])
+    fm.add_argument("--apply", action="store_true", help=_("writes the conversion; without it, only the plan"))
+    fm.add_argument("--root", default=".")
+    fm.add_argument("--repo-name", help=_("the name other graphs give this repository in <repo>:<path>#<id> pointers "
+                                          "(default: the last part of the origin remote URL)"))
+    fm.add_argument("--json", action="store_true")
+    fm.add_argument("graphs", nargs="+")
     args = ap.parse_args(argv)
     kg_validate._utf8_stdio()  # no Windows, a saída para arquivo ou pipe seria cp1252 e derrubaria o → do JSON
+    if args.cmd == "format":
+        try:
+            return format_command(args)
+        except Broken as exc:
+            return broken_input(args, exc)
     if args.cmd == "nest":
         try:
             return nest_command(args)
