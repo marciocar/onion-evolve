@@ -2,8 +2,8 @@
 branch: feat/sac-447-update-wrappers
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: 6534ae3e88a90e3a2e76047683ec0b2893ff004bf31d9ed10703eb372681762f
+reviewed_diff_sha256: cbd98a8a9be4333916d405b6cd6ec3f931dcc27b506fa120ea9b964e724c6d9e
+reviewed_code_sha256: 885384417663c1c1e1ff7dee89d56b11d5ec8dd619519e004264816be74f4148
 findings_total: 11
 findings_real: 11
 findings_blocking: 2
