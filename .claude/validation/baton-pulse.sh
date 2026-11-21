@@ -31,6 +31,13 @@
 #   em voo    PRs com CI e idade, worktrees com pendência, sinais sem ack, perguntas reservadas, candidatas a selo e
 #             checkpoints: TUDO do decide-census.sh --tsv (achado ao lado), não remedido aqui.
 #   carga     /proc/loadavg e, onde existe, o `check` do lease de carga do core (ops/load-lease.sh, core-only).
+#   config    PASTAS DE CONFIG DECLARADAS (SAC-484, 2026-11-21): a sessão que roda com CLAUDE_CONFIG_DIR próprio (o hub, por
+#             exemplo) não aparece no `claude agents --json` padrão nem em ~/.claude/projects. A lista vem de
+#             BATON_CONFIG_DIRS (caminhos separados por `:`) ou, sem ela, de config-dirs.tsv no diretório de estado (um
+#             caminho por linha, # comenta, ~ expande). De cada pasta: a lista de peers (CLAUDE_CONFIG_DIR=<pasta>
+#             claude agents --json) e o `stat` de <pasta>/projects/*/<sessionId>.jsonl. NADA mais se lê lá dentro:
+#             nem conteúdo de transcript (os subagentes dessas sessões ficam fora, declarado), nem credencial, nem
+#             settings. Pasta declarada e ausente, ou lista de peers que falha, é lacuna nomeada.
 #
 # ── CLASSES (saída de máquina, em inglês) ───────────────────────────────────────────────────────
 #   PARKED           tem linha viva no parked.tsv. Vence tudo: parada por ordem NUNCA vira ociosa.
@@ -70,7 +77,10 @@
 #   SESSION_STOPPED        estado T|t (Ctrl+Z, SIGSTOP): suspensa e invisível, o harness segue listando idle.
 #   SESSION_NOT_IN_TMUX    sem TMUX e sem ancestral tmux (ex.: mosh-server→bash): sem reanexar e sem sobreviver a reboot/fim do terminal.
 #   SESSION_SAME_CHECKOUT  duas interativas vivas no mesmo topo git: a 2ª abre com `claude --worktree`.
-#   SESSION_CAP            SESSÕES interativas distintas (dedupe por sid; a retomada em dois terminais conta uma) acima de --max-interactive (padrão 10, D_SESSION_CAP_10_PLUS_5_AGENTS_1119, 2026-11-19; antes 8).
+#   SESSION_CAP            SESSÕES interativas distintas (dedupe por sid; a retomada em dois terminais conta uma) acima de --max-interactive.
+#                          O padrão é SESSION_CAP_DEFAULT, logo abaixo do cabeçalho: o ÚNICO lugar do número no código, ao lado do
+#                          id da decisão vigente (SESSION_CAP_DECISION). O --check-cap confere que a decisão existe, não foi
+#                          superada (aresta SUPERSEDES) e diz o número, e que baton.md e baton-doctrine.md citam o mesmo.
 #   Estado ou árvore ilegível é lacuna (HYGIENE_UNMEASURED), nunca «em tmux».
 #   Teto do que dá para medir: atividade é escrita no transcript ou prompt; uma sessão que só espera um processo
 #   longo em primeiro plano escreve no transcript ao voltar, então sai ociosa enquanto espera (o harness diz busy e
@@ -86,15 +96,24 @@
 # Uso:  bash .claude/validation/baton-pulse.sh [<repo>] [--markdown|--tsv] [--quiet] [--since <iso|epoch>]
 #                [--last-sha <sha>] [--idle-min N] [--stall-min N] [--peers <arquivo.json|->] [--no-peers] [--no-family]
 #                [--skip-repo <caminho>]... [--no-gh] [--self <sessionId>] [--max-interactive N]
+#       bash .claude/validation/baton-pulse.sh [<repo>] --check-cap   (o teto: decisão vigente × medidor × docs; rc 0|1)
 # Env (bancada; todo override ativo é DECLARADO na saída):
 #   BATON_NOW=<epoch>  BATON_STATE_DIR=<dir> (padrão ~/.local/state/onion/baton)  BATON_PROJECTS_DIR=<dir>
 #   BATON_DECIDE_TSV=<arquivo> (saída pronta do decide-census --tsv)  BATON_CLAUDE=<binário>  ONION_ASK_DIR=<dir>
 #   BATON_PROC=<dir> (um /proc falso: a bancada da higiene)  BATON_TOPLEVEL_TIMEOUT_S=<seg> (teto do rev-parse por cwd, padrão 5)
+#   BATON_CONFIG_DIRS=<dir[:dir]> (pastas de config extras; fonte de produção, não override: sai na linha «pastas de config»)
 # Exit: 0 = medido (inclusive com lacunas DECLARADAS) · 2 = entrada quebrada (opção, data, python3/PyYAML ausente).
+#       --check-cap: 0 = decisão, medidor e docs dizem o mesmo teto · 1 = desencontro (cada um nomeado) · 2 = entrada quebrada.
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_baton_pulse_selftests).
 # ===========================================================================
 set -uo pipefail
-REPO=""; MAXI="10"; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; STALL="15"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
+# O TETO DE SESSÕES: o único lugar do número no código. Vem da decisão vigente no grafo
+# (docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml; D_SESSION_CAP_10_PLUS_5_AGENTS_1119 supera
+# D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116). Mudou a decisão: troque os dois aqui e rode --check-cap.
+SESSION_CAP_DEFAULT="10"
+SESSION_CAP_DECISION="D_SESSION_CAP_10_PLUS_5_AGENTS_1119"
+CHECKCAP="0"
+REPO=""; MAXI="${SESSION_CAP_DEFAULT}"; FMT="--markdown"; QUIET="0"; SINCE=""; LAST=""; IDLE="20"; STALL="15"; PEERS=""; NOPEERS="0"; FAMILY="1"; SKIP=""; NOGH="0"; SELF=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "baton-pulse: $1 exige um valor" >&2; exit 2; }; }
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -112,6 +131,7 @@ while [ $# -gt 0 ]; do
     --no-gh) NOGH="1" ;;
     --max-interactive) _need "$@"; shift; MAXI="$1" ;;
     --self) _need "$@"; shift; SELF="$1" ;;
+    --check-cap) CHECKCAP="1" ;;
     --*) echo "baton-pulse: opção desconhecida: $1" >&2; exit 2 ;;
     *) REPO="$1" ;;
   esac
@@ -127,8 +147,56 @@ case "${LAST}" in ''|*[!0-9a-f]*) [ -z "${LAST}" ] || { echo "baton-pulse: --las
   || { echo "baton-pulse: --since inválido (${SINCE}) — AAAA-MM-DD[THH:MM[:SS]][Z] (UTC) ou epoch" >&2; exit 2; }
 REPO="${REPO:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 [ -d "${REPO}" ] || { echo "baton-pulse: alvo inexistente: ${REPO}" >&2; exit 2; }
+# ── --check-cap: o teto dito em um só lugar (SAC-484). O número do código é SESSION_CAP_DEFAULT; a autoridade é a
+#    decisão no grafo; a prosa (baton.md e baton-doctrine.md) é cópia conferida. Desencontro = rc 1, cada um nomeado.
+if [ "${CHECKCAP}" = 1 ]; then
+  command -v python3 >/dev/null 2>&1 || { echo "baton-pulse --check-cap: python3 ausente" >&2; exit 2; }
+  PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${SESSION_CAP_DEFAULT}" "${SESSION_CAP_DECISION}" <<'PYCAP'
+import sys, os, re, glob
+repo, cap, dec = sys.argv[1:4]
+try:
+    import yaml
+except ImportError:
+    print('baton-pulse --check-cap: PyYAML ausente', file=sys.stderr); sys.exit(2)
+bad, found = [], None
+for g in sorted(glob.glob(os.path.join(glob.escape(repo), 'docs/onion/graph/*.kg.yaml'))):
+    try: d = yaml.safe_load(open(g, encoding='utf-8')) or {}
+    except Exception as e: print(f'baton-pulse --check-cap: grafo ilegível {g}: {e}', file=sys.stderr); sys.exit(2)
+    for n in d.get('nodes') or []:
+        if isinstance(n, dict) and n.get('id') == dec: found = (g, n)
+    for e in d.get('edges') or []:
+        if isinstance(e, dict) and e.get('to') == dec and e.get('edge_type') == 'SUPERSEDES':
+            bad.append(f'a decisão citada {dec} foi SUPERADA por {e.get("from")} ({os.path.relpath(g, repo)}): o teto do medidor está velho')
+if not found: bad.append(f'a decisão citada {dec} não existe em docs/onion/graph/*.kg.yaml')
+else:
+    g, n = found
+    if n.get('status') != 'done': bad.append(f'{dec} não está selada (status {n.get("status")!r}, esperado done)')
+    # o número ancorado ao substantivo: o rótulo vigente também diz «5 agentes», «15» e «12» (carga), e um teto 5 ou
+    # 15 não pode passar por eles (achado da revisão isolada, 2026-11-21)
+    if not re.search(rf'(?<!\d){re.escape(cap)}\s+sess', str(n.get('label') or '')):
+        bad.append(f'o rótulo de {dec} não diz o teto «{cap} sessões»: «{str(n.get("label") or "")[:120]}»')
+for rel in ('.claude/commands/meta/baton.md', '.claude/commands/common/prompts/baton-doctrine.md'):
+    p = os.path.join(repo, rel)
+    try: txt = open(p, encoding='utf-8').read()
+    except OSError: bad.append(f'{rel} ausente: não há como conferir o teto citado'); continue
+    flat = re.sub(r'\s+', ' ', txt)
+    # toda menção à flag, com ou sem crase, seguida do 1º número em até 30 caracteres sem dígito: «(padrão 4)»,
+    # «`--max-interactive 4`», «: padrão 4» e «é 4» reprovam (achado da revisão isolada: a 1ª forma deixava passar)
+    nums = re.findall(r'--max-interactive`?[^\d]{0,30}?(\d+)', flat)
+    if not nums: bad.append(f'{rel}: não cita o padrão de `--max-interactive` (esperado «padrão {cap}» ou «({cap})»)')
+    for x in nums:
+        if x != cap: bad.append(f'{rel}: diz `--max-interactive` padrão {x}, o medidor usa {cap} ({dec})')
+    if dec not in txt: bad.append(f'{rel}: não cita a decisão vigente {dec}')
+if bad:
+    for b in bad: print(f'CAP_MISMATCH\t{b}')
+    sys.exit(1)
+print(f'CAP_OK\t{cap}\t{dec}\tdecisão vigente, medidor, baton.md e baton-doctrine.md dizem o mesmo')
+PYCAP
+  exit $?
+fi
 git -C "${REPO}" rev-parse --git-dir >/dev/null 2>&1 || { echo "baton-pulse: sem índice git em ${REPO}" >&2; exit 2; }
 command -v python3 >/dev/null 2>&1 || { echo "baton-pulse: python3 ausente — não meço sem ele (nunca 0 em silêncio)" >&2; exit 2; }
+
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TMPD="$(mktemp -d)"; trap 'rm -rf "${TMPD}"' EXIT
 if [ "${PEERS}" = "-" ]; then cat > "${TMPD}/peers.json"; PEERS="${TMPD}/peers.json"; fi
@@ -156,6 +224,35 @@ else
   else PEERS_SRC="ausente: ${_cl} (sem binário do harness nesta máquina)"; fi
 fi
 
+# ── pastas de config declaradas (SAC-484): a sessão com CLAUDE_CONFIG_DIR próprio fica fora da lista padrão ──
+# Da pasta só sai a lista de peers (pelo próprio harness) e, no Python, o stat dos transcripts. Uma linha por pasta em
+# ${TMPD}/cfg.tsv: <pasta>\t<arquivo de peers ou vazio>\t<fonte ou motivo da lacuna>.
+CFG_SRC=""; : > "${TMPD}/cfg.tsv"
+_bsd="${BATON_STATE_DIR:-${XDG_STATE_HOME:-${HOME}/.local/state}/onion/baton}"
+if [ -n "${BATON_CONFIG_DIRS:-}" ]; then CFG_SRC="env BATON_CONFIG_DIRS"; tr ':' '\n' <<< "${BATON_CONFIG_DIRS}" > "${TMPD}/cfg.list"
+elif [ -f "${_bsd}/config-dirs.tsv" ]; then
+  if [ -r "${_bsd}/config-dirs.tsv" ]; then CFG_SRC="${_bsd}/config-dirs.tsv"; cut -f1 "${_bsd}/config-dirs.tsv" > "${TMPD}/cfg.list"
+  else CFG_SRC="ilegível: ${_bsd}/config-dirs.tsv"; : > "${TMPD}/cfg.list"; fi
+else CFG_SRC="nenhuma declarada (${_bsd}/config-dirs.tsv ausente)"; : > "${TMPD}/cfg.list"; fi
+_cfgn=0
+while IFS= read -r _cd || [ -n "${_cd}" ]; do
+  # «#» comenta só no começo da linha ou depois de espaço: «/x/a#b» é caminho (achado da revisão isolada)
+  _cd="$(sed -E 's/(^|[[:space:]])#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//' <<< "${_cd}")"; [ -n "${_cd}" ] || continue
+  case "${_cd}" in "~") _cd="${HOME}" ;; "~/"*) _cd="${HOME}/${_cd#\~/}" ;; esac
+  _cfgn=$((_cfgn + 1)); _cf=""
+  if [ -d "${_cd}" ] && [ "$(realpath "${_cd}")" = "$(realpath -m "${CLAUDE_CONFIG_DIR:-${HOME}/.claude}")" ]; then _cs="padrão"
+  elif [ ! -d "${_cd}" ]; then _cs="ausente: a pasta declarada não existe"
+  elif [ "${NOPEERS}" = 1 ]; then _cs="desligada (--no-peers)"
+  else
+    _cl="${BATON_CLAUDE:-claude}"
+    if ! command -v "${_cl}" >/dev/null 2>&1; then _cs="ausente: ${_cl}"
+    elif CLAUDE_CONFIG_DIR="${_cd}" timeout 20 "${_cl}" agents --json > "${TMPD}/cfg-${_cfgn}.json" 2>/dev/null; then
+      _cf="${TMPD}/cfg-${_cfgn}.json"; _cs="cmd:CLAUDE_CONFIG_DIR=<pasta> ${_cl} agents --json"
+    else _cs="falhou: CLAUDE_CONFIG_DIR=<pasta> ${_cl} agents --json (rc $?)"; fi
+  fi
+  printf '%s\t%s\t%s\n' "${_cd}" "${_cf}" "${_cs}" >> "${TMPD}/cfg.tsv"
+done < "${TMPD}/cfg.list"
+
 # ── carga ──
 LOAD_LINE=""
 if [ -r /proc/loadavg ]; then LOAD_LINE="load1 $(cut -d' ' -f1 /proc/loadavg)"; else LOAD_LINE="não medida (/proc/loadavg ilegível)"; fi
@@ -167,17 +264,21 @@ else LOAD_LINE="${LOAD_LINE} · lease ausente neste papel"; fi
 OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE|PROC|TOPLEVEL_TIMEOUT_S)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${QUIET}" "${SINCE}" "${LAST}" "${IDLE}" "${PEERS}" "${PEERS_SRC}" \
-  "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" "${STALL}" "${MAXI}" <<'PY'
+  "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" "${STALL}" "${MAXI}" \
+  "${TMPD}/cfg.tsv" "${CFG_SRC}" "${SESSION_CAP_DECISION}" <<'PY'
 import sys, os, re, json, glob, time, hashlib, subprocess, datetime
 (repo, fmt, quiet, since, last_sha, idle_min, peers_file, peers_src, family, skip, self_sid, here, dc_file, dc_rc,
- load_line, ovr, stall_min, max_inter) = sys.argv[1:19]
+ load_line, ovr, stall_min, max_inter, cfg_file, cfg_src, cap_decision) = sys.argv[1:22]
 stall_s = int(stall_min) * 60
 quiet = quiet == '1'; idle_s = int(idle_min) * 60
 self_sid = self_sid or os.environ.get('CLAUDE_CODE_SESSION_ID', '')
 now = int(os.environ.get('BATON_NOW') or time.time())
 home = os.path.expanduser('~')
 state_dir = os.environ.get('BATON_STATE_DIR') or os.path.join(os.environ.get('XDG_STATE_HOME') or os.path.join(home, '.local/state'), 'onion/baton')
-proj_dir = os.environ.get('BATON_PROJECTS_DIR') or os.path.join(home, '.claude/projects')
+# a pasta padrão é a do harness desta execução: o `claude agents --json` sem prefixo herda o CLAUDE_CONFIG_DIR do
+# ambiente, então o transcript padrão mora na mesma pasta (achado da revisão isolada, 2026-11-21)
+default_cfg = os.environ.get('CLAUDE_CONFIG_DIR') or os.path.join(home, '.claude')
+proj_dir = os.environ.get('BATON_PROJECTS_DIR') or os.path.join(default_cfg, 'projects')
 ask_dir = os.environ.get('ONION_ASK_DIR') or os.path.join(os.environ.get('XDG_STATE_HOME') or os.path.join(home, '.local/state'), 'onion/maestro-asks')
 try:
     import yaml
@@ -205,6 +306,7 @@ def git(*a, cwd=None, timeout=None):
 def real(p):
     try: return os.path.realpath(p)
     except Exception: return p
+def tilde(x): return re.sub(r'^/home/[^/]+|^/root(?=/|$)', '~', x or '')
 def mins(sec): return None if sec is None else max(0, sec) // 60
 
 gaps, warns = [], []
@@ -224,6 +326,8 @@ def sess(sid):
     return S.setdefault(sid, {'sid': sid, 'name': '', 'cwd': '', 'pid': None, 'status': '', 'state': '', 'kind': '',
                               'beacon': '', 'branch': '', 'started': None, 'act': None, 'act_src': '', 'src': []})
 peers_ok = False; PROCS = []
+def in_peers(s):   # a lista padrão ('peers') ou a de uma pasta de config declarada ('peers@<pasta>')
+    return any(x == 'peers' or x.startswith('peers@') for x in s['src'])
 if peers_file and not peers_src.startswith(('falhou', 'ausente', 'desligada')):
     try:
         data = json.load(open(peers_file, encoding='utf-8'))
@@ -242,6 +346,41 @@ if peers_file and not peers_src.startswith(('falhou', 'ausente', 'desligada')):
         gaps.append(f'lista de peers ilegível ({peers_file}): {e}'); peers_src = f'ilegível: {e}'
 else:
     gaps.append(f'lista de peers NÃO MEDIDA ({peers_src}): na sessão, a ferramenta ListAgents a dá; salve-a em JSON e passe --peers <arquivo>')
+
+# ── pastas de config declaradas (SAC-484): peers de cada uma e o diretório de transcripts dela (só stat) ──────
+CFG = []   # (pasta, rótulo, projects ou None)
+if cfg_src.startswith('ilegível'): gaps.append(f'pastas de config declaradas NÃO MEDIDAS: {cfg_src}')
+for ln in open(cfg_file, encoding='utf-8', errors='replace').read().splitlines():
+    cd, cf, cs = (ln.split('\t') + ['', ''])[:3]
+    cdr = real(cd); lab = tilde(cdr)   # o caminho, não o basename: /a/.claude e /b/.claude não se confundem
+    if cdr in (real(default_cfg), real(os.path.dirname(proj_dir))): continue   # a pasta padrão já é medida
+    if not os.path.isdir(cdr): gaps.append(f'pasta de config declarada {tilde(cd)} {cs}: as sessões dela ficam invisíveis, não «zero»'); continue
+    pj = os.path.join(cdr, 'projects')
+    CFG.append((cdr, lab, pj if os.path.isdir(pj) else None))
+    if not os.path.isdir(pj): gaps.append(f'transcripts de {tilde(cd)} não medidos: {tilde(pj)} ausente (a atividade cai na lista de peers)')
+    if not cf:
+        gaps.append(f'lista de peers de {tilde(cd)} NÃO MEDIDA ({cs}): as sessões dessa pasta ficam invisíveis, não «zero»'); continue
+    try:
+        data = json.load(open(cf, encoding='utf-8'))
+        if not isinstance(data, list): raise ValueError('não é lista')
+    except Exception as e:
+        gaps.append(f'lista de peers de {tilde(cd)} ilegível: {e}'); continue
+    seen_proc = {(str(p.get('pid')), str(p.get('sessionId') or p.get('id') or '')) for p in PROCS}
+    for x in data:
+        if not isinstance(x, dict): continue
+        # o mesmo processo visto por duas listas (pulso rodando com CLAUDE_CONFIG_DIR igual a uma pasta declarada) entra
+        # UMA vez: senão a higiene acusa «mesmo checkout» e «dois terminais» para um processo só (achado da revisão)
+        k = (str(x.get('pid')), str(x.get('sessionId') or x.get('id') or ''))
+        if k not in seen_proc: PROCS.append(x); seen_proc.add(k)
+        sid = str(x.get('sessionId') or x.get('id') or '')
+        if not sid: continue
+        fresh = sid not in S
+        s = sess(sid); s['src'].append(f'peers@{lab}')
+        if fresh or not s['name']:
+            s['name'] = str(x.get('name') or ''); s['cwd'] = real(str(x.get('cwd') or ''))
+            s['pid'] = x.get('pid'); s['status'] = str(x.get('status') or ''); s['state'] = str(x.get('state') or '')
+            s['kind'] = str(x.get('kind') or '')
+            if x.get('startedAt'): s['started'] = int(x['startedAt']) // (1000 if int(x['startedAt']) > 10**11 else 1)
 
 # ── faróis: este repo e a família ───────────────────────────────────────────────────────
 beacon_tool = os.path.join(here, 'session-beacon.sh')
@@ -288,9 +427,11 @@ else:
 # ── atividade pelo transcript (só stat) ─────────────────────────────────────────────────
 proj_ok = os.path.isdir(proj_dir)
 if not proj_ok: gaps.append(f'transcripts não medidos: {proj_dir} ausente (a atividade cai só no farol)')
+# as pastas de config declaradas entram SÓ aqui (stat do transcript), nunca na leitura de subagentes adiante
+stat_dirs = ([proj_dir] if proj_ok else []) + [pj for _, _, pj in CFG if pj]
 for s in S.values():
-    if proj_ok:
-        fs = glob.glob(os.path.join(glob.escape(proj_dir), '*', glob.escape(s['sid']) + '.jsonl'))
+    if stat_dirs:
+        fs = [f for d in stat_dirs for f in glob.glob(os.path.join(glob.escape(d), '*', glob.escape(s['sid']) + '.jsonl'))]
         if fs:
             t = int(max(os.path.getmtime(f) for f in fs))
             if s['act'] is None or t > s['act']: s['act'], s['act_src'] = t, 'transcript.mtime'
@@ -451,13 +592,13 @@ for s in S.values():
     idle_for = None if s['act'] is None else now - s['act']
     s['idle_for'] = idle_for
     if pk: cls, note = 'PARKED', why
-    elif park_unknown and not (s['pid'] is not None and alive is False) and not ('peers' not in s['src'] and s['beacon'] in ('orphan', 'stale')):
+    elif park_unknown and not (s['pid'] is not None and alive is False) and not (not in_peers(s) and s['beacon'] in ('orphan', 'stale')):
         cls, note = 'PARK_UNMEASURED', f'estado de parada não medido ({park_st}): sem oferta'
     elif s['pid'] is not None and alive is False: cls, note = 'UNREACHABLE', f'pid {s["pid"]} morto'
-    elif 'peers' in s['src'] and s['pid'] is None and s['kind'] == 'background' and s['state'] != 'working':
+    elif in_peers(s) and s['pid'] is None and s['kind'] == 'background' and s['state'] != 'working':
         cls, note = 'UNREACHABLE', f'sessão de fundo sem processo (state {s["state"] or "?"})'
-    elif 'peers' not in s['src'] and s['beacon'] in ('orphan', 'stale'): cls, note = 'UNREACHABLE', f'farol {s["beacon"]}'
-    elif 'peers' not in s['src'] and peers_ok: cls, note = 'UNREACHABLE', f'farol {s["beacon"]}, mas fora da lista de peers do harness (que foi lida)'
+    elif not in_peers(s) and s['beacon'] in ('orphan', 'stale'): cls, note = 'UNREACHABLE', f'farol {s["beacon"]}'
+    elif not in_peers(s) and peers_ok: cls, note = 'UNREACHABLE', f'farol {s["beacon"]}, mas fora da lista de peers do harness (que foi lida)'
     elif s['status'] == 'busy': cls, note = 'ACTIVE', 'harness: busy'
     elif idle_for is not None and idle_for < idle_s: cls, note = 'ACTIVE', f'atividade há {mins(idle_for)}min ({s["act_src"]})'
     else:
@@ -467,7 +608,7 @@ for s in S.values():
     s['cls'], s['note'] = cls, note
 
 # farol STALE sem peer é rastro velho (fora do TTL do farol), não sessão: sai da tabela e da contagem, e vira uma linha
-stale_traces = sorted(s['sid'] for s in S.values() if 'peers' not in s['src'] and s['beacon'] == 'stale' and s['cls'] == 'UNREACHABLE')
+stale_traces = sorted(s['sid'] for s in S.values() if not in_peers(s) and s['beacon'] == 'stale' and s['cls'] == 'UNREACHABLE')
 for sid in stale_traces: del S[sid]
 # ── subagentes das sessões vivas: o SINTOMA do agente parado num tool_use sem resultado (SAC-421) ──
 # Medido em 2026-11-12: o transcript do subagente mora em <projects>/<projeto>/<sessionId>/subagents/agent-<id>.jsonl
@@ -658,7 +799,7 @@ pc_line = ('peças: ' + ' · '.join(f'{c} {sum(1 for p in PIECES if p["cls"] == 
 #   SESSION_SAME_CHECKOUT duas interativas vivas no mesmo checkout git (topo git do cwd, não a worktree): a 2ª vai de --worktree.
 #                         SÓ dentro de repo git: fora dele o remédio --worktree não existe, então não se classifica. O rev-parse por
 #                         cwd tem teto curto (BATON_TOPLEVEL_TIMEOUT_S, padrão 5s); estouro vira HYGIENE_UNMEASURED, nunca «mesmo checkout» por palpite.
-#   SESSION_CAP           SESSÕES interativas distintas (dedupe por sid) acima de --max-interactive (padrão 10; o teto prático é 10 sessões + 5 agentes; D_SESSION_CAP_10_PLUS_5_AGENTS_1119, 2026-11-19).
+#   SESSION_CAP           SESSÕES interativas distintas (dedupe por sid) acima de --max-interactive (padrão SESSION_CAP_DEFAULT, da decisão SESSION_CAP_DECISION).
 #   Ilegível nunca é limpo: estado ou árvore que não se leem saem como lacuna nomeada (HYGIENE_UNMEASURED), não «em tmux».
 proc_root = os.environ.get('BATON_PROC') or '/proc'
 try: toplevel_timeout = float(os.environ.get('BATON_TOPLEVEL_TIMEOUT_S') or 5)
@@ -677,7 +818,6 @@ def has_tmux_key(pid):
     try: raw = open(os.path.join(proc_root, str(pid), 'environ'), 'rb').read()
     except OSError: return None
     return any(e.startswith(b'TMUX=') for e in raw.split(b'\0'))
-def tilde(x): return re.sub(r'^/home/[^/]+|^/root(?=/|$)', '~', x or '')
 def tmux_name(x): return re.sub(r'[^A-Za-z0-9_-]+', '-', x or 'sessao').strip('-') or 'sessao'
 home_dir = real(os.environ.get('HOME') or os.path.expanduser('~'))
 def opener_name(cwd):
@@ -750,7 +890,7 @@ if peers_ok:
     inter_sessions = len({p['sid'] for p in inter if p['sid']}) + sum(1 for p in inter if not p['sid'])
     if inter_sessions > int(max_inter):
         proc_note = f' ({len(inter)} processo(s))' if len(inter) != inter_sessions else ''
-        HY.append(('SESSION_CAP', None, f'{inter_sessions} sessão(ões) interativa(s) distinta(s){proc_note} acima do teto de {max_inter} (teto prático: 10 sessões + 5 agentes)',
+        HY.append(('SESSION_CAP', None, f'{inter_sessions} sessão(ões) interativa(s) distinta(s){proc_note} acima do teto de {max_inter} ({cap_decision})',
                    'feche ou estacione (parked.tsv) a ociosa sem fila; agente em vez de sessão para trabalho curto'))
 else: hy_gaps.append('lista de peers não lida: sem pid não há processo a medir')
 HORD = {c: i for i, c in enumerate(('SESSION_STOPPED', 'SESSION_NOT_IN_TMUX', 'SESSION_SAME_CHECKOUT', 'SESSION_CAP'))}
@@ -781,7 +921,7 @@ state = {'s': sorted((s['sid'], s['cls'], len(s['queue'])) for s in S.values()),
          'pr': sorted((p['ref'], p['ci'], p['stopped']) for p in prs), 'wt': sorted((t['ref'], t['path'], t['stopped']) for t in threads),
          'sig': sorted(f"{r.get('ref')}|{r.get('label')}" for r in signals), 'ask': sorted(a['key'] for a in asks if a['live']), 'busy': 'OCUPADO' in load_line,
          'measured': [prs_measured, signals_measured, asks_measured, park_st],
-         'cp': len(checkpoints), 'gaps': sorted(gaps),
+         'cp': len(checkpoints), 'gaps': sorted(gaps), 'cfg': sorted(c for c, _, _ in CFG),
          'ag': sorted((a['sid'], a['aid'], a['cls']) for a in AG if a['cls'] in AG_ALERT), 'ag_n': [acnt[c] for c in AG_ALERT],
          'pc': sorted((p['id'], p['cls'], p['owner']) for p in PIECES),
          'hy': sorted((h[0], h[1]['sid'] if h[1] else '', h[1]['name'] if h[1] else '') for h in HY)}
@@ -808,6 +948,7 @@ if fmt == '--tsv':
     print(f'maestro\tasks\t-\t-\t\t{sum(1 for a in asks if a["live"])}\tmaestro-ask\tvencidas {sum(1 for a in asks if not a["live"])}')
     print(f'maestro\tseal_candidates\t-\t-\t\t{len(seals)}\tdecide-census\tcheckpoints {len(checkpoints)} · nós open owner:maestro {len(owned.get("maestro", []))}')
     print(f'load\t-\t-\t-\t\t\t/proc/loadavg+lease\t{tsvc(load_line)}')
+    print(f'config_dirs\t-\t-\t-\t\t{len(CFG)}\t{tsvc(cfg_src)}\t' + tsvc(', '.join(tilde(c) for c, _, _ in CFG) or '—'))
     print(f'stale_beacons\t-\t-\t-\t\t{len(stale_traces)}\tfarol\trastro fora do TTL, sem peer')
     for e in events: print(f'change\t-\t-\t-\t\t\tsince\t{tsvc(e)}')
     for g in gaps: print(f'gap\t-\t-\t-\t\t\t-\t{tsvc(g)}')
@@ -827,6 +968,7 @@ print(f'# {head}')
 print(f'fontes: peers={peers_src} · farol={beacon_desc} · repos={len(repos)} · transcript={"stat de " + proj_dir if proj_ok else "não medido"} · '
       f'em voo=decide-census rc {dc_rc} · perguntas={ask_dir} · parked={park_p}{" (" + str(len(park_rows)) + " linha(s))" if park_rows is not None else (" (ausente: ninguém parado por ordem)" if park_st == "absent" else " (" + park_st + ": NÃO MEDIDO)")} · '
       f'rótulos={own_p if own_rows is not None else ("derivados" if own_st == "absent" else "derivados (" + own_st + ")")} · ociosa após {idle_min}min · papel={role or "?"}')
+print(f'pastas de config extras: {len(CFG)} ({cfg_src})' + (': ' + ', '.join(tilde(c) for c, _, _ in CFG) + ' · delas só a lista de peers e o stat dos transcripts; subagentes delas NÃO lidos (conteúdo)' if CFG else ''))
 print(f'classes: {cls_line}')
 print(ag_line)
 print(pc_line)

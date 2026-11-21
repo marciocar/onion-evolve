@@ -76,7 +76,15 @@ reporte à sessão dona; não mate nem reinicie o agente por ela.
 Higiene das sessões (cláusula 9 da doutrina, `D_SESSION_HYGIENE_TMUX_WORKTREE_1114`), por processo interativo vivo:
 `SESSION_STOPPED` (estado T no `/proc/<pid>/stat`), `SESSION_NOT_IN_TMUX` (sem a chave `TMUX` no ambiente do `claude` e sem
 tmux na árvore), `SESSION_SAME_CHECKOUT` (duas interativas no mesmo topo git) e `SESSION_CAP` (acima de `--max-interactive`,
-padrão 4). Cada aviso traz a cura como texto; reporte-a à sessão dona ou ao maestro, nunca a execute por eles.
+padrão 10, a decisão vigente `D_SESSION_CAP_10_PLUS_5_AGENTS_1119`, que superou o teto 8 de
+`D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116`). O número mora num lugar só, `SESSION_CAP_DEFAULT` no medidor;
+`bash .claude/validation/baton-pulse.sh --check-cap` confere a decisão no grafo, o medidor e esta página, e a bancada
+o roda. Cada aviso traz a cura como texto; reporte-a à sessão dona ou ao maestro, nunca a execute por eles.
+
+Pastas de config declaradas: a sessão que roda com `CLAUDE_CONFIG_DIR` próprio (o hub, por exemplo) não aparece na
+lista de peers padrão nem em `~/.claude/projects`. Declare a pasta em `~/.local/state/onion/baton/config-dirs.tsv` (um
+caminho por linha) ou em `BATON_CONFIG_DIRS` (separada por `:`), e o pulso lê dela só a lista de peers e o `stat` dos
+transcripts. Os subagentes dessas sessões ficam fora por desenho: medi-los exigiria ler o conteúdo.
 
 ## Procedimento
 
