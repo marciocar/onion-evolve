@@ -56210,7 +56210,7 @@ DEC_PY
     printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "${REPO_ROOT}/.claude/validation/kg-radar.sh" > "${_sm}/${_smv}/validation/kg-radar.sh"
     cp "${REPO_ROOT}/.claude/utils/kg/kgssot-tools.sh" "${_sm}/${_smv}/utils/kg/"
     if [ "${_smv}" = mut ]; then
-      sed -i "s|^method = f'testimony: decisão do maestro|method = f'testemunho: decisão do maestro|" "${_sm}/${_smv}/validation/kg-decide-seal.sh"
+      sed -i "s|^\\( *\\)method = f'testimony: decisão do maestro|\\1method = f'testemunho: decisão do maestro|" "${_sm}/${_smv}/validation/kg-decide-seal.sh"
       cmp -s "${seal}" "${_sm}/${_smv}/validation/kg-decide-seal.sh" && { _smres="${_smres} mut:âncora-não-casou"; continue; }
     fi
     cp "${r}/docs/a/a.kg.yaml" "${_sm}/${_smv}/s.kg.yaml"
@@ -56223,6 +56223,55 @@ DEC_PY
   if [ "${_smres}" = " limpa:testimony mut:testemunho" ] && grep -q "^testimony: decisão do maestro por pergunta com opções, 2026-11-10$" <<< "$(python3 -I -B -c 'import sys,yaml; print([x for x in yaml.safe_load(open(sys.argv[1]))["nodes"] if x["id"]=="D_VELHO"][0]["provenance"]["method"])' "${_sm}/limpa/s.kg.yaml" 2>&1)"; then
     record_pass "decide: (s1m) o selo novo grava 'testimony: decisão do maestro…' (classe em inglês); (MUT) o selador de volta ao alias 'testemunho:' reprova, a cópia limpa no mesmo arranjo passa"
   else record_fail "decide: (s1m)" "esperava a cópia limpa gravando testimony e o mutante gravando testemunho (classe gravada por cópia):${_smres}"; fi
+  # (s18) --decided-by core (2026-11-21): na ausência do maestro o core sela em nome próprio, dentro da autorização
+  #       dele, e o selo diz isso (source, method, verified_against, narrative) e pede a revisão dele; o nó existente e
+  #       o --new levam as mesmas marcas. --other, --batch e valor fora de maestro|core → rc 2, nada escrito. Sem a flag segue
+  #       «decisão do maestro» (o s1 cobre). Cópia LIMPA e MUTANTE no mesmo arranjo do s1m; o mutante desliga o ramo
+  #       do core (`if decided_by == 'core':` → `if False:`) e o caso tem de reprovar só por isso.
+  local _cb="${sb}/seal-core" _cbv _cbres=""
+  for _cbv in limpa mut; do
+    rm -rf "${_cb}/${_cbv}"; mkdir -p "${_cb}/${_cbv}/validation" "${_cb}/${_cbv}/utils/kg"
+    cp "${seal}" "${_cb}/${_cbv}/validation/"
+    printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "${REPO_ROOT}/.claude/validation/kg-radar.sh" > "${_cb}/${_cbv}/validation/kg-radar.sh"
+    cp "${REPO_ROOT}/.claude/utils/kg/kgssot-tools.sh" "${_cb}/${_cbv}/utils/kg/"
+    if [ "${_cbv}" = mut ]; then
+      sed -i "s|^if decided_by == 'core':$|if False:|" "${_cb}/${_cbv}/validation/kg-decide-seal.sh"
+      cmp -s "${seal}" "${_cb}/${_cbv}/validation/kg-decide-seal.sh" && { _cbres="${_cbres} mut:âncora-não-casou"; continue; }
+    fi
+    cp "${r}/docs/a/a.kg.yaml" "${_cb}/${_cbv}/s.kg.yaml"
+    if bash "${_cb}/${_cbv}/validation/kg-decide-seal.sh" "${_cb}/${_cbv}/s.kg.yaml" D_VELHO --chosen "caminho um" --rejected "caminho dois" --date 2026-11-21 --question "qual?" --decided-by core > "${_cb}/${_cbv}.out" 2>&1 \
+       && bash "${_cb}/${_cbv}/validation/kg-decide-seal.sh" "${_cb}/${_cbv}/s.kg.yaml" --new D_DO_CORE --label "o core decidiu" --link Q_CITADO --chosen "X" --rejected "Y" --date 2026-11-21 --question "qual?" --decided-by core >> "${_cb}/${_cbv}.out" 2>&1; then
+      if python3 -I -B - "${_cb}/${_cbv}/s.kg.yaml" <<'DEC_PY'
+import sys, yaml
+ns = {x['id']: x for x in yaml.safe_load(open(sys.argv[1]))['nodes']}
+ok = True
+for nid in ('D_VELHO', 'D_DO_CORE'):
+    n = ns[nid]; p = n['provenance']
+    ok = ok and (n['status'] == 'done' and n['plane'] == 'DEV'
+                 and p['method'] == 'testimony: decisão do core dentro da autorização do maestro, 2026-11-21, com revisão do maestro pendente'
+                 and p['source'].startswith('sessão do core') and 'maestro, na sessão' not in p['source']
+                 and p['locator'] == 'pergunta registrada de 2026-11-21: «qual?»'
+                 and n['verified_against'].startswith('decisão do core em 2026-11-21') and 'revisão do maestro pendente' in n['verified_against']
+                 and 'Selado pelo core por /meta:decide em 2026-11-21' in n['narrative'] and 'Revisão do maestro pendente' in n['narrative'])
+sys.exit(0 if ok else 1)
+DEC_PY
+      then _cbres="${_cbres} ${_cbv}:core"; else _cbres="${_cbres} ${_cbv}:maestro"; fi
+    else _cbres="${_cbres} ${_cbv}:rc($(tail -1 "${_cb}/${_cbv}.out"))"; fi
+  done
+  local _cbo _cbrc _cbref=""
+  cp "${r}/docs/a/a.kg.yaml" "${sb}/core-ref.kg.yaml"; h0="$(sha256sum "${sb}/core-ref.kg.yaml" | cut -d' ' -f1)"
+  for _cbo in "--decided-by core --other" "--decided-by ninguem" "--decided-by"; do
+    # shellcheck disable=SC2086
+    if bash "${seal}" "${sb}/core-ref.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-11-21 --question q ${_cbo} >/dev/null 2>&1; then _cbrc=0; else _cbrc=$?; fi
+    [ "${_cbrc}" -eq 2 ] && [ "$(sha256sum "${sb}/core-ref.kg.yaml" | cut -d' ' -f1)" = "${h0}" ] || _cbref="${_cbref} [${_cbo}]:rc${_cbrc}"
+  done
+  # o lote recusa o core pela recusa PRÓPRIA (a mensagem é o veredito: um lote vazio também sairia rc 2 por outro motivo)
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "${sb}/core-ref.kg.yaml" D_VELHO request ceo 2026-12-01 motivo > "${sb}/core-lote.tsv"
+  if _cbout="$(bash "${seal}" --batch "${sb}/core-lote.tsv" --preview --date 2026-11-21 --question q --decided-by core 2>&1)"; then _cbrc=0; else _cbrc=$?; fi
+  { [ "${_cbrc}" -eq 2 ] && grep -q 'decided-by core não se mistura com --batch' <<< "${_cbout}"; } || _cbref="${_cbref} [--batch]:rc${_cbrc}"
+  if [ "${_cbres}" = " limpa:core mut:maestro" ] && [ -z "${_cbref}" ]; then
+    record_pass "decide: (s18) --decided-by core grava source/method/verified_against/narrative do core com revisão do maestro pendente (nó existente e --new); --other, --batch e valor torto → rc 2, nada escrito; (MUT) sem o ramo do core, o selo volta a dizer maestro"
+  else record_fail "decide: (s18)" "esperava a cópia limpa gravando o core e o mutante gravando o maestro:${_cbres}; recusas:${_cbref:- ok}"; fi
   # (s2) nó inexistente → rc 2 e o arquivo intacto
   h0="$(sha256sum "${g}" | cut -d' ' -f1)"
   if out="$(bash "${seal}" "${g}" D_NAO_EXISTE --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi

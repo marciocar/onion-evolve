@@ -74,6 +74,11 @@ Cada resposta vira escrita no grafo **antes** da próxima rodada, pelo selador
 (`.claude/validation/kg-decide-seal.sh`), nunca à mão: nó existente → `status: done`, `verified_at`,
 `provenance.method` = `testimony: decisão do maestro por pergunta com opções, <data>`, a escolhida e
 as descartadas na `narrative`; decisão sem nó → `D_` novo no grafo do tema, ligado ao nó de onde veio.
+Quando quem decide é o **core**, na ausência do maestro e dentro da autorização dele, o selador recebe
+`--decided-by core`: a proveniência passa a `testimony: decisão do core dentro da autorização do maestro,
+<data>, com revisão do maestro pendente`, e o `verified_against` e a narrative dizem o mesmo. Sem a flag
+o selo segue como decisão do maestro. Dano de 2026-11-21: dois selos do core gravados como do maestro
+tiveram a proveniência reescrita à mão.
 Só se sela nó **`open`** (lista positiva: `confirmed` com proveniência medida não é re-carimbado), com
 a **pergunta** registrada (`--question` é obrigatório: é o único rastro de que houve pergunta), data
 que não está no futuro, escolha não vazia e distinta das descartadas; a narrative anterior fica

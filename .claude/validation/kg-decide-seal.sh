@@ -4,7 +4,8 @@
 #
 # Uso:
 #   bash .claude/validation/kg-decide-seal.sh <grafo.kg.yaml> <NODE_ID> \
-#        --chosen "<opção escolhida>" --rejected "<a|b|c>" --date AAAA-MM-DD --question "<pergunta>" [--other]
+#        --chosen "<opção escolhida>" --rejected "<a|b|c>" --date AAAA-MM-DD --question "<pergunta>" [--other] \
+#        [--decided-by maestro|core]
 #   bash .claude/validation/kg-decide-seal.sh <grafo.kg.yaml> --new <D_ID> --label "<afirmação ≤280>" \
 #        --link <ID_EXISTENTE> [--edge-type TRACES_TO] [--impact 3] --chosen ... --rejected ... --date ... --question ...
 #   bash .claude/validation/kg-decide-seal.sh --batch <lote.tsv> --preview --date AAAA-MM-DD --question "<pergunta>"   (a lista VISÍVEL + o sha256)
@@ -40,6 +41,14 @@
 #   promoção a PROD é de quem EXECUTA a decisão e mede o artefato, não do selo. Achado do dogfood da forja
 #   (2026-10-12): a 1ª versão subia para PROD e o kg-contract-check reprovou o próprio grafo da forja.
 #   `--other` = a resposta livre do maestro, fora das opções oferecidas — também é selo, e a narrative diz que foi livre.
+#   `--decided-by core` (padrão: maestro, o comportamento de sempre) = quem DECIDIU foi o core, dentro da autorização
+#   do maestro (ausência dele, ato liberado), e o selo fica marcado para a revisão dele: source «sessão do core…»,
+#   method "testimony: decisão do core dentro da autorização do maestro, <data>, com revisão do maestro pendente",
+#   verified_against e narrative dizendo o mesmo. Dano medido (2026-11-21): sem a flag o selador gravava «decisão do
+#   maestro» em todo selo, e dois selos do core de 2026-11-21 tiveram a proveniência reescrita à mão
+#   (D_PLAIN_LANGUAGE_STITCH_1121, no grafo coordenacao-selos-arquivo-2026-11, e o selo da opção descartada como nó). Não se mistura com --other (resposta livre é do maestro) nem com --batch
+#   (o lote é aprovação do maestro sobre a lista visível): rc 2. O radar reconhece só o método «decisão do maestro»
+#   como selo aceito em DEV, então a decisão do core em DEV segue no aviso decision-done-em-DEV até a revisão.
 # Com --new: cria o nó `D_*` com as mesmas marcas e uma aresta <D_ID> --<edge-type>--> <ID_EXISTENTE>
 #   (nó sem aresta reprova no radar como órfão; a ligação é o que diz DE ONDE a decisão veio).
 #
@@ -78,7 +87,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RADAR="${DECIDE_SEAL_RADAR:-${HERE}/kg-radar.sh}"
 [ -n "${DECIDE_SEAL_RADAR:-}" ] && echo "kg-decide-seal: ⚠️ override ativo — DECIDE_SEAL_RADAR=${DECIDE_SEAL_RADAR} (não é o gate de produção)" >&2
 GRAPH=""; NODE=""; NEW=""; CHOSEN=""; REJECTED=""; DATE=""; QUESTION=""; OTHER="0"; LABEL=""; LINK=""; ETYPE="TRACES_TO"; IMPACT="3"
-BATCH=""; APPROVE=""; PREVIEW="0"
+BATCH=""; APPROVE=""; PREVIEW="0"; DECIDED_BY="maestro"
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "kg-decide-seal: $1 exige um valor" >&2; exit 2; }; }
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -92,6 +101,7 @@ while [ $# -gt 0 ]; do
     --edge-type) _need "$@"; ETYPE="$2"; shift ;;
     --impact) _need "$@"; IMPACT="$2"; shift ;;
     --other) OTHER="1" ;;
+    --decided-by) _need "$@"; DECIDED_BY="$2"; shift ;;
     --batch) _need "$@"; BATCH="$2"; shift ;;
     --approve) _need "$@"; APPROVE="$2"; shift ;;
     --preview) PREVIEW="1" ;;
@@ -100,6 +110,11 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+case "${DECIDED_BY}" in maestro|core) ;; *) echo "kg-decide-seal: --decided-by aceita maestro ou core (recebi: ${DECIDED_BY}) — nada escrito" >&2; exit 2 ;; esac
+if [ "${DECIDED_BY}" = core ]; then
+  [ "${OTHER}" = "0" ] || { echo "kg-decide-seal: --decided-by core não se mistura com --other: a resposta livre é do maestro — nada escrito" >&2; exit 2; }
+  [ -z "${BATCH}" ] || { echo "kg-decide-seal: --decided-by core não se mistura com --batch: o lote é aprovação do maestro sobre a lista visível — nada escrito" >&2; exit 2; }
+fi
 # ── MODO LOTE (a triagem do /meta:decide, cláusula 10 da doutrina) ──────────────────────────────────────
 # O validador e o escritor do lote são UM só código Python (_lot_py), usado pelo modo externo (que confere o lote
 # inteiro e chama este mesmo script uma vez por grafo) e pelo modo por grafo (que reconfere TUDO de novo: ele pode
@@ -507,9 +522,9 @@ if [ -n "${BATCH}" ]; then
   PYOUT="$(_lot_py write "${BATCH}" "${APPROVE}" "${DATE}" "${QUESTION}" "${GRAPH}" "${STAGE}" 0)" || exit 2
 else
 PYOUT="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${GRAPH}" "${NODE}" "${NEW}" "${CHOSEN}" "${REJECTED}" "${DATE}" \
-  "${QUESTION}" "${OTHER}" "${LABEL}" "${LINK}" "${ETYPE}" "${IMPACT}" "${STAGE}" <<'PY'
+  "${QUESTION}" "${OTHER}" "${LABEL}" "${LINK}" "${ETYPE}" "${IMPACT}" "${STAGE}" "${DECIDED_BY}" <<'PY'
 import sys, re, datetime
-path, node, new, chosen, rejected, date, question, other, label, link, etype, impact, stage = sys.argv[1:14]
+path, node, new, chosen, rejected, date, question, other, label, link, etype, impact, stage, decided_by = sys.argv[1:15]
 def die(m): print('kg-decide-seal: ' + m + ' — nada escrito', file=sys.stderr); sys.exit(2)
 try:
     import yaml
@@ -536,12 +551,23 @@ for n in nodes:
     if isinstance(n, dict) and 'id' in n: byid.setdefault(str(n['id']), []).append(n)
 def q(s): return '"' + one(s).replace('\\', '\\\\').replace('"', '\\"') + '"'
 lines = txt.split('\n')
-seal_txt = (f'Selado por /meta:decide em {date}: escolhida «{chosen}»'
-            + (' (resposta livre do maestro, fora das opções oferecidas)' if other == '1' else '')
-            + '; descartadas: ' + ' · '.join(f'«{r}»' for r in rej) + '.')
-vag = f'decisão do maestro em {date}, por pergunta com opções (/meta:decide): escolhida «{chosen}»'
-method = f'testimony: decisão do maestro por pergunta com opções, {date}'
-locator = f'pergunta com opções de {date}' + (f': «{one(question)}»' if question else '')
+rej_txt = '; descartadas: ' + ' · '.join(f'«{r}»' for r in rej) + '.'
+if decided_by == 'core':
+    # decisão do CORE dentro da autorização do maestro: a proveniência diz quem decidiu, e o selo pede a revisão dele
+    seal_txt = (f'Selado pelo core por /meta:decide em {date}, dentro da autorização do maestro e marcado para a revisão dele: '
+                f'escolhida «{chosen}»' + rej_txt + ' Revisão do maestro pendente: se ele discordar, o selo se refaz.')
+    vag = (f'decisão do core em {date}, dentro da autorização do maestro, por pergunta registrada (/meta:decide): '
+           f'escolhida «{chosen}»; revisão do maestro pendente')
+    method = f'testimony: decisão do core dentro da autorização do maestro, {date}, com revisão do maestro pendente'
+    source = 'sessão do core, na rodada do /meta:decide, dentro da autorização do maestro'
+    locator = f'pergunta registrada de {date}' + (f': «{one(question)}»' if question else '')
+else:
+    seal_txt = (f'Selado por /meta:decide em {date}: escolhida «{chosen}»'
+                + (' (resposta livre do maestro, fora das opções oferecidas)' if other == '1' else '') + rej_txt)
+    vag = f'decisão do maestro em {date}, por pergunta com opções (/meta:decide): escolhida «{chosen}»'
+    method = f'testimony: decisão do maestro por pergunta com opções, {date}'
+    source = 'maestro, na sessão do /meta:decide'
+    locator = f'pergunta com opções de {date}' + (f': «{one(question)}»' if question else '')
 
 def narr_block(fi, old, tail):
     s = ' ' * (fi + 2)
@@ -550,7 +576,7 @@ def narr_block(fi, old, tail):
 
 def prov_lines(fi):
     s = ' ' * fi
-    return [f'{s}provenance:', f'{s}  source: "maestro, na sessão do /meta:decide"', f'{s}  locator: {q(locator)}',
+    return [f'{s}provenance:', f'{s}  source: {q(source)}', f'{s}  locator: {q(locator)}',
             f'{s}  method: {q(method)}', f'{s}  locality: "pessoa"']
 
 if not new:
@@ -661,7 +687,8 @@ if (n2.get('status') != 'done' or n2.get('plane') != 'DEV' or str(n2.get('verifi
 if not new and oldn and not str(n2.get('narrative')).startswith(oldn):
     die('a narrative anterior não sobreviveu verbatim à escrita')
 open(stage, 'w', encoding='utf-8').write(out)
-print(f'kg-decide-seal: escrito {target} em {path} — escolhida «{chosen}», descartadas {len(rej)}')
+print(f'kg-decide-seal: escrito {target} em {path} — escolhida «{chosen}», descartadas {len(rej)}'
+      + (' — decidido pelo core, revisão do maestro pendente' if decided_by == 'core' else ''))
 PY
 )" || exit 2
 fi
