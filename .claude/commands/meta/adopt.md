@@ -287,6 +287,12 @@ fi
 bash "$SOURCE_ROOT/.claude/utils/adopt/offer-onion-ci.sh" "$DEST" || true
 # ↑ rc≠0 = "lint do alvo reprovando": NÃO aborta (o gate local de (6) já está vivo); conserte e reoferte. A linha diz também o contrato do corpus, medido.
 
+# (6c) statusLine do censo de sessões («sessões: N trabalhando · M esperam você») — OFERTA, somente leitura. O helper
+#      imprime o bloco para o settings do USUÁRIO com o caminho absoluto do checkout principal, resolvido pelo git agora,
+#      e AVISA se o projeto já tem statusLine (a do projeto substitui a do usuário, e o censo some ali). Nunca escreve
+#      statusLine no projeto: lá ela apagaria a de cada pessoa. Cole a saída no relatório; quem cola o bloco é o dono.
+bash "$SOURCE_ROOT/.claude/utils/adopt/offer-statusline.sh" "$DEST" || true   # rc 3 = sem bloco (script ou python3 faltam): diga no relatório
+
 # (7) .gitattributes: eol=lf nos executáveis (SAC-107; never-clobber, desfechos no helper) e merge=union
 #     nos append-only do doc-bridge (CHANGELOG/_processed; Achado #2: duas pontas apendam → união). Idempotente.
 bash "$SOURCE_ROOT/.claude/utils/adopt/emit-eol-gitattributes.sh" "$DEST" --adopt
