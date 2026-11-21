@@ -1,6 +1,6 @@
 # 📚 Índice - Knowledge Bases
 
-> **Última atualização**: 2026-10-20 | **Gerado por**: `/docs:build-index` · contagens conferidas contra o disco pela REGRA 110 (`.claude/validation/kb-index-check.sh`)
+> **Última atualização**: 2026-11-21 | **Gerado por**: `/docs:build-index` · contagens conferidas contra o disco pela REGRA 110 (`.claude/validation/kb-index-check.sh`)
 
 Índice das **Knowledge Bases** do Sistema Onion — conhecimento estruturado para consumo por IA e referência técnica.
 
@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **109 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **56** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **13** em `decisions/` (+ 1 README de categoria)
+- **111 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **57** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **14** em `decisions/` (+ 1 README de categoria)
 
 ---
 
@@ -17,14 +17,14 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 56 — Conceitos fundamentais
+├── concepts/            # 57 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 7  — Ferramentas e recursos
 ├── platforms/           # 5  — Plataformas e tecnologias
 ├── patterns/            # 4  — Padrões de implementação (SDAAL, apresentações, policy-as-data, GLPI→Zoho)
 ├── architectures/       # 1  — C4 + ADR patterns
 ├── meta/                # 2  — Padrões de criação de comandos + identidade/produto
-├── decisions/           # 13 — ADRs: por que o mecanismo é como é + 1 README
+├── decisions/           # 14 — ADRs: por que o mecanismo é como é + 1 README
 ├── education/           # 4  — Vertical educacional (fonte≠derivação: theories/ + applications/) + 1 README
 └── agentic-patterns/    # 8  — Como IA + harness colaboram (KB viva do campo) + 4 READMEs
     ├── harness/         #     Internals de harnesses específicos
@@ -34,7 +34,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (56)
+## 🧠 Conceitos Fundamentais (57)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Onboarding do adotante](concepts/adopter-onboarding.md) — a fonte canônica da orientação de adoção (vendorizada); guias por adotante apontam para cá, não duplicam
@@ -90,6 +90,7 @@ docs/knowledge-base/
 - [Verify-External-for-Current](concepts/verify-external-for-current.md) — forcing function: claim sobre atual/emergente/popular (versão·device·player·framework·tendência) ⇒ verify externo (web) obrigatório; WebFetch é budget separado do WebSearch; sem verificar → declarar "não verificado". O `verify(vivo)` do SSOT-as-runtime aplicado ao mundo externo
 - [Sem dependência de serviço externo](concepts/no-external-service-dependency.md) — decisão do maestro (2026-10-27): o núcleo roda local e aberto; serviço externo, sobretudo pago, só como ponte opcional declarada com alternativa local nomeada. Critério: funciona sem rede para terceiro, ou nomeia o caminho local. Caso aplicado: o Gamma
 - [Linguagem Simples por superfície](concepts/plain-language-by-surface.md) — a régua da ABNT NBR ISO 24495-1:2024 onde um humano lê (maestro, docs, commit, card, público), fora do tráfego de máquina: 11 itens com o sinal que mede cada um; decisão `D_PLAIN_LANGUAGE_STITCH_1121` (costurar)
+- [Catraca de decisões](concepts/decision-ratchet-doctrine.md) — quem decide cada ato (2026-11-20): classe A automático (hoje só o que não muda estado), B «pode rodar» digitado pelo maestro, C só o maestro; força da prova em eixo separado; lista fixa de C que nunca desce; afrouxar só com histórico medido; livro para explicação e auditoria, com o teto declarado
 - [Base atual, sempre](concepts/keep-current-doctrine.md) — ordem eterna do maestro (2026-10-16): construir sobre a origin/main recém-buscada e as versões atuais; defasagem é subida ou nomeada; faltou pacote ⇒ pedir autorização e instalar. Cobrada pelo hook `session-currency-check.sh` (medidor `currency-census.sh`)
 - [Worklog Protocol](concepts/worklog-protocol.md) — sessões retomáveis com eficácia de IA (STATE.md, leitura Tier 0→3, checkpoint)
 
@@ -148,7 +149,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧭 Decisões — ADRs (13 + 1 README)
+## 🧭 Decisões — ADRs (14 + 1 README)
 
 > Por que o mecanismo é como é. Ver o [README](decisions/README.md) para o formato.
 
@@ -157,6 +158,7 @@ docs/knowledge-base/
 - [Transporte × execução](decisions/onion-adr-comms-transport-vs-execution-2026-06.md) — o eixo de risco da comunicação: transporte automático, execução com gate
 - [Constelação de Estudos](decisions/onion-adr-constellation-operating-model-2026-07.md) — estudos isolados e core observatório sob convite (proposto, gated)
 - [`/meta:create-vertical`](decisions/onion-adr-create-vertical-2026-07.md) — generalizar o padrão hub-onion para scaffoldar verticais de projeto
+- [Catraca de decisões automáticas](decisions/onion-adr-decision-ratchet-2026-11.md) — classe pelo ato, força separada, afrouxar só com histórico; as opções do Delphi de 7 sessões e o dissenso registrado
 - [Design estende o KG](decisions/onion-adr-design-extends-kg-2026-07.md) — sem grafo próprio para o design: divergir vs reger, atom-map como join
 - [Contexto de domínio como SSOT viva](decisions/onion-adr-domain-context-lifecycle-2026-06.md) — o ciclo de vida CRUD+ dos contextos de domínio
 - [Ledger de co-evolução](decisions/onion-adr-ledger-format-location-2026-06.md) — formato e localização: o markdown fica, repo neutro gated

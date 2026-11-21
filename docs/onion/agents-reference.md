@@ -6,4 +6,4 @@ Este guia documenta os agentes especializados disponíveis no sistema `.claude/`
 
 ## 📊 Resumo
 
-- Conhecimento completo: 122 comandos, 51 agentes, 16 skills, 115 knowledge bases
+- Conhecimento completo: 122 comandos, 51 agentes, 16 skills, 117 knowledge bases
