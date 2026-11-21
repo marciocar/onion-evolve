@@ -10,7 +10,7 @@ findings_blocking: 0
 tokens: 81907
 duration_min: 15
 findings_fixed: 1
-verdict: CORRIGIDO
+verdict: FIXED
 elenxo: false
 reviewer: "revisão isolada por subagente code-reviewer (sem a conclusão da sessão no brief): conferiu tags, compare d5f7970a...acfe7992, notas v1.0.273..v1.0.286 e o código da action no sha novo contra os inputs e outputs do job"
 nota: "a prova de execução do pin e do --permission-mode default fica para o PR SEGUINTE: o PR que edita o workflow faz a action se auto-pular"
