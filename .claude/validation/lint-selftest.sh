@@ -27067,6 +27067,11 @@ run_pr_merge_verified_selftests() {
 args="$*"
 # o GH_REPO que cada chamada recebeu (A3 da revisão de 2026-11-18: o gh mira o que a catraca julgou)
 [ -n "${STUB_GHREPO_LOG:-}" ] && printf '%s\n' "${GH_REPO:-}" >> "${STUB_GHREPO_LOG}"
+# (pmv2) o gh de verdade resolve o repo pelo --repo, pelo GH_REPO ou pelos remotes do cwd; sem nenhum, falha. Opt-in.
+if [ -n "${STUB_GH_NEEDS_REPO:-}" ] && [ -z "${GH_REPO:-}" ] && [[ " $args " != *" --repo "* ]] && [[ "$args" != *"repos/"* ]] \
+   && [ -z "$(git remote 2>/dev/null)" ]; then
+  echo "failed to run git: fatal: not a git repository (or any of the parent directories): .git" >&2; exit 1
+fi
 case "$args" in
   # o aviso de serialização (repo alheio): os PRs abertos, e os arquivos de cada um por arquivo em STUB_PRFILES_DIR/<n>
   *"pr list"*) [ -n "${GH_OPEN_PRS:-}" ] && printf '%s\n' ${GH_OPEN_PRS}; exit 0 ;;
@@ -27171,6 +27176,11 @@ case "$args" in
       fi
       [ -n "${GH_RESIDUE:-}" ] && printf '%b' "${GH_RESIDUE}"; exit "${GH_RESIDUE_RC:-0}" ;;
   *"api "*pulls*files*)
+      # (pmv3) a corrida logo após o push: as GH_FILES_FAIL_FIRST primeiras leituras falham como a API falha
+      if [ -n "${GH_FILES_FAIL_FIRST:-}" ]; then
+        fk=$(cat "${STUB_FK}" 2>/dev/null || echo 0); fk=$((fk+1)); echo "$fk" > "${STUB_FK}"
+        [ "$fk" -le "${GH_FILES_FAIL_FIRST}" ] && { echo "gh: Not Found (HTTP 404)" >&2; exit 1; }
+      fi
       # com GH_PR_FILES_JSON, o --jq do chamador roda de verdade sobre o JSON da API (rename: .previous_filename)
       if [ -n "${GH_PR_FILES_JSON:-}" ]; then
         q=""; prev=""; for x in "$@"; do [ "$prev" = --jq ] && q="$x"; prev="$x"; done
@@ -29193,6 +29203,69 @@ PFSTUB
       record_pass "pr-merge-verified: (th4m) mutante que RELÊ o head antes do merge ⇒ mergeia o head não julgado e o (th4) REPROVA"
     else record_fail "pr-merge-verified: (th4m) o mutante SOBREVIVEU" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
   fi
+
+  # ── TRÊS MODOS DE FALHA DE 2026-11-21 (pmv1..pmv3): o merge feito, a pasta de onde se roda, a corrida do push ─────
+  # Sandbox próprio: um repo com o SUT em ops/ (constante da bancada, como o fcore) e a branch do PR presa numa worktree.
+  local pr="${d}/pmvr" prw="${d}/pmvr-wt" pfora="${d}/pmv-fora" _pm
+  mkdir -p "${pr}/ops" "${pfora}"
+  ( cd "${pr}" && git init -q -b main && sed 's#^_PMV_CORE_CONST=marciocar/onion-evolve$#_PMV_CORE_CONST=onion-bancada/core#' "${sut}" > ops/pr-merge-verified.sh \
+    && git add -A && git -c user.email=t@t -c user.name=t commit -qm base && git branch feat/wt \
+    && git worktree add -q "${prw}" feat/wt && git remote add origin "${d}/pmvr-sem-remoto.git" ) >/dev/null 2>&1
+  grep -q '^_PMV_CORE_CONST=onion-bancada/core$' "${pr}/ops/pr-merge-verified.sh" || record_fail "pr-merge-verified: (pmv costura)" "a âncora da constante sumiu"
+  _pmv() { # $1=script $2=cwd ; resto=args. Env do caso vem de fora.
+    local _s="$1" _c="$2"; shift 2
+    echo 0 > "${d}/n"; echo 0 > "${d}/fk"
+    _mv_out="$(cd "${_c}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_FK="${d}/fk" GH_STATE_BEFORE="OPEN|null" \
+      GH_STATE_AFTER="${GH_STATE_AFTER:-MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)}" GH_MERGE_RC="${GH_MERGE_RC:-0}" \
+      GH_MERGE_OUT="${GH_MERGE_OUT:-merged}" GH_HEAD_REF="${GH_HEAD_REF:-feat/wt}" ONION_MERGE_FILES_WAITS="${ONION_MERGE_FILES_WAITS:-0 0 0 0}" \
+      bash "${_s}" 999 "$@" 2>&1)"; _mv_rc=$?
+  }
+  # (pmv1) o merge ACONTECEU e só o apagar da branch local falhou (presa numa worktree: o gh mergeia, tenta o
+  #        `git branch -D`, sai 1 e nem chega a apagar a remota). O merge feito é sucesso: rc 0, e o aviso nomeia a
+  #        worktree (lida do `git worktree list --porcelain`, dado, não a prosa do gh) e os comandos de limpeza.
+  _p_pmv1() { [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}" && grep -qF "${prw}" <<< "${_mv_out}" \
+    && grep -qF "git worktree remove ${prw}" <<< "${_mv_out}" && grep -qF "git branch -D feat/wt" <<< "${_mv_out}"; }
+  _pmv1() { GH_MERGE_RC=1 GH_MERGE_OUT="failed to delete local branch feat/wt: failed to run git: exit status 1" _pmv "$1" "${pr}"; }
+  _pmv1 "${pr}/ops/pr-merge-verified.sh"
+  if _p_pmv1; then record_pass "pr-merge-verified: (pmv1) merge feito e branch local presa numa worktree ⇒ rc 0, aviso nomeia a worktree e a limpeza"
+  else record_fail "pr-merge-verified: (pmv1) merge feito virou falha ou o aviso não nomeia a worktree" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (pmv2) rodado de FORA do repo (o cwd não é checkout git): o repo vem da pasta do próprio script, não do cwd
+  _p_pmv2() { [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}"; }
+  STUB_GH_NEEDS_REPO=1 _pmv "${pr}/ops/pr-merge-verified.sh" "${pfora}"
+  if _p_pmv2; then record_pass "pr-merge-verified: (pmv2) rodado de fora do repo ⇒ o repo vem da pasta do script, e o merge é provado"
+  else record_fail "pr-merge-verified: (pmv2) rodado de fora do repo falhou" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (pmv3) a corrida logo após o push: as 2 primeiras leituras dos arquivos do PR falham; o script tenta de novo (teto
+  #        declarado) e segue. (pmv3b) falha em TODAS: recusa dizendo que esperou e quantas vezes tentou.
+  _p_pmv3() { [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}" && [ "$(cat "${d}/fk")" -eq 3 ]; }
+  GH_FILES_FAIL_FIRST=2 _pmv "${pr}/ops/pr-merge-verified.sh" "${pr}"
+  if _p_pmv3; then record_pass "pr-merge-verified: (pmv3) leitura dos arquivos falha 2x logo após o push ⇒ tenta de novo e segue"
+  else record_fail "pr-merge-verified: (pmv3) a corrida do push virou recusa" "rc=${_mv_rc} leituras=$(cat "${d}/fk") out=${_mv_out}"; fi
+  GH_FILES_FAIL_FIRST=99 _pmv "${pr}/ops/pr-merge-verified.sh" "${pr}"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "não consegui LER os arquivos do PR" <<< "${_mv_out}" && grep -q "esperei" <<< "${_mv_out}" \
+     && [ "$(cat "${d}/fk")" -eq 5 ] && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (pmv3b) arquivos ilegíveis em todas as tentativas ⇒ recusa dizendo que esperou (5 leituras, teto declarado)"
+  else record_fail "pr-merge-verified: (pmv3b) a recusa não diz que esperou ou o teto mudou" "rc=${_mv_rc} leituras=$(cat "${d}/fk") out=${_mv_out}"; fi
+  # ── MUTANTES dos três: cada um desfaz uma cura, e o caso dela tem de reprovar ─────────────────────────────────────
+  _pmvmut() { # $1=rótulo $2=âncora (início exato da linha) $3=troca $4=função que roda o caso $5=predicado
+    _pm="${pr}/ops/pmv-mut-$1.sh"
+    PM_A="$2" PM_B="$3" awk 'BEGIN{a=ENVIRON["PM_A"]; b=ENVIRON["PM_B"]} index($0,a)==1 && !x { print b; x=1; next } { print }' "${pr}/ops/pr-merge-verified.sh" > "${_pm}"
+    if cmp -s "${pr}/ops/pr-merge-verified.sh" "${_pm}"; then record_fail "pr-merge-verified: ($1) âncora do mutante não casou" "reancore: $2"; return; fi
+    bash -n "${_pm}" 2>/dev/null || { record_fail "pr-merge-verified: ($1) o mutante não parseia" "$(bash -n "${_pm}" 2>&1 | head -1)"; return; }
+    "$4" "${_pm}"
+    if "$5"; then record_fail "pr-merge-verified: ($1) mutante SOBREVIVEU" "rc=${_mv_rc} out=${_mv_out}"
+    else record_pass "pr-merge-verified: ($1) mutante morto pelo caso da cura"; fi
+  }
+  _pmv2run() { STUB_GH_NEEDS_REPO=1 _pmv "$1" "${pfora}"; }
+  _pmv3run() { GH_FILES_FAIL_FIRST=2 _pmv "$1" "${pr}"; }
+  # (pmv0) a cópia LIMPA no mesmo arranjo dos mutantes passa nos três (senão o arranjo mataria, não a mutação)
+  cp "${pr}/ops/pr-merge-verified.sh" "${pr}/ops/pmv-mut-clean.sh"
+  if _pmv1 "${pr}/ops/pmv-mut-clean.sh" && _p_pmv1 && _pmv2run "${pr}/ops/pmv-mut-clean.sh" && _p_pmv2 && _pmv3run "${pr}/ops/pmv-mut-clean.sh" && _p_pmv3; then
+    record_pass "pr-merge-verified: (pmv0) cópia limpa no arranjo dos mutantes passa nos três casos"
+  else record_fail "pr-merge-verified: (pmv0) o arranjo mata a cópia limpa — os mutantes não provam nada" "rc=${_mv_rc} out=${_mv_out}"; fi
+  _pmvmut pmv1m '          _pmv_branch_wt="$(' '          _pmv_branch_wt=""' _pmv1 _p_pmv1
+  _pmvmut pmv2m '_pmv_cd_script_repo || true' ': sem-cd' _pmv2run _p_pmv2
+  _pmvmut pmv3m '_PMV_FILES_WAITS="${ONION_MERGE_FILES_WAITS:-' '_PMV_FILES_WAITS=""' _pmv3run _p_pmv3
+  unset -f _pmv _p_pmv1 _pmv1 _p_pmv2 _p_pmv3 _pmvmut _pmv2run _pmv3run
 
   unset -f _mvf _fxmut _fxcase _fxcase_rm _fx_intact _fxk_run _p_fx1 _p_fx2 _p_fx3 _p_fx4 _p_fx5 _p_fx6 _p_fx7 _p_fx8
   unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg _mvr _rvmut _rvcase _p_off _p_prior _p_prior_disp _p_fail _p_hist _mvth _p_th
