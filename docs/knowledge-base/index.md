@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **111 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **57** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **14** em `decisions/` (+ 1 README de categoria)
+- **112 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **58** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **14** em `decisions/` (+ 1 README de categoria)
 
 ---
 
@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 57 — Conceitos fundamentais
+├── concepts/            # 58 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 7  — Ferramentas e recursos
 ├── platforms/           # 5  — Plataformas e tecnologias
@@ -34,7 +34,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (57)
+## 🧠 Conceitos Fundamentais (58)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Onboarding do adotante](concepts/adopter-onboarding.md) — a fonte canônica da orientação de adoção (vendorizada); guias por adotante apontam para cá, não duplicam
@@ -92,6 +92,7 @@ docs/knowledge-base/
 - [Linguagem Simples por superfície](concepts/plain-language-by-surface.md) — a régua da ABNT NBR ISO 24495-1:2024 onde um humano lê (maestro, docs, commit, card, público), fora do tráfego de máquina: 11 itens com o sinal que mede cada um; decisão `D_PLAIN_LANGUAGE_STITCH_1121` (costurar)
 - [Catraca de decisões](concepts/decision-ratchet-doctrine.md) — quem decide cada ato (2026-11-20): classe A automático (hoje só o que não muda estado), B «pode rodar» digitado pelo maestro, C só o maestro; força da prova em eixo separado; lista fixa de C que nunca desce; afrouxar só com histórico medido; livro para explicação e auditoria, com o teto declarado
 - [Base atual, sempre](concepts/keep-current-doctrine.md) — ordem eterna do maestro (2026-10-16): construir sobre a origin/main recém-buscada e as versões atuais; defasagem é subida ou nomeada; faltou pacote ⇒ pedir autorização e instalar. Cobrada pelo hook `session-currency-check.sh` (medidor `currency-census.sh`)
+- [Nascimento de peça](concepts/piece-birth.md) — quando uma peça está pronta e quem merja o quê (2026-11-21, card SAC-479): porta de 4 critérios (registro com members-validate rc 0, dono com card de arranque, sponsor, revisão separada) e a condição permanente do pin depois do merge; o PR de nascimento vai ao maestro ou ao core, depois a sessão dona merja o próprio repo; deploy e produção ficam com o maestro, repo de outro dono nunca; decisão `D_PIECE_BIRTH_DOCTRINE_1121`
 - [Worklog Protocol](concepts/worklog-protocol.md) — sessões retomáveis com eficácia de IA (STATE.md, leitura Tier 0→3, checkpoint)
 
 ---

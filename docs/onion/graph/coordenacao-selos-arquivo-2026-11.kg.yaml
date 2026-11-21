@@ -942,6 +942,23 @@ nodes:
       locator: "pedido direto do maestro à sessão do core em 2026-11-20 (adotar a Linguagem Simples ABNT; o core orquestra, a curadoria monta), registrado no card SAC-501"
       method: "testimony: pedido direto do maestro em 2026-11-20; o grau (costurar) foi escolhido pelo core, com revisão do maestro pendente"
       locality: "pessoa"
+  - id: D_PIECE_BIRTH_DOCTRINE_1121
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-21"
+    owner: "core"
+    verified_against: "proposta da curadoria de 2026-11-21 (card SAC-479), versionada em docs/evolution/inbox/_processed/2026-11-21-doutrina-nascimento-de-peca.md e lida inteira; decisão do core na ausência do maestro: escolhida «Costurar»"
+    label: "Nascimento de peça vira doutrina: porta de 4 critérios e o pin só depois do merge; o PR de nascimento vai ao maestro ou ao core; depois a sessão dona merja o próprio repo pelo caminho verificado; deploy e produção ficam com o maestro. Selado pelo core, para revisão."
+    narrative: "Selado pelo core em 2026-11-21: escrito com kg-decide-seal.sh (que grava autoria do maestro) e reescrito à mão para a autoria do core, sem rodada do /meta:decide; o maestro estava ausente e a decisão é reversível. Escolhida «Costurar»; descartadas: «Absorver» · «Parquear» · «Rejeitar». Entra a KB docs/knowledge-base/concepts/piece-birth.md: (A) a porta de nascimento com quatro critérios (registro com members-validate.sh rc 0, que confere a forma e não os campos de peça; dono nomeado com card de arranque; sponsor; revisão separada do PR de nascimento) e a condição permanente do pin do onion_version só depois do merge; (B) o PR de nascimento vai ao maestro ou ao core, porque é ele que cria a delegação, e depois o merge do próprio repo passa à sessão dona pelo caminho verificado; deploy e produção ficam sempre com o maestro, repo de outro dono é sempre recusado, e o repo de consultoria do dono do core segue a lista privada de D_PRIVATE_OWNER_SESSIONS_1119; (C) a propriedade se declara antes de o merge ser delegado. Mercado: CODEOWNERS com branch protection (GitHub) e Production Readiness Review (Google SRE, cap. 32). A KB só cita o members.yaml, que é guarda e não muda neste PR. Crédito das medições: curadoria. As arestas para D_SERVICE_REPOS_OWNER_VPS_OPS_1120 e D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118 registram de onde vêm a regra de deploy e produção e a delegação do merge. Revisão do maestro pendente: se ele discordar, o selo se refaz."
+    provenance:
+      source: "sessão do core, decisão na ausência do maestro em 2026-11-21, sobre a proposta da curadoria de 2026-11-21"
+      locator: "pergunta registrada: «A curadoria propõe a doutrina de nascimento de peça (card SAC-479): como o core adota?»; proposta em docs/evolution/inbox/_processed/2026-11-21-doutrina-nascimento-de-peca.md"
+      method: "testimony: decisão do core na ausência do maestro, 2026-11-21, reversível e com revisão do maestro pendente"
+      locality: "pessoa"
 edges:
   - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
     to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
@@ -1098,4 +1115,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_PLAIN_LANGUAGE_STITCH_1121
     to: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
+    edge_type: TRACES_TO
+  - from: D_PIECE_BIRTH_DOCTRINE_1121
+    to: D_SERVICE_REPOS_OWNER_VPS_OPS_1120
+    edge_type: TRACES_TO
+  - from: D_PIECE_BIRTH_DOCTRINE_1121
+    to: D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118
     edge_type: TRACES_TO
