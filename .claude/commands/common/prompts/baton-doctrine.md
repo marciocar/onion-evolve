@@ -81,8 +81,8 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
    sai em uma linha e se recolhe, para não virar fadiga de alerta. **É nível 0** da escada selada (`D_AUTOMATION_LEVELS_0_TO_2_SCHEDULED_1111`): só mede e
    lê. **Parada por ordem não se acorda:** `PARKED` vence qualquer outra classe e não recebe mensagem; um `parked.tsv`
    ilegível é lacuna e fail-closed (`PARK_UNMEASURED`, sem oferta), nunca «ninguém parado». **Puxar, não
-   empurrar:** a sessão ociosa com fila recebe, no máximo, a oferta do que já é dela (a fase 2, desenhada e não
-   construída); quem pega é ela ou o maestro. **Subagente parado (SAC-421):** o pulso lê o fim do transcript de cada
+   empurrar:** a sessão ociosa com fila recebe, no máximo, a oferta do que já é dela (a fase 2, construída em 2026-11-21:
+   `IDLE_WITH_BACKLOG` e vagas de agente); quem pega é ela ou o maestro. **Subagente parado (SAC-421):** o pulso lê o fim do transcript de cada
    subagente das sessões vivas (inclusive os de Workflow) e acusa `AGENT_STALLED` quando há `tool_use` sem `tool_result`
    do mesmo id há mais de 15 min, e `AGENT_SILENT` quando o agente se calou sem pendência e sem fim; mede o SINTOMA, não a
    causa (aprovação sem quem responda, comando pendurado, harness travado e ferramenta longa legítima saem iguais), e não
@@ -142,8 +142,9 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
 - **O pulso não vê o que o harness e o git não veem.** Sem a lista de peers, a classe sai só pela idade do farol, e uma
   sessão que espera um processo longo em primeiro plano sai ociosa. O rótulo que casa `owner:` com sessão é derivado do
   nome e da pasta ou declarado em `owners.tsv`; o que não casa fica sem sessão, dito. Nada disso vale para outra máquina.
-- **O pulso não grava nem oferta.** A medição de horas ociosas com fila (o TSV de pulsos) e a oferta à sessão são a
-  fase 2; viajar às portas é a fase 3.
+- **O pulso oferta, mas não despacha, e só grava com flag.** A fase 2 (2026-11-21) lista a oferta (card pronto de dono
+  declarado, vaga de agente) e grava o TSV de pulsos só com `--record`; o único estado que ele grava sozinho é o cache
+  curto do backlog, fora do repo. Viajar às portas é a fase 3.
 - **Não despacha.** O censo lista e diz quem age; mandar trabalho de uma sessão a outra é o degrau 3
   (`D_SO_MECANISMO_EM_DEGRAUS`), e o rascunho da próxima fila é o degrau 2, com gatilho próprio
   (`Q_SO_GATILHO_DE_CONSTRUCAO`).
