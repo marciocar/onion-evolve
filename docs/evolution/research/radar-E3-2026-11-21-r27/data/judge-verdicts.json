@@ -1,0 +1,149 @@
+{
+  "criteria": [
+    {
+      "id": "CU1_CITACAO_DIVERGE",
+      "when": "data/2.1.330.txt não bate byte a byte com a seção do CHANGELOG oficial, ou um nó cita texto ou linha (l.N) que não está lá",
+      "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk '$0==\"## 2.1.330\"{f=1;print;next} /^## /{f=0} f') data/2.1.330.txt; grep -n -F de cada trecho citado em data/2.1.330.txt"
+    },
+    {
+      "id": "CU2_MEDICAO_NAO_REPRODUZ",
+      "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+      "check": "re-executar: claude --version; cc-delta-census.sh . --markdown; currency-census.sh; gh pr view 112 -R <dono>/onion-bridge; LC_ALL=C lint-selftest.sh --families cited_directive e channel_session; python3 -I ops/testing/permissions-deny-bench.py --settings .claude/settings.json --only default,bypass; python3 sobre .claude/settings.json e o managed-settings do host (só as chaves); contagem de agentes por model com e sem os README.md"
+    },
+    {
+      "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+      "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+      "check": "ler label e verified_against e conferir no core por grep -n ou leitura do hook, do comando, do script e do settings"
+    },
+    {
+      "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+      "when": "a rodada supera nó da r26 que não existe ou cujo estado ainda vale, ou deixa de superar nó cujo estado a medição de hoje derrubou",
+      "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-11-20-r26/radar-E3-2026-11-20-r26.kg.yaml e comparar o estado afirmado com a medição de hoje"
+    },
+    {
+      "id": "CU5_OMISSAO_DO_DELTA",
+      "when": "um item do delta toca superfície real do core e a rodada não o mediu nem o declarou em NÃO-VERIFICADOS",
+      "check": "ler data/2.1.330.txt e, para cada candidato ausente, medir a superfície no core (hooks em .claude/settings.json, comandos, agentes, skills, ops/, .github/workflows)"
+    },
+    {
+      "id": "CU6_VAZAMENTO_EM_REPO_PUBLICO",
+      "when": "o grafo ou a SYNTHESIS trazem nome de cliente ou de pessoa, caminho de máquina, IP, hostname ou e-mail",
+      "check": "grep -rnE '/home/|/tmp/|~/|@[a-z0-9.-]+\\.[a-z]' docs/evolution/research/radar-E3-2026-11-21-r27 fora de data/2.1.330.txt; kg-contract-check.sh"
+    },
+    {
+      "id": "CU7_EFEITO_AFIRMADO_SEM_MEDIR_O_MODO",
+      "when": "o nó afirma efeito de comportamento num modo (Code Mode, -p, bypass, fallback de modelo, /loop longo) que a medição não exercitou",
+      "check": "conferir que o label ou o narrative declara o modo não medido; onde possível e barato, repetir a medição no modo afirmado"
+    }
+  ],
+  "verdicts": [
+    {
+      "alvo": "E_DELTA_DA_RODADA",
+      "veredito": "SUSTENTA",
+      "nota": "diff e cmp de data/2.1.330.txt contra a seção ## 2.1.330 extraída do CHANGELOG oficial baixado em 2026-11-21 (curl raw.githubusercontent) → vazios; 145 linhas e 142 itens (grep -c '^- ') conferem; cc-delta-census.sh . --markdown → baseline 2.1.329, disco 2.1.330, processo 2.1.330, bridge 2.1.323 (SDK 0.3.323). Todas as linhas citadas pelos nós (l.4, 6, 14, 15, 24, 29, 30, 43, 44, 46, 50, 55, 58, 87, 89, 104, 105, 106, 109, 110, 114) dizem o que o nó afirma. Ressalvas: o trace aponta SYNTHESIS.md, que ainda não existe na worktree; e o currency-census acusa base:main defasada (HEAD b0df31551, 1 commit atrás de origin/main c6ab7584; o commit que falta é doutrina e não toca superfície medida)."
+    },
+    {
+      "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+      "veredito": "SUSTENTA",
+      "nota": "Aberta, e com razão: ela só pode fechar com as omissões da chave omissoes medidas e entradas (a principal é a re-sonda do agent_id, que o cabeçalho do hook pede a cada /meta:cc-update e que a r26 só fez porque o juiz apontou; esta rodada repetiu a omissão) e com a SYNTHESIS gravada com os NÃO-VERIFICADOS (Code Mode l.32-37 e l.101-103, l.38-39, l.108)."
+    },
+    {
+      "alvo": "E_HOST_NA_2_1_330_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1121",
+      "veredito": "SUSTENTA",
+      "nota": "claude --version → 2.1.330; cc-delta-census → bridge 2.1.323 (SDK 0.3.323), 6 versões atrás; currency-census.sh → bridge 0.3.323→0.3.330 defasada, action 1.0.272→1.0.286 defasada; grep -n 'claude-code-action@' .github/workflows/onion-review.yml → l.329 e l.493 com o pin anthropics/claude-code-action@d5f7970a; gh api commits/v1.0.272 → anthropics/claude-code-action@d5f7970a, commits/v1.0.286 → anthropics/claude-code-action@acfe7992; src/entrypoints/run.ts da action na v1.0.272 cita 2.1.322 e na v1.0.286 cita 2.1.330; grep -n '^## ' no CHANGELOG → 2.1.323, 325 a 330, sem 2.1.324. A régua de 6 e 7 confere. A superação do nó da r26 está certa: o host saiu da 2.1.329."
+    },
+    {
+      "alvo": "Q_SUBIR_SDK_DO_BRIDGE_0_3_330_E_PIN_DO_REVISOR_V1_0_286_1121",
+      "veredito": "SUSTENTA",
+      "nota": "gh pr view 112 -R <dono>/onion-bridge --json state,title,mergeable,createdAt → OPEN, MERGEABLE, «chore(deps): o Agent SDK sobe de 0.3.323 para 0.3.330», 2026-11-21T01:28:13Z, mergedAt null; currency-census confirma os dois alvos; o pin segue anthropics/claude-code-action@d5f7970a (v1.0.272). A superação do nó da r26 está certa: o alvo 0.3.329/v1.0.284 foi ultrapassado. Não medido por este juiz: o estado da SAC-432 (o tm.sh lê o arquivo de credenciais, fora do mandato)."
+    },
+    {
+      "alvo": "E_BANCADA_DO_DENY_VERDE_NA_2_1_330_1121",
+      "veredito": "SUSTENTA",
+      "nota": "Re-rodado: python3 -I ops/testing/permissions-deny-bench.py --settings .claude/settings.json --only default,bypass --out <scratch>/deny-bench.json → rc 0, «binario: 2.1.330 (Claude Code) · regras: 75», «sentinela ok (rc 0): modo default não executou rm», «casos: 362 · divergentes: 0». A sentinela apaga {W}/sentinel, uma subpasta, que não é alvo da mudança da l.105 (raiz, home, pasta de topo, pasta de trabalho), então ela não muda de sentido. O efeito em subagente de fundo está declarado como não medido."
+    },
+    {
+      "alvo": "E_CENSO_CONTA_OS_README_COMO_AGENTES_SEM_MODEL_1121",
+      "veredito": "SUSTENTA",
+      "nota": "grep -n do glob de agentes em .claude/validation/cc-delta-census.sh → l.339, sem excluir README.md; o censo imprime «(sem model)=9, opus=8, sonnet=43»; python3 com o mesmo regex de frontmatter: com README {sonnet 43, opus 8, sem model 9} = 60, sem README {sonnet 43, opus 8} = 51; ls .claude/agents/*/README.md → 9. O achado se reproduz."
+    },
+    {
+      "alvo": "Q_CENSO_EXCLUI_README_DA_CONTAGEM_DE_AGENTES_1121",
+      "veredito": "SUSTENTA",
+      "nota": "A família run_cc_delta_census_selftests existe (lint-selftest.sh l.55632), então o caso proposto tem onde morar. A recusa do Linear («usage limit exceeded») não foi re-medida por este juiz."
+    },
+    {
+      "alvo": "E_FALLBACK_DO_SUBAGENTE_SO_PEGA_EMBUTIDOS_E_FORKS_1121",
+      "veredito": "SUSTENTA",
+      "nota": "python3 sobre .claude/settings.json → fallbackModel [claude-opus-5-5, claude-opus-5, claude-sonnet-5-5]; 51 agentes com model; nenhum frontmatter de SKILL.md com model (onion-patterns l.100 é corpo); medi também os 176 comandos: nenhum frontmatter com model (os dois acertos de grep, agent-template.md e create-agent.md, são corpo); cc-update.md l.74-75 → general-purpose, model opus, effort high. O modo real de fallback está declarado como não medido."
+    },
+    {
+      "alvo": "E_ATRIBUICAO_DA_CASA_ESTA_NO_SETTINGS_DO_PROJETO_1121",
+      "veredito": "SUSTENTA",
+      "nota": "attribution {commit, pr} no settings do projeto; managed-settings.json do host → só pluginConfigs, e não há managed-settings.d; o settings do usuário não tem attribution. Ressalva de precisão: a troca de modelo NO MEIO DO TURNO, que é o caso da l.46, vem do fallbackModel (troca automática); o PreModelSwitch citado guarda o /model da sessão principal, que não é no meio do turno. A conclusão não muda. A exceção de managed settings pode também chegar pela entrada nova de organização do Admin Console (l.3), que não foi medida."
+    },
+    {
+      "alvo": "E_LOOP_DO_BATON_PODE_IR_A_30_DIAS_1121",
+      "veredito": "SUSTENTA",
+      "nota": "baton.md l.108-125 e baton-doctrine.md l.79-80 sem prazo; grep de '7 dias|7 days|sete dias' perto de loop, agendamento ou cron em .claude, docs/knowledge-base, docs/meta-specs, docs/onion e ops → só o nextPageToken do Jira e o FedRAMP, nada do /loop. Medi o que o nó deixou em aberto: o .claude/scheduled_tasks.lock do checkout principal guarda sessionId, pid, procStart e acquiredAt; o pid está vivo, é um processo claude cujo executável é a versão 2.1.330, e o lock foi pego hoje às 14:41 UTC. Ou seja, a sessão que hoje tem o agendador nasceu na 2.1.330, e o que ela armou já tem o teto de 30 dias. A frase «o recurso está em uso» vem só do lock; o lock prova o dono do agendador, não uma tarefa armada (não há scheduled_tasks.json)."
+    },
+    {
+      "alvo": "E_USO_MULTISSESSAO_DO_HOST_GANHA_CORRECOES_1121",
+      "veredito": "SUSTENTA",
+      "nota": "git worktree list | wc -l → 57; agent-orchestration.md l.446 confere; as remoções da casa são git worktree remove --force das worktrees PRÓPRIAS dos scripts (pr-finalize.sh l.161 pela lista _WTS, publish-door.sh l.361, materialize-door.sh l.131), não a ferramenta ExitWorktree; grep de ExitWorktree e EnterWorktree em .claude e ops fora de pesquisa → só a KB. As linhas citadas (l.14, l.15, l.29, l.30) conferem."
+    },
+    {
+      "alvo": "E_ITENS_QUE_A_CASA_NAO_USA_1121",
+      "veredito": "EXAGERA",
+      "nota": "Duas afirmações caem. (1) «claude -p em disco cheio» não é coisa que a casa não usa: o grep procurou a string 'claude -p' e não viu a chamada em forma de lista do Python; a bancada do deny (ops/testing/permissions-deny-bench.py l.430) roda [\"claude\", \"-p\", ...] com a saída stream-json num ARQUIVO, que é exatamente o caso da l.44. O dano é baixo, porque a bancada já reprova caso sem resultado (l.7, l.604, l.639): a correção só troca um rc 0 calado por rc 1. (2) A razão dada para a volta do retry de max_tokens (l.89), «a casa não fala com gateway», está errada duas vezes: a l.89 vale para o limite do MODELO e não só do gateway, e a mesma bancada fala com um servidor de API falso (ANTHROPIC_BASE_URL apontado para um stub local, l.426). A conclusão de que o retry não pega a casa segue de pé por outra razão, medida: nenhuma superfície fixa max_tokens nem CLAUDE_CODE_MAX_OUTPUT_TOKENS. O resto do nó reproduz: 0 CLAUDE_ENV_FILE, 0 mcpServers em agentes ou skills, 0 deniedMcpServers ou allowedMcpServers, 35 hooks command e 0 prompt, 10 runs-on ubuntu-latest, 0 AbovePrompt, nenhum arquivo de memória ou de rules com comentário HTML e definição de link, nenhum nome de agente duplicado no frontmatter, publish-door.sh l.885 confere. CU4: a decisão de NÃO superar E_ITENS_DE_CONFIGURACAO_QUE_A_CASA_NAO_USA_1120 está certa: o label daquele nó não cita max_tokens, só o narrative envelheceu com a l.89, e o estado que ele afirma (a casa não usa essas configurações) segue medido hoje. Nenhum outro nó da r26 caiu pela medição de hoje: os 11 PreToolUse com 9 onFailure block seguem iguais, a bancada do deny e a guarda do agent_id seguem verdes, e os nós «verde na 2.1.329» são datados: valem para a versão que nomeiam, e a r27 já tem o nó da 2.1.330 da bancada.",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "grep -n '\"claude\", \"-p\"' ops/testing/permissions-deny-bench.py (→ l.430, stdout=f para {W}/{tag}.stream.jsonl) e grep -n ANTHROPIC_BASE_URL ops/testing/permissions-deny-bench.py (→ l.426, stub local)"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "tirar «claude -p em disco cheio» da lista do que a casa não usa e registrar que a bancada do deny roda claude -p com a saída num arquivo (l.430) e já reprova caso sem resultado (l.7, l.604, l.639), de modo que a l.44 só deixa a falha explícita; trocar a razão da l.89 por «nenhuma superfície fixa max_tokens nem CLAUDE_CODE_MAX_OUTPUT_TOKENS»; e procurar claude -p também na forma de lista (\"claude\", \"-p\")",
+        "medida": "grep -rn '\"claude\", \"-p\"' em ops e .claude → 1 acerto (a bancada, l.430); grep -rln 'CLAUDE_CODE_MAX_OUTPUT_TOKENS|max_tokens' em .claude/hooks, .claude/commands, .claude/settings.json e ops → nada; a bancada re-rodada por este juiz deu rc 0 com 362 casos e 0 divergentes"
+      }
+    }
+  ],
+  "omissoes": [
+    {
+      "item": "re-sonda do agent_id da guarda de fundo em subagente; itens do delta que a tocam: l.38 (subagente de fundo parado que não fica parado) e l.39 (espera por agente de fundo parado ao terminar, em sessão de app ou SDK)",
+      "superficie": ".claude/hooks/pretooluse-subagent-background-wait.sh (l.29-30: a sonda tem de ser re-rodada no /meta:cc-update); na r26 virou o nó E_SONDA_DO_AGENT_ID_VERDE_EM_SUBAGENTE_NA_2_1_329_1120 só porque o juiz apontou",
+      "medida": "medido pela metade, no vivo, na 2.1.330: este juiz (subagente general-purpose) chamou Bash com run_in_background true e a guarda recusou com «GUARDA-PRETOOLUSE (fundo em subagente)». O agent_id segue chegando ao PreToolUse. As l.38-39 não tocam a razão da guarda (o aviso de fim de tarefa não acorda um subagente que encerrou o turno), e a l.39 vale para app e SDK, que no bridge está na 2.1.323. A metade da sessão principal não foi medida.",
+      "impacto": 3
+    },
+    {
+      "item": "Code Mode: l.32 (pausa longa com rules de paths ou deny de Read), l.33-37, l.101-103",
+      "superficie": ".claude/settings.json (12 regras deny de Read, de 75) e .claude/rules (7 arquivos com paths:), exatamente as condições da l.32; nó aberto da r26 Q_SONDA_DOS_VETOS_NO_CODE_MODE_1120 (SAC-492)",
+      "medida": "python3 sobre .claude/settings.json → deny {Bash 63, Read 12}; cc-delta-census → 7 rules com paths:; settings do projeto e do usuário sem chave de Code Mode e nenhuma variável de ambiente de Code Mode: o modo segue desligado neste host, logo nenhum efeito medido. A rodada não declara o Code Mode em lugar nenhum; vai para NÃO-VERIFICADOS da SYNTHESIS, ligado à SAC-492.",
+      "impacto": 2
+    },
+    {
+      "item": "l.108: nomes de modelo não reconhecidos com sonnet ou haiku passam ao system prompt curto",
+      "superficie": "fallbackModel do .claude/settings.json (claude-sonnet-5-5 no fim da cadeia), allowlist session_models (claude-fable-5-2, claude-opus-5-5, claude-opus-5), o --model haiku da bancada do deny (l.430)",
+      "medida": "grep -a -o -F de cada nome entre aspas no executável 2.1.330: claude-sonnet-5-5 33, claude-opus-5-5 68, claude-opus-5 65, claude-fable-5-2 36; haiku e sonnet nos agentes são apelidos. Os nomes da casa são conhecidos do binário, então o system prompt curto não os pega. Não toca.",
+      "impacto": 1
+    },
+    {
+      "item": "l.44 (claude -p com saída em arquivo no disco cheio) e l.89 (volta do retry de max_tokens)",
+      "superficie": "ops/testing/permissions-deny-bench.py l.426 e l.430",
+      "medida": "ver o EXAGERA de E_ITENS_QUE_A_CASA_NAO_USA_1121: a bancada roda claude -p com saída em arquivo e fala com um stub de API; a bancada já reprova caso sem resultado, então a l.44 só deixa a falha explícita.",
+      "impacto": 1
+    },
+    {
+      "item": "base da rodada",
+      "superficie": "worktree da rodada (currency-census, linha base:main)",
+      "medida": "currency-census.sh → base:main b0df31551 contra c6ab7584, 1 commit atrás; git diff --stat HEAD origin/main → 6 arquivos de doutrina e projeção (ADR da catraca de decisões, índice da KB, inventário), nenhum medido por esta rodada. Rebase antes do PR.",
+      "impacto": 1
+    },
+    {
+      "item": "guardas de deriva de binário (lidas dos arquivos da rodada, não re-rodadas por este juiz)",
+      "superficie": "lint-selftest.sh --families channel_session e --families cited_directive",
+      "medida": "channel_session: o arquivo da rodada termina em «Passaram: 89 · Pularam: 0 · Falharam: 0 · OK ✓ — todas as guardas reagiram conforme esperado» (verde na 2.1.330). cited_directive: sem resultado final quando este juiz terminou (última linha do arquivo: «load-lease: liberou — load 11.69 < 12 após 260s de espera», a bancada ainda na fila de carga); a rodada confere o rc e a linha (f) e compara com a r26, que reprovava por renomeação de locais do parser (SAC-433)",
+      "impacto": 2
+    }
+  ]
+}

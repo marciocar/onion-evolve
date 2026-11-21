@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1205 itens abertos** em 176 grafo(s) com aberto (de 235 no escopo) · 170 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1207 itens abertos** em 177 grafo(s) com aberto (de 236 no escopo) · 171 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1722,6 +1722,13 @@
 | 4.5 | `C_TETO_GATE_DO_GIT` | hooks-python-isolated-2026-11 | TETO: os scripts que o pre-commit e o pre-push executam não entraram: 149 invocações sem -I em 38 arquivos, fora dos hooks da s |
 | 3.2 | `C_API_DIRETA_SEM_PYTHON_CALA` | hooks-python-isolated-2026-11 | sem python3 NENHUM o veto da API direta segue calado, por decisão anterior; com python3 quebrado ou JSON ilegível ele agora fech |
 | 3.2 | `C_TETO_LEXICO` | hooks-python-isolated-2026-11 | TETO: o scanner é léxico; não vê python em variável de nome livre, em bash -c entre aspas simples, em uv run, nem por caminho |
+
+## radar-E3-2026-11-21-r27 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.8 | `Q_SUBIR_SDK_DO_BRIDGE_0_3_330_E_PIN_DO_REVISOR_V1_0_286_1121` | radar-E3-2026-11-21-r27 | o SDK do bridge sobe para 0.3.330 pelo PR onion-bridge #112 (merge e deploy do maestro) e o pin do revisor do CI sobe para a actio |
+| 3.2 | `Q_CENSO_EXCLUI_README_DA_CONTAGEM_DE_AGENTES_1121` | radar-E3-2026-11-21-r27 | a contagem de agentes por model do cc-delta-census.sh exclui os README.md (mesma convenção do inventário: 51 agentes), com um c |
 
 ## radar-E3-2026-11-18-r25 — 4 item(ns)
 

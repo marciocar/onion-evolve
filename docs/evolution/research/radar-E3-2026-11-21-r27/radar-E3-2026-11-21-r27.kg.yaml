@@ -1,0 +1,323 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.330 a 2.1.330 contra a baseline 2.1.329.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-11-21-r27
+  schema_version: "1"
+  baseline: "2026-11-21"
+  review_after: "2026-12-21"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-11-21); 12 da rodada; 17 após o juiz e as guardas (2 guardas, 2 omissões medidas, 1 superação).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   DECIDIDO (2026-11-21): (a). Caem dois nós da r26 pela medição de hoje: as versões de quem serve (o host
+#   subiu para 2.1.330) e a pergunta da subida (alvo 0.3.329/v1.0.284 ultrapassado; a subida do bridge já
+#   está num PR aberto).
+external_edges:
+  - from: E_HOST_NA_2_1_330_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1121
+    to: "docs/evolution/research/radar-E3-2026-11-20-r26/radar-E3-2026-11-20-r26.kg.yaml#E_HOST_NA_2_1_329_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1120"
+    edge_type: SUPERSEDES
+  - from: Q_SUBIR_SDK_DO_BRIDGE_0_3_330_E_PIN_DO_REVISOR_V1_0_286_1121
+    to: "docs/evolution/research/radar-E3-2026-11-20-r26/radar-E3-2026-11-20-r26.kg.yaml#Q_SUBIR_SDK_DO_BRIDGE_0_3_329_E_PIN_DO_REVISOR_V1_0_284_1120"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-21"
+    trace: "docs/evolution/research/radar-E3-2026-11-21-r27/SYNTHESIS.md"
+    verified_against: "CHANGELOG oficial: seções 2.1.330 (145 linhas, 142 itens); baseline 2.1.329, disco 2.1.330, processo 2.1.330, SDK bridge 2.1.323"
+    label: "o delta desde a baseline 2.1.329 são 1 versão(ões), de 2.1.330 a 2.1.330, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.330 a ## 2.1.330 (cópias em docs/evolution/research/radar-E3-2026-11-21-r27/data/)"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-21"
+    verified_against: "fechada em 2026-11-21 pela rodada 27 do radar do Claude Code: 142 itens; os candidatos foram medidos no vivo, as omissões que o juiz mediu entraram como nós (sonda do agent_id, nomes de modelo reconhecidos) ou como correção (claude -p da bancada), o Code Mode e o resto estão em NÃO-VERIFICADOS na SYNTHESIS, e o juiz refutou em data/judge-verdicts.json"
+    label: "quais itens de 2.1.330 a 2.1.330 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_HOST_NA_2_1_330_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-21"
+    verified_against: "claude --version → 2.1.330; cc-delta-census.sh . --markdown → processo 2.1.330, SDK bridge binário 2.1.323 (SDK 0.3.323), 6 versões publicadas atrás; currency-census.sh → agent-sdk:bridge 0.3.323 → 0.3.330 defasada e action:anthropics/claude-code-action 1.0.272 → 1.0.286 defasada (o pin anthropics/claude-code-action@d5f7970a instala o CLI 2.1.322; a v1.0.286 instala o 2.1.330); grep -n 'claude-code-action@' .github/workflows/onion-review.yml → l.329 e l.493 com o pin anthropics/claude-code-action@d5f7970a; seções do CHANGELOG depois de 2.1.322: 2.1.323, 325, 326, 327, 328, 329, 330 (a 2.1.324 não tem seção)"
+    label: "quem serve o Onion em 2026-11-21: o host na 2.1.330, o bridge na 2.1.323 (SDK 0.3.323) e o revisor do CI na 2.1.322 (action v1.0.272); nada de 2.1.325 a 2.1.330 chega ao bridge nem ao revisor"
+    narrative: "Régua do CHANGELOG (versões com seção, a mesma do cc-delta-census): o bridge foi de 5 para 6 versões atrás do host, o revisor de 6 para 7."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "cc-delta-census.sh --markdown; currency-census.sh; .github/workflows/onion-review.yml"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_SUBIR_SDK_DO_BRIDGE_0_3_330_E_PIN_DO_REVISOR_V1_0_286_1121
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-21"
+    verified_against: "currency-census.sh em 2026-11-21: bridge 0.3.323 contra 0.3.330 publicada; action v1.0.272 contra v1.0.286 publicada; gh pr view 112 no repo onion-bridge → OPEN, MERGEABLE, «chore(deps): o Agent SDK sobe de 0.3.323 para 0.3.330», aberto em 2026-11-21T01:28:13Z; tm.sh item.read SAC-432 --lean → In Progress, updatedAt 2026-11-21T01:28:19Z"
+    narrative: "Issue no Linear: SAC-432 (projeto Onion — core: próximas levas), já em andamento, comentada em 2026-11-21 com os alvos novos. A metade do bridge está no PR onion-bridge #112, aberto, esperando o merge e o deploy do maestro: esta rodada só registra, não refaz. A metade do revisor (pin da action) não andou: segue em v1.0.272, e o alvo agora é a v1.0.286."
+    label: "o SDK do bridge sobe para 0.3.330 pelo PR onion-bridge #112 (merge e deploy do maestro) e o pin do revisor do CI sobe para a action v1.0.286; a prova do revisor fica para o PR seguinte ao que edita o workflow"
+  - id: E_BANCADA_DO_DENY_VERDE_NA_2_1_330_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-21"
+    verified_against: "python3 -I ops/testing/permissions-deny-bench.py --settings .claude/settings.json --only default,bypass → rc 0, «binario: 2.1.330 (Claude Code) · regras: 75», «sentinela ok (rc 0): modo default não executou rm», «casos: 362 · divergentes: 0»"
+    label: "o permissions.deny da casa segue valendo na 2.1.330 em default e em bypass, depois da mudança que passa a pedir aprovação para mais comandos rm na raiz, na home, numa pasta de topo ou na pasta de trabalho"
+    narrative: "Item: data/2.1.330.txt l.105. A bancada mede o deny; o efeito do novo «quem não pode responder é recusado» num subagente de fundo não foi medido."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.330.txt l.105; ops/testing/permissions-deny-bench.py"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_CENSO_CONTA_OS_README_COMO_AGENTES_SEM_MODEL_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-11-21"
+    verified_against: "cc-delta-census.sh . --markdown → «agentes por model: (sem model)=9, opus=8, sonnet=43»; cc-delta-census.sh l.339 faz glob de .claude/agents/**/*.md sem excluir README.md; python3 com o mesmo regex, só sem os README.md → sonnet 43, opus 8, total 51, nenhum sem model; os 9 «sem model» são os README.md das 9 categorias (product, testing, review, git, compliance, research, meta, development, deployment)"
+    label: "o censo do /meta:cc-update conta os 9 README de categoria como agentes sem model: todos os 51 agentes da casa declaram model, e a linha «(sem model)=9» do inventário é falsa"
+    narrative: "Achado ao medir o item da 2.1.330 sobre o fallback de modelo do subagente (data/2.1.330.txt l.110), que fala de agentes sem model. Lida ao pé da letra, a linha do censo faria pensar que 9 agentes da casa herdam o fallback; a medição dá zero."
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh"
+      locator: "l.339-342 (contagem de agentes por model)"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_CENSO_EXCLUI_README_DA_CONTAGEM_DE_AGENTES_1121
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-21"
+    verified_against: "aberta em 2026-11-21 a partir de E_CENSO_CONTA_OS_README_COMO_AGENTES_SEM_MODEL_1121"
+    narrative: "Sem issue no Linear: em 2026-11-21 o tm.sh item.create no projeto Onion — core: próximas levas foi recusado com «GraphQL errors: usage limit exceeded». Fica só o nó até a cota voltar."
+    label: "a contagem de agentes por model do cc-delta-census.sh exclui os README.md (mesma convenção do inventário: 51 agentes), com um caso na bancada run_cc_delta_census_selftests que reprova se um README entrar"
+  - id: E_FALLBACK_DO_SUBAGENTE_SO_PEGA_EMBUTIDOS_E_FORKS_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-11-21"
+    verified_against: "python3 sobre .claude/settings.json → fallbackModel = [claude-opus-5-5, claude-opus-5, claude-sonnet-5-5]; os 51 agentes da casa declaram model (sonnet 43, opus 8); nenhuma SKILL.md tem model no frontmatter (grep -n '^model:' .claude/skills/*/SKILL.md → só onion-patterns l.100, que é texto do corpo, não frontmatter); .claude/commands/meta/cc-update.md l.74-75 lança o juiz como general-purpose com model opus explícito"
+    label: "a mudança da 2.1.330 que passa o fallback de modelo do subagente adiante (agentes sem model e forks rodam no fallback) só pega, na casa, os agentes embutidos lançados sem model e os forks; os 51 agentes da casa e o juiz do cc-update declaram model"
+    narrative: "Itens: data/2.1.330.txt l.110 (fallback passa adiante) e l.109 (skill com model deixa subagentes no modelo da sessão; a casa não tem skill com model). O efeito num fallback real (sessão caída para claude-sonnet-5-5 lançando fork) não foi medido."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.330.txt l.109, l.110; .claude/settings.json"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_ATRIBUICAO_DA_CASA_ESTA_NO_SETTINGS_DO_PROJETO_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-21"
+    verified_against: "python3 sobre .claude/settings.json → attribution = {commit, pr} com a linha «Orquestrado com 🧅 Onion Evolve»; managed-settings.json do host → só a chave pluginConfigs (sem attribution); .claude/settings.json tem PreModelSwitch e PostModelSwitch (premodelswitch-guard.sh), que guardam o /model da sessão principal; a troca no meio do turno, caso do item, vem do fallbackModel do mesmo settings"
+    label: "a correção da 2.1.330 para o modelo que respondia ao lembrete de atribuição e encerrava o turno cedo após trocar de modelo vale por inteiro na casa: a atribuição está no settings do projeto, e a exceção que a correção deixa é só a de managed settings"
+    narrative: "Item: data/2.1.330.txt l.46. O efeito (turno que não encerra mais cedo) não foi medido."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.330.txt l.46; .claude/settings.json; managed-settings.json do host"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_LOOP_DO_BATON_PODE_IR_A_30_DIAS_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-11-21"
+    verified_against: ".claude/commands/meta/baton.md l.108-125 (modo /loop: armar com /loop /meta:baton --quiet, reserva de 20 a 30 min) e baton-doctrine.md l.80 não citam prazo de expiração; grep -rnE '7 dias|7 days|sete dias' em baton.md e baton-doctrine.md → nada; existe .claude/scheduled_tasks.lock no checkout principal do core com mtime de 2026-11-21, ou seja, o recurso está em uso no host"
+    label: "a tarefa agendada e o /loop passam de 7 para 30 dias na 2.1.330, e isso não deixa texto da casa defasado: o modo /loop do baton não promete prazo; as tarefas criadas antes da 2.1.330 seguem acabando em 7 dias"
+    narrative: "Item: data/2.1.330.txt l.104. Um pulso do baton armado antes da 2.1.330 ainda morre no 7º dia; não foi medido se há algum armado hoje."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.330.txt l.104; .claude/commands/meta/baton.md"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_USO_MULTISSESSAO_DO_HOST_GANHA_CORRECOES_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-11-21"
+    verified_against: "git worktree list → 57 worktrees do core no host; docs/knowledge-base/concepts/agent-orchestration.md l.446 → «Não se usa EnterWorktree/ExitWorktree manual — a ferramenta gerencia»; a remoção de worktree da casa é git worktree remove (ops/pr-finalize.sh, ops/publish-door.sh, ops/materialize-door.sh), não a ferramenta ExitWorktree"
+    label: "três correções da 2.1.330 protegem o uso de várias sessões juntas, regime do host: o ExitWorktree que apagava worktree de outra sessão, o settings do usuário perdido em gravação simultânea e os plugins que sumiam; nenhuma muda texto ou guarda da casa"
+    narrative: "Itens: data/2.1.330.txt l.14, l.15, l.29 (e l.30, tarefas atualizadas ao mesmo tempo). A casa não chama ExitWorktree à mão; a correção vale para o diálogo de saída e para quem usar a ferramenta."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.330.txt l.14, l.15, l.29, l.30"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_ITENS_QUE_A_CASA_NAO_USA_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-11-21"
+    verified_against: "grep -rn CLAUDE_ENV_FILE .claude/hooks ops → nada; grep -rln '^mcpServers:' .claude/agents .claude/skills → nada; grep de deniedMcpServers e allowedMcpServers → nada; tipos de hook no settings: 35 command, 0 prompt; runs-on dos workflows → todos ubuntu-latest (sem self-hosted runner); grep de AbovePrompt fora de data/ → nada; CLAUDE.md, os arquivos de memória do projeto e .claude/rules/*.md → nenhum com comentário HTML e definição de link juntos; nomes de agente duplicados em .claude/agents → nenhum, e não há agentes de usuário; ops/publish-door.sh l.885 roda claude plugin validate --strict nos plugins publicados"
+    label: "parte do delta da 2.1.330 mexe no que a casa não usa: env de SessionStart, MCP declarado por subagente, deniedMcpServers, hook de prompt, self-hosted runner, AbovePrompt, link em CLAUDE.md com comentário HTML e agente de nome duplicado"
+    narrative: "Itens: data/2.1.330.txt l.43, l.24, l.106, l.114, l.6 e os demais do self-hosted runner, l.87, l.55, l.58. O easel (l.4), mod embutido de gráfico, aparece nesta sessão como ferramenta MCP; a casa não tem allowlist nem denylist de MCP, então o aviso da l.50 não a pega. A volta da nova tentativa no limite de max_tokens (l.89) desfaz a remoção que a r26 citou em E_ITENS_DE_CONFIGURACAO_QUE_A_CASA_NAO_USA_1120; a frase de lá envelheceu, mas o nó segue valendo, porque nenhuma superfície da casa fixa max_tokens nem CLAUDE_CODE_MAX_OUTPUT_TOKENS (grep em .claude/hooks, .claude/commands, .claude/settings.json e ops → nada). O claude -p em disco cheio (l.44) saiu desta lista pelo juiz: a bancada do deny roda claude -p com a saída num arquivo (ops/testing/permissions-deny-bench.py l.430) e já reprova caso sem resultado, então a correção só troca um rc 0 calado por rc 1."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.330.txt; .claude/settings.json; .github/workflows; ops/publish-door.sh"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_DERIVA_DO_CITED_DIRECTIVE_SEGUE_IGUAL_NA_2_1_330_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-21"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → rc 1, casos (a) a (e) verdes, «(f) DERIVA — ausente em: binario:function ⟨F⟩(e){return e.rep  binario:let n=e.matchAll(⟨B⟩),r=e.in — o COMPORTAMENTO do motor mudou no binario 2.1.330»; extração do binário 2.1.330: function CRn(e){let o=e.matchAll(cbr),r=e.includes(\"!`\")?dot(e).matchAll(mbr):[],g=[];...} e function dot(e){return e.replace(...,(o,r)=>{let g=e[r-1];...}; Wsi(e) = e.trim().replaceAll(...); cbr e mbr byte a byte iguais a Dqn e Lqn do molde em .claude/validation/cited-directive-check.sh l.79"
+    label: "a guarda de deriva do cited-directive segue reprovando na 2.1.330 pelo mesmo motivo da 2.1.329: só os nomes de função mudaram, as locais seguem o, r e g e as duas regex seguem iguais ao molde; o motor de injeção tem o mesmo comportamento"
+    narrative: "Não supera E_DERIVA_DO_CITED_DIRECTIVE_TROCA_TODAS_AS_LOCAIS_NA_2_1_329_1120 da r26: o estado que ela afirma segue valendo. A ação segue a SAC-433 (curinga de todas as locais no molde), comentada nesta rodada; nenhuma pergunta nova."
+    provenance:
+      source: "binário instalado do Claude Code 2.1.330 e a bancada"
+      locator: "lint-selftest.sh, família cited_directive, caso (f)"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_CHANNEL_SESSION_VERDE_NA_2_1_330_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-11-21"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families channel_session → rc 0, «Passaram: 89 · Pularam: 0 · Falharam: 0», «OK ✓ — todas as guardas reagiram conforme esperado» em 2026-11-21 com o Claude Code 2.1.330"
+    label: "a guarda de deriva de binário channel_session segue verde na 2.1.330"
+    provenance:
+      source: "execução das famílias da bancada"
+      locator: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families channel_session"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_SONDA_DO_AGENT_ID_VERDE_EM_SUBAGENTE_NA_2_1_330_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-21"
+    verified_against: "medido pelo juiz (subagente general-purpose) na 2.1.330: Bash com run_in_background true foi recusado por «GUARDA-PRETOOLUSE (fundo em subagente)»; o cabeçalho de .claude/hooks/pretooluse-subagent-background-wait.sh (l.29-30) manda re-rodar a sonda a cada /meta:cc-update; a metade da sessão principal (Bash em fundo sem agent_id passa) não foi medida"
+    label: "a guarda de espera em fundo em subagente segue barrando na 2.1.330: o agent_id ainda chega ao PreToolUse de um subagente; as correções de agente de fundo parado (l.38, l.39) não tocam a razão da guarda"
+    narrative: "Omissão apontada pelo juiz pela segunda rodada seguida (critério de omissão do delta). A l.39 vale para sessão de app ou SDK; o bridge, que serve por SDK, está na 2.1.323 e não a recebe."
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "omissoes: re-sonda do agent_id"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: E_NOMES_DE_MODELO_DA_CASA_SAO_RECONHECIDOS_NA_2_1_330_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-21"
+    verified_against: "medido pelo juiz: grep -a -o -F de cada nome entre aspas no executável 2.1.330 → claude-sonnet-5-5 33, claude-opus-5-5 68, claude-opus-5 65, claude-fable-5-2 36; haiku e sonnet nos agentes são apelidos"
+    label: "a mudança da 2.1.330 que dá o system prompt curto a nomes não reconhecidos com sonnet ou haiku não pega a casa: os nomes do fallbackModel e da allowlist de modelo estão no binário"
+    narrative: "Item: data/2.1.330.txt l.108. Presença do nome no binário é indício de reconhecimento, não a prova do system prompt usado."
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "omissoes: l.108"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261121_CLAUDE_P_DA_BANCADA_DO_DENY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-21"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_ITENS_QUE_A_CASA_NAO_USA_1121"
+    label: "o claude -p em disco cheio sai da lista do que a casa não usa, porque a bancada do deny o roda com saída em arquivo; a razão da volta do retry de max_tokens passa a ser que nenhuma superfície fixa max_tokens"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de E_ITENS_QUE_A_CASA_NAO_USA_1121"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_330_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1121
+    to: Q_SUBIR_SDK_DO_BRIDGE_0_3_330_E_PIN_DO_REVISOR_V1_0_286_1121
+    edge_type: SUPPORTS
+  - from: E_CENSO_CONTA_OS_README_COMO_AGENTES_SEM_MODEL_1121
+    to: Q_CENSO_EXCLUI_README_DA_CONTAGEM_DE_AGENTES_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_BANCADA_DO_DENY_VERDE_NA_2_1_330_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_FALLBACK_DO_SUBAGENTE_SO_PEGA_EMBUTIDOS_E_FORKS_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_ATRIBUICAO_DA_CASA_ESTA_NO_SETTINGS_DO_PROJETO_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_LOOP_DO_BATON_PODE_IR_A_30_DIAS_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_USO_MULTISSESSAO_DO_HOST_GANHA_CORRECOES_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_ITENS_QUE_A_CASA_NAO_USA_1121
+    edge_type: SUPPORTS
+  - from: E_FALLBACK_DO_SUBAGENTE_SO_PEGA_EMBUTIDOS_E_FORKS_1121
+    to: E_CENSO_CONTA_OS_README_COMO_AGENTES_SEM_MODEL_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_DERIVA_DO_CITED_DIRECTIVE_SEGUE_IGUAL_NA_2_1_330_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_CHANNEL_SESSION_VERDE_NA_2_1_330_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_SONDA_DO_AGENT_ID_VERDE_EM_SUBAGENTE_NA_2_1_330_1121
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_NOMES_DE_MODELO_DA_CASA_SAO_RECONHECIDOS_NA_2_1_330_1121
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261121_CLAUDE_P_DA_BANCADA_DO_DENY
+    to: E_ITENS_QUE_A_CASA_NAO_USA_1121
+    edge_type: TRACES_TO

@@ -13,13 +13,14 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-11-20
-    cc_version: "2.1.329"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "juiz independente (opus não-fork, effort high): 8 sustentados e 4 exagerados (duas linhas citadas erradas, a régua de defasagem misturada e o fechamento da pergunta antes das omissões), aplicados com 4 superações e 4 omissões medidas; a rodada refutou a afirmação do juiz de que o effort não sai na chamada; Aufhebung: SUPERSEDES de quatro nós da r25"
-                            # rodada 26 (2.1.327->2.1.329, duas versões com seção, 274 itens). Vetos PreToolUse já com onFailure
-                            # block diante do Code Mode; cited_directive reprova por renomeação (agora o n também); bridge e revisor
-                            # seguem para trás. Ações: SAC-432 e SAC-433 comentadas, SAC-492 nova. Histórico da r25 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-11-20-r26/radar-E3-2026-11-20-r26.kg.yaml
+    last_run: 2026-11-21
+    cc_version: "2.1.330"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "juiz independente (opus não-fork, effort high): 11 sustentados e 1 exagerado (o claude -p da bancada do deny contado como não usado e a razão errada da volta do retry de max_tokens), aplicado com 1 superação e 2 omissões medidas (sonda do agent_id e nomes de modelo); Aufhebung: SUPERSEDES de dois nós da r26"
+                            # rodada 27 (2.1.329->2.1.330, uma versão, 142 itens). Bridge no SDK 0.3.323 com a subida para
+                            # 0.3.330 no PR onion-bridge #112 (merge e deploy do maestro); revisor do CI na v1.0.272; cited_directive
+                            # reprova pelo mesmo motivo da 2.1.329; o censo contava README como agente. Ações: SAC-432 e SAC-433
+                            # comentadas; Q_CENSO só como nó (Linear recusou por limite de uso). Histórico da r26 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-11-21-r27/radar-E3-2026-11-21-r27.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
