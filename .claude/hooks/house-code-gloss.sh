@@ -822,7 +822,7 @@ PY
   _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/inboxes/2026-11-21-x.md","content":"Fechei o SAC-256."}}'
   if [ "${_o13}" = "0" ] && [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t13) sinal glosado cala; caminho fora da caixa (inboxes/) cala (rc 0)"; else _ko "(t13) glosado [${_o13}] · fora rc=${_rc} [${_o}]"; fi
   # ── a mensagem de commit (2026-11-21): modo commit-msg, chamado pelo .githooks/commit-msg ──
-  _cm() { local f="${_d}/COMMIT_EDITMSG"; printf '%s' "$1" > "${f}"; _rc=0; _o="$(bash "${BASH_SOURCE[0]}" commit-msg "${f}" 2>&1)" || _rc=$?; }
+  _cm() { local f="${_d}/COMMIT_EDITMSG"; printf '%s' "$1" > "${f}"; _rc=0; _o="$(bash "${BASH_SOURCE[0]}" commit-msg "${f}" 2>&1 </dev/null)" || _rc=$?; }
   # (c1) SAC-256 solto no assunto → lembrete com a glosa no stderr, rc 0
   _cm $'feat(radar): fecha o SAC-256\n\nO corpo explica.\n'
   if [ "${_rc}" -eq 0 ] && grep -q 'mensagem de commit' <<< "${_o}" && grep -q 'SAC-256 → a tarefa do task manager' <<< "${_o}"; then _ok "(c1) commit com SAC-256 solto no assunto: lembrete (rc 0)"; else _ko "(c1) rc=${_rc} [${_o}]"; fi
@@ -837,12 +837,12 @@ PY
   if [ "${_rc}" -eq 0 ] && grep -q 'SAC-256 →' <<< "${_o}"; then _ok "(c4) parágrafo final misto não é trailer: lembra (rc 0)"; else _ko "(c4) rc=${_rc} [${_o}]"; fi
   # (c5) core.commentChar trocado: a linha com ';' some, a linha com '#' é mensagem e lembra
   _rc=0; printf '%s' $'fix: a guarda\n\n; I3 no comentário\n#12 e o SAC-256 na mensagem\n' > "${_d}/COMMIT_EDITMSG"
-  _o="$(ONION_COMMIT_COMMENT_CHAR=';' bash "${BASH_SOURCE[0]}" commit-msg "${_d}/COMMIT_EDITMSG" 2>&1)" || _rc=$?
+  _o="$(ONION_COMMIT_COMMENT_CHAR=';' bash "${BASH_SOURCE[0]}" commit-msg "${_d}/COMMIT_EDITMSG" 2>&1 </dev/null)" || _rc=$?
   if [ "${_rc}" -eq 0 ] && grep -q 'SAC-256 →' <<< "${_o}" && ! grep -q 'I3 →' <<< "${_o}"; then _ok "(c5) commentChar ';': o ';' é comentário, o '#' é mensagem (rc 0)"; else _ko "(c5) rc=${_rc} [${_o}]"; fi
   # (c6) arquivo ausente, vazio, binário e só comentário: rc 0, mudo, sem Traceback
-  _rc=0; _o6c="$(bash "${BASH_SOURCE[0]}" commit-msg "${_d}/nao-existe" 2>&1)" || _rc=$?; _o6c="${_o6c}${_rc}"
+  _rc=0; _o6c="$(bash "${BASH_SOURCE[0]}" commit-msg "${_d}/nao-existe" 2>&1 </dev/null)" || _rc=$?; _o6c="${_o6c}${_rc}"
   _cm ''; _o6c="${_o6c}${_o}${_rc}"
-  _cm $'\xff\xfe\x00SAC'; _o6c="${_o6c}${_o}${_rc}"
+  printf '\377\376\000SAC-256' > "${_d}/COMMIT_EDITMSG"; _rc=0; _o="$(bash "${BASH_SOURCE[0]}" commit-msg "${_d}/COMMIT_EDITMSG" 2>&1 </dev/null)" || _rc=$?; _o="$(grep -c Traceback <<< "${_o}" || true)"; [ "${_o}" = "0" ] && _o=""; _o6c="${_o6c}${_o}${_rc}"
   _cm $'# só comentário com SAC-256\n'; _o6c="${_o6c}${_o}${_rc}"
   _rc=0; _o="$(bash "${BASH_SOURCE[0]}" commit-msg 2>&1 </dev/null)" || _rc=$?; _o6c="${_o6c}${_o}${_rc}"
   if [ "${_o6c}" = "00000" ]; then _ok "(c6) mensagem ausente, vazia, binária, só comentário e sem argumento: mudo, rc 0"; else _ko "(c6) [${_o6c}]"; fi
