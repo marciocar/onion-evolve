@@ -2,7 +2,8 @@
 branch: docs/seal-chat-channel-contract-1121
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9faed83bc8fb48238706b458f31f3d2a4770cca5a35dc0171a96d799a27376ee
+reviewed_code_sha256: d7dbfe85e1bf201b987cb135bd812346863b8dff6c519ebe03e1c5a2b51a1298
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
