@@ -2,8 +2,7 @@
 branch: feat/house-gloss-commit-and-signals-1121
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 51de902cf5e53730a825eda40a557cd4d922ff4d9b1ac3a47cf664ce6eb2716d
-reviewed_code_sha256: af06be4129392d60899964b13ab91c98bb3ad641d77c48928f84793e383a0e70
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 2
@@ -21,6 +20,8 @@ nota: >-
   reprovava na porta onion-core (papel source, sem .githooks/), e o cabeçalho prometia "sai 0 sempre"
   ignorando a falha fechada do trampolim comum. Os 3 limites são do git e ficaram declarados no
   cabeçalho do .githooks/commit-msg.
+  Depois da revisão entrou só uma edição de texto, conferida pelo autor e não pelo refutador: três
+  frases da base plain-language-by-surface.md (mergeada no PR #1709) dizem agora onde o lembrete roda.
 ---
 
 # Passada adversarial: a glosa de sigla chega ao commit e aos sinais entre sessões
