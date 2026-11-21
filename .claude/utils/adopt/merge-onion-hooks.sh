@@ -28,6 +28,7 @@
 #             O `--diff` nomeia cada regra de deny nova e os allow do alvo que ela anula (comparação de texto).
 #             Regra listada em deny-retired.tsv sai do alvo, avisada no stderr e nomeada no `--diff`. LIMITE: é por texto,
 #             então regra que o adotante escreveu idêntica à aposentada também sai.
+#             A statusLine é sempre do alvo: nunca vem da fonte; a do alvo fica e o stderr avisa que ela esconde o censo.
 #             IDEMPOTENTE: rodar 2× = no-op na 2ª.
 #
 # Uso       : merge-onion-hooks.sh <source-settings.json> <target-settings.json>
@@ -138,6 +139,11 @@ _div="$(jq -nr --slurpfile s "${SRC}" --slurpfile t "${TGT}" \
 _dshape="$(jq -r 'if ((.permissions // {}) | type) != "object" then "permissions" elif (((.permissions // {}).deny // []) | type) != "array" then "permissions.deny" else "" end' "${TGT}" 2>/dev/null || true)"
 [ -n "${_dshape}" ] && echo "AVISO: ${_dshape} do alvo não está na forma esperada — o deny da fonte NÃO foi somado; os hooks foram. Corrija o settings do alvo e rode de novo." >&2
 [ "${_div}" = diverge ] && echo "AVISO: o attribution do alvo difere do da fonte — preservado o do alvo; confira se o padrão de assinatura da família mudou." >&2
+# statusLine (2026-11-21, censo de sessões): é SEMPRE do alvo. O merge parte do alvo e nunca leva a statusLine da
+# fonte (a camada de projeto substitui a do usuário inteira, sem mesclar: levar a da fonte apagaria a de cada pessoa).
+# Alvo que JÁ tem statusLine esconde o censo naquele projeto: preserva e AVISA. A oferta é do offer-statusline.sh.
+_sl="$(jq -r 'if has("statusLine") then "tem" else "" end' "${TGT}" 2>/dev/null || true)"
+[ "${_sl}" = tem ] && echo "AVISO: o settings do alvo já tem statusLine — preservada (é do alvo); ela substitui a do usuário, então o censo de sessões não aparece neste projeto (ver offer-statusline.sh)." >&2
 
 # HOOK APOSENTADO PELO CORE (SAC-145, 2026-10-15): o refresh trata "command que a fonte não tem" como hook PRÓPRIO
 # do alvo, e um hook que o core retirou tem exatamente essa forma. Medido no 1º update depois do #1129 (que

@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+"""Linha da statusLine: quantas sessões trabalham e quantas esperam você.
+
+Lê `claude agents --json`, a interface suportada do Claude Code (sem mod). Guarda a leitura por TTL segundos,
+para várias sessões não dispararem um processo de ~150 MB a cada atualização (medido 2026-11-21: 0,5 s e
+156 MB por chamada). Falhou a leitura: mostra a última com a idade, ou declara a lacuna. NUNCA inventa zero:
+"0 trabalhando" só sai de uma leitura real que veio vazia.
+
+Portável (insumo da curadoria, costurado no core em 2026-11-21):
+- o binário `claude` vem SÓ do PATH (`shutil.which`); fora do PATH a atualização falha e cai no cache ou na
+  lacuna declarada, nunca num caminho chutado de home;
+- o cache mora em XDG_RUNTIME_DIR (ou no tmp do SO), nunca em $HOME;
+- sai SEMPRE rc 0: statusLine que sai != 0 some da barra, então todo caminho (sem leitura, cache velho, erro)
+  imprime uma linha e retorna 0. A lacuna é texto visível, não silêncio.
+
+O fim da linha aponta o agent view nativo («← claude agents»): a statusLine é texto, sem clique; quem lista por
+estado e pula para a sessão é o `claude agents` (ou a seta para a esquerda no prompt vazio).
+Ligar: .claude/utils/statusline/README.md. Bancada: lint-selftest.sh (run_sessions_statusline_selftests).
+"""
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
+try:
+    import fcntl  # trava entre sessões; sem ela (SO sem fcntl) a linha segue, só sem a trava
+except ImportError:  # pragma: no cover
+    fcntl = None
+
+TTL = 25
+STALE = 90
+HINT = " · ← claude agents"
+CACHE_DIR = os.path.join(os.environ.get("XDG_RUNTIME_DIR") or tempfile.gettempdir(), "onion-sessions-line")
+CACHE = os.path.join(CACHE_DIR, "agents.json")
+LOCK = os.path.join(CACHE_DIR, "lock")
+
+
+def say(text):
+    print(text + HINT)
+
+
+def clean(value):
+    """Nome de sessão é dado de outra sessão: tira caractere de controle (escape de terminal) e corta em 24."""
+    return "".join(ch for ch in str(value or "?") if ch.isprintable())[:24] or "?"
+
+
+def age():
+    try:
+        return time.time() - os.path.getmtime(CACHE)
+    except OSError:
+        return None
+
+
+def refresh():
+    """Atualiza o cache. Quem não pega a trava serve o que já existe, sem esperar.
+
+    `claude` vem só do PATH. Fora do PATH: FileNotFoundError sobe e o chamador cai no cache ou na lacuna.
+    """
+    with open(LOCK, "w") as lock:
+        if fcntl is not None:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                return
+        claude = shutil.which("claude")
+        if not claude:
+            raise FileNotFoundError("claude não está no PATH")
+        out = subprocess.run([claude, "agents", "--json"], capture_output=True, text=True, timeout=5, check=True).stdout
+        if not isinstance(json.loads(out), list):
+            raise ValueError("claude agents --json não devolveu uma lista")
+        fd, tmp = tempfile.mkstemp(dir=CACHE_DIR)
+        with os.fdopen(fd, "w") as f:
+            f.write(out)
+        os.replace(tmp, CACHE)
+
+
+def main():
+    os.makedirs(CACHE_DIR, mode=0o700, exist_ok=True)
+    current = age()
+    if current is None or current > TTL:
+        try:
+            refresh()
+        except (OSError, ValueError, subprocess.SubprocessError):
+            pass  # cai no cache ou na lacuna; nunca propaga rc != 0 para a barra
+    current = age()
+    if current is None:
+        say("sessões: não li o estado")  # lacuna declarada: nenhuma leitura ainda
+        return
+    try:
+        with open(CACHE) as f:
+            data = json.load(f)
+        if not isinstance(data, list):
+            raise ValueError("cache não é lista")
+    except (OSError, ValueError):
+        say("sessões: leitura ilegível")  # lacuna declarada: cache corrompido
+        return
+    rows = [x for x in data if isinstance(x, dict)]
+    wait = [x for x in rows if x.get("state") == "blocked" or x.get("status") == "waiting"]
+    work = [x for x in rows if x.get("status") == "busy" and x not in wait]
+    line = f"sessões: {len(work)} trabalhando · {len(wait)} esperam você"
+    if wait:
+        line += ": " + ", ".join(clean(x.get("name")) for x in wait)
+    if current > STALE:
+        line += f" (leitura de {int(current)} s atrás)"
+    say(line)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as exc:  # a barra nunca deve quebrar por causa da linha
+        print(f"sessões: indisponível ({type(exc).__name__}){HINT}")
+    sys.exit(0)  # rc 0 SEMPRE: statusLine que sai != 0 some da barra

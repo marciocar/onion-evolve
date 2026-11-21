@@ -62456,6 +62456,167 @@ open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,n))' "$1" "$2" "$3" "$4
 }
 _family run_jq_raw_utf8_selftests
 
+# sessions-statusline — a linha «sessões: N trabalhando · M esperam você» (2026-11-21, insumo da curadoria costurado
+# no core): .claude/utils/statusline/onion-sessions-line (rc 0 SEMPRE, lacuna visível, nunca zero inventado, claude só
+# pelo PATH, cache por TTL), a oferta somente leitura do /meta:adopt (.claude/utils/adopt/offer-statusline.sh: caminho
+# absoluto do checkout principal, aviso de statusLine de projeto) e o merge-onion-hooks.sh, que nunca leva a statusLine
+# da fonte nem sobrescreve a do alvo. Cada caso roda no SUT intacto e num mutante plantado (âncora tem de existir 1×).
+run_sessions_statusline_selftests() {
+  echo ""
+  echo "▸ sessions-statusline — linha do censo (rc 0, lacuna, TTL), oferta do adopt e statusLine never-clobber no merge"
+  local ln="${REPO_ROOT}/.claude/utils/statusline/onion-sessions-line" of="${REPO_ROOT}/.claude/utils/adopt/offer-statusline.sh" \
+        mh="${REPO_ROOT}/.claude/utils/adopt/merge-onion-hooks.sh"
+  [ -f "${ln}" ] && [ -f "${of}" ] && [ -f "${mh}" ] || { record_fail "sessions-statusline: SUT ausente" "${ln}, ${of} ou ${mh}"; return; }
+  local PY; PY="$(command -v python3 2>/dev/null)" || { record_skip "sessions-statusline: python3 ausente (SUT não exercido)"; return; }
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"
+  local G=(git -c user.name=bancada -c user.email=bancada@example.invalid -c commit.gpgsign=false)
+  mkdir -p "${sb}/bin" "${sb}/nobin" "${sb}/homebin/.local/bin"
+  # o claude falso: só builtins do sh (o PATH do caso não tem coreutils); loga a chamada e devolve SL_JSON com rc SL_RC
+  cat > "${sb}/bin/claude" <<'SL_FAKE'
+#!/bin/sh
+echo call >> "${SL_LOG}"
+printf '%s' "${SL_JSON}"
+exit "${SL_RC:-0}"
+SL_FAKE
+  chmod +x "${sb}/bin/claude"; cp "${sb}/bin/claude" "${sb}/homebin/.local/bin/claude"
+  local J_OK='[{"name":"b1","status":"busy"},{"name":"b2","status":"busy"},{"name":"w1","status":"waiting"},{"name":"bk","kind":"background","state":"blocked"},{"name":"i1","status":"idle"},{"name":"d1","status":"idle","state":"done"}]'
+  # _slrun <sut> <xdg> <PATH> [json] [rc] → saída + «rc=N» + «calls=N»
+  _slrun() {
+    local rc=0 out; : > "${sb}/log"
+    out="$(env -i PATH="$3" XDG_RUNTIME_DIR="$2" HOME="${sb}/homebin" LC_ALL=C.UTF-8 SL_LOG="${sb}/log" SL_JSON="${4:-${J_OK}}" SL_RC="${5:-0}" \
+           "${PY}" -I "$1" 2>&1)" || rc=$?
+    printf '%s\nrc=%s\ncalls=%s\n' "${out}" "${rc}" "$(grep -c call "${sb}/log")"
+  }
+  _slage() { "${PY}" -I -c 'import os,sys,time; t=time.time()-int(sys.argv[2]); os.utime(sys.argv[1],(t,t))' "$1" "$2"; }
+  # _slcase <nome> <SUT> <OLD> <NEW> <função>: a função recebe o caminho do SUT (cópia) e devolve 0 se o caso vale
+  _slcase() {
+    local name="$1" sut="$2" old="$3" new="$4" fn="$5" rc_i=1 rc_m=1 k="${sb}/k"
+    rm -rf "${k}"; mkdir -p "${k}"
+    cp "${REPO_ROOT}/.claude/utils/adopt/deny-retired-list.sh" "${REPO_ROOT}/.claude/utils/adopt/deny-retired.tsv" "${k}/" 2>/dev/null
+    local dst="${k}/c-$(basename "${sut}")" mut="${k}/m-$(basename "${sut}")"
+    cp "${sut}" "${dst}"; "${fn}" "${dst}" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "sessions-statusline: ${name}"; else record_fail "sessions-statusline: ${name}" "${SL_WHY:-caso não satisfeito}"; fi
+    cp "${dst}" "${mut}"
+    OLD="${old}" NEW="${new}" "${PY}" -I -c '
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+' "${mut}"
+    "${fn}" "${mut}" && rc_m=0
+    _prove_mutation "sessions-statusline: ${name} (MUT)" "${dst}" "${mut}" "${rc_i}" "${rc_m}"
+  }
+  _slx() { rm -rf "${sb}/x"; mkdir -p "${sb}/x"; printf '%s' "${sb}/x"; }
+  # ── a linha ──
+  # (a) caminho normal: conta busy, e waiting + blocked como «esperam você», com os nomes; rc 0
+  _sl_a() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -qxF 'sessões: 2 trabalhando · 2 esperam você: w1, bk · ← claude agents' <<< "${a}" && grep -q '^rc=0$' <<< "${a}"; }
+  _slcase "(a) caminho normal: 2 trabalhando · 2 esperam (waiting e blocked), rc 0" "${ln}" \
+    'x.get("state") == "blocked" or x.get("status") == "waiting"' 'x.get("status") == "waiting"' _sl_a
+  # (b) sem claude no PATH e sem cache: lacuna declarada, rc 0, e nenhum zero inventado
+  _sl_b() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/nobin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -qxF 'sessões: não li o estado · ← claude agents' <<< "${a}" && grep -q '^rc=0$' <<< "${a}" && ! grep -q '0 trabalhando' <<< "${a}"; }
+  _slcase "(b) sem claude no PATH e sem cache: «não li o estado», rc 0, sem zero" "${ln}" \
+    'say("sessões: não li o estado")' 'say("sessões: 0 trabalhando · 0 esperam você")' _sl_b
+  # (c) sem claude no PATH COM cache velho (200 s): serve o cache e diz a idade, rc 0
+  _sl_c() { local x a; x="$(_slx)"; mkdir -p "${x}/onion-sessions-line"; printf '%s' "${J_OK}" > "${x}/onion-sessions-line/agents.json"
+    _slage "${x}/onion-sessions-line/agents.json" 200; a="$(_slrun "$1" "${x}" "${sb}/nobin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q '^sessões: 2 trabalhando · 2 esperam você: w1, bk (leitura de 2[0-9][0-9] s atrás) · ← claude agents$' <<< "${a}" && grep -q '^rc=0$' <<< "${a}"; }
+  _slcase "(c) sem claude no PATH com cache velho: serve o cache com a idade, rc 0" "${ln}" '    if current > STALE:' '    if False:' _sl_c
+  # (d) cache fresco: o claude NÃO é chamado (o TTL poupa o processo de ~150 MB por atualização)
+  _sl_d() { local x a; x="$(_slx)"; mkdir -p "${x}/onion-sessions-line"; printf '%s' '[]' > "${x}/onion-sessions-line/agents.json"
+    a="$(_slrun "$1" "${x}" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q '^calls=0$' <<< "${a}" && grep -qxF 'sessões: 0 trabalhando · 0 esperam você · ← claude agents' <<< "${a}"; }
+  _slcase "(d) cache dentro do TTL: nenhuma chamada ao claude; o zero vem de leitura real vazia" "${ln}" \
+    '    if current is None or current > TTL:' '    if True:' _sl_d
+  # (e) erro inesperado (XDG_RUNTIME_DIR é arquivo): linha «indisponível» e rc 0, nunca traceback
+  _sl_e() { local a; : > "${sb}/xdg-file"; a="$(_slrun "$1" "${sb}/xdg-file" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q '^sessões: indisponível (' <<< "${a}" && grep -q '^rc=0$' <<< "${a}" && ! grep -q Traceback <<< "${a}"; }
+  _slcase "(e) erro inesperado: «indisponível» e rc 0, sem traceback" "${ln}" \
+    '    except Exception as exc:  # a barra' '    except ImportError as exc:  # a barra' _sl_e
+  # (f) claude que falha (rc 1) e sem cache: lacuna, rc 0
+  _sl_f() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/bin" "${J_OK}" 1)"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -qxF 'sessões: não li o estado · ← claude agents' <<< "${a}" && grep -q '^rc=0$' <<< "${a}" && grep -q '^calls=1$' <<< "${a}"; }
+  _slcase "(f) claude com rc 1 e sem cache: lacuna, rc 0" "${ln}" ', timeout=5, check=True)' ', timeout=5, check=False)' _sl_f
+  # (g) resposta que não é lista: não vira cache; a linha declara a lacuna em vez de contar
+  _sl_g() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/bin" '{"agents":[]}')"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -qxF 'sessões: não li o estado · ← claude agents' <<< "${a}" && grep -q '^rc=0$' <<< "${a}"; }
+  _slcase "(g) resposta que não é lista não vira cache" "${ln}" '        if not isinstance(json.loads(out), list):' '        if False:' _sl_g
+  # (h) nome de sessão com escape de terminal: sai sem o caractere de controle
+  _sl_h() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/bin" "$(printf '[{"name":"x\\u001b[31my","status":"waiting"}]')")"; SL_WHY="$(tr '\n' '|' <<< "${a}" | cat -v)"
+    grep -q 'esperam você: x\[31my · ' <<< "${a}" && ! grep -q $'\x1b' <<< "${a}"; }
+  _slcase "(h) nome de sessão com escape de terminal sai limpo" "${ln}" \
+    'return "".join(ch for ch in str(value or "?") if ch.isprintable())[:24] or "?"' 'return str(value or "?")[:24]' _sl_h
+  # (i) claude só pelo PATH: o binário em ~/.local/bin não é achado se não está no PATH (nada de caminho chutado)
+  local a_i; a_i="$(_slrun "${ln}" "$(_slx)" "${sb}/nobin")"
+  if grep -qxF 'sessões: não li o estado · ← claude agents' <<< "${a_i}" && grep -q '^calls=0$' <<< "${a_i}"; then
+    record_pass "sessions-statusline: (i) claude fora do PATH (só em ~/.local/bin) não é chamado"
+  else record_fail "sessions-statusline: (i) claude fora do PATH (só em ~/.local/bin) não é chamado" "$(tr '\n' '|' <<< "${a_i}")"; fi
+  # ── a oferta do adopt ──
+  local r="${sb}/repo" wt="${sb}/wt"
+  "${G[@]}" init -q "${r}"; mkdir -p "${r}/.claude/utils/statusline"; cp "${ln}" "${r}/.claude/utils/statusline/"
+  printf '{}\n' > "${r}/.claude/settings.json"; "${G[@]}" -C "${r}" add -A; "${G[@]}" -C "${r}" commit -q -m c1
+  "${G[@]}" -C "${r}" worktree add -q -b adopt "${wt}" 2>/dev/null
+  mkdir -p "${sb}/cfg"
+  _ofrun() { local rc=0 out; out="$(CLAUDE_CONFIG_DIR="${sb}/cfg" LC_ALL=C.UTF-8 bash "$1" "$2" 2>&1)" || rc=$?; printf '%s\nrc=%s\n' "${out}" "${rc}"; }
+  _ofblock() { sed -n '/^{$/,/^}$/p' <<< "$1" | "${PY}" -I -c 'import json,sys; print(json.load(sys.stdin)["statusLine"]["command"])' 2>/dev/null; }
+  # (j) no checkout principal: o bloco traz o caminho ABSOLUTO real do script, e é JSON válido
+  _of_j() { local a c; a="$(_ofrun "$1" "${r}")"; c="$(_ofblock "${a}")"; SL_WHY="cmd=${c} | $(tr '\n' '|' <<< "${a}")"
+    [ "${c}" = "python3 -I '${r}/.claude/utils/statusline/onion-sessions-line'" ] && grep -q '^rc=0$' <<< "${a}"; }
+  _slcase "(j) bloco com o caminho absoluto resolvido, JSON válido, rc 0" "${of}" 'LINE="${HOME_DIR}/${REL}"' 'LINE="${REL}"' _of_j
+  # (k) numa worktree (a adoção legacy instala numa): o caminho é o do checkout PRINCIPAL, que fica depois do merge
+  _of_k() { local a c; a="$(_ofrun "$1" "${wt}")"; c="$(_ofblock "${a}")"; SL_WHY="cmd=${c} | $(tr '\n' '|' <<< "${a}")"
+    [ "${c}" = "python3 -I '${r}/.claude/utils/statusline/onion-sessions-line'" ]; }
+  _slcase "(k) na worktree da adoção: caminho do checkout principal, nunca o da worktree" "${of}" \
+    '  HOME_DIR="$(cd "$(dirname "${_common}")" && pwd -P)"' '  :' _of_k
+  # (l) projeto que JÁ tem statusLine (settings.json ou settings.local.json): avisa e não toca no arquivo
+  printf '%s\n' '{"statusLine":{"type":"command","command":"echo meu"}}' > "${wt}/.claude/settings.local.json"
+  _of_l() { local a s0 s1; s0="$(cksum "${wt}/.claude/settings.local.json" "${wt}/.claude/settings.json")"; a="$(_ofrun "$1" "${wt}")"
+    s1="$(cksum "${wt}/.claude/settings.local.json" "${wt}/.claude/settings.json")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q 'settings.local.json já tem statusLine' <<< "${a}" && grep -q 'censo de sessões NÃO aparece' <<< "${a}" && [ "${s0}" = "${s1}" ]; }
+  _slcase "(l) statusLine no settings.local.json do projeto: avisa e não sobrescreve" "${of}" \
+    'for path in (proj, proj_local):' 'for path in (proj,):' _of_l
+  # (m) somente leitura e idempotente: duas rodadas, mesma saída, árvore intacta
+  local t0 t1 o1 o2; t0="$(cd "${wt}" && find . -path ./.git -prune -o -type f -print0 | sort -z | xargs -0 cksum)"
+  o1="$(_ofrun "${of}" "${wt}")"; o2="$(_ofrun "${of}" "${wt}")"
+  t1="$(cd "${wt}" && find . -path ./.git -prune -o -type f -print0 | sort -z | xargs -0 cksum)"
+  if [ "${o1}" = "${o2}" ] && [ "${t0}" = "${t1}" ] && [ ! -e "${sb}/cfg/settings.json" ]; then
+    record_pass "sessions-statusline: (m) oferta somente leitura e idempotente (nem o settings do usuário nasce)"
+  else record_fail "sessions-statusline: (m) oferta somente leitura e idempotente" "saídas iguais? $([ "${o1}" = "${o2}" ] && echo s || echo n); árvore igual? $([ "${t0}" = "${t1}" ] && echo s || echo n)"; fi
+  # (n) usuário que já liga o censo: «já ligada», sem bloco para colar
+  _of_n() { local a; printf '%s\n' "{\"statusLine\":{\"type\":\"command\",\"command\":\"python3 -I '${r}/.claude/utils/statusline/onion-sessions-line'\"}}" > "${sb}/cfg/settings.json"
+    a="$(_ofrun "$1" "${r}")"; rm -f "${sb}/cfg/settings.json"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q 'já ligada no settings do usuário' <<< "${a}" && ! grep -q '^PASSO DO MAESTRO' <<< "${a}"; }
+  _slcase "(n) censo já ligado no usuário: nada a colar" "${of}" '"onion-sessions-line" in str(' '"nunca-casa" in str(' _of_n
+  # (o) script ausente na instalação: rc 3 e nenhum bloco (nunca oferece caminho que não existe)
+  local r2="${sb}/r2"; "${G[@]}" init -q "${r2}"
+  _of_o() { local a; a="$(_ofrun "$1" "${r2}")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"; grep -q '^rc=3$' <<< "${a}" && ! grep -q '"statusLine"' <<< "${a}"; }
+  _slcase "(o) script ausente: rc 3, sem bloco" "${of}" '[ -f "${DEST}/${REL}" ] || {' '[ -n "${DEST}/${REL}" ] || {' _of_o
+  # ── o merge do adopt ──
+  if ! command -v jq >/dev/null 2>&1; then record_skip "sessions-statusline: jq ausente (merge-onion-hooks não exercido)"; rm -rf "${sb}"; return; fi
+  local ms="${sb}/m/src/.claude" mt="${sb}/m/tgt/.claude" mu="${sb}/m/tgu/.claude"; mkdir -p "${ms}" "${mt}" "${mu}"
+  printf '%s\n' '{"statusLine":{"type":"command","command":"echo fonte"},"hooks":{"SessionStart":[{"hooks":[{"type":"command","command":"bash .claude/hooks/x.sh"}]}]}}' > "${ms}/settings.json"
+  printf '%s\n' '{"statusLine":{"type":"command","command":"echo alvo"}}' > "${mt}/settings.json"
+  printf '%s\n' '{}' > "${mu}/settings.json"
+  mkdir -p "${ms}/hooks"; : > "${ms}/hooks/x.sh"
+  local MUT_CARRY='  | if ($src.attribution != null) and (.attribution == null)'
+  # (p) alvo COM statusLine: a do alvo fica, byte a byte, e o stderr avisa que ela esconde o censo
+  _mh_p() { local out err; out="$(bash "$1" "${ms}/settings.json" "${mt}/settings.json" 2>"${sb}/m/err")"; err="$(cat "${sb}/m/err")"
+    SL_WHY="sl=$(jq -c .statusLine <<< "${out}" 2>&1) | ${err}"
+    [ "$(jq -c .statusLine <<< "${out}")" = '{"type":"command","command":"echo alvo"}' ] && grep -q 'já tem statusLine — preservada' <<< "${err}"; }
+  _slcase "(p) alvo com statusLine: preservada e avisada" "${mh}" "${MUT_CARRY}" "  | .statusLine = (\$src.statusLine // .statusLine)
+${MUT_CARRY}" _mh_p
+  _slcase "(p2) o aviso da statusLine do alvo é load-bearing" "${mh}" '[ "${_sl}" = tem ] && echo' '[ "${_sl}" = nunca ] && echo' _mh_p
+  # (q) alvo SEM statusLine: o merge não leva a da fonte (no projeto ela apagaria a de cada pessoa); e é idempotente
+  _mh_q() { local o1 o2; o1="$(bash "$1" "${ms}/settings.json" "${mu}/settings.json" 2>/dev/null)"; printf '%s\n' "${o1}" > "${sb}/m/q1.json"
+    cp "${sb}/m/q1.json" "${mu}/settings.json"; o2="$(bash "$1" "${ms}/settings.json" "${mu}/settings.json" 2>/dev/null)"; printf '{}\n' > "${mu}/settings.json"
+    SL_WHY="o1=$(jq -c . <<< "${o1}" 2>&1)"
+    [ "$(jq 'has("statusLine")' <<< "${o1}")" = false ] && [ "$(jq -S . <<< "${o1}")" = "$(jq -S . <<< "${o2}")" ]; }
+  _slcase "(q) alvo sem statusLine: a da fonte não entra; 2ª rodada é no-op" "${mh}" "${MUT_CARRY}" "  | .statusLine = (\$src.statusLine // .statusLine)
+${MUT_CARRY}" _mh_q
+  rm -rf "${sb}"
+}
+_family run_sessions_statusline_selftests
+
 # ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 
 # ---------------------------------------------------------------------------
