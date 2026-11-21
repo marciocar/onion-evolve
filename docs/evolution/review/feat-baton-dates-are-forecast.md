@@ -2,7 +2,8 @@
 branch: feat/baton-dates-are-forecast
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0887c8ac3592578d54fd7e001790b5475d688cde7155c8051b3803a2e847a524
+reviewed_code_sha256: a9bee37c4ea5d16cd53f67229c6490eeda6a09764c1a13befba336be8967f934
 findings_total: 13
 findings_real: 12
 findings_blocking: 2
