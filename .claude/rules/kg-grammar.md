@@ -57,6 +57,20 @@ E a distinção que o próprio radar ensinou: **dissent que MATA é `REFUTES`; d
 `CONSTRAINS`.** Modelar objeção sobrevivente como `REFUTES` cria contradição — a decisão sobrevive
 ao dissent, por isso ele a *restringe*, não a derruba.
 
+**E o descartado também é nó (daqui em diante, sem migrar o passado).** Quando uma decisão é selada com
+opções de **desenho** rejeitadas que têm conteúdo próprio, cada uma vira nó (`claim`/`decision`) ligado à
+decisão: a opção que a decisão **mata** fica `refuted`, com `REFUTES` da decisão para ela; a que foi
+**trocada** fica `superseded`, com `SUPERSEDES` da decisão para ela; a que **sobrevive como limite** fica
+`open`/`confirmed`, com `CONSTRAINS` dela para a decisão (pela regra acima: limite não é derrota). Opção
+que mora só no «descartadas:» da narrative some do `kg_query` e do próximo leitor. A rejeição
+**procedimental** do `/meta:decide` («Confirmo com ajuste», «Não selar», «Ainda não») **não** vira nó. Em
+grafo com `# kg-backlog-guard: on`, o nó novo respeita o TETO: colha antes, ou suba o teto no mesmo PR
+com o porquê no `meta:`. Padrão de mercado: o MADR 4.0.0 (adr.github.io/madr) guarda «Considered Options»
+e «Pros and Cons of the Options» no próprio registro, e o grafo leva isso a nó consultável. **Sem lint por
+ora:** o aviso «rejeitadas só em texto» é gatilho nomeado, decidido só depois de 30 dias de uso medido da
+prática (o nó de origem carrega `reverify_every: "P30D"`). Origem: `D_DISCARDED_OPTION_AS_NODE_1121`, em
+`docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml`.
+
 ## Antes de fechar
 
 ```bash
