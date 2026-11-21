@@ -2,7 +2,7 @@
 branch: feat/sac-447-update-wrappers
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 4d11f1cd53eea05bd327cd9021fa308922442c312cb463908b07a1448ab9be0c
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 6534ae3e88a90e3a2e76047683ec0b2893ff004bf31d9ed10703eb372681762f
 findings_total: 11
 findings_real: 11
@@ -14,7 +14,7 @@ verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
 reviewer: "refutador INDEPENDENTE (agente separado, brief sem a conclusão do condutor; rodou a bancada, 19 mutantes próprios e 10 cenários adversariais em cópias na pasta dele, sem tocar no repo da sessão do hub nem em serviço) REPROVOU com 2 bloqueios e 9 limites; o condutor curou 10 e declarou 1, re-rodou a bancada (44 → 68 casos) e a família do auto-teste com os mutantes"
-nota: "tokens e duração são os do refutador (184.864 tokens, ~21 min de execução); a passada própria do condutor não foi medida"
+nota: "tokens e duração são os do refutador (184.864 tokens, ~21 min de execução); a passada própria do condutor não foi medida. Depois da passada, o pré-voo do pr-finalize acusou produtor|grep -q (classe pipefail) em 3 vereditos; a cura troca o pipe por here-string ou arquivo, sem mudar a lógica, com a bancada (68) e o mutante da unit carregada re-rodados pelo condutor"
 ---
 
 # Passada adversarial: `feat/sac-447-update-wrappers`
