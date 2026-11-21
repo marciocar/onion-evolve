@@ -2,8 +2,7 @@
 branch: feat/meta-restart
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: af0443c03ca616161f57dad5eaaa1f13e6cf7ee5443237811baf33352656d5b6
-reviewed_code_sha256: 3033267816e859c177f36a8437e3d24c017239116172eca91f821f73d577fe65
+reviewed_diff_sha256: pendente
 findings_total: 22
 findings_real: 22
 findings_blocking: 7
@@ -67,6 +66,14 @@ sessão **sem nenhuma tarefa terminada**, ela vem vazia; aí o `NR==FNR` vale ta
 vai para `done` e a tarefa viva some sem aviso. Nas sessões reais sempre há término, por isso ninguém viu. Cura: uma
 linha sentinela antes da lista. Caso (m) novo na família `background_task_probe`, com mutante que tira a sentinela. A
 mudança toca hook, então este PR não se merja sozinho.
+
+## Depois da revisão: só curas mecânicas pedidas pelo gate
+
+O pre-commit completo reprovou em três casos, nenhum de lógica do restart: `role-cut (k)` (comentários que citavam o
+comando novo dentro de `.claude/validation/` e da sonda, num conjunto que ainda não viaja: reescritos sem a citação),
+`shell-pipefail` (dois `ls | grep -q` da bancada nova viraram here-string) e `cited-directive (f)` (deriva do binário
+2.1.330 do Claude Code, alheia a este diff, tratada pela rodada do `/meta:cc-update`). Nada do comportamento revisado
+mudou, por isso o carimbo foi refeito sem nova passada.
 
 ## Limites declarados
 
