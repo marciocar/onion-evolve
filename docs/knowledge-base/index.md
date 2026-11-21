@@ -8,7 +8,7 @@
 
 ## 📊 Estatísticas
 
-- **108 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **109 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
 - **56** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **13** em `decisions/` (+ 1 README de categoria)
 
 ---

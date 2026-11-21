@@ -39,7 +39,8 @@ Nada de gate pesado. A norma entra por **costura**, ligada ao que o Onion já fa
 
 A norma é a **ABNT NBR ISO 24495-1:2024, Linguagem Simples, Parte 1: princípios e diretrizes** (1ª edição,
 25/07/2024). É a adoção idêntica da ISO 24495-1:2023. Ela vale para documento em texto lido por pessoa e não
-cobre acessibilidade, que é assunto da WCAG (Web Content Accessibility Guidelines) e da EN 301 549.
+cobre acessibilidade, que é assunto da WCAG (Web Content Accessibility Guidelines) e da EN 301 549 (a norma
+europeia de acessibilidade de produtos e serviços digitais).
 
 A norma diz que um documento está em Linguagem Simples quando o leitor **encontra** o que precisa,
 **entende** o que encontrou e **usa** essa informação. Ela organiza isso em quatro princípios:
@@ -67,7 +68,7 @@ como se mede.
 | **R2** | todo bloco ajuda o leitor a decidir ou agir | não há bloco que se possa cortar sem perda | §5.1.6 |
 | **L1** | o título diz o que o texto contém; três itens ou mais viram lista | título descritivo; lista presente | §5.2.2 a §5.2.4 |
 | **L2** | o detalhe longo fica em nota, apêndice ou link | o corpo principal lê-se sem ele | §5.2.5 |
-| **C1** | sigla ou termo especializado vem explicado na 1ª menção | medido pelo glossário da casa (hook) | §5.3.2 |
+| **C1** | sigla ou termo especializado vem explicado na 1ª menção | o hook do glossário da casa lembra, só nas superfícies da seção 5; no resto, revisão | §5.3.2 |
 | **C2** | uma ideia por frase, na voz ativa | frase com duas ideias ou mais pede revisão | §5.3.3, §5.3.4 |
 | **C3** | um assunto por parágrafo | o parágrafo cabe num título | §5.3.5 |
 | **C4** | tom respeitoso, trato por "você", linguagem inclusiva | sem tom de ordem seca nem jargão de grupo | §5.3.3, §5.3.7 |
@@ -86,7 +87,7 @@ como se mede.
 | Superfície pública (as portas, os anúncios) | **toda a régua** |
 | Instrução de comando, agente ou skill | **R1, L1, C1, C2**: o leitor é modelo, mas uma pessoa também lê |
 | Mensagem entre sessões, sinal de inbox | **só C1 e U1**; o resto é opcional |
-| Tráfego de máquina (JSON, TSV, log, saída de script) | **fora da régua** |
+| Tráfego de máquina sem prosa (JSON, TSV, log, saída de script) | **fora da régua**; o U1 segue valendo para grafo e sinal |
 
 ### Por que o tráfego de máquina fica de fora
 
@@ -100,6 +101,15 @@ Duas exceções sobrevivem, porque o texto de máquina acaba chegando a um human
 - **U1**: sinal velho que ninguém retira engana quem o lê depois.
 
 A mensagem ao usuário que um script imprime é superfície humana. O log de depuração não é.
+
+### Onde o core estreitou a régua da curadoria
+
+Duas escolhas do core diferem da régua proposta pela curadoria (`C_N1_REGUA`), e ficam declaradas:
+
+- **Instrução de comando, agente ou skill** fica com R1, L1, C1 e C2, não com a régua inteira. O leitor
+  principal é um modelo, e o resto da régua pesaria sem ganho medido.
+- **Tráfego de máquina sem prosa** (JSON, TSV, log) fica fora. O U1 continua valendo para grafo e sinal,
+  que têm `review_after` e retirada.
 
 ## 5. O que o Onion já tinha
 
@@ -132,7 +142,7 @@ enterrada no 3º parágrafo (R1), quatro termos sem glosa (C1) e uma frase com q
 já estava claro passou sem nenhum sinal falso. É pouco para tornar a régua obrigatória, e foi por isso que o
 veredito é costurar, não absorver.
 
-Hoje só o C1 é medido por máquina (o glossário da casa). Os outros itens são doutrina e item opcional de
+Hoje só o C1 tem lembrete de máquina (o glossário da casa), e só nas superfícies listadas na seção 5. Os outros itens são doutrina e item opcional de
 revisão. Se o uso mostrar um item que falha com frequência e tem sinal mecânico, ele vira candidato a
 lembrete, nunca direto a bloqueio.
 
@@ -149,8 +159,9 @@ lembrete, nunca direto a bloqueio.
 
 > docs(kg): o nó do radar fica superado pela rodada 26
 >
-> A rodada 26 do radar do Claude Code (eixo E3) superou o nó. O juiz refutou dois achados e manteve um.
-> A superação está registrada como aresta SUPERSEDES no grafo.
+> A rodada 26 do radar do Claude Code (o eixo E3, que mede cada versão nova) superou o nó. O juiz (o
+> revisor adversarial da rodada) refutou dois achados e manteve um. A superação está registrada no grafo
+> como aresta SUPERSEDES (o nó novo substitui o velho).
 
 O que mudou: o desfecho foi para a 1ª linha (R1), as siglas ganharam explicação (C1) e a frase longa virou
 três frases curtas (C2).
