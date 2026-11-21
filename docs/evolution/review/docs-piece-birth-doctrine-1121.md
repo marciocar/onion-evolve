@@ -2,7 +2,8 @@
 branch: docs/piece-birth-doctrine-1121
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b5c8df55ee7eeb592ac5e4ea0b100bca0bc3d1c6e11fbbd96c4ecfedf4dd0554
+reviewed_code_sha256: df0d6872457994dae2a46e3f21d34e2d34e6c29c50d15d7e7be3d5c44764d688
 findings_total: 10
 findings_real: 10
 findings_blocking: 3
