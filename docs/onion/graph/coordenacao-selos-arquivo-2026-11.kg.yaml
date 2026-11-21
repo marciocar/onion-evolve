@@ -8,6 +8,12 @@ meta:
   purpose: "Selo do maestro que sai do grafo de coordenação por causa do teto de 40 nós vem para cá, sem mudar o texto, porque outro repositório pode citá-lo. A colheita move a decisão, e não a apaga."
   note: "Nasceu em 2026-11-05: a colheita havia apagado cinco nós citados pela curadoria, e a checagem só olhava este repo. O texto dos nós é o do grafo de origem. Citação antiga com caminho do grafo de coordenação segue válida no commit fixado; a nova cita este arquivo."
 external_edges:
+  - from: D_READER_VS_JUDGE_STITCH_1121
+    to: "docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml#C_LLM_JUDGE_VETOED_SINGLE_ANNOTATOR"
+    edge_type: CONSTRAINS
+  - from: D_READER_VS_JUDGE_STITCH_1121
+    to: "docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml#C_STAGE0_GATE_BEFORE_ANY_MODEL"
+    edge_type: CONSTRAINS
   - from: Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO
     to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#E_COORD_CENSO_DAS_PENDENCIAS_1027"
     edge_type: TRACES_TO
@@ -942,6 +948,23 @@ nodes:
       locator: "pedido direto do maestro à sessão do core em 2026-11-20 (adotar a Linguagem Simples ABNT; o core orquestra, a curadoria monta), registrado no card SAC-501"
       method: "testimony: pedido direto do maestro em 2026-11-20; o grau (costurar) foi escolhido pelo core, com revisão do maestro pendente"
       locality: "pessoa"
+  - id: D_READER_VS_JUDGE_STITCH_1121
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-21"
+    owner: "core"
+    verified_against: "dissecação da curadoria de 2026-11-21 (card SAC-487), versionada em docs/evolution/inbox/_processed/2026-11-21-dissect-manifesto-slm-contradicoes-core.md e lida inteira; os dois nós de origem relidos no grafo slm-frameworks-2026-10; decisão do core na ausência do maestro: escolhida «Costurar»"
+    label: "Leitor de gabarito não é juiz de modelo: o veto de gate ao juiz de modelo fica com um anotador só; o leitor de gabarito cego, com a divergência levada ao humano como regra, é inspeção e cumpre a inspeção da porta 0. Selado pelo core, para revisão."
+    narrative: "Selado pelo core em 2026-11-21: escrito com kg-decide-seal.sh (que grava autoria do maestro) e reescrito à mão para a autoria do core, sem rodada do /meta:decide; o maestro estava ausente e a decisão é reversível. Escolhida «Costurar»; descartadas: «Absorver» · «Parquear» · «Rejeitar». A costura entra nos rótulos de C_LLM_JUDGE_VETOED_SINGLE_ANNOTATOR e C_STAGE0_GATE_BEFORE_ANY_MODEL e na SYNTHESIS.md do grafo slm-frameworks-2026-10, com a tabela dos três papéis de LLM sobre o eval: juiz de modelo (vetado como gate enquanto houver um anotador só), leitor de gabarito (permitido quando não há anotador humano qualificado: é inspeção e cumpre a inspeção da porta 0, com as ≥50 amostras) e construtor de gabarito (fora). O humano decide a regra, não cada rótulo; isso mitiga, mas não substitui, a calibração humano-humano que o veto exige. A aresta para D_DECISION_RATCHET_SYNTHESIS_SEALED_1120 registra o contexto (a catraca de decisões em observação), não a autoridade do selo. Correção devolvida ao onion-slm: o veto nunca foi absoluto, já era só de gate. Crédito do sinal: onion-slm, previsão 9 do manifesto dele; a dissecação é da curadoria. Revisão do maestro pendente: se ele discordar, o selo se refaz."
+    provenance:
+      source: "sessão do core, decisão na ausência do maestro em 2026-11-21, sobre a dissecação da curadoria de 2026-11-21"
+      locator: "pergunta registrada: «A curadoria dissecou as duas contradições que o manifesto do onion-slm aponta na doutrina de avaliação do core: qual veredito?»; dissecação em docs/evolution/inbox/_processed/2026-11-21-dissect-manifesto-slm-contradicoes-core.md"
+      method: "testimony: decisão do core na ausência do maestro, 2026-11-21, reversível e com revisão do maestro pendente"
+      locality: "pessoa"
 edges:
   - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
     to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
@@ -1097,5 +1120,8 @@ edges:
     to: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
     edge_type: TRACES_TO
   - from: D_PLAIN_LANGUAGE_STITCH_1121
+    to: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
+    edge_type: TRACES_TO
+  - from: D_READER_VS_JUDGE_STITCH_1121
     to: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
     edge_type: TRACES_TO

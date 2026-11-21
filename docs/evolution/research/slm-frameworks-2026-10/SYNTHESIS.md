@@ -39,7 +39,7 @@ Duas consequências:
 
 | etapa | entra | sai | passa quando | nó |
 |---|---|---|---|---|
-| **Porta 0** | "precisa de ML?" + erros REAIS selados do corpus | eval selado + corretor determinístico + critérios escritos | o eval roda no harness e foi inspecionado à mão (≥ 50 amostras, Guidebook) | `C_STAGE0_GATE_BEFORE_ANY_MODEL` |
+| **Porta 0** | "precisa de ML?" + erros REAIS selados do corpus | eval selado + corretor determinístico + critérios escritos | o eval roda no harness e foi inspecionado (≥ 50 amostras, Guidebook): à mão, ou, sem anotador humano qualificado, por regra mais leitores de gabarito (costura de 2026-11-21) | `C_STAGE0_GATE_BEFORE_ANY_MODEL` |
 | **Spike** (dias) | eval selado + os 4 especialistas prontos + o baseline atual | tabela recall/precision e PR-AUC por tipo, **custo medido na VPS**, lista de erros | o maestro decide sobre a tabela | `C_SPIKE_MEASURE_READY_SPECIALISTS` |
 | **PoC** | o especialista que passou | pipeline ponta a ponta via adapter SDAAL num fluxo real (ex.: de-id), instrumentado | "working end to end system with unit and system tests" (Google, o único gate explícito, e qualitativo) | `C_POC_E2E_WITH_SIMPLE_MODEL` |
 | **MVP / ajuste** | **só se o eval FALHAR** | especialista ajustado (LoRA rank 4–8) medido no MESMO eval | supera o pronto no critério do maestro | `C_MVP_FINETUNE_ONLY_IF_EVAL_FAILS` |
@@ -56,6 +56,22 @@ determinístico. O modelo é substituível. **O que fica é o mecanismo**: eval 
   para o lighteval.
 - **LLM-as-judge fica fora do gate** (`C_LLM_JUDGE_VETOED_SINGLE_ANNOTATOR`). Calibrar o juiz exige concordância
   humano-humano, e o Onion tem um rotulador só.
+- **Leitor de gabarito não é juiz de modelo** (costura de 2026-11-21, `D_READER_VS_JUDGE_STITCH_1121` no grafo
+  de selos). O veto acima vale para o LLM que dá nota ao modelo. Ler o gabarito para achar rótulo errado é outra
+  coisa, e é permitido. São três papéis:
+
+  | papel do LLM | o que faz | na doutrina |
+  |---|---|---|
+  | **juiz de modelo** | dá nota à saída do modelo, como gate | **vetado** como gate enquanto houver um anotador só |
+  | **leitor de gabarito** | lê amostras às cegas e contesta os rótulos; LLMs de modelos diferentes; cada divergência vira pergunta de REGRA ao humano | **permitido**: é inspeção e cumpre a inspeção da porta 0 (≥ 50 amostras), quando não há anotador humano qualificado |
+  | **construtor de gabarito** | gera os rótulos | **fora** desta costura |
+
+  O humano decide a regra, não cada rótulo. Isso **mitiga**, mas não substitui, a calibração humano-humano
+  que o veto exige: um rótulo errado em que os dois leitores concordam nunca vira divergência e não chega ao
+  humano. As outras condições da porta 0 seguem (o eval existe, roda no harness, critérios escritos). O veto
+  nunca foi absoluto: já era só de gate. O sinal veio do onion-slm (previsão 9 do manifesto dele), dissecado pela
+  curadoria em 2026-11-21
+  ([sinal](../../inbox/_processed/2026-11-21-dissect-manifesto-slm-contradicoes-core.md)).
 - **lighteval é candidato, não escolha** (`C_LIGHTEVAL_IS_CANDIDATE_NOT_CHOICE`). O spike mede o custo dele contra
   um harness próprio em shell/Python, que é a metade agnóstica que já é o fosso do Onion.
 - **Custo não é a régua** (`C_COST_ARGUMENTS_NOT_THE_RULER`). Os 161k GPU-h do Smol são de pré-treino, e aplicá-los
