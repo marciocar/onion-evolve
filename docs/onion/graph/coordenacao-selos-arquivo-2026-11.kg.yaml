@@ -1017,6 +1017,47 @@ nodes:
       locator: "pergunta com opções de 2026-11-21: «O WAHA só nos canais internos e de sócios; cliente final depois pelo WhatsApp oficial. Confirma?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-21"
       locality: "pessoa"
+  - id: D_DISCARDED_OPTION_AS_NODE_1121
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-21"
+    reverify_every: "P30D"
+    reverify_on: "30 dias de uso medido da prática: contar decisões seladas depois de 2026-11-21 com opção de desenho descartada e quantas viraram nó; com isso decidir o lint SOFT"
+    owner: "core"
+    verified_against: "proposta da curadoria de 2026-11-17 (recording-discarded, versionada em docs/evolution/inbox/_processed/2026-11-17-recording-discarded-grammar-proposal.md), lida inteira; decisão do core na ausência do maestro: escolhida «Aceitar a prática 1 só adiante, sem lint agora»"
+    label: "A gramática de grafos adota, só adiante, a proposta da curadoria: a opção de desenho rejeitada com conteúdo próprio vira nó com REFUTES ou CONSTRAINS para a decisão; o lint fica como gatilho de 30 dias. Selado pelo core na ausência do maestro, para revisão."
+    narrative: "Selado pelo core em 2026-11-21: escrito com kg-decide-seal.sh (que grava autoria do maestro) e reescrito à mão para a autoria do core, sem rodada do /meta:decide; o maestro estava ausente e a decisão é reversível. Escolhida «Aceitar a prática 1 só adiante, sem lint agora»; descartadas: «Aceitar com lint SOFT já» · «Migrar o corpus em massa» · «Não adotar». As duas primeiras são opções de desenho e, pela própria regra, viram nós (C_DISCARDED_LINT_SOFT_NOW_1121, C_DISCARDED_MASS_MIGRATION_1121); «Não adotar» não tem conteúdo próprio além da recusa. Entra um parágrafo em .claude/rules/kg-grammar.md, logo depois de «A regra que mais custa esquecer». As práticas 2 e 4 da proposta já estavam na gramática; a 3 é a 1 aplicada ao /meta:decide e a 5 é guia, e nenhuma das duas vira texto. Mercado: o MADR 4.0.0 guarda «Considered Options» e «Pros and Cons of the Options» no próprio registro; o grafo leva isso a nó consultável. Gatilho nomeado: o lint SOFT «rejeitadas só em texto» se cria só depois de 30 dias de uso medido da prática (a partir de 2026-11-21). A aresta para D_DECISION_RATCHET_SYNTHESIS_SEALED_1120 registra o contexto (a catraca de decisões em observação), não a autoridade do selo. Revisão do maestro pendente: se ele discordar, o selo se refaz."
+    provenance:
+      source: "sessão do core, decisão na ausência do maestro em 2026-11-21, sobre a proposta da curadoria de 2026-11-17"
+      locator: "pergunta registrada: «A curadoria propõe registrar o descartado como nó na gramática de grafos: como o core adota?»; proposta em docs/evolution/inbox/_processed/2026-11-17-recording-discarded-grammar-proposal.md"
+      method: "testimony: decisão do core na ausência do maestro, 2026-11-21, reversível e com revisão do maestro pendente"
+      locality: "pessoa"
+  - id: C_DISCARDED_LINT_SOFT_NOW_1121
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-21"
+    verified_against: "D_DISCARDED_OPTION_AS_NODE_1121"
+    label: "Opção descartada: criar já o lint SOFT que avisa nó decision ou question com «descartad» ou «rejeitad» na narrative e sem aresta REFUTES ou CONSTRAINS chegando."
+    narrative: "Recusada porque a prática ainda não tem uso medido: um aviso sobre os mais de 100 grafos que já trazem «descartadas» em texto (124 pela medição da curadoria em 2026-11-17; 104 pela recontagem do revisor do core na main de 2026-11-21) viraria ruído, e o corte entre substantivo e procedimental é humano. Fica como gatilho nomeado: 30 dias de uso medido, depois decide-se o lint."
+  - id: C_DISCARDED_MASS_MIGRATION_1121
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-21"
+    verified_against: "D_DISCARDED_OPTION_AS_NODE_1121"
+    label: "Opção descartada: converter em massa as opções rejeitadas que hoje moram só em texto nos grafos existentes."
+    narrative: "Recusada porque a maioria das linhas «descartadas» (482 pela medição da curadoria; 450 na recontagem do core em 2026-11-21) é rejeição procedimental do /meta:decide, o corte é humano e a conversão inflaria grafos perto do teto. A prática vale só adiante."
 edges:
   - from: D_ISOLATION_ROUND3_CURATION_WRITES_CASES_1116
     to: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
@@ -1186,3 +1227,12 @@ edges:
   - from: D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121
     to: D_CHAT_CHANNEL_CONTRACT_SDAAL_1121
     edge_type: TRACES_TO
+  - from: D_DISCARDED_OPTION_AS_NODE_1121
+    to: D_DECISION_RATCHET_SYNTHESIS_SEALED_1120
+    edge_type: TRACES_TO
+  - from: D_DISCARDED_OPTION_AS_NODE_1121
+    to: C_DISCARDED_LINT_SOFT_NOW_1121
+    edge_type: REFUTES
+  - from: D_DISCARDED_OPTION_AS_NODE_1121
+    to: C_DISCARDED_MASS_MIGRATION_1121
+    edge_type: REFUTES
