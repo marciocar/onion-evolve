@@ -139,9 +139,8 @@ fresh() { # <sha servido> [noworker]
 }
 run() { ONION_UPH_TEST=1 ONION_UPH_ROOT="${R}" ONION_UPH_PERSONA_SH="${t}/persona.sh" bash "${me}" "$@" > "${OUT}" 2>&1; }
 called() { grep -q -- "$1" "${R}/calls"; }
-unit() { cat "${R}/etc/systemd/system/onion-brain-hub.service"; }
 apphead() { git -C "${R}/home/marcio/onion-brain-hub-app" rev-parse HEAD; }
-untouched() { ! called 'systemctl stop' && ! called 'systemctl start' && ! called 'systemctl restart' && ! called daemon-reload && [ "$(apphead)" = "${C1}" ] && unit | grep -q '^Environment=BRAIN_HUB_DIR=/home/marcio/brain-granaai$'; }
+untouched() { ! called 'systemctl stop' && ! called 'systemctl start' && ! called 'systemctl restart' && ! called daemon-reload && [ "$(apphead)" = "${C1}" ] && grep -q '^Environment=BRAIN_HUB_DIR=/home/marcio/brain-granaai$' "${R}/etc/systemd/system/onion-brain-hub.service"; }
 
 s_usage() {
 echo "── uso e modo de teste"
@@ -183,7 +182,7 @@ fresh "${C3}"
 run hub --apply; rc=$?
 [ "${rc}" = 0 ] && grep -q '✓ RESULTADO' "${OUT}"; chk "apply → rc 0 e RESULTADO ✓" $?
 [ "$(apphead)" = "${C3}" ]; chk "o clone do worker foi ao sha SERVIDO" $?
-unit | grep -qx "Environment=BRAIN_HUB_DIR=${WORKER_PROD}" && unit | grep -qx "Environment=BRAIN_HUB_MAESTRO_USER_ID=${MID}" && ! unit | grep -q brain-granaai$
+grep -qx "Environment=BRAIN_HUB_DIR=${WORKER_PROD}" "${R}/etc/systemd/system/onion-brain-hub.service" && grep -qx "Environment=BRAIN_HUB_MAESTRO_USER_ID=${MID}" "${R}/etc/systemd/system/onion-brain-hub.service" && ! grep -q brain-granaai$ "${R}/etc/systemd/system/onion-brain-hub.service"
 chk "a unit instalada aponta a worktree do worker e preserva o id do maestro" $?
 b="$(ls "${R}/home/marcio/.local/state/onion-update-persona-hub/"onion-brain-hub.service.* 2>/dev/null | head -1)"
 [ -n "${b}" ] && grep -qx 'Environment=BRAIN_HUB_DIR=/home/marcio/brain-granaai' "${b}"; chk "backup da unit anterior no estado, com o BRAIN_HUB_DIR antigo" $?
