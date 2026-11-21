@@ -9,10 +9,13 @@ sessões: 3 trabalhando · 1 esperam você: onion-evolve · ← claude agents
 - **Fonte:** `claude agents --json`, a interface suportada do Claude Code (sem mod). Trabalhando = `status: busy`;
   esperando você = `status: waiting` ou `state: blocked`.
 - **Custo:** cada leitura sobe um processo `claude` (medido em 2026-11-21: 0,5 s e ~156 MB). Por isso a leitura
-  fica em cache por 25 s em `$XDG_RUNTIME_DIR/onion-sessions-line/` (ou no tmp do sistema), com trava entre sessões.
+  fica em cache por 25 s em `$XDG_RUNTIME_DIR/onion-sessions-line-<uid>/` (ou no tmp do sistema), com trava entre
+  sessões. A pasta tem de ser do usuário e fechada (0700); senão a linha diz `sessões: cache inseguro, não li` e não
+  lê nem escreve nada ali.
 - **Lacuna visível, nunca zero inventado:** sem leitura sai `sessões: não li o estado`; cache corrompido sai
   `sessões: leitura ilegível`; leitura com mais de 90 s mostra a idade (`leitura de N s atrás`). O `0 trabalhando`
-  só aparece quando uma leitura real veio vazia.
+  só aparece quando uma leitura real veio vazia, e sessão em estado que a linha não conhece sai contada
+  (`N em estado desconhecido`) em vez de sumir.
 - **Sempre rc 0:** a statusLine que sai com rc diferente de 0 some da barra.
 - **Portável:** o `claude` vem só do PATH; nenhum caminho de home fixo.
 - **Clicar e ir:** a statusLine é texto, sem clique. O `← claude agents` no fim aponta o agent view nativo, que lista as
