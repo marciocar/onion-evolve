@@ -2,7 +2,8 @@
 branch: docs/plain-language-adoption-1121
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9fc64b6592774ac49a18a5c029b3c5cfd2c0298975c1bd235dcbce25dff59a7e
+reviewed_code_sha256: 029680872d95c36caa126c60113a3609e30d550b7d45a013f179df9c4e7428e4
 findings_total: 6
 findings_real: 6
 findings_blocking: 2
