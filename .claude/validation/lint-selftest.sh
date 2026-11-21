@@ -62506,6 +62506,7 @@ if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ
     _prove_mutation "sessions-statusline: ${name} (MUT)" "${dst}" "${mut}" "${rc_i}" "${rc_m}"
   }
   _slx() { rm -rf "${sb}/x"; mkdir -p "${sb}/x"; printf '%s' "${sb}/x"; }
+  local CD; CD="onion-sessions-line-$(id -u)"   # a pasta do cache leva o uid (sem CLAUDE_CONFIG_DIR, que o env -i tira)
   # ── a linha ──
   # (a) caminho normal: conta busy, e waiting + blocked como «esperam você», com os nomes; rc 0
   _sl_a() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
@@ -62518,16 +62519,16 @@ if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ
   _slcase "(b) sem claude no PATH e sem cache: «não li o estado», rc 0, sem zero" "${ln}" \
     'say("sessões: não li o estado")' 'say("sessões: 0 trabalhando · 0 esperam você")' _sl_b
   # (c) sem claude no PATH COM cache velho (200 s): serve o cache e diz a idade, rc 0
-  _sl_c() { local x a; x="$(_slx)"; mkdir -p "${x}/onion-sessions-line"; printf '%s' "${J_OK}" > "${x}/onion-sessions-line/agents.json"
-    _slage "${x}/onion-sessions-line/agents.json" 200; a="$(_slrun "$1" "${x}" "${sb}/nobin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+  _sl_c() { local x a; x="$(_slx)"; mkdir -m 700 "${x}/${CD}"; printf '%s' "${J_OK}" > "${x}/${CD}/agents.json"
+    _slage "${x}/${CD}/agents.json" 200; a="$(_slrun "$1" "${x}" "${sb}/nobin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
     grep -q '^sessões: 2 trabalhando · 2 esperam você: w1, bk (leitura de 2[0-9][0-9] s atrás) · ← claude agents$' <<< "${a}" && grep -q '^rc=0$' <<< "${a}"; }
   _slcase "(c) sem claude no PATH com cache velho: serve o cache com a idade, rc 0" "${ln}" '    if current > STALE:' '    if False:' _sl_c
   # (d) cache fresco: o claude NÃO é chamado (o TTL poupa o processo de ~150 MB por atualização)
-  _sl_d() { local x a; x="$(_slx)"; mkdir -p "${x}/onion-sessions-line"; printf '%s' '[]' > "${x}/onion-sessions-line/agents.json"
+  _sl_d() { local x a; x="$(_slx)"; mkdir -m 700 "${x}/${CD}"; printf '%s' '[]' > "${x}/${CD}/agents.json"
     a="$(_slrun "$1" "${x}" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
     grep -q '^calls=0$' <<< "${a}" && grep -qxF 'sessões: 0 trabalhando · 0 esperam você · ← claude agents' <<< "${a}"; }
   _slcase "(d) cache dentro do TTL: nenhuma chamada ao claude; o zero vem de leitura real vazia" "${ln}" \
-    '    if current is None or current > TTL:' '    if True:' _sl_d
+    '    if current is None or current < 0 or current > TTL:' '    if True:' _sl_d
   # (e) erro inesperado (XDG_RUNTIME_DIR é arquivo): linha «indisponível» e rc 0, nunca traceback
   _sl_e() { local a; : > "${sb}/xdg-file"; a="$(_slrun "$1" "${sb}/xdg-file" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
     grep -q '^sessões: indisponível (' <<< "${a}" && grep -q '^rc=0$' <<< "${a}" && ! grep -q Traceback <<< "${a}"; }
@@ -62547,10 +62548,30 @@ if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ
   _slcase "(h) nome de sessão com escape de terminal sai limpo" "${ln}" \
     'return "".join(ch for ch in str(value or "?") if ch.isprintable())[:24] or "?"' 'return str(value or "?")[:24]' _sl_h
   # (i) claude só pelo PATH: o binário em ~/.local/bin não é achado se não está no PATH (nada de caminho chutado)
-  local a_i; a_i="$(_slrun "${ln}" "$(_slx)" "${sb}/nobin")"
-  if grep -qxF 'sessões: não li o estado · ← claude agents' <<< "${a_i}" && grep -q '^calls=0$' <<< "${a_i}"; then
-    record_pass "sessions-statusline: (i) claude fora do PATH (só em ~/.local/bin) não é chamado"
-  else record_fail "sessions-statusline: (i) claude fora do PATH (só em ~/.local/bin) não é chamado" "$(tr '\n' '|' <<< "${a_i}")"; fi
+  _sl_i() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/nobin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -qxF 'sessões: não li o estado · ← claude agents' <<< "${a}" && grep -q '^calls=0$' <<< "${a}"; }
+  _slcase "(i) claude fora do PATH (só em ~/.local/bin) não é chamado" "${ln}" \
+    '        claude = shutil.which("claude")' '        claude = shutil.which("claude") or os.path.expanduser("~/.local/bin/claude")' _sl_i
+  # (r) pasta do cache aberta (0777) com a trava em symlink: lacuna «cache inseguro», rc 0, e o alvo do symlink intacto
+  _sl_r() { local x a; x="$(_slx)"; mkdir -m 777 "${x}/${CD}"; chmod 777 "${x}/${CD}"; printf 'keep' > "${x}/victim"; ln -s "${x}/victim" "${x}/${CD}/lock"
+    printf '%s' "${J_OK}" > "${x}/${CD}/agents.json"; a="$(_slrun "$1" "${x}" "${sb}/bin")"; SL_WHY="victim=$(cat "${x}/victim") | $(tr '\n' '|' <<< "${a}")"
+    grep -qxF 'sessões: cache inseguro, não li · ← claude agents' <<< "${a}" && grep -q '^rc=0$' <<< "${a}" && [ "$(cat "${x}/victim")" = keep ]; }
+  _slcase "(r) pasta do cache aberta: «cache inseguro», nada lido nem truncado" "${ln}" \
+    'and stat.S_IMODE(st.st_mode) & 0o077 == 0' 'and True' _sl_r
+  # (s) trava em symlink dentro da pasta segura: O_NOFOLLOW recusa e o alvo não é truncado
+  _sl_s() { local x a; x="$(_slx)"; mkdir -m 700 "${x}/${CD}"; printf 'keep' > "${x}/victim"; ln -s "${x}/victim" "${x}/${CD}/lock"
+    a="$(_slrun "$1" "${x}" "${sb}/bin")"; SL_WHY="victim=$(cat "${x}/victim") | $(tr '\n' '|' <<< "${a}")"
+    [ "$(cat "${x}/victim")" = keep ] && grep -q '^rc=0$' <<< "${a}"; }
+  _slcase "(s) trava em symlink: O_NOFOLLOW, o alvo fica intacto" "${ln}" \
+    'os.O_CREAT | os.O_WRONLY | os.O_NOFOLLOW, 0o600' 'os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0o600' _sl_s
+  # (t) mtime no futuro (relógio que voltou): relê em vez de congelar a contagem velha
+  _sl_t() { local x a; x="$(_slx)"; mkdir -m 700 "${x}/${CD}"; printf '%s' '[]' > "${x}/${CD}/agents.json"; _slage "${x}/${CD}/agents.json" -3600
+    a="$(_slrun "$1" "${x}" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"; grep -q '^calls=1$' <<< "${a}" && grep -q '^sessões: 2 trabalhando' <<< "${a}"; }
+  _slcase "(t) cache com mtime no futuro: relê" "${ln}" 'if current is None or current < 0 or current > TTL:' 'if current is None or current > TTL:' _sl_t
+  # (u) estado que a linha não conhece (esquema mudou) aparece contado, nunca some num zero
+  _sl_u() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/bin" '[{"status":"running"},{"kind":"background","state":"active"},{"status":"idle"}]')"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -qxF 'sessões: 0 trabalhando · 0 esperam você · 2 em estado desconhecido · ← claude agents' <<< "${a}"; }
+  _slcase "(u) estado desconhecido é contado, não vira zero" "${ln}" '    if other:' '    if False:' _sl_u
   # ── a oferta do adopt ──
   local r="${sb}/repo" wt="${sb}/wt"
   "${G[@]}" init -q "${r}"; mkdir -p "${r}/.claude/utils/statusline"; cp "${ln}" "${r}/.claude/utils/statusline/"
@@ -62586,7 +62607,17 @@ if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ
   _of_n() { local a; printf '%s\n' "{\"statusLine\":{\"type\":\"command\",\"command\":\"python3 -I '${r}/.claude/utils/statusline/onion-sessions-line'\"}}" > "${sb}/cfg/settings.json"
     a="$(_ofrun "$1" "${r}")"; rm -f "${sb}/cfg/settings.json"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
     grep -q 'já ligada no settings do usuário' <<< "${a}" && ! grep -q '^PASSO DO MAESTRO' <<< "${a}"; }
-  _slcase "(n) censo já ligado no usuário: nada a colar" "${of}" '"onion-sessions-line" in str(' '"nunca-casa" in str(' _of_n
+  _slcase "(n) censo já ligado no usuário: nada a colar" "${of}" 'w.endswith("onion-sessions-line")' 'w.endswith("nunca-casa")' _of_n
+  # (n2) usuário liga o censo num caminho que sumiu (worktree removida): avisa e oferece de novo
+  _of_n2() { local a; printf '%s\n' '{"statusLine":{"type":"command","command":"python3 -I /nao/existe/onion-sessions-line"}}' > "${sb}/cfg/settings.json"
+    a="$(_ofrun "$1" "${r}")"; rm -f "${sb}/cfg/settings.json"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q 'NÃO existe mais' <<< "${a}" && grep -q '^PASSO DO MAESTRO' <<< "${a}"; }
+  _slcase "(n2) censo ligado em caminho que sumiu: avisa e oferece de novo" "${of}" 'if on and os.path.isfile(on):' 'if on:' _of_n2
+  # (n3) sem HOME nem CLAUDE_CONFIG_DIR: oferta sai rc 0 com o aviso, nunca «unbound variable»
+  local a_n3 rc_n3=0; a_n3="$(env -u HOME -u CLAUDE_CONFIG_DIR PATH="${PATH}" bash "${of}" "${r}" 2>&1)" || rc_n3=$?
+  if [ "${rc_n3}" = 0 ] && grep -q 'NÃO medi o settings do usuário' <<< "${a_n3}" && grep -q '^PASSO DO MAESTRO' <<< "${a_n3}"; then
+    record_pass "sessions-statusline: (n3) sem HOME: oferta rc 0 com aviso"
+  else record_fail "sessions-statusline: (n3) sem HOME: oferta rc 0 com aviso" "rc=${rc_n3} $(tr '\n' '|' <<< "${a_n3}")"; fi
   # (o) script ausente na instalação: rc 3 e nenhum bloco (nunca oferece caminho que não existe)
   local r2="${sb}/r2"; "${G[@]}" init -q "${r2}"
   _of_o() { local a; a="$(_ofrun "$1" "${r2}")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"; grep -q '^rc=3$' <<< "${a}" && ! grep -q '"statusLine"' <<< "${a}"; }

@@ -17,9 +17,11 @@ O fim da linha aponta o agent view nativo («← claude agents»): a statusLine 
 estado e pula para a sessão é o `claude agents` (ou a seta para a esquerda no prompt vazio).
 Ligar: .claude/utils/statusline/README.md. Bancada: lint-selftest.sh (run_sessions_statusline_selftests).
 """
+import hashlib
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -33,13 +35,25 @@ except ImportError:  # pragma: no cover
 TTL = 25
 STALE = 90
 HINT = " · ← claude agents"
-CACHE_DIR = os.path.join(os.environ.get("XDG_RUNTIME_DIR") or tempfile.gettempdir(), "onion-sessions-line")
+KNOWN_STATUS = ("busy", "waiting", "idle")  # medido em `claude agents --json` (CC 2.1.330, 2026-11-21)
+KNOWN_STATE = ("blocked", "done")
+# A pasta leva o uid (e a conta, quando CLAUDE_CONFIG_DIR a separa): sem XDG_RUNTIME_DIR ela cai no tmp do SO, que é de
+# todos, e um nome fixo deixaria outro usuário plantá-la antes (revisão isolada de 2026-11-21, achado 1).
+_ACCOUNT = os.environ.get("CLAUDE_CONFIG_DIR") or ""
+_SUFFIX = str(os.getuid()) + ("-" + hashlib.sha256(_ACCOUNT.encode()).hexdigest()[:8] if _ACCOUNT else "")
+CACHE_DIR = os.path.join(os.environ.get("XDG_RUNTIME_DIR") or tempfile.gettempdir(), "onion-sessions-line-" + _SUFFIX)
 CACHE = os.path.join(CACHE_DIR, "agents.json")
 LOCK = os.path.join(CACHE_DIR, "lock")
 
 
 def say(text):
     print(text + HINT)
+
+
+def safe_dir():
+    """A pasta do cache é diretório de verdade (não symlink), deste usuário e só dele (0700). Senão, nada se lê nem escreve."""
+    st = os.lstat(CACHE_DIR)
+    return stat.S_ISDIR(st.st_mode) and st.st_uid == os.getuid() and stat.S_IMODE(st.st_mode) & 0o077 == 0
 
 
 def clean(value):
@@ -59,7 +73,8 @@ def refresh():
 
     `claude` vem só do PATH. Fora do PATH: FileNotFoundError sobe e o chamador cai no cache ou na lacuna.
     """
-    with open(LOCK, "w") as lock:
+    # O_NOFOLLOW e sem truncar: a trava nunca segue symlink nem zera arquivo de ninguém
+    with os.fdopen(os.open(LOCK, os.O_CREAT | os.O_WRONLY | os.O_NOFOLLOW, 0o600), "w") as lock:
         if fcntl is not None:
             try:
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -79,8 +94,11 @@ def refresh():
 
 def main():
     os.makedirs(CACHE_DIR, mode=0o700, exist_ok=True)
+    if not safe_dir():
+        say("sessões: cache inseguro, não li")  # lacuna declarada: pasta de outro dono, aberta ou symlink
+        return
     current = age()
-    if current is None or current > TTL:
+    if current is None or current < 0 or current > TTL:  # mtime no futuro (relógio que voltou) também relê
         try:
             refresh()
         except (OSError, ValueError, subprocess.SubprocessError):
@@ -100,9 +118,14 @@ def main():
     rows = [x for x in data if isinstance(x, dict)]
     wait = [x for x in rows if x.get("state") == "blocked" or x.get("status") == "waiting"]
     work = [x for x in rows if x.get("status") == "busy" and x not in wait]
+    # estado que esta linha não conhece (o esquema mudou) aparece contado, nunca some num zero
+    other = [x for x in rows if x not in wait and x not in work
+             and x.get("status") not in KNOWN_STATUS and x.get("state") not in KNOWN_STATE]
     line = f"sessões: {len(work)} trabalhando · {len(wait)} esperam você"
     if wait:
         line += ": " + ", ".join(clean(x.get("name")) for x in wait)
+    if other:
+        line += f" · {len(other)} em estado desconhecido"
     if current > STALE:
         line += f" (leitura de {int(current)} s atrás)"
     say(line)
@@ -110,7 +133,14 @@ def main():
 
 if __name__ == "__main__":
     try:
+        sys.stdout.reconfigure(errors="replace")  # locale sem UTF-8 não vira exceção no print
+    except (AttributeError, ValueError):
+        pass
+    try:
         main()
     except Exception as exc:  # a barra nunca deve quebrar por causa da linha
-        print(f"sessões: indisponível ({type(exc).__name__}){HINT}")
+        try:
+            print(f"sessões: indisponível ({type(exc).__name__}){HINT}")
+        except Exception:
+            pass
     sys.exit(0)  # rc 0 SEMPRE: statusLine que sai != 0 some da barra

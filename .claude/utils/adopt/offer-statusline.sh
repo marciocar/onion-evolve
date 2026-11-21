@@ -33,6 +33,8 @@ HOME_DIR="${DEST}"; NOTE=""
 _common="$(git -C "${DEST}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
 if [ -n "${_common}" ] && [ "$(basename "${_common}")" = ".git" ] && [ -d "$(dirname "${_common}")" ]; then
   HOME_DIR="$(cd "$(dirname "${_common}")" && pwd -P)"
+elif [ -n "${_common}" ] && [ "$(git -C "${_common}" rev-parse --is-bare-repository 2>/dev/null)" = true ]; then
+  NOTE="repo bare: não há checkout principal, o caminho é o desta worktree; se ela for removida, rode a oferta de novo"
 fi
 if [ "${HOME_DIR}" != "${DEST}" ] && [ ! -f "${HOME_DIR}/${REL}" ]; then
   NOTE="o arquivo chega a ${HOME_DIR}/${REL} com o merge da branch em que ele está (adoção ou update): cole o bloco depois do merge"
@@ -40,9 +42,11 @@ fi
 LINE="${HOME_DIR}/${REL}"
 
 # ── 2. Ler (só ler) as camadas: projeto e usuário ────────────────────────────────────────────────────────
-USER_SETTINGS="${CLAUDE_CONFIG_DIR:-${HOME}/.claude}/settings.json"
+USER_SETTINGS=""
+if [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then USER_SETTINGS="${CLAUDE_CONFIG_DIR}/settings.json"
+elif [ -n "${HOME:-}" ]; then USER_SETTINGS="${HOME}/.claude/settings.json"; fi
 python3 -I - "${LINE}" "${DEST}/.claude/settings.json" "${DEST}/.claude/settings.local.json" "${USER_SETTINGS}" "${NOTE}" <<'PY'
-import json, sys
+import json, os, shlex, sys
 
 line, proj, proj_local, user, note = sys.argv[1:6]
 
@@ -73,11 +77,29 @@ for path in (proj, proj_local):
     elif st == "ilegivel":
         print(f"⚠️ AVISO: {path} ilegível (JSON inválido): NÃO medi se o projeto tem statusLine.")
 
-st, val = status_line(user)
-if st == "presente" and isinstance(val, dict) and "onion-sessions-line" in str(val.get("command", "")):
+def census_path(val):
+    """O caminho do script do censo dentro do command da statusLine, ou None."""
+    if not isinstance(val, dict):
+        return None
+    try:
+        words = shlex.split(str(val.get("command", "")))
+    except ValueError:
+        return None
+    return next((w for w in words if w.endswith("onion-sessions-line")), None)
+
+
+st, val = status_line(user) if user else ("sem-home", None)
+on = census_path(val) if st == "presente" else None
+if on and os.path.isfile(on):
     print(f"✓ statusLine do censo já ligada no settings do usuário ({user}): nada a colar.")
     sys.exit(0)
-if st == "presente":
+if on:
+    print(f"⚠️ AVISO: o settings do usuário ({user}) liga o censo em {on}, que NÃO existe mais (worktree removida?): "
+          "a barra fica vazia. Troque pelo bloco abaixo.")
+elif st == "sem-home":
+    print("⚠️ AVISO: nem CLAUDE_CONFIG_DIR nem HOME definidos: NÃO medi o settings do usuário.")
+    user = "~/.claude/settings.json"
+elif st == "presente":
     print(f"ℹ️ o settings do usuário ({user}) já tem outra statusLine ({json.dumps(val, ensure_ascii=False)}): "
           "colar o bloco abaixo a SUBSTITUI. Decida antes de colar.")
 elif st == "ilegivel":

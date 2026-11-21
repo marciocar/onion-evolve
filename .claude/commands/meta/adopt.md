@@ -168,7 +168,9 @@ if [ -f "$DEST/.claude/settings.json" ]; then
     && printf '%s\n' "$merged" > "$DEST/.claude/settings.json"
   # Sem jq, o helper devolve o alvo INTACTO e sai com código 3 → avisar o maestro p/ registrar à mão.
 else
-  cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"
+  # a statusLine nunca viaja (a do projeto apagaria a de cada pessoa; a oferta é o passo 6c): sai na cópia também
+  jq 'del(.statusLine)' "$SOURCE_ROOT/.claude/settings.json" > "$DEST/.claude/settings.json" 2>/dev/null \
+    || cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"
 fi
 
 # (2) starter docs/evolution/ — DOIS canais simétricos: inbox/ (upstream: consumidor→core) e
