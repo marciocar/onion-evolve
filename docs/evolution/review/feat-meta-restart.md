@@ -10,7 +10,7 @@ findings_blocking: 7
 findings_fixed: 16
 tokens: 267000
 duration_min: 23
-verdict: REPROVADO_E_CURADO
+verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: "revisor isolado (agente branch-code-reviewer que não escreveu o código), duas passadas: o artefato inteiro e depois só as curas"
 nota: >-
