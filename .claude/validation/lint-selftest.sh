@@ -29212,6 +29212,9 @@ PFSTUB
     && git add -A && git -c user.email=t@t -c user.name=t commit -qm base && git branch feat/wt \
     && git worktree add -q "${prw}" feat/wt && git remote add origin "${d}/pmvr-sem-remoto.git" ) >/dev/null 2>&1
   grep -q '^_PMV_CORE_CONST=onion-bancada/core$' "${pr}/ops/pr-merge-verified.sh" || record_fail "pr-merge-verified: (pmv costura)" "a âncora da constante sumiu"
+  # um sync-main-worktree.sh de marca ao lado do SUT: o script o acha pela própria pasta (_PMV_SELF), e a marca na saída
+  # prova que a pasta do script resolveu depois do cd (o pmv2b, chamado por caminho RELATIVO)
+  printf '#!/usr/bin/env bash\necho PMV-SELF-RESOLVEU\n' > "${pr}/ops/sync-main-worktree.sh"
   _pmv() { # $1=script $2=cwd ; resto=args. Env do caso vem de fora.
     local _s="$1" _c="$2"; shift 2
     echo 0 > "${d}/n"; echo 0 > "${d}/fk"
@@ -29234,7 +29237,21 @@ PFSTUB
   STUB_GH_NEEDS_REPO=1 _pmv "${pr}/ops/pr-merge-verified.sh" "${pfora}"
   if _p_pmv2; then record_pass "pr-merge-verified: (pmv2) rodado de fora do repo ⇒ o repo vem da pasta do script, e o merge é provado"
   else record_fail "pr-merge-verified: (pmv2) rodado de fora do repo falhou" "rc=${_mv_rc} out=${_mv_out}"; fi
-  # (pmv3) a corrida logo após o push: as 2 primeiras leituras dos arquivos do PR falham; o script tenta de novo (teto
+  # (pmv2b) o mesmo, chamado por caminho RELATIVO a partir da pasta-mãe (revisão isolada, B1): depois do cd, o caminho
+  #         do script tem de seguir resolvendo — senão o _rm_script some e o PR de guarda passa sem o resíduo
+  _p_pmv2b() { _p_pmv2 && grep -q "PMV-SELF-RESOLVEU" <<< "${_mv_out}"; }
+  _pmv2brun() { STUB_GH_NEEDS_REPO=1 _pmv "pmvr/ops/$(basename "$1")" "${d}"; }
+  _pmv2brun "${pr}/ops/pr-merge-verified.sh"
+  if _p_pmv2b; then record_pass "pr-merge-verified: (pmv2b) chamado por caminho relativo de fora do repo ⇒ a pasta do script segue resolvida depois do cd"
+  else record_fail "pr-merge-verified: (pmv2b) caminho relativo quebrou a pasta do script depois do cd" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (pmv1b) com --repo de OUTRO repo (o checkout daqui não é o alvo), o aviso não manda apagar worktree nem branch daqui
+  _p_pmv1b() { [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}" && ! grep -qF "git worktree remove" <<< "${_mv_out}" \
+    && ! grep -qF "git branch -D" <<< "${_mv_out}"; }
+  _pmv1brun() { GH_MERGE_RC=1 GH_MERGE_OUT="failed to delete local branch feat/wt: failed to run git: exit status 1" _pmv "$1" "${pr}" --repo owner/outro; }
+  _pmv1brun "${pr}/ops/pr-merge-verified.sh"
+  if _p_pmv1b; then record_pass "pr-merge-verified: (pmv1b) --repo de outro repo ⇒ o aviso não sugere apagar worktree/branch do checkout daqui"
+  else record_fail "pr-merge-verified: (pmv1b) o aviso sugeriu limpeza destrutiva num checkout que não é o alvo" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (pmv3) A CORRIDA logo após o push: as 2 primeiras leituras dos arquivos do PR falham; o script tenta de novo (teto
   #        declarado) e segue. (pmv3b) falha em TODAS: recusa dizendo que esperou e quantas vezes tentou.
   _p_pmv3() { [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}" && [ "$(cat "${d}/fk")" -eq 3 ]; }
   GH_FILES_FAIL_FIRST=2 _pmv "${pr}/ops/pr-merge-verified.sh" "${pr}"
@@ -29259,13 +29276,16 @@ PFSTUB
   _pmv3run() { GH_FILES_FAIL_FIRST=2 _pmv "$1" "${pr}"; }
   # (pmv0) a cópia LIMPA no mesmo arranjo dos mutantes passa nos três (senão o arranjo mataria, não a mutação)
   cp "${pr}/ops/pr-merge-verified.sh" "${pr}/ops/pmv-mut-clean.sh"
-  if _pmv1 "${pr}/ops/pmv-mut-clean.sh" && _p_pmv1 && _pmv2run "${pr}/ops/pmv-mut-clean.sh" && _p_pmv2 && _pmv3run "${pr}/ops/pmv-mut-clean.sh" && _p_pmv3; then
-    record_pass "pr-merge-verified: (pmv0) cópia limpa no arranjo dos mutantes passa nos três casos"
+  if _pmv1 "${pr}/ops/pmv-mut-clean.sh" && _p_pmv1 && _pmv2run "${pr}/ops/pmv-mut-clean.sh" && _p_pmv2 && _pmv3run "${pr}/ops/pmv-mut-clean.sh" && _p_pmv3 \
+     && _pmv2brun "${pr}/ops/pmv-mut-clean.sh" && _p_pmv2b && _pmv1brun "${pr}/ops/pmv-mut-clean.sh" && _p_pmv1b; then
+    record_pass "pr-merge-verified: (pmv0) cópia limpa no arranjo dos mutantes passa nos cinco casos"
   else record_fail "pr-merge-verified: (pmv0) o arranjo mata a cópia limpa — os mutantes não provam nada" "rc=${_mv_rc} out=${_mv_out}"; fi
   _pmvmut pmv1m '          _pmv_branch_wt="$(' '          _pmv_branch_wt=""' _pmv1 _p_pmv1
   _pmvmut pmv2m '_pmv_cd_script_repo || true' ': sem-cd' _pmv2run _p_pmv2
   _pmvmut pmv3m '_PMV_FILES_WAITS="${ONION_MERGE_FILES_WAITS:-' '_PMV_FILES_WAITS=""' _pmv3run _p_pmv3
-  unset -f _pmv _p_pmv1 _pmv1 _p_pmv2 _p_pmv3 _pmvmut _pmv2run _pmv3run
+  _pmvmut pmv2bm '_PMV_SELF="$(cd' '_PMV_SELF="${BASH_SOURCE[0]}"' _pmv2brun _p_pmv2b
+  _pmvmut pmv1bm '        [ -n "${_pmv_t}" ] && [ "$(_slug_norm "${_pmv_t}")" != "$(_slug_norm "$(git remote get-url origin' '        :' _pmv1brun _p_pmv1b
+  unset -f _pmv _p_pmv1 _pmv1 _p_pmv2 _p_pmv3 _pmvmut _pmv2run _pmv3run _p_pmv2b _pmv2brun _p_pmv1b _pmv1brun
 
   unset -f _mvf _fxmut _fxcase _fxcase_rm _fx_intact _fxk_run _p_fx1 _p_fx2 _p_fx3 _p_fx4 _p_fx5 _p_fx6 _p_fx7 _p_fx8
   unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg _mvr _rvmut _rvcase _p_off _p_prior _p_prior_disp _p_fail _p_hist _mvth _p_th
