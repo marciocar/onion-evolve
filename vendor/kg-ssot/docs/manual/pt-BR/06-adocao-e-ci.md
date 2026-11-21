@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:3baa77979c57280a -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:63bbcae1bdf1599c -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ Rode isto na raiz do seu repositório, com Python 3.12 ou mais (o piso desde a 4
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.55.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.56.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -693,7 +693,7 @@ gh attestation verify oci://ghcr.io/marciocar/kg-ssot:<versão> --repo marciocar
 - **Como sai:** pelo `packaging/sbom/sbom.py`, só com a biblioteca padrão do Python, no workflow da release. Ele
   recusa o artefato que embute código de terceiros (`node_modules`, `site-packages`, um wheel dentro de um pacote),
   e assim a afirmação do SBOM de que nada vem embutido é conferida a cada release.
-- **Reportar uma vulnerabilidade:** o [SECURITY.md](../../SECURITY.md) traz as versões suportadas, o canal privado
+- **Reportar uma vulnerabilidade:** o [SECURITY.md](../../../SECURITY.md) traz as versões suportadas, o canal privado
   (o GitHub Private Vulnerability Reporting), os prazos de resposta, o escopo e a política de divulgação.
 
 ### Conferir o que você vendoriza (desde a 4.47.0)

@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:3ff8739679108d67 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:89550e09effc035a -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -251,7 +251,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 745/745 (reprova)
+latest: 787/787 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -2330,7 +2330,7 @@ antes. Um agente em nó em branco é local a uma exportação: `_:agent0` em dua
 
 O valor do `sealed_by` sai na saída padrão, e um agente que sela vários nós é um recurso só, ligado a todos eles. Mantenha
 um papel ou uma referência (`role:comite-de-mudancas`), não um nome, como em
-[Dados pessoais](../../../ADOPTING.pt-BR.md#dados-pessoais-lgpd-e-gdpr).
+[Dados pessoais](../../../ADOPTING.pt-BR.md#dado-pessoal-lgpd-e-gdpr).
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_prov_export.py \
@@ -2587,3 +2587,50 @@ dois por quebras de linha misturadas, com o motivo em `refused` no `--json`); rc
 Rodado numa cópia do corpus do próprio produto (37 grafos lidos): 1.230 apelidos trocados em 21 grafos (412
 `testemunho`, 333 `leitura`, 264 `juízes`, 157 `medição`, 64 `derivado`), 1 valor na cauda, 1.138 nós `confirmed`
 tocados, e a suíte de conformidade e o veredito de cada grafo iguais.
+
+### `format`: o grafo passa de `.kg.yaml` a `.kg.json`, e quem o cita acompanha (4.56.0)
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py format --to json docs/graph/product.kg.yaml           # o plano
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py format --to json --apply docs/graph/product.kg.yaml   # grava
+```
+
+O mesmo modelo de dados tem duas serializações, e cada grafo vive numa delas. Converter um grafo à mão quebra quem o
+cita: a ponta de `external_edges`, o `trace` ou o `verified_against` que nomeia `docs/graph/product.kg.yaml` passa a
+apontar para um arquivo que sumiu, e o `kg_validate.py --corpus` os reprova com `integrity.dangling-external`. O
+`format` faz a troca e o acompanhamento juntos:
+
+- **O grafo passa pelo parse do contrato** (o documento canônico, com chaves JSON), é gravado em JSON e relido pelo
+  leitor no perfil JSON; o documento tem de voltar igual. Um valor que o JSON não guarda (NaN, infinito, surrogate
+  solto) recusa o grafo, e também um `.kg.json` de destino que já existe e um grafo que o git não rastreia ou que tem
+  mudança sem commit (o `.kg.yaml` sai, então o git tem de guardar exatamente o que sai). Comentários não vão para o
+  JSON: o plano conta as linhas do grafo que começam por `#` (contagem aproximada, porque uma linha `#` dentro de um
+  bloco também conta).
+- **Cada citador do corpus rastreado é reescrito pelo texto:** toda string de um `.kg.yaml` ou `.kg.json` rastreado
+  que começa pelo caminho antigo, sozinho, seguido de `#`, ou seguido de `:` e um dígito (a linha de um `trace`),
+  também na forma `<repo>:<caminho>` com o nome deste repositório (o último trecho da URL do `origin`, ou
+  `--repo-name`). Cada ocorrência é tentada sozinha e só fica se troca exatamente aquela string, então comentários e
+  aspas ficam. Caminho no meio da prosa, ou seguido de `:` e texto, fica como está e é contado, e os arquivos fora dos
+  grafos que mencionam o caminho (docs, workflows) são listados para revisar à mão. O `trace` com número de linha
+  mantém o número, que apontava para o arquivo YAML: o plano os conta para revisão.
+- **O gate roda em cada arquivo tocado, antes e depois,** com o corpus: nem o grafo convertido nem citador nenhum pode
+  ganhar código MUST ou aviso SHOULD (os códigos `yaml.*` do perfil YAML ficam fora dos dois lados). O citador que não
+  se reescreve (ponta escrita com escape ou continuação de linha, ponta compartilhada por âncora YAML, pasta
+  vendorizada, mudança sem commit, para o git poder restaurá-lo) ou o arquivo que reprovaria recusa os grafos que ele
+  cita,
+  e o plano roda de novo sem eles, então um grafo recusado não deixa citador reescrito pela metade.
+- **O `plan` (o padrão) não grava nada;** o `--apply` grava os citadores, move o grafo com `git mv` e grava o corpo
+  JSON, então o corpus rastreado já vê o `.kg.json` e o git guarda o `.kg.yaml` antigo. Todo `git mv` roda antes de
+  qualquer outra escrita, depois de conferir que cada citador e cada pasta de destino aceita escrita. Se um move ou uma
+  gravação falha (índice travado, disco cheio), tudo é desfeito: os citadores voltam ao texto original e os grafos
+  voltam de lugar. Se o próprio desfazer falha, o erro nomeia o que ficou movido e como restaurar. Vários grafos na mesma chamada podem se citar, e as pontas deles mudam juntas. O `--json` dá o
+  plano como dado.
+
+rc 0 quando o plano sai ou o `apply` termina sem recusa; rc 1 quando o `apply` recusou um grafo; rc 2 com entrada
+quebrada (arquivo que não é `.kg.yaml`, fora do `--root`, ou um `git mv` que falhou). O citador que não parseia e
+menciona o caminho, ou tem barra invertida, vai para quem revisa. Rodado numa cópia do corpus do próprio produto em
+2026-11-19: o grafo principal sozinho mudou com 29 citadores reescritos (117 linhas, cada uma diferente só no
+caminho), os 49 grafos de
+trabalho de uma vez mudaram sem sobrar ponta para `.kg.yaml`, e nos dois casos cada um dos 842 grafos rastreados
+manteve veredito e códigos com `--corpus`; com os citadores sem reescrita, 26 deles reprovam com
+`integrity.dangling-external`.

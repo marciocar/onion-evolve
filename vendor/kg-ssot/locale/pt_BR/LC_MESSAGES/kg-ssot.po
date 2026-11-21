@@ -1029,6 +1029,15 @@ msgid ""
 "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
 "  kg_migrate.py nest --map MAP.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
 "  kg_migrate.py methods plan|apply [--json] [--confirmed-out FILE.tsv] [--manifest-out FILE.tsv] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+"  kg_migrate.py format --to json [--apply] [--json] [--root DIR] [--repo-name NAME] graph.kg.yaml ...\n"
+"\n"
+"format turns each graph given into a .kg.json through the contract's parse (the round trip through the reader must\n"
+"give the same document; NaN, infinity or a lone surrogate is refused) and rewrites, by text, every string of a\n"
+"tracked graph that starts with the old path (external_edges, trace, verified_against, provenance.source): the path\n"
+"alone, or followed by # or :, also as <repo>:<path> with this repository's name. A path inside prose stays and is counted, and the files outside the graphs that mention\n"
+"it are listed. Each file touched goes through the gate with the corpus before and after, and may not gain a MUST code\n"
+"or a SHOULD warning; a graph whose citer cannot be rewritten, or that would fail, is refused. With --apply, the\n"
+"citers are written, the .kg.json is written and the .kg.yaml leaves (git keeps it).\n"
 "\n"
 "methods swaps the Portuguese alias of the provenance.method class (medição, leitura, juízes, derivado, testemunho)\n"
 "for the canonical English one (measurement, reading, judges, derived, testimony), by text: only the class changes,\n"
@@ -1079,6 +1088,15 @@ msgstr ""
 "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
 "  kg_migrate.py nest --map MAPA.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
 "  kg_migrate.py methods plan|apply [--json] [--confirmed-out ARQ.tsv] [--manifest-out ARQ.tsv] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
+"  kg_migrate.py format --to json [--apply] [--json] [--root DIR] [--repo-name NOME] grafo.kg.yaml ...\n"
+"\n"
+"format transforma cada grafo dado num .kg.json pelo parse do contrato (a ida e volta pelo leitor tem de dar o mesmo\n"
+"documento; NaN, infinito ou surrogate solto é recusado) e reescreve, pelo texto, toda string de um grafo rastreado\n"
+"que começa pelo caminho antigo (external_edges, trace, verified_against, provenance.source): o caminho sozinho, ou\n"
+"seguido de # ou de :, também como <repo>:<caminho> com o nome deste repositório. Caminho no meio da prosa fica e é\n"
+"contado, e os arquivos fora dos grafos que o mencionam são listados. Cada arquivo tocado passa pelo gate com o corpus\n"
+"antes e depois, e não pode ganhar código MUST nem aviso SHOULD; o grafo cujo citador não se reescreve, ou que\n"
+"reprovaria, é recusado. Com --apply, os citadores são gravados, o .kg.json é gravado e o .kg.yaml sai (o git o guarda).\n"
 "\n"
 "methods troca o apelido em português da classe de provenance.method (medição, leitura, juízes, derivado, testemunho)\n"
 "pela canônica em inglês (measurement, reading, judges, derived, testimony), pelo texto: só a classe muda, o detalhe\n"
@@ -5462,3 +5480,127 @@ msgstr "--grace {value}: a folga é grande demais"
 #: tools/kg_rituals.py
 msgid "the calendar has no more occurrences (COUNT or UNTIL reached)"
 msgstr "o calendário não tem mais ocorrências (o COUNT ou o UNTIL chegou)"
+
+#: tools/kg_migrate.py
+msgid "CONVERT"
+msgstr "CONVERTE"
+
+#: tools/kg_migrate.py
+msgid "JSON cannot represent a value: {error}"
+msgstr "o JSON não representa um valor: {error}"
+
+#: tools/kg_migrate.py
+msgid "REWRITE"
+msgstr "REESCREVE"
+
+#: tools/kg_migrate.py
+msgid "a pointer to a converted graph is not written as its own plain text (escape, line continuation or YAML anchor)"
+msgstr "uma ponta para um grafo convertido não está escrita como texto simples próprio (escape, continuação de linha ou âncora YAML)"
+
+#: tools/kg_migrate.py
+msgid "cited by {graphs} graph(s), {pointers} pointer(s) rewritten; {prose} mention(s) in prose left as they are"
+msgstr "citado por {graphs} grafo(s), {pointers} ponta(s) reescrita(s); {prose} menção(ões) em prosa ficam como estão"
+
+#: tools/kg_migrate.py
+msgid "files outside the graphs that mention it (review by hand): {files}"
+msgstr "arquivos fora dos grafos que o mencionam (revisar à mão): {files}"
+
+#: tools/kg_migrate.py
+msgid "graph that does not parse ({code})"
+msgstr "grafo que não parseia ({code})"
+
+#: tools/kg_migrate.py
+msgid "graph that does not parse and may cite a converted graph: review by hand"
+msgstr "grafo que não parseia e pode citar um grafo convertido: revisar à mão"
+
+#: tools/kg_migrate.py
+msgid "not a .kg.yaml file: {file}"
+msgstr "não é um arquivo .kg.yaml: {file}"
+
+#: tools/kg_migrate.py
+msgid "the graph is inside a vendored folder"
+msgstr "o grafo está numa pasta vendorizada"
+
+#: tools/kg_migrate.py
+msgid "the name other graphs give this repository in <repo>:<path>#<id> pointers (default: the last part of the origin remote URL)"
+msgstr "o nome que outros grafos dão a este repositório nas pontas <repo>:<caminho>#<id> (padrão: o último trecho da URL do remote origin)"
+
+#: tools/kg_migrate.py
+msgid "the round trip through the reader changes the graph"
+msgstr "a ida e volta pelo leitor muda o grafo"
+
+#: tools/kg_migrate.py
+msgid "turns .kg.yaml graphs into .kg.json and rewrites the pointers of who cites them"
+msgstr "transforma grafos .kg.yaml em .kg.json e reescreve as pontas de quem os cita"
+
+#: tools/kg_migrate.py
+msgid "writes the conversion; without it, only the plan"
+msgstr "grava a conversão; sem ele, só o plano"
+
+#: tools/kg_migrate.py
+msgid "{dest} already exists"
+msgstr "{dest} já existe"
+
+#: tools/kg_migrate.py
+msgid "{file} ({n} pointer(s))"
+msgstr "{file} ({n} ponta(s))"
+
+#: tools/kg_migrate.py
+msgid "{file} cites it and cannot be rewritten: {why}"
+msgstr "{file} o cita e não se reescreve: {why}"
+
+#: tools/kg_migrate.py
+msgid "{file} cites it and is inside a vendored folder"
+msgstr "{file} o cita e está numa pasta vendorizada"
+
+#: tools/kg_migrate.py
+msgid "{file} is outside --root {root}"
+msgstr "{file} está fora do --root {root}"
+
+#: tools/kg_migrate.py
+msgid "· {converted} graph(s) converted, {refused} refused, {rewritten} citing graph(s) rewritten{tail}"
+msgstr "· {converted} grafo(s) convertido(s), {refused} recusado(s), {rewritten} grafo(s) citador(es) reescrito(s){tail}"
+
+#: tools/kg_migrate.py
+msgid "the graph is not tracked by git or has uncommitted changes"
+msgstr "o grafo não é rastreado pelo git ou tem mudanças sem commit"
+
+#: tools/kg_migrate.py
+msgid "{n} comment line(s) of the graph do not go to the JSON (git keeps them in the old file)"
+msgstr "{n} linha(s) de comentário do grafo não vão para o JSON (o git as guarda no arquivo antigo)"
+
+#: tools/kg_migrate.py
+msgid "{n} trace(s) carry a line number of the YAML file, which does not hold in the JSON one: review them"
+msgstr "{n} trace(s) levam um número de linha do arquivo YAML, que não vale no JSON: revise-os"
+
+#: tools/kg_migrate.py
+msgid "cannot write {files}, nothing was written"
+msgstr "não dá para gravar {files}, nada foi gravado"
+
+#: tools/kg_migrate.py
+msgid "{error}; everything was undone"
+msgstr "{error}; tudo foi desfeito"
+
+#: tools/kg_migrate.py
+msgid "git mv {file} failed: {error}"
+msgstr "o git mv de {file} falhou: {error}"
+
+#: tools/kg_migrate.py
+msgid "writing failed: {error}"
+msgstr "a gravação falhou: {error}"
+
+#: tools/kg_migrate.py
+msgid "{error}; undoing failed for {files}: restore a citer with git checkout HEAD -- <citer>, and a moved graph with git rm --cached <the .kg.json> and git checkout HEAD -- <the .kg.yaml>"
+msgstr "{error}; desfazer falhou para {files}: restaure um citador com git checkout HEAD -- <citador>, e um grafo movido com git rm --cached <o .kg.json> e git checkout HEAD -- <o .kg.yaml>"
+
+#: tools/kg_migrate.py
+msgid "{file} cites it and has uncommitted changes"
+msgstr "{file} o cita e tem mudanças sem commit"
+
+#: tools/kg_validate.py
+msgid "x_processing_purpose is the purpose of processing of the data the graph holds (v4.26): a list that is not empty of maps with ref (an https:// IRI, or the <path>.kg.yaml#<id> form of a node in your own vocabulary) and scheme (a slug); release (the https:// IRI of the dated release of the vocabulary) is required when ref is an IRI; label is optional text, never personal data."
+msgstr "x_processing_purpose é a finalidade do tratamento do dado que o grafo guarda (v4.26): uma lista não vazia de mapas com ref (um IRI https://, ou a forma <caminho>.kg.yaml#<id> de um nó do seu próprio vocabulário) e scheme (um slug); release (o IRI https:// do release datado do vocabulário) é obrigatório quando o ref é IRI; label é texto opcional, nunca dado pessoal."
+
+#: tools/kg_validate.py
+msgid "x_processing_purpose belongs in meta (v4.26): the unit is the graph, not the node."
+msgstr "x_processing_purpose fica no meta (v4.26): a unidade é o grafo, não o nó."

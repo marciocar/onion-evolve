@@ -424,6 +424,21 @@ reads through what"): a reader who is not a developer reads only through the `kg
 authenticating proxy, and the command-line tools, `kg_audit.py`, and the `kg-mcp` over stdio or with a single store
 read every level, so give them only to developers.
 
+From `kg-ssot-v4.55.0` to `kg-ssot-v4.56.0`, contract v4.26 comes in, SHOULD only: no graph that passed fails, and no MUST
+verdict changes. The new canonical profile is `x_processing_purpose`, in `meta`: the purpose of processing of the data
+the graph holds, as a list of pointers to a vocabulary with a pinned version (`ref`, `scheme`, `release`, `label`),
+judged only by its form, with no catalog of purposes in the contract (manual, chapter 3). The SHOULD schema changes, so
+the gate prints the `· identity` notice on the first run and passes (unless `--strict-identity`), and `kg_gate.py
+--update` records the new identity. A graph that already carries an `x_processing_purpose` out of form, or on a node,
+gets a SHOULD warning that a baseline per graph or per node sees as new debt: fix the form, or record it with the
+reason, `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.26: the purpose of
+processing, debt that already existed"`. A graph without the key sees nothing new. One tool gains a subcommand and
+changes no verdict: `kg_migrate.py format --to json` moves a graph from `.kg.yaml` to `.kg.json` and rewrites the
+pointers of the graphs that cite it, with the gate before and after on every file touched (manual, chapter 5). The
+vendor brings no new file, and the `gate` profile keeps its 21 files. The full release adds the 42 conformance cases of
+`spec/conformance/fixtures/latest/form/purpose/` (the suite goes from 745 to 787), and the links of the README and of the
+Brazilian Portuguese manual that a vendored copy could not resolve are fixed.
+
 From `kg-ssot-v4.54.0` to `kg-ssot-v4.55.0`, contract v4.25 comes in, SHOULD only: no graph that passed fails, and no MUST
 verdict changes. The new canonical profile is `x_ritual`, the agent ritual, on a `rule` or `policy` node, with its
 calendar (an RFC 5545 RRULE in a strict subset, `dtstart`, and an IANA time zone), judged only by its form (manual,

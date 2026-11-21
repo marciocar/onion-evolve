@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:6a503f7f90a0a07a -->
+<!-- translation-of: docs/manual/03-format.md sha256:0906c91b349b1d74 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -186,6 +186,7 @@ livre, e qualquer outra chave alerta. Os valores de enum são códigos, em ingl�
 | `x_dispose_by` · `x_dispose_basis` · `x_hold` | meta | o prazo de expurgo do grafo inteiro, a base dele e a suspensão (v4.23) |
 | `x_downgrade` | meta | a trilha dos rebaixamentos de nível do grafo inteiro: de, para, motivo, aprovador, referência e data (v4.24) |
 | `x_ritual` | nó (`rule`, `policy`) | um ritual do agente: uma obrigação recorrente que um executor cumpre e confere, com o calendário (v4.25) |
+| `x_processing_purpose` | meta | a finalidade do tratamento do dado que o grafo guarda, como ponteiro para um vocabulário com versão fixada (v4.26) |
 
 ### `x_term`
 
@@ -461,6 +462,47 @@ O contrato não diz quando o registro é exigido: a queda do nível só se vê e
 níveis, que é da política da organização e não do grafo. Isso é do `kg_gate.py --classification-downgrade` (capítulo
 5), que compara cada grafo com a base e pede que o último registro seja esta queda, venha depois da trilha da base, que
 fica como era, e nomeie um aprovador que não mudou o nível.
+
+### `x_processing_purpose` (v4.26)
+
+A finalidade do tratamento do dado que o grafo guarda, como ponteiro para um vocabulário com versão fixada. O contrato
+não carrega catálogo de finalidades: julga só a forma do ponteiro, e o significado fica no vocabulário, seja um
+externo, como o DPV (Data Privacy Vocabulary) do grupo comunitário de privacidade do W3C, seja o do próprio adotante.
+É uma lista, um item por finalidade:
+
+```yaml
+meta:
+  purpose: "o propósito deste grafo"            # outra chave: o propósito do GRAFO
+  x_processing_purpose:                         # a finalidade do TRATAMENTO do dado que o grafo guarda
+    - ref: "https://w3id.org/dpv#ServiceProvision"
+      scheme: dpv
+      release: "https://w3id.org/dpv/2.0"
+    - ref: "docs/vocab/purposes.kg.yaml#T_PURPOSE_CUSTOMER_SUPPORT"
+      scheme: acme
+      label: "atendimento de suporte"
+```
+
+| Chave | Forma |
+|---|---|
+| `ref` | obrigatório: um IRI absoluto `https://` numa forma simples (`https://` seguido de texto sem espaço), para um vocabulário externo, ou a forma `<caminho>.kg.yaml#<id>` do `externalRef`, para um nó `x_term` do seu próprio vocabulário no mesmo repositório |
+| `scheme` | obrigatório: o slug do vocabulário (minúsculas, dígitos e hífen), como no `x_term.scheme`; não aceita ponto, e por isso não carrega versão |
+| `release` | o IRI `https://` do release datado do vocabulário; obrigatório quando o `ref` é IRI, porque o namespace de um vocabulário como o DPV não muda entre versões, e é o release que fixa uma |
+| `label` | opcional: o texto humano da finalidade, não vazio; nunca dado pessoal nem nome de cliente, porque vai para o git |
+
+Um vocabulário de finalidades compartilhado por vários repositórios vai pela forma IRI: a forma local vale só no mesmo
+repositório, como o `externalRef`. Outra chave sem `x_` dentro do item alerta como `form.unknown-key`. O nome longo
+evita a colisão com `meta.purpose` (o propósito do grafo) e com `x_ritual.purpose` (o propósito do ritual).
+
+O contrato julga só a forma, e só quando a chave está presente: o valor que não é lista alerta como
+`form.type.meta.x_processing_purpose`, a lista vazia como `form.range.meta.x_processing_purpose`, o item que não é
+mapa como `form.type.meta.x_processing_purpose.item`, a chave que falta como
+`form.required.meta.x_processing_purpose.<chave>` (por exemplo `form.required.meta.x_processing_purpose.release` no
+IRI sem release) e o valor fora da forma como `form.pattern.meta.x_processing_purpose.<chave>` ou
+`form.type.meta.x_processing_purpose.<chave>`. Do `ref` local só a forma é julgada: se o arquivo e o nó existem, e se o
+nó tem `x_term`, não é conferido. O IRI também não é validado: o host, a barra invertida e o caractere de controle passam
+pela forma simples, e um `label` só com caracteres invisíveis (U+200B, U+0085) passa como texto, como nos outros
+perfis. Item repetido não alerta. No nó, `x_processing_purpose` não é perfil e alerta como
+`form.misplaced.node.x_processing_purpose`; na aresta, é chave `x_` livre. Grafo sem a chave não vê nada novo.
 
 ### `x_ritual` (v4.25)
 

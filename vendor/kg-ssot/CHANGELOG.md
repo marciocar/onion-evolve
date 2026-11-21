@@ -8,6 +8,50 @@ The contract version (`v4.N`) is the version of the `.kg.yaml` / `.kg.json` cont
 only when the contract changes. Each release section is also the body of its GitHub release.
 Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
+## [4.56.0] - 2026-11-21
+
+Contract v4.26, SHOULD only: nothing that passed fails, and no MUST verdict changes.
+
+- Contract v4.26: the canonical profile `x_processing_purpose`, in `meta` only and judged only when present and only
+  by its form: the purpose of processing of the data the graph holds, as a pointer to a vocabulary with a pinned
+  version. The contract carries no catalog of purposes; the meaning stays in the vocabulary, an external one such as
+  the DPV (Data Privacy Vocabulary) of the W3C, or your own. It is a list that is not empty of items `{ref, scheme,
+  release, label}`: `ref` is required, an `https://` IRI in a simple form (for an external vocabulary) or the
+  `<path>.kg.yaml#<id>` (or `.kg.json`) form of `externalRef` (for an `x_term` node of your own vocabulary in the same repository);
+  `scheme` is required, a slug as in `x_term.scheme`, with no dot, so it carries no version; `release` is the `https://`
+  IRI of the dated release of the vocabulary, required when `ref` is an IRI, because the release is what pins the
+  version; and `label` is optional text that is not empty, never personal data, since it goes to git. The item is
+  closed: another key without `x_` warns as `form.unknown-key`. Out of form it warns as `form.type`, `form.range`,
+  `form.required`, or `form.pattern` on `meta.x_processing_purpose` and its keys; on a node, as
+  `form.misplaced.node.x_processing_purpose`; on an edge it is a free `x_` key. The IRI form uses the explicit whitespace
+  class of v4.23, not `\s`, which differs between the Python and JavaScript regular expressions: U+FEFF anywhere in `ref`
+  or `release`, or a `label` made only of whitespace and U+FEFF, warns, and U+0085 passes, in both readers. Declared limits: only the form of a local `ref` is
+  judged (whether the file and the node exist is not checked), the IRI itself is not validated, a `label` of invisible
+  characters passes as text, and a repeated item does not warn. Both readers give the same verdict; the suite goes from
+  745 to 787 cases (`latest/form/purpose/`).
+- **Your gate's contract identity changes.** The SHOULD schema changes, so the gate prints the `· identity` notice on
+  the first run after the update and passes, unless you run it with `--strict-identity`; `kg_gate.py --update` records
+  the new identity. A graph that already carries an `x_processing_purpose` out of form, or on a node, sees new SHOULD
+  debt and fails the ratchet: fix the form, or accept it as baseline with the reason, `python3 -I -B
+  vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.26: the purpose of processing, debt that
+  already existed"`. A graph without the key sees nothing new.
+- `kg_migrate.py format --to json [--apply] [--json] [--root DIR] [--repo-name NAME] GRAPH...`: a graph moves from `.kg.yaml` to
+  `.kg.json`, and who cites it follows. The graph goes through the contract's parse, is written as JSON, and is read
+  back by the reader in the JSON profile; the document must come back equal. A value JSON cannot hold, a destination
+  that already exists, and a graph that git does not track or that has uncommitted changes refuse the graph; comments
+  do not go to JSON, and the plan counts them. Every string value of a tracked graph that starts with the old path
+  (alone, followed by `#`, or followed by `:` and a digit, also in the `<repo>:<path>` form) is rewritten by text,
+  occurrence by occurrence, so comments and quoting stay; a path in the middle of prose stays and is counted, and the
+  files outside the graphs that mention the path are listed for review by hand. The gate runs on every file touched,
+  before and after, with the corpus: no file may gain a MUST code or a SHOULD warning, and a citer that cannot be
+  rewritten refuses the graphs it cites. `plan` (the default) writes nothing; `--apply` is a transaction: it checks that
+  every write can happen, moves the graph with `git mv`, and undoes everything if a move or a write fails. rc 0 on a
+  plan or a clean apply, 1 when `apply` refused a graph, 2 on broken input (manual, chapter 5).
+- Fixed: relative links that a vendored copy of the release could not resolve, which an adopter's documentation
+  checker flagged in `vendor/kg-ssot`. The demo GIFs of the README live in `docs/demo/`, which only the public
+  repository carries, and now point to it by absolute URL; in the Brazilian Portuguese manual, the personal data anchor
+  of chapter 5 and the `SECURITY.md` link of chapter 6 now resolve.
+
 ## [4.55.0] - 2026-11-18
 
 Contract v4.25, SHOULD only: nothing that passed fails, and no MUST verdict changes.

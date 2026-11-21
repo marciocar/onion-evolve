@@ -8,6 +8,49 @@ com as releases marcadas como `kg-ssot-vX.Y.Z`. A versão do contrato (`v4.N`) �
 Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As releases anteriores à 4.16.0 estão no
 [ADOPTING.pt-BR.md](ADOPTING.pt-BR.md).
 
+## [4.56.0] - 2026-11-21
+
+Contrato v4.26, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda.
+
+- Contrato v4.26: o perfil canônico `x_processing_purpose`, só no `meta` e julgado só quando presente e só pela forma:
+  a finalidade do tratamento do dado que o grafo guarda, como ponteiro para um vocabulário com versão fixada. O
+  contrato não traz catálogo de finalidades; o sentido fica no vocabulário, um externo como o DPV (Data Privacy
+  Vocabulary) do W3C, ou o seu próprio. É uma lista não vazia de itens `{ref, scheme, release, label}`: `ref` é
+  obrigatório, um IRI `https://` numa forma simples (para um vocabulário externo) ou a forma `<caminho>.kg.yaml#<id>` (ou `.kg.json`)
+  do `externalRef` (para um nó `x_term` do seu próprio vocabulário no mesmo repositório); `scheme` é obrigatório, um
+  slug como o `x_term.scheme`, sem ponto, então não leva versão; `release` é o IRI `https://` da release datada do
+  vocabulário, obrigatório quando o `ref` é IRI, porque é a release que fixa a versão; e `label` é texto opcional não
+  vazio, nunca dado pessoal, porque vai ao git. O item é fechado: outra chave sem `x_` alerta como `form.unknown-key`.
+  Fora da forma, alerta como `form.type`, `form.range`, `form.required` ou `form.pattern` em `meta.x_processing_purpose`
+  e nas chaves dele; no nó, como `form.misplaced.node.x_processing_purpose`; na aresta, é uma chave `x_` livre. A forma
+  do IRI usa a classe de espaço explícita do v4.23, não o `\s`, que difere entre as expressões regulares do Python e do
+  JavaScript: o U+FEFF em qualquer ponto do `ref` ou do `release`, ou um `label` feito só de espaços e U+FEFF, alerta, e o U+0085 passa, nos dois leitores. Limites
+  declarados: do `ref` local só a forma é julgada (não se confere se o arquivo e o nó existem), o IRI em si não é
+  validado, o `label` de caracteres invisíveis passa como texto, e o item repetido não alerta. Os dois leitores dão o
+  mesmo veredito; a suíte vai de 745 a 787 casos (`latest/form/purpose/`).
+- **A identidade do contrato no seu gate muda.** O schema SHOULD muda, então o gate imprime o aviso `· identidade` na
+  primeira rodada depois da atualização e passa, salvo com `--strict-identity`; o `kg_gate.py --update` grava a
+  identidade nova. O grafo que já leva um `x_processing_purpose` fora da forma, ou num nó, vê dívida SHOULD nova e
+  reprova na catraca: corrija a forma, ou aceite-a como linha de base com o motivo, `python3 -I -B
+  vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "contract v4.26: the purpose of processing, debt that
+  already existed"`. O grafo sem a chave não vê nada novo.
+- `kg_migrate.py format --to json [--apply] [--json] [--root DIR] [--repo-name NOME] GRAFO...`: o grafo passa de `.kg.yaml` a
+  `.kg.json`, e quem o cita acompanha. O grafo passa pelo parse do contrato, é escrito como JSON e relido pelo leitor no
+  perfil JSON; o documento tem de voltar igual. Um valor que o JSON não guarda, um destino que já existe e um grafo que
+  o git não rastreia ou que tem mudança não commitada recusam o grafo; os comentários não vão ao JSON, e o plano os
+  conta. Todo valor de texto de um grafo rastreado que começa pelo caminho antigo (sozinho, seguido de `#`, ou seguido
+  de `:` e um dígito, também na forma `<repo>:<caminho>`) é reescrito por texto, ocorrência por ocorrência, e por isso
+  os comentários e as aspas ficam; o caminho no meio da prosa fica e é contado, e os arquivos fora dos grafos que citam
+  o caminho saem listados para revisão à mão. O gate roda em todo arquivo tocado, antes e depois, com o corpus: nenhum
+  arquivo pode ganhar código MUST nem aviso SHOULD, e o citador que não dá para reescrever recusa os grafos que cita. O
+  `plan` (o padrão) não escreve nada; o `--apply` é uma transação: confere que toda escrita pode acontecer, move o grafo
+  por `git mv` e desfaz tudo se um movimento ou uma escrita falhar. rc 0 no plano ou no apply limpo, 1 quando o `apply`
+  recusou um grafo, 2 na entrada quebrada (manual, capítulo 5).
+- Corrigido: links relativos que a cópia vendorizada da release não resolvia, e que o verificador de documentação de um
+  adotante acusou em `vendor/kg-ssot`. Os GIFs da demo do README vivem em `docs/demo/`, que só o repositório público
+  leva, e passam a apontar para ele por URL absoluta; no manual em português do Brasil, a âncora de dados pessoais do
+  capítulo 5 e o link do `SECURITY.md` do capítulo 6 passam a resolver.
+
 ## [4.55.0] - 2026-11-18
 
 Contrato v4.25, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda.

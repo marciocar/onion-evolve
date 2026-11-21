@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/10-glossary.md sha256:7b1d5e2a96c5e384 -->
+<!-- translation-of: docs/manual/10-glossary.md sha256:2d700107623c6589 -->
 # 10. Glossário
 
 [English](../10-glossary.md) | **Português (Brasil)**
@@ -29,7 +29,7 @@
 | **Nó** | Uma afirmação tipada do grafo |
 | **Órfão** | Um nó sem nenhuma aresta. Reprova |
 | **Pacote de auditoria** | Uma linha por item de questionário, com a pergunta, a resposta, o veredito, a evidência datada, os pedidos de evidência, o dono e as lacunas calculadas, em CSV, XLSX ou JSON (`kg_audit.py`), desde a 4.22.0 |
-| **Perfil canônico** | A forma que o SHOULD dá a uma chave `x_` que os adotantes repetem (`x_term`, `x_mirror`, `x_severity`...), desde o v4.11; `x_criterion` e `x_measured_under` desde o v4.12; `x_classification`, no `meta`, desde o v4.20; `x_dispose_by`, `x_dispose_basis` e `x_hold`, no `meta`, desde o v4.23; `x_downgrade`, no `meta`, desde o v4.24; `x_ritual`, num nó `rule` ou `policy`, desde o v4.25 (desde a 4.55.0). Só julga a chave presente, e só alerta |
+| **Perfil canônico** | A forma que o SHOULD dá a uma chave `x_` que os adotantes repetem (`x_term`, `x_mirror`, `x_severity`...), desde o v4.11; `x_criterion` e `x_measured_under` desde o v4.12; `x_classification`, no `meta`, desde o v4.20; `x_dispose_by`, `x_dispose_basis` e `x_hold`, no `meta`, desde o v4.23; `x_downgrade`, no `meta`, desde o v4.24; `x_ritual`, num nó `rule` ou `policy`, desde o v4.25 (desde a 4.55.0); `x_processing_purpose`, no `meta`, desde o v4.26 (desde a 4.56.0). Só julga a chave presente, e só alerta |
 | **Perfil `gate`** | A parte mínima da release: o suficiente para rodar o gate e o check |
 | **Plano** | `DEV` ou `PROD` |
 | **Proveniência** | O objeto `provenance` (`source`, `locator`, `method`): de onde veio a afirmação. Obrigatória no nó `confirmed` ou PROD; desde o v4.21, SHOULD em toda `evidence` que não é `unverifiable` e na `decision` `done` (proveniência sempre) |

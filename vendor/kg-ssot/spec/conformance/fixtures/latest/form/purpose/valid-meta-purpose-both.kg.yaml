@@ -1,0 +1,29 @@
+meta:
+  schema_version: "1"
+  id: valid-meta-purpose-both
+  x_processing_purpose:
+    - ref: "https://w3id.org/dpv#ServiceProvision"
+      scheme: dpv
+      release: "https://w3id.org/dpv/2.0"
+    - ref: "docs/vocab/purposes.kg.yaml#T_PURPOSE_CUSTOMER_SUPPORT"
+      scheme: casa
+      label: "atendimento de suporte"
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EN_A
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A entidade sintética A."
+edges:
+  - from: EN_A
+    to: Q_A
+    edge_type: TRACES_TO
