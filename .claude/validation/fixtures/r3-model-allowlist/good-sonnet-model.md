@@ -3,6 +3,7 @@ name: selftest-fixture-probe
 description: Fixture de auto-teste — model dentro da allowlist (Regra 3). NÃO deve flagrar.
 model: sonnet
 category: development
+color: blue
 tools:
   - Read
 ---

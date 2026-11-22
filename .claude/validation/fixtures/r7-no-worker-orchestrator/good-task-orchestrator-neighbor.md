@@ -3,6 +3,7 @@ name: presentation-orchestrator
 description: Fixture de auto-teste — agente orquestrador LEGÍTIMO (Regra 7). NÃO deve flagrar.
 model: sonnet
 category: product
+color: blue
 tools:
   - Read
 ---

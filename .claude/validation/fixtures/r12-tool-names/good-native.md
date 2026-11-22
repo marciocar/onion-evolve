@@ -2,6 +2,7 @@
 name: selftest-fixture-probe
 description: Fixture de auto-teste do lint — agente exemplar com tools nativas válidas (Regra 12). Não deve gerar violação.
 category: development
+color: blue
 tools: [Read, Grep]
 ---
 

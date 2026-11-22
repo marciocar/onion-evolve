@@ -2,6 +2,7 @@
 name: selftest-fixture-probe
 description: Fixture de auto-teste do lint — agente com frontmatter completo (Regra 1). Não deve flagrar.
 category: development
+color: blue
 tools: [Read]
 ---
 
