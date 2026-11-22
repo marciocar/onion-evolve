@@ -2,7 +2,7 @@
 branch: feat/extract-meeting-area
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 735e88e6f1182d7a371711652afc5ce2ebbd9f0e0bd9ea7117b5bbdc2c9bae19
+reviewed_diff_sha256: ecc72381110704922aa0b5eeab71da434456582ad839224622a875fe2c4815c6
 reviewed_code_sha256: 2b40d72f3bbe26cb8364febfce3e08be468d663ad72892d539851eaa3afce28f
 findings_total: 18
 findings_real: 18
