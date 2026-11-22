@@ -2,8 +2,7 @@
 branch: chore/vendor-company-brain-0.1.0
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 5e8b20f948c6a1800c21b9f8485cf34f6491bb98793364f41d6edd273c2ab6e1
-reviewed_code_sha256: ede7e3d37c2ddef340e39961f65f155fc5356fea1f8e31239fbd510f4f89d45d
+reviewed_diff_sha256: pendente
 findings_total: 8
 findings_real: 8
 findings_blocking: 1
@@ -61,4 +60,12 @@ nota: "O achado 8 foi curado em parte: o parâmetro sources deixou de prometer l
 - **Diff do vendor.** Mudaram só `tests/voice-conduct-conformance.sh` (a linha do `cd` passou a ser `cd "$(dirname "${BASH_SOURCE[0]}")/.."`, com duas linhas de comentário) e o carimbo (tag, commit, versão e o sha256 desse teste). Nenhum outro arquivo do motor mudou, e o verificador, o comando e a bancada não foram tocados.
 - **Medida.** A conformidade rodou de dentro de `vendor/company-brain` sem `GIT_DIR` nem `GIT_WORK_TREE`: rc 0, 59 casos, 21 códigos. De um cwd fora do repo, pelo caminho absoluto, também deu rc 0. Isso fecha `Q_CBV_TESTE_SUPOE_RAIZ` no grafo, e `C_CBV_VENDOR_V010_CONFERE` e `C_CBV_CONFORMIDADE_DO_VENDOR` foram re-carimbados com essas medidas.
 - **Quem re-revisou.** O próprio agente de execução, lendo o diff inteiro do delta (o teste e o carimbo). A passada isolada do refutador vale para o resto do diff, que não mudou. O delta é código de terceiro vendorizado, conferido por sha256 contra a tag, e não código do core.
+
+## Re-revisão: rebase sobre a main com o /engineer:spike (2026-11-22)
+
+- **O que mudou.** O PR estava em conflito depois que o #1733 (`/engineer:spike`) entrou. Ele também subiu o inventário de 122 para 123. Rebaseei sobre `origin/main` @ `847344b7e`.
+- **Conflitos.** Só houve conflito em projeções geradas: `docs/onion/inventory.md` no 1º commit e `docs/backlog.md` nos seguintes. Nenhum arquivo de conteúdo do PR conflitou. O inventário foi regenerado por `inventory.sh --markdown` e agora diz 124 comandos, com 13 em `docs/`. As frases de total foram propagadas por `lint-artifacts.sh --fix`, que realinhou 10 arquivos. O backlog e as outras projeções são regenerados pelo `pr-finalize`.
+- **Um ajuste à mão, declarado.** A linha de tabela `| Comandos | 123 |` do `docs/onion/getting-started.md` foi para 124 à mão: o `--fix` não cobre a forma de tabela, e o `/meta:inventory` manda reconciliar esse caso com contexto.
+- **Contagem.** Conferi o docs inteiro com `grep` (fora de `vendor/`, `docs/evolution` e `docs/analysis`): não sobrou nenhum «123 comandos».
+- **O código do PR não mudou.** Verificador, comando, bancada, grafo e vendor continuam iguais, e o vendor segue na v0.1.1. A re-revisão foi do agente de execução, sobre o diff do rebase.
 
