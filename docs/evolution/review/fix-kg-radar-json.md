@@ -88,3 +88,9 @@ O revisor desta passada foi um agente separado do autor, como dizem o campo `rev
 frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
 sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
 código foi apagado, para o `pr-finalize` carimbar de novo.
+
+No rebase desta correção, o grafo `sinais-de-campo-2026-09.kg.yaml` conflitou com a main, que acrescentou no mesmo
+ponto dois nós e duas arestas do ensaio A2A local. Os dois lados só acrescentam: fiquei com os nós e as arestas da
+main e, depois deles, com os desta branch, sem mudar nenhuma linha (radar `--integrity --schema` e
+`kg-contract-check.sh` rc 0). O `docs/backlog.md` e o `docs/onion/testing-inventory.md` conflitaram como
+projeções: tomei o lado da main e o `pr-finalize` os regenera.
