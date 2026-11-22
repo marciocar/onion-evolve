@@ -2,7 +2,7 @@
 branch: feat/chat-channel-contract
 pr: 1732
 date: 2026-11-22
-reviewed_diff_sha256: 678f9262b0c3c088ca3d0e6bd1fd914b5ec6534c20ca5559213ef1dba94b5dc7
+reviewed_diff_sha256: 4cdf1c242bf763878d685a1e98cdbdcab89f67474cec9450852606a33614c86e
 reviewed_code_sha256: 44b202b4e82a008be68514da28490da1e6dbe5f79cca3e91ae87a20c1c1fd20b
 findings_total: 24
 findings_real: 24
