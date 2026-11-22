@@ -38873,6 +38873,23 @@ run_install_caddy_config_selftests() {
   fi
 }
 
+# Cerca de saída por uid do Gokapi (ops/egress-uid-fence.sh) — bancada embutida (--selftest, sandbox mktemp, iptables,
+# iptables-restore, install e systemctl de mentira; nunca toca o firewall). Os casos são as guardas: salto no TOPO do
+# OUTPUT (antes do ufw, que aceita lo), REJECT do loopback e da porta interna, idempotência, conta que não resolve,
+# restore falho sem salto, install que desfaz quando a unit não sobe, ato sem --apply. Nasceu do pedido da vps-ops
+# (setup do Gokapi sem autenticação ao alcance de qualquer conta local, 2026-11-22).
+run_egress_uid_fence_selftests() {
+  local ef="${REPO_ROOT}/ops/egress-uid-fence.sh"
+  if [ ! -f "${ef}" ]; then record_skip "egress-uid-fence: ops/egress-uid-fence.sh ausente"; return; fi
+  local rc=0 out
+  out="$(bash "${ef}" --selftest 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "egress-uid-fence: bancada sandbox verde ($(printf '%s' "${out}" | grep -o '[0-9]* pass' | head -1))"
+  else
+    record_fail "egress-uid-fence: --selftest" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
+  fi
+}
+
 # Sync do Onion num workspace do /chat (ops/workspace-adopt-sync.sh) — bancada embutida (--selftest, sandbox
 # mktemp, sem sudo, nunca toca o diretório servido) e os mutantes de cada guarda (--selftest-mutants): vivo mudado
 # depois do stage, symlink, fora do prefixo, apply sem stage, staging alheio, symlink de fuga e segredo no staging.
@@ -44220,6 +44237,7 @@ _family run_site_deeplink_selftests
 _family run_plugin_private_url_selftests
 _family run_deploy_site_selftests
 _family run_install_caddy_config_selftests
+_family run_egress_uid_fence_selftests
 _family run_workspace_adopt_sync_selftests
 _family run_docker_engine_migrate_selftests
 _family run_realign_selftests
