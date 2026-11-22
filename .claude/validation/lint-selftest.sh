@@ -51877,6 +51877,70 @@ run_preflight_families_selftests() {
     record_pass "preflight-families: (b) o pr-finalize roda o pré-voo com git sem identidade adivinhada"
   else record_fail "preflight-families: (b)" "o motor não chama o pré-voo no ambiente do runner"; fi
 
+  # (g..k) A SUPERFÍCIE DAS REGRAS (2026-11-22): o PR #1735 criou a REGRA 122 no lint-artifacts.sh, o pré-voo não
+  #   rodou fixtures nem lint_hard_file, e as fixtures BOAS de agente só reprovaram no CI, 1 hora depois.
+  # (g) a lista curta de famílias é conferida AQUI: cada uma tem de existir como família da bancada real
+  local _rf _rf_bad="" _rf_n=0
+  _rf="$(sed -n 's/^RULE_FAMS="\([^"]*\)"$/\1/p' "${sut}")"
+  for _f in ${_rf//,/ }; do
+    _rf_n=$((_rf_n + 1))
+    grep -q "^run_${_f}_selftests() {" "${REPO_ROOT}/.claude/validation/lint-selftest.sh" || _rf_bad="${_rf_bad} ${_f}"
+  done
+  if [ "${_rf_n}" -ge 3 ] && [ -z "${_rf_bad}" ] && [[ ",${_rf}," == *",fixtures,"* ]] && [[ ",${_rf}," == *",lint_hard_file,"* ]]; then
+    record_pass "preflight-families: (g) as ${_rf_n} famílias da superfície das regras (${_rf}) existem na bancada, fixtures e lint_hard_file entre elas"
+  else record_fail "preflight-families: (g)" "RULE_FAMS='${_rf}' sem família na bancada:${_rf_bad:- <lista vazia ou sem fixtures/lint_hard_file>}"; fi
+  # sandbox: o lint cita zz-rule-check.sh e zz-colors.tsv (juiz e dado de juiz); unrelated.sh e o baseline não
+  d="$(mktemp -d)"
+  (
+    cd "${d}" && git init -q -b main && git config user.email t@t && git config user.name t
+    mkdir -p .claude/validation/fixtures/r1
+    printf 'run_alfa_selftests() {\n  echo a\n}\n# comentario fora de familia\n' > .claude/validation/lint-selftest.sh
+    printf '#!/bin/bash\nh="${SCRIPT_DIR}/zz-rule-check.sh"; m="${SCRIPT_DIR}/zz-colors.tsv"\n# lint-selftest.sh zz-base.txt\n' > .claude/validation/lint-artifacts.sh
+    for f in zz-rule-check.sh zz-colors.tsv zz-base.txt unrelated.sh rules-registry.sh lint-rules.md fixtures/r1/good.md; do
+      printf 'x\n' > ".claude/validation/${f}"; done
+    git add -A && git commit -qm base && git update-ref refs/remotes/origin/main HEAD
+  ) >/dev/null 2>&1
+  _pr_touch() {  # <arquivo> [sut] [PATH] → a saída do helper com aquele arquivo alterado e STAGEADO
+    ( cd "${d}" && git reset -q --hard && printf 'y\n' >> "$1" && git add -A \
+      && PATH="${3:-${PATH}}" bash "${2:-${sut}}" 2>&1; git reset -q --hard )
+  }
+  # julga só a ÚLTIMA linha (a lista que o helper imprime), por token exato: o aviso de stderr cita as famílias e
+  # "sweep_fixtures" contém "fixtures" — o grep solto passava num mutante que só avisava (medido na 1ª passada)
+  _pr_all() { local l; l=",$(tail -1 <<< "$1"),"
+    [[ "${l}" == *",fixtures,"* && "${l}" == *",sweep_fixtures,"* && "${l}" == *",lint_hard_file,"* ]]; }
+  _pr_none() { local l; l=",$(tail -1 <<< "$1"),"
+    [[ "${l}" != *",fixtures,"* && "${l}" != *",sweep_fixtures,"* && "${l}" != *",lint_hard_file,"* && "${l}" == *",shell_pipefail_robustness,"* ]]; }
+  local _r _r_bad=""
+  for _f in lint-artifacts.sh zz-rule-check.sh zz-colors.tsv rules-registry.sh lint-rules.md fixtures/r1/good.md; do
+    _r="$(_pr_touch ".claude/validation/${_f}")"; _pr_all "${_r}" || _r_bad="${_r_bad} ${_f}=[${_r}]"
+  done
+  if [ -z "${_r_bad}" ]; then
+    record_pass "preflight-families: (h) lint-artifacts, juiz e dado que o lint cita (derivados dele), rules-registry, lint-rules e fixture ⇒ fixtures,sweep_fixtures,lint_hard_file"
+  else record_fail "preflight-families: (h)" "não selecionou:${_r_bad}"; fi
+  # (i) o que o lint não cita, o baseline .txt e a bancada fora de família não compram as famílias das fixtures
+  _r_bad=""
+  for _f in unrelated.sh zz-base.txt lint-selftest.sh; do
+    _r="$(_pr_touch ".claude/validation/${_f}")"
+    _pr_none "${_r}" || _r_bad="${_r_bad} ${_f}=[${_r}]"
+  done
+  if [ -z "${_r_bad}" ]; then
+    record_pass "preflight-families: (i) arquivo que o lint não cita, baseline .txt e comentário da bancada ⇒ sem as famílias das fixtures (não viram imposto de todo PR)"
+  else record_fail "preflight-families: (i)" "selecionou demais:${_r_bad}"; fi
+  # (j) não decidir não vira "não seleciona": o python3 que CAI (sai 1, como um traceback) ⇒ as famílias entram
+  local _shim="${d}.shim"; mkdir -p "${_shim}"; printf '#!/bin/sh\nexit 1\n' > "${_shim}/python3"; chmod +x "${_shim}/python3"
+  _r="$(_pr_touch .claude/validation/unrelated.sh "${sut}" "${_shim}:${PATH}")"
+  if _pr_all "${_r}" && grep -q 'não derivei a superfície das regras' <<< "${_r}"; then
+    record_pass "preflight-families: (j) derivação que cai (python3 rc 1) ⇒ fixtures,sweep_fixtures,lint_hard_file entram, dizendo por quê"
+  else record_fail "preflight-families: (j)" "saída: ${_r}"; fi
+  # (k-MUT) sem o bloco da superfície das regras o helper volta ao buraco do #1735: o lint mudado não as escolhe
+  local _mut="${d}.mut.sh"
+  sed '/^# ── A SUPERFÍCIE DAS REGRAS/,/^# sem repetição/{/^# sem repetição/!d}' "${sut}" > "${_mut}"
+  _r="$(_pr_touch .claude/validation/lint-artifacts.sh "${_mut}")"
+  if _pr_none "${_r}"; then
+    record_pass "preflight-families: (k-MUT) sem o bloco da superfície das regras o lint mudado não escolhe as fixtures — (h) é load-bearing"
+  else record_fail "preflight-families: (k-MUT)" "o mutante ainda selecionou (ou quebrou): ${_r}"; fi
+  rm -rf "${d}" "${_shim}"; rm -f "${_mut}"; unset -f _pr_touch _pr_all _pr_none
+
   # (c..f) A PORTA MINI (2026-11-06, tarefa #31): #1497 e #1501 reprovaram no CI na door_mini (a) por ponteiro
   #   morto num arquivo que viaja ao mini, e o pré-voo não a escolhia. A superfície vem do roles.yaml do
   #   fixture, NÃO da real: o arquivo `commands/so-no-fixture.md` só existe na allowlist daqui, e selecioná-lo
@@ -51932,6 +51996,16 @@ YML
   if grep -q 'door_mini' <<< "${_c5}"; then
     record_pass "preflight-families: (e) roles.yaml que não resolve ⇒ door_mini entra (falha para o lado de medir)"
   else record_fail "preflight-families: (e)" "saída: ${_c5}"; fi
+  # (e2) o python3 que CAI na conta da superfície (sai 1, como um traceback) não vira "não toca": door_mini entra.
+  #      O shim só cai quando a conta é a do mini (SURF no ambiente); o resolvedor segue com o python3 real.
+  local _ps="${d}.pyshim" _rp; _rp="$(command -v python3)"; mkdir -p "${_ps}"
+  printf '#!/bin/sh\n[ -n "${SURF:-}" ] && exit 1\nexec "%s" "$@"\n' "${_rp}" > "${_ps}/python3"; chmod +x "${_ps}/python3"
+  local _c5b; _c5b="$( cd "${d}" && git checkout -q -f main 2>/dev/null && git reset -q --hard && printf 'y\n' >> .claude/commands/meta/fora.md \
+    && git add -A && PATH="${_ps}:${PATH}" bash "${sut}" 2>&1; git reset -q --hard )"
+  if grep -q 'door_mini' <<< "${_c5b}" && grep -q 'não decidi a superfície do mini' <<< "${_c5b}"; then
+    record_pass "preflight-families: (e2) a conta da superfície do mini que cai (rc 1) ⇒ door_mini entra, dizendo por quê"
+  else record_fail "preflight-families: (e2)" "saída: ${_c5b}"; fi
+  rm -rf "${_ps}"
   # (f-MUT) sem o bloco da porta mini o helper volta ao buraco medido: o (c) não seleciona
   local mut="${d}/../pf-mut-$$.sh"
   sed '/^# ── A PORTA MINI/,/^# sem repetição/{/^# sem repetição/!d}' "${sut}" > "${mut}"
