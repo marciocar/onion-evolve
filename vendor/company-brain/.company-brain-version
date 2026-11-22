@@ -75,7 +75,7 @@
     "spec/voice-conduct/v2.schema.yaml": "441431c68dc28d9abd2e64f5c3b22b8d6807b029676e10a4166b00a64c633dfb",
     "templates/company-brain-context/README.md": "9ca71c1a151d9ddd5b9ecb5fa1be8bbbeadd59f4148441fb1ca98f11003084ef",
     "templates/company-brain-context/voice-conduct.yaml": "2ec2f9e73db6aa754772aa820553b10d2165b9dd84d1f44ebe5142a0e63ecb3c",
-    "tests/voice-conduct-conformance.sh": "8b035666c744e72c8df6295dcf896c8830d01602014664076481d81778b5ac36",
-    "tools/voice_conduct_check.py": "0bba15c01f92df97a21f350c23bad65846bd191e8fc5380640e79e29cee73e33"
+    "tests/voice-conduct-conformance.sh": "8b035666c744e72c8df6295dcf896c8830d01602014664076481d81778b5ac36+x",
+    "tools/voice_conduct_check.py": "0bba15c01f92df97a21f350c23bad65846bd191e8fc5380640e79e29cee73e33+x"
   }
 }

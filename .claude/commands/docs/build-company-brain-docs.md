@@ -5,7 +5,7 @@ allowed-tools: Read Write Bash(find *) Bash(ls *) Bash(bash .claude/utils/scope/
 
 parameters:
   - name: sources
-    description: Caminhos, links ou descrições das fontes reais (regras da persona em prosa, matriz de quem pede e quem aprova, grafo de audiências, canais)
+    description: Caminhos ou descrições das fontes reais no repo (página externa entra colada ou salva como arquivo; o comando não abre links) (regras da persona em prosa, matriz de quem pede e quem aprova, grafo de audiências, canais)
     required: true
 
 category: docs

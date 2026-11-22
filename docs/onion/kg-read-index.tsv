@@ -2843,6 +2843,8 @@ ops/update-bridge.sh	E_W9_BRIDGE_DEPLOY_0902	docs/onion/graph/m2-bridge-logto-20
 ops/verify-adopter-gate.sh	E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 ops/verify-adopter-gate.sh	E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 site/src/pages	Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
+vendor/company-brain/.company-brain-version	C_CBV_VENDOR_V010_CONFERE	docs/onion/graph/company-brain-vendor-2026-11.kg.yaml
+vendor/company-brain/tests/voice-conduct-conformance.sh	C_CBV_CONFORMIDADE_DO_VENDOR	docs/onion/graph/company-brain-vendor-2026-11.kg.yaml
 vendor/kg-ssot/.kg-ssot-version	E_KG_SSOT_4251_ADOTADA_1024	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 vendor/kg-ssot/.kg-ssot-version	E_KG_SSOT_426_ADOTADA_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 vendor/kg-ssot/.kg-ssot-version	E_KG_SSOT_427_ADOTADA_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml

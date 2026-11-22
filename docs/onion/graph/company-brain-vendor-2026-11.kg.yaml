@@ -7,7 +7,7 @@ meta:
   baseline: "2026-11-22"
   review_after: "2026-12-06"
   purpose: "O maestro selou em 2026-11-22, no grafo do produto Onion Company Brain (repo privado do produto, não conferível por terceiro), que o motor do contexto do Company Brain vive no repo do produto e o core o vendoriza por tag; que o comando entra por PR do core; e que o Company Brain é opcional. Este grafo registra a entrada da tag company-brain-v0.1.0 no core, a conferência medida e as pendências que a vendorização deixou."
-  note: "TETO, declarado: 5 nós. O selo é do grafo do produto e não se repete aqui; este grafo guarda só o que o PR do core mediu e deixou aberto. Nenhum nome de cliente ou empresa."
+  note: "TETO, declarado: 5 nós. O selo é do grafo do produto e não se repete aqui; este grafo guarda só o que o PR do core mediu e deixou aberto. Nenhum nome de cliente ou empresa. Consequência declarada (refutador, 2026-11-22): o repo do produto é privado e o core é público, então os 64 arquivos do recorte ficam públicos pelo vendor; é o efeito do selo de vendorizar por tag, não um vazamento, e o recorte não traz dado de empresa (templates com marcadores)."
   # ═══ TETO: 5 NÓS ═══
 nodes:
   - id: C_CBV_VENDOR_V010_CONFERE
@@ -20,8 +20,8 @@ nodes:
     verified_at: "2026-11-22"
     verified_against: "python3 -I .claude/validation/company-brain-vendor-check.py check → rc 0 (64 arquivos); verify --source <clone raso da tag company-brain-v0.1.0> → rc 0, commit 15af74dc5193"
     trace: "vendor/company-brain/.company-brain-version"
-    label: "vendor/company-brain traz o recorte da tag company-brain-v0.1.0 (README.md, builder, spec, templates, tests, tools: 64 arquivos), com carimbo de tag, commit e sha256 de cada arquivo, conferido contra um clone da tag"
-    narrative: "O molde da kg-ssot (kg_vendor.py) não coube: ele fixa o produto, lê um manifesto de release dentro da tag e confere atestação, e a tag do Company Brain não tem manifesto e o core leva só um recorte. Reproduziu-se o proporcional num verificador do próprio produto, sem vendorizador genérico: update (substitui a pasta pelo recorte da tag e carimba), check (vendor x carimbo, offline) e verify (carimbo x blobs da tag). A bancada run_company_brain_vendor_selftests cobre os três modos e um mutante."
+    label: "vendor/company-brain traz o recorte da tag company-brain-v0.1.0 (README.md, builder, spec, templates, tests, tools: 64 arquivos), com carimbo de tag, commit, sha256 e modo de cada arquivo, conferido contra um clone da tag"
+    narrative: "O molde da kg-ssot (kg_vendor.py) não coube: ele fixa o produto, lê um manifesto de release dentro da tag e confere atestação, e a tag do Company Brain não tem manifesto e o core leva só um recorte. Reproduziu-se o proporcional num verificador do próprio produto, sem vendorizador genérico: update (substitui a pasta pelo recorte da tag e carimba), check (vendor x carimbo, offline) e verify (carimbo x blobs da tag, lidos por ls-tree e cat-file, não pelo git archive). A passada adversarial pegou link de diretório calado, carimbo malformado com rc 1, update que apagava qualquer destino e modo não conferido; as quatro curas têm caso na bancada. A bancada run_company_brain_vendor_selftests cobre os três modos e um mutante."
     provenance:
       source: "company-brain-vendor-check.py deste repo"
       locator: ".claude/validation/company-brain-vendor-check.py e vendor/company-brain/.company-brain-version"
