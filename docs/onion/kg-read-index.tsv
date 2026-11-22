@@ -579,6 +579,7 @@
 .claude/validation/kg-contract-check.sh	E_GERADORES_ESCREVEM_O_CONTRATO_V3	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 .claude/validation/kg-corpus-grep.sh	E_AS_DUAS_CURAS_COM_CONTRAPROVA	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/kg-corpus-grep.sh	E_CORPUS_VIROU_INSTRUMENTO_DE_ISENCAO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
+.claude/validation/kg-corpus-grep.sh	Q_LEITORES_DO_CORPUS_SO_ENUMERAM_KG_YAML_1122	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/validation/kg-coverage-baseline.txt	C_OPCAO_C_ADOTAR_SARIF_E_INTERCAMBIO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/kg-coverage-baseline.txt	E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/kg-drive-project.sh	E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
@@ -594,6 +595,7 @@
 .claude/validation/kg-radar.sh	C_OPCAO_O4_ARESTA_CROSS_ARQUIVO_PRIMEIRA_CLASSE	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-radar.sh	D_GATILHO_E_TRIGGER	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/validation/kg-radar.sh	D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
+.claude/validation/kg-radar.sh	D_RADAR_LE_KG_JSON_PELO_MESMO_AWK_1122	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/validation/kg-radar.sh	D_S2_ABSORBED	docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml
 .claude/validation/kg-radar.sh	D_m1_avisa_nao_reprova	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .claude/validation/kg-radar.sh	E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE	docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml
@@ -1767,7 +1769,7 @@ docs/evolution/inbox/_processed/2026-11-08-reply-chat-persona-pilot-resumo.md	E_
 docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md	D_IT_ADOPTER_SIGNAL_SEAL_1108	docs/onion/graph/inbox-triage-1108.kg.yaml
 docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md	E_IT_SIGNALS_MEASURED_1108	docs/onion/graph/inbox-triage-1108.kg.yaml
 docs/evolution/inbox/_processed/2026-11-08-signal-campainha-gaps.md	E_DB_LACUNAS_MEDIDAS_NO_HUB_1108	docs/onion/graph/doorbell-hardening-2026-11.kg.yaml
-docs/evolution/inbox/_processed/2026-11-21-question-spike-poc-standard.md	E_HUB_ASKED_SPIKE_STANDARD_1121	docs/onion/graph/spike-standard-2026-11.kg.yaml
+docs/evolution/inbox/_processed/2026-11-21-signal-gate-ignores-kg-json.md	E_SINAL_RADAR_ABORTA_KG_JSON_1122	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
