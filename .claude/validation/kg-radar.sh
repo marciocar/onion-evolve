@@ -163,10 +163,14 @@ fi
 # TETO DECLARADO: o texto livre (label, verified_against) aparece CRU nos dois, e o escape que o
 # .kg.yaml escreveu à mão (\" entre aspas duplas, '' entre simples) não volta do JSON, que guarda só
 # o valor: nesses campos a saída mostra o valor, e o .kg.yaml mostrava a grafia. Veredito e colunas
-# estruturadas (id, tipo, plano, status, pesos, datas) são iguais, medidos em 5 grafos do core.
+# estruturadas (id, tipo, plano, status, pesos, datas) e o rc são iguais, medidos nos 75 grafos de
+# docs/onion/graph convertidos pelo kg_migrate, em 15 modos. E a LINHA citada numa acusação (chave
+# repetida, "linhas 8 e 13") é a do arquivo traduzido, que o usuário não vê: o id e o campo é que valem.
+# Valor ANINHADO além do campo do nó vai em flow numa linha, e meta vem antes de nodes e edges: ver o
+# comentário de flow() abaixo. null vira campo vazio, como no .kg.yaml.
 # FAIL-CLOSED com rc 2 (erro de arquivo, nunca veredito): python3 ausente, sintaxe fora da RFC 8259,
-# NaN/Infinity, CHAVE REPETIDA e raiz que não é objeto. A chave repetida o YAML deste radar acusa
-# no --integrity; no JSON ela não sobrevive à tradução (o mapa guarda uma só), e o perfil JSON do
+# NaN/Infinity, CHAVE REPETIDA e raiz que não é objeto. A chave repetida num campo de NÓ o YAML deste
+# radar acusa no --integrity; no JSON ela não sobrevive à tradução (o mapa guarda uma só), e o perfil JSON do
 # contrato a recusa como parse.duplicate-key, então aqui ela para a leitura com o nome do código.
 # O que o radar NÃO julga no .kg.yaml ele também não julga no .kg.json: faixa de número (I-JSON) e
 # profundidade são do contrato (kg-contract-check.sh), nos dois formatos.
@@ -214,7 +218,9 @@ def key(k):
     return k if BARE.match(k) else json.dumps(k, ensure_ascii=False)
 def scalar(v):
     if v is None:
-        return "null"
+        # VAZIO, nunca a palavra null: no .kg.yaml o null escrito é `campo:` sem valor, e o awk lê vazio como
+        # ausente. Com "null" o awk lia o texto: layer null reprovava e trace null valia como proveniência.
+        return ""
     if v is True:
         return "true"
     if v is False:
@@ -232,35 +238,44 @@ def first(d, k):
         return dict([(k, d[k])] + [(a, b) for a, b in d.items() if a != k])
     return d
 lines = []
-def emit_map(d, ind, lead=None):
+def flow(v):
+    # Valor ANINHADO além do campo do nó vai em estilo flow numa linha só (JSON é YAML flow válido). O awk lê
+    # status:, trace:, impact: em QUALQUER coluna: em bloco, um x_prev: {status: done} sobrescrevia o status do
+    # nó, e uma lista de mapas com id virava nó fantasma (passada adversarial). Flow é o que o .kg.yaml escrito
+    # à mão costuma usar ali, e o awk o ignora do mesmo jeito.
+    if isinstance(v, (dict, list)):
+        return json.dumps(v, ensure_ascii=False)
+    return scalar(v)
+def put(pre, sv):
+    lines.append(pre + (" " + sv if sv != "" else ""))
+def emit_field_map(d, ind, lead=None, block_keys=()):
+    # Um mapa de CAMPOS (meta, item de nodes/edges/external_edges, provenance): chave por linha, valor escalar
+    # na linha ou aninhado em flow. Só o provenance do nó desce em bloco, porque o awk o lê pela coluna.
     for i, (k, v) in enumerate(d.items()):
         pre = (lead if (lead is not None and i == 0) else " " * ind) + key(k) + ":"
-        if isinstance(v, dict) and v:
-            lines.append(pre); emit_map(v, ind + 2)
-        elif isinstance(v, list) and v:
-            lines.append(pre); emit_list(v, ind + 2)
-        elif isinstance(v, dict):
-            lines.append(pre + " {}")
-        elif isinstance(v, list):
-            lines.append(pre + " []")
+        if k in block_keys and isinstance(v, dict) and v:
+            lines.append(pre); emit_field_map(v, ind + 2)
         else:
-            lines.append(pre + " " + scalar(v))
-def emit_list(items, ind):
-    for it in items:
-        if isinstance(it, dict) and it:
-            emit_map(it, ind + 2, lead=" " * ind + "- ")
-        elif isinstance(it, list) and it:
-            lines.append(" " * ind + "-"); emit_list(it, ind + 2)
-        elif isinstance(it, dict):
-            lines.append(" " * ind + "- {}")
-        elif isinstance(it, list):
-            lines.append(" " * ind + "- []")
-        else:
-            lines.append(" " * ind + "- " + scalar(it))
+            put(pre, flow(v))
 for sect, k in (("nodes", "id"), ("edges", "from")):
     if isinstance(doc.get(sect), list):
         doc[sect] = [first(it, k) for it in doc[sect]]
-emit_map(doc, 0)
+order = ["meta"] + [k for k in doc if k != "meta"]  # meta ANTES de nodes/edges: o awk fecha o meta na 1a seção
+for k in order:
+    if k not in doc:
+        continue
+    v = doc[k]
+    if isinstance(v, dict) and v:
+        lines.append(key(k) + ":"); emit_field_map(v, 2)
+    elif isinstance(v, list) and v:
+        lines.append(key(k) + ":")
+        for it in v:
+            if isinstance(it, dict) and it:
+                emit_field_map(it, 4, lead="  - ", block_keys=(("provenance",) if k == "nodes" else ()))
+            else:
+                put("  -", flow(it))
+    else:
+        put(key(k) + ":", flow(v))
 try:
     body = "".join(l + "\n" for l in lines).encode("utf-8")
 except UnicodeEncodeError:
@@ -707,6 +722,15 @@ section == "edges" && /^[[:space:]]*trigger:/ { v = $0; sub(/^[[:space:]]*trigge
 section == "edges" && /^[[:space:]]*on:/ { v = $0; sub(/^[[:space:]]*on:/, "", v); eon[ne] = trim(v); eonLegacy[ne] = 1; next }
 
 # meta: campos de governança de frescor/schema (proposta #1/#2 — ADR kg-freshness-gate)
+# A COLUNA DOS CAMPOS DE META é medida na PRIMEIRA chave de meta, e por isso esta regra vem ANTES de toda
+# regra de meta com `next` (2026-11-22). Ela morava depois de schema_version, baseline e review_after: com um
+# desses como 1a chave (a ordem mais comum de escrever), a coluna ficava em -1 e o review_after era descartado
+# em SILÊNCIO, e o --validade dizia que o grafo não o declarava. Latente no corpus (200 grafos com
+# review_after, 0 cegos: todos abrem o meta com outra chave), achado ao ler .kg.json com as chaves do topo em
+# ordem alfabética (passada adversarial do fix/kg-radar-json).
+section == "meta" && metaFieldIndent < 0 && /^[[:space:]]+[A-Za-z_][A-Za-z0-9_]*:/ {
+  metaFieldIndent = match($0, /[^[:space:]]/) - 1
+}
 section == "meta" && /^[[:space:]]*schema_version:/ { v = $0; sub(/^[[:space:]]*schema_version:/, "", v); metaSchema = trim(v); next }
 section == "meta" && /^[[:space:]]*baseline:/       { v = $0; sub(/^[[:space:]]*baseline:/, "", v);       metaBaseline = trim(v); next }
 # ⚠️ `review_after` É LIDO AQUI DESDE 2026-09-18, e a razão veio de dois sinais de campo do mesmo
@@ -754,9 +778,7 @@ section == "meta" && metaClosed == 0 && /^[[:space:]]+review_after:/ {
 # É redundante por construção: conteúdo de bloco YAML é sempre MAIS indentado que a chave que o
 # abre, logo nunca casa a indentação de um campo direto. Guarda que não pode rejeitar nada é
 # exatamente o que esta onda está removendo do resto da casa — não vou deixá-la aqui.
-section == "meta" && metaFieldIndent < 0 && /^[[:space:]]+[A-Za-z_][A-Za-z0-9_]*:/ {
-  metaFieldIndent = match($0, /[^[:space:]]/) - 1
-}
+# (a regra que mede a coluna dos campos de meta mora ANTES do schema_version: ver o comentário lá)
 
 # COMENTÁRIO INLINE SAI. `target:` é um CAMINHO que a selagem consome, e o exemplo do próprio
 # README traz ` # ← o gatilho` na mesma linha: sem esta poda o valor vira caminho+comentário. O
