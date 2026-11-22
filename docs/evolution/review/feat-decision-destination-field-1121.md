@@ -2,7 +2,8 @@
 branch: feat/decision-destination-field-1121
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 828d2637e8152f06059cde5e5331a36eefe0e44ac36d6798791ad59c62a95f5f
+reviewed_code_sha256: d9b5bef945e213f66939353154a861080381958b835328a151c1c970e33d2bf8
 findings_total: 12
 findings_real: 5
 findings_blocking: 0
