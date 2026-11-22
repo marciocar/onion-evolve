@@ -47,7 +47,7 @@ WRITE_SCOPE="bridge:write"       # P10 — CAPACIDADE por identidade (escrever/e
 ROLE_NAME="bridge-operator"      # M2M — o chamador SERVIÇO
 USER_ROLE_NAME="bridge-user"     # User — a PESSOA (tipo diferente no Logto; a M2M não serve)
 PASS_FILE="/root/.onion-vps-logto-bootstrap"
-PG_CONTAINER="onion-vps-logto-postgres"
+# PG_CONTAINER, TOKEN_ORIGIN, RESOLVE, API_ORIGIN e MAPI_DEFAULT: definidos em logto-mapi.sh (source abaixo).
 # BOOTSTRAP CIRCULAR, e como se quebra (medido 2026-07-26):
 #   O app M2M `m-default` — o único que concede a Management API do tenant `default` —
 #   vive no tenant `admin`. E o Logto só RESOLVE o tenant admin quando a requisição chega
@@ -63,10 +63,6 @@ PG_CONTAINER="onion-vps-logto-postgres"
 #   Apresentar no console um token com aud=https://default.logto.app/api devolve
 #   ERR_JWT_CLAIM_VALIDATION_FAILED/aud — o binding de audiencia e REAL e rejeitou o uso
 #   errado. Isso e, de quebra, a prova do P4.1 (RFC 8707 honrado => plano A).
-TOKEN_ORIGIN="https://console.onionevolve.com"   # tenant admin — onde m-default existe
-RESOLVE="console.onionevolve.com:443:127.0.0.1"  # loopback-only, sem exposicao publica
-API_ORIGIN="https://auth.onionevolve.com"        # tenant default — onde se provisiona
-MAPI_DEFAULT="https://default.logto.app/api"
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -110,108 +106,13 @@ done
 say() { printf '%s\n' "$*"; }
 step() { printf '\n── %s\n' "$*"; }
 
-# --- 0. token M2M (client_credentials) -------------------------------------
-# O app `m-default` vive no tenant `admin` e carrega o papel machine:mapi:default,
-# que concede a Management API do tenant `default`. O issuer do tenant admin só
-# escuta em 127.0.0.1:3012 (vhost público desligado) — daí o Host forjado.
-# PRÉ-FLIGHT do nó circular. Sem isto, a ausência do vhost loopback aparece lá embaixo como
-# `invalid_client` — erro que não diz NADA sobre a causa e custou uma sessão inteira para
-# diagnosticar. O andaime é removido de propósito depois de cada uso (o estado seguro é o
-# estado SEM configuração); então a falta dele é o caso NORMAL, não a exceção. Falhe cedo,
-# falhe explicando, e entregue o comando exato. [[fix-must-become-mechanism]]
-step "pré-flight: o issuer do tenant admin está alcançável?"
-if ! grep -q "console.onionevolve.com/oidc" <<< "$(curl -sS -k --max-time 5 --resolve "${RESOLVE}" \
-     "${TOKEN_ORIGIN}/oidc/.well-known/openid-configuration" 2>/dev/null)"; then
-  cat >&2 <<'HELP'
-ERRO: o issuer do tenant `admin` não responde no loopback.
-
-  POR QUÊ: o app M2M `m-default` (o único que concede a Management API do tenant
-  `default`) vive no tenant `admin`, e o Logto só RESOLVE esse tenant quando a
-  requisição chega com origem exatamente igual ao ADMIN_ENDPOINT
-  (https://console.onionevolve.com). Sem o vhost, tudo cai no OIDC do tenant
-  `default` e o token endpoint responde `invalid_client` — sem dizer o motivo.
-
-  CONSERTO — USE O MECANISMO QUE JA EXISTE, nao erga um vhost paralelo:
-
-    bash ~/onion-vps-logto/console.sh on      # liga o vhost do console (publico, cert real)
-    bash ~/onion-vps-logto/console.sh status  # confere
-    bash ~/onion-vps-logto/console.sh off     # DESLIGUE ao terminar
-
-  O maestro construiu esse liga/desliga de proposito: o console fica FORA do ar por
-  padrao e so sobe na janela de configuracao. Ate 2026-07-28 este bloco mandava
-  escrever um vhost loopback proprio — o autor ergueu e derrubou SEIS vezes num dia
-  sem procurar o mecanismo que ja existia. Conselho nao se repete sozinho; ponteiro sim.
-
-  ANTES DE DEIXAR LIGADO ALEM DA JANELA: o tenant `admin` esta com registro ABERTO
-  (sign_up identifiers ["username"], password). Fechar antes de publicar de vez.
-
-  NOTA: mexer no Caddy de produção é mudança que o maestro precisa AUTORIZAR NOMEANDO
-  — não é inferível de um "pode seguir" genérico.
-HELP
-  exit 6
-fi
-say "   issuer do tenant admin OK (loopback)"
-
-step "0. token M2M para a Management API do tenant default"
-# `|| true` NÃO é desleixo: sem ele, sob `set -euo pipefail`, a falha do docker mata o script
-# NA ATRIBUIÇÃO — e a checagem abaixo, que existe e dá a mensagem certa, NUNCA RODA.
-# Medido 2026-08-02: o script morria mudo (exit 1, zero saída) e só o `bash -x` revelou onde.
-# Guarda INALCANÇÁVEL é pior que guarda ausente: dá a impressão de estar coberto.
-#
-# E o docker exige sudo para usuário fora do grupo `docker` (medido: `docker ps` → denied).
-# Tenta direto e cai para `sudo -n` — serve tanto rodando como root (cron) quanto como o maestro,
-# sem exigir que o chamador saiba qual dos dois é.
-_dk() { docker "$@" 2>/dev/null || sudo -n docker "$@" 2>/dev/null; }
-_secret="$(_dk exec "${PG_CONTAINER}" psql -U logto -d logto -tAc \
-  "select secret from applications where id='m-default';" | tr -d ' \r\n' || true)"
-[ -n "${_secret}" ] || {
-  cat >&2 <<'HELPSEC'
-ERRO: não consegui ler o secret do app M2M `m-default` no banco do Logto.
-
-  CAUSAS POSSÍVEIS, em ordem de probabilidade:
-   1. docker exige sudo para este usuário e o `sudo -n` (sem senha) falhou;
-   2. o container do Postgres não está de pé  → sudo docker ps | grep logto-postgres
-   3. o app `m-default` não existe no tenant admin → rode este script SEM --smtp para provisioná-lo.
-
-  DIAGNÓSTICO EM UM COMANDO:
-    sudo docker exec onion-vps-logto-postgres psql -U logto -d logto -tAc \
-      "select id from applications where id='m-default';"
-HELPSEC
-  exit 4
-}
-
-_tok_resp="$(curl -sS -k --resolve "${RESOLVE}" -X POST "${TOKEN_ORIGIN}/oidc/token" \
-  --data-urlencode grant_type=client_credentials \
-  --data-urlencode "resource=${MAPI_DEFAULT}" \
-  --data-urlencode scope=all \
-  -u "m-default:${_secret}")"
-unset _secret
-TOKEN="$(printf '%s' "${_tok_resp}" | jq -r '.access_token // empty')"
-[ -n "${TOKEN}" ] || {
-  echo "ERRO no token endpoint. Corpo (sem segredo):" >&2
-  printf '%s\n' "${_tok_resp}" | jq -c 'del(.access_token)' >&2 || printf '%s\n' "${_tok_resp}" >&2
-  exit 5
-}
-say "   token obtido (len=${#TOKEN})"
-
-api() { # api <METHOD> <PATH> [json-body]
-  local m="$1" p="$2" b="${3:-}"
-  if [ -n "$b" ]; then
-    curl -sS -X "$m" "${API_ORIGIN}/api${p}" \
-      -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json" -d "$b"
-  else
-    curl -sS -X "$m" "${API_ORIGIN}/api${p}" \
-      -H "Authorization: Bearer ${TOKEN}"
-  fi
-}
-
-mutate() { # mutate <descrição> <METHOD> <PATH> <json>
-  # A mensagem humana vai para STDERR de propósito: o STDOUT desta função é DADO
-  # (JSON que o chamador parseia com jq). Misturar os dois faz o dry-run quebrar com
-  # "Invalid numeric literal" — canal de log poluindo canal de dados.
-  if [ "${APPLY}" = "1" ]; then api "$2" "$3" "$4"
-  else printf '   [DRY-RUN] %s\n' "$1" >&2; printf '%s' '{}'; fi
-}
+# Pré-flight, token, api e mutate vivem em logto-mapi.sh (2026-11-22), compartilhados com o
+# gokapi-oidc-provision.sh. O source define TOKEN_ORIGIN/RESOLVE/API_ORIGIN/MAPI_DEFAULT/PG_CONTAINER
+# (os valores de sempre) e tira o secret do m-default e o Bearer do argv do curl.
+# shellcheck source=ops/bridge-auth/logto-mapi.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/logto-mapi.sh"
+logto_preflight
+logto_token
 
 # --- 1. usuário do maestro no tenant default -------------------------------
 # --- MODO --write-org-map: cache id-da-org -> nome do membro ------------------
@@ -409,9 +310,10 @@ if [ "${SMTP_PROVISION:-0}" = "1" ]; then
     {usageType:"OrganizationInvitation", subject:"Convite para a federacao Onion", content:"Voce foi convidado para uma organizacao no Onion.\n\nAcesse: {{link}}", contentType:"text/plain"}
   ]')"
 
-  _cfg="$(jq -nc --arg h "${_host}" --argjson p "${_port}" --arg f "${_from}" \
-                 --arg u "${SMTP_USER}" --arg w "${SMTP_PASS}" --argjson t "${_templates}" \
-    '{host:$h, port:$p, secure:false, fromEmail:$f, auth:{type:"login", user:$u, pass:$w}, templates:$t}')"
+  # usuário e senha SMTP vão ao jq pelo ambiente, nunca em argv (/proc/<pid>/cmdline) — 2026-11-22
+  _cfg="$(_SMTP_U="${SMTP_USER}" _SMTP_W="${SMTP_PASS}" jq -nc --arg h "${_host}" --argjson p "${_port}" --arg f "${_from}" \
+                 --argjson t "${_templates}" \
+    '{host:$h, port:$p, secure:false, fromEmail:$f, auth:{type:"login", user:$ENV._SMTP_U, pass:$ENV._SMTP_W}, templates:$t}')"
 
   _existing="$(api GET "/connectors" | jq -r '.[]? | select(.connectorId=="simple-mail-transfer-protocol") | .id' | head -1)"
 
@@ -568,7 +470,7 @@ if [ -n "${_uid}" ]; then
 else
   # Senha aleatória forte. Vai para arquivo root-only; o maestro troca no 1º login.
   _pw="$(python3 -c 'import secrets,string; a=string.ascii_letters+string.digits+"!@#%^*-_=+"; print("".join(secrets.choice(a) for _ in range(28)))')"
-  _body="$(jq -nc --arg u "${BRIDGE_USER}" --arg p "${_pw}" '{username:$u, password:$p}')"
+  _body="$(_NEW_PW="${_pw}" jq -nc --arg u "${BRIDGE_USER}" '{username:$u, password:$ENV._NEW_PW}')"   # senha fora do argv
   _created="$(mutate "criaria usuário '${BRIDGE_USER}' com senha aleatória" POST "/users" "${_body}")"
   _uid="$(printf '%s' "${_created}" | jq -r '.id // empty')"
   if [ "${APPLY}" = "1" ] && [ -n "${_uid}" ]; then

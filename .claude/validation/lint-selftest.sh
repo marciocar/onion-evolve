@@ -235,7 +235,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature,session_open"
+SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,gokapi_oidc,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature,session_open"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -13672,6 +13672,42 @@ PY
 # transcrição; o wrapper confere o binário no GitHub (w23) e o gguf no HF (w24) e passa o fixture de 2 falantes à prova
 # (w25). A montagem do binário (stage_diar_bin: download, digest, extração filtrada) é do --apply, como o stage_hf.
 # ---------------------------------------------------------------------------
+# ── gokapi-oidc (2026-11-22, spike do Gokapi): o ato ops/bridge-auth/gokapi-oidc-provision.sh (core-only) ──
+# (a) a bancada (ops/testing/gokapi-oidc-provision-selftest.sh, Logto simulado em 127.0.0.1) passa com a contagem
+# exata; (m) cada peça do ato derrubada numa CÓPIA (o original nunca é tocado) faz a bancada reprovar.
+run_gokapi_oidc_selftests() {
+  local -; set +e
+  local act="${REPO_ROOT}/ops/bridge-auth/gokapi-oidc-provision.sh" st="${REPO_ROOT}/ops/testing/gokapi-oidc-provision-selftest.sh"
+  if [ ! -f "${act}" ] || [ ! -f "${st}" ]; then record_skip "gokapi-oidc: sem ops/bridge-auth/gokapi-oidc-provision.sh (core-only) — nada a testar"; return; fi
+  command -v python3 >/dev/null 2>&1 || { record_skip "gokapi-oidc: sem python3 (o Logto simulado) → pulado"; return; }
+  local d; d="$(mktemp -d /tmp/gokapi-oidc-lint.XXXXXX)"
+  mkdir -p "${d}/ops/testing" "${d}/ops/bridge-auth"; cp "${st}" "${d}/ops/testing/"
+  cp "${REPO_ROOT}/ops/bridge-auth/logto-mapi.sh" "${REPO_ROOT}/ops/bridge-auth/logto-provision.sh" "${act}" "${d}/ops/bridge-auth/"
+  local want=30 o rc
+  if o="$(bash "${d}/ops/testing/gokapi-oidc-provision-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q "^selftest: ${want} ok · 0 falha(s)$" <<< "${o}"; then
+    record_pass "gokapi-oidc: (a) bancada do ato — ${want} casos (dry-run não grava, segredo fora da saída e do argv, idempotência, deriva, recusas sem mutação, undo, molde sobre a biblioteca)"
+  else record_fail "gokapi-oidc: (a) bancada" "rc=${rc}: $(grep -E '✗|^selftest' <<< "${o}" | head -4 | tr '\n' '|')"; rm -rf "${d}"; return; fi
+  local m from to n mo
+  while IFS= read -r m; do
+    [ -n "${m}" ] || continue
+    from="${m%%@@*}"; to="${m#*@@}"
+    n="$(grep -cF -- "${from}" "${act}" || true)"
+    if [ "${n}" != 1 ]; then record_fail "gokapi-oidc: (m)" "âncora aparece ${n}× (tem de ser 1): ${from:0:70}"; continue; fi
+    FROM="${from}" TO="${to}" perl -pe 's/\Q$ENV{FROM}\E/$ENV{TO}/' "${act}" > "${d}/ops/bridge-auth/gokapi-oidc-provision.sh"
+    if mo="$(bash "${d}/ops/testing/gokapi-oidc-provision-selftest.sh" 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -ne 0 ] && grep -q '^  ✗' <<< "${mo}"; then record_pass "gokapi-oidc: (m) mutante reprova: ${from:0:60}"
+    else record_fail "gokapi-oidc: (m)" "o mutante SOBREVIVEU (rc=${rc}): ${from:0:70}"; fi
+  done <<'MUT'
+  if [ "${APPLY}" != 1 ]; then say "   [DRY-RUN] ${_label}@@  if false; then say "   [DRY-RUN] ${_label}
+  if cred_matches "${_val}" "${_dst}"; then say@@  if false; then say
+  if [ "${APP_COUNT}" -gt 1 ]; then@@  if false; then
+  cred_put "${APP_SECRET}" "${CRED_SECRET}" "client secret"@@  say "${APP_SECRET}"; cred_put "${APP_SECRET}" "${CRED_SECRET}" "client secret"
+[ -n "${_uid}" ] || die 7@@true || die 7
+MUT
+  rm -rf "${d}"
+}
+
 # ── slack-persona (2026-11-06, degrau 2 do comms-stable-2026-11): o wrapper ops/slack-persona.sh (core-only) ──
 # (a) a bancada do wrapper (ops/testing/slack-persona-selftest.sh) passa com a contagem exata; (m) cada peça do wrapper
 # derrubada numa CÓPIA (o original nunca é tocado) faz a bancada reprovar com asserção caída. A cópia limpa passa antes.
@@ -45023,6 +45059,7 @@ _family run_bridge_hardening_selftests
 _family run_chat_runner_selftests
 _family run_migrate_python_service_selftests
 _family run_stt_service_selftests
+_family run_gokapi_oidc_selftests
 _family run_slack_persona_selftests
 _family run_update_bridge_selftests
 _family run_version_drift_selftests
