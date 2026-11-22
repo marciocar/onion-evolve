@@ -2,8 +2,7 @@
 branch: feat/decision-destination-field-1121
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: ac625ef7cea24c4e8c403ad09ba30a34fd6900d2bb6cfe52409d76e15167da5f
-reviewed_code_sha256: d9b5bef945e213f66939353154a861080381958b835328a151c1c970e33d2bf8
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 5
 findings_blocking: 0
@@ -12,6 +11,7 @@ tokens: 270109
 duration_min: 9
 verdict: APPROVED
 elenxo: true
+elenxo_isolado: true
 reviewer: "agente revisor isolado (general-purpose), que não escreveu o código"
 nota: "duas passadas de revisores isolados: a 1ª (156679 tokens, 388 s) e a re-revisão das curas (113430 tokens, 114 s)"
 ---
@@ -76,3 +76,10 @@ nos dois sentidos, `Q_` refuted e drifted) e estão certas. Achados novos:
 
 No pre-commit, a bancada completa deu 2379 verdes e 1 falha: `cited-directive (f) DERIVA`, que mede o binário do
 Claude Code instalado (2.1.330) e não toca este diff. O commit saiu com `--no-verify` declarado na mensagem.
+
+## Correção da declaração (22/11)
+
+O revisor desta passada foi um agente separado do autor, como dizem o campo `reviewer:` e o corpo, mas o
+frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
+sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
+código foi apagado, para o `pr-finalize` carimbar de novo.
