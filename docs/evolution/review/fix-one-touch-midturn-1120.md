@@ -2,7 +2,7 @@
 branch: fix/one-touch-midturn-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: a4a794c2a0fee2f5dacb6e7528af8d4a2b33bf7f657e8d0fc59d5f27f859c71b
+reviewed_diff_sha256: 43c27a8fa9e9b37f0560cba4d89290b61b313d8863181d529a22aa073c1588dc
 reviewed_code_sha256: 0db6bfb1a7503f1baed787c6f5b325b39b66ee73c5d9eacf758b8247200b9057
 findings_total: 7
 findings_real: 4
