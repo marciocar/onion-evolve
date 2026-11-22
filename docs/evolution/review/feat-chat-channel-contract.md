@@ -2,7 +2,8 @@
 branch: feat/chat-channel-contract
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 862d86a2583f2dc35f4eafd5e3348abe8a801d70c17f4b22322e2809b30a9420
+reviewed_code_sha256: 318c49c91417a415795441af2ba10a7287e760728bea238f545aa80db6cb7d51
 findings_total: 19
 findings_real: 19
 findings_blocking: 6
