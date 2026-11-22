@@ -1,9 +1,8 @@
 ---
 branch: feat/caddy-service-vhosts
-pr: pendente
+pr: 1737
 date: 2026-11-22
-reviewed_diff_sha256: cce9abcb1f84a72227131305160ca97838a677843ff718a6086bf04f2ca5d372
-reviewed_code_sha256: 2fd7fe25b519e6aa9114e3d764aca4390b4ddd068399cf67a3806b7d8a3ec4cc
+reviewed_diff_sha256: pendente
 findings_total: 17
 findings_real: 17
 findings_blocking: 3
@@ -133,3 +132,7 @@ Todos plantados por `ops/mutate-and-restore.sh`, com `LC_ALL=C`, contra a bancad
 - **Não rodei** `--check` nem o install no vivo, porque o `--check` lê os segredos do gmill para renderizar. Também não rodei a cerca no firewall vivo: as duas coisas são do maestro.
 - **Sem 3ª passada do refutador:** as curas da 2ª passada (placeholders, tls, allowlist) e a troca da coluna do clone para `~/` (a REGRA 121 (Grafo novo ou tocado não cita repositório não conferível por terceiro) barrou a home de conta na TSV) não foram re-revisadas por ele. A cobertura delas é a bancada (68/68, com casos de caddy real), os mutantes C13 a C15 e o ensaio real verde.
 - **Defasagem nomeada, fora do caminho:** o Caddy do host é 2.11.4, e a última é v2.11.9 (2026-11-05). Subir é deploy do maestro.
+
+## Re-revisão (rebase sobre a origin/main, 2026-11-22)
+
+O #1737 ficou em conflito com a main depois do PR aberto. O rebase é do `pr-finalize --rebase`. A main não tocou nenhum arquivo de conteúdo deste PR (`git diff --name-only HEAD...origin/main` sem `ops/install-caddy-config.sh`, `ops/egress-uid-fence.sh`, `ops/moat-targets.tsv`, `ops/caddy/`, o lint-selftest nem o grafo vps-shared-tools), então o conflito é de projeção gerada, regenerada pela máquina. O código revisado não muda: o diff volta a `pendente` para o carimbo novo, e as duas passadas do refutador acima seguem valendo para o mesmo código.
