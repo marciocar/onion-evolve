@@ -41,7 +41,7 @@ DEST="${1:-}"; SRC="${2:-}"
   || { echo "uso: adopter-guard-core.sh <DEST> <SOURCE_ROOT>" >&2; exit 2; }
 TSV="${DEST%/}/.claude/adopter-guard.tsv"
 
-_say() { printf 'adopter-guard: %s\n' "$*"; }
+_say() { printf 'adopter-guard: %s%s\n' "$*" "${CANON_VIA:+ · canônico: ${CANON_VIA}}"; }
 
 # _is_core <dir> — o checkout do core: caminho absoluto, sem carimbo, com o registro da federação
 # (relativo nunca vale: resolveria contra o cwd de quem roda o update)
@@ -55,6 +55,52 @@ case "${common}" in
   *) _say "pulada: a fonte ${SRC} não tem checkout principal resolvível (git-common-dir '${common}')"; exit 0 ;;
 esac
 _is_core "${CORE}" || { _say "pulada: ${CORE} não é o checkout do core (tem carimbo ou não tem o members.yaml) — a linha core é do maestro"; exit 0; }
+
+# ── A FONTE PODE SER UM CLONE (SAC-444, medido em 2026-11-22) ─────────────────────────────────────────
+# Quando a adoção roda de um CLONE do core (um `git clone` para um diretório temporário), o
+# `--git-common-dir` resolve para o próprio clone, e a linha core passava a apontar um diretório que some:
+# o veto do adotante ficava armado e sem lista no dia seguinte. Reproduzido numa adoção de teste: a linha
+# nasceu com o caminho do clone em scratch. O checkout CANÔNICO se acha por duas pistas, nesta ordem:
+#   1. o `local_path` do membro `kind: source` no members.yaml da fonte (o registro diz onde o core mora);
+#   2. o remoto `origin` da fonte, quando é um caminho local (clone feito de um checkout desta máquina).
+# Cada pista só vale se o candidato é um core válido E o MESMO repositório (um commit-raiz em comum): um
+# local_path de outro repo com o mesmo formato não sequestra a linha. Nenhuma pista vale → fica o
+# resolvido, como antes (num fork noutra máquina o clone É o checkout que fica), e a saída avisa.
+_roots() { git -C "$1" rev-list --max-parents=0 HEAD 2>/dev/null | sort -u; }
+_same_repo() {
+  local a b
+  a="$(_roots "$1")"; b="$(_roots "$2")"
+  [ -n "${a}" ] && [ -n "${b}" ] && [ -n "$(comm -12 <(printf '%s\n' "${a}") <(printf '%s\n' "${b}"))" ] && return 0
+  # clone RASO: a raiz dele é a borda do corte, não a do repo; vale o HEAD da fonte existir no candidato
+  b="$(git -C "$2" rev-parse -q --verify HEAD 2>/dev/null)" && [ -n "${b}" ] && git -C "$1" cat-file -e "${b}^{commit}" 2>/dev/null
+}
+_checkout_of() {  # <dir> → o checkout principal dele (o pai do git-common-dir), ou nada
+  local g
+  g="$(cd "$1" 2>/dev/null && g="$(git rev-parse --git-common-dir 2>/dev/null)" && cd "${g}" 2>/dev/null && pwd -P)" || return 1
+  case "${g}" in */.git) printf '%s' "${g%/.git}" ;; *) return 1 ;; esac
+}
+_source_local_path() {  # <core> → o local_path do membro kind: source do members.yaml dele (bloco a bloco)
+  awk '
+    /^[[:space:]]*-[[:space:]]+id:/ { if (k == "source" && lp != "") { print lp; exit } k = ""; lp = "" }
+    /^[[:space:]]+kind:[[:space:]]*/ { v = $0; sub(/^[[:space:]]+kind:[[:space:]]*/, "", v); sub(/[[:space:]#].*$/, "", v); k = v }
+    /^[[:space:]]+local_path:[[:space:]]*/ { v = $0; sub(/^[[:space:]]+local_path:[[:space:]]*"?/, "", v); sub(/["#[:space:]].*$/, "", v); lp = v }
+    END { if (k == "source" && lp != "") print lp }' "$1/docs/evolution/federation/members.yaml" 2>/dev/null | head -1
+}
+CANON_VIA=""
+_try_canon() {  # <candidato> <pista> → troca CORE quando o candidato é o mesmo core, válido, e outro diretório
+  local c="$1"
+  case "${c}" in "~/"*) c="${HOME}/${c#"~/"}" ;; esac
+  [ -n "${c}" ] && [ -d "${c}" ] || return 1
+  c="$(_checkout_of "${c}")" || return 1
+  _is_core "${c}" || return 1
+  [ "${c}" = "${CORE}" ] && return 0
+  _same_repo "${c}" "${CORE}" || return 1
+  CANON_VIA="$2 (a fonte ${CORE} é outro checkout do mesmo repo)"; CORE="${c}"; return 0
+}
+_try_canon "$(_source_local_path "${CORE}")" "local_path do membro kind: source" \
+  || { o="$(git -C "${CORE}" remote get-url origin 2>/dev/null)" || o=""; o="${o#file://}"
+       case "${o}" in /*) _try_canon "${o}" "remoto origin local" ;; *) false ;; esac; } \
+  || CANON_VIA="nenhuma pista do checkout canônico (local_path do kind: source nem origin local): ${CORE} é a fonte; se for um clone temporário, a linha some com ele"
 case "${CORE}" in *[[:space:]]*) _say "pulada: o caminho do core '${CORE}' tem espaço e a lib não o lê — declare à mão"; exit 0 ;; esac
 [ "$(cd "${DEST}" && pwd -P)" = "$(cd "${CORE}" && pwd -P)" ] && { _say "pulada: o destino é o próprio core"; exit 0; }
 

@@ -1,0 +1,145 @@
+# kg-backlog-guard: on
+# Três defeitos do /meta:adopt (SAC-444), sinais de um adotante na adoção greenfield de 2026-11-19: a linha
+# core do adopter-guard.tsv com caminho efêmero, a corrida entre a prova de vida do githook e a prova de
+# bloqueio, e o bytecode do Python sem .gitignore. Cada um foi reproduzido numa adoção de teste em scratch
+# (ops/materialize-adopter.sh, nunca um adotante real), curado em .claude/utils/adopt/ e posto na bancada.
+meta:
+  id: adopt-greenfield-defects-2026-11
+  schema_version: "1"
+  baseline: "2026-11-22"
+  review_after: "2026-12-22"   # 30d: defeito de adoção
+  # ═══ TETO: 7 NÓS ═══  (1 pergunta + 3 evidências + 3 decisões)
+nodes:
+  - id: Q_ADOPT_GREENFIELD_TRES_DEFEITOS_1122
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-22"
+    verified_against: "adoção de teste montada por ops/materialize-adopter.sh sobre origin/main 488dfdafe, com os helpers da branch fix/adopt-three-defects; famílias adopter_guard_core, secret_gitignore e prove_gate_blocks da bancada"
+    label: "os três defeitos da adoção greenfield (linha core efêmera, corrida das provas do gate, __pycache__ fora do .gitignore) estão curados no core e cobertos pela bancada"
+    narrative: "Aberta até o merge do PR e o próximo --update de um adotante real confirmar no campo. A cura do caminho efêmero não reescreve uma linha antiga que ainda aponte um clone vivo (é tratada como escolha do maestro); ela some quando o clone some e o update seguinte a troca."
+  - id: E_ADOPTER_GUARD_GRAVOU_O_CLONE_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-11-22"
+    verified_against: "adopter-guard-core.sh de origin/main 488dfdafe rodado com a fonte num clone do core em scratch"
+    trace: ".claude/utils/adopt/adopter-guard-core.sh"
+    label: "medido: com a fonte num clone temporário do core, a linha core do adopter-guard.tsv nasceu com o caminho do clone em scratch, não o do checkout canônico"
+    narrative: "O --git-common-dir de um clone resolve para o próprio clone. Depois da cura a mesma chamada grava o local_path do membro kind: source do members.yaml (o checkout que fica), e diz por qual pista chegou nele."
+    provenance:
+      source: "adoção de teste em scratch, sessão do core de 2026-11-22"
+      locator: "saída 'adopter-guard: escrita: arquivo novo com core <clone em scratch>'"
+      method: "measurement: helper real, arquivo lido depois"
+      locality: "repo"
+  - id: E_PROVAS_DO_GATE_SE_ATROPELAM_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "install-onion-githook.sh e prove-gate-blocks.sh de origin/main 488dfdafe contra a mesma adoção de teste, primeiro um de cada vez, depois juntos (o segundo 5 s depois)"
+    trace: ".claude/utils/adopt/prove-gate-blocks.sh"
+    label: "medido: sozinhos, o instalador sai rc 0 e a prova sai rc 0 com bloqueio PROVADO; juntos, a prova imprime bloqueio PROVADO e sai rc 4 INTEGRIDADE"
+    narrative: "O commit-sonda do verificador chamado pelo instalador faz commit e reset no checkout real enquanto a prova compara a foto do começo com a do fim. Com a trava, a mesma corrida dá rc 0 nos dois, e a prova diz que esperou."
+    provenance:
+      source: "adoção de teste em scratch, sessão do core de 2026-11-22"
+      locator: "logs par-install/par-prove (antes) e par2-install/par2-prove (depois) no scratch da sessão"
+      method: "measurement: scripts reais em paralelo, rc lido"
+      locality: "repo"
+  - id: E_PYCACHE_NAO_RASTREADO_NO_ADOTANTE_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.95
+    verified_at: "2026-11-22"
+    verified_against: "adoção de teste: .gitignore lido, import kg_gate pelo vendor/kg-ssot/tools, git status e kg_vendor.py check"
+    trace: ".claude/utils/adopt/ensure-secret-gitignore.sh"
+    label: "medido: o adotante nasceu com um .gitignore só de segredos; um import das ferramentas do vendor deixou vendor/kg-ssot/tools/__pycache__/ como não-rastreado e o kg_vendor.py check reprovou o vendor"
+    narrative: "Depois da cura, o __pycache__/ entra no .gitignore em qualquer nível. Teto: o kg_vendor.py check lê o disco, então o bytecode plantado continua acusando lá; o .gitignore tira o bytecode do commit, não do disco."
+    provenance:
+      source: "adoção de teste em scratch, sessão do core de 2026-11-22"
+      locator: "git status '?? vendor/kg-ssot/tools/__pycache__/' e '✗ extra tools/__pycache__/kg_gate.cpython-315.pyc'"
+      method: "measurement: comando real, saída lida"
+      locality: "repo"
+  - id: D_LINHA_CORE_PELO_CHECKOUT_CANONICO_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-22"
+    verified_against: "bancada adopter_guard_core, casos (i), (j), (k) e o mutante (MUT-canon)"
+    trace: ".claude/utils/adopt/adopter-guard-core.sh"
+    label: "a linha core segue o checkout canônico: primeiro o local_path do membro kind: source da fonte, depois o origin local, e só vale o candidato que é um core do MESMO repositório"
+    narrative: "Decisão da sessão de execução, pela opção recomendada. O mesmo repositório é um commit-raiz em comum (ou, em clone raso, o HEAD da fonte presente no candidato), para um local_path de outro repo não sequestrar a linha. Sem pista, fica a fonte, como antes (num fork noutra máquina o clone é o checkout que fica), e a saída avisa."
+    provenance:
+      source: "sessão de execução do core, PR da branch fix/adopt-three-defects (SAC-444)"
+      locator: ".claude/utils/adopt/adopter-guard-core.sh, bloco A FONTE PODE SER UM CLONE"
+      method: "testimony: decisão da sessão pela opção recomendada, declarada no PR e no resíduo de revisão"
+      locality: "repo"
+  - id: D_TRAVA_POR_REPOSITORIO_ENTRE_PROVAS_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-22"
+    verified_against: "bancada prove_gate_blocks, caso (r) e o mutante (MUT-race); a corrida real repetida com a cura"
+    trace: ".claude/utils/adopt/gate-probe-lock.sh"
+    label: "as duas provas do gate (o commit-sonda do verificador e a prova de bloqueio) se revezam por uma trava no git-dir comum do alvo"
+    narrative: "Decisão da sessão de execução: trava exclusiva (flock, com mkdir e pid onde não há flock), não serialização na ordem do adopt.md, porque a corrida mediu dois scripts chamados juntos por quem conduz, e só a trava cobre qualquer chamador. Não é a porta de admissão de carga: aquela limita quantos passos pesados rodam na máquina, esta impede dois provadores no mesmo repositório."
+    provenance:
+      source: "sessão de execução do core, PR da branch fix/adopt-three-defects (SAC-444)"
+      locator: ".claude/utils/adopt/gate-probe-lock.sh, cabeçalho"
+      method: "testimony: decisão da sessão pela opção recomendada, declarada no PR e no resíduo de revisão"
+      locality: "repo"
+  - id: D_PYCACHE_NO_MESMO_HELPER_DO_GITIGNORE_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-22"
+    verified_against: "bancada secret_gitignore, casos (d), (h), (i) e o mutante"
+    trace: ".claude/utils/adopt/ensure-secret-gitignore.sh"
+    label: "o __pycache__/ entra pelo mesmo helper que já garante o bloco de segredos, com a mesma régua: regra do adotante que já cubra é respeitada, bytecode versionado só avisa"
+    narrative: "Decisão da sessão de execução: um helper a mais pediria outra chamada no adopt.md e no materialize-adopter.sh para a mesma operação (garantir linhas no .gitignore). Roda na adoção e no --update, então os adotantes antigos recebem a linha no próximo update."
+    provenance:
+      source: "sessão de execução do core, PR da branch fix/adopt-three-defects (SAC-444)"
+      locator: ".claude/utils/adopt/ensure-secret-gitignore.sh, bloco BYTECODE"
+      method: "testimony: decisão da sessão pela opção recomendada, declarada no PR e no resíduo de revisão"
+      locality: "repo"
+edges:
+  - from: E_ADOPTER_GUARD_GRAVOU_O_CLONE_1122
+    to: Q_ADOPT_GREENFIELD_TRES_DEFEITOS_1122
+    edge_type: SUPPORTS
+  - from: E_PROVAS_DO_GATE_SE_ATROPELAM_1122
+    to: Q_ADOPT_GREENFIELD_TRES_DEFEITOS_1122
+    edge_type: SUPPORTS
+  - from: E_PYCACHE_NAO_RASTREADO_NO_ADOTANTE_1122
+    to: Q_ADOPT_GREENFIELD_TRES_DEFEITOS_1122
+    edge_type: SUPPORTS
+  - from: D_LINHA_CORE_PELO_CHECKOUT_CANONICO_1122
+    to: E_ADOPTER_GUARD_GRAVOU_O_CLONE_1122
+    edge_type: TRACES_TO
+  - from: D_TRAVA_POR_REPOSITORIO_ENTRE_PROVAS_1122
+    to: E_PROVAS_DO_GATE_SE_ATROPELAM_1122
+    edge_type: TRACES_TO
+  - from: D_PYCACHE_NO_MESMO_HELPER_DO_GITIGNORE_1122
+    to: E_PYCACHE_NAO_RASTREADO_NO_ADOTANTE_1122
+    edge_type: TRACES_TO

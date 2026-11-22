@@ -37,6 +37,7 @@ REPO="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 # Classe: a checagem perguntava "o .git é diretório?" quando a pergunta é "isto é um repo git?".
 # o helper do diagnóstico de worktree, resolvido ANTES do `cd` (o BASH_SOURCE pode ser relativo).
 WT_HELPER="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.claude/utils/adopt/worktree-hooks-ready.sh"
+_GPL="${WT_HELPER%/*}/gate-probe-lock.sh"   # a trava da sonda (SAC-444), pelo mesmo motivo
 git -C "${REPO}" rev-parse --git-dir >/dev/null 2>&1 || { echo "✗ '${REPO}' não é um repositório git"; exit 2; }
 cd "$REPO" || exit 2
 
@@ -123,11 +124,23 @@ CRIOU_COMMIT=0
 # `git add` do usuário pendente entraria no commit-sonda e seria commitado junto (e depois
 # "desfeito" por um reset que ele não pediu). Esta sonda vai rodar DENTRO do /meta:adopt:
 # ferramenta de verificação que altera o estado de quem verifica não é verificação, é dano.
+# TRAVA do repositório (SAC-444, medido em 2026-11-22): a sonda abaixo MEXE no checkout real (commit e
+# reset), e o `prove-gate-blocks.sh` rodando junto no mesmo alvo saía rc 4 INTEGRIDADE com a prova boa.
+# Quem chega com a trava tomada espera; o porquê inteiro está no cabeçalho da lib.
+if [ -f "${_GPL}" ]; then
+  # shellcheck source=../.claude/utils/adopt/gate-probe-lock.sh
+  . "${_GPL}"
+  if ! onion_gate_probe_lock .; then   # o cwd já é o REPO (que pode ter vindo relativo)
+    no "outra prova do gate segurou o repositório além de ${ONION_GATE_PROBE_LOCK_WAIT:-1800}s — a sonda NÃO rodou (não medido); rode de novo quando ela terminar"
+    exit 1
+  fi
+fi
 TMPIDX="$(mktemp -t onion-gate-idx.XXXXXX)"
 export GIT_INDEX_FILE="$TMPIDX"
 cleanup() {
   [ "$CRIOU_COMMIT" -eq 1 ] && git reset --soft HEAD~1 >/dev/null 2>&1
   rm -f "$PROBE" "$TMPIDX"
+  command -v onion_gate_probe_unlock >/dev/null 2>&1 && onion_gate_probe_unlock
 }
 trap cleanup EXIT
 

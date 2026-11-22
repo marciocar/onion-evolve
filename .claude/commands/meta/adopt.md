@@ -153,7 +153,7 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/assert-dest.sh" "$DEST" || exit 1   # (-1
 #     settings.local.json ignorados). Sinal de campo: um adotante legacy (2026-07-24, ignorava .claude/ em 2 linhas).
 #     Sem .gitignore ou sem ignore cego → no-op. Helper testável (lint-selftest.sh: scope-gitignore).
 bash "$SOURCE_ROOT/.claude/utils/adopt/scope-claude-gitignore.sh" "$DEST"
-bash "$SOURCE_ROOT/.claude/utils/adopt/ensure-secret-gitignore.sh" "$DEST"   # (0b) .gitignore de segredos (por quê: no cabeçalho do helper)
+bash "$SOURCE_ROOT/.claude/utils/adopt/ensure-secret-gitignore.sh" "$DEST"   # (0b) .gitignore de segredos e do bytecode do Python, `__pycache__/` (por quê: no cabeçalho do helper)
 
 # (0.5) LICENÇAS com NOME PRÓPRIO — nunca `LICENSE` (na raiz rege o REPO INTEIRO). Aqui porque é o único bloco que Fase 3 E `--update` invocam. Porquê completo: no helper.
 bash "$SOURCE_ROOT/.claude/utils/adopt/emit-licenses.sh" "$DEST" "$SOURCE_ROOT"

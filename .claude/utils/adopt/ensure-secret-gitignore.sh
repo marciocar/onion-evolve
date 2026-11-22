@@ -11,6 +11,15 @@
 #           respeitada e nada muda. Um `.env` JÁ VERSIONADO não é desfeito (gitignore não destrackeia):
 #           o script AVISA em voz alta, com o comando que o maestro roda se quiser.
 #
+# BYTECODE (SAC-444, medido em 2026-11-22): o bundle viaja com ferramentas Python (vendor/kg-ssot/tools,
+#           .claude/validation/*.py) e o adotante nascia sem `__pycache__/` no `.gitignore`. Numa adoção de
+#           teste, um `import kg_gate` plantou `vendor/kg-ssot/tools/__pycache__/` como não-rastreado: um
+#           `git add -A` o versiona, e o `kg_vendor.py check` reprova o vendor como divergente da tag. O mesmo
+#           helper garante o 2º bloco, pela mesma régua: regra do adotante que já cubra (`__pycache__`,
+#           `**/__pycache__/`, `*.pyc`, `*.py[cod]`) é respeitada; senão acrescenta. Bytecode JÁ versionado
+#           só avisa. Teto: o gitignore não apaga o `__pycache__/` do disco, e o `kg_vendor.py check` lê o
+#           disco; quem roda o Python do vendor sem `-B` ainda o planta (o gitignore só o tira do commit).
+#
 # USO     : ensure-secret-gitignore.sh <DEST>      → rc 0 (e imprime o que fez); rc 2 = uso errado
 # =============================================================================
 set -uo pipefail
@@ -39,6 +48,23 @@ else
   echo "ensure-secret-gitignore: bloco de segredos acrescentado a ${GI}"
 fi
 
+# bytecode do Python: já existe regra que o ignora? (o diretório em qualquer nível, ou os .pyc)
+_has_pyc_rule() {
+  [ -f "${GI}" ] || return 1
+  grep -qE '^[[:space:]]*(\*\*/)?__pycache__/?[[:space:]]*$|^[[:space:]]*\*\.py(c|\[[a-z]*c[a-z]*\])[[:space:]]*$' "${GI}"
+}
+if _has_pyc_rule; then
+  echo "ensure-secret-gitignore: o .gitignore já ignora __pycache__ — nada a fazer"
+else
+  {
+    [ -s "${GI}" ] && [ -n "$(tail -c1 "${GI}")" ] && echo
+    [ -s "${GI}" ] && echo
+    echo "# Bytecode do Python — gerado ao rodar as ferramentas do Onion, nunca versionado. Onion."
+    echo "__pycache__/"
+  } >> "${GI}"
+  echo "ensure-secret-gitignore: bloco de bytecode (__pycache__/) acrescentado a ${GI}"
+fi
+
 # um .env já VERSIONADO segue versionado: o gitignore não o desfaz
 if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
   _tracked="$(git -C "${DEST}" ls-files -- '.env' '.env.*' ':!.env.example' ':!.env.example.onion')" || _tracked=""
@@ -47,6 +73,12 @@ if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
     printf '     %s\n' ${_tracked}
     echo "   Para parar de versionar (sem apagar o arquivo local): git -C '${DEST}' rm --cached <arquivo>"
     echo "   E trate o segredo como VAZADO se o repo já foi enviado a algum remoto."
+  fi
+  _pyc="$(git -C "${DEST}" ls-files -- '*__pycache__/*' '*.pyc')" || _pyc=""
+  if [ -n "${_pyc}" ]; then
+    echo "⚠️  ensure-secret-gitignore: bytecode do Python JÁ VERSIONADO — o .gitignore não o desfaz:"
+    printf '     %s\n' ${_pyc}
+    echo "   Para parar de versionar (sem apagar o local): git -C '${DEST}' rm -r --cached <caminho>"
   fi
 fi
 exit 0

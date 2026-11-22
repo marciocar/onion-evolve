@@ -20486,10 +20486,36 @@ run_secret_gitignore_selftests() {
   else record_fail "secret-gitignore: (b/c)" "perdeu linha do adotante, colou na última, ou não é idempotente"; fi
   rm -rf "${d}"
   # (d) regra do adotante que já cobre .env → nada muda
-  d="$(mktemp -d)"; printf '*.env\n' > "${d}/.gitignore"; before="$(cat "${d}/.gitignore")"
+  d="$(mktemp -d)"; printf '*.env\n*.py[cod]\n' > "${d}/.gitignore"; before="$(cat "${d}/.gitignore")"
   bash "${helper}" "${d}" >/dev/null 2>&1
-  if [ "$(cat "${d}/.gitignore")" = "${before}" ]; then record_pass "secret-gitignore: (d) regra própria do adotante respeitada"
-  else record_fail "secret-gitignore: (d)" "acrescentou bloco sobre uma regra que já cobria .env"; fi
+  if [ "$(cat "${d}/.gitignore")" = "${before}" ]; then record_pass "secret-gitignore: (d) regras próprias do adotante (.env e bytecode) respeitadas"
+  else record_fail "secret-gitignore: (d)" "acrescentou bloco sobre uma regra que já cobria .env ou o bytecode"; fi
+  rm -rf "${d}"
+  # (h) BYTECODE (SAC-444): o adotante nascia sem __pycache__/ e um `import` das ferramentas do vendor o
+  #     deixava como não-rastreado (medido numa adoção de teste). Greenfield → o bloco nasce, o git ignora
+  #     o diretório em qualquer nível, e a 2ª rodada não duplica. MUTANTE: sem a linha, o caso vira.
+  _sg_pyc() {  # $1=helper → 0 quando o __pycache__ aninhado sai ignorado e a 2ª rodada é no-op
+    local g; g="$(mktemp -d)"; git -C "${g}" init -q >/dev/null 2>&1
+    bash "$1" "${g}" >/dev/null 2>&1; local b; b="$(cat "${g}/.gitignore" 2>/dev/null)"
+    bash "$1" "${g}" >/dev/null 2>&1
+    mkdir -p "${g}/vendor/kg-ssot/tools/__pycache__"; : > "${g}/vendor/kg-ssot/tools/__pycache__/kg_gate.cpython-312.pyc"
+    git -C "${g}" check-ignore -q vendor/kg-ssot/tools/__pycache__/kg_gate.cpython-312.pyc \
+      && [ "$(cat "${g}/.gitignore")" = "${b}" ] && [ -z "$(git -C "${g}" status --porcelain --untracked-files=all -- vendor)" ]
+    local rc=$?; rm -rf "${g}"; return "${rc}"
+  }
+  if _sg_pyc "${helper}"; then record_pass "secret-gitignore: (h) greenfield nasce com __pycache__/ ignorado em qualquer nível, e a 2ª rodada é no-op"
+  else record_fail "secret-gitignore: (h)" "o __pycache__ do vendor ficou não-rastreado, ou a 2ª rodada mudou o .gitignore"; fi
+  local mut; mut="$(mktemp)"; sed 's|^    echo "__pycache__/"$|    :|' "${helper}" > "${mut}"
+  if cmp -s "${mut}" "${helper}"; then record_fail "secret-gitignore: (h) MUT" "o sed não trocou a linha — mutante não plantado"
+  elif ! _sg_pyc "${mut}"; then record_pass "secret-gitignore: (h) MUT sem a linha __pycache__/ o bytecode volta a aparecer como não-rastreado — o caso morde"
+  else record_fail "secret-gitignore: (h) MUT" "o mutante sobreviveu"; fi
+  rm -f "${mut}"; unset -f _sg_pyc
+  # (i) bytecode JÁ versionado → aviso explícito com o comando (o gitignore não o desfaz)
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/t/__pycache__"; : > "${d}/t/__pycache__/m.pyc"; git -C "${d}" add -f t
+  out="$(bash "${helper}" "${d}" 2>&1)"
+  if grep -q 'bytecode do Python JÁ VERSIONADO' <<< "${out}" && grep -qF 't/__pycache__/m.pyc' <<< "${out}"; then
+    record_pass "secret-gitignore: (i) bytecode já versionado → aviso com o caminho"
+  else record_fail "secret-gitignore: (i)" "o bytecode versionado passou calado: '${out}'"; fi
   rm -rf "${d}"
   # (e) .env JÁ versionado → avisa em voz alta (não destrackeia)
   d="$(mktemp -d)"; git -C "${d}" init -q; printf 'X=1\n' > "${d}/.env"; git -C "${d}" add .env
@@ -20572,6 +20598,51 @@ run_adopter_guard_core_selftests() {
     if [ "${before}" != "${after}" ]; then
       record_pass "adopter-guard-core: (g) MUT sem ler a linha core existente a 2ª rodada duplica a linha — a idempotência morde"
     else record_fail "adopter-guard-core: (g) MUT" "o mutante sobreviveu: a 2ª rodada não mudou o arquivo"; fi
+  fi
+  # (i)-(k) FONTE CLONE (SAC-444, medido em 2026-11-22): adotando de um clone temporário do core, a linha
+  #     nascia com o caminho do CLONE, que some. Um core "canônico" com o members.yaml COMMITADO (o membro
+  #     kind: source declara local_path = ele) e um clone dele com origin trocado por URL (a pista 2 calada).
+  local canon="${t}/canon" cl="${t}/canon-clone" other="${t}/other-core"
+  mkdir -p "${canon}/docs/evolution/federation"
+  git -C "${canon}" init -q -b main >/dev/null 2>&1
+  canon="$(cd "${canon}" && pwd -P)"
+  printf 'members:\n  - id: core-x\n    role: source\n    kind: source\n    local_path: "%s"   # o checkout que fica\n  - id: outro\n    kind: adopter\n    local_path: "/nao/e/este"\n' "${canon}" \
+    > "${canon}/docs/evolution/federation/members.yaml"
+  git -C "${canon}" add -A >/dev/null 2>&1; git -C "${canon}" -c user.email=f@onion.invalid -c user.name=f -c commit.gpgsign=false commit -qm init >/dev/null 2>&1
+  git clone -q "${canon}" "${cl}" >/dev/null 2>&1; git -C "${cl}" remote set-url origin https://exemplo.invalid/core.git
+  cl="$(cd "${cl}" && pwd -P)"
+  _agc_dest 8; out="$(bash "${helper}" "${d}" "${cl}" 2>&1)"
+  if grep -qxF "$(printf 'core\t%s' "${canon}")" "${tsv}" && grep -q 'canônico: local_path do membro kind: source' <<< "${out}"; then
+    record_pass "adopter-guard-core: (i) fonte = CLONE do core → a linha aponta o checkout canônico (local_path do kind: source), não o clone"
+  else record_fail "adopter-guard-core: (i)" "linha: $(tr '\t\n' '>|' < "${tsv}") · saída '${out}'"; fi
+  # (j) sem a pista do registro (local_path aponta outro lugar), o origin LOCAL do clone acha o canônico
+  local cl2="${t}/canon-clone2"; git clone -q "${canon}" "${cl2}" >/dev/null 2>&1; cl2="$(cd "${cl2}" && pwd -P)"
+  sed -i.bak "s|local_path: \"${canon}\"|local_path: \"/nao/existe\"|" "${cl2}/docs/evolution/federation/members.yaml"
+  _agc_dest 9; out="$(bash "${helper}" "${d}" "${cl2}" 2>&1)"
+  if grep -qxF "$(printf 'core\t%s' "${canon}")" "${tsv}" && grep -q 'canônico: remoto origin local' <<< "${out}"; then
+    record_pass "adopter-guard-core: (j) clone com origin LOCAL e registro sem pista → o origin acha o checkout canônico"
+  else record_fail "adopter-guard-core: (j)" "linha: $(tr '\t\n' '>|' < "${tsv}") · saída '${out}'"; fi
+  # (k) IDENTIDADE: local_path que aponta um core válido de OUTRO repositório (sem commit em comum) não sequestra
+  #     a linha; fica a fonte, e a saída avisa que ela pode ser um clone temporário
+  mkdir -p "${other}/docs/evolution/federation"; : > "${other}/docs/evolution/federation/members.yaml"
+  git -C "${other}" init -q >/dev/null 2>&1; git -C "${other}" -c user.email=f@onion.invalid -c user.name=f -c commit.gpgsign=false commit -q --allow-empty -m outro >/dev/null 2>&1
+  other="$(cd "${other}" && pwd -P)"
+  local cl3="${t}/canon-clone3"; git clone -q "${canon}" "${cl3}" >/dev/null 2>&1; git -C "${cl3}" remote set-url origin https://exemplo.invalid/core.git
+  cl3="$(cd "${cl3}" && pwd -P)"
+  sed -i.bak "s|local_path: \"${canon}\"|local_path: \"${other}\"|" "${cl3}/docs/evolution/federation/members.yaml"
+  _agc_dest 10; out="$(bash "${helper}" "${d}" "${cl3}" 2>&1)"
+  if grep -qxF "$(printf 'core\t%s' "${cl3}")" "${tsv}" && grep -q 'nenhuma pista do checkout canônico' <<< "${out}"; then
+    record_pass "adopter-guard-core: (k) local_path de OUTRO repositório não sequestra a linha (identidade por commit-raiz); a saída avisa do clone"
+  else record_fail "adopter-guard-core: (k)" "linha: $(tr '\t\n' '>|' < "${tsv}") · saída '${out}'"; fi
+  # (MUT-canon) sem a pista do registro, (i) volta a gravar o caminho do clone
+  local mutc="${t}/mut-canon.sh"
+  sed 's|^_try_canon "$(_source_local_path "${CORE}")"|false "$(_source_local_path "${CORE}")"|' "${helper}" > "${mutc}"
+  if cmp -s "${mutc}" "${helper}"; then record_fail "adopter-guard-core: (MUT-canon)" "o sed não trocou a pista — mutante não plantado"
+  else
+    _agc_dest 11; bash "${mutc}" "${d}" "${cl}" >/dev/null 2>&1
+    if grep -qxF "$(printf 'core\t%s' "${cl}")" "${tsv}"; then
+      record_pass "adopter-guard-core: (MUT-canon) sem ler o local_path do kind: source, a linha volta a apontar o clone — o caso (i) morde"
+    else record_fail "adopter-guard-core: (MUT-canon)" "o mutante sobreviveu: $(tr '\t\n' '>|' < "${tsv}")"; fi
   fi
   # (h) o adopt CHAMA o helper e o relatório tem a seção (helper que ninguém chama é guarda morta)
   if grep -q 'adopter-guard-core.sh' "${REPO_ROOT}/.claude/commands/meta/adopt.md" && grep -qF 'a linha `adopter-guard: …` do passo (0.6)' "${REPO_ROOT}/.claude/commands/meta/adopt.md"; then
@@ -35806,6 +35877,7 @@ LINT
       ignore) printf '#!/usr/bin/env bash\nbash "$(git rev-parse --show-toplevel)/.claude/validation/lint-artifacts.sh" || true\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
       nocite) printf '#!/usr/bin/env bash\ncase "$(git diff --cached --name-only)" in *inventory*) echo "barrado por outro gestor"; exit 1 ;; esac\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
       lintall) printf '#!/usr/bin/env bash\nbash "$(git rev-parse --show-toplevel)/.claude/validation/lint-artifacts.sh"\nexit 1\n' > "${r}/.githooks/pre-commit" ;;
+      slow)   printf '#!/usr/bin/env bash\nsleep 2\nexec bash "$(git rev-parse --show-toplevel)/.claude/validation/lint-artifacts.sh"\n' > "${r}/.githooks/pre-commit" ;;
       none)   rmdir "${r}/.githooks" ;;
     esac
     [ -f "${r}/.githooks/pre-commit" ] && chmod +x "${r}/.githooks/pre-commit"
@@ -35961,6 +36033,39 @@ LINT
     record_pass "prove-gate-blocks: (l) hook symlink absoluto roda no sandbox (cp -aL) → PROVADO, nada escrito no alvo"
   else record_fail "prove-gate-blocks: (l)" "rc=${_r} intacto=${_intact} carimbo-no-alvo=$([ -e "${tl}/.githooks/carimbo-do-hook.txt" ] && echo sim || echo não) última='$(_pg_last)'"; fi
   rm -f "${tl}/.githooks/carimbo-do-hook.txt"
+
+  # (r) CORRIDA (SAC-444, medida numa adoção greenfield de teste): o install-onion-githook.sh e esta prova
+  #     rodaram juntos no mesmo checkout, e o commit-sonda do verificador mudou HEAD e status no meio da foto;
+  #     a prova imprimiu PROVADO e saiu rc 4. Aqui um COMPETIDOR pega a trava do repositório, mexe no checkout
+  #     real (como a sonda) e o restaura 3 s depois. Com a trava, a prova ESPERA, diz que esperou, e sai
+  #     PROVADO; sem ela (MUTANTE), a foto do começo pega o checkout mexido e a do fim o restaurado: rc 4.
+  #     O hook `slow` (2 s por commit) garante que a prova sem trava atravessa a restauração.
+  local tr="${d}/r"; _pg_mk "${tr}" slow
+  _pg_race() {  # $1=script → _o, _r
+    local lib="${REPO_ROOT}/.claude/utils/adopt/gate-probe-lock.sh" mk="${d}/race-ready" i=0 bp
+    rm -f "${mk}"
+    ( . "${lib}"; onion_gate_probe_lock "${tr}" || exit 1
+      printf 'sonda\n' > "${tr}/.onion-gate-probe.tmp"; : > "${mk}"; sleep 3; rm -f "${tr}/.onion-gate-probe.tmp" ) &
+    bp=$!
+    while [ ! -e "${mk}" ] && [ "${i}" -lt 300 ]; do sleep 0.1; i=$((i + 1)); done
+    _r=0; _o="$(TMPDIR="${d}/tmp" bash "$1" "${tr}" 2>&1)" || _r=$?
+    wait "${bp}" 2>/dev/null
+  }
+  _pg_race "${pg}"
+  if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO"* ]] && grep -q 'outra prova do gate segura' <<< "${_o}"; then
+    record_pass "prove-gate-blocks: (r) outro provador segurando o repositório → a prova espera, diz que esperou, e sai PROVADO com a foto íntegra"
+  else record_fail "prove-gate-blocks: (r)" "rc=${_r} última='$(_pg_last)'"; fi
+  # a lib ao lado do mutante: sem ela o mutante pularia a trava pelo `[ -f ]` e o sed não mediria nada
+  cp "${REPO_ROOT}/.claude/utils/adopt/gate-probe-lock.sh" "${d}/gate-probe-lock.sh"
+  local mrace="${d}/mut-race.sh"; sed 's|^  onion_gate_probe_lock "${T}" \\$|  true \\|' "${pg}" > "${mrace}"
+  if cmp -s "${pg}" "${mrace}"; then record_fail "prove-gate-blocks: (MUT-race) setup" "a mutação não foi aplicada (a âncora do sed mudou?)"
+  else
+    _pg_race "${mrace}"
+    if [ "${_r}" -eq 4 ] && [[ "$(_pg_last)" == *"checkout real do alvo mudou"* ]]; then
+      record_pass "prove-gate-blocks: (MUT-race) sem a trava, a sonda do outro provador derruba a prova em INTEGRIDADE (rc 4) — o caso morde"
+    else record_fail "prove-gate-blocks: (MUT-race)" "o mutante sobreviveu: rc=${_r} última='$(_pg_last)'"; fi
+  fi
+  unset -f _pg_race
 
   # ── MUTANTES — cada um tira uma decisão e o caso que a mede tem de virar ───────────────────────────
   _pg_mut() {  # $1=nome · $2=sed · $3=alvo · $4=padrão que a última linha do ORIGINAL tem e o mutante perde

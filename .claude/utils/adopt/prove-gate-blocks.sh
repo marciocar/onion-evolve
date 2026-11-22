@@ -76,6 +76,18 @@ T="$(git -C "${T_IN}" rev-parse --show-toplevel 2>/dev/null)" \
 T_HEAD="$(git -C "${T}" rev-parse --verify -q HEAD 2>/dev/null)" \
   || verdict_no 3 "o alvo não tem commits (sem HEAD de onde montar o sandbox)"
 
+# ── 0. TRAVA do repositório (SAC-444): ANTES da foto. Medido numa adoção greenfield de teste: com o
+# `install-onion-githook.sh` rodando junto, o commit-sonda dele (no checkout real) mudou HEAD e status no
+# meio desta prova, e ela saiu rc 4 INTEGRIDADE logo depois de imprimir bloqueio PROVADO. A trava faz as
+# duas provas se revezarem; o porquê inteiro está no cabeçalho da lib.
+_GPL="$(dirname "${BASH_SOURCE[0]}")/gate-probe-lock.sh"
+if [ -f "${_GPL}" ]; then
+  # shellcheck source=gate-probe-lock.sh
+  . "${_GPL}"
+  onion_gate_probe_lock "${T}" \
+    || verdict_no 3 "outra prova do gate segurou o repositório do alvo além de ${ONION_GATE_PROBE_LOCK_WAIT:-1800}s — rode de novo quando ela terminar"
+fi
+
 # ── 1. FOTO do checkout real ────────────────────────────────────────────────────────────────────────
 # HEAD, branch, status (com untracked) e config local. As OUTRAS refs ficam de fora de propósito, e foi
 # medido no dogfood (2026-10-20): com a foto incluindo `for-each-ref`, a prova contra um clone do
@@ -111,7 +123,11 @@ finish() {
   rm -rf "${SB}" 2>/dev/null
   # A integridade é conferida em TODA saída, inclusive nas de NÃO PROVADO: o sandbox existiu e pode ter
   # escapado. Divergência troca o veredito por INTEGRIDADE, porque mais nada importa se o alvo mudou.
-  if [ "$(snapshot)" != "${SNAP_BEFORE}" ]; then
+  local same=1; [ "$(snapshot)" = "${SNAP_BEFORE}" ] || same=0
+  # a trava sai DEPOIS da 2ª foto: até ela, nenhum outro provador mexe no checkout (no caminho com
+  # flock ela morreria com o processo; o unlock cobre o caminho sem flock)
+  command -v onion_gate_probe_unlock >/dev/null 2>&1 && onion_gate_probe_unlock
+  if [ "${same}" -eq 0 ]; then
     echo "✗ INTEGRIDADE: o checkout real de ${T} MUDOU durante a prova (HEAD, branch, status ou config)."
     echo "bloqueio NÃO PROVADO: o checkout real do alvo mudou durante a prova — confira git status e git reflog em ${T}"
     exit 4
