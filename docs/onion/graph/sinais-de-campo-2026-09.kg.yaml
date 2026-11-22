@@ -1910,7 +1910,7 @@ nodes:
     verified_at: "2026-11-22"
     verified_against: "reproduzido no core em 2026-11-22 sobre origin/main 399f84a81: 5 grafos de docs/onion/graph convertidos com o kg_migrate.py format --to json vendorizado (4.56.0) num repo de scratch; o kg-radar.sh deu rc 0 no .kg.yaml e rc 1 no .kg.json com a linha nenhum nó encontrado"
     label: "O kg-radar.sh lia YAML por linha e reprovava com rc 1 todo .kg.json correto (nenhum nó encontrado), o formato que a kg-ssot 4.56.0 passou a produzir: item 3 do sinal do hub de 2026-11-21."
-    narrative: "Os itens 1 e 2 do mesmo sinal (o kg_gate.py não descobre os .kg.json rastreados e as external_edges no perfil JSON) são do produto kg-ssot, que já os tem em consulta Delphi repassada ao hub pelo core; não ganham nó aqui. O kg-contract-check.sh já lê .kg.json, porque julga pelo kg_gate do vendor: medido no mesmo scratch, ele julgou o grafo convertido e só acusou a ponta externa ausente, que é do scratch."
+    narrative: "Os itens 1 e 2 do mesmo sinal (o kg_gate.py não descobre os .kg.json rastreados e as external_edges no perfil JSON) são do produto kg-ssot, que já os tem em consulta Delphi repassada ao hub pelo core; não ganham nó aqui. O kg-contract-check.sh abria o .kg.json mas o lia pelo caminho YAML (texto cru ao kg_gate.measure_texts, sem o as_source do perfil JSON): um .kg.json com vírgula sobrando, comentário ou corpo em YAML saía conforme ali e reprovava no kg_validate (achado da passada adversarial, medido). Curado no mesmo PR com o as_source, caso (a2) da bancada kg_contract_check."
     trace: "docs/evolution/inbox/_processed/2026-11-21-signal-gate-ignores-kg-json.md"
     provenance:
       source: ".claude/validation/kg-radar.sh"
@@ -1925,9 +1925,9 @@ nodes:
     impact: 4
     confidence: 0.9
     verified_at: "2026-11-22"
-    verified_against: "bancada radar_json_format (5 casos) e 6 mutantes plantados pelo mutate-and-restore.sh; 75 rodadas (5 grafos do core em 15 modos) com rc igual nos dois formatos"
+    verified_against: "bancada radar_json_format e mutantes plantados pelo mutate-and-restore.sh; os 75 grafos de docs/onion/graph convertidos pelo kg_migrate e comparados em 15 modos, rc igual nos dois formatos"
     label: "O kg-radar.sh lê o .kg.json no ponto de leitura: o json da biblioteca padrão traduz para o YAML de bloco que o mesmo awk já lê, e chave repetida, NaN ou sintaxe fora da RFC 8259 param com rc 2."
-    narrative: "Um formato, um veredito: nenhum segundo parser de grafo. A tradução impõe id no início do item de nodes e from no início do item de edges, porque o awk depende dessas ordens e o mapa do JSON não tem ordem. Teto declarado: o texto livre aparece com o valor do JSON, e o escape escrito à mão no .kg.yaml não volta; nas 75 rodadas, 8 saídas diferem só nesses campos, e as colunas estruturadas e o rc são iguais em todas."
+    narrative: "Um formato, um veredito: nenhum segundo parser de grafo. A tradução impõe id no início do item de nodes e from no início do item de edges, porque o awk depende dessas ordens e o mapa do JSON não tem ordem. Valor aninhado além do campo do nó vai em flow numa linha (o awk lê status:, trace: e impact: em qualquer coluna), meta vem antes de nodes e edges, e null vira campo vazio: as três curas vieram da passada adversarial, que achou nó fantasma, status sobrescrito, review_after ignorado e trace null contado como proveniência. Tetos declarados: o texto livre aparece com o valor do JSON, sem o escape escrito à mão no .kg.yaml, e a linha citada numa acusação é a do arquivo traduzido."
     trace: ".claude/validation/kg-radar.sh"
     provenance:
       source: ".claude/validation/lint-selftest.sh"

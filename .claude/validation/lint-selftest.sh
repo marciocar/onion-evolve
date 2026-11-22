@@ -3839,10 +3839,11 @@ JSON
   printf '{"meta": {"schema_version": "1"}, "nodes": [ {"id": "A",} ]}\n' > "${d}/broken.kg.json"
   printf '{"meta": {}, "nodes": [{"id": "A", "impact": NaN}]}\n' > "${d}/nan.kg.json"
   printf '[1, 2]\n' > "${d}/list.kg.json"
-  local f bad=""
-  for f in broken nan list; do
-    rj=0; bash "${rad}" "${d}/${f}.kg.json" --integrity >/dev/null 2>&1 || rj=$?
-    [ "${rj}" = 2 ] || bad="${bad} ${f}=${rj}"
+  local f bad="" code
+  for f in broken:parse.yaml-error nan:parse.yaml-error list:parse.root-not-mapping; do
+    code="${f#*:}"; f="${f%%:*}"
+    rj=0; oj="$(bash "${rad}" "${d}/${f}.kg.json" --integrity 2>&1)" || rj=$?
+    { [ "${rj}" = 2 ] && grep -qF "(${code})" <<< "${oj}"; } || bad="${bad} ${f}=${rj}"
   done
   if [ -z "${bad}" ]; then record_pass "radar-json: (d) JSON fora da RFC 8259, NaN e raiz que não é objeto → rc 2 (erro de arquivo, nunca veredito)"
   else record_fail "radar-json: (d)" "rc esperado 2:${bad}"; fi
@@ -3851,6 +3852,70 @@ JSON
   if grep -q 'MODO PROPOSTA (sufixo .proposal.kg.json)' <<< "${oj}"; then
     record_pass "radar-json: (e) sufixo .proposal.kg.json liga o modo proposta, como o .proposal.kg.yaml"
   else record_fail "radar-json: (e)" "rc=${rj}; o modo proposta não engatou pelo sufixo .kg.json"; fi
+  # (f) NULL é VAZIO, como no .kg.yaml (`campo:` sem valor). Achado da passada adversarial: a 1ª tradução
+  #     escrevia a palavra null, e o awk a lia como texto: layer null reprovava (rc 1, o yaml dava 0) e
+  #     trace null contava como proveniência ancorada (o yaml acusava decisão sem proveniência).
+  printf 'meta:\n  schema_version: "1"\nnodes:\n  - id: A\n    node_type: decision\n    plane: DEV\n    status: open\n    layer:\n    trace:\n    impact: 3\n    confidence: 0.5\n    label: x\n  - id: B\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: y\nedges:\n  - from: B\n    edge_type: SUPPORTS\n    to: A\n' > "${d}/nul.kg.yaml"
+  printf '{"meta": {"schema_version": "1"}, "nodes": [{"id": "A", "node_type": "decision", "plane": "DEV", "status": "open", "layer": null, "trace": null, "impact": 3, "confidence": 0.5, "label": "x"}, {"id": "B", "node_type": "claim", "plane": "DEV", "status": "open", "impact": 3, "confidence": 0.5, "label": "y"}], "edges": [{"from": "B", "edge_type": "SUPPORTS", "to": "A"}]}\n' > "${d}/nul.kg.json"
+  ry=0; oy="$(bash "${rad}" "${d}/nul.kg.yaml" --all 2>&1 | sed "s#${d}/nul.kg.yaml#G#g")" || ry=$?
+  rj=0; oj="$(bash "${rad}" "${d}/nul.kg.json" --all 2>&1 | sed "s#${d}/nul.kg.json#G#g")" || rj=$?
+  if [ "${ry}" = "${rj}" ] && [ "${oy}" = "${oj}" ] && grep -q 'decisão-sem-proveniência: A' <<< "${oj}"; then
+    record_pass "radar-json: (f) null no .kg.json = campo vazio no .kg.yaml (layer e trace nulos dão o mesmo veredito)"
+  else record_fail "radar-json: (f)" "rc yaml=${ry} json=${rj}; saídas $( [ "${oy}" = "${oj}" ] && echo iguais || echo DIFERENTES)"; fi
+  # (g)-(j) ACHADOS DA PASSADA ADVERSARIAL, cada um um JSON válido no contrato que a 1ª tradução lia errado.
+  #   (g) mapa aninhado num campo x_ com status/trace dentro: em bloco, o awk o lia como campo do NÓ (a decisão
+  #       aberta sumia da fila e ganhava proveniência). Par: o mesmo mapa em flow no .kg.yaml.
+  #   (i) lista de mapas com id num campo x_: em bloco virava nó fantasma (id duplicado, rc 1).
+  #   (j) quebra de linha num label forjando "status: done": sem o escape, o nó saía da fila.
+  local base='"meta": {"schema_version": "1"}, "edges": [{"from": "B", "edge_type": "SUPPORTS", "to": "A"}]'
+  local nodeb='{"id": "B", "node_type": "claim", "plane": "DEV", "status": "open", "impact": 3, "confidence": 0.5, "trace": "b.sh", "label": "y"}'
+  local yb='meta:\n  schema_version: "1"\nnodes:\n  - id: A\n    node_type: decision\n    plane: DEV\n    status: open\n    impact: 5\n    confidence: 0.9\n    label: x\n%b  - id: B\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    trace: b.sh\n    label: "y"\nedges:\n  - from: B\n    edge_type: SUPPORTS\n    to: A\n'
+  printf "${yb}" '    x_prev: {status: done, trace: "nada.sh"}\n' > "${d}/xm.kg.yaml"
+  printf '{%s, "nodes": [{"id": "A", "node_type": "decision", "plane": "DEV", "status": "open", "impact": 5, "confidence": 0.9, "label": "x", "x_prev": {"status": "done", "trace": "nada.sh"}}, %s]}\n' "${base}" "${nodeb}" > "${d}/xm.kg.json"
+  printf "${yb}" '    x_history: [{id: B, status: done, impact: 1}]\n' > "${d}/xl.kg.yaml"
+  printf '{%s, "nodes": [{"id": "A", "node_type": "decision", "plane": "DEV", "status": "open", "impact": 5, "confidence": 0.9, "label": "x", "x_history": [{"id": "B", "status": "done", "impact": 1}]}, %s]}\n' "${base}" "${nodeb}" > "${d}/xl.kg.json"
+  printf '{%s, "nodes": [{"id": "A", "node_type": "decision", "plane": "DEV", "status": "open", "impact": 5, "confidence": 0.9, "label": "x\\n    status: done"}, %s]}\n' "${base}" "${nodeb}" > "${d}/nl.kg.json"
+  local tag pair m2 okg=1
+  for pair in g:xm i:xl; do
+    tag="${pair%%:*}"; f="${pair#*:}"
+    for m2 in --all --open-tsv --provenance --integrity; do
+      ry=0; oy="$(bash "${rad}" "${d}/${f}.kg.yaml" "${m2}" 2>&1 | sed "s#${d}/${f}.kg.yaml#G#g")" || ry=$?
+      rj=0; oj="$(bash "${rad}" "${d}/${f}.kg.json" "${m2}" 2>&1 | sed "s#${d}/${f}.kg.json#G#g")" || rj=$?
+      if [ "${ry}" != "${rj}" ] || [ "${oy}" != "${oj}" ]; then okg=0; record_fail "radar-json: (${tag}) ${f} ${m2}" "rc yaml=${ry} json=${rj}; saídas $( [ "${oy}" = "${oj}" ] && echo iguais || echo DIFERENTES)"; fi
+    done
+    [ "${okg}" = 1 ] && record_pass "radar-json: (${tag}) valor aninhado num campo x_ fica em flow: mesmo rc e mesma saída do .kg.yaml (fila, proveniência, integridade)"
+    okg=1
+  done
+  rj=0; oj="$(bash "${rad}" "${d}/nl.kg.json" --open-tsv 2>&1)" || rj=$?
+  if [ "${rj}" = 0 ] && grep -q $'\tA\t' <<< "${oj}"; then
+    record_pass "radar-json: (j) quebra de linha no label não forja campo: o nó A segue na fila de abertos"
+  else record_fail "radar-json: (j)" "rc=${rj}; A sumiu da fila (o \\n virou linha status: done)"; fi
+  #   (h) chaves do topo em ordem alfabética (jq -S, sort_keys): edges antes de meta. O awk fecha o meta na 1ª
+  #       seção, e o review_after vencido sumia (o --validade dizia que o grafo não o declarava).
+  printf '{"edges": [{"from": "B", "edge_type": "SUPPORTS", "to": "A"}], "meta": {"review_after": "2026-02-01", "schema_version": "1"}, "nodes": [{"id": "A", "node_type": "decision", "plane": "DEV", "status": "open", "impact": 5, "confidence": 0.9, "trace": "a.sh", "label": "x"}, %s]}\n' "${nodeb}" > "${d}/sorted.kg.json"
+  #       E o mesmo defeito no .kg.yaml, latente: com schema_version como 1ª chave de meta, a coluna dos campos
+  #       de meta não era medida e o review_after sumia igual.
+  printf 'meta:\n  schema_version: "1"\n  review_after: "2026-02-01"\nnodes:\n  - id: A\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    trace: a.sh\n    label: x\n' > "${d}/sv1.kg.yaml"
+  rj=0; oj="$(bash "${rad}" "${d}/sorted.kg.json" --validade 2>&1)" || rj=$?
+  oy="$(bash "${rad}" "${d}/sv1.kg.yaml" --validade 2>&1)" || true
+  if grep -q 'REVISITA VENCIDA: meta.review_after 2026-02-01' <<< "${oj}" && grep -q 'REVISITA VENCIDA: meta.review_after 2026-02-01' <<< "${oy}"; then
+    record_pass "radar-json: (h) review_after lido com meta depois de edges (JSON) e com schema_version como 1ª chave (YAML)"
+  else record_fail "radar-json: (h)" "rc=${rj}; o review_after sumiu (json: $(grep -c REVISITA <<< "${oj}"), yaml: $(grep -c REVISITA <<< "${oy}"))"; fi
+  #   (k) reverify_every no .kg.json: o pré-filtro do --due lê o arquivo TRADUZIDO e o leitor do contrato o
+  #       ORIGINAL; com o pré-filtro no original (uma linha só, sem a chave no começo) o STALE-EXPIRED sumia.
+  #   (l) o tmp da tradução sai junto com o do --due: o trap do --due substitui o anterior e precisa levar os dois.
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" ]; then
+    printf '{"meta": {"schema_version": "1"}, "nodes": [{"id": "A", "node_type": "claim", "plane": "DEV", "status": "open", "impact": 3, "confidence": 0.5, "trace": "a.sh", "label": "x", "verified_at": "2025-01-01", "reverify_every": "P30D"}]}\n' > "${d}/due.kg.json"
+    local tk; tk="$(mktemp -d)"
+    rj=0; oj="$(TMPDIR="${tk}" bash "${rad}" "${d}/due.kg.json" --freshness 2>&1)" || rj=$?
+    if grep -q 'STALE-EXPIRED: A' <<< "${oj}"; then
+      record_pass "radar-json: (k) reverify_every vencido no .kg.json → STALE-EXPIRED, como no .kg.yaml"
+    else record_fail "radar-json: (k)" "rc=${rj}; o vencimento por cadência sumiu no .kg.json"; fi
+    if [ -z "$(ls -A "${tk}")" ]; then
+      record_pass "radar-json: (l) nenhum diretório temporário sobra (tradução + --due)"
+    else record_fail "radar-json: (l)" "sobrou em TMPDIR: $(ls -A "${tk}" | tr '\n' ' ')"; fi
+    rm -rf "${tk}"
+  else record_skip "radar-json: (k)(l) leitor do contrato ausente (vendor/kg-ssot)"; fi
   rm -rf "${d}"
 }
 
@@ -47279,7 +47344,7 @@ run_kg_contract_check_selftests() {
   local chk="${REPO_ROOT}/.claude/validation/kg-contract-check.sh" ven="${REPO_ROOT}/vendor/kg-ssot"
   if [ ! -f "${chk}" ] || [ ! -f "${ven}/tools/kg_gate.py" ]; then record_fail "kg-contract-check" "checador ou vendor ausente"; return; fi
   python3 -c 'import yaml, jsonschema' >/dev/null 2>&1 || { record_skip "kg-contract-check: PyYAML/jsonschema ausentes (SUT não exercido)"; return; }
-  local sb out rc long
+  local sb out rc long outb
   sb="$(TMPDIR=/tmp mktemp -d)"
   mkdir -p "${sb}/.claude/validation" "${sb}/vendor" "${sb}/g" "${sb}/.claude/utils/kg"
   cp "${chk}" "${sb}/.claude/validation/"; cp -a "${ven}" "${sb}/vendor/"
@@ -47293,6 +47358,18 @@ run_kg_contract_check_selftests() {
   if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/novo.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ]; then record_pass "kg-contract-check: (a) grafo novo conforme ao v3 → rc 0"
   else record_fail "kg-contract-check: (a)" "grafo novo conforme reprovado rc=${rc}: ${out}"; fi
+  # (a2) .kg.json PELO PERFIL JSON (2026-11-22, passada adversarial do fix/kg-radar-json): o mesmo grafo novo em
+  #     JSON passa, e o JSON que só o YAML aceitaria (vírgula sobrando) reprova com parse.yaml-error. Antes o texto
+  #     chegava cru ao leitor e era lido como YAML: o segundo saía "conforme" e o kg_validate o reprovava.
+  python3 -I -B -c 'import json,sys,yaml; json.dump(yaml.safe_load(open(sys.argv[1])), open(sys.argv[2],"w"), default=str)' \
+    "${sb}/g/novo.kg.yaml" "${sb}/g/novojs.kg.json" 2>/dev/null
+  sed -e 's/}$/,}/' "${sb}/g/novojs.kg.json" > "${sb}/g/virgula.kg.json"
+  local rcj rcv
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/novojs.kg.json 2>&1)"; then rcj=0; else rcj=$?; fi
+  if outb="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/virgula.kg.json 2>&1)"; then rcv=0; else rcv=$?; fi
+  if [ "${rcj}" -eq 0 ] && [ "${rcv}" -eq 1 ] && grep -q 'parse.yaml-error' <<< "${outb}"; then
+    record_pass "kg-contract-check: (a2) .kg.json lido pelo perfil JSON: o conforme passa, a vírgula sobrando reprova"
+  else record_fail "kg-contract-check: (a2)" "esperava rc 0 e rc 1 com parse.yaml-error: rcj=${rcj} rcv=${rcv} ${out} ${outb}"; fi
   # (b) grafo NOVO com confirmed sem provenance → rc 1 nomeando o código
   _kcc_graph semprov | sed -e '/provenance:/,/method:/d' > "${sb}/g/semprov.kg.yaml"
   if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/semprov.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
@@ -47326,7 +47403,7 @@ run_kg_contract_check_selftests() {
   #     deixa só o código e reprova este caso.
   _kcc_graph locruim | sed -e 's/      method: "measurement: comando de prova"/&\n      locality: "nuvem"/' > "${sb}/g/locruim.kg.yaml"
   _kcc_graph locboa | sed -e 's/      method: "measurement: comando de prova"/&\n      locality: "repo"/' > "${sb}/g/locboa.kg.yaml"
-  local outb rcb
+  local rcb
   if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/locruim.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
   if outb="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/locboa.kg.yaml 2>&1)"; then rcb=0; else rcb=$?; fi
   if [ "${rc}" -eq 1 ] && grep -q 'SHOULD form.enum.node.provenance.locality — provenance.locality fora do vocabulário: use repo, web, host ou pessoa' <<< "${out}" \

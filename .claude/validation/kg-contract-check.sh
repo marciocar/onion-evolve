@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# kg-contract-check.sh — julga UM ou mais .kg.yaml contra o contrato vendorizado (hoje v4.3), ANTES do commit.
+# kg-contract-check.sh — julga UM ou mais .kg.yaml (ou .kg.json) contra o contrato vendorizado (hoje v4.3), ANTES do commit.
 #
 # Por que existe (2026-10-08, SAC-71): desde que o gate do contrato entrou no CI (vendor/kg-ssot,
 # kg_gate.py), todo grafo NOVO tem de nascer limpo no SHOULD — e o gate só enxerga arquivo rastreado
@@ -107,6 +107,13 @@ for f in files:
     # perde alvo escrito com escape YAML (\x2F, \u0023, continuação de linha) ou chave entre aspas, e aí o
     # índice incompleto reprovava alvo válido (refutador de 2026-10-10). Só a versão de agora entra: da do
     # HEAD só se usa o SHOULD, que não consulta o corpus.
+    # PERFIL POR NOME (2026-11-22): o .kg.json se lê pelo perfil JSON do contrato (as_source, como o kg_gate e o
+    # kg_validate fazem). Sem isto o texto chegava cru e era lido como YAML: um .kg.json com vírgula sobrando,
+    # comentário ou corpo em YAML de bloco saía "conforme" aqui e reprovava no kg_validate (passada adversarial
+    # do fix/kg-radar-json, medido). O mesmo vale para o texto do HEAD.
+    text = kg_gate.kg_validate.as_source(path, text)
+    if old_text is not None:
+        old_text = kg_gate.kg_validate.as_source(path, old_text)
     doc = kg_gate.kg_validate.parse_v1(text)[0]
     ext = doc.get("external_edges") if isinstance(doc, dict) else None
     index = None
