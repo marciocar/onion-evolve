@@ -2751,6 +2751,8 @@ docs/technical-context/04-workflow/contributing.md	F_CONTRIB	docs/onion/graph/te
 docs/technical-context/04-workflow/contributing.md	Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR	docs/onion/graph/context-freshness-2026-08-12.kg.yaml
 docs/technical-context/index.md	F_INDEX	docs/onion/graph/technical-context-core-2026-07.kg.yaml
 ops/audit-adopters-registry.sh	E_METADE_DO_PARQUE_FORA_DO_REGISTRO_DA_FEDERACAO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+ops/bridge-auth/gokapi-oidc-provision.sh	D_GOKAPI_OIDC_BY_API_2026_11	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+ops/bridge-auth/logto-mapi.sh	E_TEST_FALLBACK_READ_REAL_MDEF_SECRET_2026_11	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	C_PROJETOR_DE_IDENTIDADE_SEM_ANCORA	docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml
 ops/bridge-auth/logto-provision.sh	C_blocked_chain_kills_inner_edit	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	C_i_bypassed_the_api_with_sql	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
