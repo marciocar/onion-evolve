@@ -2,8 +2,7 @@
 branch: feat/agent-colors
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 770937a552ccb6ae2bedbc78b72bec450ed40ba774ebc978fff45ef637659703
-reviewed_code_sha256: 5217522bc9111352d767a6e74a7e6360908c806ff5a13d080dfd59151375db86
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 0
@@ -12,6 +11,7 @@ duration_min: 22
 findings_fixed: 4
 verdict: APPROVED
 elenxo: true
+elenxo_isolado: true
 reviewer: "subagente general-purpose (opus), refutador independente, só leitura"
 nota: "Refutador com mandato de achar falso positivo; aprovou sem bloqueio. Curei 3 limites no código (sem name: não é julgado, diretório ilegível vira rc 2, citações de REGRA com título) e declarei 2 no TETO (formas raras de YAML e --only julgando a árvore). O 5º, estilo, também curado."
 ---
@@ -87,3 +87,10 @@ ser um agente válido. O caso `lint-hard-file (b)` usa a `r12-tool-names/good-na
 Não houve outra cópia de fixture boa para `.claude/agents/` na bancada (grep por `fixtures/…good…md`).
 As famílias `fixtures`, `lint_hard_file`, `sweep_fixtures` e `agent_color` rodaram localmente com
 `LC_ALL=C` antes do push.
+
+## Correção da declaração (22/11)
+
+O revisor desta passada foi um agente separado do autor, como dizem o campo `reviewer:` e o corpo, mas o
+frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
+sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
+código foi apagado, para o `pr-finalize` carimbar de novo.
