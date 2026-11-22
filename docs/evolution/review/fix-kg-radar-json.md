@@ -2,7 +2,8 @@
 branch: fix/kg-radar-json
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0498c67bf1acfe2828af6230daeb7845e9a17603d1a8ad192a73f6a07918dcc8
+reviewed_code_sha256: b1b4cf61648ae804628b87ac2ee059d22d82672d221a6b0ed84af6f1e9c470f7
 findings_total: 9
 findings_real: 8
 findings_blocking: 6
