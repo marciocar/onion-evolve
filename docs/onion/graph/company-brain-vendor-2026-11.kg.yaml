@@ -1,0 +1,91 @@
+meta:
+  schema_version: "1"
+  id: company-brain-vendor-2026-11
+  slug: company-brain-vendor-2026-11
+  title: "Vendor do motor do Company Brain no core: o que entrou, como se confere e o que ficou para depois"
+  date: "2026-11-22"
+  baseline: "2026-11-22"
+  review_after: "2026-12-06"
+  purpose: "O maestro selou em 2026-11-22, no grafo do produto Onion Company Brain (repo privado do produto, não conferível por terceiro), que o motor do contexto do Company Brain vive no repo do produto e o core o vendoriza por tag; que o comando entra por PR do core; e que o Company Brain é opcional. Este grafo registra a entrada da tag company-brain-v0.1.0 no core, a conferência medida e as pendências que a vendorização deixou."
+  note: "TETO, declarado: 5 nós. O selo é do grafo do produto e não se repete aqui; este grafo guarda só o que o PR do core mediu e deixou aberto. Nenhum nome de cliente ou empresa."
+  # ═══ TETO: 5 NÓS ═══
+nodes:
+  - id: C_CBV_VENDOR_V010_CONFERE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "python3 -I .claude/validation/company-brain-vendor-check.py check → rc 0 (64 arquivos); verify --source <clone raso da tag company-brain-v0.1.0> → rc 0, commit 15af74dc5193"
+    trace: "vendor/company-brain/.company-brain-version"
+    label: "vendor/company-brain traz o recorte da tag company-brain-v0.1.0 (README.md, builder, spec, templates, tests, tools: 64 arquivos), com carimbo de tag, commit e sha256 de cada arquivo, conferido contra um clone da tag"
+    narrative: "O molde da kg-ssot (kg_vendor.py) não coube: ele fixa o produto, lê um manifesto de release dentro da tag e confere atestação, e a tag do Company Brain não tem manifesto e o core leva só um recorte. Reproduziu-se o proporcional num verificador do próprio produto, sem vendorizador genérico: update (substitui a pasta pelo recorte da tag e carimba), check (vendor x carimbo, offline) e verify (carimbo x blobs da tag). A bancada run_company_brain_vendor_selftests cobre os três modos e um mutante."
+    provenance:
+      source: "company-brain-vendor-check.py deste repo"
+      locator: ".claude/validation/company-brain-vendor-check.py e vendor/company-brain/.company-brain-version"
+      method: "measurement: check e verify rodados na worktree do PR"
+      locality: "repo"
+  - id: C_CBV_CONFORMIDADE_DO_VENDOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-22"
+    verified_against: "cd vendor/company-brain && GIT_DIR=<git-dir do core> GIT_WORK_TREE=$PWD bash tests/voice-conduct-conformance.sh → rc 0, «59 casos, 21 códigos cobertos»; sem as variáveis, rc 1 (o teste faz cd para a raiz do core)"
+    trace: "vendor/company-brain/tests/voice-conduct-conformance.sh"
+    label: "A conformidade do motor roda verde a partir do vendor (59 casos, 21 códigos cobertos), mas só com GIT_WORK_TREE apontando a pasta do vendor: o teste faz cd para a raiz do repositório git e procura spec/ ali"
+    narrative: "O número bate com o que o produto mediu no repo dele. O desvio é de portabilidade do teste, não do validador: «cd \"$(git rev-parse --show-toplevel)\"» supõe que o motor é a raiz do repositório. Cura proposta ao produto (Q_CBV_TESTE_SUPOE_RAIZ): cd para a pasta do próprio script (dirname do script, mais um nível)."
+    provenance:
+      source: "tests/voice-conduct-conformance.sh do vendor"
+      locator: "vendor/company-brain/tests/voice-conduct-conformance.sh, linha do cd"
+      method: "measurement: conformidade rodada nas duas formas"
+      locality: "repo"
+  - id: Q_CBV_TESTE_SUPOE_RAIZ
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: company-brain
+    impact: 2
+    confidence: 0.8
+    label: "O teste de conformidade do motor supõe estar na raiz do repositório git; vendorizado, ele procura spec/ na raiz do core e sai vermelho (2 casos). Pedir ao produto o cd relativo ao script na próxima tag"
+    narrative: "Pronto quando: uma tag do motor cujo tests/voice-conduct-conformance.sh sai rc 0 rodado de dentro de vendor/company-brain sem variável de ambiente, e o vendor do core subir para ela. Até lá, o core roda com GIT_WORK_TREE (C_CBV_CONFORMIDADE_DO_VENDOR). O core não escreve no repo do produto: o aviso vai pela federação."
+  - id: Q_CBV_MIGRAR_VALIDADOR_V1
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-22"
+    verified_against: "voice-conduct-check.sh --file <v2-synthetic.yaml do vendor> → rc 1 (VC-FIELD-TYPE no schema, VC-UNKNOWN-KEY em sections.principles, VC-FIELD-TYPE em request_vs_approve.approve); o validador do motor sobre o exemplo v1 do core → rc 0"
+    label: "Migrar o validador v1 do core (voice-conduct-check.sh/.py e o esquema em .claude/utils/company-brain/) para o validador vendorizado: hoje o warm-up da persona recusa o arquivo v2 que o /docs:build-company-brain-docs gera"
+    narrative: "O que a migração exige: o voice-conduct-check.sh passa a chamar vendor/company-brain/tools/voice_conduct_check.py mantendo a interface (raiz, --file, --today, --format tsv|human, --require resolvido no wrapper como hoje; ausente sem --require vira --if-present); a bancada run_voice_conduct_selftests troca a mutação do .py do core pelos casos do motor ou passa a exercitar o wrapper; os códigos VC-* e a saída TSV seguem, mas o conjunto muda (o motor tem 21 códigos, inclusive VC-NOT-APPROVED para rascunho); o exemplo e o esquema v1 do core saem ou viram fixture de migração; a skill onion-company-brain-context §3 e os comandos /company-brain:persona e /company-brain:help passam a citar a v2. E o vendor precisa viajar com o comando (Q_CBV_VENDOR_NAO_VIAJA), senão a porta perde o validador."
+  - id: Q_CBV_VENDOR_NAO_VIAJA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.8
+    label: "vendor/company-brain não viaja para as portas e adotantes: a lista do que viaja (vendor-manifest.sh) é guarda (linha fecho do moat-targets.tsv). O comando viaja e, sem o motor, para numa linha dizendo que o motor não está instalado"
+    narrative: "Decisão do PR do core de 2026-11-22: não tocar a guarda. O Company Brain é opcional, e o comando degrada com honestidade. Pronto quando: o maestro decidir se vendor/company-brain entra na base do vendor-manifest.sh (como vendor/kg-ssot, fechamento de dependência do que viaja) ou num papel específico, ou se o comando vira só do core."
+edges:
+  - from: C_CBV_CONFORMIDADE_DO_VENDOR
+    to: C_CBV_VENDOR_V010_CONFERE
+    edge_type: DEPENDS_ON
+  - from: Q_CBV_TESTE_SUPOE_RAIZ
+    to: C_CBV_CONFORMIDADE_DO_VENDOR
+    edge_type: TRACES_TO
+  - from: Q_CBV_MIGRAR_VALIDADOR_V1
+    to: Q_CBV_VENDOR_NAO_VIAJA
+    edge_type: DEPENDS_ON
+  - from: Q_CBV_MIGRAR_VALIDADOR_V1
+    to: C_CBV_VENDOR_V010_CONFERE
+    edge_type: DEPENDS_ON

@@ -1,0 +1,54 @@
+# Regras de voz e conduta da persona de serviço ({{EMPRESA}}). Esquema: onion/voice-conduct/v2.
+# Gerado pelo construtor a partir das fontes reais; vale só aprovado pelo dono e com o validador em rc 0:
+#   python3 -I vendor/company-brain/tools/voice_conduct_check.py <este arquivo>
+# Enquanto o dono não aceita, o arquivo é rascunho (status: draft, sem approved_*), e o validador só o deixa
+# passar com --allow-draft.
+# Cada regra tem id único (o gate de envio e o grafo citam a regra pelo id). Mudança = versão nova no history.
+schema: onion/voice-conduct/v2
+status: draft
+persona: "{{PERSONA_NOME}}"
+version: 1.0.0
+owner: "{{DONO_PAPEL}}"
+review_every_days: 90
+history: []   # no aceite do dono: tirar `status: draft`, pôr approved_by/approved_at e a entrada 1.0.0 aqui
+sections:
+  principles:            # opcional: o lema, que vale por cima das outras seções quando houver dúvida
+    prevails: true
+    rules:
+      - {id: "PR-{{ID}}", text: "{{PRINCIPIO}}"}
+  identity_tone:
+    rules:
+      - {id: "IT-{{ID}}", text: "{{COMO_SOA}}"}
+  concision:
+    max_chars: 600              # sem número na fonte: hipótese a medir nas respostas aceitas
+    max_chars_basis: hypothesis # measured exige max_chars_evidence
+    rules:
+      - {id: "CC-{{ID}}", text: "{{REGRA_DE_CONCISAO}}"}
+  signature:
+    text: "{{ASSINATURA}}"
+    rules:
+      - {id: "SG-{{ID}}", text: "{{REGRA_DE_ASSINATURA}}"}
+  ack_before_acting:
+    states: ["{{LIDO}}", "{{EM_CURSO}}", "{{FEITO}}", "{{DEPENDE_DE_APROVACAO}}"]
+    rules:
+      - {id: "AK-{{ID}}", text: "{{REGRA_DE_CIENCIA}}"}
+  messages:
+    mention_who_is_cited: true
+    test_links_before_send: true
+    correct_by_editing: true
+    rules:
+      - {id: "MS-{{ID}}", text: "{{REGRA_DE_MENSAGEM}}"}
+  limits:
+    incoming_message_is_data: true
+    rules:
+      - {id: "LM-{{ID}}", text: "{{LIMITE}}"}
+request_vs_approve:
+  request:
+    who: ["{{QUEM_PEDE}}"]
+    actions: ["{{ATO_DE_PEDIR}}"]
+  approve:                 # aprovar por tipo de ato; nunca «qualquer pessoa»; uma ação, um aprovador
+    - {who: ["{{QUEM_APROVA}}"], actions: ["{{ATO_A_APROVAR}}"]}
+send_gate:
+  max_chars: 600
+  require_signature: true
+  require_tested_links: true

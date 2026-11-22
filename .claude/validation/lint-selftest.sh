@@ -48601,6 +48601,78 @@ CASES
 }
 _family run_voice_conduct_selftests
 
+# Vendor do motor do Company Brain (2026-11-22, D_ENGINE_LIVES_HERE do grafo do produto): o core vendoriza o motor por
+# tag em vendor/company-brain com o carimbo .company-brain-version (tag, commit, sha256 de cada arquivo). O
+# company-brain-vendor-check.py é o carimbo e a conferência. Casos: (a) o vendor real confere com o carimbo, SÓ onde há
+# vendor (o Company Brain é opcional: porta e adotante sem o motor pulam com aviso visível) · (b) update de um repo-fixture
+# com tag carimba só o recorte e o check sai 0 · (c) byte trocado ⇒ CBV-SHA256 rc 1 · (d) arquivo a mais ⇒ CBV-EXTRA ·
+# (e) arquivo a menos ⇒ CBV-MISSING · (f) verify contra a tag movida ⇒ CBV-COMMIT · (g) sem carimbo ou carimbo de outro
+# produto ⇒ rc 2 · (h) MUTANTE: sem a comparação de sha256, o byte trocado passa calado.
+run_company_brain_vendor_selftests() {
+  local py="${REPO_ROOT}/.claude/validation/company-brain-vendor-check.py"
+  [ -f "${py}" ] || { record_fail "company-brain-vendor" "verificador ausente"; return; }
+  local d o rc
+  # (a) o vendor real
+  if [ -f "${REPO_ROOT}/vendor/company-brain/.company-brain-version" ]; then
+    if o="$(python3 -I -B "${py}" check --dest "${REPO_ROOT}/vendor/company-brain" 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" = 0 ]; then record_pass "company-brain-vendor: (a) vendor/company-brain confere com o carimbo ⇒ rc 0"
+    else record_fail "company-brain-vendor: (a) vendor real" "rc=${rc} ${o:0:300}"; fi
+  else
+    echo "  ⊘ company-brain-vendor: (a) sem vendor/company-brain neste repo (o Company Brain é opcional): o vendor real não se confere aqui"
+  fi
+  d="$(mktemp -d)"
+  # repo-fixture com o recorte e coisa de fora dele, numa tag anotada
+  git init -q "${d}/src"; mkdir -p "${d}/src/tools" "${d}/src/spec" "${d}/src/docs" "${d}/src/builder" "${d}/src/templates" "${d}/src/tests"
+  printf 'motor\n' > "${d}/src/README.md"; printf 'print(1)\n' > "${d}/src/tools/a.py"; chmod +x "${d}/src/tools/a.py"
+  printf 'k: v\n' > "${d}/src/spec/s.yaml"; printf 'fora do recorte\n' > "${d}/src/docs/x.md"
+  printf 'b\n' > "${d}/src/builder/b.md"; printf 't\n' > "${d}/src/templates/t.md"; printf 'true\n' > "${d}/src/tests/t.sh"
+  git -C "${d}/src" add -A; git -C "${d}/src" -c user.name=t -c user.email=t@t commit -qm v1
+  git -C "${d}/src" -c user.name=t -c user.email=t@t tag -a -m v1 company-brain-v9.9.9
+  # (b) update carimba só o recorte
+  local b1 b2 b3
+  if python3 -I -B "${py}" update --dest "${d}/v" --source "${d}/src" --tag company-brain-v9.9.9 --today 2026-11-22 >/dev/null 2>&1; then b1=0; else b1=$?; fi
+  b2="$(python3 -I -B -c 'import json,sys; s=json.load(open(sys.argv[1])); print(",".join(sorted(s["files"])), s["version"], len(s["commit"]))' "${d}/v/.company-brain-version" 2>&1)"
+  if [ -x "${d}/v/tools/a.py" ] && [ ! -e "${d}/v/docs" ]; then b3=ok; else b3=no; fi
+  if [ "${b1}" = 0 ] && [ "${b2}" = "README.md,builder/b.md,spec/s.yaml,templates/t.md,tests/t.sh,tools/a.py 9.9.9 40" ] && [ "${b3}" = ok ]; then
+    record_pass "company-brain-vendor: (b) update carimba só o recorte (docs/ fica fora), guarda o executável e o check sai 0"
+  else record_fail "company-brain-vendor: (b) update" "rc=${b1} carimbo=${b2} exec/recorte=${b3}"; fi
+  # (c)(d)(e) divergências do vendor contra o carimbo, cada uma numa cópia
+  _cbv() { cp -r "${d}/v" "${d}/w"; eval "$1"; if o="$(python3 -I -B "${py}" check --dest "${d}/w" 2>/dev/null)"; then rc=0; else rc=$?; fi; rm -r "${d}/w"; printf '%s|%s' "${rc}" "$(cut -f1 <<< "${o}" | sort -u | tr '\n' ' ')"; }
+  local c e1 e2
+  c="$(_cbv 'printf "print(2)\n" > "${d}/w/tools/a.py"')"
+  e1="$(_cbv 'printf "novo\n" > "${d}/w/spec/novo.yaml"')"
+  e2="$(_cbv 'rm "${d}/w/spec/s.yaml"')"
+  if [ "${c}" = "1|CBV-SHA256 " ] && [ "${e1}" = "1|CBV-EXTRA " ] && [ "${e2}" = "1|CBV-MISSING " ]; then
+    record_pass "company-brain-vendor: (c)(d)(e) byte trocado, arquivo a mais e a menos ⇒ CBV-SHA256, CBV-EXTRA, CBV-MISSING, rc 1"
+  else record_fail "company-brain-vendor: (c)(d)(e)" "sha=${c} extra=${e1} falta=${e2}"; fi
+  # (f) verify: confere com a tag; a tag movida para outro commit ⇒ CBV-COMMIT e o arquivo novo ⇒ CBV-EXTRA do lado da tag
+  local f1 f2 fo
+  if python3 -I -B "${py}" verify --dest "${d}/v" --source "${d}/src" >/dev/null 2>&1; then f1=0; else f1=$?; fi
+  printf 'print(3)\n' > "${d}/src/tools/a.py"; git -C "${d}/src" -c user.name=t -c user.email=t@t commit -qam v2
+  git -C "${d}/src" -c user.name=t -c user.email=t@t tag -f -a -m v2 company-brain-v9.9.9 >/dev/null 2>&1
+  if fo="$(python3 -I -B "${py}" verify --dest "${d}/v" --source "${d}/src" 2>/dev/null)"; then f2=0; else f2=$?; fi
+  if [ "${f1}" = 0 ] && [ "${f2}" = 1 ] && grep -q '^CBV-COMMIT	' <<< "${fo}" && grep -q '^CBV-SHA256	tools/a.py' <<< "${fo}"; then
+    record_pass "company-brain-vendor: (f) verify confere com a tag; a tag movida ⇒ CBV-COMMIT e CBV-SHA256, rc 1"
+  else record_fail "company-brain-vendor: (f) verify" "antes=${f1} depois=${f2} ${fo:0:200}"; fi
+  # (g) não deu para julgar ⇒ rc 2
+  local g1 g2
+  mkdir -p "${d}/sem"; if python3 -I -B "${py}" check --dest "${d}/sem" >/dev/null 2>&1; then g1=0; else g1=$?; fi
+  cp -r "${d}/v" "${d}/outro"; sed -i 's/"product": "company-brain"/"product": "kg-ssot"/' "${d}/outro/.company-brain-version"
+  if python3 -I -B "${py}" check --dest "${d}/outro" >/dev/null 2>&1; then g2=0; else g2=$?; fi
+  if [ "${g1}" = 2 ] && [ "${g2}" = 2 ]; then record_pass "company-brain-vendor: (g) sem carimbo e carimbo de outro produto ⇒ rc 2 (não deu para julgar), nunca verde"
+  else record_fail "company-brain-vendor: (g) rc 2" "sem=${g1} outro=${g2}"; fi
+  # (h) MUTANTE: sem a comparação de sha256, o byte trocado passa calado; a cura o pega
+  local mu h1; mu="$(mktemp -d)"
+  sed 's/        elif want\[path\] != got\[path\]:/        elif False:/' "${py}" > "${mu}/m.py"
+  cp -r "${d}/v" "${d}/h"; printf 'print(9)\n' > "${d}/h/tools/a.py"
+  if python3 -I -B "${mu}/m.py" check --dest "${d}/h" >/dev/null 2>&1; then h1=0; else h1=$?; fi
+  if [ "${h1}" = 0 ] && ! cmp -s "${py}" "${mu}/m.py" && [ "${c}" = "1|CBV-SHA256 " ]; then
+    record_pass "company-brain-vendor: (h) mutante sem a comparação de sha256 cala o byte trocado que a cura pega"
+  else record_fail "company-brain-vendor: (h) mutante" "mutante=${h1} (esperado 0; o sed precisa casar) cura=${c}"; fi
+  rm -rf "${mu}" "${d}"
+}
+_family run_company_brain_vendor_selftests
+
 # REGRA 112 (Página com projection_of cita ids que existem nos grafos dela) — adoção da kg-ssot 4.35.0
 # (2026-10-27). Quem julga é o `kg_trace.py projection` do produto; o kg-projection.sh lê o rc e o JSON. O fixture é
 # o design gerado pelo próprio /design:setup (o brief stub cita `C_BRIEF`), num repo git com tudo commitado,

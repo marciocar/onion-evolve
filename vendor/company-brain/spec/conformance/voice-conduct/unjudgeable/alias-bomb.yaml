@@ -1,0 +1,5 @@
+# Não julgável: alias YAML
+schema: onion/voice-conduct/v2
+a0: &a0 [x, x]
+a1: &a1 [*a0, *a0]
+persona: *a1
