@@ -58,10 +58,16 @@ E toda resposta que sai (`message.reply`) declara: `in_reply_to` (o `provider_me
 No WhatsApp o id cru é `<número>@c.us`, e o id de mensagem do WAHA também leva o número. Por isso **nenhum
 identificador sai do adapter cru**: `provider_id` (de `requester`, de `audience.members[]` e de `on_behalf_of`),
 `place.id`, `thread.id`, `thread.reply_to`, `provider_message_id` e `in_reply_to` são **pseudônimos estáveis**.
-Forma recomendada: `<provider>:` mais o HMAC-SHA256 do id cru com uma chave privada da instância, em 16 hex (ex.:
-`waha:3f9a1c0be47d2a65`); o apelido da lista fechada também serve. A resolução do id cru para pessoa, e de volta
+Forma recomendada: `<provider>:` mais os 64 primeiros bits do HMAC-SHA256 do id cru (chave privada da instância), um
+nibble por letra de `a` a `p`, ou seja `<provider>:[a-p]{16}` (ex.: `waha:dpjkfaclboejdcgf`), sem nenhum dígito; o
+apelido da lista fechada também serve. Hex não serve: cerca de 20% dos pseudônimos em hex têm 8 dígitos seguidos. A resolução do id cru para pessoa, e de volta
 para responder no fio, acontece **só dentro do adapter**. O juiz recusa (`ID-COM-NUMERO`) identificador com 8 ou mais
-dígitos seguidos ou com forma de e-mail, salvo a forma `<provider>:<16 hex>`.
+dígitos (admitido um separador entre eles) ou com forma `local@domínio`, **sem exceção**.
+
+Limites declarados da guarda de id: id nativo numérico (o `ts` de mensagem do Slack, o id de chat do Telegram) e
+apelido com data ou com `@` reprovam, então todo id de mensagem e de lugar também tem de ser pseudônimo; e ela não
+cobre `person`, `place.name`, `signed_by` nem `audit.id` (no WhatsApp, o nome da conversa direta costuma ser o número:
+o adapter não o põe em `place.name`).
 
 No texto da resposta, a guarda de número é heurística (10 ou mais dígitos com separadores de telefone, depois de
 tirar datas e horas).
@@ -70,7 +76,8 @@ tirar datas e horas).
 
 `internal` (gente de dentro), `partner` (sócio), `external` (fora do mapa, ou contato de fora) e `customer` (cliente
 final). Quem não está no mapa de identidade sai `external` com `person: null`. `customer` é reservado ao canal oficial
-com cliente final: no WAHA o juiz o recusa (`PAPEL`). O enum vive no schema e as linhas `role.*` do vocabulário; o juiz
+com cliente final: o juiz só o aceita do provedor `whatsapp-cloud` (lista fechada) e o recusa em qualquer outro,
+inclusive no WAHA (`PAPEL`). O enum vive no schema e as linhas `role.*` do vocabulário; o juiz
 recusa medir (rc 2) se os dois divergirem. Decisão do core de 2026-11-22, reversível.
 
 ## Verbos e regras do núcleo

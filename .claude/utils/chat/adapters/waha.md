@@ -30,8 +30,9 @@ identidade e a recepção durável):
    rodar `conformance.py check` sobre essa saída na bancada da peça, com o WAHA simulado e mutantes.
 2. **Mapa de identidade e pseudônimos** (`identity.resolve`): id do WhatsApp para pessoa e papel (`internal`,
    `partner` ou `external`; `customer` nunca aqui); sem pessoa, `external` com `person: null`. **Nada sai cru:** o
-   remetente, os participantes, o chat e os ids de mensagem viram `waha:<HMAC-SHA256 do id cru com a chave privada da
-   instância, 16 hex>` (ou o apelido da lista fechada), e o caminho de volta (responder no fio) resolve o pseudônimo
+   remetente, os participantes, o chat e os ids de mensagem viram `waha:[a-p]{16}`: os 64 primeiros bits do
+   HMAC-SHA256 do id cru com a chave privada da instância, um nibble por letra de `a` a `p` (hex não serve: ~20% sai
+   com 8 dígitos seguidos e o juiz recusa), ou o apelido da lista fechada, e o caminho de volta (responder no fio) resolve o pseudônimo
    dentro da peça. A chave do HMAC é segredo da unidade, como a do WAHA.
 3. **Dedupe pelo id da mensagem do WhatsApp**, não só pelo sha256 do corpo assinado (`rule.dedupe_provider_id`).
 4. **Audiência por conversa antes de responder** (`audience.list`), com a lista de participantes do grupo.
