@@ -22,13 +22,24 @@
 #   · o salto fica na 1ª posição do OUTPUT, ANTES do ufw-before-output, que aceita todo o tráfego de `lo`;
 #   · o ufw (MANAGE_BUILTINS=no, medido) re-anexa os saltos dele com -A e não esvazia o OUTPUT, então um
 #     `ufw reload` não derruba a cerca. Um `iptables -F OUTPUT` derruba: o `verify` acusa, e o `up` repõe.
-#   · IPv6 fica de fora de propósito: o compose publica só 127.0.0.1, e o verify reprova se a porta escutar em [::].
+#   · IPv6 fica de fora de propósito: o compose publica só 127.0.0.1, e o verify reprova qualquer escuta na porta
+#     que não seja 127.0.0.1:3050 (inclusive [::1], [::] e IP externo).
 #
 # O QUE A CERCA NÃO FAZ (teto declarado):
 #   · não barra as contas que passam: o túnel é da conta do maestro, e qualquer processo dessa conta (inclusive as
 #     sessões de agente que rodam com ela) alcança o /setup. Fechar isso pediria conta dedicada ao túnel;
-#   · não barra o root, que manda no firewall;
-#   · não vê tráfego que não sai do host (container para container na mesma rede do compose: o Gokapi está só).
+#   · não barra o root, que manda no firewall. Na porta interna o root PASSA (é o docker-proxy), e com ele qualquer
+#     processo uid 0, inclusive um container `--network host` como root: quem está no grupo docker chega lá;
+#   · não vê tráfego que não sai do host (container para container na mesma rede do compose: o Gokapi está só);
+#   · a regra da porta interna não tem destino (as redes do Docker mudam de faixa): conta comum leva RST em qualquer
+#     TCP para a porta 53842 de qualquer host. O efeito colateral foi aceito por ser uma porta sem outro uso aqui;
+#   · NÃO falha fechada no boot: se o `up` falhar, o Docker sobe mesmo assim (amarrar o Docker à cerca derrubaria
+#     todos os containers por causa de um). O `verify` acusa; o `status` do Gokapi deve vir depois dele;
+#   · `systemctl restart` da unit roda o down antes do up e abre uma janela: para repor, use `systemctl reload`
+#     (ExecReload = up, sem janela) ou o `up` direto;
+#   · o veto do MOAT barra este script (install/undo com --apply, up, down) e a unit, mas NÃO a cópia de root em
+#     /usr/local/sbin nem o iptables cru pelo sudo (medido pelo refutador em 2026-11-22): o firewall vivo segue sendo
+#     do maestro por disciplina, não por catraca.
 #
 # Uso (o maestro roda os atos pelo `!`; SEM --apply é ensaio):
 #   ops/egress-uid-fence.sh plan [--tunnel-user U]            # ENSAIO (padrão): quem passa, as regras, a unit, o estado
@@ -94,6 +105,12 @@ fence_rules() {
 JUMP="-p tcp -m conntrack --ctstate NEW -m comment --comment onion-egress-fence -j $CHAIN"
 
 chain_exists() { $SUDO_CMD $IPT -w -S "$CHAIN" >/dev/null 2>&1; }
+# Antes de concluir "sem chain" ou "sem salto": a listagem do OUTPUT tem de funcionar. Sem isso, um sudo sem
+# credencial ou um xtables travado dariam o mesmo vazio que "nada instalado" (refutador, 2026-11-22).
+need_fw() {
+  if [[ -n "$SUDO_CMD" ]]; then sudo -n true 2>/dev/null || die "sudo sem senha falhou; nada mudou"; fi
+  $SUDO_CMD $IPT -w -S OUTPUT >/dev/null 2>&1 || die "não consegui ler o OUTPUT do iptables; nada mudou"
+}
 # Números (no OUTPUT, 1 = 1ª regra) das regras que saltam para a chain. Pelo ALVO, não pelo texto do -S: a forma
 # canônica que o iptables imprime pode diferir da que se escreveu, e casar texto deixaria cópia sem apagar.
 jump_lines() {
@@ -107,6 +124,7 @@ jump_is_first() {  # a 1ª regra do OUTPUT salta para a chain, e com a especific
 # transação só, sem janela com a chain vazia) e garante o salto na 1ª posição do OUTPUT.
 up() {
   local rules spec first others n
+  need_fw
   rules="$(fence_rules)" || die "conta da lista não resolve; nada mudou"
   { echo "*filter"; echo ":$CHAIN - [0:0]"
     while IFS= read -r spec; do echo "-A $CHAIN $spec"; done <<< "$rules"
@@ -123,6 +141,7 @@ up() {
 # down: tira o salto (todas as cópias) e depois a chain. Idempotente: sem nada, não falha.
 down() {
   local n
+  need_fw
   for n in $(jump_lines | sort -rn); do $SUDO_CMD $IPT -w -D OUTPUT "$n"; done
   if chain_exists; then $SUDO_CMD $IPT -w -F "$CHAIN"; $SUDO_CMD $IPT -w -X "$CHAIN"; fi
   echo "✓ cerca removida: sem salto no OUTPUT e sem a chain $CHAIN"
@@ -143,6 +162,7 @@ Type=oneshot
 RemainAfterExit=yes
 Environment=FENCE_TUNNEL_USER=$(tunnel_user)
 ExecStart=$SBIN_DEST up
+ExecReload=$SBIN_DEST up
 ExecStop=$SBIN_DEST down
 
 [Install]
@@ -152,19 +172,22 @@ EOF
 
 # A sonda: tenta conectar como <conta> e diz se o REJECT da regra <comentário> contou o pacote. Independe de o
 # Gokapi estar de pé (sem ninguém escutando, a conexão de quem passa leva RST do kernel, e o contador não mexe).
-reject_count() {  # pacotes no REJECT de comentário $1
+rule_count() {  # pacotes da regra de comentário $1
   $SUDO_CMD $IPT -w -L "$CHAIN" -v -x -n | awk -v c="/* $1 */" 'index($0, c) {print $1; exit}'
 }
-probe() {  # probe <conta> <comentário do REJECT> → imprime "rejeitou" ou "passou"
+# probe <conta> <comentário da regra que TEM de contar> → "contou" ou "não contou". Para quem passa, a regra é o
+# RETURN dela: "não mexeu no REJECT" sozinho ficaria verde até com a sonda sem rodar (refutador, 2026-11-22).
+probe() {
   local before after
-  before="$(reject_count "$2")"
+  before="$(rule_count "$2")"
   sudo -n -u "$1" timeout 3 bash -c "exec 3<>/dev/tcp/$HOST_ADDR/$HOST_PORT" >/dev/null 2>&1 || true
-  after="$(reject_count "$2")"
-  if [[ -n "$before" && -n "$after" && "$after" -gt "$before" ]]; then echo rejeitou; else echo passou; fi
+  after="$(rule_count "$2")"
+  if [[ -n "$before" && -n "$after" && "$after" -gt "$before" ]]; then echo contou; else echo "não contou"; fi
 }
 
 verify() {
   local fail=0 rules spec count want first out
+  need_fw
   rules="$(fence_rules)" || die "conta da lista não resolve"
   if ! chain_exists; then echo "  ✗ chain $CHAIN ausente"; fail=1
   else
@@ -178,14 +201,15 @@ verify() {
   if jump_is_first && [[ "$(jump_lines | wc -l)" == 1 ]]; then echo "  ✓ salto único, na 1ª posição do OUTPUT (antes do ufw, que aceita lo)"
   else echo "  ✗ o salto NÃO é a 1ª regra do OUTPUT, ou há cópias (posições: $(jump_lines | tr '\n' ' '))"; fail=1; fi
   if [[ "$PROBE" == 1 ]]; then
-    if ss -ltn | awk '{print $4}' | grep -qE "^(\[::\]|\*|0\.0\.0\.0):$HOST_PORT$"; then
-      echo "  ✗ a porta $HOST_PORT escuta fora do loopback IPv4: a cerca não cobre"; fail=1; fi
+    local other; other="$(ss -ltnH | awk '{print $4}' | grep -E ":$HOST_PORT\$" | grep -vxF "$HOST_ADDR:$HOST_PORT" || true)"
+    [[ -z "$other" ]] && echo "  ✓ a porta $HOST_PORT só escuta em $HOST_ADDR" \
+      || { echo "  ✗ a porta $HOST_PORT escuta também em: $(tr '\n' ' ' <<< "$other")(a cerca não cobre)"; fail=1; }
     out="$(probe nobody gokapi-loopback-deny-others)"
-    [[ "$out" == rejeitou ]] && echo "  ✓ sonda: nobody → 127.0.0.1:$HOST_PORT levou RST da cerca" \
+    [[ "$out" == contou ]] && echo "  ✓ sonda: nobody → 127.0.0.1:$HOST_PORT levou RST da cerca" \
       || { echo "  ✗ sonda: nobody → 127.0.0.1:$HOST_PORT NÃO foi barrado pela cerca"; fail=1; }
-    out="$(probe caddy gokapi-loopback-deny-others)"
-    [[ "$out" == passou ]] && echo "  ✓ sonda: caddy → 127.0.0.1:$HOST_PORT passa pela cerca" \
-      || { echo "  ✗ sonda: caddy foi barrado (o vhost cairia)"; fail=1; }
+    out="$(probe caddy gokapi-loopback-allow-caddy)"
+    [[ "$out" == contou ]] && echo "  ✓ sonda: caddy → 127.0.0.1:$HOST_PORT passou pela regra de liberação dele" \
+      || { echo "  ✗ sonda: caddy não passou pela regra de liberação (barrado, ou a sonda não rodou)"; fail=1; }
     [[ "$($SYSTEMCTL is-enabled "$UNIT_NAME" 2>/dev/null)" == enabled ]] && echo "  ✓ unit $UNIT_NAME habilitada (volta no boot)" \
       || { echo "  ✗ unit $UNIT_NAME não habilitada: a cerca some no próximo boot"; fail=1; }
   fi
@@ -212,6 +236,7 @@ plan() {
 
 install_fence() {
   local ts unit_tmp rc
+  need_fw
   fence_rules >/dev/null || die "conta da lista não resolve; nada mudou"
   # pré-voo: o iptables daqui entende as duas extensões? (-C de regra inexistente sai 1; extensão ausente sai 2)
   rc=0; $SUDO_CMD $IPT -w -C OUTPUT -p tcp -m conntrack --ctorigdstport 1 -m owner --uid-owner 0 -j RETURN 2>/dev/null || rc=$?
@@ -236,6 +261,7 @@ install_fence() {
 }
 
 undo_fence() {
+  need_fw
   $SUDO_CMD $SYSTEMCTL disable --now "$UNIT_NAME" 2>/dev/null || true   # o ExecStop roda o down
   $SUDO_CMD rm -f "$UNIT_DEST"
   $SUDO_CMD $SYSTEMCTL daemon-reload
@@ -262,7 +288,7 @@ set -f
 op="$1"; ch="$2"; shift 2
 has_chain() { [ "$1" = OUTPUT ] || grep -qxF -- "-N $1" "$FW"; }
 case "$op" in
-  -S) has_chain "$ch" || exit 1
+  -S) [ -n "${STUB_S_FAIL:-}" ] && exit 4; has_chain "$ch" || exit 1
       if [ "$ch" = OUTPUT ]; then echo "-P OUTPUT ACCEPT"; else echo "-N $ch"; fi
       grep -F -- "-A $ch " "$FW" | grep -E -- "^-A $ch " || true ;;
   -L) has_chain "$ch" || exit 1; echo "Chain $ch"; echo "num target prot opt source destination"
@@ -357,10 +383,14 @@ STUB
   t "down: remove" 0 down
   ok "down: sem salto e sem chain" '! grep -qF -- "$CHAIN" "$FW"'
   t "down: idempotente sem nada" 0 down
+  # 8b. listagem do iptables falha (sudo sem credencial, xtables travado) → recusa, nunca "removida" no escuro
+  STUB_S_FAIL=1 t "down: listagem do OUTPUT falha → recusa" 2 down
+  STUB_S_FAIL=1 t "verify: listagem do OUTPUT falha → recusa" 2 verify
   # 9. install --apply: cópia de root, unit, enable (que roda o up), verify; undo desfaz tudo
   t "install: instala, liga e verifica" 0 install_fence
   ok "install: unit escrita com ExecStart/ExecStop e o túnel" 'grep -qF "ExecStart=$SBIN_DEST up" "$UNIT_DEST" && grep -qF "ExecStop=$SBIN_DEST down" "$UNIT_DEST" && grep -qF "Environment=FENCE_TUNNEL_USER=$FENCE_TUNNEL_USER" "$UNIT_DEST"'
   ok "install: unit antes do Docker" 'grep -qx "Before=docker.service" "$UNIT_DEST"'
+  ok "install: reload da unit é o up (repõe sem janela)" 'grep -qxF "ExecReload=$SBIN_DEST up" "$UNIT_DEST"'
   ok "install: cerca de pé" 'jump_first'
   t "install 2x: backup da unit anterior" 0 install_fence
   ok "install 2x: backup criado" '[[ -n "$(find "$BACKUP_DIR" -name "unit.service.*.bak")" ]]'

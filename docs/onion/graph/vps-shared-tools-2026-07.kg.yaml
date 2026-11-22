@@ -796,8 +796,8 @@ nodes:
     impact: 3
     confidence: 0.85
     verified_at: "2026-11-22"
-    verified_against: "bash ops/install-caddy-config.sh --plan na branch feat/caddy-service-vhosts (rc 0: CRIAR gokapi.caddy, PENDENTE librechat/vault/waha, caddy validate verde) e com a lista apontada para os ramos dos PRs (ADOTAR os três, validate verde); bancada 53/53"
-    label: "O ops/install-caddy-config.sh lê os vhosts dos repos de serviço (ops/caddy/service-vhosts.tsv): blob commitado na ref, adoção só do vivo byte a byte igual, hosts limitados por repo, fonte ausente = pendente que não remove nada; falta o install no vivo, que é do maestro"
+    verified_against: "bash ops/install-caddy-config.sh --plan na branch feat/caddy-service-vhosts (rc 0: CRIAR gokapi.caddy, PENDENTE librechat/vault/waha, caddy validate verde) e com a lista apontada para os ramos dos PRs (ADOTAR os três, validate verde, com o adapt_guard julgando as quatro fontes reais no caddy do host); bancada 64/64"
+    label: "O ops/install-caddy-config.sh lê os vhosts dos repos de serviço (ops/caddy/service-vhosts.tsv): blob commitado na ref, adoção só do vivo byte a byte igual, hosts e upstreams limitados por repo no JSON do caddy adapt, carimbo de serviço distinto do do core, fonte ausente = pendente que não remove nada; falta o install no vivo, que é do maestro"
     narrative: "Fecha quando: o maestro roda o install depois do merge, e o --check sai sem drift com gokapi.caddy criado e, à medida que os PRs dos repos entram, librechat/vault/waha adotados (carimbo na 1ª linha). Até lá o vivo fica como está."
     provenance:
       source: "ops/install-caddy-config.sh e ops/caddy/service-vhosts.tsv na branch feat/caddy-service-vhosts"
@@ -828,7 +828,7 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-11-22"
-    verified_against: "ops/egress-uid-fence.sh em netns novo (unshare -n, iptables real, firewall vivo intocado): nobody→:3050 recusado, caddy e marcio conectam, root→:53842 conecta, nobody e caddy→:53842 recusados; verify verde salvo a unit; up idempotente e repõe o salto no topo; down limpa. Bancada 39/39"
+    verified_against: "ops/egress-uid-fence.sh em netns novo (unshare -n, iptables real, firewall vivo intocado): nobody→:3050 recusado, caddy e marcio conectam, root→:53842 conecta, nobody e caddy→:53842 recusados; verify verde salvo a unit (a sonda do caddy conta no RETURN dele); up idempotente e repõe o salto no topo; down limpa. Bancada 42/42"
     label: "Cerca de saída por uid do Gokapi pronta como ato do core (ops/egress-uid-fence.sh): 127.0.0.1:3050 só para caddy e a conta do túnel, 53842 só para root (docker-proxy), por destino ORIGINAL do conntrack, salto na 1ª posição do OUTPUT, unit antes do Docker; falta o install --apply, que é do maestro"
     narrative: "Pedido da vps-ops (achado M1 do resíduo feat-act-gokapi-spike: o /setup sem autenticação ao alcance de qualquer conta local). Teto declarado: a conta do túnel é a do maestro, e qualquer processo dela passa. Fecha quando o maestro roda install --apply antes do up do Gokapi e o verify sai verde no vivo."
     provenance:

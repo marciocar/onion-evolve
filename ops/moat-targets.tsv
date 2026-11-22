@@ -64,7 +64,9 @@
 #     host medidos na instalação; um drop-in nesse diretório mudaria toda instância do runner sem passar pela allowlist.
 #   · a CERCA DE SAÍDA por uid do Gokapi (2026-11-22, pedido da vps-ops): a unit onion-vps-egress-fence, a cópia de root
 #     em /usr/local/sbin e a chain ONION-EGRESS-FENCE nascem e morrem só por egress-uid-fence.sh (install/undo --apply);
-#     `up` e `down` são o que a unit chama como root, e pela sessão também são ato (mexem no firewall vivo).
+#     `up` e `down` são o que a unit chama como root, e pela sessão também são ato (mexem no firewall vivo). Limite
+#     medido pelo refutador: a cópia de root (`sudo bash /usr/local/sbin/...`) e o iptables cru pelo sudo NÃO passam
+#     por este veto; a linha `ato` só alcança script de ops/.
 #   · o STT em LOTE do core (2026-10-17, D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017) tem wrapper próprio: stt-service.sh monta
 #     /opt/onion-stt (modelo e VAD por revisão fixada e sha256, venv por lock com hash, código), gera o token em
 #     /etc/onion-stt (0600, nunca em argv), prova o sandbox numa unit transitória ANTES de trocar a unit onion-vps-stt,

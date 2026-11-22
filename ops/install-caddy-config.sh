@@ -26,8 +26,11 @@
 # (nome no conf.d · clone local · ref · caminho · hosts permitidos). O que muda para esses vhosts:
 #   · a fonte é o BLOB COMMITADO na ref (`git show <ref>:<caminho>`), nunca a árvore de trabalho do clone: mudança
 #     local sem commit não vai para o ar. O script não faz fetch nem escreve no clone, só lê;
-#   · o carimbo é o mesmo MANAGED_MARK, com a fonte `<repo>:<caminho>`. Os arquivos dos repos NÃO trazem carimbo
-#     (medido em 2026-11-22: a 1ª linha é comentário livre). Conferir a deriva à mão: `tail -n +2 <vivo> | cmp <fonte> -`;
+#   · o carimbo é OUTRO, SERVICE_MARK, com a fonte `<repo>:<caminho>`, e de propósito não contém o MANAGED_MARK: a
+#     versão anterior deste script remove todo vivo com MANAGED_MARK sem fonte em ops/caddy/conf.d, e um revert ou
+#     um checkout velho derrubaria os vhosts de serviço como órfãos (refutador, 2026-11-22). Os arquivos dos repos
+#     NÃO trazem carimbo (medido em 2026-11-22: a 1ª linha é comentário livre). Conferir a deriva à mão:
+#     `tail -n +2 <vivo> | cmp <fonte> -` (vale com a fonte terminando numa quebra de linha só: o install normaliza o fim);
 #   · ADOÇÃO: o vivo não gerido de mesmo nome só é adotado se for byte a byte igual à fonte (a cópia que os PRs dos
 #     repos mediram). Diferente, recusa: alguém mexeu à mão ou o repo divergiu, e a decisão é do maestro;
 #   · todo site do arquivo tem de estar na coluna de hosts: um repo de serviço não declara o domínio de outro;
@@ -65,6 +68,7 @@ SUDO_CMD="sudo"
 CADDY_BIN="caddy"                     # o selftest troca por um stub no sandbox
 RELOAD_CMD=(sudo systemctl reload caddy)   # idem
 MANAGED_MARK="# GERIDO por ops/install-caddy-config.sh — fonte versionada:"
+SERVICE_MARK="# VHOST DE SERVIÇO, instalado pelo install-caddy-config do core a partir do repo:"   # sem o MANAGED_MARK dentro
 
 die() { echo "ERRO: $*" >&2; exit 2; }
 usage() { sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '/^Uso:/,/^$/p'; }
@@ -78,23 +82,23 @@ core_names() {
   set -f
 }
 
-# Linhas válidas da lista de serviço: nome · clone · ref · caminho · hosts (TAB). Linha malformada = die: lista
-# lida pela metade instalaria só parte dos vhosts sem ninguém ver. Saída: as 5 colunas, TAB, uma linha por vhost.
+# Linhas válidas da lista de serviço: nome · clone · ref · caminho · hosts · upstreams (TAB). Linha malformada = die:
+# lista lida pela metade instalaria só parte dos vhosts sem ninguém ver. Saída: as 6 colunas, TAB, uma por vhost.
 service_rows() {
   [[ -f "$SERVICE_TSV" ]] || return 0
-  local n repo ref path hosts extra
-  while IFS=$'\t' read -r n repo ref path hosts extra || [[ -n "$n" ]]; do
+  local n repo ref path hosts ups extra
+  while IFS=$'\t' read -r n repo ref path hosts ups extra || [[ -n "$n" ]]; do
     [[ -z "${n//[[:space:]]/}" || "$n" == \#* ]] && continue
     [[ "$n" =~ ^[a-z0-9][a-z0-9-]*\.caddy$ ]] || die "service-vhosts.tsv: nome inválido «$n»"
     [[ "$repo" == /* ]] || die "service-vhosts.tsv: clone de $n não é caminho absoluto («$repo»)"
     [[ -n "$ref" && "$ref" != -* ]] || die "service-vhosts.tsv: ref de $n vazia ou com cara de flag"
     [[ "$path" =~ ^caddy/[a-z0-9][a-z0-9-]*\.caddy$ ]] || die "service-vhosts.tsv: caminho de $n fora de caddy/*.caddy («$path»)"
-    [[ -n "$hosts" && -z "$extra" ]] || die "service-vhosts.tsv: linha de $n sem hosts ou com coluna a mais"
-    printf '%s\t%s\t%s\t%s\t%s\n' "$n" "$repo" "$ref" "$path" "$hosts"
+    [[ -n "$hosts" && -n "$ups" && -z "$extra" ]] || die "service-vhosts.tsv: linha de $n sem hosts, sem upstreams ou com coluna a mais"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$repo" "$ref" "$path" "$hosts" "$ups"
   done < "$SERVICE_TSV"
 }
 
-service_field() {  # service_field <nome> <coluna 1..5>; vazio se o nome não está na lista
+service_field() {  # service_field <nome> <coluna 1..6>; vazio se o nome não está na lista
   local rows; rows="$(service_rows)" || exit 2
   awk -F'\t' -v n="$1" -v c="$2" '$1==n {print $c; exit}' <<< "$rows"
 }
@@ -173,7 +177,12 @@ live_names() {
   set -f
 }
 
-is_managed_live() { grep -qF "$MANAGED_MARK" <<< "$($SUDO_CMD head -n1 "$1" 2>/dev/null)"; }
+is_managed_live() {  # carimbo do core OU de serviço na 1ª linha
+  local first; first="$($SUDO_CMD head -n1 "$1" 2>/dev/null)"
+  grep -qF "$MANAGED_MARK" <<< "$first" || grep -qF "$SERVICE_MARK" <<< "$first"
+}
+mark_for() { if [[ -f "$CONF_SRC_DIR/$1" ]]; then echo "$MANAGED_MARK $(source_label "$1")"; else echo "$SERVICE_MARK $(source_label "$1")"; fi; }
+has_markers() { local f; f="$(source_file "$1")" || return 1; grep -qE '@@[A-Z0-9_]+@@' "$f"; }
 
 # Adoção: o vivo NÃO gerido é byte a byte a fonte de SERVIÇO (a cópia medida pelos PRs dos repos). O vhost do core
 # segue recusando sobrescrever o escrito à mão.
@@ -184,28 +193,75 @@ adoptable() {
   $SUDO_CMD cmp -s "$f" "$CONF_DEST_DIR/$n"
 }
 
+# O LIMITE DO REPO, julgado pelo PRÓPRIO Caddy (refutador, 2026-11-22): a contagem de chaves no texto se contorna
+# (chave em comentário depois de TAB, chave entre aspas), e um site de outro domínio passava. Aqui a fonte vira o
+# JSON do `caddy adapt` (marcadores trocados por um valor neutro: o adapt não precisa de segredo) e se exige:
+#   · só a app http (e tls, que a diretiva `tls` do site gera); nada de admin, storage ou logging;
+#   · escuta só em :443/:80, e TODA rota de nível superior com host, todo host na coluna de hosts;
+#   · todo reverse_proxy com upstream na coluna de upstreams (fecha a API admin :2019 e o loopback de outro serviço),
+#     sem upstream dinâmico; nada de file_server nem templates (leriam disco como a conta do Caddy, que lê os segredos).
+adapt_guard() {  # adapt_guard <nome> <arquivo-fonte>
+  local name="$1" src="$2" tmp json
+  tmp="$(mktemp "$SRC_CACHE/adapt.XXXXXX")"
+  sed -E 's/@@[A-Z0-9_]+@@/onion-placeholder/g' "$src" > "$tmp"
+  json="$("$CADDY_BIN" adapt --config "$tmp" --adapter caddyfile 2>/dev/null)" || die "caddy adapt recusou a fonte de $name ($(source_label "$name"))"
+  HOSTS="$(service_field "$name" 5)" UPS="$(service_field "$name" 6)" python3 -I -c '
+import json, os, re, sys
+cfg = json.loads(sys.stdin.read() or "{}")
+hosts = {h for h in re.split(r"[,\s]+", os.environ["HOSTS"]) if h}
+ups = {u for u in re.split(r"[,\s]+", os.environ["UPS"]) if u}
+def no(msg): sys.exit("limite do repo: " + msg)
+if set(cfg) - {"apps"}: no("chave global fora de apps: %s" % sorted(set(cfg) - {"apps"}))
+apps = cfg.get("apps", {})
+if set(apps) - {"http", "tls"}: no("app fora de http/tls: %s" % sorted(set(apps) - {"http", "tls"}))
+servers = apps.get("http", {}).get("servers", {})
+if not servers: no("nenhum site")
+for srv in servers.values():
+    bad = [l for l in srv.get("listen", []) if l not in (":443", ":80")]
+    if bad: no("escuta fora de :443/:80: %s" % bad)
+    for r in srv.get("routes", []):
+        ms = r.get("match") or []
+        if not ms or any(not m.get("host") for m in ms): no("rota de nível superior sem host")
+        for m in ms:
+            out = [h for h in m["host"] if h not in hosts]
+            if out: no("host fora da lista %s: %s" % (sorted(hosts), out))
+def walk(x):
+    if isinstance(x, dict):
+        h = x.get("handler")
+        if h in ("file_server", "templates"): no("handler %s proibido" % h)
+        if h == "reverse_proxy":
+            if "dynamic_upstreams" in x: no("upstream dinâmico")
+            for u in x.get("upstreams", []):
+                if u.get("dial") not in ups: no("upstream fora da lista %s: %s" % (sorted(ups), u.get("dial")))
+        for v in x.values(): walk(v)
+    elif isinstance(x, list):
+        for v in x: walk(v)
+walk(cfg)
+' <<< "$json" || die "fonte de $name recusada pelo limite do repo (veja acima)"
+}
+
 # Renderiza um vhost gerido para a stdout: carimbo + fonte com @@NOME@@ resolvidos.
 # Recusa (die) marcador sem valor, valor vazio, ou valor com espaço/aspas/quebra de linha. Fonte de serviço:
 # recusa também site fora dos hosts declarados e conteúdo de nível superior que não seja bloco de site.
 render() {
   local name="$1" src env="$SECRETS_DIR/${1%.caddy}.env" secrets="" hosts=""
   src="$(source_file "$name")" || die "fonte gerida ausente: $name"
-  [[ -f "$CONF_SRC_DIR/$name" ]] || hosts="$(service_field "$name" 5)"
+  if [[ ! -f "$CONF_SRC_DIR/$name" ]]; then hosts="$(service_field "$name" 5)"; adapt_guard "$name" "$src"; fi
   if grep -qE '@@[A-Z0-9_]+@@' "$src"; then
     secrets="$($SUDO_CMD cat "$env" 2>/dev/null)" || die "segredos de $name ausentes em $env (rode ops/caddy-site-secrets.sh)"
   fi
-  SECRETS="$secrets" HOSTS="$hosts" python3 -I - "$src" "$MANAGED_MARK $(source_label "$name")" <<'PY' || die "render de $name recusado (veja acima)"
+  SECRETS="$secrets" HOSTS="$hosts" python3 -I - "$src" "$(mark_for "$name")" <<'PY' || die "render de $name recusado (veja acima)"
 import os, re, sys
 src, mark = sys.argv[1], sys.argv[2]
 text = open(src, encoding="utf-8").read()
 hosts = os.environ.get("HOSTS", "")
 if hosts:
-    # Só blocos de site no nível superior, e todo endereço deles na lista. Contagem de chaves ingênua (chave
-    # dentro de string conta): na dúvida recusa, que é o lado seguro.
+    # 1º filtro, barato: só blocos de site no nível superior, e todo endereço deles na lista. A contagem de chaves é
+    # ingênua (chave entre aspas conta) e SE CONTORNA: a autoridade é o adapt_guard, que lê o JSON do próprio Caddy.
     allowed = {h for h in re.split(r"[,\s]+", hosts) if h}
     depth = 0
     for ln, line in enumerate(text.splitlines(), 1):
-        code = "" if line.lstrip().startswith("#") else line.split(" #", 1)[0].strip()
+        code = re.sub(r"(^|\s)#.*$", "", line).strip()   # comentário do Caddyfile: # no começo de token
         if not code:
             continue
         if depth == 0:
@@ -249,7 +305,9 @@ stage_and_validate() {
   [[ -f "$SRC" ]] || die "fonte ausente: $SRC"
   [[ -L "$SRC" ]] && die "fonte é SYMLINK — recuso (estado ilegítimo desta derivação)"
   local stage n managed lives
-  managed="$(managed_names)" || exit 2
+  # a lista vem do chamador (MANAGED_LIST) quando ele já a calculou: estágio e apply instalam o MESMO conjunto, mesmo
+  # que um fetch no clone mude a ref no meio (refutador, 2026-11-22)
+  if [[ -n "${MANAGED_LIST+x}" ]]; then managed="$MANAGED_LIST"; else managed="$(managed_names)" || exit 2; fi
   lives="$(live_names)"
   stage="$($SUDO_CMD mktemp -d)" || die "mktemp do estágio falhou"
   $SUDO_CMD chmod 0700 "$stage"
@@ -270,7 +328,7 @@ stage_and_validate() {
       if [[ -f "$CONF_SRC_DIR/$n" ]]; then die "$CONF_DEST_DIR/$n existe e NÃO é gerido — recuso sobrescrever um vhost escrito à mão"; fi
       die "$CONF_DEST_DIR/$n existe, NÃO é gerido e difere da fonte $(source_label "$n") — recuso adotar (compare: diff <(git -C $(service_field "$n" 2) show $(service_field "$n" 3):$(service_field "$n" 4)) $CONF_DEST_DIR/$n)"
     fi
-    if [[ "${PLAN:-0}" == 1 && -f "$CONF_SRC_DIR/$n" ]] && grep -qE '@@[A-Z0-9_]+@@' "$CONF_SRC_DIR/$n"; then
+    if [[ "${PLAN:-0}" == 1 ]] && has_markers "$n"; then
       if [[ -e "$CONF_DEST_DIR/$n" ]]; then $SUDO_CMD cp -p "$CONF_DEST_DIR/$n" "$stage/conf.d/$n"
       else echo "  ! $n tem segredo e não está no vivo: fora da validação do ensaio (o install valida)" >&2; fi
       continue
@@ -346,10 +404,10 @@ verify_live() {
 apply_config() {
   # `|| exit 2` explícito: dentro de um contexto testado (`f || …`) o `set -e` NÃO dispara, e a
   # falha do pré-voo seguia instalando (pego pela bancada, 2026-10-08).
-  local stage; stage="$(stage_and_validate)" || exit 2
+  local managed; managed="$(managed_names)" || exit 2
+  local stage; stage="$(MANAGED_LIST="$managed" stage_and_validate)" || exit 2
   local -a restore=() created=() removed=()
-  local bak n managed lives
-  managed="$(managed_names)" || exit 2
+  local bak n lives
   lives="$(live_names)"
   bak="$(backup_file "$DEST" Caddyfile)"; [[ -n "$bak" ]] && restore+=("$bak|$DEST")
   [[ -z "$bak" ]] && echo "(sem $DEST a preservar — 1ª instalação)"
@@ -439,7 +497,7 @@ check() {
 # um diretório temporário, nunca /etc/caddy). Saída: uma linha por vhost; rc 0 = o install passaria o pré-voo.
 plan() {
   [[ -f "$DEST" ]] || { echo "não estou na VPS (sem $DEST) — nada a ensaiar; abstenho (exit 0)"; return 0; }
-  local n managed pending lives f live_body action
+  local n managed pending lives f action
   managed="$(managed_names)" || exit 2
   pending="$(pending_names)" || exit 2
   lives="$(live_names)"
@@ -453,12 +511,12 @@ plan() {
     elif ! is_managed_live "$CONF_DEST_DIR/$n"; then
       if adoptable "$n"; then action="> ADOTAR (vivo não gerido é byte a byte a fonte; ganha o carimbo na 1ª linha, backup antes)"
       else action="✗ RECUSA (vivo não gerido difere da fonte, ou é vhost do core escrito à mão): o install para no pré-voo"; fi
-    elif [[ -f "$CONF_SRC_DIR/$n" ]] && grep -qE '@@[A-Z0-9_]+@@' "$CONF_SRC_DIR/$n"; then
+    elif has_markers "$n"; then
       action="? com segredo: o ensaio não renderiza (o --check confere)"
     else
-      f="$(source_file "$n")" || die "fonte de $n sumiu no ensaio"
-      live_body="$($SUDO_CMD tail -n +2 "$CONF_DEST_DIR/$n" | sha256sum | awk '{print $1}')"
-      if [[ "$live_body" == "$(sha256sum < "$f" | awk '{print $1}')" && "$($SUDO_CMD head -n1 "$CONF_DEST_DIR/$n")" == "$MANAGED_MARK $(source_label "$n")" ]]; then
+      # a mesma forma que o apply grava e o --check confere: printf '%s\n' do render
+      f="$(render "$n")" || exit 2
+      if [[ "$(printf '%s\n' "$f" | sha256sum | awk '{print $1}')" == "$(read_hash "$CONF_DEST_DIR/$n")" ]]; then
         action="= inalterado"
       else action="~ ATUALIZAR (fonte mudou; backup antes)"; fi
     fi
@@ -475,7 +533,7 @@ plan() {
     else echo "  · não gerido, fica · conf.d/$n"; fi
   done <<< "$lives"
   echo "── pré-voo: caddy validate no estágio"
-  local stage; stage="$(PLAN=1 stage_and_validate)" || { echo "✗ RESULTADO: o install pararia no pré-voo (veja acima)"; return 1; }
+  local stage; stage="$(PLAN=1 MANAGED_LIST="$managed" stage_and_validate)" || { echo "✗ RESULTADO: o install pararia no pré-voo (veja acima)"; return 1; }
   $SUDO_CMD rm -rf "$stage"
   echo "✓ RESULTADO: ensaio verde; o install faria o que está acima (e recarregaria o Caddy)"
 }
@@ -495,7 +553,25 @@ selftest() {
 case "${1:-}" in
   validate) [ -n "${STUB_SEEN:-}" ] && cp "$3" "$STUB_SEEN" 2>/dev/null; exit "${STUB_VALIDATE_RC:-0}" ;;
   fmt)      exit 0 ;;
-  adapt)    echo '{}' ;;
+  adapt)    # com caddy de verdade na máquina, o adapt é o dele (REAL_CADDY); sem ele (o CI), um dublê que monta o
+            # JSON das linhas «site {», «reverse_proxy X» e «file_server» (não vê aspas nem comentário com TAB)
+            if [ -n "${REAL_CADDY:-}" ]; then exec "$REAL_CADDY" "$@"; fi
+            python3 -I - "$3" <<'EMU'
+import json, re, sys
+routes, depth, cur = [], 0, None
+for line in open(sys.argv[1], encoding="utf-8"):
+    code = re.sub(r"(^|\s)#.*$", "", line).strip()
+    if not code: continue
+    if depth == 0 and code.endswith("{"):
+        cur = {"match": [{"host": [a for a in re.split(r"[,\s]+", code[:-1]) if a]}], "handle": []}; routes.append(cur)
+    elif cur is not None and code.startswith("reverse_proxy "):
+        cur["handle"].append({"handler": "reverse_proxy", "upstreams": [{"dial": code.split()[1]}]})
+    elif cur is not None and code.split()[0] == "file_server":
+        cur["handle"].append({"handler": "file_server"})
+    depth += code.count("{") - code.count("}")
+print(json.dumps({"apps": {"http": {"servers": {"srv0": {"listen": [":443"], "routes": routes}}}}}))
+EMU
+            ;;
   *)        exit 0 ;;
 esac
 STUB
@@ -590,10 +666,11 @@ STUB
   git -C "$svc" add caddy/waha.caddy
   git -C "$svc" -c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -qm vhost
   cp "$svc/caddy/waha.caddy" "$CONF_DEST_DIR/waha.caddy"
-  printf '# nome\tclone\tref\tcaminho\thosts\nwaha.caddy\t%s\tmaster\tcaddy/waha.caddy\twaha.example\n' "$svc" > "$SERVICE_TSV"
+  printf '# nome\tclone\tref\tcaminho\thosts\tupstreams\nwaha.caddy\t%s\tmaster\tcaddy/waha.caddy\twaha.example\t127.0.0.1:3999\n' "$svc" > "$SERVICE_TSV"
   apply_config >/dev/null 2>&1 || true
   # 14. adoção: o não gerido igual à fonte ganha o carimbo, o corpo segue byte a byte
-  ok "serviço: vivo igual à fonte é ADOTADO (carimbo com a fonte do repo)" '[[ "$(head -n1 "$CONF_DEST_DIR/waha.caddy")" == "$MANAGED_MARK svc-waha:caddy/waha.caddy" ]]'
+  ok "serviço: vivo igual à fonte é ADOTADO (carimbo com a fonte do repo)" '[[ "$(head -n1 "$CONF_DEST_DIR/waha.caddy")" == "$SERVICE_MARK svc-waha:caddy/waha.caddy" ]]'
+  ok "serviço: o carimbo de serviço NÃO contém o do core (a versão anterior do script o removeria como órfão)" '! grep -qF "$MANAGED_MARK" <<< "$(head -n1 "$CONF_DEST_DIR/waha.caddy")"'
   ok "serviço: corpo adotado == blob do repo" 'tail -n +2 "$CONF_DEST_DIR/waha.caddy" | cmp -s "$svc/caddy/waha.caddy" -'
   t "serviço: check verde depois da adoção" 0 check
   # 15. a árvore de trabalho do clone NÃO vai para o ar: só o commit
@@ -617,11 +694,35 @@ STUB
   t "serviço: diretiva solta no nível superior → apply RECUSA" 2 apply_config
   ok "serviço: a recusa da diretiva solta é pela forma do nível superior (não só pelo host)" 'set +e; _o="$( set -e; apply_config 2>&1 )"; set -e; [[ "$_o" == *"no nível superior só cabe bloco de site"* ]]'
   git -C "$svc" reset -q --hard HEAD~2
+  # 18b. dentro do bloco permitido: upstream fora da lista (a API admin) e file_server → recusa
+  local gc=(-c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false)
+  printf 'waha.example {\n    reverse_proxy 127.0.0.1:2019\n}\n' > "$svc/caddy/waha.caddy"; git -C "$svc" "${gc[@]}" commit -qam admin
+  t "serviço: upstream fora da lista (admin :2019) → apply RECUSA" 2 apply_config
+  printf 'waha.example {\n    root * /etc/caddy/conf.d\n    file_server\n}\n' > "$svc/caddy/waha.caddy"; git -C "$svc" "${gc[@]}" commit -qam files
+  t "serviço: file_server no bloco → apply RECUSA" 2 apply_config
+  ok "serviço: vivo intocado após as recusas do bloco" 'cmp -s "$SB/waha.keep" "$CONF_DEST_DIR/waha.caddy"'
+  # 18c. com o Caddy de verdade (o achado do refutador): chave em comentário depois de TAB e chave entre aspas
+  #      enganam a contagem do texto; o adapt_guard pega. Sem caddy na máquina (o CI), o caso é pulado e DITO.
+  local real; real="$(command -v caddy || true)"
+  if [[ -n "$real" ]]; then
+    printf 'waha.example {\n  reverse_proxy 127.0.0.1:3999\t# {\n}\nonionevolve.com {\n  respond x\t# }\n}\n' > "$svc/caddy/waha.caddy"; git -C "$svc" "${gc[@]}" commit -qam tab
+    REAL_CADDY="$real" t "serviço (caddy real): host alheio escondido por comentário com TAB → apply RECUSA" 2 apply_config
+    printf 'waha.example {\n  respond "a{b"\n}\nonionevolve.com {\n  respond "c}d"\n}\n' > "$svc/caddy/waha.caddy"; git -C "$svc" "${gc[@]}" commit -qam quote
+    REAL_CADDY="$real" t "serviço (caddy real): host alheio escondido por chave entre aspas → apply RECUSA" 2 apply_config
+    ok "serviço (caddy real): quem recusa as aspas é o adapt_guard (host fora da lista no JSON)" 'set +e; _o="$( set -e; REAL_CADDY="$real" apply_config 2>&1 )"; set -e; [[ "$_o" == *"limite do repo: host fora da lista"* ]]'
+  else
+    echo "  ⊘ casos com caddy real pulados: sem caddy nesta máquina (o dublê do adapt não vê aspas nem TAB)"
+  fi
+  # volta a fonte ao 1º commit (a cópia do vivo) e confere que ela passa, com o caddy real quando houver
+  git -C "$svc" checkout -q "$(git -C "$svc" rev-list --max-parents=0 HEAD)" -- caddy/waha.caddy
+  git -C "$svc" "${gc[@]}" commit -qam back
+  REAL_CADDY="$real" t "serviço: a fonte legítima passa no limite do repo" 0 apply_config
+  ok "serviço: vivo segue igual depois das recusas" 'cmp -s "$SB/waha.keep" "$CONF_DEST_DIR/waha.caddy"'
   # 19. symlink commitado no lugar do vhost → recusa (não segue link)
   local svl="$SB/svc-link"; mkdir -p "$svl/caddy"; git -C "$svl" init -q -b master
   ln -s /etc/passwd "$svl/caddy/link.caddy"; git -C "$svl" add caddy/link.caddy
   git -C "$svl" -c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -qm link
-  printf 'link.caddy\t%s\tmaster\tcaddy/link.caddy\tlink.example\n' "$svl" >> "$SERVICE_TSV"
+  printf 'link.caddy\t%s\tmaster\tcaddy/link.caddy\tlink.example\t127.0.0.1:1\n' "$svl" >> "$SERVICE_TSV"
   t "serviço: symlink commitado como vhost → apply RECUSA" 2 apply_config
   ok "serviço: a recusa do symlink é pelo modo do blob (não pelo conteúdo do link)" 'set +e; _o="$( set -e; apply_config 2>&1 )"; set -e; [[ "$_o" == *"não é arquivo comum"* ]]'
   sed -i '/^link\.caddy/d' "$SERVICE_TSV"
@@ -629,10 +730,10 @@ STUB
   local svg="$SB/svc-gokapi"; mkdir -p "$svg/caddy"; git -C "$svg" init -q -b master
   printf '# transfer\ntransfer.example {\n\t@setup path /setup*\n\trespond @setup 404\n\treverse_proxy 127.0.0.1:3050\n}\n' > "$svg/caddy/gokapi.caddy"
   git -C "$svg" add caddy/gokapi.caddy; git -C "$svg" -c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -qm vhost
-  printf 'gokapi.caddy\t%s\tmaster\tcaddy/gokapi.caddy\ttransfer.example\n' "$svg" >> "$SERVICE_TSV"
+  printf 'gokapi.caddy\t%s\tmaster\tcaddy/gokapi.caddy\ttransfer.example\t127.0.0.1:3050\n' "$svg" >> "$SERVICE_TSV"
   ok "serviço: ensaio anuncia CRIAR e não toca o vivo" 'set +e; _o="$( set -e; plan 2>&1 )"; set -e; [[ "$_o" == *"CRIAR"*"conf.d/gokapi.caddy"* && ! -e "$CONF_DEST_DIR/gokapi.caddy" ]]'
   t "serviço: vhost novo do repo → apply cria" 0 apply_config
-  ok "serviço: vhost novo carimbado com a fonte do repo" '[[ "$(head -n1 "$CONF_DEST_DIR/gokapi.caddy")" == "$MANAGED_MARK svc-gokapi:caddy/gokapi.caddy" ]]'
+  ok "serviço: vhost novo carimbado com a fonte do repo" '[[ "$(head -n1 "$CONF_DEST_DIR/gokapi.caddy")" == "$SERVICE_MARK svc-gokapi:caddy/gokapi.caddy" ]]'
   ok "serviço: ensaio depois do apply diz inalterado" 'set +e; _o="$( set -e; plan 2>&1 )"; set -e; [[ "$_o" == *"= inalterado · conf.d/gokapi.caddy"* ]]'
   # 21. PENDENTE: a ref perde o arquivo (ou o clone some) → o vivo carimbado FICA; check acusa, apply não remove
   mv "$svg" "$SB/svc-gokapi.away"
@@ -645,7 +746,7 @@ STUB
   t "serviço: mesmo nome no core e na lista → apply RECUSA" 2 apply_config
   rm -f "$CONF_SRC_DIR/gokapi.caddy"
   # 23. lista malformada (caminho fora de caddy/) → recusa, nada pela metade
-  printf 'bad.caddy\t%s\tmaster\tdocker-compose.yml\tbad.example\n' "$svg" >> "$SERVICE_TSV"
+  printf 'bad.caddy\t%s\tmaster\tdocker-compose.yml\tbad.example\t127.0.0.1:1\n' "$svg" >> "$SERVICE_TSV"
   t "serviço: linha da lista com caminho fora de caddy/ → apply RECUSA" 2 apply_config
   t "serviço: linha da lista com caminho fora de caddy/ → check RECUSA" 2 check
   sed -i '/^bad\.caddy/d' "$SERVICE_TSV"
