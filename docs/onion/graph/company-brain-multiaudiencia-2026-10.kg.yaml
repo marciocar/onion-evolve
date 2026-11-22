@@ -200,6 +200,7 @@ nodes:
     layer: audit
     plane: DEV
     status: open
+    x_wait: "parqueado com gatilho pela D_CROSS_REPO_CONTRACT_1104 (no repo onion-kg-ssot): reabre com um caso confirmado de objeção perdida entre repos ou um adotante externo que precise validar a forma; o kg-ssot confere em cada review_after (próximo em 2026-12-04)"
     owner: kg-ssot
     impact: 3
     confidence: 0.5
