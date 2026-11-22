@@ -3757,6 +3757,103 @@ run_radar_composable_modes_selftests() {
   rm -rf "${d}"
 }
 
+# LEITURA POR FORMATO do kg-radar (2026-11-22, sinal do hub de 2026-11-21): a kg-ssot 4.56.0 trouxe
+# `kg_migrate.py format --to json`, e o radar, que lê YAML por linha, devolvia "nenhum nó encontrado" e
+# rc 1 para um .kg.json correto. A cura traduz o JSON para o YAML de bloco que o awk já lê; esta família
+# prova que os DOIS formatos dão o MESMO veredito e a MESMA saída, e que o JSON ruim para com rc 2.
+# ⚠️ Saída igual, e não só rc igual: o defeito antigo também devolvia um rc (1) "coerente" com um grafo
+# reprovado, e só o texto separa "li e reprovei" de "não li nada".
+run_radar_json_format_selftests() {
+  local rad="${REPO_ROOT}/.claude/validation/kg-radar.sh"
+  [ -f "${rad}" ] || { record_skip "radar-json: radar ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "radar-json: python3 ausente (o .kg.json exige leitor)"; return; }
+  local d; d="$(mktemp -d)"
+  cat > "${d}/ok.kg.yaml" <<'YAML'
+meta:
+  schema_version: "1"
+  baseline: "2026-11-01"
+nodes:
+  - id: D_UM
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-20"
+    verified_against: "medido com grep -n 'x' a.sh"
+    trace: a.sh
+    label: 'decisão com "aspas" e #cerquilha'
+  - id: Q_DOIS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: b.sh
+    label: pergunta aberta
+edges:
+  - from: Q_DOIS
+    edge_type: DEPENDS_ON
+    to: D_UM
+YAML
+  # TETO DECLARADO: o radar mostra o texto CRU da linha, e o escape do YAML (\" entre aspas duplas) não volta
+  # do JSON, que guarda só o valor. O rótulo com aspas vai em aspas simples para a igualdade medir o VALOR.
+  # o MESMO grafo em JSON, com as chaves FORA da ordem que o awk exige (id e from no fim): a tradução as reordena
+  cat > "${d}/ok.kg.json" <<'JSON'
+{"meta": {"schema_version": "1", "baseline": "2026-11-01"},
+ "nodes": [
+  {"node_type": "decision", "plane": "PROD", "status": "confirmed", "impact": 4, "confidence": 0.9,
+   "verified_at": "2026-11-20", "verified_against": "medido com grep -n 'x' a.sh", "trace": "a.sh",
+   "label": "decisão com \"aspas\" e #cerquilha", "id": "D_UM"},
+  {"id": "Q_DOIS", "node_type": "question", "plane": "DEV", "status": "open", "impact": 3, "confidence": 0.5,
+   "trace": "b.sh", "label": "pergunta aberta"}
+ ],
+ "edges": [{"edge_type": "DEPENDS_ON", "to": "D_UM", "from": "Q_DOIS"}]
+}
+JSON
+  # o defeito plantado nos dois formatos: aresta para nó inexistente (integridade reprova, rc 1)
+  sed 's/    to: D_UM/    to: D_FANTASMA/' "${d}/ok.kg.yaml" > "${d}/bad.kg.yaml"
+  sed 's/"to": "D_UM"/"to": "D_FANTASMA"/' "${d}/ok.kg.json" > "${d}/bad.kg.json"
+  local m case_ok=1 ry rj oy oj
+  for m in --all --integrity --schema --weights-tsv --open-tsv --state; do
+    ry=0; oy="$(bash "${rad}" "${d}/ok.kg.yaml" "${m}" 2>&1 | sed "s#${d}/ok.kg.yaml#G#g")" || ry=$?
+    rj=0; oj="$(bash "${rad}" "${d}/ok.kg.json" "${m}" 2>&1 | sed "s#${d}/ok.kg.json#G#g")" || rj=$?
+    if [ "${ry}" != "${rj}" ] || [ "${oy}" != "${oj}" ]; then
+      case_ok=0; record_fail "radar-json: (a) grafo são, modo ${m}" "rc yaml=${ry} json=${rj}; saídas $( [ "${oy}" = "${oj}" ] && echo iguais || echo DIFERENTES)"
+    fi
+  done
+  ry=0; bash "${rad}" "${d}/ok.kg.json" --integrity >/dev/null 2>&1 || ry=$?
+  if [ "${case_ok}" = 1 ] && [ "${ry}" = 0 ] && ! bash "${rad}" "${d}/ok.kg.json" --integrity 2>&1 | grep -q 'nenhum nó encontrado'; then
+    record_pass "radar-json: (a) grafo são → .kg.yaml e .kg.json com o mesmo rc 0 e a mesma saída em 6 modos"
+  elif [ "${case_ok}" = 1 ]; then record_fail "radar-json: (a)" "o .kg.json são não passou (rc=${ry})"; fi
+  ry=0; oy="$(bash "${rad}" "${d}/bad.kg.yaml" --integrity --schema 2>&1 | sed "s#${d}/bad.kg.yaml#G#g")" || ry=$?
+  rj=0; oj="$(bash "${rad}" "${d}/bad.kg.json" --integrity --schema 2>&1 | sed "s#${d}/bad.kg.json#G#g")" || rj=$?
+  if [ "${ry}" = 1 ] && [ "${rj}" = 1 ] && [ "${oy}" = "${oj}" ] && grep -q 'D_FANTASMA' <<< "${oj}"; then
+    record_pass "radar-json: (b) aresta pendurada → os dois formatos reprovam com rc 1 e a mesma acusação"
+  else record_fail "radar-json: (b)" "rc yaml=${ry} json=${rj}; acusa D_FANTASMA no json: $(grep -c D_FANTASMA <<< "${oj}")"; fi
+  printf '{"meta": {"schema_version": "1"}, "nodes": [{"id": "A", "id": "B"}]}\n' > "${d}/dup.kg.json"
+  rj=0; oj="$(bash "${rad}" "${d}/dup.kg.json" --integrity 2>&1)" || rj=$?
+  if [ "${rj}" = 2 ] && grep -q 'parse.duplicate-key' <<< "${oj}"; then
+    record_pass "radar-json: (c) chave repetida no .kg.json → rc 2 com o código do contrato (não some na tradução)"
+  else record_fail "radar-json: (c)" "rc=${rj}: ${oj}"; fi
+  printf '{"meta": {"schema_version": "1"}, "nodes": [ {"id": "A",} ]}\n' > "${d}/broken.kg.json"
+  printf '{"meta": {}, "nodes": [{"id": "A", "impact": NaN}]}\n' > "${d}/nan.kg.json"
+  printf '[1, 2]\n' > "${d}/list.kg.json"
+  local f bad=""
+  for f in broken nan list; do
+    rj=0; bash "${rad}" "${d}/${f}.kg.json" --integrity >/dev/null 2>&1 || rj=$?
+    [ "${rj}" = 2 ] || bad="${bad} ${f}=${rj}"
+  done
+  if [ -z "${bad}" ]; then record_pass "radar-json: (d) JSON fora da RFC 8259, NaN e raiz que não é objeto → rc 2 (erro de arquivo, nunca veredito)"
+  else record_fail "radar-json: (d)" "rc esperado 2:${bad}"; fi
+  cp "${d}/ok.kg.json" "${d}/frag.proposal.kg.json"
+  rj=0; oj="$(bash "${rad}" "${d}/frag.proposal.kg.json" --integrity 2>&1)" || rj=$?
+  if grep -q 'MODO PROPOSTA (sufixo .proposal.kg.json)' <<< "${oj}"; then
+    record_pass "radar-json: (e) sufixo .proposal.kg.json liga o modo proposta, como o .proposal.kg.yaml"
+  else record_fail "radar-json: (e)" "rc=${rj}; o modo proposta não engatou pelo sufixo .kg.json"; fi
+  rm -rf "${d}"
+}
+
 run_kg_status_factor_selftests() {
   local view="${SCRIPT_DIR}/kg-view.sh" radar="${SCRIPT_DIR}/kg-radar.sh"
   local lib="${SCRIPT_DIR}/lib/status-factor.awk"
@@ -45201,6 +45298,7 @@ _family run_decouple_source_selftests
 _family run_kg_view_selftests
 _family run_kg_status_factor_selftests
 _family run_radar_composable_modes_selftests
+_family run_radar_json_format_selftests
 _family run_pretooluse_veto_selftests
 _family run_moat_gate_selftests
 _family run_a2a_invite_live_selftests
