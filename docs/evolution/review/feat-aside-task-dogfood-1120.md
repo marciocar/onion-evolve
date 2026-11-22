@@ -2,8 +2,7 @@
 branch: feat/aside-task-dogfood-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: 4416b0b2b2c0ebfd2de56f721db346f2f34ccf2d2736e0fdc656dca70b356b6b
-reviewed_code_sha256: fc28176e5fd1cb516a0aa667b69b4a5829d2de551625b816bfb62b7e86b9b52e
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 11
 findings_blocking: 0
@@ -11,10 +10,10 @@ tokens: 71467
 duration_min: 4
 findings_fixed: 9
 verdict: FIXED
-elenxo: false
+elenxo: true
 elenxo_isolado: true
 reviewer: "subagente code-reviewer isolado, sem a conclusão do autor, com mandato de refutar e rodar comandos; leu só o diff e o repo"
-nota: "tokens = os do subagente revisor. elenxo: false porque não é o Elenxo de workflow; elenxo_isolado: true porque o revisor não escreveu o diff e não recebeu a conclusão. 0 bloqueantes, 6 ressalvas, 6 nits; 9 curados, 2 aceitos com motivo (M7 fraco e rótulo sem namespace do plugin, padrão das rotas existentes) e 1 não real para a guarda (trap no Ctrl-C)."
+nota: "tokens = os do subagente revisor. elenxo: true (corrigido em 2026-11-22 pela sessão do core; antes false porque não era o Elenxo de workflow): no esquema do resíduo o campo declara se houve passada adversarial, e houve, por revisor com mandato de refutar; elenxo_isolado: true porque o revisor não escreveu o diff e não recebeu a conclusão. 0 bloqueantes, 6 ressalvas, 6 nits; 9 curados, 2 aceitos com motivo (M7 fraco e rótulo sem namespace do plugin, padrão das rotas existentes) e 1 não real para a guarda (trap no Ctrl-C)."
 ---
 
 # Passada adversarial: `feat/aside-task-dogfood-1120`
