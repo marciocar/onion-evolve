@@ -2,8 +2,7 @@
 branch: fix/jq-raw-utf8-boundary
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: f9816700e14c708a57daaa9f321b81956bd8dcfadf8192b51f8b96a006b11108
-reviewed_code_sha256: 2317f8d9a8a36b140d8e710b93b5c4f06bea5b0b563e5c3a7bb3e4d243aa98b7
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 5
 findings_blocking: 2
