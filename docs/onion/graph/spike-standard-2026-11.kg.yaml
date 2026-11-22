@@ -1,0 +1,78 @@
+# kg-backlog-guard: on
+# O padrão de spike/PoC do Onion (/engineer:spike), pedido pelo hub em 2026-11-21 e respondido pelo core no mesmo dia.
+# Este grafo guarda a decisão da forja e o PRIMEIRO spike registrado pelo molde: a pergunta nasceu num commit anterior
+# à amostra, como o comando exige.
+meta:
+  id: spike-standard-2026-11
+  schema_version: "1"
+  baseline: "2026-11-22"
+  review_after: "2026-12-22"   # 30d: o molde é cunhagem a medir pelos primeiros spikes dos projetos
+  x_supersedes_none: "Superfície nova: nenhum grafo anterior é superado. As peças vizinhas (escada de promoção, drive §3.1, peek) são citadas, não substituídas."
+  # ═══ TETO: 12 NÓS ═══
+  # Nascem 7 (a decisão da forja, o sinal do hub, o spike de prova em 3 nós e a pergunta do medidor; o 7º é a
+  # decisão do spike). A folga é para o medidor da ordem e os primeiros spikes de projeto que o core registrar aqui.
+nodes:
+  - id: D_SPIKE_COMMAND_IN_ENGINEER_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-22"
+    verified_against: "forge-census.sh no core em 2026-11-22: nenhum comando de spike entre os 67 candidatos; spike citado só em /product:estimate e em duas doutrinas"
+    label: "O padrão de spike/PoC vira o comando /engineer:spike, com a ficha, a forma no grafo (Q_ -> evidence -> decision) e o reuso da escada de promoção e do drive §3.1."
+    narrative: "Categoria engineer, e não meta: o spike vem antes do /engineer:plan em qualquer projeto que usa o Onion, e não é peça da evolução do framework; assim ele viaja com a vertical de engenharia, sem subir o teto do meta. Doutrina nova não nasce: a escada de promoção (a camada PoC/spike) e o drive §3.1 (critério com denominador fixo e avaliador cego) já são a doutrina, e o comando as cita. Medidor e bancada (peças 3 e 7 da forja) ficam para Q_SPIKE_ORDER_MEASURER_1122. Esta decisão depende do spike de prova do molde."
+    provenance:
+      source: "forja do /engineer:spike pela sessão do core"
+      locator: ".claude/commands/engineer/spike.md"
+      method: "testimony: brief da sessão do core, decisão pela opção recomendada"
+      locality: "host"
+  - id: E_HUB_ASKED_SPIKE_STANDARD_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-21"
+    verified_against: "sinal do hub arquivado em docs/evolution/inbox/_processed/2026-11-21-question-spike-poc-standard.md"
+    label: "O hub perguntou se o Onion tem padrão de spike/PoC (template, onde mora o resultado, critério de saída, tempo-caixa) antes de 9 spikes de funcionalidade nova. A resposta do core apontou a escada e o drive §3.1 e prometeu o comando."
+    trace: "docs/evolution/inbox/_processed/2026-11-21-question-spike-poc-standard.md"
+    provenance:
+      source: "sinal upstream do hub"
+      locator: "docs/evolution/inbox/_processed/2026-11-21-question-spike-poc-standard.md"
+      method: "testimony: pergunta do hub"
+      locality: "host"
+  - id: Q_SPIKE_XFIELDS_PASS_GATES_1122
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-22"
+    verified_against: "critério escrito e commitado antes da amostra"
+    label: "Um spike registrado pelo molde (Q_ com x_spike_*, evidence, decision) passa no kg-radar --integrity --schema, no kg-contract-check e no yaml.safe_load, nos dois commits?"
+    x_spike_kill: "morre se QUALQUER juiz sair rc diferente de 0 neste grafo (denominador fixo: 3 juízes x 2 commits = 6 rodadas)"
+    x_spike_success: "6 de 6 rodadas com rc 0, e um mutante com edge_type inválido reprova no radar"
+    x_spike_timebox: "30min"
+    x_spike_deadline: "2026-11-22"
+    x_spike_proves: "que o molde do grafo do spike é aceito pelos juízes da casa"
+    x_spike_untouched: "nenhum outro grafo rastreado; nenhum juiz é editado"
+    x_spike_undo: "reverter os dois commits deste grafo; o mutante vive só no scratch"
+    x_spike_workdir: "scratch da sessão, fora do produto"
+    provenance:
+      source: "forja do /engineer:spike"
+      locator: ".claude/commands/engineer/spike.md, seção A forma no grafo"
+      method: "testimony: pergunta da forja"
+      locality: "host"
+edges:
+  - from: D_SPIKE_COMMAND_IN_ENGINEER_1122
+    to: Q_SPIKE_XFIELDS_PASS_GATES_1122
+    edge_type: DEPENDS_ON
+  - from: E_HUB_ASKED_SPIKE_STANDARD_1121
+    to: D_SPIKE_COMMAND_IN_ENGINEER_1122
+    edge_type: SUPPORTS
