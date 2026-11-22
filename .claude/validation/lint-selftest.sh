@@ -62522,7 +62522,7 @@ if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ
   _sl_c() { local x a; x="$(_slx)"; mkdir -m 700 "${x}/${CD}"; printf '%s' "${J_OK}" > "${x}/${CD}/agents.json"
     _slage "${x}/${CD}/agents.json" 200; a="$(_slrun "$1" "${x}" "${sb}/nobin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
     grep -q '^sessões: 2 trabalhando · 2 esperam você: w1, bk (leitura de 2[0-9][0-9] s atrás) · ← claude agents$' <<< "${a}" && grep -q '^rc=0$' <<< "${a}"; }
-  _slcase "(c) sem claude no PATH com cache velho: serve o cache com a idade, rc 0" "${ln}" '    if current > STALE:' '    if False:' _sl_c
+  _slcase "(c) sem claude no PATH com cache velho: serve o cache com a idade, rc 0" "${ln}" '    elif current > STALE:' '    elif False:' _sl_c
   # (d) cache fresco: o claude NÃO é chamado (o TTL poupa o processo de ~150 MB por atualização)
   _sl_d() { local x a; x="$(_slx)"; mkdir -m 700 "${x}/${CD}"; printf '%s' '[]' > "${x}/${CD}/agents.json"
     a="$(_slrun "$1" "${x}" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
@@ -62569,9 +62569,15 @@ if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ
     a="$(_slrun "$1" "${x}" "${sb}/bin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"; grep -q '^calls=1$' <<< "${a}" && grep -q '^sessões: 2 trabalhando' <<< "${a}"; }
   _slcase "(t) cache com mtime no futuro: relê" "${ln}" 'if current is None or current < 0 or current > TTL:' 'if current is None or current > TTL:' _sl_t
   # (u) estado que a linha não conhece (esquema mudou) aparece contado, nunca some num zero
-  _sl_u() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/bin" '[{"status":"running"},{"kind":"background","state":"active"},{"status":"idle"}]')"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
-    grep -qxF 'sessões: 0 trabalhando · 0 esperam você · 2 em estado desconhecido · ← claude agents' <<< "${a}"; }
+  _sl_u() { local a; a="$(_slrun "$1" "$(_slx)" "${sb}/bin" '[{"status":"running"},{"kind":"background","state":"active"},{"status":"idle"},{"status":"idle","state":"running"}]')"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -qxF 'sessões: 0 trabalhando · 0 esperam você · 3 em estado desconhecido · ← claude agents' <<< "${a}"; }
   _slcase "(u) estado desconhecido é contado, não vira zero" "${ln}" '    if other:' '    if False:' _sl_u
+  _slcase "(u2) status conhecido não mascara state desconhecido" "${ln}" \
+    '                  or (x.get("state") is not None and x.get("state") not in KNOWN_STATE))]' '                  and (x.get("state") is not None and x.get("state") not in KNOWN_STATE))]' _sl_u
+  # (t2) mtime no futuro e a releitura falha (sem claude): o rótulo diz, a contagem velha não passa por atual
+  _sl_t2() { local x a; x="$(_slx)"; mkdir -m 700 "${x}/${CD}"; printf '%s' "${J_OK}" > "${x}/${CD}/agents.json"; _slage "${x}/${CD}/agents.json" -3600
+    a="$(_slrun "$1" "${x}" "${sb}/nobin")"; SL_WHY="$(tr '\n' '|' <<< "${a}")"; grep -q '(leitura com data no futuro) · ← claude agents$' <<< "${a}"; }
+  _slcase "(t2) mtime no futuro sem releitura: rótulo, não contagem atual" "${ln}" '    if current < 0:' '    if False:' _sl_t2
   # ── a oferta do adopt ──
   local r="${sb}/repo" wt="${sb}/wt"
   "${G[@]}" init -q "${r}"; mkdir -p "${r}/.claude/utils/statusline"; cp "${ln}" "${r}/.claude/utils/statusline/"
@@ -62612,7 +62618,12 @@ if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ
   _of_n2() { local a; printf '%s\n' '{"statusLine":{"type":"command","command":"python3 -I /nao/existe/onion-sessions-line"}}' > "${sb}/cfg/settings.json"
     a="$(_ofrun "$1" "${r}")"; rm -f "${sb}/cfg/settings.json"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
     grep -q 'NÃO existe mais' <<< "${a}" && grep -q '^PASSO DO MAESTRO' <<< "${a}"; }
-  _slcase "(n2) censo ligado em caminho que sumiu: avisa e oferece de novo" "${of}" 'if on and os.path.isfile(on):' 'if on:' _of_n2
+  _slcase "(n2) censo ligado em caminho que sumiu: avisa e oferece de novo" "${of}" 'elif on and os.path.isfile(on):' 'elif on:' _of_n2
+  # (n4) censo ligado por caminho relativo (quebra fora do repo): avisa e oferece, mesmo rodando de dentro do repo
+  _of_n4() { local a; printf '%s\n' '{"statusLine":{"type":"command","command":"python3 -I .claude/utils/statusline/onion-sessions-line"}}' > "${sb}/cfg/settings.json"
+    a="$(cd "${r}" && _ofrun "$1" "${r}")"; rm -f "${sb}/cfg/settings.json"; SL_WHY="$(tr '\n' '|' <<< "${a}")"
+    grep -q 'caminho RELATIVO' <<< "${a}" && grep -q '^PASSO DO MAESTRO' <<< "${a}"; }
+  _slcase "(n4) censo por caminho relativo: avisa e oferece" "${of}" 'if on and not os.path.isabs(on):' 'if False:' _of_n4
   # (n3) sem HOME nem CLAUDE_CONFIG_DIR: oferta sai rc 0 com o aviso, nunca «unbound variable»
   local a_n3 rc_n3=0; a_n3="$(env -u HOME -u CLAUDE_CONFIG_DIR PATH="${PATH}" bash "${of}" "${r}" 2>&1)" || rc_n3=$?
   if [ "${rc_n3}" = 0 ] && grep -q 'NÃO medi o settings do usuário' <<< "${a_n3}" && grep -q '^PASSO DO MAESTRO' <<< "${a_n3}"; then
