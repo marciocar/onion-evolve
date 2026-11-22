@@ -21,6 +21,20 @@
 #   · O vivo renderizado fica 0640 root:caddy, porque carrega segredo.
 #   · Linhas `# verify: <url> <código>` no conf.d versionado entram na verificação comportamental.
 #
+# VHOSTS DOS REPOS DE SERVIÇO (2026-11-22, cards SAC-465 e #70 do core): librechat, vault, waha e gokapi moram no
+# repo do próprio serviço (`caddy/<nome>.caddy`), e o core segue dono do Caddy. A lista é ops/caddy/service-vhosts.tsv
+# (nome no conf.d · clone local · ref · caminho · hosts permitidos). O que muda para esses vhosts:
+#   · a fonte é o BLOB COMMITADO na ref (`git show <ref>:<caminho>`), nunca a árvore de trabalho do clone: mudança
+#     local sem commit não vai para o ar. O script não faz fetch nem escreve no clone, só lê;
+#   · o carimbo é o mesmo MANAGED_MARK, com a fonte `<repo>:<caminho>`. Os arquivos dos repos NÃO trazem carimbo
+#     (medido em 2026-11-22: a 1ª linha é comentário livre). Conferir a deriva à mão: `tail -n +2 <vivo> | cmp <fonte> -`;
+#   · ADOÇÃO: o vivo não gerido de mesmo nome só é adotado se for byte a byte igual à fonte (a cópia que os PRs dos
+#     repos mediram). Diferente, recusa: alguém mexeu à mão ou o repo divergiu, e a decisão é do maestro;
+#   · todo site do arquivo tem de estar na coluna de hosts: um repo de serviço não declara o domínio de outro;
+#   · fonte ausente na ref (PR ainda aberto) é PENDENTE: o vivo fica como está, e nada se remove por isso. Só é
+#     órfão o carimbado cujo nome não está nem em ops/caddy/conf.d nem na lista;
+#   · sem `# verify:` na fonte, a verificação cobra que cada host responda (código ≠ 000) depois do reload.
+#
 # GUARDAS POR CONSTRUÇÃO (não por disciplina), fundadas na pesquisa de estado da arte 2026:
 #  1. PRÉ-VOO: `caddy validate` num ESTÁGIO (Caddyfile + conf.d final) antes de tocar o vivo.
 #  2. BACKUP timestamped do Caddyfile e de cada conf.d gerido ANTES do cp.
@@ -31,6 +45,7 @@
 #
 # Uso:
 #   ops/install-caddy-config.sh             # valida, faz backup, instala e recarrega (na KVM 8)
+#   ops/install-caddy-config.sh --plan      # ENSAIO: o que o install mudaria + validação do estágio; não toca o vivo
 #   ops/install-caddy-config.sh --check     # read-only: acusa drift fonte×/etc/caddy (exit 1 se houver)
 #   ops/install-caddy-config.sh --selftest  # bancada em sandbox (nunca toca /etc nem recarrega)
 set -euo pipefail
@@ -41,6 +56,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC="${REPO}/ops/caddy/Caddyfile"
 DEST="/etc/caddy/Caddyfile"
 CONF_SRC_DIR="${REPO}/ops/caddy/conf.d"
+SERVICE_TSV="${REPO}/ops/caddy/service-vhosts.tsv"   # vhosts que moram nos repos de serviço
 CONF_DEST_DIR="/etc/caddy/conf.d"
 SECRETS_DIR="/etc/caddy/secrets"
 CONF_OWNER="root:caddy"               # o selftest esvazia (sandbox sem root)
@@ -53,14 +69,101 @@ MANAGED_MARK="# GERIDO por ops/install-caddy-config.sh — fonte versionada:"
 die() { echo "ERRO: $*" >&2; exit 2; }
 usage() { sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '/^Uso:/,/^$/p'; }
 
-# Fontes geridas: os *.caddy de ops/caddy/conf.d/ (nomes, um por linha).
-managed_names() {
+# Fontes geridas do core: os *.caddy de ops/caddy/conf.d/ (nomes, um por linha).
+core_names() {
   [[ -d "$CONF_SRC_DIR" ]] || return 0
   local f
   set +f
   for f in "$CONF_SRC_DIR"/*.caddy; do [[ -f "$f" ]] && basename "$f"; done
   set -f
 }
+
+# Linhas válidas da lista de serviço: nome · clone · ref · caminho · hosts (TAB). Linha malformada = die: lista
+# lida pela metade instalaria só parte dos vhosts sem ninguém ver. Saída: as 5 colunas, TAB, uma linha por vhost.
+service_rows() {
+  [[ -f "$SERVICE_TSV" ]] || return 0
+  local n repo ref path hosts extra
+  while IFS=$'\t' read -r n repo ref path hosts extra || [[ -n "$n" ]]; do
+    [[ -z "${n//[[:space:]]/}" || "$n" == \#* ]] && continue
+    [[ "$n" =~ ^[a-z0-9][a-z0-9-]*\.caddy$ ]] || die "service-vhosts.tsv: nome inválido «$n»"
+    [[ "$repo" == /* ]] || die "service-vhosts.tsv: clone de $n não é caminho absoluto («$repo»)"
+    [[ -n "$ref" && "$ref" != -* ]] || die "service-vhosts.tsv: ref de $n vazia ou com cara de flag"
+    [[ "$path" =~ ^caddy/[a-z0-9][a-z0-9-]*\.caddy$ ]] || die "service-vhosts.tsv: caminho de $n fora de caddy/*.caddy («$path»)"
+    [[ -n "$hosts" && -z "$extra" ]] || die "service-vhosts.tsv: linha de $n sem hosts ou com coluna a mais"
+    printf '%s\t%s\t%s\t%s\t%s\n' "$n" "$repo" "$ref" "$path" "$hosts"
+  done < "$SERVICE_TSV"
+}
+
+service_field() {  # service_field <nome> <coluna 1..5>; vazio se o nome não está na lista
+  local rows; rows="$(service_rows)" || exit 2
+  awk -F'\t' -v n="$1" -v c="$2" '$1==n {print $c; exit}' <<< "$rows"
+}
+
+service_names() { local rows; rows="$(service_rows)" || exit 2; [[ -z "$rows" ]] || cut -f1 <<< "$rows"; }
+
+# Lê a fonte de um vhost para <arquivo>. Core: o arquivo de ops/caddy/conf.d/. Serviço: o BLOB commitado na ref
+# (modo 100644; symlink e submódulo recusados). rc 1 = fonte ausente (pendente); die = fonte ilegítima.
+fetch_source() {
+  local n="$1" out="$2" repo ref path meta
+  if [[ -e "$CONF_SRC_DIR/$n" ]]; then
+    [[ -f "$CONF_SRC_DIR/$n" && ! -L "$CONF_SRC_DIR/$n" ]] || die "fonte gerida ausente ou symlink: $CONF_SRC_DIR/$n"
+    cat "$CONF_SRC_DIR/$n" > "$out"; return 0
+  fi
+  repo="$(service_field "$n" 2)"; [[ -n "$repo" ]] || return 1
+  ref="$(service_field "$n" 3)"; path="$(service_field "$n" 4)"
+  [[ -e "$repo/.git" ]] || return 1
+  meta="$(git -C "$repo" ls-tree "$ref" -- "$path" 2>/dev/null)" || return 1
+  [[ -n "$meta" ]] || return 1
+  [[ "$meta" == "100644 blob "* ]] || die "fonte de $n em $repo@$ref:$path não é arquivo comum ($meta)"
+  git -C "$repo" show "$ref:$path" > "$out" 2>/dev/null || return 1
+}
+
+source_label() {  # o que vai no carimbo
+  if [[ -f "$CONF_SRC_DIR/$1" ]]; then echo "ops/caddy/conf.d/$1"
+  else echo "$(basename "$(service_field "$1" 2)"):$(service_field "$1" 4)"; fi
+}
+
+source_rev() {  # de onde a fonte de serviço foi lida (ref, sha curto e data), para o relatório
+  local repo ref; repo="$(service_field "$1" 2)"; ref="$(service_field "$1" 3)"
+  [[ -n "$repo" ]] || return 0
+  git -C "$repo" log -1 --format="$ref=%h (%cs)" "$ref" 2>/dev/null || echo "$ref=?"
+}
+
+# As fontes lidas (templates, sem segredo) vão para um diretório privado criado UMA vez no topo (os subshells o
+# herdam) e removido no EXIT. Sem cache: cada leitura é nova, então a fonte nunca sai velha dentro da execução.
+SRC_CACHE=""
+source_file() {  # imprime o caminho de uma cópia nova da fonte de <nome>; rc 1 se ausente
+  local n="$1" f
+  [[ -n "$SRC_CACHE" && -d "$SRC_CACHE" ]] || die "SRC_CACHE não inicializado (bug do script)"
+  f="$(mktemp "$SRC_CACHE/src.XXXXXX")"
+  fetch_source "$n" "$f" || { rm -f "$f"; return 1; }
+  echo "$f"
+}
+
+# Geridos com fonte legível: core + serviço cuja fonte existe na ref. Serviço sem fonte = pendente.
+# ⚠️ Chame SEMPRE como `x="$(managed_names)" || exit 2`, nunca em `< <(…)`: o die dentro de uma substituição de
+# processo some calado, e a lista sairia pela metade (uma fonte ilegítima viraria "não listada").
+managed_names() {
+  local n names rc
+  core_names
+  names="$(service_names)" || exit 2
+  while IFS= read -r n; do
+    [[ -n "$n" ]] || continue
+    [[ -e "$CONF_SRC_DIR/$n" ]] && die "$n está em ops/caddy/conf.d/ E em service-vhosts.tsv: uma fonte só"
+    rc=0; ( source_file "$n" >/dev/null ) || rc=$?
+    case "$rc" in 0) echo "$n" ;; 1) ;; *) exit 2 ;; esac
+  done <<< "$names"
+}
+pending_names() {
+  local n names rc
+  names="$(service_names)" || exit 2
+  while IFS= read -r n; do
+    [[ -n "$n" ]] || continue
+    rc=0; ( source_file "$n" >/dev/null ) || rc=$?
+    case "$rc" in 0) ;; 1) echo "$n" ;; *) exit 2 ;; esac
+  done <<< "$names"
+}
+is_known() { [[ -f "$CONF_SRC_DIR/$1" || -n "$(service_field "$1" 1)" ]]; }
 
 # Vivos em conf.d (nomes *.caddy). Lidos com sudo: o gerido é 0640.
 live_names() {
@@ -72,17 +175,51 @@ live_names() {
 
 is_managed_live() { grep -qF "$MANAGED_MARK" <<< "$($SUDO_CMD head -n1 "$1" 2>/dev/null)"; }
 
-# Renderiza um conf.d gerido para a stdout: carimbo + template com @@NOME@@ resolvidos.
-# Recusa (die) marcador sem valor, valor vazio, ou valor com espaço/aspas/quebra de linha.
+# Adoção: o vivo NÃO gerido é byte a byte a fonte de SERVIÇO (a cópia medida pelos PRs dos repos). O vhost do core
+# segue recusando sobrescrever o escrito à mão.
+adoptable() {
+  local n="$1" f
+  [[ -f "$CONF_SRC_DIR/$n" ]] && return 1
+  f="$(source_file "$n")" || return 1
+  $SUDO_CMD cmp -s "$f" "$CONF_DEST_DIR/$n"
+}
+
+# Renderiza um vhost gerido para a stdout: carimbo + fonte com @@NOME@@ resolvidos.
+# Recusa (die) marcador sem valor, valor vazio, ou valor com espaço/aspas/quebra de linha. Fonte de serviço:
+# recusa também site fora dos hosts declarados e conteúdo de nível superior que não seja bloco de site.
 render() {
-  local name="$1" src="$CONF_SRC_DIR/$1" env="$SECRETS_DIR/${1%.caddy}.env" secrets=""
-  [[ -f "$src" && ! -L "$src" ]] || die "fonte gerida ausente ou symlink: $src"
+  local name="$1" src env="$SECRETS_DIR/${1%.caddy}.env" secrets="" hosts=""
+  src="$(source_file "$name")" || die "fonte gerida ausente: $name"
+  [[ -f "$CONF_SRC_DIR/$name" ]] || hosts="$(service_field "$name" 5)"
   if grep -qE '@@[A-Z0-9_]+@@' "$src"; then
     secrets="$($SUDO_CMD cat "$env" 2>/dev/null)" || die "segredos de $name ausentes em $env (rode ops/caddy-site-secrets.sh)"
   fi
-  SECRETS="$secrets" python3 -I - "$src" "$MANAGED_MARK ops/caddy/conf.d/$name" <<'PY' || die "render de $name recusado (veja acima)"
+  SECRETS="$secrets" HOSTS="$hosts" python3 -I - "$src" "$MANAGED_MARK $(source_label "$name")" <<'PY' || die "render de $name recusado (veja acima)"
 import os, re, sys
 src, mark = sys.argv[1], sys.argv[2]
+text = open(src, encoding="utf-8").read()
+hosts = os.environ.get("HOSTS", "")
+if hosts:
+    # Só blocos de site no nível superior, e todo endereço deles na lista. Contagem de chaves ingênua (chave
+    # dentro de string conta): na dúvida recusa, que é o lado seguro.
+    allowed = {h for h in re.split(r"[,\s]+", hosts) if h}
+    depth = 0
+    for ln, line in enumerate(text.splitlines(), 1):
+        code = "" if line.lstrip().startswith("#") else line.split(" #", 1)[0].strip()
+        if not code:
+            continue
+        if depth == 0:
+            if not code.endswith("{") or code == "{" or code.startswith("("):
+                sys.exit(f"linha {ln}: no nível superior só cabe bloco de site com host da lista («{code}»)")
+            addrs = [a for a in re.split(r"[,\s]+", code[:-1]) if a]
+            bad = [a for a in addrs if a not in allowed]
+            if not addrs or bad:
+                sys.exit(f"linha {ln}: site fora dos hosts declarados {sorted(allowed)}: {bad or code}")
+        depth += code.count("{") - code.count("}")
+        if depth < 0:
+            sys.exit(f"linha {ln}: chave fechada sem abrir")
+    if depth != 0:
+        sys.exit("chaves desbalanceadas no arquivo")
 vals = {}
 for line in os.environ.get("SECRETS", "").splitlines():
     if not line.strip() or line.startswith("#"):
@@ -91,7 +228,6 @@ for line in os.environ.get("SECRETS", "").splitlines():
     if not sep:
         sys.exit("linha de segredo sem '=': chave omitida")
     vals[k.strip()] = v
-text = open(src, encoding="utf-8").read()
 def sub(m):
     k = m.group(1)
     v = vals.get(k)
@@ -107,30 +243,41 @@ PY
 
 # Pré-voo: monta um ESTÁGIO com o Caddyfile + conf.d final (não geridos do vivo + geridos
 # renderizados) e roda `caddy validate` nele. Falha = die, nada tocado. Imprime o dir do estágio.
+#   PLAN=1 (o ensaio): vhost do core com marcador de segredo NÃO é renderizado (o ensaio não lê segredo); entra no
+#   estágio a cópia viva dele, e sem cópia viva fica de fora da validação, dito na saída.
 stage_and_validate() {
   [[ -f "$SRC" ]] || die "fonte ausente: $SRC"
   [[ -L "$SRC" ]] && die "fonte é SYMLINK — recuso (estado ilegítimo desta derivação)"
-  local stage n
+  local stage n managed lives
+  managed="$(managed_names)" || exit 2
+  lives="$(live_names)"
   stage="$($SUDO_CMD mktemp -d)" || die "mktemp do estágio falhou"
   $SUDO_CMD chmod 0700 "$stage"
   $SUDO_CMD mkdir -p "$stage/conf.d"
   sed "s#${CONF_DEST_DIR}/#${stage}/conf.d/#g" "$SRC" | $SUDO_CMD tee "$stage/Caddyfile" >/dev/null
   while IFS= read -r n; do
     [[ -n "$n" ]] || continue
-    if [[ -f "$CONF_SRC_DIR/$n" ]]; then continue; fi           # gerido: entra renderizado abaixo
-    is_managed_live "$CONF_DEST_DIR/$n" && continue              # gerido órfão: vai ser removido
-    $SUDO_CMD cp -p "$CONF_DEST_DIR/$n" "$stage/conf.d/$n"       # não gerido: só copia p/ validar
-  done < <(live_names)
+    grep -qxF "$n" <<< "$managed" && continue                    # gerido: entra renderizado abaixo
+    if is_managed_live "$CONF_DEST_DIR/$n" && ! is_known "$n"; then continue; fi   # órfão: vai ser removido
+    $SUDO_CMD cp -p "$CONF_DEST_DIR/$n" "$stage/conf.d/$n"       # não gerido ou pendente: só copia p/ validar
+  done <<< "$lives"
   while IFS= read -r n; do
     [[ -n "$n" ]] || continue
-    # colisão: versionado com o nome de um vivo NÃO gerido → recusa no pré-voo, antes de tocar nada
-    if [[ -e "$CONF_DEST_DIR/$n" ]] && ! is_managed_live "$CONF_DEST_DIR/$n"; then
+    # colisão: versionado com o nome de um vivo NÃO gerido → recusa no pré-voo, antes de tocar nada, salvo a
+    # adoção da fonte de serviço byte a byte igual ao vivo
+    if [[ -e "$CONF_DEST_DIR/$n" ]] && ! is_managed_live "$CONF_DEST_DIR/$n" && ! adoptable "$n"; then
       $SUDO_CMD rm -rf "$stage"
-      die "$CONF_DEST_DIR/$n existe e NÃO é gerido — recuso sobrescrever um vhost escrito à mão"
+      if [[ -f "$CONF_SRC_DIR/$n" ]]; then die "$CONF_DEST_DIR/$n existe e NÃO é gerido — recuso sobrescrever um vhost escrito à mão"; fi
+      die "$CONF_DEST_DIR/$n existe, NÃO é gerido e difere da fonte $(source_label "$n") — recuso adotar (compare: diff <(git -C $(service_field "$n" 2) show $(service_field "$n" 3):$(service_field "$n" 4)) $CONF_DEST_DIR/$n)"
+    fi
+    if [[ "${PLAN:-0}" == 1 && -f "$CONF_SRC_DIR/$n" ]] && grep -qE '@@[A-Z0-9_]+@@' "$CONF_SRC_DIR/$n"; then
+      if [[ -e "$CONF_DEST_DIR/$n" ]]; then $SUDO_CMD cp -p "$CONF_DEST_DIR/$n" "$stage/conf.d/$n"
+      else echo "  ! $n tem segredo e não está no vivo: fora da validação do ensaio (o install valida)" >&2; fi
+      continue
     fi
     local rendered; rendered="$(render "$n")" || { $SUDO_CMD rm -rf "$stage"; exit 2; }
     printf '%s\n' "$rendered" | $SUDO_CMD tee "$stage/conf.d/$n" >/dev/null
-  done < <(managed_names)
+  done <<< "$managed"
   if ! $SUDO_CMD "$CADDY_BIN" validate --config "$stage/Caddyfile" --adapter caddyfile >/dev/null 2>&1; then
     $SUDO_CMD rm -rf "$stage"
     die "caddy validate FALHOU no estágio — nada foi tocado (rode: $CADDY_BIN validate --config $SRC --adapter caddyfile)"
@@ -166,22 +313,33 @@ verify_live() {
     [[ "$code" =~ ^(200|301|302|308|401|403|404)$ ]] && echo "  ✓ $host responde ($code)" \
       || { echo "  ✗ $host = $code (proxy fora do ar?)"; fail=1; }
   done
-  # conf.d gerido: cada `# verify: <url> <código>` é cobrado exatamente.
+  # conf.d gerido: cada `# verify: <url> <código>` é cobrado exatamente. Fonte de serviço sem `# verify:`: cada
+  # host da lista tem de responder (qualquer código ≠ 000; o 502 de um serviço ainda parado conta como resposta).
+  local managed src verifies h
+  managed="$(managed_names)" || exit 2
   while IFS= read -r n; do
     [[ -n "$n" ]] || continue
+    src="$(source_file "$n")" || { echo "  ✗ fonte de $n sumiu durante a verificação"; fail=1; continue; }
+    verifies="$(sed -n 's/^# verify: *\([^ ]*\) \([0-9][0-9][0-9]\) *$/\1 \2/p' "$src")"
+    if [[ -z "$verifies" && ! -f "$CONF_SRC_DIR/$n" ]]; then
+      for h in $(service_field "$n" 5 | tr ',' ' '); do verifies+="https://$h/ any"$'\n'; done
+    fi
     while read -r url want; do
+      [[ -n "$url" ]] || continue
       # vhost novo: o certificado ACME sai SEGUNDOS depois do reload (medido 2026-10-08: 000 logo
       # após o reload, 401 com cert válido ~20s depois). Espera até VERIFY_WAIT_S antes de reprovar.
       local waited=0
       while :; do
         code="$(curl -sS -o /dev/null -w '%{http_code}' "$url" 2>/dev/null)" || true
-        [[ "$code" == "$want" || "$waited" -ge "${VERIFY_WAIT_S:-90}" ]] && break
+        code="${code:-000}"
+        if [[ "$want" == any ]]; then [[ "$code" != 000 ]] && break; elif [[ "$code" == "$want" ]]; then break; fi
+        [[ "$waited" -ge "${VERIFY_WAIT_S:-90}" ]] && break
         sleep 5; waited=$((waited+5))
       done
-      [[ "$code" == "$want" ]] && echo "  ✓ $url = $code ($n)" \
-        || { echo "  ✗ $url = $code (esperado $want, $n)"; fail=1; }
-    done < <(sed -n 's/^# verify: *\([^ ]*\) \([0-9][0-9][0-9]\) *$/\1 \2/p' "$CONF_SRC_DIR/$n")
-  done < <(managed_names)
+      if [[ "$code" == "$want" || ( "$want" == any && "$code" != 000 ) ]]; then echo "  ✓ $url = $code ($n)"
+      else echo "  ✗ $url = $code (esperado $want, $n)"; fail=1; fi
+    done <<< "$verifies"
+  done <<< "$managed"
   return "$fail"
 }
 
@@ -190,17 +348,21 @@ apply_config() {
   # falha do pré-voo seguia instalando (pego pela bancada, 2026-10-08).
   local stage; stage="$(stage_and_validate)" || exit 2
   local -a restore=() created=() removed=()
-  local bak n
+  local bak n managed lives
+  managed="$(managed_names)" || exit 2
+  lives="$(live_names)"
   bak="$(backup_file "$DEST" Caddyfile)"; [[ -n "$bak" ]] && restore+=("$bak|$DEST")
   [[ -z "$bak" ]] && echo "(sem $DEST a preservar — 1ª instalação)"
   $SUDO_CMD mkdir -p "$CONF_DEST_DIR"
-  # geridos órfãos (carimbados no vivo, sem fonte no repo): backup + remoção
+  # geridos órfãos (carimbados no vivo, nome fora de ops/caddy/conf.d E da lista de serviço): backup + remoção.
+  # Pendente (na lista, fonte ainda ausente na ref) NÃO é órfão: um clone sumido não derruba o vhost.
   while IFS= read -r n; do
-    [[ -n "$n" && ! -f "$CONF_SRC_DIR/$n" ]] || continue
+    [[ -n "$n" ]] || continue
+    is_known "$n" && continue
     is_managed_live "$CONF_DEST_DIR/$n" || continue
     bak="$(backup_file "$CONF_DEST_DIR/$n" "conf.d-$n")"; restore+=("$bak|$CONF_DEST_DIR/$n")
     $SUDO_CMD rm -f "$CONF_DEST_DIR/$n"; removed+=("$n")
-  done < <(live_names)
+  done <<< "$lives"
   { $SUDO_CMD cp "$SRC" "$DEST" && $SUDO_CMD chmod 0644 "$DEST"; } || die "cp fonte→$DEST falhou"
   while IFS= read -r n; do
     [[ -n "$n" ]] || continue
@@ -213,7 +375,7 @@ apply_config() {
     $SUDO_CMD chmod 0640 "$CONF_DEST_DIR/$n.new" || die "chmod de conf.d/$n falhou"
     if [[ -n "$CONF_OWNER" ]]; then $SUDO_CMD chown "$CONF_OWNER" "$CONF_DEST_DIR/$n.new" || die "chown de conf.d/$n falhou"; fi
     $SUDO_CMD mv -f "$CONF_DEST_DIR/$n.new" "$CONF_DEST_DIR/$n" || die "mv de conf.d/$n falhou"
-  done < <(managed_names)
+  done <<< "$managed"
   $SUDO_CMD rm -rf "$stage"
   if ! "${RELOAD_CMD[@]}"; then
     echo "reload FALHOU — restaurando backup" >&2
@@ -241,26 +403,87 @@ check() {
     echo "  fonte=$hs  vivo=$hd  — alguém editou /etc/caddy à mão, ou falta instalar."
     rc=1
   fi
+  local managed pending lives
+  managed="$(managed_names)" || die "lista de vhosts geridos ilegível no --check"
+  pending="$(pending_names)" || die "lista de vhosts de serviço ilegível no --check"
+  lives="$(live_names)"
   while IFS= read -r n; do
     [[ -n "$n" ]] || continue
     want="$(render "$n")" || die "render de $n falhou no --check"
     want="$(printf '%s\n' "$want" | sha256sum | awk '{print $1}')"   # mesma forma do que o apply grava
     got="$(read_hash "$CONF_DEST_DIR/$n")"
     if [[ -z "$got" ]]; then echo "✗ DRIFT: conf.d/$n versionado e AUSENTE no vivo (falta instalar)"; rc=1
-    elif [[ "$want" != "$got" ]]; then echo "✗ DRIFT: conf.d/$n vivo diverge do render da fonte"; rc=1
+    elif [[ "$want" != "$got" ]]; then
+      if ! is_managed_live "$CONF_DEST_DIR/$n" && adoptable "$n"; then
+        echo "✗ DRIFT: conf.d/$n igual à fonte $(source_label "$n"), ainda sem carimbo (falta instalar: o install adota)"
+      else echo "✗ DRIFT: conf.d/$n vivo diverge do render da fonte"; fi
+      rc=1
     else echo "✓ sem drift: conf.d/$n == render da fonte"; fi
-  done < <(managed_names)
+  done <<< "$managed"
   while IFS= read -r n; do
-    [[ -n "$n" && ! -f "$CONF_SRC_DIR/$n" ]] || continue
+    [[ -n "$n" ]] || continue
+    if [[ -e "$CONF_DEST_DIR/$n" ]] && is_managed_live "$CONF_DEST_DIR/$n"; then
+      echo "✗ DRIFT: conf.d/$n carimbado, e a fonte $(source_label "$n") sumiu da ref $(service_field "$n" 3) (o install não o remove)"; rc=1
+    else echo "· conf.d/$n pendente: fonte $(source_label "$n") ainda ausente na ref $(service_field "$n" 3) — o vivo segue como está"; fi
+  done <<< "$pending"
+  while IFS= read -r n; do
+    [[ -n "$n" ]] || continue
+    is_known "$n" && continue
     if is_managed_live "$CONF_DEST_DIR/$n"; then echo "✗ DRIFT: conf.d/$n carimbado como gerido, sem fonte no repo (órfão)"; rc=1
     else echo "· conf.d/$n não gerido (fora do repo) — ignorado"; fi
-  done < <(live_names)
+  done <<< "$lives"
   return "$rc"
+}
+
+# ENSAIO (--plan): o que o install faria em cada vhost, sem tocar o vivo nem ler segredo. Valida o estágio (que é
+# um diretório temporário, nunca /etc/caddy). Saída: uma linha por vhost; rc 0 = o install passaria o pré-voo.
+plan() {
+  [[ -f "$DEST" ]] || { echo "não estou na VPS (sem $DEST) — nada a ensaiar; abstenho (exit 0)"; return 0; }
+  local n managed pending lives f live_body action
+  managed="$(managed_names)" || exit 2
+  pending="$(pending_names)" || exit 2
+  lives="$(live_names)"
+  echo "── ensaio: o que o install faria (nada foi tocado)"
+  if [[ "$(read_hash "$SRC")" == "$(read_hash "$DEST")" ]]; then echo "  = Caddyfile: inalterado"
+  else echo "  ~ Caddyfile: SUBSTITUÍDO pela fonte versionada (backup antes)"; fi
+  while IFS= read -r n; do
+    [[ -n "$n" ]] || continue
+    local origin="ops/caddy/conf.d"; [[ -f "$CONF_SRC_DIR/$n" ]] || origin="$(source_label "$n") @ $(source_rev "$n")"
+    if [[ ! -e "$CONF_DEST_DIR/$n" ]]; then action="+ CRIAR (vhost novo; carimbado)"
+    elif ! is_managed_live "$CONF_DEST_DIR/$n"; then
+      if adoptable "$n"; then action="> ADOTAR (vivo não gerido é byte a byte a fonte; ganha o carimbo na 1ª linha, backup antes)"
+      else action="✗ RECUSA (vivo não gerido difere da fonte, ou é vhost do core escrito à mão): o install para no pré-voo"; fi
+    elif [[ -f "$CONF_SRC_DIR/$n" ]] && grep -qE '@@[A-Z0-9_]+@@' "$CONF_SRC_DIR/$n"; then
+      action="? com segredo: o ensaio não renderiza (o --check confere)"
+    else
+      f="$(source_file "$n")" || die "fonte de $n sumiu no ensaio"
+      live_body="$($SUDO_CMD tail -n +2 "$CONF_DEST_DIR/$n" | sha256sum | awk '{print $1}')"
+      if [[ "$live_body" == "$(sha256sum < "$f" | awk '{print $1}')" && "$($SUDO_CMD head -n1 "$CONF_DEST_DIR/$n")" == "$MANAGED_MARK $(source_label "$n")" ]]; then
+        action="= inalterado"
+      else action="~ ATUALIZAR (fonte mudou; backup antes)"; fi
+    fi
+    echo "  $action · conf.d/$n ← $origin"
+  done <<< "$managed"
+  while IFS= read -r n; do
+    [[ -n "$n" ]] || continue
+    echo "  · PENDENTE · conf.d/$n ← $(source_label "$n") ausente em $(service_field "$n" 3) ($(service_field "$n" 2)); o vivo fica como está"
+  done <<< "$pending"
+  while IFS= read -r n; do
+    [[ -n "$n" ]] || continue
+    is_known "$n" && continue
+    if is_managed_live "$CONF_DEST_DIR/$n"; then echo "  - REMOVER (órfão carimbado, backup antes) · conf.d/$n"
+    else echo "  · não gerido, fica · conf.d/$n"; fi
+  done <<< "$lives"
+  echo "── pré-voo: caddy validate no estágio"
+  local stage; stage="$(PLAN=1 stage_and_validate)" || { echo "✗ RESULTADO: o install pararia no pré-voo (veja acima)"; return 1; }
+  $SUDO_CMD rm -rf "$stage"
+  echo "✓ RESULTADO: ensaio verde; o install faria o que está acima (e recarregaria o Caddy)"
 }
 
 # ── selftest: sandbox com stubs; nunca toca /etc nem recarrega de verdade ──
 selftest() {
-  local pass=0 fail=0; SB="$(mktemp -d)"; trap 'rm -rf "${SB:-}"' EXIT   # SB global: o trap de EXIT o alcança
+  local pass=0 fail=0; SB="$(mktemp -d)"; trap 'rm -rf -- "${SB:-}" "${SRC_CACHE:-}"' EXIT   # SB global: o trap de EXIT o alcança
+  SERVICE_TSV="$SB/service-vhosts.tsv"   # sem a lista real: a bancada nunca lê os clones da máquina
   SRC="$SB/src-Caddyfile"; DEST="$SB/etc/Caddyfile"; BACKUP_DIR="$SB/etc/backups"; SUDO_CMD=""
   CONF_SRC_DIR="$SB/src-conf.d"; CONF_DEST_DIR="$SB/etc/conf.d"; SECRETS_DIR="$SB/etc/secrets"; CONF_OWNER=""
   mkdir -p "$SB/etc" "$CONF_DEST_DIR" "$SECRETS_DIR"
@@ -359,15 +582,89 @@ STUB
   ok "versionado ausente no vivo → check nomeia o drift" 'set +e; _o="$( set -e; check 2>&1 )"; set -e; [[ "$_o" == *"conf.d/demo.caddy versionado e AUSENTE"* ]]'   # errexit ligado, como no runner; sem `| grep -q` (EPIPE)
   rm -f "$CONF_SRC_DIR/demo.caddy"
 
+  # ── vhosts dos repos de serviço (2026-11-22) ──
+  # um repo de serviço em sandbox: o vivo de waha.caddy nasceu à mão e é a cópia exata do que o repo commitou
+  local svc="$SB/svc-waha"; mkdir -p "$svc/caddy"
+  git -C "$svc" init -q -b master
+  printf '# WAHA — rota pública\nwaha.example {\n    reverse_proxy 127.0.0.1:3999\n}\n' > "$svc/caddy/waha.caddy"
+  git -C "$svc" add caddy/waha.caddy
+  git -C "$svc" -c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -qm vhost
+  cp "$svc/caddy/waha.caddy" "$CONF_DEST_DIR/waha.caddy"
+  printf '# nome\tclone\tref\tcaminho\thosts\nwaha.caddy\t%s\tmaster\tcaddy/waha.caddy\twaha.example\n' "$svc" > "$SERVICE_TSV"
+  apply_config >/dev/null 2>&1 || true
+  # 14. adoção: o não gerido igual à fonte ganha o carimbo, o corpo segue byte a byte
+  ok "serviço: vivo igual à fonte é ADOTADO (carimbo com a fonte do repo)" '[[ "$(head -n1 "$CONF_DEST_DIR/waha.caddy")" == "$MANAGED_MARK svc-waha:caddy/waha.caddy" ]]'
+  ok "serviço: corpo adotado == blob do repo" 'tail -n +2 "$CONF_DEST_DIR/waha.caddy" | cmp -s "$svc/caddy/waha.caddy" -'
+  t "serviço: check verde depois da adoção" 0 check
+  # 15. a árvore de trabalho do clone NÃO vai para o ar: só o commit
+  printf '# local\nwaha.example {\n    respond "sem commit"\n}\n' > "$svc/caddy/waha.caddy"
+  t "serviço: mudança sem commit no clone não vira drift" 0 check
+  git -C "$svc" checkout -q -- caddy/waha.caddy
+  # 16. vivo não gerido DIFERENTE da fonte → recusa adotar e não toca o vivo
+  cp "$CONF_DEST_DIR/waha.caddy" "$SB/waha.keep"
+  printf '# a mao\nwaha.example {\n    reverse_proxy 127.0.0.1:4000\n}\n' > "$CONF_DEST_DIR/waha.caddy"
+  t "serviço: vivo não gerido diferente da fonte → apply RECUSA" 2 apply_config
+  ok "serviço: vivo diferente intocado após a recusa" 'grep -qF 127.0.0.1:4000 "$CONF_DEST_DIR/waha.caddy"'
+  cp "$SB/waha.keep" "$CONF_DEST_DIR/waha.caddy"
+  # 17. site fora dos hosts declarados (o repo tenta servir o domínio de outro) → recusa
+  printf 'waha.example, onionevolve.com {\n    reverse_proxy 127.0.0.1:3999\n}\n' > "$svc/caddy/waha.caddy"
+  git -C "$svc" -c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -qam hijack
+  t "serviço: site fora dos hosts declarados → apply RECUSA" 2 apply_config
+  ok "serviço: vivo intocado após o host recusado" 'cmp -s "$SB/waha.keep" "$CONF_DEST_DIR/waha.caddy"'
+  # 18. conteúdo de nível superior que não é site (import/global) → recusa
+  printf 'import /etc/caddy/secrets/*\nwaha.example {\n}\n' > "$svc/caddy/waha.caddy"
+  git -C "$svc" -c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -qam import
+  t "serviço: diretiva solta no nível superior → apply RECUSA" 2 apply_config
+  ok "serviço: a recusa da diretiva solta é pela forma do nível superior (não só pelo host)" 'set +e; _o="$( set -e; apply_config 2>&1 )"; set -e; [[ "$_o" == *"no nível superior só cabe bloco de site"* ]]'
+  git -C "$svc" reset -q --hard HEAD~2
+  # 19. symlink commitado no lugar do vhost → recusa (não segue link)
+  local svl="$SB/svc-link"; mkdir -p "$svl/caddy"; git -C "$svl" init -q -b master
+  ln -s /etc/passwd "$svl/caddy/link.caddy"; git -C "$svl" add caddy/link.caddy
+  git -C "$svl" -c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -qm link
+  printf 'link.caddy\t%s\tmaster\tcaddy/link.caddy\tlink.example\n' "$svl" >> "$SERVICE_TSV"
+  t "serviço: symlink commitado como vhost → apply RECUSA" 2 apply_config
+  ok "serviço: a recusa do symlink é pelo modo do blob (não pelo conteúdo do link)" 'set +e; _o="$( set -e; apply_config 2>&1 )"; set -e; [[ "$_o" == *"não é arquivo comum"* ]]'
+  sed -i '/^link\.caddy/d' "$SERVICE_TSV"
+  # 20. vhost novo de serviço (o gokapi): fonte na ref, nada no vivo → criado e carimbado
+  local svg="$SB/svc-gokapi"; mkdir -p "$svg/caddy"; git -C "$svg" init -q -b master
+  printf '# transfer\ntransfer.example {\n\t@setup path /setup*\n\trespond @setup 404\n\treverse_proxy 127.0.0.1:3050\n}\n' > "$svg/caddy/gokapi.caddy"
+  git -C "$svg" add caddy/gokapi.caddy; git -C "$svg" -c user.name=t -c user.email=t@t -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -qm vhost
+  printf 'gokapi.caddy\t%s\tmaster\tcaddy/gokapi.caddy\ttransfer.example\n' "$svg" >> "$SERVICE_TSV"
+  ok "serviço: ensaio anuncia CRIAR e não toca o vivo" 'set +e; _o="$( set -e; plan 2>&1 )"; set -e; [[ "$_o" == *"CRIAR"*"conf.d/gokapi.caddy"* && ! -e "$CONF_DEST_DIR/gokapi.caddy" ]]'
+  t "serviço: vhost novo do repo → apply cria" 0 apply_config
+  ok "serviço: vhost novo carimbado com a fonte do repo" '[[ "$(head -n1 "$CONF_DEST_DIR/gokapi.caddy")" == "$MANAGED_MARK svc-gokapi:caddy/gokapi.caddy" ]]'
+  ok "serviço: ensaio depois do apply diz inalterado" 'set +e; _o="$( set -e; plan 2>&1 )"; set -e; [[ "$_o" == *"= inalterado · conf.d/gokapi.caddy"* ]]'
+  # 21. PENDENTE: a ref perde o arquivo (ou o clone some) → o vivo carimbado FICA; check acusa, apply não remove
+  mv "$svg" "$SB/svc-gokapi.away"
+  t "serviço: fonte sumida → check acusa" 1 check
+  t "serviço: fonte sumida → apply segue" 0 apply_config
+  ok "serviço: fonte sumida NÃO remove o vivo carimbado" '[[ -f "$CONF_DEST_DIR/gokapi.caddy" ]]'
+  mv "$SB/svc-gokapi.away" "$svg"
+  # 22. nome nas duas fontes (core e serviço) → recusa
+  cp "$svg/caddy/gokapi.caddy" "$CONF_SRC_DIR/gokapi.caddy"
+  t "serviço: mesmo nome no core e na lista → apply RECUSA" 2 apply_config
+  rm -f "$CONF_SRC_DIR/gokapi.caddy"
+  # 23. lista malformada (caminho fora de caddy/) → recusa, nada pela metade
+  printf 'bad.caddy\t%s\tmaster\tdocker-compose.yml\tbad.example\n' "$svg" >> "$SERVICE_TSV"
+  t "serviço: linha da lista com caminho fora de caddy/ → apply RECUSA" 2 apply_config
+  t "serviço: linha da lista com caminho fora de caddy/ → check RECUSA" 2 check
+  sed -i '/^bad\.caddy/d' "$SERVICE_TSV"
+  # 24. saiu da lista → vira órfão carimbado e é removido (com backup), como os do core
+  sed -i '/^gokapi\.caddy/d' "$SERVICE_TSV"
+  t "serviço: tirado da lista → apply remove o órfão" 0 apply_config
+  ok "serviço: órfão de serviço removido e o adotado preservado" '[[ ! -e "$CONF_DEST_DIR/gokapi.caddy" && -f "$CONF_DEST_DIR/waha.caddy" ]]'
+
   echo "── selftest: ${pass} pass / ${fail} fail ──"
   [[ "$fail" -eq 0 ]]
 }
 
+SRC_CACHE="$(mktemp -d)"; trap 'rm -rf -- "${SRC_CACHE:-}"' EXIT   # fontes lidas (sem segredo); os subshells herdam
 MODE="${1:-install}"
 case "$MODE" in
   --help|-h)  usage; exit 0 ;;
   --selftest) selftest ;;
   --check)    check ;;
+  --plan)     plan ;;
   install)    [[ -f "$DEST" || -d /etc/caddy ]] || die "sem /etc/caddy — este script roda NA KVM 8"
               apply_config ;;
   *) die "modo desconhecido: $MODE (use --help)" ;;

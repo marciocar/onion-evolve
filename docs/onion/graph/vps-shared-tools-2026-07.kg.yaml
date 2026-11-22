@@ -770,6 +770,73 @@ nodes:
       method: "measurement: curl sem credencial na rota pública + install-caddy-config.sh --check (só leitura)"
       locality: "host"
 
+  # ── vhosts dos repos de serviço e a cerca do Gokapi (2026-11-22, cards SAC-465 e #70 do core) ──
+  - id: E_CADDY_SERVICE_VHOSTS_FORM_1122
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-11-22"
+    verified_against: "gh api contents de caddy/*.caddy nos ramos feat/caddy-vhost (librechat #4, vaultwarden #3, waha #4) e em master do onion-vps-gokapi; cmp de cada um contra o vivo de mesmo nome ⟨no conf.d do Caddy do host⟩; git for-each-ref nos clones locais contra o sha do master no GitHub"
+    label: "Forma medida dos vhosts de serviço: caddy/<nome>.caddy com a 1ª linha em comentário livre, SEM carimbo; librechat, vault e waha são byte a byte o vivo; o do Gokapi chama-se gokapi.caddy (não transfer.caddy) e já está no master; nenhum usa marcador de segredo nem `# verify:`"
+    narrative: "O carimbo que os READMEs dos PRs citam é o do wrapper do core (MANAGED_MARK), que ele põe ao instalar. Os três PRs ainda abertos põem o arquivo só no ramo feat/caddy-vhost; no master dos três o arquivo não existe. Os clones locais estavam com origin/master igual ao GitHub na medição (8da1d95, 73332d4, a6e4a8f, 920baa3)."
+    provenance:
+      source: "repos onion-vps-librechat, onion-vps-vaultwarden, onion-waha e onion-vps-gokapi no GitHub; ⟨o conf.d do Caddy do host⟩"
+      locator: "caddy/librechat.caddy, caddy/vault.caddy, caddy/waha.caddy @ feat/caddy-vhost; caddy/gokapi.caddy @ master 920baa3"
+      method: "measurement: leitura pela API, cmp contra o vivo, sem escrever nos repos"
+      locality: "host"
+  - id: C_CADDY_WRAPPER_READS_SERVICE_REPOS_1122
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-22"
+    verified_against: "bash ops/install-caddy-config.sh --plan na branch feat/caddy-service-vhosts (rc 0: CRIAR gokapi.caddy, PENDENTE librechat/vault/waha, caddy validate verde) e com a lista apontada para os ramos dos PRs (ADOTAR os três, validate verde); bancada 53/53"
+    label: "O ops/install-caddy-config.sh lê os vhosts dos repos de serviço (ops/caddy/service-vhosts.tsv): blob commitado na ref, adoção só do vivo byte a byte igual, hosts limitados por repo, fonte ausente = pendente que não remove nada; falta o install no vivo, que é do maestro"
+    narrative: "Fecha quando: o maestro roda o install depois do merge, e o --check sai sem drift com gokapi.caddy criado e, à medida que os PRs dos repos entram, librechat/vault/waha adotados (carimbo na 1ª linha). Até lá o vivo fica como está."
+    provenance:
+      source: "ops/install-caddy-config.sh e ops/caddy/service-vhosts.tsv na branch feat/caddy-service-vhosts"
+      locator: "saída do --plan de 2026-11-22 e a bancada --selftest"
+      method: "measurement: ensaio no host (sem tocar ⟨a config servida do Caddy⟩) e bancada em sandbox com mutantes"
+      locality: "host"
+  - id: E_GOKAPI_SETUP_REACHABLE_BY_CONTAINER_IP_1122
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "curl http://172.22.0.2:80/alive como conta comum → 200 (container do vaultwarden, que só publica 127.0.0.1:3020); nat OUTPUT do Docker com ! -d 127.0.0.0/8 e docker-proxy (root) servindo os loopbacks publicados; ufw-before-output aceita -o lo"
+    label: "Fechar só 127.0.0.1:3050 não protege o /setup do Gokapi: o host alcança o IP do container direto, e o Gokapi escuta na porta interna 53842. A cerca precisa das duas portas, e o salto vem antes do ufw, que aceita todo o loopback"
+    provenance:
+      source: "medição no host em 2026-11-22"
+      locator: "curl ao IP do container, iptables -t nat -S OUTPUT, iptables -S OUTPUT, ps do docker-proxy"
+      method: "measurement: leitura do firewall e uma requisição GET a um container existente"
+      locality: "host"
+  - id: C_GOKAPI_EGRESS_UID_FENCE_1122
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    owner: maestro
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-22"
+    verified_against: "ops/egress-uid-fence.sh em netns novo (unshare -n, iptables real, firewall vivo intocado): nobody→:3050 recusado, caddy e marcio conectam, root→:53842 conecta, nobody e caddy→:53842 recusados; verify verde salvo a unit; up idempotente e repõe o salto no topo; down limpa. Bancada 39/39"
+    label: "Cerca de saída por uid do Gokapi pronta como ato do core (ops/egress-uid-fence.sh): 127.0.0.1:3050 só para caddy e a conta do túnel, 53842 só para root (docker-proxy), por destino ORIGINAL do conntrack, salto na 1ª posição do OUTPUT, unit antes do Docker; falta o install --apply, que é do maestro"
+    narrative: "Pedido da vps-ops (achado M1 do resíduo feat-act-gokapi-spike: o /setup sem autenticação ao alcance de qualquer conta local). Teto declarado: a conta do túnel é a do maestro, e qualquer processo dela passa. Fecha quando o maestro roda install --apply antes do up do Gokapi e o verify sai verde no vivo."
+    provenance:
+      source: "ops/egress-uid-fence.sh na branch feat/caddy-service-vhosts"
+      locator: "plan, --selftest e o dogfood em netns de 2026-11-22"
+      method: "measurement: iptables real em namespace de rede isolado e bancada com mutantes"
+      locality: "host"
+
 edges:
   - from: E_DOCKER_VPS_MIGRADO_29_9_2_1022
     to: D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022
@@ -942,7 +1009,12 @@ edges:
   - from: E_CENSO0901_ENT_monitoring
     to: Q_p2_clarify
     edge_type: SUPERSEDES
-
+  - from: E_CADDY_SERVICE_VHOSTS_FORM_1122
+    to: C_CADDY_WRAPPER_READS_SERVICE_REPOS_1122
+    edge_type: SUPPORTS
+  - from: E_GOKAPI_SETUP_REACHABLE_BY_CONTAINER_IP_1122
+    to: C_GOKAPI_EGRESS_UID_FENCE_1122
+    edge_type: SUPPORTS
 external_edges:
   - from: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
     to: "docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml#D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021"

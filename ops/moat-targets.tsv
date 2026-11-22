@@ -62,6 +62,9 @@
 #   · a CERCA DE REDE do runner (opção A do degrau 3, 2026-10-16): o drop-in onion-chat@.service.d/60-egress-fence.conf
 #     nasce só pelo chat-runner.sh (install --egress-fence), renderizado do modelo do bridge servido com os endereços do
 #     host medidos na instalação; um drop-in nesse diretório mudaria toda instância do runner sem passar pela allowlist.
+#   · a CERCA DE SAÍDA por uid do Gokapi (2026-11-22, pedido da vps-ops): a unit onion-vps-egress-fence, a cópia de root
+#     em /usr/local/sbin e a chain ONION-EGRESS-FENCE nascem e morrem só por egress-uid-fence.sh (install/undo --apply);
+#     `up` e `down` são o que a unit chama como root, e pela sessão também são ato (mexem no firewall vivo).
 #   · o STT em LOTE do core (2026-10-17, D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017) tem wrapper próprio: stt-service.sh monta
 #     /opt/onion-stt (modelo e VAD por revisão fixada e sha256, venv por lock com hash, código), gera o token em
 #     /etc/onion-stt (0600, nunca em argv), prova o sandbox numa unit transitória ANTES de trocar a unit onion-vps-stt,
@@ -86,6 +89,7 @@ deploy	unit	caddy	ops/install-caddy-config.sh
 deploy	unit	docker	ops/docker-engine-migrate.sh
 deploy	unit	containerd	ops/docker-engine-migrate.sh
 deploy	unit	onion-vps-docker-firewall	ops/docker-engine-migrate.sh
+deploy	unit	onion-vps-egress-fence	ops/egress-uid-fence.sh
 deploy	unit	onion-vps-*	-
 deploy	unit	onion-adopt-*	-
 deploy	unit	onion-chat.socket	ops/chat-runner.sh
@@ -116,6 +120,9 @@ deploy	path	/etc/systemd/system/onion-vps-mcp-kg-writer.service.d/50-python.conf
 deploy	path	/etc/systemd/system/onion-vps-mcp-kg-granaai.service.d/50-python.conf	ops/migrate-python-service.sh
 deploy	path	/etc/onion-stt	ops/stt-service.sh
 deploy	path	/var/backups/onion-stt	ops/stt-service.sh
+deploy	path	/etc/systemd/system/onion-vps-egress-fence.service	ops/egress-uid-fence.sh
+deploy	path	/usr/local/sbin/onion-vps-egress-fence.sh	ops/egress-uid-fence.sh
+deploy	path	/var/backups/onion-egress-fence	ops/egress-uid-fence.sh
 deploy	path	/etc/systemd/system/onion-slack-persona.service	ops/slack-persona.sh
 deploy	path	/etc/onion-slack-persona	ops/slack-persona.sh
 deploy	path	/etc/credstore.encrypted/onion-slack-persona.*	ops/slack-persona.sh
@@ -155,6 +162,7 @@ ato	script	ops/update-kg-writer.sh	@any
 ato	script	ops/deploy-site.sh	@none,deploy,--maestro
 ato	script	ops/install-caddy-config.sh	@none,install
 ato	script	ops/caddy-site-secrets.sh	@any
+ato	script	ops/egress-uid-fence.sh	--apply,up,down
 ato	script	ops/docker-engine-migrate.sh	apply,resume
 ato	script	ops/workspace-adopt-sync.sh	apply,reapply
 ato	script	ops/migrate-python-service.sh	--yes
