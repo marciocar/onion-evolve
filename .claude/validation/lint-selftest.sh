@@ -48607,7 +48607,9 @@ _family run_voice_conduct_selftests
 # vendor (o Company Brain é opcional: porta e adotante sem o motor pulam com aviso visível) · (b) update de um repo-fixture
 # com tag carimba só o recorte e o check sai 0 · (c) byte trocado ⇒ CBV-SHA256 rc 1 · (d) arquivo a mais ⇒ CBV-EXTRA ·
 # (e) arquivo a menos ⇒ CBV-MISSING · (f) verify contra a tag movida ⇒ CBV-COMMIT · (g) sem carimbo ou carimbo de outro
-# produto ⇒ rc 2 · (h) MUTANTE: sem a comparação de sha256, o byte trocado passa calado.
+# produto ⇒ rc 2 · (h) MUTANTE: sem a comparação de sha256, o byte trocado passa calado · (i) link de diretório a mais e
+# bit de execução tirado ⇒ CBV-EXTRA e CBV-SHA256 · (j) carimbo malformado (string JSON, commit numérico) ⇒ rc 2, nunca 1
+# · (k) update recusa destino que não é vendor deste produto e destino que é a fonte, sem apagar nada (refutador, 2026-11-22).
 run_company_brain_vendor_selftests() {
   local py="${REPO_ROOT}/.claude/validation/company-brain-vendor-check.py"
   [ -f "${py}" ] || { record_fail "company-brain-vendor" "verificador ausente"; return; }
@@ -48618,7 +48620,7 @@ run_company_brain_vendor_selftests() {
     if [ "${rc}" = 0 ]; then record_pass "company-brain-vendor: (a) vendor/company-brain confere com o carimbo ⇒ rc 0"
     else record_fail "company-brain-vendor: (a) vendor real" "rc=${rc} ${o:0:300}"; fi
   else
-    echo "  ⊘ company-brain-vendor: (a) sem vendor/company-brain neste repo (o Company Brain é opcional): o vendor real não se confere aqui"
+    record_skip "company-brain-vendor: (a) sem vendor/company-brain neste repo (o Company Brain é opcional): o vendor real não se confere aqui"
   fi
   d="$(mktemp -d)"
   # repo-fixture com o recorte e coisa de fora dele, numa tag anotada
@@ -48661,6 +48663,29 @@ run_company_brain_vendor_selftests() {
   if python3 -I -B "${py}" check --dest "${d}/outro" >/dev/null 2>&1; then g2=0; else g2=$?; fi
   if [ "${g1}" = 2 ] && [ "${g2}" = 2 ]; then record_pass "company-brain-vendor: (g) sem carimbo e carimbo de outro produto ⇒ rc 2 (não deu para julgar), nunca verde"
   else record_fail "company-brain-vendor: (g) rc 2" "sem=${g1} outro=${g2}"; fi
+  # (i) link de diretório a mais e bit de execução tirado
+  local i1 i2
+  i1="$(_cbv 'ln -s /etc "${d}/w/evil"')"
+  i2="$(_cbv 'chmod -x "${d}/w/tools/a.py"')"
+  if [ "${i1}" = "1|CBV-EXTRA " ] && [ "${i2}" = "1|CBV-SHA256 " ]; then
+    record_pass "company-brain-vendor: (i) link de diretório a mais ⇒ CBV-EXTRA; bit de execução tirado ⇒ CBV-SHA256, rc 1"
+  else record_fail "company-brain-vendor: (i) link/modo" "link=${i1} modo=${i2}"; fi
+  # (j) carimbo malformado ⇒ rc 2
+  local j1 j2
+  cp -r "${d}/v" "${d}/j1"; printf '"product tag commit version include files"\n' > "${d}/j1/.company-brain-version"
+  if python3 -I -B "${py}" check --dest "${d}/j1" >/dev/null 2>&1; then j1=0; else j1=$?; fi
+  cp -r "${d}/v" "${d}/j2"; sed -i 's/"commit": "[0-9a-f]*"/"commit": 5/' "${d}/j2/.company-brain-version"
+  if python3 -I -B "${py}" check --dest "${d}/j2" >/dev/null 2>&1; then j2=0; else j2=$?; fi
+  if [ "${j1}" = 2 ] && [ "${j2}" = 2 ]; then record_pass "company-brain-vendor: (j) carimbo que é string e commit numérico ⇒ rc 2 (não julgou), nunca 1"
+  else record_fail "company-brain-vendor: (j) carimbo malformado" "string=${j1} commit=${j2} (esperado 2 e 2)"; fi
+  # (k) update não apaga o que não é vendor deste produto nem a fonte
+  local k1 k2
+  mkdir -p "${d}/vitima"; printf 'importante\n' > "${d}/vitima/x.txt"
+  if python3 -I -B "${py}" update --dest "${d}/vitima" --source "${d}/src" --tag company-brain-v9.9.9 >/dev/null 2>&1; then k1=0; else k1=$?; fi
+  if python3 -I -B "${py}" update --dest "${d}/src" --source "${d}/src" --tag company-brain-v9.9.9 >/dev/null 2>&1; then k2=0; else k2=$?; fi
+  if [ "${k1}" = 2 ] && [ -f "${d}/vitima/x.txt" ] && [ "${k2}" = 2 ] && [ -d "${d}/src/.git" ]; then
+    record_pass "company-brain-vendor: (k) update recusa destino sem carimbo e destino = fonte (rc 2), sem apagar nada"
+  else record_fail "company-brain-vendor: (k) destino" "vitima=${k1} fonte=${k2}"; fi
   # (h) MUTANTE: sem a comparação de sha256, o byte trocado passa calado; a cura o pega
   local mu h1; mu="$(mktemp -d)"
   sed 's/        elif want\[path\] != got\[path\]:/        elif False:/' "${py}" > "${mu}/m.py"
