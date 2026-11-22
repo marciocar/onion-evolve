@@ -2,8 +2,7 @@
 branch: feat/agent-colors
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: b9ed225af7550ca40c190b18c11cc29a8329c0823ce99bc8d879e7128c49476a
-reviewed_code_sha256: 880995d18ffcb4d30bdb7df70e9821c267e892f39a3e842d61f90d425d45bd94
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 0
@@ -53,6 +52,8 @@ Os `confirmed` do grafo novo foram conferidos contra o que o PR propõe:
 5. **ESTILO, curado.** O texto atribuía a chave duplicada à REGRA 17. Agora diz que nenhuma regra a acusa, e as REGRAS 1 e 23 aparecem com o título.
 
 O que o refutador suspeitou e não se confirmou: na leitura de BOM, CRLF, aspas, comentário, chave entre aspas e fecho com tab, o juiz bate com o Claude Code. O `---` no meio do frontmatter é coberto pela REGRA 102 (Chave de frontmatter de agente pertence à allowlist (oficiais + as da casa)): ela o acusa como FECHO-AMBIGUO.
+
+Depois da revisão, o gate de nomes do KG-SSOT (`ops/kg-vocab-ci.sh`) acusou um código sem termo, `V0`, em dois labels do grafo novo. Troquei o código pela descrição, e só o texto mudou.
 
 ## Mutantes
 
