@@ -2,8 +2,7 @@
 branch: feat/chat-channel-contract
 pr: 1732
 date: 2026-11-22
-reviewed_diff_sha256: 678f9262b0c3c088ca3d0e6bd1fd914b5ec6534c20ca5559213ef1dba94b5dc7
-reviewed_code_sha256: 44b202b4e82a008be68514da28490da1e6dbe5f79cca3e91ae87a20c1c1fd20b
+reviewed_diff_sha256: pendente
 findings_total: 24
 findings_real: 24
 findings_blocking: 7
@@ -12,6 +11,7 @@ duration_min: 10
 findings_fixed: 14
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: general-purpose (opus), isolado
 nota: "três passadas do mesmo revisor isolado (14 achados na 1ª, 5 novos na 2ª, 5 na 3ª sobre a emenda do pseudônimo e do papel); revisor isolado com mandato de refutar, sem ver o raciocínio da sessão; tokens e duração são os do agente revisor. Os 6 que bloqueavam foram curados; dos 8 limites, 3 foram curados (nomes privados, pontos do Delphi, fonte do nó de origem) e 5 ficam declarados no README e abaixo."
 ---
