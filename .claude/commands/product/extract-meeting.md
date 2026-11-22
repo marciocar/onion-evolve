@@ -179,9 +179,15 @@ Processar a transcrição abaixo aplicando o Framework EXTRACT completo.
 **exatamente** as decisões, ações e riscos do grafo, um item por nó, com o id entre crases. Escreva o grafo
 primeiro (Passo 6) e derive essas seções dele: duas leituras separadas da transcrição (a sua e a do
 `@extract-meeting-specialist`) já deram 5 decisões num e 8 no outro. Decisão que só o resumo tem vira nó no
-grafo, com trace; nó que o resumo não cita entra no resumo. Cada fato aparece **na seção do seu papel**
-(citar o risco só em Pendências não vale). Pendências, Timeline e Resumo são livres (não viram nó). Sub-item
-indentado (justificativa, contexto) não conta como item; comentário HTML não conta como citação.
+grafo, com trace; nó que o resumo não cita entra no resumo. Regras que o gate confere:
+- cada fato aparece **na seção do seu papel**, num item só (citar o risco só em Pendências não vale, e dois
+  itens com o mesmo id reprovam);
+- o fato do item é o **primeiro** id dele; outros ids na mesma linha ou em sub-item são referência (ex.: «limita `D_X`»)
+  e não mudam a seção;
+- nas seções Decisões, Ações e Riscos, todo item de lista, linha de tabela e parágrafo solto precisa de um id;
+  sub-item indentado (justificativa, contexto) e a continuação do item não contam como item novo;
+- Pendências, Timeline, Resumo, Conexões e Expectativas são livres (não viram nó); um subtítulo sem nome de
+  seção dentro de Decisões continua sendo Decisões; comentário HTML não conta como citação.
 
 **Nível `complete`:**
 Output YAML completo seguindo schema do knowledge base.

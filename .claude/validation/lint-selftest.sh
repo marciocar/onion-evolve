@@ -58102,10 +58102,10 @@ AREA_ROLES = ("action", "risk")$(printf '\x1f')AREA_ROLES = ("action",)$(printf 
 if os.path.isfile(af):$(printf '\x1f')if 0:$(printf '\x1f')área do padrão fora do vocabulário do repo reprova
     if badt or not toks:$(printf '\x1f')    if 0:$(printf '\x1f')vocabulário do repo malformado reprova
         for t in sorted(set(facts) - in_sec):$(printf '\x1f')        for t in []:$(printf '\x1f')decisão do grafo fora do resumo reprova
-            if is_item and not ids: items.append($(printf '\x1f')            if 0: items.append($(printf '\x1f')decisão do resumo sem nó reprova
-items.pop()   # cabeçalho da tabela$(printf '\x1f')pass   # cabeçalho da tabela$(printf '\x1f')resumo reconciliado passa
+            if not own: items.append((ln0, "/".join(sorted(sk)), txt)); return$(printf '\x1f')            if not own: return$(printf '\x1f')decisão do resumo sem nó reprova
+                if op is not None and op[4] == "row" and op[0] == cand: op = None$(printf '\x1f')                if 0: op = None$(printf '\x1f')resumo reconciliado passa
 if t in facts or re.fullmatch(r"[DAR]_[A-Z0-9_]+", t)]$(printf '\x1f')if t in facts]$(printf '\x1f')id do resumo que o grafo não tem reprova
-                elif sec:$(printf '\x1f')                elif 0:$(printf '\x1f')fato na seção errada reprova
+            if facts[t] not in sk:$(printf '\x1f')            if 0:$(printf '\x1f')fato na seção errada reprova
             if fence: continue$(printf '\x1f')            if 0: continue$(printf '\x1f')item em bloco de código não conta
     if not os.path.isfile(summary):$(printf '\x1f')    if 0:$(printf '\x1f')resumo ausente reprova
         if it["status"] in DONE: closed.append($(printf '\x1f')        if 0: closed.append($(printf '\x1f')carry-over: o fechado some e é contado
@@ -58119,19 +58119,19 @@ mark = "⚠️ " if it["role"] == "risk" else ""$(printf '\x1f')mark = ""$(print
     if prev_eff is not None and ind(line) > prev_eff:$(printf '\x1f')    if 0:$(printf '\x1f')escalar continuado reprova
     if r in AREA_ROLES and n.get("status") in CLOSED$(printf '\x1f')    if 0 and n.get("status") in CLOSED$(printf '\x1f')ação fechada sem motivo reprova
  and not (n.get("verified_at") and n.get("verified_against")):$(printf '\x1f'):$(printf '\x1f')ação fechada com motivo passa
-    if r in AREA_ROLES and re.fullmatch(r"[|>][+-]?\\d?", n.get("label", "")):$(printf '\x1f')    if 0:$(printf '\x1f')label em bloco da ação reprova
+    if r in AREA_ROLES and re.fullmatch(BLOCK_RX, n.get("label", "")):$(printf '\x1f')    if 0:$(printf '\x1f')label em bloco da ação reprova
 text = re.sub(r"<!--.*?-->",$(printf '\x1f')text = re.sub(r"<!--NUNCA-->",$(printf '\x1f')id só em comentário HTML não conta
-            elif "|" in line and (in_table or line.lstrip().startswith("|")):$(printf '\x1f')            elif "|" in line and line.lstrip().startswith("|"):$(printf '\x1f')tabela sem barra inicial é lida
+            elif "|" in line and not im and (in_table or line.lstrip().startswith("|")):$(printf '\x1f')            elif "|" in line and not im and line.lstrip().startswith("|"):$(printf '\x1f')tabela sem barra inicial é lida
 |\\bproximos passos$(printf '\x1f')$(printf '\x1f')seção Próximos passos é de ações
 ([-*+•]|\\d+[.)])$(printf '\x1f')([-*+]|\\d+[.)])$(printf '\x1f')item com marcador • conta
 line = re.sub(r"^\\s{0,3}(>\\s?)+", "", line)$(printf '\x1f')line = line$(printf '\x1f')item em citação conta
-if col <= 3: is_item = True$(printf '\x1f')if col == 0: is_item = True$(printf '\x1f')item recuado em 2 espaços conta
-if list_col is None or col < list_col:$(printf '\x1f')if True:$(printf '\x1f')resumo reconciliado passa
+if im and (list_col is None or col < list_col) and col <= 3:$(printf '\x1f')if im and (list_col is None or col < list_col) and col == 0:$(printf '\x1f')item recuado em 2 espaços conta
+if im and (list_col is None or col < list_col) and col <= 3:$(printf '\x1f')if im and col <= 3:$(printf '\x1f')resumo reconciliado passa
         for t in sorted(set(facts) - in_sec):$(printf '\x1f')        for t in sorted(set(facts) - cited):$(printf '\x1f')risco citado só em Pendências reprova
-if re.search(r"timeline|cronograma|pendenc|resumo", h): return None$(printf '\x1f')if 0: return None$(printf '\x1f')Timeline das decisões não é seção de decisão
+if re.search(r"timeline|cronograma|pendenc|resumo|conex|expectativ|ambiguidad", h): return frozenset()$(printf '\x1f')if 0: return frozenset()$(printf '\x1f')Timeline das decisões não é seção de decisão
 ks = frozenset(k for k, rx in KINDS if re.search(rx, h))$(printf '\x1f')ks = frozenset(k for k, rx in KINDS[:1] if re.search(rx, h))$(printf '\x1f')seção mista aceita os dois papéis
-if re.fullmatch(r"\\s{0,3}(=+|-+)\\s*", line) and prev_txt and not in_table:$(printf '\x1f')if 0:$(printf '\x1f')título setext abre seção
- or re.fullmatch(r"\\s{0,3}(?:\\*\\*|__)([^*_]+)(?:\\*\\*|__)\\s*:?\\s*", line)$(printf '\x1f')$(printf '\x1f')título em negrito abre seção
+            if re.fullmatch(r"\\s{0,3}(=+|-+)\\s*", line) and prev_kind$(printf '\x1f')            if 0 and prev_kind$(printf '\x1f')título setext abre seção
+            if bm: heading(bm.group(1), 7); continue$(printf '\x1f')            if 0: heading(bm.group(1), 7); continue$(printf '\x1f')título em negrito abre seção
     if rp in seen or p["id"] in seen_ids:$(printf '\x1f')    if rp in seen:$(printf '\x1f')carry-over de cópia do mesmo grafo reprova
 if closed: md += ["## Fechados$(printf '\x1f')if 0: md += ["## Fechados$(printf '\x1f')backlog lista os fechados
 esc = lambda x: re.sub(r"([\\\\\`*_\\[\\]<>|])", r"\\\\\\1", x)$(printf '\x1f')esc = lambda x: x$(printf '\x1f')label vira texto, não marcação
@@ -58139,6 +58139,20 @@ esc = lambda x: re.sub(r"([\\\\\`*_\\[\\]<>|])", r"\\\\\\1", x)$(printf '\x1f')e
   case "\${BACKLOG}" in *.md) ;; *)$(printf '\x1f')  case "\${BACKLOG}" in *) ;; *.md)$(printf '\x1f')backlog que não é .md é recusado
   [ -d "\$(dirname -- "\${BACKLOG}")" ] ||$(printf '\x1f')  true ||$(printf '\x1f')backlog em diretório inexistente não julga
   if [ -e "\${BACKLOG}" ] && ! head -n1$(printf '\x1f')  if false && ! head -n1$(printf '\x1f')backlog não sobrescreve o que não é projeção
+    if "x_due" in n and not re.fullmatch($(printf '\x1f')    if 0 and not re.fullmatch($(printf '\x1f')x_due fora de data reprova
+    if r == "risk" and "x_owner" in n and not ($(printf '\x1f')    if 0 and "x_owner" in n and not ($(printf '\x1f')dono de risco inexistente reprova
+def bare(v): return re.sub(r"(^|\\s)#.*\$", "", v).strip()$(printf '\x1f')def bare(v): return v.strip()$(printf '\x1f')bloco com comentário não é continuação
+BLOCK_RX = r"[|>]([+-]?\\d?|\\d[+-])"$(printf '\x1f')BLOCK_RX = r"[|>][+-]?\\d?"$(printf '\x1f')bloco com indentação explícita não é continuação
+_v = "" if re.fullmatch(r"[&!]\\S+", _v) else _v$(printf '\x1f')_v = _v$(printf '\x1f')âncora sozinha não é continuação
+            t = own[0]$(printf '\x1f')            t = own[-1]$(printf '\x1f')item que cita outro fato como referência passa
+                    if im: op[4] = True$(printf '\x1f')                    if 0: op[4] = True$(printf '\x1f')id só no sub-item não salva o item
+if not (k is None and sec is not None and lvl > sec_lvl):$(printf '\x1f')if True:$(printf '\x1f')subtítulo dentro da seção herda
+if not (k is None and sec is not None and lvl > sec_lvl):$(printf '\x1f')if True:$(printf '\x1f')subtítulo em negrito não esconde item sem nó
+            if t in listed: items.append($(printf '\x1f')            if 0: items.append($(printf '\x1f')id repetido em dois itens reprova
+close(); op = [ln, sec, line.strip()[:60], list(good), "para"]$(printf '\x1f')close(); op = None$(printf '\x1f')parágrafo solto na seção de decisões reprova
+ and prev_kind == "para" and op is not None and op[4] == "para":$(printf '\x1f') and op is not None:$(printf '\x1f')linha horizontal depois de item não esconde item
+            elif op is not None and op[4] != "row" and (prev_kind != "blank" or (list_col is not None and col >= list_col)):$(printf '\x1f')            elif 0:$(printf '\x1f')item quebrado em duas linhas com o id na continuação passa
+    fd, tmp = tempfile.mkstemp(prefix=".backlog-", suffix=".tmp", dir=os.path.dirname(os.path.abspath(out)))$(printf '\x1f')    tmp = out + ".tmp"; fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC)$(printf '\x1f')temporário não segue link plantado
 (nlines is None or int(m.group(1)) <= nlines)$(printf '\x1f')(True)$(printf '\x1f')parada além do fim do arquivo reprova
 if m and int(m.group(1)) >= 1 and$(printf '\x1f')if m and$(printf '\x1f')parada na linha 0 reprova
     if r is None: fail("PAPEL-AUSENTE", n["id"], "nó sem x_meeting_role num grafo de reunião"); continue$(printf '\x1f')    if r is None: continue$(printf '\x1f')nó sem papel reprova
