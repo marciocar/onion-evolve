@@ -490,6 +490,8 @@
 .claude/validation/act-signature-check.sh	C_TETO_REGRA_117_SO_PRESENCA_DA_PALAVRA	docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml
 .claude/validation/act-signature-check.sh	D_REGRA_117_CATRACA_DA_LISTA	docs/evolution/research/guard-deploy-acts-2026-11/deploy-acts-2026-11.kg.yaml
 .claude/validation/adapter-enforcement-check.sh	Q_ADAPTER_DECLARA_PONTO_DE_COBRANCA	docs/evolution/research/machinery-enforcement-2026-10/machinery-enforcement-2026-10.kg.yaml
+.claude/validation/agent-color-check.sh	D_GUARDA_NOVA_E_NAO_EXTENSAO_DA_102	docs/evolution/research/guard-agent-color-2026-11/agent-color-2026-11.kg.yaml
+.claude/validation/agent-colors.tsv	D_MAPA_CATEGORIA_COR_GIT_DEPLOYMENT_ORANGE	docs/evolution/research/guard-agent-color-2026-11/agent-color-2026-11.kg.yaml
 .claude/validation/agent-frontmatter-keys-check.sh	D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV	docs/evolution/research/guard-agent-frontmatter-keys-2026-10/agent-frontmatter-keys-2026-10.kg.yaml
 .claude/validation/aside-router.sh	E_ASIDE_ROUTER_GATE_E_PROMPT	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/automation-ladder-registry.txt	C_RELOGIO_NAO_E_VEDADO_AO_EVOLVE_E_A_GUARDA_NAO_DECIDE_ISSO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
