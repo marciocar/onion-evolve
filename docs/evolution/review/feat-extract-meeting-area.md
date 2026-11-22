@@ -2,8 +2,7 @@
 branch: feat/extract-meeting-area
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: c5066f644db32b9125acf28dbae884c17eab3ac864ac5ec11f9583e433b436c0
-reviewed_code_sha256: 2b40d72f3bbe26cb8364febfce3e08be468d663ad72892d539851eaa3afce28f
+reviewed_diff_sha256: pendente
 findings_total: 18
 findings_real: 18
 findings_blocking: 11
@@ -12,6 +11,7 @@ duration_min: 12
 findings_fixed: 16
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: "general-purpose opus, 2 passadas isoladas (refutar) + dogfood da sessão de execução"
 nota: "18 = 10 da 1ª passada + 7 da 2ª + 1 do dogfood (o --backlog sobrescrevia o resumo não passado em --summary). tokens e duração somam as duas passadas, lidas no fim de cada agente. findings_fixed 16: o achado 6 da 1ª passada (grafos antigos reprovam) e o 8 em parte viram limite declarado."
 ---
@@ -82,3 +82,10 @@ Por isso o diff volta a `pendente` e o hash do código foi apagado, para o `pr-f
 - A série do carry-over é dada por quem roda (`--carry`); o gate não a infere de `docs/meetings/`.
 - Item que volta numa reunião seguinte vira nó novo; a marca de novo × reforço fica aberta, com as lacunas 3 e 4
   do teste de campo (nó `Q_MB_OPEN_GAPS_1122`).
+
+## Correção da declaração (22/11)
+
+O revisor desta passada foi um agente separado do autor, como dizem o campo `reviewer:` e o corpo, mas o
+frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
+sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
+código foi apagado, para o `pr-finalize` carimbar de novo.
