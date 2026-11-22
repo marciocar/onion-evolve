@@ -2,8 +2,7 @@
 branch: feat/agent-colors
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: c144f0cfce1bb2821bef81cb825fe5897dd4b100a7deccb1c3659bccc61fc8e6
-reviewed_code_sha256: 775377f0743bc222cc03f1857c6bbf7880ffcc571df2c7d3f60aa5e033cbb066
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 0
@@ -71,3 +70,19 @@ Depois da revisão, o gate de nomes do KG-SSOT (`ops/kg-vocab-ci.sh`) acusou um 
 - A categoria vem do diretório. A coerência com o campo `category:` é da REGRA 23 (Frontmatter: category: em agentes (a metade 'model: em comandos' foi REVOGADA pela REGRA 71)).
 - Ficam fora agentes de plugin, de usuário e do `--agents` JSON. A doc diz que este último ignora `color`.
 - O template e o molde têm cópias legíveis do mapa. O caso (t) da bancada as compara com o `.tsv`.
+
+## Re-revisão (CI vermelho do #1735, 2026-11-22)
+
+O CI reprovou os lotes 6 e 7 da bancada e o selftest-gate, e a causa era a família `fixtures`. O harness
+planta cada fixture BOA de agente como `.claude/agents/development/selftest-fixture-probe.md`, e a REGRA 122
+acusava `COR-AUSENTE` em todas, porque nenhuma tinha `color:`. O pré-voo local não roda a família
+`fixtures`, e por isso a bancada local não pegou o defeito.
+
+A cura vale para as 8 fixtures `good` que o manifesto planta sob `.claude/agents/`, conferidas por `awk` no
+`manifest.tsv` (todas no alvo `development`): elas ganharam `color: blue`, a cor da categoria do diretório.
+A `r7-no-worker-orchestrator/good-task-orchestrator-neighbor.md` declara `category: product`, mas é plantada
+em `development`, e a guarda lê o diretório. A guarda não ganhou isenção para a sonda: uma fixture boa tem de
+ser um agente válido. O caso `lint-hard-file (b)` usa a `r12-tool-names/good-native.md` e foi curado junto.
+Não houve outra cópia de fixture boa para `.claude/agents/` na bancada (grep por `fixtures/…good…md`).
+As famílias `fixtures`, `lint_hard_file`, `sweep_fixtures` e `agent_color` rodaram localmente com
+`LC_ALL=C` antes do push.

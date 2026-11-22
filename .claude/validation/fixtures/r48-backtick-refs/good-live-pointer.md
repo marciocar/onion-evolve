@@ -2,6 +2,7 @@
 name: selftest-fixture-probe
 description: Fixture de auto-teste do lint — prosa com backtick para caminho .claude existente (Regra 48). Não deve flagrar.
 category: development
+color: blue
 tools: [Read]
 ---
 

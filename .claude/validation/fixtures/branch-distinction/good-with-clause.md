@@ -4,6 +4,7 @@ description: |
   Fixture de auto-teste — agente branch-* COM cláusula de distinção.
   Diferença vs @selftest-probe: este é DIFF-SCOPED (só mudanças do branch). Não deve gerar violação.
 category: development
+color: blue
 tools: [Read]
 ---
 
