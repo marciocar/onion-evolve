@@ -1,0 +1,23 @@
+{
+  "contract": "onion.chat/v1",
+  "kind": "message.received",
+  "provider": "waha",
+  "provider_message_id": "msg-example-0001",
+  "requested_at": "2026-11-22T13:00:00Z",
+  "seen_at": "2026-11-22T13:00:02Z",
+  "requester": {"provider_id": "member-a@example", "resolved_by": "provider_id", "person": "person-a", "role": "partner"},
+  "place": {"id": "group-example@example", "kind": "group", "name": "canal de exemplo"},
+  "thread": {"id": "msg-example-0001", "reply_to": null},
+  "audience": {
+    "listed_at": "2026-11-22T13:00:02Z",
+    "complete": true,
+    "members": [
+      {"provider_id": "member-a@example", "person": "person-a", "external": false},
+      {"provider_id": "member-b@example", "person": "person-b", "external": false},
+      {"provider_id": "agent@example", "person": null, "external": false}
+    ]
+  },
+  "body": {"text": "@brain qual o estado do contrato?", "untrusted": true},
+  "retention": {"class": "third_party", "expires_at": "2026-12-22T13:00:00Z"},
+  "mention": {"direct": true, "by_context": false}
+}

@@ -8,6 +8,9 @@ meta:
   purpose: "Selo do maestro que sai do grafo de coordenação por causa do teto de 40 nós vem para cá, sem mudar o texto, porque outro repositório pode citá-lo. A colheita move a decisão, e não a apaga."
   note: "Nasceu em 2026-11-05: a colheita havia apagado cinco nós citados pela curadoria, e a checagem só olhava este repo. O texto dos nós é o do grafo de origem. Citação antiga com caminho do grafo de coordenação segue válida no commit fixado; a nova cita este arquivo."
 external_edges:
+  - from: D_CHAT_CHANNEL_CONTRACT_SDAAL_1121
+    to: "docs/onion/graph/chat-channel-contract-2026-11.kg.yaml#E_CHAT_ORIGIN_MAESTRO_ASK_1121"
+    edge_type: TRACES_TO
   - from: D_READER_VS_JUDGE_STITCH_1121
     to: "docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml#C_LLM_JUDGE_VETOED_SINGLE_ANNOTATOR"
     edge_type: CONSTRAINS
@@ -1179,9 +1182,6 @@ edges:
     edge_type: TRACES_TO
   - from: D_PIECE_BIRTH_DOCTRINE_1121
     to: D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118
-    edge_type: TRACES_TO
-  - from: D_CHAT_CHANNEL_CONTRACT_SDAAL_1121
-    to: D_HUB_AWS_SHADOW_5_BUSINESS_DAYS_1120
     edge_type: TRACES_TO
   - from: D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121
     to: D_CHAT_CHANNEL_CONTRACT_SDAAL_1121

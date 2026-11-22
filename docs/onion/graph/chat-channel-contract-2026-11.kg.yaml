@@ -1,0 +1,87 @@
+meta:
+  schema_version: "1"
+  id: chat-channel-contract-2026-11
+  slug: chat-channel-contract-2026-11
+  title: "Contrato SDAAL de canal de conversa: origem, construção e a medida do 1º adapter"
+  date: "2026-11-22"
+  baseline: "2026-11-22"
+  review_after: "2026-12-22"
+  purpose: "Grafo do assunto do contrato de canal de conversa (onion.chat/v1, em .claude/utils/chat/). A decisão selada mora no arquivo de selos (D_CHAT_CHANNEL_CONTRACT_SDAAL_1121); aqui ficam a origem do pedido, a construção do contrato no core e a medida do adapter WAHA na peça que opera o canal."
+  note: "Nasceu em 2026-11-22 com o PR do contrato, que cura os dois achados do resíduo do PR #1726: a síntese do Delphi passa a viver no repo (.claude/utils/chat/README.md) e o nó da decisão ganha aresta para a origem certa (E_CHAT_ORIGIN_MAESTRO_ASK_1121) no lugar da aresta de proximidade para a sombra da AWS."
+  # ═══ TETO: 20 NÓS ═══
+external_edges:
+  - from: E_CHAT_CONTRACT_BUILT_1122
+    to: "docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml#D_CHAT_CHANNEL_CONTRACT_SDAAL_1121"
+    edge_type: TRACES_TO
+  - from: E_CHAT_WAHA_CAPABILITIES_MEASURED_1122
+    to: "docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml#D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121"
+    edge_type: TRACES_TO
+nodes:
+  - id: E_CHAT_ORIGIN_MAESTRO_ASK_1121
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-21"
+    verified_against: "pedido do maestro à sessão do core em 2026-11-21, que a sessão registrou na memória dela e repassou à curadoria como encomenda da dissecação «canal de conversa» (campo request do sinal de 2026-11-21 da curadoria ao core)"
+    label: "Origem do contrato: o maestro pediu em 2026-11-21 um contrato SDAAL de canal de conversa em que o agente responde e age na hora, quando chamado (@brain) ou quando entende pelo contexto que é com ele"
+    narrative: "Fala do maestro registrada pela sessão do core: «a conversa com você tem que ser imediata, a pessoa escreve te chamando (ex: @brain) ou você entendendo que é com você, deve tomar as decisões e ações». Dela saíram a encomenda à curadoria (dissecar a categoria, com a conversa imediata no contrato), o Delphi de 4 sessões e o selo D_CHAT_CHANNEL_CONTRACT_SDAAL_1121. O brief da sessão do core diz que o pedido veio do canal do maestro com os sócios; o lugar não foi medido por este registro, só o conteúdo."
+    provenance:
+      source: "maestro, na sessão do core de 2026-11-21"
+      locator: "memória da sessão do core (chat-agent-immediate-action, 2026-11-21) e o campo request do sinal da curadoria «Dissecação da categoria canal de conversa» de 2026-11-21"
+      method: "testimony: fala do maestro registrada pela sessão"
+      locality: "pessoa"
+  - id: E_CHAT_CONTRACT_BUILT_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "python3 -I -B .claude/utils/chat/conformance.py sobre os exemplos (rc 0) e sobre os casos com falta (rc 1); família run_chat_conformance_selftests da bancada, com mutantes"
+    label: "O contrato onion.chat/v1 existe no core: schema da mensagem normalizada com os 5 campos, vocabulário fechado de 22 capacidades (7 verbos obrigatórios, 5 opcionais, 10 regras do núcleo) e o juiz conformance.py (rc 0 conforme, 1 viola, 2 não mediu)"
+    narrative: "Construído em .claude/utils/chat/ no molde do task-manager, sem adapter com segredo nem chamada ao provedor. O juiz reprova evento sem id do provedor, quem pede fora do id do provedor, sem audiência e duplicado; na resposta, vazamento, audiência reprovada ou listada depois, horas fora de ordem e «serviu?» pulado sem motivo. Limite declarado: não sabe se a identidade resolvida é a pessoa certa nem se a guarda da peça funciona."
+    provenance:
+      source: "sessão do core, PR do contrato de canal de conversa"
+      locator: ".claude/utils/chat/ (README.md, interface.md, message.schema.json, vocabulary.tsv, conformance.py)"
+      method: "measurement: execução do juiz e da bancada"
+      locality: "repo"
+  - id: E_CHAT_WAHA_CAPABILITIES_MEASURED_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-22"
+    verified_against: "leitura do código do onion-messaging em db94954 (igual à origin/main medida por git ls-remote): tools/notify/remind.py, watcher/onion_watcher/channels.py e events.py, queue/onion_queue/daemon.py; conformance.py capabilities --strict sobre a declaração"
+    label: "O adapter WAHA na peça onion-messaging cumpre 6 de 17 capacidades obrigatórias: envio, ack, guarda de vazamento, teto com pending, teto de mídia e segredo fora da saída; a recepção entrega o corpo bruto, sem os 5 campos"
+    narrative: "Parciais: recepção (CloudEvent com o corpo bruto do WAHA), audiência (só --groups), dedupe (pelo sha256 do corpo, não pelo id da mensagem), retenção (prune do dono, sem prazo de corpos de terceiros) e auditoria (só do envio). Faltam: responder no fio, mapa de identidade, «serviu?», latência e marca de quem leu; a perda do número não foi medida. Medida por leitura, nada rodado contra o WAHA."
+    provenance:
+      source: "sessão do core, leitura do repositório onion-messaging"
+      locator: ".claude/utils/chat/adapters/waha.capabilities.tsv"
+      method: "measurement: leitura do código da peça e conformance.py --strict"
+      locality: "repo"
+  - id: Q_CHAT_WAHA_ADAPTER_CONFORMANT_1122
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: onion-messaging
+    impact: 4
+    confidence: 0.5
+    label: "O adapter WAHA da onion-messaging entrega o evento com os 5 campos e passa no conformance.py --strict?"
+    narrative: "Pronto quando: a bancada da peça roda conformance.py check sobre a saída do adapter com o WAHA simulado e mutantes, com rc 0, e a declaração waha.capabilities.tsv é atualizada no core com a fonte de cada capacidade nova. O 1º entregável que o Delphi pediu (os 5 campos, o mapa de identidade e a recepção durável) é o primeiro passo. Prazo a calibrar com a peça dona: sai de pontos e histórico."
+edges:
+  - from: E_CHAT_CONTRACT_BUILT_1122
+    to: E_CHAT_ORIGIN_MAESTRO_ASK_1121
+    edge_type: TRACES_TO
+  - from: Q_CHAT_WAHA_ADAPTER_CONFORMANT_1122
+    to: E_CHAT_WAHA_CAPABILITIES_MEASURED_1122
+    edge_type: DEPENDS_ON
+  - from: E_CHAT_WAHA_CAPABILITIES_MEASURED_1122
+    to: E_CHAT_CONTRACT_BUILT_1122
+    edge_type: DEPENDS_ON

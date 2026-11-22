@@ -1,0 +1,16 @@
+{
+  "contract": "onion.chat/v1",
+  "kind": "message.reply",
+  "provider": "waha",
+  "in_reply_to": "msg-example-0001",
+  "place": {"id": "group-example@example", "kind": "group"},
+  "thread": {"id": "msg-example-0001"},
+  "signed_by": "brain",
+  "on_behalf_of": {"provider_id": "member-a@example", "resolved_by": "provider_id", "person": "person-a", "role": "partner"},
+  "audience_checked": {"listed_at": "2026-11-22T13:00:02Z", "verdict": "ok"},
+  "leak_guard": {"verdict": "passed"},
+  "latency": {"requested_at": "2026-11-22T13:00:00Z", "seen_at": "2026-11-22T13:00:02Z", "replied_at": "2026-11-22T13:00:09Z"},
+  "served": {"asked": true},
+  "audit": {"id": "audit-example-0001"},
+  "body": {"text": "O contrato está selado; o adapter WhatsApp vem a seguir. Serviu?"}
+}

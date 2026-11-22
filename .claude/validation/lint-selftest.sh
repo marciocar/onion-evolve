@@ -52165,6 +52165,97 @@ run_adapter_enforcement_selftests() {
 }
 _family run_adapter_enforcement_selftests
 
+# Modo chat-conformance — o juiz do contrato onion.chat/v1 (D_CHAT_CHANNEL_CONTRACT_SDAAL_1121, 2026-11-22). O SUT é o
+# conformance.py REAL, chamado como a peça o chama (`python3 -I -B conformance.py check|capabilities`), sobre eventos e
+# respostas derivados dos exemplos conformes do próprio contrato: cada caso tira UMA coisa e confere o código da falta.
+run_chat_conformance_selftests() {
+  local sut="${REPO_ROOT}/.claude/utils/chat/conformance.py" ex="${REPO_ROOT}/.claude/utils/chat/examples"
+  local tsv="${REPO_ROOT}/.claude/utils/chat/adapters/waha.capabilities.tsv"
+  [ -f "${sut}" ] || { record_fail "chat-conformance" "juiz ausente: ${sut}"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "chat-conformance: python3 ausente"; return; }
+  local d out rc; d="$(mktemp -d)"
+  _cc() { if out="$(python3 -I -B "${sut}" "$@" 2>&1)"; then rc=0; else rc=$?; fi; }
+  _cc check "${ex}/received.example.json"
+  if [ "${rc}" = 2 ] && grep -q 'jsonschema ausente' <<< "${out}"; then
+    record_skip "chat-conformance: jsonschema ausente (o juiz declara não medi, rc 2)"; rm -rf "${d}"; unset -f _cc; return
+  fi
+  # Fixtures: cada uma é o exemplo conforme com UMA alteração (python3 -I, sem rede, sem estado).
+  if ! python3 -I -B - "${ex}" "${d}" <<'PY'
+import copy, json, sys
+ex, d = sys.argv[1], sys.argv[2]
+ev = json.load(open(f"{ex}/received.example.json")); rp = json.load(open(f"{ex}/reply.example.json"))
+def w(name, *objs): open(f"{d}/{name}.jsonl", "w").write("".join(json.dumps(o) + "\n" for o in objs))
+def mut(base, fn):
+    o = copy.deepcopy(base); fn(o); return o
+w("stream", ev, rp)
+w("noid", mut(ev, lambda o: o.pop("provider_message_id")))
+w("fromtext", mut(ev, lambda o: o["requester"].update(resolved_by="text")))
+w("display", mut(ev, lambda o: o["requester"].update(resolved_by="display_name")))
+w("noaud", mut(ev, lambda o: o.pop("audience")))
+w("dup", ev, ev)
+w("outsider", mut(ev, lambda o: o["requester"].update(provider_id="someone-else@example")))
+w("leak", mut(rp, lambda o: o["leak_guard"].update(verdict="blocked")))
+w("digits", mut(rp, lambda o: o["body"].update(text="ligue para 11 98765 4321 ainda hoje")))
+w("audlate", mut(rp, lambda o: o["audience_checked"].update(listed_at="2026-11-22T13:00:30Z")))
+w("noserved", mut(rp, lambda o: o["served"].update(asked=False)))
+w("orphan", ev, mut(rp, lambda o: o.update(in_reply_to="msg-que-nao-veio")))
+rows = open(sys.argv[1] + "/../adapters/waha.capabilities.tsv").read().splitlines()
+open(f"{d}/caps-missing.tsv", "w").write("\n".join(r for r in rows if not r.startswith("served.ask\t")) + "\n")
+open(f"{d}/caps-req.tsv", "w").write("\n".join(r.replace("served.ask\trequired", "served.ask\toptional") for r in rows) + "\n")
+open(f"{d}/caps-nosrc.tsv", "w").write("\n".join(r.replace("piece:onion-messaging/queue/onion_queue/daemon.py\top_ack", "-\top_ack") for r in rows) + "\n")
+PY
+  then record_fail "chat-conformance: fixtures" "o gerador python falhou"; rm -rf "${d}"; unset -f _cc; return; fi
+  # (a) os exemplos do contrato, sozinhos e juntos no mesmo fluxo, saem conformes
+  local a_ok=1
+  _cc check "${ex}/received.example.json"; [ "${rc}" = 0 ] || a_ok=0
+  _cc check "${ex}/reply.example.json"; [ "${rc}" = 0 ] || a_ok=0
+  _cc check "${d}/stream.jsonl"; [ "${rc}" = 0 ] || a_ok=0
+  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0)"
+  else record_fail "chat-conformance: (a) exemplos conformes" "rc=${rc} out=[${out}]"; fi
+  # (b..m) cada falta reprova com rc 1 e o código dela
+  local c f code
+  while IFS='|' read -r c f code; do
+    _cc check "${d}/${f}.jsonl"
+    if [ "${rc}" = 1 ] && grep -q "	${code}	" <<< "${out}"; then record_pass "chat-conformance: (${c}) ${f} reprova com ${code}"
+    else record_fail "chat-conformance: (${c}) ${f}" "esperado rc 1 e ${code}; rc=${rc} out=[${out}]"; fi
+  done <<'CASES'
+b|noid|SEM-ID-DO-PROVEDOR
+c|fromtext|IDENTIDADE-FORA-DO-ID
+d|display|IDENTIDADE-FORA-DO-ID
+e|noaud|SEM-AUDIENCIA
+f|dup|DUPLICADO
+g|outsider|SEM-AUDIENCIA
+h|leak|VAZAMENTO
+i|digits|VAZAMENTO
+j|audlate|SEM-AUDIENCIA
+k|noserved|SERVIU
+l|orphan|FIO
+CASES
+  # (m) a declaração real do adapter WAHA está bem formada (rc 0); com --strict, o adapter reprova pelo que falta
+  _cc capabilities "${tsv}"
+  local m_rc="${rc}"
+  _cc capabilities "${tsv}" --strict
+  if [ "${m_rc}" = 0 ] && [ "${rc}" = 1 ] && grep -q '	OBRIGATORIA-FALTANDO	' <<< "${out}"; then
+    record_pass "chat-conformance: (m) waha.capabilities.tsv bem formada; --strict reprova o adapter pelo que falta"
+  else record_fail "chat-conformance: (m) declaração do WAHA" "rc sem strict=${m_rc}, com strict=${rc} out=[${out}]"; fi
+  # (n) declaração com capacidade a menos, requisito trocado ou implemented sem fonte reprova
+  local n_miss=""
+  _cc capabilities "${d}/caps-missing.tsv"; { [ "${rc}" = 1 ] && grep -q '	AUSENTE	' <<< "${out}"; } || n_miss="${n_miss} AUSENTE"
+  _cc capabilities "${d}/caps-req.tsv"; { [ "${rc}" = 1 ] && grep -q '	REQUISITO	' <<< "${out}"; } || n_miss="${n_miss} REQUISITO"
+  _cc capabilities "${d}/caps-nosrc.tsv"; { [ "${rc}" = 1 ] && grep -q '	SEM-FONTE	' <<< "${out}"; } || n_miss="${n_miss} SEM-FONTE"
+  if [ -z "${n_miss}" ]; then record_pass "chat-conformance: (n) capacidade ausente, requisito trocado e implemented sem fonte: cada um reprova"
+  else record_fail "chat-conformance: (n) declaração" "faltaram:${n_miss}"; fi
+  # (o) não mediu é rc 2, nunca 0: arquivo vazio e arquivo ausente
+  : > "${d}/empty.json"
+  _cc check "${d}/empty.json"; local o1="${rc}"
+  _cc check "${d}/nao-existe.json"
+  if [ "${o1}" = 2 ] && [ "${rc}" = 2 ]; then record_pass "chat-conformance: (o) arquivo vazio e ausente saem rc 2 (não mediu)"
+  else record_fail "chat-conformance: (o) rc 2" "vazio=${o1} ausente=${rc}"; fi
+  unset -f _cc
+  rm -rf "${d}"
+}
+_family run_chat_conformance_selftests
+
 run_shard_plan_selftests() {
   local sut="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"
   if [ ! -f "${sut}" ]; then record_skip "shard-plan: o SUT nao existe (${sut})"; return; fi

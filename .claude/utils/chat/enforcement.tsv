@@ -1,0 +1,8 @@
+# Onde o contrato de cada adapter de chat é COBRADO (REGRA 107 (Adapter SDAAL declara onde o seu contrato é cobrado)).
+# Uma linha por adapter de adapters/*.md: <adapter><TAB><forma>:<valor>, forma em exe | hook | validator | none.
+#   exe:<caminho> um executável o roda · hook:<caminho> hook registrado barra o transporte cru ·
+#   validator:<caminho> validador chamado pelo lint · none:<motivo>; gatilho:<o que a pediria>
+# Arquivo auxiliar em adapters/ (não é adapter) declara <!-- adapter-auxiliar: <adapter> --> nas 5 primeiras linhas.
+# O executável de todo adapter de chat roda na peça que opera o canal, nunca no core (D_CHAT_CHANNEL_CONTRACT_SDAAL_1121):
+# a cobrança no core é o juiz conformance.py, que a bancada da peça roda sobre a saída do adapter.
+waha	none:o executável roda na peça onion-messaging, fora do core, e a cobrança é o conformance.py na bancada dela; gatilho: a peça publicar a saída normalizada do adapter (fixture com o WAHA simulado) que o CI do core possa conferir
