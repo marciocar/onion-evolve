@@ -2,7 +2,8 @@
 branch: feat/gokapi-oidc-provision
 pr: 1736
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 64e119d12408606d6614a383efa17d2939c840fc683511d4d5e3ccf48fd54ffa
+reviewed_code_sha256: 6adcb22cbf5b473c38583cf7b916c5003d37da811a02a125bc96d7c5497c7d4e
 findings_total: 6
 findings_real: 6
 findings_blocking: 3
