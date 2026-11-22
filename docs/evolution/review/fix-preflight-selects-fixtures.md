@@ -2,17 +2,16 @@
 branch: fix/preflight-selects-fixtures
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 0bc59a3866f3c8fe86bca33d77203751ee55ab3c3a8cf9cc3579719e14ecd1aa
-reviewed_code_sha256: e714365f072cb6db27cededfdb4b147c37e9267c47e6628e16f73227a484d1e9
-findings_total: 11
-findings_real: 9
+reviewed_diff_sha256: pendente
+findings_total: 14
+findings_real: 12
 findings_blocking: 6
-tokens: 120328
-duration_min: 5
-findings_fixed: 7
+tokens: 237032
+duration_min: 7
+findings_fixed: 8
 verdict: REJECTED_AND_FIXED
 elenxo: true
-reviewer: subagente general-purpose (opus), mandato de refutar, só leitura
+reviewer: dois subagentes general-purpose (opus), mandato de refutar, só leitura (diff inteiro; depois o delta do --jobs)
 nota: "A passada refutou a 1ª forma (superfície só do 1º nível citado pelo lint) com juízes chamados por checks, lib/, utils/ e check apagado escapando; curados por fecho e candidatos da base. Duas premissas do comentário estavam erradas e foram corrigidas. O custo de parede de fixtures no pré-voo fica como limite declarado, medido no dogfood."
 ---
 
@@ -52,6 +51,24 @@ A bancada ganha os casos de `preflight_families` (g, h, h2, h3, i, j, j2, j3, k-
     lista curta fica, conferida pelo caso (g).
 11. **Não acolhido: separar código de comentário no lint.** O revisor mediu que só 4 nomes aparecem apenas em
     comentário, então o ganho seria pequeno.
+
+## Segunda passada: o delta do `--jobs auto`
+
+O dogfood serial na cabeça do #1735 passou de 50 minutos. Por isso o `preflight-run.sh` passou a mandar
+`--jobs auto` quando a lista tem `fixtures`, e o caso (l) entrou na bancada. Um segundo refutador revisou só esse
+delta.
+
+12. **Real, corrigido no texto.** O motor usa `min(jobs, famílias)` workers, então a fatia de fixtures tem de 2 a 6
+    partes, não nproc. O comentário passou a declarar esse limite. Tirar o teto do motor muda a bancada inteira e
+    fica fora deste PR.
+13. **Real, limite declarado.** Um pré-voo que segura uma vaga do lease pode ocupar até `_j` vagas do semáforo da
+    bancada. A exposição é a mesma do pre-commit, que já roda com `--jobs auto`. O total segue limitado pelas 8
+    vagas da máquina.
+14. **Real, já existia, declarado.** Com `ONION_SELFTEST_FULL=1`, o pré-voo segue serial.
+
+O refutador verificou que não há deadlock entre o lease e as vagas. Também verificou que o caso (l) distingue o
+mutante e que a soma sob `--jobs --families` está certa. Um mutante pelo `mutate-and-restore`, que tira a linha do
+`case`, foi morto.
 
 ## Mutantes
 

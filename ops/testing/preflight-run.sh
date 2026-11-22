@@ -47,6 +47,13 @@ if [ -n "${tree}" ] && [ -f "${mark}" ] && grep -qxF -- "${key}" "${mark}" 2>/de
 fi
 
 sel=(--families "${fams}")
+# FIXTURES EM FAIXAS (2026-11-22): um diff de REGRA traz a família fixtures (o manifesto inteiro contra o lint, a mais
+# cara da bancada) e, serial, ela passou de 50 min no dogfood da cabeça do #1735. Com --jobs a bancada fatia o
+# manifesto entre os workers (ONION_SELFTEST_SHARD), e cada worker disputa as VAGAS DA MÁQUINA, o mesmo semáforo do
+# pre-commit, que já roda com --jobs auto. LIMITE declarado (passada adversarial): o motor usa min(jobs, famílias)
+# workers, então a fatia é de 2 a 6 partes (as famílias do pré-voo), não nproc; o ganho é desse tamanho. Sem fixtures
+# segue serial, como sempre foi; ONION_SELFTEST_FULL=1 abaixo também (já era assim).
+case ",${fams}," in *,fixtures,*) sel+=(--jobs auto) ;; esac
 if [ "${full}" = 1 ]; then
   sel=(); echo "pré-voo COMPLETO pedido (ONION_SELFTEST_FULL=1, opt-in) — todas as famílias"
 else
