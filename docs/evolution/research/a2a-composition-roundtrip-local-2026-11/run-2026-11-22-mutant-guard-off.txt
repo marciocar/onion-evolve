@@ -1,0 +1,7 @@
+# Mutante: cópia do rehearsal com o guard do bridge_sim.py desligado (why = guard(...) trocado por why = None). Exit 5: o ensaio reprova o mutante.
+FAIL N2a guard, unknown bearer: expected '401 credencial-desconhecida' got '403 trust-denied'
+FAIL N2a guard, member's bearer: expected '401 convite-de-outro-membro' got '403 trust-denied'
+FAIL N2b guard: expected '401 convite-de-outro-receptor' got '403 trust-denied'
+FAIL N2d: expected '401 credencial-ausente' got '403 replay'
+FAIL N3d bridge after revoke: expected '401 convite-revogado' got '200 -'
+assertions: 50 pass, 5 fail
