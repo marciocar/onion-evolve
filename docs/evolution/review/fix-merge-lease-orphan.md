@@ -2,7 +2,8 @@
 branch: fix/merge-lease-orphan
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: de3f4a9c2c7eb8efd3f4f19dc76a08eb65290be20c95a452aff56d6c2c3c64fd
+reviewed_code_sha256: f2631a80799cecea31aa33443efbf3cc8811d4e7a237f6f2529ed78e6d34d2ce
 findings_total: 7
 findings_real: 7
 findings_blocking: 1
