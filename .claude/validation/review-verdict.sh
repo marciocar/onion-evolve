@@ -454,8 +454,10 @@ JSON
   # O parecer deixou de ser advisory, entao erro de CONTAGEM agora bloqueia merge — ou, pior,
   # DEIXA passar defeito. Os dois lados precisam de caso, e os casos precisam poder FALHAR.
   _mkres() { # $1=arquivo  $2=texto do parecer
-    printf '{"type":"result","subtype":"success","is_error":false,"num_turns":5,"total_cost_usd":0.5,"result":%s}\n' \
-      "$(printf '%s' "$2" | jq -Rs .)" > "${d}/$1.json"
+    # Por --rawfile, nunca `jq -Rs`: o jq 1.7 corrompe o multibyte que cruza o byte 4096 da entrada crua.
+    printf '%s' "$2" > "${d}/$1.txt"
+    jq -nc --rawfile r "${d}/$1.txt" \
+      '{type:"result",subtype:"success",is_error:false,num_turns:5,total_cost_usd:0.5,result:$r}' > "${d}/$1.json"
   }
   _ach() { bash "$0" "${d}/$1.json" 2>/dev/null | awk -F= '/^achados=/{print $2}'; }
   _chk() { # $1=arquivo $2=esperado $3=rotulo
@@ -541,6 +543,23 @@ VEREDITO: 2 violacoes
   [ "$(_ach bom)" = "3" ] || { printf '  ✗ review-verdict: (ACH-j) BOM UTF-8 deu %s, esperado 3\n' "$(_ach bom)"; rc=1; _dec_ok=0; }
   [ "${_dec_ok}" = "1" ] \
     && printf '  ✓ review-verdict: (ACH-j) decoracao markdown (- > ##) e BOM nao apagam o gate\n'
+
+  # (ACH-k) PARECER LONGO EM pt-BR (2026-11-22): o jq 1.7 corrompe o multibyte que cruza o byte 4096 da
+  #    entrada crua (`jq -R`/`-Rs`), e o fixture saia adulterado. O resultado tem de ser o texto, byte a byte,
+  #    com o 'e' acentuado e o emoji de 4 bytes exatamente na fronteira.
+  local _bk _bk_ok=1 _bk_txt
+  for _bk in "4094:é" "4093:😀" "4092:😀"; do
+    _bk_txt="$(printf '%*s' "${_bk%%:*}" '' | tr ' ' a)${_bk#*:}b
+VEREDITO: 3 violacoes"
+    _mkres bnd "${_bk_txt}"
+    if ! jq -j .result "${d}/bnd.json" | cmp -s - <(printf '%s' "${_bk_txt}"); then
+      printf '  ✗ review-verdict: (ACH-k) parecer com %s na fronteira de 4096 saiu adulterado no JSON\n' "${_bk}"; rc=1; _bk_ok=0
+    elif [ "$(_ach bnd)" != "3" ]; then
+      printf '  ✗ review-verdict: (ACH-k) parecer com %s na fronteira deu %s, esperado 3\n' "${_bk}" "$(_ach bnd)"; rc=1; _bk_ok=0
+    fi
+  done
+  [ "${_bk_ok}" = "1" ] \
+    && printf '  ✓ review-verdict: (ACH-k) parecer longo com multibyte na fronteira de 4096 chega integro e conta\n'
 
   # GATE: o exit code e o que o CI consome.
   # ⚠️ O ✓ SO SAI SE TODAS PASSARAM. A 1a versao imprimia esta linha FORA do laco: mutando o gate
