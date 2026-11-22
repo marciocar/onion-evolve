@@ -98,10 +98,10 @@ nodes:
     impact: 3
     confidence: 0.85
     verified_at: "2026-11-22"
-    verified_against: "bancada prove_gate_blocks, caso (r) e o mutante (MUT-race); a corrida real repetida com a cura"
+    verified_against: "bancada prove_gate_blocks, casos (r), (r2), (r3) e os mutantes (MUT-race), (MUT-vrace), (MUT-daemon); a corrida real repetida com a cura"
     trace: ".claude/utils/adopt/gate-probe-lock.sh"
     label: "as duas provas do gate (o commit-sonda do verificador e a prova de bloqueio) se revezam por uma trava no git-dir comum do alvo"
-    narrative: "Decisão da sessão de execução: trava exclusiva (flock, com mkdir e pid onde não há flock), não serialização na ordem do adopt.md, porque a corrida mediu dois scripts chamados juntos por quem conduz, e só a trava cobre qualquer chamador. Não é a porta de admissão de carga: aquela limita quantos passos pesados rodam na máquina, esta impede dois provadores no mesmo repositório."
+    narrative: "Decisão da sessão de execução: trava exclusiva (flock, com mkdir e pid onde não há flock), não serialização na ordem do adopt.md, porque a corrida mediu dois scripts chamados juntos por quem conduz. A passada adversarial mostrou que a 1ª versão travava só o verificador: o instalador agora segura a trava desde a cópia do hook (o verificador filho a herda por reentrada), os commits fecham o descritor para um daemon do hook não segurá-la, e a retomada de trava velha sem flock passa por uma trava de retomada. Não é a porta de admissão de carga: aquela limita quantos passos pesados rodam na máquina, esta impede dois provadores no mesmo repositório."
     provenance:
       source: "sessão de execução do core, PR da branch fix/adopt-three-defects (SAC-444)"
       locator: ".claude/utils/adopt/gate-probe-lock.sh, cabeçalho"

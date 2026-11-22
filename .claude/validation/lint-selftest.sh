@@ -20510,6 +20510,14 @@ run_secret_gitignore_selftests() {
   elif ! _sg_pyc "${mut}"; then record_pass "secret-gitignore: (h) MUT sem a linha __pycache__/ o bytecode volta a aparecer como não-rastreado — o caso morde"
   else record_fail "secret-gitignore: (h) MUT" "o mutante sobreviveu"; fi
   rm -f "${mut}"; unset -f _sg_pyc
+  # (h2) regra DESFEITA: `__pycache__/` seguido de `!vendor/**/__pycache__/` parece cobrir, e o git não ignora
+  #      o do vendor → o helper decide pelo comportamento do git e acrescenta o bloco
+  d="$(mktemp -d)"; git -C "${d}" init -q; printf '.env\n__pycache__/\n!vendor/**/__pycache__/\n' > "${d}/.gitignore"
+  out="$(bash "${helper}" "${d}" 2>&1)"
+  if grep -q 'bloco de bytecode (__pycache__/) acrescentado' <<< "${out}"; then
+    record_pass "secret-gitignore: (h2) regra de bytecode desfeita por negação → o git decide (não ignora) e o bloco entra"
+  else record_fail "secret-gitignore: (h2)" "a regra desfeita contou como coberta: '${out}'"; fi
+  rm -rf "${d}"
   # (i) bytecode JÁ versionado → aviso explícito com o comando (o gitignore não o desfaz)
   d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/t/__pycache__"; : > "${d}/t/__pycache__/m.pyc"; git -C "${d}" add -f t
   out="$(bash "${helper}" "${d}" 2>&1)"
@@ -20643,6 +20651,20 @@ run_adopter_guard_core_selftests() {
     if grep -qxF "$(printf 'core\t%s' "${cl}")" "${tsv}"; then
       record_pass "adopter-guard-core: (MUT-canon) sem ler o local_path do kind: source, a linha volta a apontar o clone — o caso (i) morde"
     else record_fail "adopter-guard-core: (MUT-canon)" "o mutante sobreviveu: $(tr '\t\n' '>|' < "${tsv}")"; fi
+  fi
+  # (MUT-origin) sem a pista do origin local, (j) volta a gravar o clone; (MUT-identity) sem conferir o mesmo
+  #     repositório, (k) troca a linha para o OUTRO repo
+  local muto="${t}/mut-origin.sh" muti="${t}/mut-identity.sh"
+  sed 's|case "${o}" in /\*) _try_canon "${o}" "remoto origin local" ;;|case "${o}" in /nunca/*) _try_canon "${o}" "remoto origin local" ;;|' "${helper}" > "${muto}"
+  sed 's#^  _same_repo "${c}" "${CORE}" || return 1$#  true#' "${helper}" > "${muti}"
+  if cmp -s "${muto}" "${helper}" || cmp -s "${muti}" "${helper}"; then record_fail "adopter-guard-core: (MUT-origin/identity)" "o sed não trocou — mutante não plantado"
+  else
+    _agc_dest 12; bash "${muto}" "${d}" "${cl2}" >/dev/null 2>&1
+    if grep -qxF "$(printf 'core\t%s' "${cl2}")" "${tsv}"; then record_pass "adopter-guard-core: (MUT-origin) sem a pista do origin local, (j) volta a gravar o clone — o caso morde"
+    else record_fail "adopter-guard-core: (MUT-origin)" "o mutante sobreviveu: $(tr '\t\n' '>|' < "${tsv}")"; fi
+    _agc_dest 13; bash "${muti}" "${d}" "${cl3}" >/dev/null 2>&1
+    if grep -qxF "$(printf 'core\t%s' "${other}")" "${tsv}"; then record_pass "adopter-guard-core: (MUT-identity) sem conferir o mesmo repositório, (k) aponta o OUTRO repo — o caso morde"
+    else record_fail "adopter-guard-core: (MUT-identity)" "o mutante sobreviveu: $(tr '\t\n' '>|' < "${tsv}")"; fi
   fi
   # (h) o adopt CHAMA o helper e o relatório tem a seção (helper que ninguém chama é guarda morta)
   if grep -q 'adopter-guard-core.sh' "${REPO_ROOT}/.claude/commands/meta/adopt.md" && grep -qF 'a linha `adopter-guard: …` do passo (0.6)' "${REPO_ROOT}/.claude/commands/meta/adopt.md"; then
@@ -36049,7 +36071,7 @@ LINT
     bp=$!
     while [ ! -e "${mk}" ] && [ "${i}" -lt 300 ]; do sleep 0.1; i=$((i + 1)); done
     _r=0; _o="$(TMPDIR="${d}/tmp" bash "$1" "${tr}" 2>&1)" || _r=$?
-    wait "${bp}" 2>/dev/null
+    wait "${bp}" 2>/dev/null || true
   }
   _pg_race "${pg}"
   if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO"* ]] && grep -q 'outra prova do gate segura' <<< "${_o}"; then
@@ -36066,6 +36088,53 @@ LINT
     else record_fail "prove-gate-blocks: (MUT-race)" "o mutante sobreviveu: rc=${_r} última='$(_pg_last)'"; fi
   fi
   unset -f _pg_race
+  # (r2) o VERIFICADOR real (ops/verify-adopter-gate.sh, core-only; é ele que mexe no checkout) contra a prova:
+  #      a prova começa quando a sonda do verificador já está no checkout real. Com a trava, espera e sai
+  #      PROVADO; MUTANTE: o verificador sem a trava → a prova sai rc 4. Mede que o verificador PEGA a trava
+  #      (o caso (r) usa um competidor que chama a lib direto, e um caminho quebrado até ela passaria calado).
+  local vg="${REPO_ROOT}/ops/verify-adopter-gate.sh"
+  _pg_vrace() {  # $1=verificador → _o, _r
+    local i=0 vp; rm -f "${tr}/.onion-gate-probe.tmp"
+    ( TMPDIR="${d}/tmp" bash "$1" "${tr}" >/dev/null 2>&1 ) &
+    vp=$!
+    while [ ! -e "${tr}/.onion-gate-probe.tmp" ] && [ "${i}" -lt 300 ]; do sleep 0.1; i=$((i + 1)); done
+    _r=0; _o="$(TMPDIR="${d}/tmp" bash "${pg}" "${tr}" 2>&1)" || _r=$?
+    wait "${vp}" 2>/dev/null || true   # o rc do verificador não importa aqui (set -e)
+  }
+  if [ ! -f "${vg}" ]; then record_skip "prove-gate-blocks: (r2)" "verificador ausente (core-only)"
+  else
+    _pg_vrace "${vg}"
+    if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO"* ]] && grep -q 'outra prova do gate segura' <<< "${_o}"; then
+      record_pass "prove-gate-blocks: (r2) o verificador real com a sonda no checkout → a prova espera a trava dele e sai PROVADO"
+    else record_fail "prove-gate-blocks: (r2)" "rc=${_r} última='$(_pg_last)'"; fi
+    local mv2="${d}/mut-verify.sh"; sed 's|^if \[ -f "${_GPL}" \]; then$|if false; then|' "${vg}" > "${mv2}"
+    if cmp -s "${vg}" "${mv2}"; then record_fail "prove-gate-blocks: (MUT-vrace) setup" "a mutação não foi aplicada (a âncora do sed mudou?)"
+    else
+      _pg_vrace "${mv2}"
+      if [ "${_r}" -eq 4 ]; then record_pass "prove-gate-blocks: (MUT-vrace) verificador sem a trava → a prova cai em INTEGRIDADE (rc 4) — o caso morde"
+      else record_fail "prove-gate-blocks: (MUT-vrace)" "o mutante sobreviveu: rc=${_r} última='$(_pg_last)'"; fi
+    fi
+  fi
+  unset -f _pg_vrace
+  # (r3) DAEMON do hook: um hook que solta processo de fundo não pode herdar a trava (fd 9) e segurá-la depois
+  #      do fim da prova. A prova termina e, logo em seguida, outro provador pega a trava em até 3 s.
+  #      MUTANTE: sem o `9>&-` nos commits, o daemon segura a trava e o 2º provador estoura o teto.
+  local tz="${d}/z"; _pg_mk "${tz}" onion
+  printf '#!/usr/bin/env bash\n( sleep 20 >/dev/null 2>&1 </dev/null & )\nexec bash "$(git rev-parse --show-toplevel)/.claude/validation/lint-artifacts.sh"\n' > "${tz}/.githooks/pre-commit"
+  chmod +x "${tz}/.githooks/pre-commit"
+  _pg_daemon() {  # $1=script → 0 quando o 2º provador pega a trava logo depois
+    TMPDIR="${d}/tmp" bash "$1" "${tz}" >/dev/null 2>&1
+    ( . "${REPO_ROOT}/.claude/utils/adopt/gate-probe-lock.sh"; ONION_GATE_PROBE_LOCK_WAIT=3 onion_gate_probe_lock "${tz}" ) 2>/dev/null
+  }
+  if _pg_daemon "${pg}"; then record_pass "prove-gate-blocks: (r3) daemon solto pelo hook não herda a trava: o próximo provador a pega logo depois"
+  else record_fail "prove-gate-blocks: (r3)" "a trava ficou presa depois da prova (daemon do hook com o fd 9)"; fi
+  local mz="${d}/mut-daemon.sh"; sed 's/ 9>&-)"; RC=\$?/)"; RC=$?/' "${pg}" > "${mz}"
+  if cmp -s "${pg}" "${mz}"; then record_fail "prove-gate-blocks: (MUT-daemon) setup" "a mutação não foi aplicada"
+  elif command -v flock >/dev/null 2>&1; then
+    if ! _pg_daemon "${mz}"; then record_pass "prove-gate-blocks: (MUT-daemon) sem o 9>&- o daemon segura a trava e o próximo provador estoura — o caso morde"
+    else record_fail "prove-gate-blocks: (MUT-daemon)" "o mutante sobreviveu"; fi
+  else record_skip "prove-gate-blocks: (MUT-daemon)" "sem flock: o descritor não é a trava neste caminho"; fi
+  unset -f _pg_daemon
 
   # ── MUTANTES — cada um tira uma decisão e o caso que a mede tem de virar ───────────────────────────
   _pg_mut() {  # $1=nome · $2=sed · $3=alvo · $4=padrão que a última linha do ORIGINAL tem e o mutante perde

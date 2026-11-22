@@ -51,6 +51,14 @@ fi
 # bytecode do Python: já existe regra que o ignora? (o diretório em qualquer nível, ou os .pyc)
 _has_pyc_rule() {
   [ -f "${GI}" ] || return 1
+  # Num repo git, quem decide é o COMPORTAMENTO: o git ignora um .pyc aninhado? (passada adversarial: a regex
+  # aceitava `  __pycache__/` com espaço inicial e regra desfeita por `!`, que o git não honra). Sem o
+  # excludesFile global, que é da máquina e não viaja com o repo.
+  if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
+    git -C "${DEST}" -c core.excludesFile=/dev/null check-ignore --no-index -q \
+      vendor/onion-probe/__pycache__/m.cpython-312.pyc 2>/dev/null
+    return
+  fi
   grep -qE '^[[:space:]]*(\*\*/)?__pycache__/?[[:space:]]*$|^[[:space:]]*\*\.py(c|\[[a-z]*c[a-z]*\])[[:space:]]*$' "${GI}"
 }
 if _has_pyc_rule; then

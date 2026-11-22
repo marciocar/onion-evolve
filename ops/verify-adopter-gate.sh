@@ -153,7 +153,7 @@ git add "$PROBE" >/dev/null 2>&1
 # BLOQUEIO ineludível: ele nunca é alcançado, e o caso da bancada que o exercita PULA — o que, em
 # modo STRICT, reprova (e reprova certo: guarda que não roda no CI é guarda que não existe).
 # A identidade é do SONDA e morre com ele (`-c`, não `config`): não toca a configuração do alvo.
-OUTPUT="$(git -c commit.gpgsign=false -c user.email=onion-gate-probe@local -c user.name='Onion Gate Probe' commit -m "chore: onion gate probe (descartável)" 2>&1)"
+OUTPUT="$(git -c commit.gpgsign=false -c user.email=onion-gate-probe@local -c user.name='Onion Gate Probe' commit -m "chore: onion gate probe (descartável)" 2>&1 9>&-)"   # 9>&-: daemon do hook não herda a trava
 RC=$?
 [ "$RC" -eq 0 ] && CRIOU_COMMIT=1
 
@@ -186,7 +186,7 @@ LINT="${REPO}/.claude/validation/lint-artifacts.sh"
 if [ ! -f "$LINT" ]; then
   info "sem .claude/validation/lint-artifacts.sh — nada a bloquear (repo não adotou o gate)"
 else
-  bash "$LINT" >/dev/null 2>&1
+  bash "$LINT" >/dev/null 2>&1 9>&-
   LRC=$?
   # ⚠️ FALSO POSITIVO CORRIGIDO na 1ª execução real (metagamify, 2026-08-16): a versão
   # anterior declarava "bloqueio provado" só porque lint reprovava E o commit falhou — mas

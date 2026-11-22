@@ -43,6 +43,19 @@ bash "$(dirname "$0")/assert-dest.sh" "${DEST}" || exit 2
 TPL="$(dirname "$0")/githook-pre-commit-onion.tpl"
 [ -f "${TPL}" ] || { echo "ERRO: template não encontrado: ${TPL}" >&2; exit 2; }
 
+# TRAVA do repositório (SAC-444): os passos (1) a (3) mudam status e config do alvo, e a prova de vida (4)
+# faz commit-sonda no checkout real; a prova de bloqueio (prove-gate-blocks.sh) rodando junto fotografa
+# exatamente isso e saía rc 4 INTEGRIDADE. A trava vale do passo (1) ao fim; o verificador filho a herda
+# (reentrada pela variável exportada na lib) em vez de esperar por este processo.
+if [ -f "$(dirname "$0")/gate-probe-lock.sh" ]; then
+  # shellcheck source=gate-probe-lock.sh
+  . "$(dirname "$0")/gate-probe-lock.sh"
+  onion_gate_probe_lock "${DEST}" || {
+    echo "ERRO: outra prova do gate segurou o repositório de ${DEST} além de ${ONION_GATE_PROBE_LOCK_WAIT:-1800}s — nada instalado; rode de novo quando ela terminar." >&2
+    exit 1; }
+  trap 'onion_gate_probe_unlock' EXIT
+fi
+
 HOOKDIR="${DEST}/.githooks"
 HOOK="${HOOKDIR}/pre-commit"
 mkdir -p "${HOOKDIR}" 2>/dev/null || { echo "AVISO: não criou ${HOOKDIR} (permissão?) — hook não provisionado." >&2; exit 0; }

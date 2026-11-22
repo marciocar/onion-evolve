@@ -86,6 +86,7 @@ if [ -f "${_GPL}" ]; then
   . "${_GPL}"
   onion_gate_probe_lock "${T}" \
     || verdict_no 3 "outra prova do gate segurou o repositório do alvo além de ${ONION_GATE_PROBE_LOCK_WAIT:-1800}s — rode de novo quando ela terminar"
+  trap 'onion_gate_probe_unlock' EXIT   # até o finish (abaixo) assumir: sair por verdict_no não deixa trava órfã
 fi
 
 # ── 1. FOTO do checkout real ────────────────────────────────────────────────────────────────────────
@@ -193,15 +194,15 @@ git -C "${R}" config core.hooksPath "${HSB}"
 GC=(git -C "${R}" -c commit.gpgsign=false -c user.email=onion-gate-proof@local -c user.name='Onion Gate Proof')
 "${GC[@]}" add -A >/dev/null 2>&1
 if ! git -C "${R}" diff --cached --quiet 2>/dev/null; then
-  "${GC[@]}" commit -q --no-verify -m "base: estado do alvo" >/dev/null 2>&1 \
+  "${GC[@]}" commit -q --no-verify -m "base: estado do alvo" >/dev/null 2>&1 9>&- \
     || verdict_no 3 "não consegui fixar o estado do alvo no sandbox (commit-base)"
 fi
 
 run_commit() {  # $@ = args do commit → define OUT e RC
   if command -v timeout >/dev/null 2>&1; then
-    OUT="$(cd "${R}" && timeout "${PROBE_TIMEOUT}" "${GC[@]}" commit "$@" 2>&1)"; RC=$?
+    OUT="$(cd "${R}" && timeout "${PROBE_TIMEOUT}" "${GC[@]}" commit "$@" 2>&1 9>&-)"; RC=$?   # 9>&-: daemon do hook não herda a trava
   else
-    OUT="$(cd "${R}" && "${GC[@]}" commit "$@" 2>&1)"; RC=$?
+    OUT="$(cd "${R}" && "${GC[@]}" commit "$@" 2>&1 9>&-)"; RC=$?
   fi
 }
 
