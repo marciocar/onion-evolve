@@ -2,8 +2,7 @@
 branch: docs/a2a-roundtrip-measure
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 0f45f15662b437515ba0806b5db85debc51c68014bc148e54a1216e0209e39fa
-reviewed_code_sha256: 8b72ebb4f962eec458fe45c03edd0d785d9863e7afea2af7a4692943c644a2c1
+reviewed_diff_sha256: pendente
 findings_total: 9
 findings_real: 9
 findings_blocking: 4
