@@ -13,7 +13,7 @@ verdict: FIXED
 elenxo: true
 elenxo_isolado: true
 reviewer: "Agente revisor separado (code-reviewer), somente leitura, com mandato de refutar, lançado pela sessão sobre o diff sem receber as conclusões do autor. Fez três passadas. 1ª: 1 achado bloqueante (cache plantável no tmp, que trunca arquivo e forja dados), 6 não bloqueantes e 2 de baixa prioridade. 2ª, sobre o fix: 4 corrigidos, 3 parciais e 1 novo. 3ª, sobre o fix final: NO_FINDINGS. Ficou uma observação de texto, não corrigida e declarada no corpo."
-nota: "tokens 0 = não medido. Medido: a bancada sessions_statusline deu 52 passaram e 0 falharam (casos com mutantes via _prove_mutation); a guarda-da-guarda pegou dois mutantes com âncora caduca, e ambos foram corrigidos. A linha rodou ao vivo contra claude agents --json (CC 2.1.330), rc 0. A oferta rodou ao vivo no core: resolveu o checkout principal a partir da worktree."
+nota: "tokens 0 = não medido. Medido: a bancada sessions_statusline deu 52 passaram e 0 falharam (casos com mutantes via _prove_mutation); a guarda-da-guarda pegou dois mutantes com âncora caduca, e ambos foram corrigidos. A linha rodou ao vivo contra claude agents --json (CC 2.1.330), rc 0. A oferta rodou ao vivo no core: resolveu o checkout principal a partir da worktree. Depois da 3ª passada, só a FORMA de duas linhas do adopt.md mudou (a cópia do settings e o passo 6c viraram uma linha cada), para caber nas 800 linhas da REGRA 5 (Limites de linhas); a semântica é idêntica e o bloco if/else passa no bash -n."
 ---
 
 # Passada adversarial: `feat/sessions-statusline-1121`
