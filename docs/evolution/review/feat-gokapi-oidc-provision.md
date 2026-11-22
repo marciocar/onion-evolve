@@ -1,9 +1,8 @@
 ---
 branch: feat/gokapi-oidc-provision
-pr: pendente
+pr: 1736
 date: 2026-11-22
-reviewed_diff_sha256: 64e119d12408606d6614a383efa17d2939c840fc683511d4d5e3ccf48fd54ffa
-reviewed_code_sha256: 6adcb22cbf5b473c38583cf7b916c5003d37da811a02a125bc96d7c5497c7d4e
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 6
 findings_blocking: 3
@@ -11,7 +10,7 @@ tokens: 127339
 duration_min: 4
 findings_fixed: 6
 verdict: FIXED
-elenxo: false
+elenxo: true
 reviewer: general-purpose opus (refutador isolado, mandato refutar: vazamento de segredo e idempotência)
 nota: "A bancada foi de 26 para 30 casos com as curas; mutantes por ops/mutate-and-restore.sh: 19 plantadas, 18 mortes de primeira; o sobrevivente virou o caso 3b e morreu na replantação."
 ---
@@ -80,3 +79,7 @@ sem mutante.
 - O contrato do Logto vem do código da imagem 1.46.0, não de chamada ao vivo; a bancada simula esse contrato.
 - O auto-cadastro em si é do tenant (signInMode): o ato só avisa; fechar o tenant é ato à parte.
 - `--data-binary` no corpo do molde não tem caso que o exercite com segredo (o dry-run do molde não faz POST).
+
+## Correção da declaração (22/11)
+
+O campo `elenxo` dizia `false`, mas a passada adversarial aconteceu: um refutador opus isolado, com mandato de refutar, achou 6 problemas, todos curados (registro acima). A declaração passa a `true`. O código não mudou; o carimbo do diff volta a `pendente` para o `pr-finalize` carimbar de novo.
