@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1210 itens abertos** em 179 grafo(s) com aberto (de 238 no escopo) · 171 grupo(s), agrupados por `owner:` (75 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1211 itens abertos** em 179 grafo(s) com aberto (de 238 no escopo) · 171 grupo(s), agrupados por `owner:` (76 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -977,7 +977,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 19 item(ns)
+## maestro — 20 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -985,6 +985,7 @@
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
+| 7.7 | `D_GOKAPI_OIDC_BY_API_2026_11` | m2-bridge-logto-2026-07 | O app OIDC do Gokapi e o credstore saem de um ato por API (sem console, sem colar segredo); auto-cadastro é do tenant, o app ganh |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
 | 6.0 | `Q_MD_BRAIN_PROMOTION_DETAILS_1109` | maestro-decisions-1109b | Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório? |
 | 4.8 | `Q_MN_LEGAL_READING_1109` | meeting-notice-absence-2026-11 | Falta leitura jurídica de LGPD para reuniões registradas sem aviso, antes do uso em dado real. |
