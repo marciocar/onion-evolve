@@ -2,8 +2,7 @@
 branch: fix/jq-raw-utf8-boundary
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 503155c0193f799da6a3bcdf064a56669cb551f505fb883f60f98ce6c510780b
-reviewed_code_sha256: 2317f8d9a8a36b140d8e710b93b5c4f06bea5b0b563e5c3a7bb3e4d243aa98b7
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 5
 findings_blocking: 2
@@ -12,6 +11,7 @@ duration_min: 8
 findings_fixed: 5
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: "subagente general-purpose (opus), mandato refutar, sem o raciocínio do autor"
 nota: "Revisão isolada sobre o commit 3f68590b4; os achados 1 e 2 (médios) bloqueavam e foram curados; a observação sobre o ACH-k não é defeito e virou esclarecimento no comentário. tokens = tokens do subagente refutador."
 ---
@@ -66,3 +66,10 @@ Na bancada, cada ponto também tem mutante na CÓPIA; num jq sem o defeito a son
 - Não medido em bash 3.2 do macOS (não há na VPS).
 - O jq do sistema segue 1.7.1: subir é do maestro (nó C_JQ_SYSTEM_LAG_1122). O CVE-2026-49839 do `--rawfile`
   (≤ 1.8.1) exige string acima do limite do jq; os corpos A2A têm teto de 8192 bytes.
+
+## Correção da declaração (22/11)
+
+O revisor desta passada foi um agente separado do autor, como dizem o campo `reviewer:` e o corpo, mas o
+frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
+sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
+código foi apagado, para o `pr-finalize` carimbar de novo.
