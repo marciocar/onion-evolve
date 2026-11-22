@@ -34,7 +34,7 @@ nodes:
     valid_from: "2026-11-22"
     verified_at: "2026-11-22"
     verified_against: "https://code.claude.com/docs/en/sub-agents (tabela de campos do frontmatter) e ⟨o binário instalado do Claude Code 2.1.330⟩"
-    label: "A paleta aceita hoje é de 8 valores: red, blue, green, yellow, purple, orange, pink, cyan. A doc diz 'Accepts red, blue, green, yellow, purple, orange, pink, or cyan'; o binário 2.1.330 tem as mesmas 8 chaves em V0 e testa a cor com sT.includes(e), comparação exata."
+    label: "A paleta aceita hoje é de 8 valores: red, blue, green, yellow, purple, orange, pink, cyan. A doc diz 'Accepts red, blue, green, yellow, purple, orange, pink, or cyan'; o binário 2.1.330 tem as mesmas 8 chaves no objeto minificado de cores de subagente e testa a cor com sT.includes(e), comparação exata."
     narrative: "a comparação exata quer dizer que 'Blue' não pinta, por isso a guarda compara sem normalizar caixa. Valor fora da lista é ignorado em silêncio: o agente fica sem cor e nada avisa. A doc também diz que color não é aceito no --agents JSON."
     provenance:
       source: "https://code.claude.com/docs/en/sub-agents"
@@ -93,7 +93,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    label: "TETO: a paleta é a da doc e do binário 2.1.330 em 2026-11-22. Cor nova do Claude Code é acusada até entrar no .tsv; o /meta:cc-update reconfere a linha color da doc e as chaves de V0."
+    label: "TETO: a paleta é a da doc e do binário 2.1.330 em 2026-11-22. Cor nova do Claude Code é acusada até entrar no .tsv; o /meta:cc-update reconfere a linha color da doc e as chaves do objeto de cores de subagente no binário."
 
 edges:
   - from: E_CORES_FORA_DA_CATEGORIA_1122
