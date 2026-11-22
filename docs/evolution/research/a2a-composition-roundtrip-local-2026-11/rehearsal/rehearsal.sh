@@ -83,7 +83,7 @@ bash "${FT}/a2a-invite.sh" create intruso --days 1 --file "${INV}" --token-out "
 expect "a2a-invite refuses a member outside the registry (rc != 0)" yes "$([ "$?" -ne 0 ] && echo yes || echo no)"
 ( umask 077; openssl rand -hex 24 > "${R}/keys/tok-unknown" )
 
-step "1. bridge simulated on loopback (mirrors onion-bridge 5c1ba8d)"
+step "1. bridge simulated on loopback (mirrors onion-bridge F3, 2026-10-22)"
 python3 -I "${TOOLS}/bridge_sim.py" "${FT}/a2a-verify.sh" "${TR}" "${JW}" "${R}/bridge-data/trust-log.md" "${R}/pending" \
   "${INV}" "${R}/port" > "${R}/log/bridge.log" 2>&1 &
 BPID=$!; trap 'kill ${BPID} 2>/dev/null' EXIT

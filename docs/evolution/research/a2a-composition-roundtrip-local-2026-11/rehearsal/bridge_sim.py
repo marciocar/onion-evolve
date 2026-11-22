@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Bridge SIMULADO do ensaio local. Espelha o onion-bridge na F3 (commit 5c1ba8d, 2026-10-22: src/a2a.ts,
-# src/a2a-invites.ts e src/a2a-receivers.ts), não a cópia de 2026-08 (7e736ba), que é anterior à rota por
+# Bridge SIMULADO do ensaio local. Espelha o onion-bridge na F3 (⟨commit⟩ da F3, de 2026-10-22, num repo privado: src/a2a.ts,
+# src/a2a-invites.ts e src/a2a-receivers.ts), não a cópia local de 2026-08, que é anterior à rota por
 # receptor. O que espelha:
 #   1. guard do convite por membro: o sha256 do bearer casa um convite do arquivo (A2A_INVITES_FILE do bridge,
 #      gerado aqui pelo a2a-invite.sh real) que tem de estar de pé, nomear o receptor da rota e o signal.from;
