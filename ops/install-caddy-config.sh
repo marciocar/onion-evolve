@@ -82,6 +82,13 @@ core_names() {
   set -f
 }
 
+invoker_home() {  # a HOME de quem chamou (o maestro roda como ele mesmo; com sudo, a do SUDO_USER)
+  local u="${SUDO_USER:-$(id -un)}" h
+  h="$(getent passwd "$u" | cut -d: -f6)"
+  [[ -n "$h" ]] || die "não achei a HOME de $u"
+  echo "$h"
+}
+
 # Linhas válidas da lista de serviço: nome · clone · ref · caminho · hosts · upstreams (TAB). Linha malformada = die:
 # lista lida pela metade instalaria só parte dos vhosts sem ninguém ver. Saída: as 6 colunas, TAB, uma por vhost.
 service_rows() {
@@ -90,7 +97,10 @@ service_rows() {
   while IFS=$'\t' read -r n repo ref path hosts ups extra || [[ -n "$n" ]]; do
     [[ -z "${n//[[:space:]]/}" || "$n" == \#* ]] && continue
     [[ "$n" =~ ^[a-z0-9][a-z0-9-]*\.caddy$ ]] || die "service-vhosts.tsv: nome inválido «$n»"
-    [[ "$repo" == /* ]] || die "service-vhosts.tsv: clone de $n não é caminho absoluto («$repo»)"
+    # `~/x` = o clone na HOME de quem invoca (SUDO_USER, se houver): a lista não carrega caminho de home de conta
+    # (REGRA 121, dado público); caminho absoluto segue valendo (a bancada usa o do sandbox)
+    if [[ "$repo" == "~/"* ]]; then repo="$(invoker_home)/${repo#\~/}"; fi
+    [[ "$repo" == /* ]] || die "service-vhosts.tsv: clone de $n não é ~/… nem caminho absoluto («$repo»)"
     [[ -n "$ref" && "$ref" != -* ]] || die "service-vhosts.tsv: ref de $n vazia ou com cara de flag"
     [[ "$path" =~ ^caddy/[a-z0-9][a-z0-9-]*\.caddy$ ]] || die "service-vhosts.tsv: caminho de $n fora de caddy/*.caddy («$path»)"
     [[ -n "$hosts" && -n "$ups" && -z "$extra" ]] || die "service-vhosts.tsv: linha de $n sem hosts, sem upstreams ou com coluna a mais"
@@ -774,6 +784,11 @@ STUB
   t "serviço: linha da lista com caminho fora de caddy/ → apply RECUSA" 2 apply_config
   t "serviço: linha da lista com caminho fora de caddy/ → check RECUSA" 2 check
   sed -i '/^bad\.caddy/d' "$SERVICE_TSV"
+  # 23b. `~/` na coluna do clone = a HOME de quem invoca (a lista versionada não carrega caminho de home de conta)
+  cp "$SERVICE_TSV" "$SB/tsv.keep"
+  printf 'home.caddy\t~/clone-x\tmaster\tcaddy/home.caddy\thome.example\t127.0.0.1:1\n' >> "$SERVICE_TSV"
+  ok "serviço: ~/ na lista vira a HOME de quem invoca" '[[ "$(service_field home.caddy 2)" == "$(getent passwd "${SUDO_USER:-$(id -un)}" | cut -d: -f6)/clone-x" ]]'
+  cp "$SB/tsv.keep" "$SERVICE_TSV"
   # 24. saiu da lista → vira órfão carimbado e é removido (com backup), como os do core
   sed -i '/^gokapi\.caddy/d' "$SERVICE_TSV"
   t "serviço: tirado da lista → apply remove o órfão" 0 apply_config

@@ -2,8 +2,7 @@
 branch: feat/caddy-service-vhosts
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 362db76752fee27ba4846cc1e7d4666c993068c9f59f8e52b4f21ea8c2481177
-reviewed_code_sha256: 4672d55fd10eb8db644127d4e511409ddec207be69bdb121c10de5268c41d517
+reviewed_diff_sha256: pendente
 findings_total: 17
 findings_real: 17
 findings_blocking: 3
@@ -131,4 +130,5 @@ Todos plantados por `ops/mutate-and-restore.sh`, com `LC_ALL=C`, contra a bancad
 - **Os achados 7, 8 e 11** ficam como limite (acima).
 - **A conta do túnel é a do maestro (`marcio`).** Qualquer processo dela passa, inclusive sessões de agente. Fechar isso pede uma conta dedicada ao túnel, e a decisão é do maestro.
 - **Não rodei** `--check` nem o install no vivo, porque o `--check` lê os segredos do gmill para renderizar. Também não rodei a cerca no firewall vivo: as duas coisas são do maestro.
+- **Sem 3ª passada do refutador:** as curas da 2ª passada (placeholders, tls, allowlist) e a troca da coluna do clone para `~/` (a REGRA 121 (Grafo novo ou tocado não cita repositório não conferível por terceiro) barrou a home de conta na TSV) não foram re-revisadas por ele. A cobertura delas é a bancada (68/68, com casos de caddy real), os mutantes C13 a C15 e o ensaio real verde.
 - **Defasagem nomeada, fora do caminho:** o Caddy do host é 2.11.4, e a última é v2.11.9 (2026-11-05). Subir é deploy do maestro.

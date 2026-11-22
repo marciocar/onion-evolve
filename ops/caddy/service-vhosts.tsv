@@ -1,7 +1,7 @@
 # ops/caddy/service-vhosts.tsv — vhosts que moram no repo do PRÓPRIO serviço (decisão do core de 2026-11-21, card
 # SAC-465): o core segue dono do Caddy e instala estes arquivos por ops/install-caddy-config.sh; o conteúdo é do repo.
 #
-# Colunas (TAB): nome no /etc/caddy/conf.d · clone local · ref lida · caminho no repo · hosts permitidos (vírgula) ·
+# Colunas (TAB): nome no /etc/caddy/conf.d · clone local (~/ = HOME de quem invoca) · ref lida · caminho no repo · hosts permitidos (vírgula) ·
 #   upstreams permitidos (vírgula, host:porta como o reverse_proxy os escreve)
 #   · a ref é a do ramo padrão do repo, medida em 2026-11-22 (todos em `master`). O script lê o blob COMMITADO na ref
 #     do clone local e não faz fetch: rode `git -C <clone> fetch` antes do ensaio para ler o que está no GitHub;
@@ -9,7 +9,7 @@
 #     upstream fora da coluna (a API admin :2019, o loopback de outro serviço), file_server ou app fora de http recusam;
 #   · fonte ausente na ref (PR do repo ainda aberto) = pendente: o vivo fica como está.
 # Os nomes saem do que roda hoje em /etc/caddy/conf.d (librechat, vault, waha) e do repo do gokapi (caddy/gokapi.caddy).
-librechat.caddy	/home/marcio/onion-vps-librechat	origin/master	caddy/librechat.caddy	chat.onionevolve.com	127.0.0.1:3025,127.0.0.1:8912
-vault.caddy	/home/marcio/onion-vps-vaultwarden	origin/master	caddy/vault.caddy	vault.onionevolve.com	127.0.0.1:3020
-waha.caddy	/home/marcio/onion-vps-waha	origin/master	caddy/waha.caddy	waha.onionevolve.com	127.0.0.1:3999
-gokapi.caddy	/home/marcio/onion-vps-gokapi	origin/master	caddy/gokapi.caddy	transfer.onionevolve.com	127.0.0.1:3050
+librechat.caddy	~/onion-vps-librechat	origin/master	caddy/librechat.caddy	chat.onionevolve.com	127.0.0.1:3025,127.0.0.1:8912
+vault.caddy	~/onion-vps-vaultwarden	origin/master	caddy/vault.caddy	vault.onionevolve.com	127.0.0.1:3020
+waha.caddy	~/onion-vps-waha	origin/master	caddy/waha.caddy	waha.onionevolve.com	127.0.0.1:3999
+gokapi.caddy	~/onion-vps-gokapi	origin/master	caddy/gokapi.caddy	transfer.onionevolve.com	127.0.0.1:3050

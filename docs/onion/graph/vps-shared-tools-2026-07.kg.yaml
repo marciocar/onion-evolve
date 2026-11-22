@@ -796,7 +796,7 @@ nodes:
     impact: 3
     confidence: 0.85
     verified_at: "2026-11-22"
-    verified_against: "bash ops/install-caddy-config.sh --plan na branch feat/caddy-service-vhosts (rc 0: CRIAR gokapi.caddy, PENDENTE librechat/vault/waha, caddy validate verde) e com a lista apontada para os ramos dos PRs (ADOTAR os três, validate verde, com o adapt_guard julgando as quatro fontes reais no caddy do host); bancada 67/67"
+    verified_against: "bash ops/install-caddy-config.sh --plan na branch feat/caddy-service-vhosts (rc 0: CRIAR gokapi.caddy, PENDENTE librechat/vault/waha, caddy validate verde) e com a lista apontada para os ramos dos PRs (ADOTAR os três, validate verde, com o adapt_guard julgando as quatro fontes reais no caddy do host); bancada 68/68"
     label: "O ops/install-caddy-config.sh lê os vhosts dos repos de serviço (ops/caddy/service-vhosts.tsv): blob commitado na ref, adoção só do vivo byte a byte igual, hosts e upstreams limitados por repo no JSON do caddy adapt, carimbo de serviço distinto do do core, fonte ausente = pendente que não remove nada; falta o install no vivo, que é do maestro"
     narrative: "Fecha quando: o maestro roda o install depois do merge, e o --check sai sem drift com gokapi.caddy criado e, à medida que os PRs dos repos entram, librechat/vault/waha adotados (carimbo na 1ª linha). Até lá o vivo fica como está."
     provenance:
