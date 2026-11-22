@@ -1,9 +1,8 @@
 ---
 branch: feat/chat-channel-contract
-pr: pendente
+pr: 1732
 date: 2026-11-22
-reviewed_diff_sha256: f8993f28d7596a7de748134bd6967daecd88b66679fa5c075029e55fc8c1579d
-reviewed_code_sha256: 44b202b4e82a008be68514da28490da1e6dbe5f79cca3e91ae87a20c1c1fd20b
+reviewed_diff_sha256: pendente
 findings_total: 24
 findings_real: 24
 findings_blocking: 7
@@ -11,7 +10,7 @@ tokens: 505926
 duration_min: 10
 findings_fixed: 14
 verdict: REJECTED_AND_FIXED
-elenxo: false
+elenxo: true
 reviewer: general-purpose (opus), isolado
 nota: "três passadas do mesmo revisor isolado (14 achados na 1ª, 5 novos na 2ª, 5 na 3ª sobre a emenda do pseudônimo e do papel); revisor isolado com mandato de refutar, sem ver o raciocínio da sessão; tokens e duração são os do agente revisor. Os 6 que bloqueavam foram curados; dos 8 limites, 3 foram curados (nomes privados, pontos do Delphi, fonte do nó de origem) e 5 ficam declarados no README e abaixo."
 ---
@@ -135,3 +134,7 @@ também é rc 2; o comportamento é o mesmo.
   com os sócios) vem do brief, não foi medido.
 - Mutantes rodados com a família extraída do `lint-selftest.sh` num harness mínimo (mesmo código da função, sem o
   resto da bancada), por causa da carga da máquina; a bancada completa roda no pr-finalize e no CI.
+
+## Correção da declaração (22/11)
+
+O campo `elenxo` dizia `false`, mas houve passada adversarial: o revisor isolado (opus) rodou três passadas com mandato de refutar, registradas acima. A declaração passa a `true`. O código não mudou; o carimbo do diff volta a `pendente` para o `pr-finalize` carimbar de novo.
