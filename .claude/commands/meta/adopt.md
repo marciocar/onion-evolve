@@ -167,11 +167,7 @@ if [ -f "$DEST/.claude/settings.json" ]; then
              "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json")" \
     && printf '%s\n' "$merged" > "$DEST/.claude/settings.json"
   # Sem jq, o helper devolve o alvo INTACTO e sai com código 3 → avisar o maestro p/ registrar à mão.
-else
-  # a statusLine nunca viaja (a do projeto apagaria a de cada pessoa; a oferta é o passo 6c): sai na cópia também
-  jq 'del(.statusLine)' "$SOURCE_ROOT/.claude/settings.json" > "$DEST/.claude/settings.json" 2>/dev/null \
-    || { cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"
-         grep -q '"statusLine"' "$DEST/.claude/settings.json" && echo "⚠️ sem jq: a statusLine da fonte NÃO foi retirada do settings do alvo; tire à mão." >&2; true; }
+else jq 'del(.statusLine)' "$SOURCE_ROOT/.claude/settings.json" > "$DEST/.claude/settings.json" 2>/dev/null || { cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"; grep -q '"statusLine"' "$DEST/.claude/settings.json" && echo "⚠️ sem jq: a statusLine da fonte NÃO saiu do settings do alvo; tire à mão." >&2; true; }   # a statusLine nunca viaja: a do projeto apagaria a de cada pessoa (porquê: offer-statusline.sh)
 fi
 
 # (2) starter docs/evolution/ — DOIS canais simétricos: inbox/ (upstream: consumidor→core) e
@@ -289,12 +285,7 @@ fi
 #      no docstring do helper, que é a autoridade. Nunca aplique por conta própria.
 bash "$SOURCE_ROOT/.claude/utils/adopt/offer-onion-ci.sh" "$DEST" || true
 # ↑ rc≠0 = "lint do alvo reprovando": NÃO aborta (o gate local de (6) já está vivo); conserte e reoferte. A linha diz também o contrato do corpus, medido.
-
-# (6c) statusLine do censo de sessões («sessões: N trabalhando · M esperam você») — OFERTA, somente leitura. O helper
-#      imprime o bloco para o settings do USUÁRIO com o caminho absoluto do checkout principal, resolvido pelo git agora,
-#      e AVISA se o projeto já tem statusLine (a do projeto substitui a do usuário, e o censo some ali). Nunca escreve
-#      statusLine no projeto: lá ela apagaria a de cada pessoa. Cole a saída no relatório; quem cola o bloco é o dono.
-bash "$SOURCE_ROOT/.claude/utils/adopt/offer-statusline.sh" "$DEST" || true   # rc 3 = sem bloco (script ou python3 faltam): diga no relatório
+bash "$SOURCE_ROOT/.claude/utils/adopt/offer-statusline.sh" "$DEST" || true   # (6c) statusLine do censo de sessões: OFERTA somente leitura do bloco para o settings do USUÁRIO (caminho absoluto do checkout principal) e aviso se o projeto já tem statusLine; nunca escreve. Cole a saída no relatório; rc 3 = sem bloco (porquê: no helper)
 
 # (7) .gitattributes: eol=lf nos executáveis (SAC-107; never-clobber, desfechos no helper) e merge=union
 #     nos append-only do doc-bridge (CHANGELOG/_processed; Achado #2: duas pontas apendam → união). Idempotente.

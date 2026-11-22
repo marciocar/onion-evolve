@@ -2,8 +2,7 @@
 branch: feat/sessions-statusline-1121
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 339dd12cd5718899e568e4dc82a5098efc515789c9373cb097823599c20065dd
-reviewed_code_sha256: 75e1cb9b81b6a73fee3c9484826e1f9ba44d13f2109448f6974af06e6cc7c4ab
+reviewed_diff_sha256: pendente
 findings_total: 11
 findings_real: 10
 findings_blocking: 1
