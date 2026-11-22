@@ -179,8 +179,9 @@ Processar a transcrição abaixo aplicando o Framework EXTRACT completo.
 **exatamente** as decisões, ações e riscos do grafo, um item por nó, com o id entre crases. Escreva o grafo
 primeiro (Passo 6) e derive essas seções dele: duas leituras separadas da transcrição (a sua e a do
 `@extract-meeting-specialist`) já deram 5 decisões num e 8 no outro. Decisão que só o resumo tem vira nó no
-grafo, com trace; nó que o resumo não cita entra no resumo. Pendências, Timeline e Resumo são livres (não
-viram nó). Sub-item indentado (justificativa, contexto) não conta como item.
+grafo, com trace; nó que o resumo não cita entra no resumo. Cada fato aparece **na seção do seu papel**
+(citar o risco só em Pendências não vale). Pendências, Timeline e Resumo são livres (não viram nó). Sub-item
+indentado (justificativa, contexto) não conta como item; comentário HTML não conta como citação.
 
 **Nível `complete`:**
 Output YAML completo seguindo schema do knowledge base.
@@ -297,6 +298,12 @@ Todo nó com `x_meeting_role` leva os campos que o `MEETING` mostra acima: `plan
   arquivo vale o padrão `produto · tecnico · negocio · compliance · design · operacoes · pesquisa`. Área que
   ninguém nomeou é `NAO_ESPECIFICADO` (nunca inventar): o item não se perde, vai para o topo do backlog, a
   triar. Decisão, participante e aviso não levam área.
+- **Fechar uma ação ou um risco** (numa reunião seguinte, por exemplo) é mudar o `status` do nó no grafo dele
+  para `done` com `verified_at` e `verified_against` (o motivo); sem os dois o gate reprova
+  (`FECHADO-SEM-MOTIVO`), porque o item sumiria do backlog calado. O `label` de ação e risco é uma linha só.
+- **Grafo gravado antes da área** (versão 3.1.0 do comando) reprova com `AREA-AUSENTE` em cada ação e risco,
+  inclusive no `--for-use` da consolidação. A migração é acrescentar `x_area: NAO_ESPECIFICADO` a cada um (ou
+  a área certa) e rodar o gate de novo.
 
 **O registro de aviso (aviso ≠ consentimento).** O grafo registra **o que aconteceu**: cada tentativa de
 aviso e a resposta de cada participante a ela. Ele **nunca declara consentimento legal**: isso é juízo
@@ -363,15 +370,17 @@ bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml \
 ```
 
 - Uma seção por área, `NAO_ESPECIFICADO` primeiro (é o que precisa de triagem); cada ação ou risco aberto é
-  `- [ ] <ação> — dono: <owner> — prazo: <due|—> · <id>`, e o risco leva `⚠️`.
+  `- [ ] <id> · dono: <owner> · prazo: <due|—> — <label>`, e o risco leva `⚠️`. Os campos vêm antes do texto
+  livre, e o texto livre sai escapado (ele vem da fala da reunião: é texto, nunca marcação).
 - **Carry-over**: passe em `--carry` os grafos das reuniões anteriores da **mesma série** (o parâmetro
   `carry`; sem ele, liste os `.kg.yaml` de `docs/meetings/` e pergunte ao usuário quais são da série). O que
   segue aberto lá entra aqui com `↩ reunião de <data>`. O item some quando o nó fecha **no grafo dele**
-  (`status: done` com `verified_at` e `verified_against`, o motivo); o cabeçalho conta os fechados, para nada
-  sumir calado.
+  (`status: done` com `verified_at` e `verified_against`, o motivo); o cabeçalho conta os fechados e a seção
+  final os nomeia, para nada sumir calado. Grafo repetido (o mesmo `meta.id`) entra uma vez só, senão reprova.
 - Só grava com **todos** os grafos conformes: reprovado sai rc 1 (`CARRY-REPROVADO`, `CARRY-FORA-DE-ORDEM`
   para grafo posterior à reunião ou repetido), reunião sem aviso sai rc 3 (o backlog é uso, retido como no
-  `--for-use`), e em nenhum dos dois o arquivo é escrito.
+  `--for-use`), e em nenhum dos dois o arquivo é escrito. Saída que é um dos insumos, que não é `.md`, cujo
+  diretório não existe ou que já existe sem ser uma projeção anterior do backlog sai rc 2, sem tocar em nada.
 
 > **Dados reais.** O grafo guarda nomes e falas reais, sem anonimização. Não o grave em repositório público.
 > Combine com o controlador o prazo de eliminação: apagar de um repo com histórico exige reescrever o histórico.

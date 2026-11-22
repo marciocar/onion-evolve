@@ -69,11 +69,14 @@
 #   forma:   PAPEL-AUSENTE (todo nó leva x_meeting_role) · PAPEL-DESCONHECIDO · SEM-REUNIAO · ACAO-SEM-DONO ·
 #            META-INCOMPLETA · CAMPO-FORA-DO-TIPO (impact fora de inteiro 1-5, confidence fora de 0-1)
 #   área:    AREA-AUSENTE · AREA-FORA-DO-VOCABULARIO (inclui valor vazio, lista ou dois termos) ·
-#            AREA-FORA-DO-PAPEL (x_area só em ação e risco) · AREAS-INVALIDAS (meeting-areas.txt malformado)
+#            AREA-FORA-DO-PAPEL (x_area só em ação e risco) · AREAS-INVALIDAS (meeting-areas.txt malformado) ·
+#            FECHADO-SEM-MOTIVO (ação ou risco fechado sem verified_at e verified_against) · ESCALAR-CONTINUADO
+#            (linha mais funda depois de `chave: valor`: o YAML junta ao valor, e o leitor via só a 1ª linha)
 #   resumo:  RESUMO-AUSENTE · RESUMO-SEM-NO (o grafo tem, o resumo não) · RESUMO-ITEM-SEM-NO (o resumo tem, o
 #            grafo não) · RESUMO-NO-INEXISTENTE (id citado que não é fato do grafo) · RESUMO-SECAO-ERRADA
 #   backlog: CARRY-REPROVADO (grafo anterior fora do gate) · CARRY-FORA-DE-ORDEM (data posterior à da reunião,
-#            o próprio grafo, ou repetido)
+#            o próprio grafo, outra cópia dele ou outro grafo com o mesmo meta.id). Saída que é um dos insumos,
+#            que não é .md, cujo diretório não existe ou que existe sem ser projeção anterior sai rc 2, sem tocar.
 #   corpus:  RADAR (kg-radar.sh --integrity --schema reprovou) · CONTRATO (kg-contract-check.sh reprovou,
 #            onde ele mora ao lado e o contrato está vendorizado; sem ele, o "não julgado" é declarado)
 # O leitor: comentário (`#`, qualquer coluna) nunca abre seção; as chaves de um nó são as da indentação do
@@ -114,6 +117,7 @@ NODE_X = {"x_meeting_role", "x_notice_channel", "x_notice_text", "x_notice_ref",
 DEFAULT_AREAS = ["produto", "tecnico", "negocio", "compliance", "design", "operacoes", "pesquisa"]
 AREA_FILE = os.path.join("docs", "meetings", "meeting-areas.txt")
 AREA_ROLES = ("action", "risk")
+CLOSED = {"confirmed", "done", "superseded", "refuted"}   # a régua do radar (trabalhoPendente): fora dela, aberto
 bad = []
 def fail(code, nid, why): bad.append(f"{code}\t{nid}\t{why}")
 nfc = lambda x: unicodedata.normalize("NFC", x)
@@ -132,6 +136,7 @@ def ind(line): return len(line) - len(line.lstrip(" "))
 #  · chave repetida no nó reprova aqui, sem depender do radar.
 meta, nodes, cur, sec, nodecol, block = {}, [], None, None, None, None
 consent_keys, dup = [], []
+prev_eff, prev_id = None, "-"   # coluna da chave da linha anterior, quando ela tinha valor escalar
 for raw in open(g, encoding="utf-8"):
     line = raw.rstrip("\n")
     s = line.strip()
@@ -139,6 +144,14 @@ for raw in open(g, encoding="utf-8"):
         if not s or ind(line) > block: continue
         block = None
     if not s or s.startswith("#"): continue
+    # ESCALAR CONTINUADO (refutador da SAC-480, achado 2): linha mais funda logo depois de `chave: valor` é a
+    # continuação do valor para o YAML (`x_area: tecnico` + `  produto` = "tecnico produto"), e este leitor só
+    # via a 1ª linha. Uma chave por linha é a forma do radar; a continuação reprova em vez de ser lida pela metade.
+    if prev_eff is not None and ind(line) > prev_eff:
+        fail("ESCALAR-CONTINUADO", prev_id, f"linha mais funda depois de um valor escalar (continuação que o YAML junta ao valor): {s[:60]}")
+    _kv = (s[2:] if s.startswith("- ") else s)
+    _v = _kv.split(":", 1)[1].strip() if ":" in _kv and re.match(r"^[A-Za-z_][\w-]*\s*:", _kv) else (_kv if s.startswith("- ") else "")
+    prev_eff = (ind(line) + (2 if s.startswith("- ") else 0)) if (_v and not re.fullmatch(r"[|>][+-]?\d?", _v)) else None
     m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):", line)
     if m: sec = m.group(1); cur = None; nodecol = None; continue
     key = s[2:] if s.startswith("- ") else s
@@ -149,7 +162,7 @@ for raw in open(g, encoding="utf-8"):
     elif sec == "nodes":
         if nodecol is None and s.startswith("-"): nodecol = ind(line)
         if ind(line) == nodecol and s.startswith("-"):
-            if re.match(r"^- id:", s): cur = {"id": val(s[2:])}; nodes.append(cur)
+            if re.match(r"^- id:", s): cur = {"id": val(s[2:])}; nodes.append(cur); prev_id = cur["id"]
             else: fail("NO-FORA-DA-FORMA", "-", f"item da lista de nós fora da forma `- id:`: {s[:60]}"); cur = None
         elif cur is not None and ind(line) == nodecol + 2 and k and not s.startswith("- "):
             if k in cur: dup.append((cur["id"], k))
@@ -301,7 +314,11 @@ for i, r in roles.items():
     n = by[i]
     if "x_area" in n and r not in AREA_ROLES:
         fail("AREA-FORA-DO-PAPEL", i, f"x_area num nó {r}: a área é de ação e risco, onde o backlog agrupa")
-    elif r in AREA_ROLES:
+    if r in AREA_ROLES and n.get("status") in CLOSED and not (n.get("verified_at") and n.get("verified_against")):
+        fail("FECHADO-SEM-MOTIVO", i, f"{r} com status {n.get('status')}: fechar exige verified_at e verified_against (o motivo), senão o item some do backlog calado")
+    if r in AREA_ROLES and re.fullmatch(r"[|>][+-]?\d?", n.get("label", "")):
+        fail("CAMPO-FORA-DO-TIPO", i, "label em bloco (|, >): o label é uma linha só, até 280 caracteres")
+    if r in AREA_ROLES:
         a = n.get("x_area")
         if a is None: fail("AREA-AUSENTE", i, f"{r} sem x_area: um termo de {area_src}, ou NAO_ESPECIFICADO")
         elif a not in valid_areas:
@@ -313,38 +330,56 @@ if summary:
         fail("RESUMO-AUSENTE", "-", f"resumo não encontrado: {summary}")
     else:
         strip = lambda x: "".join(c for c in unicodedata.normalize("NFD", x.lower()) if unicodedata.category(c) != "Mn")
+        KINDS = (("decision", r"decis"), ("action", r"\bacao|\bacoes|\btarefa|\baction|\bproximos passos|\bencaminhamento|\bto-?do"),
+                 ("risk", r"\brisco|\brisk"))
         def kind(h):
             h = strip(h)
-            if "decis" in h: return "decision"
-            if re.search(r"\bacao|\bacoes|\btarefa", h): return "action"
-            if "risco" in h: return "risk"
-            return None
-        cited, items, sec_kind, fence, prev_row = set(), [], None, False, None
-        for ln, raw in enumerate(open(summary, encoding="utf-8", errors="replace"), 1):
-            line = nfc(raw.rstrip("\r\n"))
-            if re.match(r"^\s*(```|~~~)", line): fence = not fence; continue
+            if re.search(r"timeline|cronograma|pendenc|resumo", h): return None   # a seção é de outra coisa, mesmo citando fatos
+            ks = frozenset(k for k, rx in KINDS if re.search(rx, h))
+            return ks or None
+        text = open(summary, encoding="utf-8", errors="replace").read()
+        text = re.sub(r"<!--.*?-->", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)   # comentário HTML não renderiza
+        cited, in_sec, items, sec, fence, cand, list_col, prev_txt, in_table = set(), set(), [], None, False, None, None, "", False
+        for ln, raw in enumerate(text.split("\n"), 1):
+            line = nfc(raw.rstrip("\r"))
+            if re.match(r"^\s{0,3}(```|~~~)", line): fence = not fence; continue
             if fence: continue
-            hm = re.match(r"^#{1,6}\s+(.*)$", line)
-            if hm: sec_kind = kind(hm.group(1)); prev_row = None; continue
+            line = re.sub(r"^\s{0,3}(>\s?)+", "", line)   # citação: o item dentro dela é item
+            hm = re.match(r"^\s{0,3}#{1,6}\s+(.*?)\s*#*\s*$", line) or re.fullmatch(r"\s{0,3}(?:\*\*|__)([^*_]+)(?:\*\*|__)\s*:?\s*", line)
+            if hm: sec = kind(hm.group(1)); list_col = None; in_table = False; prev_txt = ""; continue
+            if re.fullmatch(r"\s{0,3}(=+|-+)\s*", line) and prev_txt and not in_table:   # título setext
+                sec = kind(prev_txt); list_col = None; prev_txt = ""
+                if items and items[-1][0] == ln - 1: items.pop()
+                continue
+            if not line.strip(): in_table = False; prev_txt = ""; continue
             ids = [t for t in re.findall(r"`([A-Za-z0-9_]+)`", line) if t in facts or re.fullmatch(r"[DAR]_[A-Z0-9_]+", t)]
             for t in ids:
                 if t not in facts:
                     fail("RESUMO-NO-INEXISTENTE", t, f"o resumo cita `{t}` na linha {ln}, e o grafo não tem esse fato")
                     continue
                 cited.add(t)
-                if sec_kind and facts[t] != sec_kind:
-                    fail("RESUMO-SECAO-ERRADA", t, f"`{t}` é {facts[t]} e está na seção de {sec_kind} (linha {ln})")
-            if sec_kind is None: continue
-            if re.match(r"^\s*\|?\s*:?-{3,}", line) and "|" in line:
-                if prev_row is not None and items and items[-1][0] == prev_row: items.pop()   # cabeçalho da tabela
-                continue
-            is_item = re.match(r"^ ?([-*+]|\d+[.)])\s+\S", line) or re.match(r"^\s*\|", line)
-            prev_row = ln if re.match(r"^\s*\|", line) else None
-            if is_item and not ids: items.append((ln, sec_kind, line.strip()[:60]))
+                if sec and facts[t] in sec: in_sec.add(t)
+                elif sec:
+                    fail("RESUMO-SECAO-ERRADA", t, f"`{t}` é {facts[t]} e está na seção de {'/'.join(sorted(sec))} (linha {ln})")
+            prev_txt = line.strip()
+            if sec is None: continue
+            if "|" in line and re.fullmatch(r"\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*", line):
+                if cand is not None and items and items[-1][0] == cand: items.pop()   # cabeçalho da tabela
+                in_table = True; continue
+            im = re.match(r"^( *)([-*+•]|\d+[.)])\s+\S", line)
+            is_item = False
+            if im:
+                col = len(im.group(1))
+                if list_col is None or col < list_col:   # sub-item fica na coluna do conteúdo do item de cima ou além
+                    if col <= 3: is_item = True; list_col = col + len(im.group(2)) + 1
+            elif "|" in line and (in_table or line.lstrip().startswith("|")):
+                is_item = True
+            cand = ln if ("|" in line and not im) else None
+            if is_item and not ids: items.append((ln, "/".join(sorted(sec)), line.strip()[:60]))
         for ln, k, txt in items:
             fail("RESUMO-ITEM-SEM-NO", f"L{ln}", f"item da seção de {k} sem o id do nó do grafo: {txt}")
-        for t in sorted(set(facts) - cited):
-            fail("RESUMO-SEM-NO", t, f"{facts[t]} do grafo que o resumo não cita (`{t}` entre crases)")
+        for t in sorted(set(facts) - in_sec):
+            fail("RESUMO-SEM-NO", t, f"{facts[t]} do grafo que o resumo não lista na seção do papel (`{t}` entre crases)" + (" (citado só fora dela)" if t in cited else ""))
 if dump and not bad:
     items = [{"id": i, "role": r, "area": by[i].get("x_area", ""), "owner": by[i].get("x_owner", ""),
               "due": by[i].get("x_due", ""), "status": by[i].get("status", ""), "label": by[i].get("label", "")}
@@ -482,6 +517,11 @@ if [ "${1:-}" = "--selftest" ]; then
   _case "vocabulário do repo vale" OK "s=s.replace('x_area: tecnico','x_area: cadastro').replace('x_area: cadastro','x_area: pagamentos',1)" "${T2}"
   _case "área do padrão fora do vocabulário do repo reprova" AREA-FORA-DO-VOCABULARIO "pass" "${T2}"
   _case "vocabulário do repo malformado reprova" AREAS-INVALIDAS "s=s.replace('x_area: tecnico','x_area: cadastro')" "${T3}"
+  # ── 1ª passada do refutador da SAC-480/488: o que o leitor lia diferente do YAML, e o que fechava calado ──
+  _case "escalar continuado reprova" ESCALAR-CONTINUADO "s=s.replace('    x_area: tecnico\n','    x_area: tecnico\n      produto\n',1)"
+  _case "ação fechada sem motivo reprova" SO:FECHADO-SEM-MOTIVO "s=s.replace('    x_area: tecnico\n    plane: DEV\n    status: open','    x_area: tecnico\n    plane: DEV\n    status: done',1)"
+  _case "ação fechada com motivo passa" OK "s=s.replace('    x_area: tecnico\n    plane: DEV\n    status: open','    x_area: tecnico\n    plane: DEV\n    status: done\n    verified_at: \"2026-10-23\"\n    verified_against: \"gerador entregue, registro fictício\"',1)"
+  _case "label em bloco da ação reprova" CAMPO-FORA-DO-TIPO "s=s.replace('    label: \"Carla Modelo monta','    label: >-\n      Carla Modelo monta',1).replace('2026-10-23.\"\n    trace','2026-10-23.\n    trace',1)"
   # ── AUSÊNCIA DE AVISO: passa na forma como SOFT, nunca como conformidade, e não abre brecha ──
   _case "aviso de verdade com nao_avisado reprova" NAO-AVISADO-SEM-AUSENCIA "s=s.replace('x_notice_response: ciente','x_notice_response: nao_avisado',1)"
   BASE="${FIX}/meeting-notice-absent.kg.yaml"
@@ -530,6 +570,17 @@ if [ "${1:-}" = "--selftest" ]; then
   _scase "pendência sem nó não é cobrada" OK "s=s.replace('### Timeline','- ⚠️ Outra pendência sem nó.\n\n### Timeline',1)"
   _scase "item em bloco de código não conta" OK "s=s.replace('### Pendências','\`\`\`\n- exemplo sem nó\n\`\`\`\n\n### Pendências',1)"
   _scase "resumo ausente reprova" AUSENTE "pass"
+  _scase "id só em comentário HTML não conta" RESUMO-SEM-NO "s=s.replace('- ✅ O relatório','<!-- - ✅ O relatório',1).replace('por enquanto. \`D_RELATORIO_PDF_PLANILHA\`','por enquanto. \`D_RELATORIO_PDF_PLANILHA\` -->',1)"
+  _scase "tabela sem barra inicial é lida" RESUMO-ITEM-SEM-NO "s=s.replace('| \`A_GERADOR_PLANILHA\` |\n','| \`A_GERADOR_PLANILHA\` |\nBruno Exemplo | Revisar o PDF | — | —\n',1)"
+  _scase "seção Próximos passos é de ações" RESUMO-ITEM-SEM-NO "s=s.replace('### Pendências','### Próximos passos\n- Revisar o PDF antes do envio.\n\n### Pendências',1)"
+  _scase "item com marcador • conta" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Ações','\n• Outra decisão sem nó.\n\n### Ações',1)"
+  _scase "item em citação conta" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Ações','\n\n> - Decisão citada sem nó.\n\n### Ações',1)"
+  _scase "item recuado em 2 espaços conta" RESUMO-ITEM-SEM-NO "s=s.replace('### Decisões\n','### Decisões\n  - ✅ Decisão recuada sem nó.\n',1)"
+  _scase "risco citado só em Pendências reprova" RESUMO-SEM-NO "s=s.replace('\n- ⚠️ A biblioteca de PDF em uso está sem manutenção há um ano. \`R_LIB_PDF_SEM_MANUTENCAO\`','',1).replace('não foi definido.','não foi definido. \`R_LIB_PDF_SEM_MANUTENCAO\`',1)"
+  _scase "Timeline das decisões não é seção de decisão" OK "s=s.replace('### Timeline','### Timeline das decisões',1)"
+  _scase "seção mista aceita os dois papéis" OK "s=s.replace('### Riscos','### Decisões e riscos',1)"
+  _scase "título setext abre seção" OK "s=s.replace('### Riscos','Riscos\n------',1)"
+  _scase "título em negrito abre seção" OK "s=s.replace('### Riscos','**Riscos**',1)"
   # ── BACKLOG POR ÁREA (SAC-480): projeção do grafo, só de grafos conformes, com carry-over ──
   SELF="${HERE}/$(basename "${BASH_SOURCE[0]}")"
   _mk() { python3 -I -B -c "import sys; s=open(sys.argv[1]).read(); ${2}; open(sys.argv[2],'w').write(s)" "${3:-${FIX}/meeting-ok.kg.yaml}" "${T}/$1"; }
@@ -555,9 +606,9 @@ if [ "${1:-}" = "--selftest" ]; then
   _mk cur-noarea.kg.yaml "s=s.replace('    x_area: tecnico\n','',1)"
   _mk absent.kg.yaml "pass" "${FIX}/meeting-notice-absent.kg.yaml"
   _bcase "backlog agrupa por área" 0 "## tecnico" cur.kg.yaml
-  _bcase "backlog marca o risco" 0 "- [ ] ⚠️ Risco: a biblioteca de PDF" cur.kg.yaml
+  _bcase "backlog marca o risco" 0 "- [ ] ⚠️ \`R_LIB_PDF_SEM_MANUTENCAO\` · dono: NAO_ESPECIFICADO · prazo: — — Risco: a biblioteca de PDF" cur.kg.yaml
   _bcase "NAO_ESPECIFICADO vem primeiro no backlog" 0 "FIRST:NAO_ESPECIFICADO (a triar)" cur-unspec.kg.yaml
-  _bcase "carry-over traz o aberto da reunião anterior" 0 "Carla Modelo revisa o modelo do relatório até sexta, 2026-10-23. — dono: P_CARLA_MODELO — prazo: 2026-10-23 · \`A_REVISAR_MODELO\` · ↩ reunião de 2026-10-09" cur.kg.yaml --carry prev.kg.yaml
+  _bcase "carry-over traz o aberto da reunião anterior" 0 "- [ ] \`A_REVISAR_MODELO\` · dono: P_CARLA_MODELO · prazo: 2026-10-23 · ↩ reunião de 2026-10-09 (\`prev.kg.yaml\`) — Carla Modelo revisa o modelo do relatório" cur.kg.yaml --carry prev.kg.yaml
   _bcase "carry-over: o fechado some e é contado" 0 "Itens abertos: 3 (2 desta reunião, 1 de reuniões anteriores). Fora da projeção por estarem fechados: 1." cur.kg.yaml --carry prev.kg.yaml
   _bcase "carry-over de reunião posterior reprova" 1 "CARRY-FORA-DE-ORDEM" cur.kg.yaml --carry later.kg.yaml
   _bcase "carry-over do próprio grafo reprova" 1 "CARRY-FORA-DE-ORDEM" cur.kg.yaml --carry cur.kg.yaml
@@ -565,6 +616,24 @@ if [ "${1:-}" = "--selftest" ]; then
   _bcase "backlog de grafo reprovado não grava" 1 "AREA-AUSENTE" cur-noarea.kg.yaml
   _bcase "backlog de reunião sem aviso fica retido" 3 "backlog RETIDO" absent.kg.yaml
   _bcase "carry-over sem aviso também retém" 3 "backlog RETIDO" cur.kg.yaml --carry absent.kg.yaml
+  _mk prev-copy.kg.yaml "pass" "${T}/prev.kg.yaml"
+  _mk cur-html.kg.yaml "s=s.replace('Carla Modelo monta o gerador','Carla Modelo <img src=x onerror=alert(1)> monta o gerador',1)"
+  _bcase "carry-over de cópia do mesmo grafo reprova" 1 "CARRY-FORA-DE-ORDEM" cur.kg.yaml --carry prev.kg.yaml --carry prev-copy.kg.yaml
+  _bcase "backlog lista os fechados" 0 "Fecharam no grafo de origem, com o motivo em \`verified_against\`: \`R_LIB_PDF_SEM_MANUTENCAO\` (done, 2026-10-09)." cur.kg.yaml --carry prev.kg.yaml
+  _bcase "label vira texto, não marcação" 0 "Carla Modelo \\<img src=x onerror=alert(1)\\> monta" cur-html.kg.yaml
+  _rcase() {   # <nome> <rc> <trecho da saída> <args...>   (a CLI inteira, sem o --backlog do _bcase)
+    local name="$1" wrc="$2" pat="$3" o r; shift 3
+    [ -z "${ONLY}" ] || [ "${name}" = "${ONLY}" ] || return 0
+    cp "${T}/cur.kg.yaml" "${T}/cur-keep.kg.yaml"
+    o="$(cd "${T}" && bash "${SELF}" "$@" --root "${T}" 2>&1)"; r=$?
+    if [ "${r}" -eq "${wrc}" ] && grep -qF -- "${pat}" <<< "${o}" && cmp -s "${T}/cur.kg.yaml" "${T}/cur-keep.kg.yaml"; then echo "✅ ${name}"; P=$((P+1))
+    else echo "✗ ${name} (rc ${r}; esperado ${wrc} com ${pat}; saída: $(tr '\n' '|' <<< "${o}"))"; F=$((F+1)); cp "${T}/cur-keep.kg.yaml" "${T}/cur.kg.yaml"; fi
+  }
+  _rcase "backlog sobre o próprio grafo é recusado" 2 "nunca sobrescreve a fonte" cur.kg.yaml --backlog cur.kg.yaml
+  _rcase "backlog que não é .md é recusado" 2 "grava um .md" cur.kg.yaml --backlog saida.txt
+  _rcase "backlog em diretório inexistente não julga" 2 "diretório da saída inexistente" cur.kg.yaml --backlog sumiu/saida.md
+  cp "${FIX}/meeting-ok-extract.md" "${T}/resumo-keep-extract.md"
+  _rcase "backlog não sobrescreve o que não é projeção" 2 "não é uma projeção do backlog" cur.kg.yaml --backlog resumo-keep-extract.md
   # O CONTRATO só julga onde o vendor existe (o core): o caso roda com a raiz do repo do checador, e fora dele
   # sai ⊘ declarado — nunca verde por vacuidade, nunca falha por ambiente.
   CROOT="$(git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -602,6 +671,15 @@ if [ -z "${ROOT}" ]; then ROOT="$(git -C "$(dirname "${G}")" rev-parse --show-to
 [ -z "${SUMMARY}" ] || SUMMARY="$(realpath -- "${SUMMARY}")"
 NOTICE_ABSENT=0
 if [ -n "${BACKLOG}" ]; then
+  _out_real="$(realpath -m -- "${BACKLOG}")"
+  for _in in "${G}" "${CARRY[@]}" ${SUMMARY:+"${SUMMARY}"}; do
+    [ "$(realpath -m -- "${_in}")" != "${_out_real}" ] || { echo "meeting-graph-check: --backlog ${BACKLOG} é um dos insumos (${_in}): a projeção nunca sobrescreve a fonte" >&2; exit 2; }
+  done
+  case "${BACKLOG}" in *.md) ;; *) echo "meeting-graph-check: --backlog grava um .md, não ${BACKLOG}" >&2; exit 2 ;; esac
+  # só sobrescreve uma projeção anterior: o resumo que não veio em --summary (dogfood da SAC-480) também é fonte
+  if [ -e "${BACKLOG}" ] && ! head -n1 -- "${BACKLOG}" | grep -q '^# Backlog por área: '; then
+    echo "meeting-graph-check: ${BACKLOG} existe e não é uma projeção do backlog: não sobrescrevo" >&2; exit 2; fi
+  [ -d "$(dirname -- "${BACKLOG}")" ] || { echo "meeting-graph-check: diretório da saída inexistente: $(dirname -- "${BACKLOG}")" >&2; exit 2; }
   # A PROJEÇÃO só nasce de grafos conformes: o atual e cada anterior passam pelo mesmo gate, e o que reprova ou
   # fica retido impede a escrita inteira (backlog parcial descartaria itens em silêncio).
   D="$(TMPDIR="${TMPDIR:-/tmp}" mktemp -d)"; trap 'rm -rf "${D}"' EXIT
@@ -623,41 +701,47 @@ if [ -n "${BACKLOG}" ]; then
   fi
   if [ "${rc}" -eq 0 ]; then
     python3 -I -B - "${D}" "${k}" "${ROOT}" "${BACKLOG}" <<'PYB'
-import json, os, sys
+import json, os, re, sys
 d, k, root, out = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]
 DONE = {"confirmed", "done", "superseded", "refuted"}   # a mesma régua do radar (trabalhoPendente)
 cur = json.load(open(os.path.join(d, "0.json"), encoding="utf-8"))
 prev = [json.load(open(os.path.join(d, f"{i}.json"), encoding="utf-8")) for i in range(1, k + 1)]
 rroot = os.path.realpath(root)
 rel = lambda p: os.path.relpath(os.path.realpath(p), rroot) if os.path.realpath(p).startswith(rroot + os.sep) else p
-bad, seen = [], {os.path.realpath(cur["graph"])}
+bad, seen, seen_ids = [], {os.path.realpath(cur["graph"])}, {cur["id"]}
 for p in prev:
     rp = os.path.realpath(p["graph"])
-    if rp in seen: bad.append(f"CARRY-FORA-DE-ORDEM\t-\t{rel(p['graph'])} é o próprio grafo ou veio repetido")
+    if rp in seen or p["id"] in seen_ids: bad.append(f"CARRY-FORA-DE-ORDEM\t-\t{rel(p['graph'])} é o próprio grafo, outra cópia dele ou da mesma reunião (meta.id {p['id']}), ou veio repetido")
     elif p["date"] > cur["date"]: bad.append(f"CARRY-FORA-DE-ORDEM\t-\t{rel(p['graph'])} é de {p['date']}, depois da reunião ({cur['date']})")
-    seen.add(rp)
+    seen.add(rp); seen_ids.add(p["id"])
 if bad: print("\n".join(bad)); sys.exit(1)
 order = ["NAO_ESPECIFICADO"] + cur["areas"]
-groups, closed, n_cur, n_prev = {a: [] for a in order}, 0, 0, 0
+groups, closed, n_cur, n_prev = {a: [] for a in order}, [], 0, 0
+esc = lambda x: re.sub(r"([\\`*_\[\]<>|])", r"\\\1", x)   # o label vem da fala da reunião: é texto, nunca marcação
 for src in [cur] + sorted(prev, key=lambda p: p["date"], reverse=True):
     for it in src["items"]:
-        if it["status"] in DONE: closed += 1; continue
+        if it["status"] in DONE: closed.append(f"`{it['id']}` ({it['status']}, {src['date']})"); continue
         mark = "⚠️ " if it["role"] == "risk" else ""
-        line = f"- [ ] {mark}{it['label']} — dono: {it['owner'] or 'NAO_ESPECIFICADO'} — prazo: {it['due'] or '—'} · `{it['id']}`"
+        line = f"- [ ] {mark}`{it['id']}` · dono: {it['owner'] or 'NAO_ESPECIFICADO'} · prazo: {it['due'] or '—'}"
         if src is not cur: line += f" · ↩ reunião de {src['date']} (`{rel(src['graph'])}`)"; n_prev += 1
         else: n_cur += 1
+        line += f" — {esc(it['label'])}"   # o texto livre por último: nada nele se passa por campo
         groups.setdefault(it["area"], []).append(line)
 md = [f"# Backlog por área: {cur['id']} ({cur['date']})", "",
       f"> Projeção do grafo `{rel(cur['graph'])}`" + (f" e de {len(prev)} reunião(ões) anterior(es)" if prev else "")
       + ", gerada pelo `meeting-graph-check.sh --backlog`. Não edite à mão: o item fecha no grafo dele e some daqui na próxima geração.",
-      f"> Itens abertos: {n_cur + n_prev} ({n_cur} desta reunião, {n_prev} de reuniões anteriores). Fora da projeção por estarem fechados: {closed}.", ""]
+      f"> Itens abertos: {n_cur + n_prev} ({n_cur} desta reunião, {n_prev} de reuniões anteriores). Fora da projeção por estarem fechados: {len(closed)}.", ""]
 for a in order + [x for x in groups if x not in order]:
     if not groups.get(a): continue
     md += [f"## {a}" + (" (a triar)" if a == "NAO_ESPECIFICADO" else ""), ""] + groups[a] + [""]
 if n_cur + n_prev == 0: md += ["Nenhum item aberto.", ""]
+if closed: md += ["## Fechados (fora da projeção)", "", "Fecharam no grafo de origem, com o motivo em `verified_against`: " + ", ".join(closed) + ".", ""]
 tmp = out + ".tmp"
-with open(tmp, "w", encoding="utf-8") as fh: fh.write("\n".join(md))
-os.replace(tmp, out)
+try:
+    with open(tmp, "w", encoding="utf-8") as fh: fh.write("\n".join(md))
+    os.replace(tmp, out)
+except OSError as e:
+    print(f"meeting-graph-check: não pude gravar {out}: {e}", file=sys.stderr); sys.exit(2)
 PYB
     rc=$?
     [ "${rc}" -eq 0 ] && echo "meeting-graph-check: ✅ backlog por área gravado em ${BACKLOG}" >&2
