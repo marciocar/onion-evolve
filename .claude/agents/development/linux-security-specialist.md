@@ -14,7 +14,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: red
+color: blue
 priority: alta
 category: development
 

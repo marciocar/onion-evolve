@@ -13,7 +13,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: green
+color: yellow
 priority: alta
 category: review
 

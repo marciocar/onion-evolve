@@ -58012,6 +58012,118 @@ EOF_MUT
 }
 _family run_agent_frontmatter_keys_selftests
 
+# REGRA 122 (Cor de agente presente, na paleta do Claude Code e igual à da categoria) — SAC-409, proposta da curadoria
+# de 2026-11-21. O Claude Code ignora em silêncio a cor fora da paleta: 38 dos 51 agentes não batiam a categoria. A
+# SSOT é agent-colors.tsv; o juiz, agent-color-check.sh. Casos: (a) as polaridades do --selftest · (b) o modo que o
+# lint consome, no corpus real · (c) a CLI num repo-sandbox, fonte e derivado · (e) sem o mapa → rc 2 · (d) o
+# dispatcher de produção, fonte (HARD) e adotante (SOFT) · (t) as cópias legíveis do mapa (Tabela de Cores do
+# template e a linha "Hoje:" do molde do agent-creator) batem o .tsv · (m) UM MUTANTE POR CASO, na CÓPIA da guarda —
+# mutante que não se aplica é FALHA, nunca verde por vacuidade.
+run_agent_color_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/agent-color-check.sh" mp="${REPO_ROOT}/.claude/validation/agent-colors.tsv"
+  if [ ! -f "${chk}" ] || [ ! -f "${mp}" ]; then record_fail "agent-color" "guarda ou mapa ausente"; return; fi
+  local o rc
+  # (a) o --selftest próprio
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE '^agent-color selftest: [0-9]+ passaram, 0 falharam$' <<< "${o}"; then
+    record_pass "agent-color: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos)"
+  else record_fail "agent-color: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real (51 agentes, passivo ZERO). CAMINHO LITERAL (REGRA 59).
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/agent-color-check.sh" "${REPO_ROOT}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then record_pass "agent-color: (b) corpus real → rc 0 e silencioso no modo tsv"
+  else record_fail "agent-color: (b) corpus real" "rc=${rc}; [$(head -3 <<< "${o}" | tr '\n' '|')]"; fi
+  # (c) a CLI num repo-sandbox COMO O RUNNER A INVOCA (script + mapa ao lado)
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/.claude/agents/meta"
+  cp "${chk}" "${mp}" "${sb}/.claude/validation/"
+  printf -- '---\nname: fx\ndescription: d\nmodel: sonnet\ncolor: teal\ncategory: meta\n---\n' > "${sb}/.claude/agents/meta/fx.md"
+  printf -- '# leia-me\ncolor: teal\n' > "${sb}/.claude/agents/meta/README.md"
+  local s="${sb}/.claude/validation/agent-color-check.sh" o2 rc2
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if o2="$(LC_ALL=C bash "${s}" "${sb}" --tsv --derived 2>&1)"; then rc2=0; else rc2=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tCOR-FORA-DA-PALETA\t.claude/agents/meta/fx.md\t.*"color: purple"' <<< "${o}" \
+     && [ "$(grep -c . <<< "${o}")" = 1 ] && [ "$(awk -F'\t' 'NR==1{print NF}' <<< "${o}")" = 4 ] \
+     && [ "${rc2}" -eq 0 ] && grep -q $'^SOFT\tCOR-FORA-DA-PALETA\t.claude/agents/meta/fx.md\t' <<< "${o2}"; then
+    record_pass "agent-color: (c) CLI: teal → HARD rc 1 (tsv de 4 campos, README fora); --derived → SOFT rc 0"
+  else record_fail "agent-color: (c) CLI" "rc=${rc}/${rc2}; [${o}] [${o2}]"; fi
+  # (e) sem o mapa → rc 2 (NAO VERIFICADO), nunca verde
+  mv "${sb}/.claude/validation/agent-colors.tsv" "${sb}/mp.bak"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ]; then record_pass "agent-color: (e) sem o mapa → rc 2 (não julga, não passa)"
+  else record_fail "agent-color: (e)" "sem o mapa saiu rc=${rc}"; fi
+  mv "${sb}/mp.bak" "${sb}/.claude/validation/agent-colors.tsv"
+  # (d) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, num repo com a cor trocada, emite a REGRA 122 — HARD na fonte e
+  #     SOFT no adotante (o carimbo role: adopted liga IS_DERIVED). A HARD é lida no ONION_LINT_HARD_FILE.
+  local sd l l2 hf hf2; sd="$(TMPDIR=/tmp mktemp -d)"; hf="${sd}.hard"; hf2="${sd}.hard2"; : > "${hf}"; : > "${hf2}"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  printf -- '---\nname: fx-cor\ndescription: d\nmodel: sonnet\ncolor: cyan\ncategory: meta\n---\n' > "${sd}/.claude/agents/meta/fx-cor.md"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  l="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hf}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/.claude/agents/meta/fx-cor.md" 2>&1 || true)"
+  printf 'role: adopted\n' > "${sd}/.claude/.onion-version"
+  l2="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hf2}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/.claude/agents/meta/fx-cor.md" 2>&1 || true)"
+  local _rx='^VIOLATION: \.claude/agents/meta/fx-cor\.md: REGRA 122 \(Cor de agente presente, na paleta do Claude Code e igual à da categoria\): \[COR-DIVERGE-DA-CATEGORIA\] color: "cyan"'
+  if grep -qE "${_rx}" <<< "${l}" && grep -qE "${_rx}" "${hf}" \
+     && grep -qE "${_rx}" <<< "${l2}" && ! grep -q 'REGRA 122' "${hf2}"; then
+    record_pass "agent-color: (d) o lint de produção emite a REGRA 122 — HARD na fonte, SOFT no adotante"
+  else record_fail "agent-color: (d) dispatcher" "fonte: $(grep -E 'REGRA 122' <<< "${l}" | head -2 | tr '\n' '|') adotante: $(grep -E 'REGRA 122' <<< "${l2}" | head -2 | tr '\n' '|')"; fi
+  rm -rf "${sd}" "${hf}" "${hf2}"
+  # (t) AS CÓPIAS LEGÍVEIS DO MAPA não derivam do .tsv: a Tabela de Cores do template de agente e a linha "Hoje:" do
+  #     molde do @agent-creator-specialist dizem, categoria por categoria, a mesma cor que o .tsv (nem a mais, nem a menos)
+  local tpl="${REPO_ROOT}/.claude/commands/common/templates/agent-template.md" mol="${REPO_ROOT}/.claude/agents/meta/agent-creator-specialist.md"
+  local want_map tpl_map mol_map
+  want_map="$(awk -F'\t' '$1=="category"{print $2"="$3}' "${mp}" | sort)"
+  tpl_map="$(awk '/^## 🎨 Tabela de Cores/{f=1;next} f&&/^## /{exit} f&&/^\| [a-z]+ \| `[a-z]+` \|/{gsub(/[|`]/," "); split($0,a," "); print a[1]"="a[2]}' "${tpl}" 2>/dev/null | sort)"
+  mol_map="$(awk '/^\*\*Cor derivada da categoria:\*\*/{f=1} f{print} f&&/^$/{exit}' "${mol}" 2>/dev/null | tr '\n' ' ' \
+    | grep -oE '(development|testing|review|compliance|meta|product|research|git e deployment) `[a-z]+`' \
+    | sed -E 's/^git e deployment `([a-z]+)`$/git=\1\ndeployment=\1/; s/^([a-z]+) `([a-z]+)`$/\1=\2/' | sort)"
+  if [ -n "${want_map}" ] && [ "${tpl_map}" = "${want_map}" ] && [ "${mol_map}" = "${want_map}" ]; then
+    record_pass "agent-color: (t) a Tabela de Cores do template e o \"Hoje:\" do molde batem o .tsv ($(grep -c . <<< "${want_map}") categorias)"
+  else record_fail "agent-color: (t) cópia do mapa derivou" "tsv=[$(tr '\n' ' ' <<< "${want_map}")] template=[$(tr '\n' ' ' <<< "${tpl_map}")] molde=[$(tr '\n' ' ' <<< "${mol_map}")]"; fi
+  # (m) MUTANTES — reverte cada cura na CÓPIA da guarda e EXIGE que o caso nomeado do --selftest reprove
+  local old new want mo mrc
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${chk}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "agent-color: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "agent-color: (m) mutante morde → ✗ ${want}"
+    else record_fail "agent-color: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_MUT
+if (!seen) { emit("COR-AUSENTE"$(printf '\x1f')if (0) { emit("COR-AUSENTE"$(printf '\x1f')acusa: agente sem color:
+if (val ~ /[][{}<>]/ || val == "") {$(printf '\x1f')if (0) {$(printf '\x1f')acusa: o placeholder [cor da categoria]
+if (val ~ /[][{}<>]/ || val == "") {$(printf '\x1f')if (val ~ /[][]/ || val == "") {$(printf '\x1f')acusa: placeholder de template {{color}}
+if (val ~ /[][{}<>]/ || val == "") {$(printf '\x1f')if (val ~ /[][{}<>]/) {$(printf '\x1f')acusa: color: vazio
+if (!(val in pal)) {$(printf '\x1f')if (0) {$(printf '\x1f')acusa: black, fora da paleta
+if (val != want) emit($(printf '\x1f')if (0) emit($(printf '\x1f')acusa: cor da paleta trocada
+if (!(category in cat)) {$(printf '\x1f')if (0) {$(printf '\x1f')acusa: categoria sem linha no mapa
+category = substr(category, 1, index(category, "/") - 1); else category = ""$(printf '\x1f')category = substr(category, 1, index(category, "/") - 1); else category = category$(printf '\x1f')acusa: agente na raiz de agents/
+    { sub(/\\r\$/, "") }$(printf '\x1f')    { x = 0 }$(printf '\x1f')acusa: teal num arquivo CRLF
+FNR == 1 { sub(/^\\357\\273\\277/, "");$(printf '\x1f')FNR == 1 {$(printf '\x1f')acusa: BOM na linha 1
+seen = 1; v = \$0;$(printf '\x1f')if (seen) next; seen = 1; v = \$0;$(printf '\x1f')acusa: color: repetido vale o último
+      val = v$(printf '\x1f')      val = tolower(v)$(printf '\x1f')acusa: Purple em maiúscula
+else { sub(/[ \\t]+#.*\$/, "", v); sub(/[ \\t]+\$/, "", v) }$(printf '\x1f')else { sub(/[ \\t]+\$/, "", v) }$(printf '\x1f')cala: agente honesto
+if (v ~ /^"/) {$(printf '\x1f')if (0) {$(printf '\x1f')cala: valor entre aspas duplas
+else if (v ~ /^\\047/) {$(printf '\x1f')else if (0) {$(printf '\x1f')cala: valor entre aspas simples
+/^("color"|\\047color\\047|color)[ \\t]*:/$(printf '\x1f')/^(color)[ \\t]*:/$(printf '\x1f')cala: chave color entre aspas
+infm && \$0 ~ /^---[ \\t]*\$/ { done = 1; verdict(); next }$(printf '\x1f')infm && \$0 == "---" { done = 1; verdict(); next }$(printf '\x1f')cala: fecho '---' com tab
+END { if (bad) exit 2;$(printf '\x1f')END { if (infm && !done) verdict(); if (bad) exit 2;$(printf '\x1f')cala: frontmatter sem fecho
+if (\$0 ~ /^---[ \\t]*\$/) infm = 1; else done = 1; next }$(printf '\x1f')infm = 1; next }$(printf '\x1f')cala: arquivo sem frontmatter
+if (c[2] in pal) {$(printf '\x1f')if (0) {$(printf '\x1f')rc 2: cor duplicada na paleta
+if (c[2] in cat) {$(printf '\x1f')if (0) {$(printf '\x1f')rc 2: categoria duplicada
+c[1] == "category" && n >= 4 && c[2] != "" && c[3] != "" && c[4] != ""$(printf '\x1f')c[1] == "category" && n >= 3 && c[2] != "" && c[3] != ""$(printf '\x1f')rc 2: linha de categoria sem a razão
+if (npal == 0 || ncat == 0) {$(printf '\x1f')if (npal == 0) {$(printf '\x1f')rc 2: mapa com paleta e sem categoria
+for (k in cat) if (!(cat[k] in pal)) {$(printf '\x1f')for (k in cat) if (0) {$(printf '\x1f')rc 2: categoria aponta cor fora
+printf "agent-color: linha malformada no mapa: %s — NAO VERIFICADO\\n", line > "/dev/stderr"; bad = 1; exit 2$(printf '\x1f')continue$(printf '\x1f')rc 2: tipo de linha fora do vocabulário
+if (sev == "HARD") hard = 1 }$(printf '\x1f')if (0) hard = 1 }$(printf '\x1f')acusa: agente sem color:
+if (sev == "HARD") hard = 1 }$(printf '\x1f')hard = 1 }$(printf '\x1f')derivado: esperava SOFT e rc 0
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_agent_color_selftests
+
 # Modo mcp-onion-kg — o servidor MCP read(KG) do DEGRAU 1 de D_ONION_BRAIN_MCP_REMOTO (2026-10-12). O harness
 # (ops/mcp-onion-kg/selftest.py) sobe o servidor de VERDADE em 127.0.0.1 numa porta efêmera, contra uma raiz-
 # fixture em mktemp (clone + worktree DESTACADO), chama cada tool por JSON-RPC e mata só os processos que subiu.

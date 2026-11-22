@@ -18,7 +18,7 @@ tools:
   - TodoWrite
   - Bash
 
-color: cyan
+color: purple
 priority: alta
 category: meta
 

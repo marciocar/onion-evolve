@@ -76,6 +76,18 @@ SENÃO → inferir da expertise:
 | docker, deploy, container | `deployment` |
 | pesquisa, análise multi-fonte | `research` |
 
+### Passo 2.1: Derivar a Cor da Categoria
+
+A cor **não se escolhe por agente**: ela sai da categoria, na SSOT `.claude/validation/agent-colors.tsv`
+(linha `category<TAB>{{category}}<TAB><cor>`). A REGRA 122 (Cor de agente presente, na paleta do Claude Code
+e igual à da categoria) reprova cor ausente, placeholder, fora da paleta ou diferente da categoria.
+
+```bash
+awk -F'\t' -v c="{{category}}" '$1=="category" && $2==c {print $3}' .claude/validation/agent-colors.tsv
+```
+
+Categoria nova (sem linha no `.tsv`): acrescente a linha com uma cor da paleta antes de criar o agente.
+
 ### Passo 3: Gerar Estrutura
 
 Usar template padrão de `common/templates/agent-template.md`:
@@ -96,7 +108,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: [cor apropriada]
+color: {{color}}                  # derivada da categoria (Passo 2.1)
 priority: [alta/média/baixa]
 category: {{category}}
 

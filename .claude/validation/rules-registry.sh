@@ -236,7 +236,7 @@ if dup_app:
 CATEGORIES = [
     ("Frontmatter & conformidade de artefato",
      "Campos obrigatórios, válidos e bem-formados no frontmatter de agentes e comandos.",
-     [1, 2, 3, 12, 17, 23, 51, 102]),
+     [1, 2, 3, 12, 17, 23, 51, 102, 122]),
     ("Higiene de artefato",
      "Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.",
      [5, 6, 13, 14, 15, 22, 48, 60, 71, 74, 94, 98, 109]),

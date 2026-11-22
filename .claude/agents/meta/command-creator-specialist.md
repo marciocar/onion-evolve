@@ -13,7 +13,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: cyan
+color: purple
 priority: alta
 category: meta
 

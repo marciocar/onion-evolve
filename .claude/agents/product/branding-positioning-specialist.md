@@ -15,7 +15,7 @@ tools:
   - Glob
   - WebSearch
   - TodoWrite
-color: yellow
+color: cyan
 priority: alta
 expertise: ["branding", "brand-positioning", "brand-strategy", "brand-identity", "competitive-positioning", "brand-equity", "brand-architecture", "brand-storytelling", "omnicanal-experience", "brand-2025-trends"]
 related_agents: ["storytelling-business-specialist", "product-agent", "research-agent"]

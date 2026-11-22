@@ -34,9 +34,9 @@ tools:                           # Ferramentas nativas do Claude Code
 # METADATA
 # ═══════════════════════════════════════════════════════════════════════════════
 
-color: purple                    # Cor identificadora (ver tabela abaixo)
+color: blue                      # DERIVADA de category (Tabela de Cores; REGRA 122)
 priority: alta                   # alta | média | baixa
-category: development            # Categoria do agente
+category: development            # Categoria do agente (o subdiretório)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # RELACIONAMENTOS
@@ -82,7 +82,7 @@ updated: "2025-11-24"
 
 | Campo | Tipo | Descrição | Default |
 |-------|------|-----------|---------|
-| `color` | string | Cor para UI | `purple` |
+| `color` | enum | Cor no task list e no transcript, **derivada de `category`** | a da categoria (Tabela de Cores) |
 | `priority` | enum | Prioridade | `média` |
 | `category` | string | Categoria | inferido da pasta |
 | `expertise` | array | Áreas de expertise | `[]` |
@@ -101,17 +101,23 @@ executam em paralelo.
 
 ## 🎨 Tabela de Cores
 
-| Categoria | Cor | Hex |
-|-----------|-----|-----|
-| development | `blue` | #4466ff |
-| product | `purple` | #9c27b0 |
-| review | `orange` | #ff9800 |
-| testing | `green` | #4caf50 |
-| compliance | `red` | #f44336 |
-| meta | `cyan` | #00bcd4 |
-| git | `teal` | #009688 |
-| research | `indigo` | #3f51b5 |
-| deployment | `brown` | #795548 |
+A cor **sai da categoria**, nunca do agente. SSOT: `.claude/validation/agent-colors.tsv`; a
+REGRA 122 (Cor de agente presente, na paleta do Claude Code e igual à da categoria) reprova cor ausente,
+placeholder, fora da paleta ou diferente da categoria. O Claude Code aceita só 8 valores (`red`, `blue`,
+`green`, `yellow`, `purple`, `orange`, `pink`, `cyan`) e **ignora calado** qualquer outro: o agente fica
+sem cor. São 9 categorias para 8 cores, então git e deployment dividem o `orange`.
+
+| Categoria | Cor |
+|-----------|-----|
+| development | `blue` |
+| testing | `green` |
+| review | `yellow` |
+| compliance | `red` |
+| meta | `purple` |
+| product | `cyan` |
+| git | `orange` |
+| deployment | `orange` |
+| research | `pink` |
 
 ---
 
@@ -262,7 +268,7 @@ tools:
   - Bash
   - TodoWrite
 
-color: orange
+color: yellow
 priority: alta
 category: review
 
@@ -316,7 +322,7 @@ tools:
   - TodoWrite
   - Bash        # REST da ClickUp API (curl) — API-first; MCP é transporte OPCIONAL via adapter
 
-color: orange
+color: blue
 priority: alta
 category: development
 

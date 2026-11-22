@@ -1,0 +1,40 @@
+# agent-colors.tsv — SSOT da cor de AGENTE por categoria (REGRA 122, card SAC-409).
+#
+# Lido por: .claude/validation/agent-color-check.sh (a guarda) e pela REGRA 122 do lint. O molde do
+# @agent-creator-specialist e o template de agente apontam para cá: a cor de um agente novo é DERIVADA
+# da categoria (o subdiretório em .claude/agents/), nunca escolhida por agente.
+#
+# Por que existe: o Claude Code aceita só as cores da paleta e IGNORA em silêncio qualquer outro valor
+# (o agente fica sem cor, sem erro). Medido em 2026-11-21 pela curadoria e reconferido em 2026-11-22:
+# 38 dos 51 agentes não batiam a categoria (7 fora da paleta, 1 sem a chave, 30 com a cor trocada), e o
+# molde do agent-creator vazava o placeholder "[cor da categoria]".
+#
+# Dois tipos de linha (TAB):
+#   palette   <cor>        <fonte>              — os valores que o Claude Code aceita no campo color:
+#   category  <categoria>  <cor>  <razão>       — a cor de cada categoria (tem de estar na paleta)
+#
+# PALETA — fonte: tabela "Supported frontmatter fields" de https://code.claude.com/docs/en/sub-agents, lida em
+# 2026-11-22 ("Accepts red, blue, green, yellow, purple, orange, pink, or cyan"), e o mapa do binário 2.1.330
+# (as 8 chaves de V0, conferidas com `includes` exato: maiúscula não pinta). Versão nova do Claude Code com
+# cor nova: acrescente aqui com a fonte; até lá a guarda acusa, e esse é o comportamento desejado.
+#
+# CATEGORIAS — 9 categorias e 8 cores: git e deployment dividem o orange (entrega/ops), a 1ª opção da
+# proposta da curadoria (docs/evolution/inbox/_processed/2026-11-21-doutrina-color-agentes-paleta.md).
+# Categoria nova: acrescente a linha aqui; agente numa categoria sem linha é acusado.
+palette	red	doc sub-agents 2026-11-22 + binário 2.1.330
+palette	blue	doc sub-agents 2026-11-22 + binário 2.1.330
+palette	green	doc sub-agents 2026-11-22 + binário 2.1.330
+palette	yellow	doc sub-agents 2026-11-22 + binário 2.1.330
+palette	purple	doc sub-agents 2026-11-22 + binário 2.1.330
+palette	orange	doc sub-agents 2026-11-22 + binário 2.1.330
+palette	pink	doc sub-agents 2026-11-22 + binário 2.1.330
+palette	cyan	doc sub-agents 2026-11-22 + binário 2.1.330
+category	development	blue	núcleo de engenharia, a maior categoria
+category	testing	green	verde = passa
+category	review	yellow	atenção, revisão
+category	compliance	red	segurança, para
+category	meta	purple	o framework sobre si
+category	product	cyan	produto, descoberta
+category	git	orange	versionamento, entrega
+category	deployment	orange	entrega, ops (divide a cor com git)
+category	research	pink	exploração

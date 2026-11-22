@@ -5,6 +5,7 @@ description: |
   Use para desenvolvimento de agentes IA, workflows e integracoes via Runflow SDK.
 category: development
 model: sonnet
+color: blue
 tools:
   - Read
   - Write

@@ -12,7 +12,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: red
+color: purple
 priority: alta
 category: meta
 

@@ -13,7 +13,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: cyan
+color: purple
 priority: alta
 category: meta
 
@@ -407,11 +407,13 @@ description: |
   [Diferencial único]
 model: [sonnet|opus]
 tools: [lista separada por vírgulas]
-color: [cor da categoria]
+category: [categoria = o subdiretório em .claude/agents/]
+color: [a cor da categoria, lida em .claude/validation/agent-colors.tsv — nunca escolhida por agente]
 priority: [alta|media|baixa]
 expertise: ["tag1", "tag2", "tag3"]
 related_agents: ["agente-1", "agente-2"]
-related_commands: ["/comando-1", "/comando-2"]autonomy: [alta|media|baixa]
+related_commands: ["/comando-1", "/comando-2"]
+autonomy: [alta|media|baixa]
 ---
 
 # 🎯 [Nome do Agente]
@@ -623,11 +625,13 @@ description: |
   [Relacionamentos]
 model: [sonnet|opus]
 tools: [lista separada por vírgulas]
-color: [cor da categoria]
+category: [categoria = o subdiretório em .claude/agents/]
+color: [a cor da categoria, lida em .claude/validation/agent-colors.tsv — nunca escolhida por agente]
 priority: [alta|media|baixa]
 expertise: ["tag1", "tag2", "tag3"]
 related_agents: ["agente-1", "agente-2"]
-related_commands: ["/comando-1", "/comando-2"]autonomy: [alta|media|baixa]
+related_commands: ["/comando-1", "/comando-2"]
+autonomy: [alta|media|baixa]
 ---
 ```
 
@@ -638,6 +642,9 @@ related_commands: ["/comando-1", "/comando-2"]autonomy: [alta|media|baixa]
 - ✅ `expertise` array de strings
 - ✅ `related_agents` array de nomes (sem @)
 - ✅ `related_commands` array de caminhos (com /)
+- ✅ `color` = a cor da `category` em `.claude/validation/agent-colors.tsv` (**resolva antes de escrever**:
+  o colchete do molde é instrução, não valor; a REGRA 122 (Cor de agente presente, na paleta do Claude Code
+  e igual à da categoria) reprova cor ausente, placeholder, fora da paleta ou diferente da categoria)
 
 #### 4.2. Localização do Arquivo
 
@@ -666,6 +673,12 @@ related_commands: ["/comando-1", "/comando-2"]autonomy: [alta|media|baixa]
 - `research/` - Pesquisa multi-fonte
 - `review/` - Code review, análise, validação
 - `testing/` - Estratégias e implementação de testes
+
+**Cor derivada da categoria:** leia `.claude/validation/agent-colors.tsv` (a SSOT) e use a 3ª coluna da linha
+`category<TAB><categoria>`. Hoje: development `blue` · testing `green` · review `yellow` · compliance `red` ·
+meta `purple` · product `cyan` · git e deployment `orange` · research `pink`. O Claude Code só aceita
+`red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink` e `cyan`, e ignora calado qualquer outro valor.
+Categoria nova entra no `.tsv` com uma cor da paleta antes do primeiro agente dela.
 
 **Criar Nova Categoria:**
 Apenas se:
@@ -728,7 +741,7 @@ Write .claude/agents/[categoria]/[nome-agente].md
 - [ ] Related commands corretos
 - [ ] MCP servers especificados (se aplicável)
 - [ ] Autonomy level adequado
-- [ ] Color matching categoria
+- [ ] Color = a cor da categoria em `.claude/validation/agent-colors.tsv` (REGRA 122)
 - [ ] Priority definida
 ```
 
@@ -1060,6 +1073,7 @@ name: [tecnologia]-[acao]-specialist
 description: Especialista em [tecnologia] que [ação principal]. Use para [casos de uso].
 model: sonnet
 tools: Read, Write, Edit, Grep, Bash
+category: development
 color: blue
 priority: media
 expertise: ["[tecnologia]", "[domínio]", "[skill]"]
@@ -1076,7 +1090,8 @@ name: [standard]-[tipo]-specialist
 description: Especialista em [standard] que [ação principal]. Gera [artefatos] audit-ready.
 model: sonnet
 tools: Read, Write, Edit, Grep, Glob
-color: maroon
+category: compliance
+color: red
 priority: alta
 expertise: ["[standard]", "compliance", "audit", "[domain]"]
 related_agents: ["security-information-master"]
@@ -1092,11 +1107,13 @@ name: [servico]-[acao]-manager
 description: Especialista em [serviço] que [ação principal]. Use para [workflows]. Acessa via adapter (API ou MCP opcional).
 model: sonnet
 tools: Read, Write, Grep, TodoWrite
-color: orange
+category: development
+color: blue
 priority: alta
 expertise: ["[servico]", "automation", "integration"]
 related_agents: ["product-agent", "task-specialist"]
-related_commands: ["/product/task", "/meta/setup-integration"]autonomy: alta
+related_commands: ["/product/task", "/meta/setup-integration"]
+autonomy: alta
 ---
 ```
 
@@ -1107,11 +1124,13 @@ name: [dominio]-orchestrator
 description: Meta-orquestrador de [domínio] que [ação principal]. Coordena [agentes].
 model: sonnet
 tools: Read, Glob, Grep, TodoWrite
-color: black
+category: meta
+color: purple
 priority: alta
 expertise: ["meta-architecture", "orchestration", "[domain]"]
 related_agents: ["agente-1", "agente-2", "agente-3"]
-related_commands: ["/meta/[comando]"]autonomy: alta
+related_commands: ["/meta/[comando]"]
+autonomy: alta
 ---
 ```
 

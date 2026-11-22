@@ -12,7 +12,7 @@ tools:
   - Glob
   - TodoWrite
 
-color: indigo
+color: pink
 priority: alta
 category: research
 

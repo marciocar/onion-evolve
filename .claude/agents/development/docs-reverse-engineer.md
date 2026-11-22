@@ -13,7 +13,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: purple
+color: blue
 priority: alta
 category: development
 
