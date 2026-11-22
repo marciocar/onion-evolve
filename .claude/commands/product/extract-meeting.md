@@ -3,8 +3,9 @@ name: extract-meeting
 description: |
   Extração estruturada de conhecimento de transcrições de reuniões usando Framework EXTRACT.
   Use para transformar arquivos de contexto bruto em artefatos de alto valor para humanos, sistemas e IA.
-  Grava o resumo (.md) e o grafo da reunião (.kg.yaml, com trace ao trecho e o registro de aviso aos
-  participantes) em docs/meetings/; o gate meeting-graph-check.sh diz se o grafo vale.
+  Grava o resumo (.md), o grafo da reunião (.kg.yaml, com trace ao trecho, o registro de aviso aos
+  participantes e a área de cada ação e risco) e o backlog por área (projeção do grafo, com carry-over) em
+  docs/meetings/; o gate meeting-graph-check.sh diz se o grafo vale e se o resumo bate com ele.
 allowed-tools: Read Write Bash(find *) Bash(test -e *) Bash(mkdir -p *) Bash(basename *) Bash(wc -l *) Bash(bash .claude/validation/meeting-graph-check.sh *)
 
 parameters:
@@ -17,6 +18,9 @@ parameters:
   - name: focus
     description: Foco específico (decisions, tasks, gaps, all)
     required: false
+  - name: carry
+    description: Grafos (.kg.yaml) das reuniões anteriores da mesma série, para o carry-over do backlog
+    required: false
 
 category: product
 tags:
@@ -25,8 +29,8 @@ tags:
   - knowledge-base
   - documentation
 
-version: "3.1.0"
-updated: "2026-10-16"
+version: "3.2.0"
+updated: "2026-11-22"
 
 related_commands:
   - /product/task
@@ -44,6 +48,7 @@ knowledge_bases:
 outputs:
   - docs/meetings/<nome>-extract.md
   - docs/meetings/<nome>.kg.yaml
+  - docs/meetings/<nome>-backlog.md
 ---
 
 # 📋 Extrair Conhecimento de Reunião
@@ -54,12 +59,18 @@ Transformação de transcrições brutas em conhecimento estruturado usando o Fr
 
 Processar transcrições de reuniões e gerar outputs estruturados consumíveis por humanos, sistemas e IA, seguindo as 7 dimensões do Framework EXTRACT.
 
-Toda extração gera **dois artefatos** em `docs/meetings/`, o diretório único das reuniões (o
+Toda extração gera **três artefatos** em `docs/meetings/`, o diretório único das reuniões (o
 `/product:consolidate-meetings`, o `/product:whisper` e o `@whisper-specialist` leem e gravam no mesmo lugar):
 
-- `<nome>-extract.md`: o resumo EXTRACT no nível pedido, para gente ler;
 - `<nome>.kg.yaml`: o **grafo da reunião** (pessoas, aviso, decisões, ações e riscos), cada nó com
-  `trace` ao trecho da transcrição. É a entrada da consolidação entre reuniões.
+  `trace` ao trecho da transcrição. É a **fonte da verdade** e a entrada da consolidação entre reuniões;
+- `<nome>-extract.md`: o resumo EXTRACT no nível pedido, para gente ler. As decisões, ações e riscos dele
+  **saem do grafo**, cada item com o id do nó, e o gate confere que os dois batem;
+- `<nome>-backlog.md`: o **backlog por área**, projeção gerada do grafo (nunca escrita à mão), com o que
+  ficou aberto nas reuniões anteriores da série (carry-over).
+
+Duas vistas, um SSOT: a tabela do resumo agrupa por **responsável**, o backlog agrupa por **área** (a
+swimlane dos trackers). Dono, prazo e área moram no mesmo nó, e nenhuma vista é a fonte.
 
 A entrada aceita hoje é **transcrição em texto** (`.txt` ou `.md`, uma fala por linha). Áudio e vídeo passam
 antes pelo `/product:whisper`, que gera o texto.
@@ -145,13 +156,16 @@ Processar a transcrição abaixo aplicando o Framework EXTRACT completo.
 [3-5 linhas]
 
 ### Decisões
-- ✅ [Decisão 1]
-- ✅ [Decisão 2]
+- ✅ [Decisão 1] `D_<DECISAO_1>`
+- ✅ [Decisão 2] `D_<DECISAO_2>`
 
 ### Ações
-| Responsável | Ação | Prazo |
-|-------------|------|-------|
-| [Nome] | [Descrição] | [Data] |
+| Responsável | Ação | Prazo | Nó |
+|-------------|------|-------|----|
+| [Nome] | [Descrição] | [Data] | `A_<ACAO>` |
+
+### Riscos
+- ⚠️ [Risco] `R_<RISCO>`
 
 ### Pendências
 - ⚠️ [Gap 1]
@@ -161,12 +175,19 @@ Processar a transcrição abaixo aplicando o Framework EXTRACT completo.
 - 📅 [Data]: [Marco]
 ```
 
+**O executivo é reconciliado com o grafo (o gate confere).** As seções Decisões, Ações e Riscos listam
+**exatamente** as decisões, ações e riscos do grafo, um item por nó, com o id entre crases. Escreva o grafo
+primeiro (Passo 6) e derive essas seções dele: duas leituras separadas da transcrição (a sua e a do
+`@extract-meeting-specialist`) já deram 5 decisões num e 8 no outro. Decisão que só o resumo tem vira nó no
+grafo, com trace; nó que o resumo não cita entra no resumo. Pendências, Timeline e Resumo são livres (não
+viram nó). Sub-item indentado (justificativa, contexto) não conta como item.
+
 **Nível `complete`:**
 Output YAML completo seguindo schema do knowledge base.
 
 **Nível `graph`:**
-Só o grafo da reunião (Passo 6), sem o `.md`. O grafo é gravado em **todo** nível; os outros níveis
-mudam só o resumo.
+Só o grafo da reunião (Passo 6), sem o `.md` do resumo. O grafo e o backlog por área (Passo 8) são gravados
+em **todo** nível; os outros níveis mudam só o resumo.
 
 ### Passo 5: Salvar Resultado
 
@@ -236,9 +257,11 @@ nodes:
     x_meeting_role: action
     x_owner: P_<NOME>              # ou NAO_ESPECIFICADO
     x_due: "<AAAA-MM-DD>"          # opcional
+    x_area: produto                # UM termo do vocabulário de áreas, ou NAO_ESPECIFICADO
   - id: R_<RISCO>
     node_type: claim
     x_meeting_role: risk
+    x_area: tecnico                # idem; x_owner é opcional no risco
 
 edges:
   - from: NOTICE_1
@@ -268,6 +291,12 @@ Todo nó com `x_meeting_role` leva os campos que o `MEETING` mostra acima: `plan
 - **Inferência**: dono ou prazo que você deduziu (ex.: "eu faço até sexta" → a data) entra com
   `[INFERIDO]` no `label` e `confidence` de 0.6 ou menos. Dono que ninguém nomeou é `NAO_ESPECIFICADO`.
 - **Arestas**: as do bloco `edges:` acima, uma por nó. Nó sem aresta reprova no radar como órfão.
+- **Área (`x_area`)**: toda ação e todo risco leva **um** valor, nunca dois nem lista (a lição da swimlane:
+  campo multivalor quebra o agrupamento). O vocabulário é **fechado**: o repo declara o seu em
+  `docs/meetings/meeting-areas.txt` (um termo por linha, minúsculo e sem acento, ex.: as áreas do app), e sem o
+  arquivo vale o padrão `produto · tecnico · negocio · compliance · design · operacoes · pesquisa`. Área que
+  ninguém nomeou é `NAO_ESPECIFICADO` (nunca inventar): o item não se perde, vai para o topo do backlog, a
+  triar. Decisão, participante e aviso não levam área.
 
 **O registro de aviso (aviso ≠ consentimento).** O grafo registra **o que aconteceu**: cada tentativa de
 aviso e a resposta de cada participante a ela. Ele **nunca declara consentimento legal**: isso é juízo
@@ -301,6 +330,9 @@ jurídico, não fato da transcrição, e o gate reprova qualquer chave `legal_co
 ### Passo 7: Gate do grafo
 
 ```bash
+# nível executive (o padrão): o gate reconcilia o resumo com o grafo
+bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml --summary docs/meetings/<nome>-extract.md
+# compact, complete e graph: só o grafo (o compact é um digest de uma decisão; não cita todos os nós)
 bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml
 ```
 
@@ -314,7 +346,32 @@ bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml
   errado, nó órfão, dono que não é participante) e rode de novo. `SEM-TENTATIVA-DE-AVISO` e
   `RECUSA-SEM-PARADA` **não se corrigem no grafo**: dizem que a reunião não tem registro de aviso ou que a
   captura seguiu depois de uma recusa. Mostre o motivo ao usuário e não apresente o grafo como válido.
+- **`RESUMO-*`**: grafo e resumo divergem (`RESUMO-SEM-NO`: o grafo tem, o resumo não; `RESUMO-ITEM-SEM-NO`:
+  o resumo tem, o grafo não; `RESUMO-NO-INEXISTENTE` e `RESUMO-SECAO-ERRADA`: id errado). Reconcilie: o que só
+  o resumo tem vira nó com trace (ou sai do resumo, se não está na transcrição); o que só o grafo tem entra no
+  resumo. Rode o gate de novo.
+- **`AREA-*`**: ação ou risco sem área, com área fora do vocabulário ou com mais de uma. Corrija no grafo.
 - **rc 2**: o gate não pôde julgar (radar ou python3 ausente). Não é verde: diga isso ao usuário.
+
+### Passo 8: Backlog por área (`docs/meetings/<nome>-backlog.md`)
+
+O backlog é **projeção do grafo**, gerada pelo gate e nunca escrita à mão:
+
+```bash
+bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml \
+  --backlog docs/meetings/<nome>-backlog.md [--carry docs/meetings/<anterior>.kg.yaml ...]
+```
+
+- Uma seção por área, `NAO_ESPECIFICADO` primeiro (é o que precisa de triagem); cada ação ou risco aberto é
+  `- [ ] <ação> — dono: <owner> — prazo: <due|—> · <id>`, e o risco leva `⚠️`.
+- **Carry-over**: passe em `--carry` os grafos das reuniões anteriores da **mesma série** (o parâmetro
+  `carry`; sem ele, liste os `.kg.yaml` de `docs/meetings/` e pergunte ao usuário quais são da série). O que
+  segue aberto lá entra aqui com `↩ reunião de <data>`. O item some quando o nó fecha **no grafo dele**
+  (`status: done` com `verified_at` e `verified_against`, o motivo); o cabeçalho conta os fechados, para nada
+  sumir calado.
+- Só grava com **todos** os grafos conformes: reprovado sai rc 1 (`CARRY-REPROVADO`, `CARRY-FORA-DE-ORDEM`
+  para grafo posterior à reunião ou repetido), reunião sem aviso sai rc 3 (o backlog é uso, retido como no
+  `--for-use`), e em nenhum dos dois o arquivo é escrito.
 
 > **Dados reais.** O grafo guarda nomes e falas reais, sem anonimização. Não o grave em repositório público.
 > Combine com o controlador o prazo de eliminação: apagar de um repo com histórico exige reescrever o histórico.
@@ -330,6 +387,7 @@ Com `⚠️ NÃO HOUVE AVISO`, o título do bloco é `⚠️ EXTRAÇÃO CONCLUÍ
 
 📁 Arquivo: docs/meetings/[nome]-extract.md
 🕸️ Grafo:   docs/meetings/[nome].kg.yaml (gate: ✅ conforme | ⚠️ NÃO HOUVE AVISO | ✗ MOTIVO)
+📋 Backlog: docs/meetings/[nome]-backlog.md ([N] abertos em [K] áreas; [C] de reuniões anteriores | retido | não gravado)
 
 📊 Extração EXTRACT:
 ∟ Essência: ✅
@@ -349,7 +407,7 @@ Com `⚠️ NÃO HOUVE AVISO`, o título do bloco é `⚠️ EXTRAÇÃO CONCLUÍ
 🚀 Próximos Passos:
 1. Revisar gaps críticos
 2. Validar decisões com participantes
-3. Criar tasks no gerenciador (@task-specialist)
+3. Triar a seção NAO_ESPECIFICADO do backlog e criar tasks no gerenciador (@task-specialist)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -370,6 +428,9 @@ Com `⚠️ NÃO HOUVE AVISO`, o título do bloco é `⚠️ EXTRAÇÃO CONCLUÍ
 
 # Só o grafo da reunião (docs/meetings/reuniao.kg.yaml), sem o resumo
 /product/extract-meeting source=reuniao.txt level=graph
+
+# Com o carry-over da reunião anterior da série no backlog por área
+/product/extract-meeting source=reuniao-2.txt carry=docs/meetings/reuniao-1.kg.yaml
 ```
 
 ## 🔗 Referências

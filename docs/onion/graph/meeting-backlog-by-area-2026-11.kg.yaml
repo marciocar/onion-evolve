@@ -1,0 +1,61 @@
+meta:
+  schema_version: "1"
+  id: meeting-backlog-by-area-2026-11
+  slug: meeting-backlog-by-area-2026-11
+  title: "Backlog por área e reconciliação grafo × resumo no /product:extract-meeting"
+  date: "2026-11-22"
+  baseline: "2026-11-22"
+  review_after: "2026-12-22"
+  purpose: "Guardar as decisões de desenho da área (x_area), do backlog por área com carry-over e da reconciliação do resumo com o grafo da reunião, e o que ficou aberto das lacunas do teste de campo."
+  # ═══ TETO: 4 NÓS ═══
+nodes:
+  - id: E_MB_FIELD_TEST_AND_PROPOSAL_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-22"
+    verified_against: "sinais da caixa do core: teste de campo da peça company-brain (19/11) e proposta da curadoria (21/11), lidos na íntegra"
+    label: "O teste de campo achou o grafo e o resumo divergindo (5 contra 8 decisões) e pediu backlog por área; a curadoria propôs x_area de valor único, projeção por área e check no gate."
+    narrative: "Lacunas 1 e 2 do teste de campo viram SAC-488 e SAC-480. A proposta cita o padrão de mercado: item de ação com dono e prazo, o não resolvido transita para a próxima revisão, e o agrupamento por swimlane só funciona com campo de valor único (Jira JSWCLOUD-17580)."
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-11-21-doutrina-extract-meeting-backlog-por-area.md"
+      locator: "seções 1 a 4"
+      method: "reading: sinal da curadoria e sinal de campo da peça company-brain"
+      locality: "repo"
+  - id: D_MB_AREA_BACKLOG_RECONCILE_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-22"
+    verified_against: "bancada do meeting-graph-check.sh (--selftest) e mutantes do lint-selftest na branch feat/extract-meeting-area"
+    label: "x_area de um valor em ação e risco, vocabulário fechado do repo (padrão de 7 áreas), backlog projetado pelo gate com carry-over explícito, e resumo reconciliado pelo id do nó."
+    narrative: "Decidido pela sessão de execução sem o maestro, pela opção recomendada: o repo pode TROCAR o vocabulário (áreas do app), não só estreitar, porque o teste de campo pediu áreas do app; carry-over por --carry explícito (a série não é inferida); o backlog é uso e fica retido com reunião sem aviso; a reconciliação vale para o nível executive. Grafos antigos sem x_area passam a reprovar com AREA-AUSENTE; a cura é uma linha."
+    provenance:
+      source: ".claude/validation/meeting-graph-check.sh"
+      locator: "cabeçalho (ÁREA, --summary, --backlog) e casos do --selftest"
+      method: "reading: o gate e a bancada da branch feat/extract-meeting-area"
+      locality: "repo"
+  - id: Q_MB_OPEN_GAPS_1122
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    x_linear_issue: "SAC-488"
+    impact: 3
+    confidence: 0.6
+    label: "Ficam abertas as lacunas 3 e 4 do teste de campo (aviso por campo estruturado, acusar entrada truncada) e a marca de novo × reforço no backlog."
+    narrative: "Pronto quando: o aviso dado fora da transcrição tem entrada estruturada no comando; o comando acusa transcrição cortada no meio da frase; e um item repetido de reunião anterior se marca como reforço em vez de virar nó duplicado. A reconciliação do compact e do complete também segue fora do gate."
+edges:
+  - from: D_MB_AREA_BACKLOG_RECONCILE_1122
+    to: E_MB_FIELD_TEST_AND_PROPOSAL_1122
+    edge_type: TRACES_TO
+  - from: Q_MB_OPEN_GAPS_1122
+    to: D_MB_AREA_BACKLOG_RECONCILE_1122
+    edge_type: TRACES_TO

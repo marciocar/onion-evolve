@@ -12,10 +12,25 @@
 #
 # Uso:  bash .claude/validation/meeting-graph-check.sh <grafo.kg.yaml> [--root <dir>]
 #       bash .claude/validation/meeting-graph-check.sh <grafo.kg.yaml> --for-use [--root <dir>]
+#       bash .claude/validation/meeting-graph-check.sh <grafo.kg.yaml> --summary <nome>-extract.md [--root <dir>]
+#       bash .claude/validation/meeting-graph-check.sh <grafo.kg.yaml> --backlog <saída.md> [--carry <grafo anterior>]... [--root <dir>]
 #       bash .claude/validation/meeting-graph-check.sh --selftest ["<nome de um caso>"]
 #   --for-use  a pergunta de quem vai CONSUMIR o grafo (consolidar, virar tarefa): reunião sem aviso sai rc 3, uso retido.
+#   --summary  RECONCILIA o resumo executivo com o grafo (SAC-488): toda decisão, ação e risco do grafo aparece no
+#           resumo pelo id entre crases, e todo item das seções Decisões, Ações e Riscos do resumo cita um nó do papel
+#           da seção. O que um tem e o outro não reprova (RESUMO-*).
+#   --backlog  grava a PROJEÇÃO do backlog por área (SAC-480): as ações e os riscos abertos, agrupados por `x_area`,
+#           com NAO_ESPECIFICADO primeiro. Projeção é uso: só escreve com todo grafo conforme; reunião sem aviso
+#           sai rc 3 e nada é escrito. `--carry` (repetível) traz os abertos das reuniões anteriores da série
+#           (carry-over): o item segue no backlog enquanto o nó está aberto no grafo dele, e some quando fecha.
 #   --root  diretório a que `meta.x_meeting_source` e os `trace:` são relativos (padrão: a raiz git do
 #           grafo; sem git, o diretório corrente).
+#
+# ÁREA (`x_area`, SAC-480): toda ação e todo risco leva UM valor (a lição da swimlane: campo multivalor quebra o
+# agrupamento) de um vocabulário FECHADO. O repo declara o seu em `docs/meetings/meeting-areas.txt` (um termo
+# por linha, `[a-z][a-z0-9_]*`, `#` comenta); sem o arquivo vale o padrão
+# `produto tecnico negocio compliance design operacoes pesquisa`. `NAO_ESPECIFICADO` vale sempre: área que
+# ninguém nomeou não se inventa, vai à triagem.
 #
 # O esquema que ele julga (gramática do .kg.yaml + chaves x_ desta família):
 #   meta:  x_meeting_date "AAAA-MM-DD" · x_meeting_source "<transcrição relativa à raiz>" ·
@@ -30,7 +45,8 @@
 #          participant:    x_notice_ref (id de um notice_attempt, ou do notice_absent) ·
 #                          x_notice_response (ciente | recusou | sem_resposta | autora_do_aviso;
 #                          com notice_absent, só nao_avisado | recusou)
-#          action:         x_owner (id de um participant, ou NAO_ESPECIFICADO)
+#          action:         x_owner (id de um participant, ou NAO_ESPECIFICADO) · x_area
+#          risk:           x_area (x_owner opcional)
 #
 # AUSÊNCIA DE AVISO: reunião em que de fato não houve aviso não pode inventar um `notice_attempt`. O registro
 # `notice_absent` é registro válido (rc 0) e sai como SOFT no stdout, `SOFT:AVISO-AUSENTE\t<nó>\t<n> pessoa(s)…`.
@@ -52,6 +68,12 @@
 #            FONTE-FORA-DA-RAIZ (absoluto ou `..` que sai da raiz)
 #   forma:   PAPEL-AUSENTE (todo nó leva x_meeting_role) · PAPEL-DESCONHECIDO · SEM-REUNIAO · ACAO-SEM-DONO ·
 #            META-INCOMPLETA · CAMPO-FORA-DO-TIPO (impact fora de inteiro 1-5, confidence fora de 0-1)
+#   área:    AREA-AUSENTE · AREA-FORA-DO-VOCABULARIO (inclui valor vazio, lista ou dois termos) ·
+#            AREA-FORA-DO-PAPEL (x_area só em ação e risco) · AREAS-INVALIDAS (meeting-areas.txt malformado)
+#   resumo:  RESUMO-AUSENTE · RESUMO-SEM-NO (o grafo tem, o resumo não) · RESUMO-ITEM-SEM-NO (o resumo tem, o
+#            grafo não) · RESUMO-NO-INEXISTENTE (id citado que não é fato do grafo) · RESUMO-SECAO-ERRADA
+#   backlog: CARRY-REPROVADO (grafo anterior fora do gate) · CARRY-FORA-DE-ORDEM (data posterior à da reunião,
+#            o próprio grafo, ou repetido)
 #   corpus:  RADAR (kg-radar.sh --integrity --schema reprovou) · CONTRATO (kg-contract-check.sh reprovou,
 #            onde ele mora ao lado e o contrato está vendorizado; sem ele, o "não julgado" é declarado)
 # O leitor: comentário (`#`, qualquer coluna) nunca abre seção; as chaves de um nó são as da indentação do
@@ -73,9 +95,9 @@ _check() {   # <grafo> <raiz>
   # caminho ABSOLUTO já: o contrato roda com `cd` na raiz, e um relativo saía "não julgado" com rc 0
   # (2ª passada do refutador, achado 3 — a mesma classe que o kg-decide-seal.sh já curou)
   g="$(realpath -- "$1")"
-  out="$(python3 -I -B - "${g}" "${root}" <<'PY'
-import os, re, sys, unicodedata
-g, root = sys.argv[1], sys.argv[2]
+  out="$(python3 -I -B - "${g}" "${root}" "${MG_SUMMARY:-}" "${MG_DUMP:-}" <<'PY'
+import json, os, re, sys, unicodedata
+g, root, summary, dump = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 ROLES = {"meeting", "participant", "notice_attempt", "notice_absent", "decision", "action", "risk"}
 FACTS = ("decision", "action", "risk")
 RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso", "nao_avisado"}
@@ -87,7 +109,11 @@ CHAN = {"chat", "voz", "convite", "outro"}
 # do .kg.yaml, que o radar e o contrato julgam.
 META_X = {"x_meeting_date", "x_meeting_source", "x_capture_stopped_at", "x_cost_tokens"}
 NODE_X = {"x_meeting_role", "x_notice_channel", "x_notice_text", "x_notice_ref", "x_notice_response",
-          "x_owner", "x_due", "x_path_is_content", "x_notice_absent_basis", "x_notice_remediation"}
+          "x_owner", "x_due", "x_path_is_content", "x_notice_absent_basis", "x_notice_remediation", "x_area"}
+# ÁREA (SAC-480): vocabulário FECHADO, declarado pelo repo ou o padrão; NAO_ESPECIFICADO vale sempre
+DEFAULT_AREAS = ["produto", "tecnico", "negocio", "compliance", "design", "operacoes", "pesquisa"]
+AREA_FILE = os.path.join("docs", "meetings", "meeting-areas.txt")
+AREA_ROLES = ("action", "risk")
 bad = []
 def fail(code, nid, why): bad.append(f"{code}\t{nid}\t{why}")
 nfc = lambda x: unicodedata.normalize("NFC", x)
@@ -259,6 +285,72 @@ if stop_line is not None:
     for i, r in roles.items():
         if r != "meeting" and by[i].get("_to", 0) > stop_line:
             fail("CAPTURA-APOS-RECUSA", i, f"trecho vai até a linha {by[i]['_to']}, depois da parada em #L{stop_line}")
+# ÁREA: um valor, do vocabulário fechado, só onde a projeção agrupa (ação e risco)
+areas, area_src = list(DEFAULT_AREAS), "o padrão"
+af = os.path.join(root, AREA_FILE)
+if os.path.isfile(af):
+    area_src = AREA_FILE
+    toks = [re.sub(r"#.*$", "", x).strip() for x in open(af, encoding="utf-8", errors="replace")]
+    toks = [nfc(t) for t in toks if t]
+    badt = [t for t in toks if not re.fullmatch(r"[a-z][a-z0-9_]*", t)]
+    if badt or not toks:
+        fail("AREAS-INVALIDAS", "meta", f"{AREA_FILE}: um termo por linha em [a-z][a-z0-9_]*; recusados: {badt[:3] or '(arquivo vazio)'}")
+    areas = list(dict.fromkeys(t for t in toks if t not in badt))
+valid_areas = set(areas) | {"NAO_ESPECIFICADO"}
+for i, r in roles.items():
+    n = by[i]
+    if "x_area" in n and r not in AREA_ROLES:
+        fail("AREA-FORA-DO-PAPEL", i, f"x_area num nó {r}: a área é de ação e risco, onde o backlog agrupa")
+    elif r in AREA_ROLES:
+        a = n.get("x_area")
+        if a is None: fail("AREA-AUSENTE", i, f"{r} sem x_area: um termo de {area_src}, ou NAO_ESPECIFICADO")
+        elif a not in valid_areas:
+            fail("AREA-FORA-DO-VOCABULARIO", i, f"x_area {a or '(vazio)'!r}: UM termo de {area_src} ({' '.join(areas)}) ou NAO_ESPECIFICADO")
+# RESUMO (SAC-488): o resumo executivo cita cada fato do grafo pelo id, e cada item das seções de fatos cita um nó
+if summary:
+    facts = {i: r for i, r in roles.items() if r in FACTS}
+    if not os.path.isfile(summary):
+        fail("RESUMO-AUSENTE", "-", f"resumo não encontrado: {summary}")
+    else:
+        strip = lambda x: "".join(c for c in unicodedata.normalize("NFD", x.lower()) if unicodedata.category(c) != "Mn")
+        def kind(h):
+            h = strip(h)
+            if "decis" in h: return "decision"
+            if re.search(r"\bacao|\bacoes|\btarefa", h): return "action"
+            if "risco" in h: return "risk"
+            return None
+        cited, items, sec_kind, fence, prev_row = set(), [], None, False, None
+        for ln, raw in enumerate(open(summary, encoding="utf-8", errors="replace"), 1):
+            line = nfc(raw.rstrip("\r\n"))
+            if re.match(r"^\s*(```|~~~)", line): fence = not fence; continue
+            if fence: continue
+            hm = re.match(r"^#{1,6}\s+(.*)$", line)
+            if hm: sec_kind = kind(hm.group(1)); prev_row = None; continue
+            ids = [t for t in re.findall(r"`([A-Za-z0-9_]+)`", line) if t in facts or re.fullmatch(r"[DAR]_[A-Z0-9_]+", t)]
+            for t in ids:
+                if t not in facts:
+                    fail("RESUMO-NO-INEXISTENTE", t, f"o resumo cita `{t}` na linha {ln}, e o grafo não tem esse fato")
+                    continue
+                cited.add(t)
+                if sec_kind and facts[t] != sec_kind:
+                    fail("RESUMO-SECAO-ERRADA", t, f"`{t}` é {facts[t]} e está na seção de {sec_kind} (linha {ln})")
+            if sec_kind is None: continue
+            if re.match(r"^\s*\|?\s*:?-{3,}", line) and "|" in line:
+                if prev_row is not None and items and items[-1][0] == prev_row: items.pop()   # cabeçalho da tabela
+                continue
+            is_item = re.match(r"^ ?([-*+]|\d+[.)])\s+\S", line) or re.match(r"^\s*\|", line)
+            prev_row = ln if re.match(r"^\s*\|", line) else None
+            if is_item and not ids: items.append((ln, sec_kind, line.strip()[:60]))
+        for ln, k, txt in items:
+            fail("RESUMO-ITEM-SEM-NO", f"L{ln}", f"item da seção de {k} sem o id do nó do grafo: {txt}")
+        for t in sorted(set(facts) - cited):
+            fail("RESUMO-SEM-NO", t, f"{facts[t]} do grafo que o resumo não cita (`{t}` entre crases)")
+if dump and not bad:
+    items = [{"id": i, "role": r, "area": by[i].get("x_area", ""), "owner": by[i].get("x_owner", ""),
+              "due": by[i].get("x_due", ""), "status": by[i].get("status", ""), "label": by[i].get("label", "")}
+             for i, r in roles.items() if r in AREA_ROLES]
+    with open(dump, "w", encoding="utf-8") as fh:
+        json.dump({"graph": g, "id": meta.get("id", ""), "date": meta.get("x_meeting_date", ""), "areas": areas, "items": items}, fh, ensure_ascii=False)
 lines_out = list(bad)
 if absent_mode:
     people = sum(1 for r in roles.values() if r == "participant")
@@ -304,6 +396,7 @@ if [ "${1:-}" = "--selftest" ]; then
   T="$(TMPDIR="${TMPDIR:-/tmp}" mktemp -d)"; trap 'rm -rf "${T}"' EXIT
   mkdir -p "${T}/.claude/validation/fixtures/meeting-graph"
   cp "${FIX}/transcript-ok.txt" "${FIX}/transcript-no-notice.txt" "${T}/.claude/validation/fixtures/meeting-graph/"
+  [ -f "${FIX}/meeting-ok-extract.md" ] || { echo "meeting-graph-check: fixture do resumo ausente (${FIX}/meeting-ok-extract.md) — selftest não pôde rodar" >&2; exit 2; }
   G="${T}/g.kg.yaml"; P=0; F=0
   BASE="${FIX}/meeting-ok.kg.yaml"
   _case() {   # <nome> <motivo-esperado|OK|SO:motivo|SOFT:<trecho da linha SOFT>> <python que muta o texto em s> [raiz]   (SO: = o ÚNICO motivo)
@@ -373,6 +466,22 @@ if [ "${1:-}" = "--selftest" ]; then
   _case "confidence em texto reprova" CAMPO-FORA-DO-TIPO "s=s.replace('confidence: 0.6','confidence: high',1)"
   _case "impact em texto reprova" CAMPO-FORA-DO-TIPO "s=s.replace('impact: 2','impact: medium',1)"
   _case "radar reprova o órfão" RADAR "import re; s=re.sub(r'  - from: R_LIB_PDF_SEM_MANUTENCAO\n    to: D_RELATORIO_PDF_PLANILHA\n    edge_type: CONSTRAINS\n','',s,1)"
+  # ── ÁREA (SAC-480): um valor, do vocabulário fechado do repo (ou o padrão), só em ação e risco ──
+  _case "ação sem área reprova" SO:AREA-AUSENTE "s=s.replace('    x_area: tecnico\n','',1)"
+  _case "risco sem área reprova" SO:AREA-AUSENTE "i=s.rindex('    x_area: tecnico\n'); s=s[:i]+s[i+len('    x_area: tecnico\n'):]"
+  _case "área fora do vocabulário reprova" AREA-FORA-DO-VOCABULARIO "s=s.replace('x_area: tecnico','x_area: marketing',1)"
+  _case "área com dois valores reprova" AREA-FORA-DO-VOCABULARIO "s=s.replace('x_area: tecnico','x_area: \"produto, tecnico\"',1)"
+  _case "área em lista reprova" AREA-FORA-DO-VOCABULARIO "s=s.replace('    x_area: tecnico\n','    x_area:\n    - produto\n',1)"
+  _case "área NAO_ESPECIFICADO passa" OK "s=s.replace('x_area: tecnico','x_area: NAO_ESPECIFICADO',1)"
+  _case "área em nó de decisão reprova" AREA-FORA-DO-PAPEL "s=s.replace('    x_meeting_role: decision\n','    x_meeting_role: decision\n    x_area: produto\n',1)"
+  T2="${T}/vocab-repo"; T3="${T}/vocab-bad"
+  for _r in "${T2}" "${T3}"; do mkdir -p "${_r}/.claude/validation/fixtures/meeting-graph" "${_r}/docs/meetings"
+    cp "${FIX}/transcript-ok.txt" "${_r}/.claude/validation/fixtures/meeting-graph/"; done
+  printf '# áreas do app (fictício)\ncadastro\npagamentos  # cobrança\n\n' > "${T2}/docs/meetings/meeting-areas.txt"
+  printf 'cadastro\nPagamentos Online\n' > "${T3}/docs/meetings/meeting-areas.txt"
+  _case "vocabulário do repo vale" OK "s=s.replace('x_area: tecnico','x_area: cadastro').replace('x_area: cadastro','x_area: pagamentos',1)" "${T2}"
+  _case "área do padrão fora do vocabulário do repo reprova" AREA-FORA-DO-VOCABULARIO "pass" "${T2}"
+  _case "vocabulário do repo malformado reprova" AREAS-INVALIDAS "s=s.replace('x_area: tecnico','x_area: cadastro')" "${T3}"
   # ── AUSÊNCIA DE AVISO: passa na forma como SOFT, nunca como conformidade, e não abre brecha ──
   _case "aviso de verdade com nao_avisado reprova" NAO-AVISADO-SEM-AUSENCIA "s=s.replace('x_notice_response: ciente','x_notice_response: nao_avisado',1)"
   BASE="${FIX}/meeting-notice-absent.kg.yaml"
@@ -399,6 +508,63 @@ if [ "${1:-}" = "--selftest" ]; then
   _case "recusa sem aviso ainda exige a parada" RECUSA-SEM-PARADA "s=s.replace('x_notice_response: nao_avisado','x_notice_response: recusou',1)"
   _case "aviso ausente com consentimento reprova" CONSENTIMENTO-LEGAL-DECLARADO "s=s.replace('    x_notice_response: nao_avisado\n','    x_notice_response: nao_avisado\n    x_consent_inferred: sim\n',1)"
   BASE="${FIX}/meeting-ok.kg.yaml"
+  # ── RESUMO × GRAFO (SAC-488): o que um tem e o outro não, reprova ──
+  _scase() {   # <nome> <motivo|OK> <python que muta o resumo em s>
+    local name="$1" want="$2" mut="$3" o r sm="${T}/resumo-extract.md"
+    [ -z "${ONLY}" ] || [ "${name}" = "${ONLY}" ] || return 0
+    python3 -I -B -c "import sys; s=open(sys.argv[1]).read(); ${mut}; open(sys.argv[2],'w').write(s)" "${FIX}/meeting-ok-extract.md" "${sm}"
+    [ "${want}" = "AUSENTE" ] && { rm -f "${sm}"; want=RESUMO-AUSENTE; }
+    o="$(MG_SUMMARY="${sm}" _check "${BASE}" "${CROOT_OR_T}" 2>/dev/null)"; r=$?
+    if { [ "${want}" = "OK" ] && [ "${r}" -eq 0 ]; } || { [ "${want}" != "OK" ] && [ "${r}" -eq 1 ] && grep -q "^${want}	" <<< "${o}"; }; then
+      echo "✅ ${name}"; P=$((P+1))
+    else echo "✗ ${name} (rc ${r}; esperado ${want}; saída: $(tr '\n' '|' <<< "${o}"))"; F=$((F+1)); fi
+  }
+  CROOT_OR_T="${T}"
+  _scase "resumo reconciliado passa" OK "pass"
+  _scase "decisão do grafo fora do resumo reprova" RESUMO-SEM-NO "s=s.replace(' \`D_RELATORIO_PDF_PLANILHA\`','',1)"
+  _scase "risco do grafo fora do resumo reprova" RESUMO-SEM-NO "s=s.replace(' \`R_LIB_PDF_SEM_MANUTENCAO\`','',1)"
+  _scase "decisão do resumo sem nó reprova" RESUMO-ITEM-SEM-NO "s=s.replace('### Ações','- ✅ Decisão que o grafo não tem.\n\n### Ações',1)"
+  _scase "linha da tabela de ações sem nó reprova" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Riscos','\n| Bruno Exemplo | Revisar o PDF | — | — |\n\n### Riscos',1)"
+  _scase "id do resumo que o grafo não tem reprova" RESUMO-NO-INEXISTENTE "s=s.replace('### Riscos','### Riscos\n- ⚠️ Outro risco. \`R_INVENTADO\`',1)"
+  _scase "fato na seção errada reprova" RESUMO-SECAO-ERRADA "s=s.replace(' \`R_LIB_PDF_SEM_MANUTENCAO\`','',1).replace('### Pendências','### Pendências',1).replace('o HTML fica de fora por enquanto. \`D_RELATORIO_PDF_PLANILHA\`','o HTML fica de fora por enquanto. \`D_RELATORIO_PDF_PLANILHA\` \`R_LIB_PDF_SEM_MANUTENCAO\`',1)"
+  _scase "pendência sem nó não é cobrada" OK "s=s.replace('### Timeline','- ⚠️ Outra pendência sem nó.\n\n### Timeline',1)"
+  _scase "item em bloco de código não conta" OK "s=s.replace('### Pendências','\`\`\`\n- exemplo sem nó\n\`\`\`\n\n### Pendências',1)"
+  _scase "resumo ausente reprova" AUSENTE "pass"
+  # ── BACKLOG POR ÁREA (SAC-480): projeção do grafo, só de grafos conformes, com carry-over ──
+  SELF="${HERE}/$(basename "${BASH_SOURCE[0]}")"
+  _mk() { python3 -I -B -c "import sys; s=open(sys.argv[1]).read(); ${2}; open(sys.argv[2],'w').write(s)" "${3:-${FIX}/meeting-ok.kg.yaml}" "${T}/$1"; }
+  PREV_MUT="s=s.replace('meeting-2026-10-16-relatorios','meeting-2026-10-09-relatorios').replace('x_meeting_date: \"2026-10-16\"','x_meeting_date: \"2026-10-09\"').replace('A_GERADOR_PLANILHA','A_REVISAR_MODELO').replace('Carla Modelo monta o gerador de planilha','Carla Modelo revisa o modelo do relatório').replace('x_area: tecnico','x_area: produto',1).replace('    status: open\n    impact: 3\n    confidence: 0.6','    status: done\n    verified_at: \"2026-10-12\"\n    verified_against: \"biblioteca trocada, registro fictício\"\n    impact: 3\n    confidence: 0.6',1)"
+  _bcase() {   # <nome> <rc> <trecho: no backlog (rc 0) ou na saída (rc≠0); FIRST:<título> = 1ª seção> <args...>
+    local name="$1" wrc="$2" pat="$3" out="${T}/backlog.md" o r ok=0; shift 3
+    [ -z "${ONLY}" ] || [ "${name}" = "${ONLY}" ] || return 0
+    rm -f "${out}"
+    o="$(cd "${T}" && bash "${SELF}" "$@" --backlog "${out}" --root "${T}" 2>&1)"; r=$?
+    if [ "${r}" -eq "${wrc}" ]; then
+      if [ "${wrc}" -eq 0 ]; then
+        if [ "${pat#FIRST:}" != "${pat}" ]; then [ -f "${out}" ] && [ "$(grep -m1 '^## ' "${out}")" = "## ${pat#FIRST:}" ] && ok=1
+        else [ -f "${out}" ] && grep -qF -- "${pat}" "${out}" && ok=1; fi
+      else [ ! -f "${out}" ] && grep -qF -- "${pat}" <<< "${o}" && ok=1; fi
+    fi
+    if [ "${ok}" -eq 1 ]; then echo "✅ ${name}"; P=$((P+1))
+    else echo "✗ ${name} (rc ${r}; esperado ${wrc} com ${pat}; saída: $(tr '\n' '|' <<< "${o}"); backlog: $(tr '\n' '|' < "${out}" 2>/dev/null))"; F=$((F+1)); fi
+  }
+  _mk cur.kg.yaml "pass"; _mk prev.kg.yaml "${PREV_MUT}"
+  _mk later.kg.yaml "${PREV_MUT}; s=s.replace('x_meeting_date: \"2026-10-09\"','x_meeting_date: \"2026-10-30\"')"
+  _mk prev-noarea.kg.yaml "${PREV_MUT}; s=s.replace('    x_area: produto\n','',1)"
+  _mk cur-unspec.kg.yaml "s=s.replace('x_area: tecnico','x_area: NAO_ESPECIFICADO',1)"
+  _mk cur-noarea.kg.yaml "s=s.replace('    x_area: tecnico\n','',1)"
+  _mk absent.kg.yaml "pass" "${FIX}/meeting-notice-absent.kg.yaml"
+  _bcase "backlog agrupa por área" 0 "## tecnico" cur.kg.yaml
+  _bcase "backlog marca o risco" 0 "- [ ] ⚠️ Risco: a biblioteca de PDF" cur.kg.yaml
+  _bcase "NAO_ESPECIFICADO vem primeiro no backlog" 0 "FIRST:NAO_ESPECIFICADO (a triar)" cur-unspec.kg.yaml
+  _bcase "carry-over traz o aberto da reunião anterior" 0 "Carla Modelo revisa o modelo do relatório até sexta, 2026-10-23. — dono: P_CARLA_MODELO — prazo: 2026-10-23 · \`A_REVISAR_MODELO\` · ↩ reunião de 2026-10-09" cur.kg.yaml --carry prev.kg.yaml
+  _bcase "carry-over: o fechado some e é contado" 0 "Itens abertos: 3 (2 desta reunião, 1 de reuniões anteriores). Fora da projeção por estarem fechados: 1." cur.kg.yaml --carry prev.kg.yaml
+  _bcase "carry-over de reunião posterior reprova" 1 "CARRY-FORA-DE-ORDEM" cur.kg.yaml --carry later.kg.yaml
+  _bcase "carry-over do próprio grafo reprova" 1 "CARRY-FORA-DE-ORDEM" cur.kg.yaml --carry cur.kg.yaml
+  _bcase "carry-over reprovado não grava o backlog" 1 "CARRY-REPROVADO" cur.kg.yaml --carry prev-noarea.kg.yaml
+  _bcase "backlog de grafo reprovado não grava" 1 "AREA-AUSENTE" cur-noarea.kg.yaml
+  _bcase "backlog de reunião sem aviso fica retido" 3 "backlog RETIDO" absent.kg.yaml
+  _bcase "carry-over sem aviso também retém" 3 "backlog RETIDO" cur.kg.yaml --carry absent.kg.yaml
   # O CONTRATO só julga onde o vendor existe (o core): o caso roda com a raiz do repo do checador, e fora dele
   # sai ⊘ declarado — nunca verde por vacuidade, nunca falha por ambiente.
   CROOT="$(git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -414,11 +580,15 @@ if [ "${1:-}" = "--selftest" ]; then
   [ "${F}" -eq 0 ]; exit $?
 fi
 
-G=""; ROOT=""; FOR_USE=0
+G=""; ROOT=""; FOR_USE=0; SUMMARY=""; BACKLOG=""; CARRY=()
 while [ $# -gt 0 ]; do
   case "$1" in
     --root) [ -n "${2:-}" ] || { echo "meeting-graph-check: --root exige um diretório" >&2; exit 2; }; ROOT="$2"; shift ;;
     --for-use) FOR_USE=1 ;;
+    --summary) [ -n "${2:-}" ] || { echo "meeting-graph-check: --summary exige o resumo (.md)" >&2; exit 2; }; SUMMARY="$2"; shift ;;
+    --backlog) [ -n "${2:-}" ] || { echo "meeting-graph-check: --backlog exige o arquivo de saída" >&2; exit 2; }; BACKLOG="$2"; shift ;;
+    --carry) [ -n "${2:-}" ] || { echo "meeting-graph-check: --carry exige um grafo anterior" >&2; exit 2; }
+             [ -f "$2" ] || { echo "meeting-graph-check: grafo anterior inexistente: $2" >&2; exit 2; }; CARRY+=("$2"); shift ;;
     --*) echo "meeting-graph-check: opção desconhecida: $1" >&2; exit 2 ;;
     *) [ -z "${G}" ] || { echo "meeting-graph-check: argumento a mais: $1" >&2; exit 2; }; G="$1" ;;
   esac
@@ -428,8 +598,74 @@ done
 [ -f "${G}" ] || { echo "meeting-graph-check: grafo inexistente: ${G}" >&2; exit 2; }
 if [ -z "${ROOT}" ]; then ROOT="$(git -C "$(dirname "${G}")" rev-parse --show-toplevel 2>/dev/null || pwd)"; fi
 [ -d "${ROOT}" ] || { echo "meeting-graph-check: raiz inexistente: ${ROOT}" >&2; exit 2; }
+[ "${#CARRY[@]}" -eq 0 ] || [ -n "${BACKLOG}" ] || { echo "meeting-graph-check: --carry só vale com --backlog" >&2; exit 2; }
+[ -z "${SUMMARY}" ] || SUMMARY="$(realpath -- "${SUMMARY}")"
 NOTICE_ABSENT=0
-_check "${G}" "${ROOT}"; rc=$?
+if [ -n "${BACKLOG}" ]; then
+  # A PROJEÇÃO só nasce de grafos conformes: o atual e cada anterior passam pelo mesmo gate, e o que reprova ou
+  # fica retido impede a escrita inteira (backlog parcial descartaria itens em silêncio).
+  D="$(TMPDIR="${TMPDIR:-/tmp}" mktemp -d)"; trap 'rm -rf "${D}"' EXIT
+  MG_SUMMARY="${SUMMARY}" MG_DUMP="${D}/0.json" _check "${G}" "${ROOT}"; rc=$?
+  absent="${NOTICE_ABSENT}"; k=0
+  for c in "${CARRY[@]}"; do
+    k=$((k+1)); NOTICE_ABSENT=0
+    cout="$(MG_SUMMARY="" MG_DUMP="${D}/${k}.json" _check "${c}" "${ROOT}" 2>/dev/null; echo "rc=$? absent=${NOTICE_ABSENT}")"
+    crc="$(sed -n 's/^rc=\([0-9]*\) absent=.*/\1/p' <<< "${cout}" | tail -1)"
+    grep -q "^rc=[0-9]* absent=1$" <<< "${cout}" && absent=1
+    if [ "${crc}" = "2" ]; then echo "meeting-graph-check: grafo anterior ${c} não pôde ser julgado" >&2; rc=2
+    elif [ "${crc}" != "0" ]; then
+      printf 'CARRY-REPROVADO\t-\t%s reprovou no gate: %s\n' "${c}" "$(grep -v '^SOFT:\|^rc=' <<< "${cout}" | cut -f1 | sort -u | tr '\n' ' ')"
+      [ "${rc}" -eq 2 ] || rc=1
+    fi
+  done
+  if [ "${rc}" -eq 0 ] && [ "${absent}" -eq 1 ]; then
+    echo "meeting-graph-check: backlog RETIDO: há reunião sem aviso entre os grafos; a projeção é uso e nada foi escrito em ${BACKLOG}" >&2; exit 3
+  fi
+  if [ "${rc}" -eq 0 ]; then
+    python3 -I -B - "${D}" "${k}" "${ROOT}" "${BACKLOG}" <<'PYB'
+import json, os, sys
+d, k, root, out = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]
+DONE = {"confirmed", "done", "superseded", "refuted"}   # a mesma régua do radar (trabalhoPendente)
+cur = json.load(open(os.path.join(d, "0.json"), encoding="utf-8"))
+prev = [json.load(open(os.path.join(d, f"{i}.json"), encoding="utf-8")) for i in range(1, k + 1)]
+rroot = os.path.realpath(root)
+rel = lambda p: os.path.relpath(os.path.realpath(p), rroot) if os.path.realpath(p).startswith(rroot + os.sep) else p
+bad, seen = [], {os.path.realpath(cur["graph"])}
+for p in prev:
+    rp = os.path.realpath(p["graph"])
+    if rp in seen: bad.append(f"CARRY-FORA-DE-ORDEM\t-\t{rel(p['graph'])} é o próprio grafo ou veio repetido")
+    elif p["date"] > cur["date"]: bad.append(f"CARRY-FORA-DE-ORDEM\t-\t{rel(p['graph'])} é de {p['date']}, depois da reunião ({cur['date']})")
+    seen.add(rp)
+if bad: print("\n".join(bad)); sys.exit(1)
+order = ["NAO_ESPECIFICADO"] + cur["areas"]
+groups, closed, n_cur, n_prev = {a: [] for a in order}, 0, 0, 0
+for src in [cur] + sorted(prev, key=lambda p: p["date"], reverse=True):
+    for it in src["items"]:
+        if it["status"] in DONE: closed += 1; continue
+        mark = "⚠️ " if it["role"] == "risk" else ""
+        line = f"- [ ] {mark}{it['label']} — dono: {it['owner'] or 'NAO_ESPECIFICADO'} — prazo: {it['due'] or '—'} · `{it['id']}`"
+        if src is not cur: line += f" · ↩ reunião de {src['date']} (`{rel(src['graph'])}`)"; n_prev += 1
+        else: n_cur += 1
+        groups.setdefault(it["area"], []).append(line)
+md = [f"# Backlog por área: {cur['id']} ({cur['date']})", "",
+      f"> Projeção do grafo `{rel(cur['graph'])}`" + (f" e de {len(prev)} reunião(ões) anterior(es)" if prev else "")
+      + ", gerada pelo `meeting-graph-check.sh --backlog`. Não edite à mão: o item fecha no grafo dele e some daqui na próxima geração.",
+      f"> Itens abertos: {n_cur + n_prev} ({n_cur} desta reunião, {n_prev} de reuniões anteriores). Fora da projeção por estarem fechados: {closed}.", ""]
+for a in order + [x for x in groups if x not in order]:
+    if not groups.get(a): continue
+    md += [f"## {a}" + (" (a triar)" if a == "NAO_ESPECIFICADO" else ""), ""] + groups[a] + [""]
+if n_cur + n_prev == 0: md += ["Nenhum item aberto.", ""]
+tmp = out + ".tmp"
+with open(tmp, "w", encoding="utf-8") as fh: fh.write("\n".join(md))
+os.replace(tmp, out)
+PYB
+    rc=$?
+    [ "${rc}" -eq 0 ] && echo "meeting-graph-check: ✅ backlog por área gravado em ${BACKLOG}" >&2
+  fi
+  [ "${rc}" -eq 0 ] || echo "meeting-graph-check: ✗ backlog NÃO gravado (rc ${rc})" >&2
+  exit "${rc}"
+fi
+MG_SUMMARY="${SUMMARY}" _check "${G}" "${ROOT}"; rc=$?
 case "${rc}" in
   0) if [ "${NOTICE_ABSENT}" -eq 1 ]; then
        echo "meeting-graph-check: ⚠️ ${G} NÃO HOUVE AVISO aos participantes: registro válido do fato (trace ao trecho, radar verde), risco de compliance aberto, uso retido por padrão" >&2

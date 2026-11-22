@@ -57979,7 +57979,7 @@ _family run_mcp_onion_kg_writer_selftests
 # GRAFO DE REUNIÃO — SAC-157 (passo zero do core, 2026-10-16). O /product:extract-meeting passou a gravar o
 # `.kg.yaml` da reunião, e o gate dele é o meeting-graph-check.sh: trace ao trecho da transcrição e o modelo
 # aviso ≠ consentimento (tentativa de aviso, resposta por participante, parada na recusa, nunca consentimento
-# legal). Casos: (a) o --selftest próprio (55 polaridades, o contrato julgado no core) · (b) a CLI sobre a fixture boa, como o comando a
+# legal). Casos: (a) o --selftest próprio (as polaridades, inclusive área, resumo × grafo e backlog por área da SAC-480/488; o contrato julgado no core) · (b) a CLI sobre a fixture boa, como o comando a
 # chama → rc 0 · (c) a CLI sobre a reunião SEM tentativa de aviso (o grafo que o próprio comando gerou no dogfood)
 # → rc 1 com esse motivo e só ele · (d) sem o radar
 # ao lado → rc 2, nunca verde · (m) UM MUTANTE POR CURA, na CÓPIA — mutante que não se aplica é FALHA.
@@ -58095,6 +58095,27 @@ stop_line > min(refusal_lines)$(printf '\x1f')stop_line > max(refusal_lines)$(pr
 by[i].get("_to", 0) > stop_line$(printf '\x1f')by[i].get("_from", 0) > stop_line$(printf '\x1f')faixa que atravessa a parada reprova
 by[i].get("_to", 0) > stop_line$(printf '\x1f')by[i].get("_to", 0) >= stop_line$(printf '\x1f')fato que termina na linha da parada passa
 if r != "meeting" and by[i]$(printf '\x1f')if r in FACTS and by[i]$(printf '\x1f')participante depois da parada reprova
+        if a is None: fail("AREA-AUSENTE"$(printf '\x1f')        if 0: fail("AREA-AUSENTE"$(printf '\x1f')ação sem área reprova
+AREA_ROLES = ("action", "risk")$(printf '\x1f')AREA_ROLES = ("action",)$(printf '\x1f')risco sem área reprova
+        elif a not in valid_areas:$(printf '\x1f')        elif 0:$(printf '\x1f')área fora do vocabulário reprova
+    if "x_area" in n and r not in AREA_ROLES:$(printf '\x1f')    if 0:$(printf '\x1f')área em nó de decisão reprova
+if os.path.isfile(af):$(printf '\x1f')if 0:$(printf '\x1f')área do padrão fora do vocabulário do repo reprova
+    if badt or not toks:$(printf '\x1f')    if 0:$(printf '\x1f')vocabulário do repo malformado reprova
+        for t in sorted(set(facts) - cited):$(printf '\x1f')        for t in []:$(printf '\x1f')decisão do grafo fora do resumo reprova
+            if is_item and not ids: items.append($(printf '\x1f')            if 0: items.append($(printf '\x1f')decisão do resumo sem nó reprova
+items.pop()   # cabeçalho da tabela$(printf '\x1f')pass   # cabeçalho da tabela$(printf '\x1f')resumo reconciliado passa
+if t in facts or re.fullmatch(r"[DAR]_[A-Z0-9_]+", t)]$(printf '\x1f')if t in facts]$(printf '\x1f')id do resumo que o grafo não tem reprova
+                if sec_kind and facts[t] != sec_kind:$(printf '\x1f')                if 0:$(printf '\x1f')fato na seção errada reprova
+            if fence: continue$(printf '\x1f')            if 0: continue$(printf '\x1f')item em bloco de código não conta
+    if not os.path.isfile(summary):$(printf '\x1f')    if 0:$(printf '\x1f')resumo ausente reprova
+        if it["status"] in DONE: closed += 1; continue$(printf '\x1f')        if 0: closed += 1; continue$(printf '\x1f')carry-over: o fechado some e é contado
+    elif p["date"] > cur["date"]:$(printf '\x1f')    elif 0:$(printf '\x1f')carry-over de reunião posterior reprova
+    if rp in seen:$(printf '\x1f')    if 0:$(printf '\x1f')carry-over do próprio grafo reprova
+    elif [ "\${crc}" != "0" ]; then$(printf '\x1f')    elif false; then$(printf '\x1f')carry-over reprovado não grava o backlog
+  if [ "\${rc}" -eq 0 ] && [ "\${absent}" -eq 1 ]; then$(printf '\x1f')  if false; then$(printf '\x1f')backlog de reunião sem aviso fica retido
+    grep -q "^rc=[0-9]* absent=1\$" <<< "\${cout}" && absent=1$(printf '\x1f')    true$(printf '\x1f')carry-over sem aviso também retém
+order = ["NAO_ESPECIFICADO"] + cur["areas"]$(printf '\x1f')order = cur["areas"] + ["NAO_ESPECIFICADO"]$(printf '\x1f')NAO_ESPECIFICADO vem primeiro no backlog
+mark = "⚠️ " if it["role"] == "risk" else ""$(printf '\x1f')mark = ""$(printf '\x1f')backlog marca o risco
 (nlines is None or int(m.group(1)) <= nlines)$(printf '\x1f')(True)$(printf '\x1f')parada além do fim do arquivo reprova
 if m and int(m.group(1)) >= 1 and$(printf '\x1f')if m and$(printf '\x1f')parada na linha 0 reprova
     if r is None: fail("PAPEL-AUSENTE", n["id"], "nó sem x_meeting_role num grafo de reunião"); continue$(printf '\x1f')    if r is None: continue$(printf '\x1f')nó sem papel reprova

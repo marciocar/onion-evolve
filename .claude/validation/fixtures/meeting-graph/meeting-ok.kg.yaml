@@ -122,6 +122,7 @@ nodes:
   - id: A_GERADOR_PLANILHA
     node_type: claim
     x_meeting_role: action
+    x_area: tecnico
     x_owner: P_CARLA_MODELO
     x_due: "2026-10-23"
     plane: DEV
@@ -134,6 +135,7 @@ nodes:
   - id: R_LIB_PDF_SEM_MANUTENCAO
     node_type: claim
     x_meeting_role: risk
+    x_area: tecnico
     plane: DEV
     status: open
     impact: 3
