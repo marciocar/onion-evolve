@@ -2,8 +2,7 @@
 branch: docs/a2a-roundtrip-measure
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: ef3c16c4417013c144d565fc0d5d1717593ab550c61bdb7baf6252726005bcf4
-reviewed_code_sha256: 21790210cb42c02a9b7f94bf5f37548c3c7d6db8aaa01c9d88b88b2fcbe3d896
+reviewed_diff_sha256: pendente
 findings_total: 9
 findings_real: 9
 findings_blocking: 4
@@ -31,8 +30,8 @@ O PR não muda motor, guarda nem hook.
 
 ## Achados
 
-1. **(média, bloqueava) O bridge citado como espelho não era o certo.** A cópia local 7e736ba é anterior à F3 e não tem o convite por membro. Contra o bridge atual, os vetos N2a e N2b sairiam no guard, com 401.
-   - **Cura:** o `bridge_sim.py` agora espelha o 5c1ba8d: guard de convite por membro, veredito estrito com exit 0 e eco do receptor. O convite é criado pelo `a2a-invite.sh` real, e o aceite roda com `--invites`.
+1. **(média, bloqueava) O bridge citado como espelho não era o certo.** A cópia local de 2026-08 é anterior à F3 e não tem o convite por membro. Contra o bridge atual, os vetos N2a e N2b sairiam no guard, com 401.
+   - **Cura:** o `bridge_sim.py` agora espelha a F3 (⟨commit⟩ de 2026-10-22, repo privado): guard de convite por membro, veredito estrito com exit 0 e eco do receptor. O convite é criado pelo `a2a-invite.sh` real, e o aceite roda com `--invites`.
    - Os negativos ficaram assim: N2a e N2b dão 401 no guard, e o gate é medido à parte como defesa em profundidade. Entrou um negativo novo, a N3d (convite revogado).
    - O que a simulação não espelha está declarado no cabeçalho do script e no nó.
 2. **(média, bloqueava) O motivo da N2b estava errado.** O veto vem da regra de papel ("standalone não tem canal lateral"), não da falta de aresta.
