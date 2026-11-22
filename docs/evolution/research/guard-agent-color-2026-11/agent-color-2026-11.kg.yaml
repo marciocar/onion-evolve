@@ -34,8 +34,8 @@ nodes:
     valid_from: "2026-11-22"
     verified_at: "2026-11-22"
     verified_against: "https://code.claude.com/docs/en/sub-agents (tabela de campos do frontmatter) e ⟨o binário instalado do Claude Code 2.1.330⟩"
-    label: "A paleta aceita hoje é de 8 valores: red, blue, green, yellow, purple, orange, pink, cyan. A doc diz 'Accepts red, blue, green, yellow, purple, orange, pink, or cyan'; o binário 2.1.330 tem as mesmas 8 chaves no objeto minificado de cores de subagente e testa a cor com sT.includes(e), comparação exata."
-    narrative: "a comparação exata quer dizer que 'Blue' não pinta, por isso a guarda compara sem normalizar caixa. Valor fora da lista é ignorado em silêncio: o agente fica sem cor e nada avisa. A doc também diz que color não é aceito no --agents JSON."
+    label: "A paleta aceita hoje é de 8 valores: red, blue, green, yellow, purple, orange, pink, cyan. A doc oficial e o binário 2.1.330 dizem o mesmo, e o binário compara exato (sT.includes(e))."
+    narrative: "a doc diz 'Accepts red, blue, green, yellow, purple, orange, pink, or cyan'; o binário tem as mesmas 8 chaves no objeto minificado de cores de subagente. A comparação exata quer dizer que 'Blue' não pinta, por isso a guarda compara sem normalizar caixa. Valor fora da lista é ignorado em silêncio: o agente fica sem cor e nada avisa. A doc também diz que color não é aceito no --agents JSON."
     provenance:
       source: "https://code.claude.com/docs/en/sub-agents"
       locator: "linha color da tabela de campos do frontmatter; no binário, var V0={red:…,cyan:…},sT=Object.keys(V0);function UW(e){return e!==void 0&&sT.includes(e)}"
