@@ -2,7 +2,8 @@
 branch: chore/vendor-company-brain-0.1.0
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 35aa84d64ae6bf915aaad91798f017e8abff0db881eae3dcf7194cb4b53aef26
+reviewed_code_sha256: 6c547a860923a525299454a92ec730aa4459a670588b4f6d47f11367dcb799a7
 findings_total: 8
 findings_real: 8
 findings_blocking: 1
