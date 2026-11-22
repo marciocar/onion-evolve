@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:63bbcae1bdf1599c -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:118ebc1dad04810e -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ Rode isto na raiz do seu repositório, com Python 3.12 ou mais (o piso desde a 4
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.56.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.56.1 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -57,8 +57,12 @@ em si é:
 
 Consertar um grafo não compensa quebrar outro: o gate compara o MUST grafo a grafo.
 
-O gate mede só arquivos `.kg.yaml`. Um `.kg.json` no repositório fica fora dele. Se você quer o CI cobrando esses
-arquivos, rode `kg_validate.py` neles num passo próprio.
+O gate mede os arquivos `.kg.yaml` e `.kg.json` do mesmo jeito: o `.kg.json` rastreado é lido no perfil JSON do
+contrato e passa pela mesma linha de base, pelo mesmo `--touched` e pelas mesmas conferências opcionais. Até a 4.56.0
+o gate media só o `.kg.yaml`; se você atualiza a partir dali com um `.kg.json` já rastreado, a primeira rodada o
+mostra como grafo novo. Se ele passa no MUST e não traz dívida SHOULD, o gate passa e o `--update` o registra. Se ele
+sobe a dívida, grave a base com o motivo, `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression
+"<motivo>"`; se ele reprova no MUST, conserte, ou aceite como dívida herdada do mesmo jeito.
 
 ## A língua da saída no CI
 

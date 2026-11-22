@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/kg-inbox/_rejected/grana-ai-mapeamento-2026-08-20260821-215957.proposal.kg.yaml",
+  "id": "grana-ai-mapeamento-2026-08",
+  "must": [
+    "form.required.node.provenance"
+  ],
+  "should": {}
+}

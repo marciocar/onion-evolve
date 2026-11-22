@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:8afe8cc80489770f -->
+<!-- translation-of: docs/manual/04-contract.md sha256:d2cb43842632d6f0 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -172,7 +172,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
 | 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
 | 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
-| 4.56 | Contrato v4.26, só SHOULD: a finalidade do tratamento `x_processing_purpose` no `meta`, um ponteiro para vocabulário com versão fixada (`ref`, `scheme`, `release`, `label`), julgada só pela forma; `form.misplaced.node.x_processing_purpose` no nó; e o `kg_migrate.py format --to json`, que passa o grafo a `.kg.json` e reescreve os caminhos de quem o cita |
+| 4.56 | Contrato v4.26, só SHOULD: a finalidade do tratamento `x_processing_purpose` no `meta`, um ponteiro para vocabulário com versão fixada (`ref`, `scheme`, `release`, `label`), julgada só pela forma; `form.misplaced.node.x_processing_purpose` no nó; e o `kg_migrate.py format --to json`, que passa o grafo a `.kg.json` e reescreve os caminhos de quem o cita; na 4.56.1, o gate mede os grafos `.kg.json` rastreados |
 | 4.55 | Contrato v4.25, só SHOULD: o ritual do agente `x_ritual` num nó `rule` ou `policy`, julgado só pela forma, com a RRULE da RFC 5545 num subconjunto estrito, o `dtstart` na forma básica e a forma do nome de fuso da IANA; `form.misplaced.node.x_ritual` em outro tipo de nó |
 | 4.54 | Contrato v4.24, só SHOULD: a trilha de rebaixamento `x_downgrade` no `meta`, julgada só pela forma, com `form.misplaced.node.x_downgrade` no nó; o `kg_gate.py --classification-downgrade` reprova a queda do nível frente à base (`--touched`, ou `--base REF`) sem o registro, ou aprovada por um autor da mudança de nível |
 | 4.52 | Contrato v4.23, só SHOULD: o prazo de expurgo no `meta` (`x_dispose_by`, `x_dispose_basis`, `x_hold`), julgado só pela forma, com `form.misplaced.node.<chave>` no nó; o `kg_validate.py --due` lista o expurgo vencido, o suspenso e o conflito com o `retain_for`; o `kg_gate.py --classification-floor NÍVEL --area-policy ARQ` reprova o grafo no nível ou acima, pela ordem dos `levels` da política; a regra do subagente no `provenance.method` |

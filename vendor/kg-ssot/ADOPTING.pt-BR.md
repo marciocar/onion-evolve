@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:d926ac87bcf7a9de -->
+<!-- translation-of: ADOPTING.md sha256:172b3320964932ee -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -440,6 +440,14 @@ grafos que o citam, com o gate antes e depois em todo arquivo tocado (manual, ca
 novo, e o perfil `gate` segue com 21 arquivos. A release inteira acrescenta os 42 casos de conformidade de
 `spec/conformance/fixtures/latest/form/purpose/` (a suíte passa de 745 para 787), e os links do README e do manual em
 português do Brasil que a cópia vendorizada não resolvia estão corrigidos.
+
+Da `kg-ssot-v4.56.0` para a `kg-ssot-v4.56.1`, o contrato não muda. O gate passa a medir os grafos `.kg.json` rastreados
+como mede os `.kg.yaml`, em todos os modos. Um repositório sem `.kg.json` não vê nada novo. Um que rastreia `.kg.json`
+fora de fixtures, do vendor e de `docs/materials` vê grafos novos na primeira rodada: os que passam no MUST sem dívida
+SHOULD entram com `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update`; um que sobe a dívida ou reprova no MUST,
+conserte ou registre,
+`python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "os grafos .kg.json entraram no gate: dívida
+que já existia"`. Para deixar um arquivo de fora de propósito, use `--exclude GLOB`.
 
 Da `kg-ssot-v4.54.0` para a `kg-ssot-v4.55.0`, entra o contrato v4.25, só SHOULD: nenhum grafo que passava reprova, e
 nenhum veredito MUST muda. O perfil canônico novo é o `x_ritual`, o ritual do agente, num nó `rule` ou `policy`, com o
@@ -1036,7 +1044,9 @@ contrato: RFC 8259 com um BOM inicial aceito, I-JSON (RFC 7493, sem surrogate so
 `kg_validate.py`, `kg_conformance.py`, `kg_store.py` e `kg_mcp.py` leem os dois formatos pela extensão (sensível a
 maiúsculas: `.kg.json`). **O gate continua só com `.kg.yaml`**: um `.kg.json` commitado no repositório não é medido
 pelo `kg_gate.py`. Desde a 4.14.0 (contrato v4.7), as `external_edges` apontam também para `.kg.json`, e o gate os lê
-como alvo. Quem guarda `.kg.json` no repo e quer o CI cobrando roda `kg_validate.py` neles num passo próprio.
+como alvo. Quem guarda `.kg.json` no repo e quer o CI cobrando roda `kg_validate.py` neles num passo próprio. (Isso
+valeu até a 4.56.0. Depois dela, o gate mede o `.kg.json` rastreado como o `.kg.yaml`, em todos os modos; o changelog
+diz o que a primeira rodada depois do update mostra.)
 
 ## 5. Do v3 para o v4
 

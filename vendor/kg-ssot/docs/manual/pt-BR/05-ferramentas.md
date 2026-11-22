@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:89550e09effc035a -->
+<!-- translation-of: docs/manual/05-tools.md sha256:ac6f8cf9f21184a8 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -262,9 +262,12 @@ de manifesto, pasta desconhecida.
 
 ## `kg_gate.py`: a catraca por grafo
 
-O gate é para o CI de um repositório que guarda grafos. Ele mede todos os `.kg.yaml` **que o git rastreia** e
-compara o resultado com uma linha de base (a pasta `.kg-ssot/gate/`). A regra: **nada piora**. Um grafo que já
-reprovava fica registrado como dívida herdada; um grafo novo tem de passar.
+O gate é para o CI de um repositório que guarda grafos. Ele mede todos os `.kg.yaml` e `.kg.json` **que o git
+rastreia** e compara o resultado com uma linha de base (a pasta `.kg-ssot/gate/`). A regra: **nada piora**. Um grafo
+que já reprovava fica registrado como dívida herdada; um grafo novo tem de passar. O `.kg.json` é lido pelo mesmo
+leitor do `kg_validate.py`, no perfil JSON do contrato, e vai a todo lugar aonde o `.kg.yaml` vai: o corpus e os
+excludes dele, a linha de base, o `--touched`, a saída e as conferências opcionais. Até a 4.56.0 o gate media só o
+`.kg.yaml`, e um grafo novo em `.kg.json` entrava sem gate nenhum ver.
 
 Sem base, o gate se recusa a rodar:
 
@@ -320,7 +323,7 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 | `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*`, `docs/materials/*` e o vendor do KG-SSOT (qualquer pasta com o carimbo `.kg-ssot-version`, desde a 4.19.1) já saem por padrão; o `--no-default-excludes` os traz de volta |
 | `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
 | `--touched BASE` | Desde a 4.47, outro modo, sem linha de base: reprova só se um nó tocado desde o ancestral comum de `BASE` e `HEAD` carrega `integrity.bare-decision` ou `integrity.superseded-without-successor`. O carimbo de frescor (`verified_at`, `verified_against`) e, desde a 4.50, a classe de `provenance.method` trocada entre um apelido em português e a sua classe canônica em inglês com o detalhe depois de `: ` igual byte a byte (a troca do `kg_migrate.py methods`) não tocam o nó; qualquer outra mudança toca, inclusive no method. O `--touched` não olha o MUST; com dois nós de mesmo id, que o MUST já reprova, vale o último |
-| `--sources` | Desligado por padrão. Confere também cada fonte citada dos grafos medidos, como o `kg_trace.py check --strict-sources`: o `sha256` ou `node_sha256` que não confere, o locator lido pelo `scheme` que não acha o trecho, ou o arquivo citado que sumiu do git reprova (rc 1). Com `--touched`, só os grafos alterados e os nós cuja fonte citada mudou. Só o arquivo rastreado é lido, pelo blob do índice (a edição local conta depois do `git add`); a fonte fora do índice é ausente, e o submódulo não baixado, o segmento `.git`, `.` ou `..` e a URL contam como não conferidos. O `.kg.json` não é conferido aqui. Não combina com `--update` |
+| `--sources` | Desligado por padrão. Confere também cada fonte citada dos grafos medidos, como o `kg_trace.py check --strict-sources`: o `sha256` ou `node_sha256` que não confere, o locator lido pelo `scheme` que não acha o trecho, ou o arquivo citado que sumiu do git reprova (rc 1). Com `--touched`, só os grafos alterados e os nós cuja fonte citada mudou. Só o arquivo rastreado é lido, pelo blob do índice (a edição local conta depois do `git add`); a fonte fora do índice é ausente, e o submódulo não baixado, o segmento `.git`, `.` ou `..` e a URL contam como não conferidos. As fontes de um `.kg.json` também são conferidas, desde a 4.56.1. Não combina com `--update` |
 | `--private-repos ARQ` | Desde a 4.51. Desligado por padrão. Reprova (rc 1) o repositório privado citado sem o marcador `private-cite:<id>` (contrato v4.22); veja *O repositório privado citado sem o marcador* abaixo. Não combina com `--update` |
 | `--classification-floor NÍVEL --area-policy ARQ` | Desde a 4.52. Desligado por padrão. Reprova (rc 1) o `.kg.yaml` ou `.kg.json` rastreado (com `--touched`, o alterado; os excludes padrão não valem, só o `--exclude`) cujo `meta.x_classification` está em `NÍVEL` ou acima, pela ordem dos `levels` da política (contrato v4.23); veja *O piso de classificação* abaixo. Não combina com `--update` |
 | `--classification-cites --area-policy ARQ` | Desde a 4.54.0. Desligado por padrão, com ou sem o piso. Reprova (rc 1) o grafo que cita, num campo estruturado, um grafo rastreado de nível maior que o dele, pela ordem dos `levels` da política; veja *Citação entre níveis* abaixo. Não combina com `--update` |
@@ -361,8 +364,8 @@ ferramenta que a porte:
    de padrões é privado, e o que casou com ele também. A chave, o id de nó ou o caminho do grafo que contém um padrão sai
    mascarado (`<key #i>`, a posição no caminho do campo; `<node #i>`, o índice do nó; `<graph #i>`), porque ao lado do
    número da linha ligaria a linha ao nome. Uma linha de resumo conta padrões, grafos e campos.
-5. **O que não lê.** Só os grafos que o gate mede: nunca um `.kg.json`, nem, por padrão, as fixtures, `docs/materials/`
-   e o vendor, nem o que o `--exclude` tira.
+5. **O que não lê.** Lê só os grafos que o gate mede, o `.kg.yaml` e o `.kg.json` (o `.kg.json` desde a release
+   4.56.1): nunca, por padrão, as fixtures, `docs/materials/` e o vendor, nem o que o `--exclude` tira.
 
 Desligado por padrão, nada muda sem ele. Vale nos dois modos: na catraca e no `--touched` (onde lê todos os grafos
 medidos, não só os tocados). Não combina com `--update`: a conferência não faz parte da linha de base.

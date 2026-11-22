@@ -8,6 +8,32 @@ com as releases marcadas como `kg-ssot-vX.Y.Z`. A versão do contrato (`v4.N`) �
 Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As releases anteriores à 4.16.0 estão no
 [ADOPTING.pt-BR.md](ADOPTING.pt-BR.md).
 
+## [4.56.1] - 2026-11-22
+
+O contrato não muda: o gate passa a medir os grafos `.kg.json` que antes pulava.
+
+- **O `kg_gate.py` mede o `.kg.json` rastreado como o `.kg.yaml`** (um relato de campo na 4.56.0). Até a 4.56.0 o
+  gate, com a linha de base e com `--touched`, dava rc 0 sem nunca ler um `.kg.json`: a base não pedia o registro dele
+  e a saída não o listava, enquanto o `kg_validate.py` media o mesmo arquivo. Um grafo novo em `.kg.json` entrava sem
+  gate nenhum ver, e o `kg_migrate.py format --to json` (4.56.0) incentiva o formato. Agora o `.kg.json` é lido pelo
+  leitor do `kg_validate.py` no perfil JSON do contrato e vai a todo lugar aonde o `.kg.yaml` vai: o corpus com os
+  mesmos excludes padrão (`*/fixtures/*`, `docs/materials/*`, o vendor) e o `--exclude`, a linha de base (o `--update`
+  grava o registro dele; o novo sem registro é julgado como o `.kg.yaml` novo), o `--granularity node`, o `--touched`
+  (o `.kg.json` alterado é comparado nó a nó, e a base dele também é lida no perfil JSON), a saída, o `--sources`, o
+  `--private-repos` e o `--rituals-overdue`. A ponta externa de uma `external_edges` num `.kg.json` agora também é
+  conferida pelo gate (`integrity.dangling-external`). As conferências de classificação já liam os dois formatos. O
+  `.kg.json` rastreado que não é UTF-8 é entrada quebrada (rc 2), como o `.kg.yaml` ilegível já era.
+- **Se você já rastreia `.kg.json`, a catraca vê grafos novos na primeira rodada depois do update.** O que passa no
+  MUST e não traz dívida SHOULD passa, e o `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update` o registra. O que
+  sobe a dívida SHOULD ou reprova no MUST reprova a rodada: conserte, ou registre como dívida herdada com o motivo,
+  `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "os grafos .kg.json entraram no gate:
+  dívida que já existia"`. Para deixar um arquivo de fora de propósito, use `--exclude GLOB`. O repositório sem
+  `.kg.json` não vê nada novo.
+- "Não dá para usar `external_edges` no perfil JSON" (o mesmo relato): dá. O contrato as aceita num `.kg.json`,
+  apontando para um `.kg.yaml` ou para um `.kg.json` (o caso da suíte
+  `latest/integrity/external-corpus/valid-corpus-json-to-json.kg.json`), e o `kg_validate.py --corpus <raiz>` confere
+  a ponta. O que faltava era o gate medir o `.kg.json` que aponta.
+
 ## [4.56.0] - 2026-11-21
 
 Contrato v4.26, só SHOULD: nada que passava reprova, e nenhum veredito MUST muda.

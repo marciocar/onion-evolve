@@ -1,0 +1,10 @@
+{
+  "graph": "docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml",
+  "id": "gap-web-search-capability-20260821-215136",
+  "must": [
+    "form.required.node.provenance"
+  ],
+  "should": {
+    "integrity.untraced-decision": 1
+  }
+}

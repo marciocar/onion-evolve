@@ -439,6 +439,14 @@ vendor brings no new file, and the `gate` profile keeps its 21 files. The full r
 `spec/conformance/fixtures/latest/form/purpose/` (the suite goes from 745 to 787), and the links of the README and of the
 Brazilian Portuguese manual that a vendored copy could not resolve are fixed.
 
+From `kg-ssot-v4.56.0` to `kg-ssot-v4.56.1`, the contract does not change. The gate now measures the tracked `.kg.json`
+graphs as it measures the `.kg.yaml` ones, in every mode. A repository without `.kg.json` sees nothing new. One that
+tracks `.kg.json` outside fixtures, the vendor and `docs/materials` sees new graphs on the first run: those that pass
+MUST without SHOULD debt are recorded by `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update`; for one that raises
+the debt or fails MUST, fix it or record it,
+`python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "the .kg.json graphs entered the gate: debt
+that already existed"`. To keep a file out on purpose, use `--exclude GLOB`.
+
 From `kg-ssot-v4.54.0` to `kg-ssot-v4.55.0`, contract v4.25 comes in, SHOULD only: no graph that passed fails, and no MUST
 verdict changes. The new canonical profile is `x_ritual`, the agent ritual, on a `rule` or `policy` node, with its
 calendar (an RFC 5545 RRULE in a strict subset, `dtstart`, and an IANA time zone), judged only by its form (manual,
@@ -1042,7 +1050,8 @@ most 128 nested collections, and unique keys. In `.kg.json`, these points fail (
 **The gate still measures only `.kg.yaml`**: a `.kg.json` committed to the repository is not measured by
 `kg_gate.py`. Since 4.14.0 (contract v4.7), `external_edges` can also point to `.kg.json`, and the gate reads those as
 targets. If you keep `.kg.json` in the repository and want CI to enforce it, run `kg_validate.py` on them in a step of
-its own.
+its own. (This held up to 4.56.0. After it, the gate measures a tracked `.kg.json` like a `.kg.yaml`, in every mode;
+the changelog says what the first run after the update shows.)
 
 ## 5. From v3 to v4
 
