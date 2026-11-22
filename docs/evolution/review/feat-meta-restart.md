@@ -2,8 +2,7 @@
 branch: feat/meta-restart
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 3611263649075a104b9428f903ac0c942b4a2cba33b7799f9605d3cb3113a706
-reviewed_code_sha256: 2eb4f73bd5cf8e4abf1967af657ec0d0eb4e1930fec60889a90322e5721fe345
+reviewed_diff_sha256: pendente
 findings_total: 22
 findings_real: 22
 findings_blocking: 7
@@ -74,7 +73,8 @@ O pre-commit completo reprovou em três casos, nenhum de lógica do restart: `ro
 comando novo dentro de `.claude/validation/` e da sonda, num conjunto que ainda não viaja: reescritos sem a citação),
 `shell-pipefail` (dois `ls | grep -q` da bancada nova viraram here-string) e `cited-directive (f)` (deriva do binário
 2.1.330 do Claude Code, alheia a este diff, tratada pela rodada do `/meta:cc-update`). Nada do comportamento revisado
-mudou, por isso o carimbo foi refeito sem nova passada.
+mudou, por isso o carimbo foi refeito sem nova passada. O mesmo vale para o rebase sobre a origin/main de
+2026-11-21, que só trouxe código de outros PRs para a base e um conflito de contagem (knowledge bases 117 → 118).
 
 ## Limites declarados
 
