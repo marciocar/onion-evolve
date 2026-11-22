@@ -2,7 +2,7 @@
 branch: fix/kg-radar-json
 pr: 1734
 date: 2026-11-22
-reviewed_diff_sha256: 55b83478b2997945cff4634b3d447e0d9530fcf6766c60682503a65c1ff8d528
+reviewed_diff_sha256: 48ef140f9fc8c58980f04a566ed8d524cc42e9007a1c88387e6c57b2e5f3582f
 reviewed_code_sha256: 883e04916e12bb95cd6ae1d546612ba65315ebd668f0a3ea297eb7d2f5e26f67
 findings_total: 9
 findings_real: 8
