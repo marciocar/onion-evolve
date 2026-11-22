@@ -42,6 +42,12 @@ Resolva **nesta ordem** e use o primeiro que existir:
 5. **Degradação honesta**: sem arquivo aprovado, a persona **não fala** (o warm-up para). Nunca invente
    regra, papel ou dono.
 
+**Gerar o contexto a partir das fontes reais (desde 2026-11-22):** `/docs:build-company-brain-docs`, que usa
+este resolvedor e o motor do produto Onion Company Brain vendorizado por tag em `vendor/company-brain/`
+(esquema `onion/voice-conduct/v2`, validador com `--if-present`, template e conformidade; carimbo em
+`vendor/company-brain/.company-brain-version`, conferido por `.claude/validation/company-brain-vendor-check.py`).
+O validador v1 da seção 3 segue sendo o do warm-up até a migração; ele recusa a v2.
+
 ## 2. SSOT mínimo
 
 ```

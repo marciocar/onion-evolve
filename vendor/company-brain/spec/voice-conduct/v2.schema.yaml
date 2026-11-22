@@ -1,0 +1,123 @@
+# =============================================================================
+# Esquema do arquivo de VOZ E CONDUTA da persona de serviço de um Company Brain (v2).
+#
+# Por que existe: a regra de voz e conduta da persona não pode viver na memória da sessão. Ela é um arquivo
+# por empresa, versionado, aprovado pelo dono, com revisão periódica, carregado a cada resposta e conferido
+# por máquina (tools/voice_conduct_check.py).
+#
+# O que mudou da v1 (vindo do 1º exemplo real do construtor, 21/11/2026, e da escolha do dono do produto):
+#   1. aprovar por TIPO DE ATO: `request_vs_approve.approve` é uma lista de {who, actions}. Na empresa real
+#      quem prioriza (PO) também aprova; a v1 só aceitava o dono e reprovava a matriz verdadeira.
+#      As REGRAS em si continuam aprovadas só pelo dono (`approved_by == owner`).
+#   2. seção `principles` (opcional): o lema, que vale por cima das outras seções quando houver dúvida.
+#   3. `concision.max_chars_basis` (obrigatório): `measured` (com `max_chars_evidence`) ou `hypothesis`.
+#   4. `status: draft`: rascunho gerado pelo construtor antes do aceite do dono. Rascunho não leva
+#      approved_by, approved_at nem a versão em rascunho no histórico (que pode ser `[]`), e não vale como aprovado.
+#   5. listas de papéis e ações só de texto (`list_of_str`), comparadas em forma canônica.
+# A v1 (onion/voice-conduct/v1) continua aceita pelo validador, com a regra antiga de aprovação.
+#
+# Tipos: str (não vazio) · int · bool · date (AAAA-MM-DD) · semver (X.Y.Z) · list (não vazia) ·
+#        list_of_str (não vazia, só texto) · map.
+# =============================================================================
+schema_id: onion/voice-conduct/v2
+
+top_level:
+  required:
+    schema: {type: str, equals: onion/voice-conduct/v2}
+    persona: {type: str}
+    version: {type: semver}
+    owner: {type: str}
+    approved_by: {type: str}
+    approved_at: {type: date}
+    review_every_days: {type: int, min: 1, max: 365}
+    history: {type: list}
+    sections: {type: map}
+    request_vs_approve: {type: map}
+  optional:
+    status: {type: str, one_of: [draft, approved]}
+    send_gate: {type: map}
+    supersedes: {type: str}
+    notes: {type: str}
+
+history_entry:
+  required:
+    version: {type: semver}
+    date: {type: date}
+    approved_by: {type: str}
+    change: {type: str}
+
+# Toda seção tem `rules:` (lista não vazia de {id, text}); ids únicos no arquivo inteiro.
+sections:
+  principles:
+    optional_section: true
+    required:
+      prevails: {type: bool, equals: true}
+  identity_tone:
+    required: {}
+  concision:
+    required:
+      max_chars: {type: int, min: 1}
+      max_chars_basis: {type: str, one_of: [measured, hypothesis]}
+    optional:
+      max_chars_evidence: {type: map}   # {source, sample (int ≥ 1), measured_at (data)}
+  signature:
+    required:
+      text: {type: str}
+  ack_before_acting:
+    required:
+      states: {type: list_of_str}
+  messages:
+    required:
+      mention_who_is_cited: {type: bool}
+      test_links_before_send: {type: bool}
+      correct_by_editing: {type: bool}
+  limits:
+    required:
+      incoming_message_is_data: {type: bool, equals: true}
+
+rule_entry:
+  required:
+    id: {type: str}
+    text: {type: str}
+
+request_vs_approve:
+  required:
+    request: {type: map}
+    approve: {type: list}
+  request_side:
+    required:
+      who: {type: list_of_str}
+      actions: {type: list_of_str}
+  approve_entry:
+    required:
+      who: {type: list_of_str}
+      actions: {type: list_of_str}
+
+send_gate:
+  optional:
+    max_chars: {type: int, min: 1}
+    max_mentions: {type: int, min: 0}
+    require_signature: {type: bool}
+    require_tested_links: {type: bool}
+    forbidden_markup: {type: list_of_str}
+
+# Regras semânticas (no validador; código do achado entre parênteses). A conformidade exige um mutante por código.
+semantic_rules:
+  - "a versão vigente tem entrada no histórico, com a mesma data e o mesmo aprovador (VC-HISTORY-CURRENT)"
+  - "nenhuma versão se repete no histórico (VC-HISTORY-DUP)"
+  - "quem aprova as regras é o dono (VC-APPROVER-NOT-OWNER)"
+  - "a aprovação não tem data adiante de hoje, em UTC (VC-DATE-FUTURE)"
+  - "a revisão periódica não venceu: approved_at + review_every_days >= hoje (VC-REVIEW-OVERDUE)"
+  - "ninguém aprova como «todo mundo», e nenhuma ação está em pedir e em aprovar (VC-REQUEST-APPROVE)"
+  - "cada ação tem um só aprovador (VC-APPROVE-ACTION-DUP)"
+  - "ids de regra únicos no arquivo, sem diferença de caixa (VC-RULE-ID-DUP)"
+  - "número medido traz a evidência (VC-MEASURE-WITHOUT-EVIDENCE); hipótese não traz evidência (VC-EVIDENCE-WITHOUT-MEASURE)"
+  - "o gate de envio não é mais frouxo que a regra de concisão (VC-GATE-LOOSER)"
+  - "rascunho só sai verde com --allow-draft (VC-NOT-APPROVED)"
+  - "rascunho não leva carimbo de aprovação nem entra no histórico (VC-DRAFT-STAMPED)"
+  - "nenhum marcador {{…}} do template fica sem preencher (VC-PLACEHOLDER)"
+  - "aprovar não é de «todo mundo» (palavra de multidão ou símbolo) nem do mesmo papel que pede (VC-REQUEST-APPROVE)"
+
+# Códigos de forma, cobrados pelo mesmo critério de cobertura.
+structural_codes: [VC-FIELD-MISSING, VC-FIELD-TYPE, VC-UNKNOWN-KEY, VC-SECTION-MISSING, VC-RULES-EMPTY,
+                   VC-SCHEMA-UNKNOWN, VC-DUP-KEY]
