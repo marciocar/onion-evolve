@@ -2,7 +2,8 @@
 branch: fix/preflight-selects-fixtures
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0bc59a3866f3c8fe86bca33d77203751ee55ab3c3a8cf9cc3579719e14ecd1aa
+reviewed_code_sha256: e714365f072cb6db27cededfdb4b147c37e9267c47e6628e16f73227a484d1e9
 findings_total: 11
 findings_real: 9
 findings_blocking: 6
