@@ -42,7 +42,8 @@
 #     seguinte recusava "o código mudou depois da revisão", e a limpeza era à mão (3 vezes num dia).
 #   · exit 0 só com: lint em "Violações HARD : 0" literal (rc lido) julgado sobre o COMMIT (worktree destacada
 #     do HEAD, com o env do CI — o mesmo que o pre-push e o runner veem), resíduo ✅, painel estável.
-#     Qualquer outra coisa = exit 1, nada enviado (commits locais já feitos FICAM, e a mensagem diz).
+#     Qualquer outra coisa = exit 1, nada enviado (commits locais já feitos FICAM, e a mensagem diz). Única
+#     exceção: o lease de carga estourou o teto antes do pré-voo = exit 75 (EX_TEMPFAIL, ADIADO, rode de novo).
 #   · NÃO LAVA RESÍDUO (bloqueador B1 do Elenxo, 2026-10-05): a 1ª versão recarimbava o hash de um resíduo
 #     caduco mesmo quando o CÓDIGO tinha mudado depois da revisão — código não revisado saía com carimbo de
 #     revisado. Agora o resíduo guarda também `reviewed_code_sha256` (o diff SEM as projeções geradas), e o
@@ -384,7 +385,14 @@ if [ -r ops/load-lease.sh ]; then
   # fechamentos com pré-voo, mais agentes com bancada e mutantes, rodaram juntos (load 16–19). A cura
   # improvisada foi um `flock` à mão em volta do pr-finalize; agora é a mesma vaga da bancada e dos mutantes.
   load_lease_acquire || _ll_rc=$?
-  [ "${_ll_rc}" = 0 ] || die "carga: a máquina não liberou a rodada (load-lease rc=${_ll_rc}; 4 = teto estourado, 2 = não mediu) — nada rodou; veja bash ops/load-lease.sh status"
+  # rc 75 (EX_TEMPFAIL) = ADIADO PELA CARGA, contrato com quem chama (o pr-merge-verified, 2026-11-22): com o rc 1 de
+  # sempre, o auto-rebase lia o teto do lease como "conflito de FONTE". O rc 2 (não mediu) segue rc 1: não é adiamento.
+  if [ "${_ll_rc}" = 4 ]; then
+    _ll_kept=""; [ "${REBASE}" = 1 ] && _ll_kept="; o rebase local já feito FICA na worktree, sem envio"
+    echo "PR-FINALIZE: carga: a máquina não liberou a rodada (load-lease rc=4, teto estourado) — ADIADO, nada enviado nem pré-voo/lint${_ll_kept}; rode de novo (bash ops/load-lease.sh status)" >&2
+    exit 75
+  fi
+  [ "${_ll_rc}" = 0 ] || die "carga: a máquina não liberou a rodada (load-lease rc=${_ll_rc}; 2 = não mediu) — nada rodou; veja bash ops/load-lease.sh status"
   [ -n "${ONION_LOAD_LEASE_HELD:-}" ] || export ONION_LOAD_LEASE_HELD=pr-finalize
 fi
 _step "0 pré-voo"

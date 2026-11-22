@@ -82,6 +82,9 @@
 #           regenera as projeções na árvore combinada e as commita no head), com o MESMO teto de tentativas,
 #           e o head novo espera o CI salvo a condição (8). Ilegível ⇒ não mergeio (fail-closed). Com
 #           --merge-commit, PR atrás é RECUSADO: o rebase linearizaria o merge que é o conteúdo.
+#   ADIADO PELA CARGA (2026-11-22): o pr-finalize do auto-rebase recusado pelo lease de carga (rc 75, ou o motor
+#           antigo com `PR-FINALIZE: carga: … load-lease rc=4`) sai rc 5 com "ADIADO PELA CARGA, rode de novo" —
+#           nunca "conflito de FONTE", e sem rastro no PR, porque nada foi enviado.
 #   --wait-ci-after-rebase: opt-out — depois do auto-rebase, espera o CI do head novo como antes.
 #   PROVENANCE DA BRANCH (sem flag, SAC-80, 2026-10-09): se o PR ADICIONA em `*.kg.yaml` um `source:`
 #           com `@<sha>` de commit que NÃO é ancestral da base (commit da própria branch), o rebase o
@@ -1199,6 +1202,22 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
   else
   say "PR #${PR} ${_rb_state} — auto-rebase ${_rebases}/${_REBASE_MAX} na worktree ${_wt} (pr-finalize --rebase --push)"
   _rb_out="$(cd "$_wt" && bash ops/pr-finalize.sh --rebase --push 2>&1)"; _rb_rc=$?
+  fi
+  # ══ ADIADO PELA CARGA (defeito medido em 2026-11-21/22) ═══════════════════════════════════════════════════════
+  # O pr-finalize pega a vaga do lease de carga depois do rebase LOCAL e antes do pré-voo, do lint e do push; quando o
+  # lease recusa (teto estourado, vaga ocupada), nada foi enviado: a branch do PR segue no head de antes, e o
+  # rebase local, se houve, fica na worktree para a próxima rodada. Até aqui esse rc caía no ramo abaixo e o script relatava
+  # "conflito de FONTE", mandando resolver à mão um conflito que não existia. Contrato: rc 75 (EX_TEMPFAIL) do
+  # pr-finalize. A worktree roda o pr-finalize DA BRANCH, que pode ser anterior ao rc 75: o motor antigo sai rc 1
+  # com a linha `PR-FINALIZE: carga: … load-lease rc=4`, e ela vale igual. Sai rc 5, próprio, sem rastro no PR
+  # (nada mudou nele). O lease que NÃO MEDIU (rc 2) também não é conflito de fonte: para nomeando o lease.
+  if [ "$_rb_rc" -eq 75 ] || { [ "$_rb_rc" -eq 1 ] && LC_ALL=C grep -q '^PR-FINALIZE: carga: .*load-lease rc=4' <<< "$_rb_out"; }; then
+    printf '✗ auto-rebase ADIADO PELA CARGA — o lease de carga não liberou a vaga do pr-finalize (pr-finalize rc=%s); nada foi enviado, a branch do PR segue no head de antes (o rebase local, se houve, fica na worktree) e NÃO é conflito de fonte. Rode de novo quando a carga cair (bash ops/load-lease.sh status). pr-finalize disse: %s\n' \
+      "$_rb_rc" "$(printf '%s\n' "$_rb_out" | LC_ALL=C grep 'carga' | tail -1)"
+    exit 5
+  fi
+  if [ "$_rb_rc" -eq 1 ] && LC_ALL=C grep -q '^PR-FINALIZE: carga: .*load-lease rc=2' <<< "$_rb_out"; then
+    die "auto-rebase NÃO RODOU: o lease de carga não mediu (load-lease rc=2) — não é conflito de fonte; veja bash ops/load-lease.sh status na worktree ${_wt}. Nada foi mergeado."
   fi
   # o driver das famílias (SAC-146) RESOLVEU a fonte: a branch local ficou rebaseada, e o pr-finalize parou no
   # carimbo, porque o hash de código muda pelo contexto. Não é "conflito de FONTE", nem "nada mudou".

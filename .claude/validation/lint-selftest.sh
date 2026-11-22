@@ -28408,6 +28408,12 @@ echo "$*" >> "${PF_LOG}"
 if [ "${PF_MODE:-ok}" = fail ]; then
   echo "PR-FINALIZE: conflito REAL em src/x.sh — rebase abortado, nada mudou; resolva à mão" >&2; exit 1
 fi
+# o lease de carga recusou a vaga (2026-11-22): o motor novo sai rc 75; o antigo, rc 1 com a linha de carga
+case "${PF_MODE:-ok}" in
+  load) echo "PR-FINALIZE: carga: a máquina não liberou a rodada (load-lease rc=4, teto estourado) — ADIADO, nada enviado nem pré-voo/lint; rode de novo (bash ops/load-lease.sh status)" >&2; exit 75 ;;
+  load-legacy) echo "PR-FINALIZE: carga: a máquina não liberou a rodada (load-lease rc=4; 4 = teto estourado, 2 = não mediu) — nada rodou; veja bash ops/load-lease.sh status" >&2; exit 1 ;;
+  load-unmeasured) echo "PR-FINALIZE: carga: a máquina não liberou a rodada (load-lease rc=2; 2 = não mediu) — nada rodou; veja bash ops/load-lease.sh status" >&2; exit 1 ;;
+esac
 # --allow-empty: o conteúdo de `r` repete entre casos (o PF_LOG é zerado a cada um), e sem a flag o
 # "rebase" não andava o HEAD — os casos SAC-85 (w3-w6) mediam um rebase que não aconteceu.
 echo "r$(wc -l < "${PF_LOG}")" > r; git add r; git -c user.email=t@t -c user.name=t commit -q --allow-empty -m rebase
@@ -28669,6 +28675,40 @@ PFSTUB
     if [ -z "${_xm}" ] || _p_fx12; then record_fail "pr-merge-verified: (fx-xii) — MUTANTE SOBREVIVEU" "sem o desfecho do core o rastro tinha de voltar a 'recusado' genérico"
     else record_pass "pr-merge-verified: (fx-xii) rastro da recusa do pr-finalize (core) diz 'recusado: conflito de fonte em src/x.sh' (e o mutante reprova)"; fi
   fi
+
+  # ── (ld-a)..(ld-d) ADIADO PELA CARGA NÃO É CONFLITO DE FONTE (defeito medido em 2026-11-21/22) ─────────────────
+  # O pr-finalize do auto-rebase saía rc 1 quando o lease de carga recusava a vaga, e o SUT relatava "conflito de
+  # FONTE" mandando resolver à mão um conflito que não existia. Agora: rc 75 do motor novo, ou rc 1 com a linha
+  # `PR-FINALIZE: carga: … load-lease rc=4` do motor antigo da branch ⇒ rc 5 "ADIADO PELA CARGA", sem rastro no PR
+  # e sem merge; o lease que não mediu (rc=2) para nomeando o lease. Cada braço tem o seu mutante.
+  _p_ld() { [ "${_mv_rc}" -eq 5 ] && grep -qF "ADIADO PELA CARGA" <<< "${_mv_out}" && ! grep -qF "conflito de FONTE" <<< "${_mv_out}" \
+            && [ ! -s "${d}/margs" ] && [ ! -s "${d}/comment" ]; }
+  _ldcase() { # $1=rótulo $2=PF_MODE $3=predicado $4=âncora do mutante $5=substituição
+    local _lm; _lm="$(_fxmut "$4" "$5")"
+    : > "${d}/comment"; STUB_COMMENT="${d}/comment" _mva "CONFLICTING MERGEABLE" "$2" feat/alguma-coisa
+    if ! "$3"; then record_fail "pr-merge-verified: $1" "rc=${_mv_rc} com=[$(cat "${d}/comment")] out=${_mv_out}"; return; fi
+    if [ -z "${_lm}" ]; then record_fail "pr-merge-verified: $1 — MUTANTE" "a âncora do mutante não casou no SUT ($4)"; return; fi
+    : > "${d}/comment"; STUB_COMMENT="${d}/comment" _sut_a="${_lm}" _mva "CONFLICTING MERGEABLE" "$2" feat/alguma-coisa
+    if "$3"; then record_fail "pr-merge-verified: $1 — MUTANTE SOBREVIVEU" "sem o braço o caso tinha de reprovar"
+    else record_pass "pr-merge-verified: $1 (e o mutante reprova)"; fi
+  }
+  _ldcase "(ld-a) pr-finalize rc 75 (lease recusou) ⇒ rc 5 ADIADO PELA CARGA, sem 'conflito de FONTE', sem rastro nem merge" load _p_ld \
+    'if [ "$_rb_rc" -eq 75 ] ||' 'if [ "$_rb_rc" -eq 99 ] ||'
+  _ldcase "(ld-b) motor ANTIGO da branch (rc 1 + 'PR-FINALIZE: carga: … load-lease rc=4') ⇒ rc 5 ADIADO PELA CARGA" load-legacy _p_ld \
+    ".*load-lease rc=4' <<< \"\$_rb_out\"; }; then" ".*load-lease rc=X' <<< \"\$_rb_out\"; }; then"
+  _p_ldc() { [ "${_mv_rc}" -eq 1 ] && grep -qF "o lease de carga não mediu" <<< "${_mv_out}" && ! grep -qF "conflito de FONTE" <<< "${_mv_out}" \
+             && [ ! -s "${d}/margs" ]; }
+  _ldcase "(ld-c) lease que NÃO MEDIU (rc=2) ⇒ para nomeando o lease, nunca 'conflito de FONTE'" load-unmeasured _p_ldc \
+    ".*load-lease rc=2' <<< \"\$_rb_out\"; then" ".*load-lease rc=X' <<< \"\$_rb_out\"; then"
+  # (ld-d) o CONTRATO do lado do pr-finalize real: o teto do lease (rc 4) sai exit 75 com a linha que o SUT lê
+  local _ldf="${REPO_ROOT}/ops/pr-finalize.sh" _ldi=1 _ldm=1
+  _c_ldf() { awk '/if \[ "\$\{_ll_rc\}" = 4 \]; then/ { a = NR } a && NR <= a + 4 && /PR-FINALIZE: carga: .*load-lease rc=4/ { b = NR }
+                 b && NR <= b + 2 && /^    exit 75$/ { ok = 1 } END { exit !ok }' "$1"; }
+  cp "${_ldf}" "${d}/ldf.sh"; sed 's/^    exit 75$/    exit 1/' "${_ldf}" > "${d}/ldfm.sh"
+  _c_ldf "${d}/ldf.sh" && _ldi=0; _c_ldf "${d}/ldfm.sh" && _ldm=0
+  if [ "${_ldi}" = 0 ]; then record_pass "pr-merge-verified: (ld-d) o pr-finalize sai exit 75 com a linha de carga quando o lease estoura o teto"
+  else record_fail "pr-merge-verified: (ld-d) contrato do pr-finalize" "o ramo do rc 4 do lease não sai exit 75 com 'PR-FINALIZE: carga: … load-lease rc=4'"; fi
+  _prove_mutation "pr-merge-verified: (ld-d) pr-finalize (MUT: exit 75 → exit 1)" "${d}/ldf.sh" "${d}/ldfm.sh" "${_ldi}" "${_ldm}"
 
   # ── (dr-a)..(dr-c) RASCUNHO É RECUSADO ANTES DE QUALQUER EFEITO (2026-10-25) ────────────────────────────
   # O fixture é o PIOR caso: repo alheio, PR CONFLICTING com conflito de fonte — sem o gate, o SUT faria fetch,
@@ -60711,6 +60751,62 @@ if o in s:
     LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"3 donos para 1 vagas"* ]]; }
   _llcase "(r) com 3 donos e N=1 (load 10,5), a 4ª não entra na vaga 0 livre" \
     'if [ -n "${cand}" ] && [ "${busy}" -lt "${k}" ]; then' 'if [ -n "${cand}" ]; then' _c_owners
+  # ── VAGA ÓRFÃ (defeito medido em 2026-11-21/22: um lint-selftest órfão segurou uma vaga por 7h42) ──────────────
+  # O flock é segurado por um processo real (_llhold); o DONO registrado no holder é lido de um /proc de mentira
+  # (ONION_LOAD_PROC), onde o caso decide se ele está morto, reusado, órfão ou legítimo. Com N=1 (SLOTS_MAX=1) e a
+  # vaga 0 presa: órfã ⇒ sai da conta e o run entra na vaga extra (slot.1); legítima ⇒ conta e o run estoura o teto.
+  _llproc() { # $1=pid $2=ppid $3=início → cria ${d}/proc/<pid>/stat (comm com espaço e parêntese, como o kernel deixa)
+    mkdir -p "${d}/proc/$1"; printf '%s (ba) sh) S %s %s %s\n' "$1" "$2" "$(seq -s ' ' 3 19)" "$3" > "${d}/proc/$1/stat"; }
+  _llorph() { # $1=conteúdo do holder (vazio = holder vazio) $2=idade do mtime do holder → "rc|saída" do run com a vaga 0 presa
+    _llset 3.00; rm -rf "${d}/proc" "${d}/ran"; mkdir -p "${d}/proc"
+    _llhold || { echo "9|o dono de teste não pegou a vaga"; return; }
+    printf '%s' "$1" > "${d}/vaga/slot.0.holder"; [ -n "${2:-}" ] && touch -d "$2" "${d}/vaga/slot.0.holder"
+    LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "${LLW}" run --max 2 -- touch "${d}/ran"; _llunhold; }
+  _llnow() { date -u -d "${1:-now}" +%FT%TZ; }
+  _c_odead() { local a; a="$(LLW="$1" _llorph "pid 999999 · pr-finalize · desde $(_llnow)")"; LL_WHY="${a}"
+    [ "${a%%|*}" = 0 ] && [ -e "${d}/ran" ] && [[ "${a#*|}" == *"dono pid 999999 MORTO"* ]] && [[ "${a#*|}" == *"slot.1.lock"* ]]; }
+  _llcase "(u) dono registrado MORTO (o fd ficou com um filho) ⇒ a vaga sai da conta e o run entra" \
+    'if ! cur="$(_ll_pstat "${pid}")"; then' 'if false; then' _c_odead
+  _llcase "(u2) a vaga órfã abre uma vaga extra na varredura (senão a órfã ocupa o lugar de uma livre)" \
+    '[ "${scan}" -lt $(( 2 * LL_SLOTS_MAX )) ] && scan=$(( scan + 1 ))' ':' _c_odead
+  _c_oreuse_w() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4242 100 7
+    printf 'pid 4242 · pr-finalize · desde %s · início 5' "$(_llnow)" > "${d}/vaga/slot.0.holder"
+    local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"pid foi reusado"* ]]; }
+  _llcase "(v) pid do dono REUSADO (o início do processo difere do gravado) ⇒ a vaga sai da conta" \
+    'if [ -n "${st0}" ] && [ "${st0}" != "${start}" ]; then' 'if false; then' _c_oreuse_w
+  _c_oaged() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4243 1 9
+    printf 'pid 4243 · lint-selftest (direto) · desde %s · início 9' "$(_llnow '-3 hours')" > "${d}/vaga/slot.0.holder"
+    local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"dono pid 4243 ÓRFÃO (ppid 1)"*"acima do teto de 7200s"* ]]; }
+  _llcase "(w) dono vivo ÓRFÃO (ppid 1) há 3 h, acima do teto de 7200 s ⇒ a vaga sai da conta" \
+    'if [ "${ppid}" = 1 ] || [ "${pcomm}" = systemd ]; then' 'if false; then' _c_oaged
+  _c_oyoung() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4244 1 9
+    printf 'pid 4244 · lint-selftest (direto) · desde %s · início 9' "$(_llnow '-10 minutes')" > "${d}/vaga/slot.0.holder"
+    local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [[ "${a#*|}" != *"NÃO conta"* ]]; }
+  _llcase "(x) dono órfão há só 10 min (abaixo do teto) CONTA: a bancada longa e legítima não perde a vaga" \
+    '[ "${age}" -ge "${LL_ORPHAN_MAX}" ] || return 1
+    printf '"'"'dono pid' ': || return 1
+    printf '"'"'dono pid' _c_oyoung
+  _c_olegit() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4245 100 9
+    printf 'pid 4245 · pr-finalize · desde %s · início 9' "$(_llnow '-5 hours')" > "${d}/vaga/slot.0.holder"
+    local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [[ "${a#*|}" != *"NÃO conta"* ]]; }
+  _llcase "(x2) dono vivo, com pai vivo, há 5 h CONTA: só o órfão tem teto de idade" \
+    '  return 1
+}
+# load_lease_acquire [teto]' '  return 0
+}
+# load_lease_acquire [teto]' _c_olegit
+  _c_oempty() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"
+    : > "${d}/vaga/slot.0.holder"; touch -d '-3 hours' "${d}/vaga/slot.0.holder"
+    local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"presa sem dono registrado há"* ]]; }
+  _llcase "(y) vaga presa SEM dono registrado há 3 h (holder vazio) ⇒ sai da conta pelo mtime" \
+    '[ "${age}" -ge "${LL_ORPHAN_MAX}" ] || return 1
+    printf '"'"'presa sem' 'false || return 1
+    printf '"'"'presa sem' _c_oempty
   # (s) PSI ILEGÍVEL com o sinal ligado é NÃO MEDIDO e cai na carga (kernel sem /proc/pressure não morre no teto)
   _c_nopsi() { _llset 3.00; local a; a="$(LLR_ENV="ONION_LOAD_PSI_HIGH=30 ONION_LOAD_PSI_DIR=${d}/sem-psi" _llr "$1" check)"
     LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"NÃO MEDIDO"* ]]; }
