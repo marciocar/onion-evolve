@@ -722,7 +722,7 @@ if [ -n "${BACKLOG}" ]; then
   done
   case "${BACKLOG}" in *.md) ;; *) echo "meeting-graph-check: --backlog grava um .md, não ${BACKLOG}" >&2; exit 2 ;; esac
   # só sobrescreve uma projeção anterior: o resumo que não veio em --summary (dogfood da SAC-480) também é fonte
-  if [ -e "${BACKLOG}" ] && ! head -n1 -- "${BACKLOG}" | grep -q '^# Backlog por área: '; then
+  if [ -e "${BACKLOG}" ] && ! grep -q '^# Backlog por área: ' <<< "$(head -n1 -- "${BACKLOG}")"; then
     echo "meeting-graph-check: ${BACKLOG} existe e não é uma projeção do backlog: não sobrescrevo" >&2; exit 2; fi
   [ -d "$(dirname -- "${BACKLOG}")" ] || { echo "meeting-graph-check: diretório da saída inexistente: $(dirname -- "${BACKLOG}")" >&2; exit 2; }
   # A PROJEÇÃO só nasce de grafos conformes: o atual e cada anterior passam pelo mesmo gate, e o que reprova ou

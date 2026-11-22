@@ -61,6 +61,11 @@ Um mutante por cura no `run_meeting_graph_selftests` do `lint-selftest.sh`, cada
 morderam todos; os que deixaram de se aplicar depois da reescrita da reconciliação foram reapontados, e os três
 casos que a regra do parágrafo cobria por baixo foram reescritos para distinguir item de parágrafo.
 
+## Depois da revisão
+
+O pré-voo do `pr-finalize` acusou um sítio novo da classe pipefail/EPIPE (`head -n1 | grep -q` na guarda de
+sobrescrita); trocado por here-string, sem mudar o comportamento, com o caso e o mutante reapontados.
+
 ## Limites declarados
 
 - Grafo de reunião anterior a esta versão reprova com `AREA-AUSENTE` até alguém acrescentar `x_area`; a
