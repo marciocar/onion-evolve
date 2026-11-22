@@ -51975,6 +51975,25 @@ run_preflight_families_selftests() {
     record_pass "preflight-families: (k-MUT) sem o bloco da superfície das regras o lint mudado não escolhe as fixtures — (h) é load-bearing"
   else record_fail "preflight-families: (k-MUT)" "o mutante ainda selecionou (ou quebrou): ${_r}"; fi
   rm -rf "${d}" "${_shim}" "${_shim2}"; rm -f "${_mut}"; unset -f _pr_touch _pr_all _pr_none
+  # (l) com fixtures na lista o pré-voo roda a bancada em faixas (--jobs auto fatia o manifesto); sem, segue serial.
+  #     O preflight-run.sh é o REAL; o seletor e a bancada são de mentira e a bancada grava os argumentos que recebeu.
+  local _run="${REPO_ROOT}/ops/testing/preflight-run.sh" _l1 _l2
+  if [ -f "${_run}" ]; then
+    d="$(mktemp -d)"
+    (
+      cd "${d}" && git init -q -b main && mkdir -p ops/testing .claude/validation && cp "${_run}" ops/testing/
+      printf '#!/bin/bash\necho "${PF_FAMS}"\n' > ops/testing/preflight-families.sh
+      printf '#!/bin/bash\necho "$*" >> "%s/args"\necho "Passaram : 1"\n' "${d}" > .claude/validation/lint-selftest.sh
+    ) >/dev/null 2>&1
+    ( cd "${d}" && env -u ONION_IN_PREFLIGHT -u ONION_SELFTEST_FULL PF_FAMS="shell_pipefail_robustness,fixtures,lint_hard_file" bash ops/testing/preflight-run.sh ) >/dev/null 2>&1
+    _l1="$(sed -n 1p "${d}/args" 2>/dev/null)"
+    ( cd "${d}" && env -u ONION_IN_PREFLIGHT -u ONION_SELFTEST_FULL PF_FAMS="shell_pipefail_robustness,sweep_fixtures" bash ops/testing/preflight-run.sh ) >/dev/null 2>&1
+    _l2="$(sed -n 2p "${d}/args" 2>/dev/null)"
+    if [[ " ${_l1} " == *" --jobs auto "* ]] && [[ "${_l2}" == *"--families shell_pipefail_robustness,sweep_fixtures"* ]] && [[ " ${_l2} " != *" --jobs "* ]]; then
+      record_pass "preflight-families: (l) fixtures na lista ⇒ o pré-voo passa --jobs auto (faixas); sem fixtures (sweep_fixtures não conta) segue serial"
+    else record_fail "preflight-families: (l)" "com fixtures=[${_l1}] sem=[${_l2}]"; fi
+    rm -rf "${d}"
+  else record_skip "preflight-families: (l) ops/testing/preflight-run.sh ausente (adotante) → pulado"; fi
 
   # (c..f) A PORTA MINI (2026-11-06, tarefa #31): #1497 e #1501 reprovaram no CI na door_mini (a) por ponteiro
   #   morto num arquivo que viaja ao mini, e o pré-voo não a escolhia. A superfície vem do roles.yaml do
