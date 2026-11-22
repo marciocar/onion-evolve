@@ -97,7 +97,10 @@ else
   [ "$(LC_ALL=C wc -c < "${WORK}/body" | tr -d ' ')" -le 8192 ] || die "corpo > 8192 bytes"
   # UTF-8 válido: o jq (--rawfile) troca byte inválido por U+FFFD, e o body_sha256 dos bytes crus deixaria
   # de bater com o corpo que viaja (o gate vetaria body-mismatch). Ida e volta pelo jq tem de ser idêntica.
-  jq -Rsj . < "${WORK}/body" | cmp -s - "${WORK}/body" || die "corpo não é UTF-8 válido"
+  # A ida e volta é pelo MESMO --rawfile que monta o envelope, nunca pelo `jq -R`: o jq 1.7 corrompe o
+  # caractere multibyte que cruza o byte 4096 da entrada crua (corrigido no jq 1.8.1, #3421), e um corpo
+  # válido acima de 4 KiB era recusado e ia para a dead-letter (medido em 2026-11-22).
+  jq -nj --rawfile b "${WORK}/body" '$b' | cmp -s - "${WORK}/body" || die "corpo não é UTF-8 válido"
   [ -n "${JTI}" ] || JTI="nb-$(rand_hex 12)"
   [ -n "${THREAD}" ] || THREAD="th-$(date +%Y%m%d)-$(rand_hex 4)"
   NOW="$(date +%s)"; IAT=$(( NOW + IAT_OFF )); EXP=$(( NOW + EXP_OFF ))

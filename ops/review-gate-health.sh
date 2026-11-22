@@ -53,6 +53,15 @@ classify_pr() { # $1=achados do parecer (N|-1|vazio)  $2=conclusao do check (suc
   [ "${concl}" = "success" ] && printf '%s' MEASURED || printf '%s' MISMATCH
 }
 
+# O parecer vira o JSON que o review-verdict.sh lê. O corpo entra por --rawfile, nunca por `jq -Rs`: o jq 1.7
+# corrompe o caractere multibyte que cruza o byte 4096 da entrada crua (corrigido no jq 1.8.1), e um parecer
+# longo em pt-BR saía adulterado (medido em 2026-11-22).
+parecer_envelope() { # $1=corpo do parecer  $2=arquivo de saida
+  local b; b="$(mktemp)"; printf '%s' "$1" > "${b}"
+  jq -nc --rawfile r "${b}" '{type:"result",subtype:"success",is_error:false,num_turns:1,total_cost_usd:0,result:$r}' > "$2"
+  local rc=$?; rm -f "${b}"; return "${rc}"
+}
+
 run_selftest() {
   local rc=0 got
   _case() { # $1=rotulo $2=achados $3=conclusao $4=esperado
@@ -68,6 +77,15 @@ run_selftest() {
   _case 'UNCOUNTABLE quando o parecer nao se deixa contar' -1 success UNCOUNTABLE
   _case 'UNCOUNTABLE para lixo, nunca saude' lixo success UNCOUNTABLE
   _case 'NO-PARECER quando o PR nao tem parecer nenhum' '' success NO-PARECER
+  # O ENVELOPE DO PARECER: multibyte na fronteira de 4096 bytes chega byte a byte (o jq 1.7 com -R o corrompia).
+  local _e _t _f; _f="$(mktemp)"
+  for _e in "4094:é" "4093:😀" "4092:😀"; do
+    _t="$(printf '%*s' "${_e%%:*}" '' | tr ' ' a)${_e#*:}b"
+    if parecer_envelope "${_t}" "${_f}" && jq -j .result "${_f}" | cmp -s - <(printf '%s' "${_t}"); then
+      printf '  ✓ review-gate-health: envelope do parecer integro com %s na fronteira de 4096\n' "${_e}"
+    else printf '  ✗ review-gate-health: envelope do parecer adulterou %s na fronteira de 4096\n' "${_e}"; rc=1; fi
+  done
+  rm -f "${_f}"
   printf '\n  %s\n' "$([ "${rc}" = 0 ] && echo 'OK — classificacao integra' || echo 'FALHOU')"
   return "${rc}"
 }
@@ -104,8 +122,7 @@ while IFS=$'\t' read -r num sha; do
   body="$(gh pr view "${num}" --json comments --jq '[.comments[] | select(.body|contains("onion-review-parecer"))] | last | .body // ""' 2>/dev/null || true)"
   ach=""
   if [ -n "${body}" ]; then
-    _tmp="$(mktemp)"; printf '{"type":"result","subtype":"success","is_error":false,"num_turns":1,"total_cost_usd":0,"result":%s}\n' \
-      "$(printf '%s' "${body}" | jq -Rs .)" > "${_tmp}"
+    _tmp="$(mktemp)"; parecer_envelope "${body}" "${_tmp}"
     ach="$(bash "${_VERDICT}" "${_tmp}" 2>/dev/null | awk -F= '/^achados=/{print $2}')"
     rm -f "${_tmp}"
   fi

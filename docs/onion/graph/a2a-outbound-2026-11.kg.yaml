@@ -150,6 +150,49 @@ nodes:
       locator: "pergunta com opções de 2026-11-10: «A colheita do OpenClaw serve para qualquer caminho: reconexão que só estreita o escopo, allowlist que falha fechada e aprovação que exige o escopo de quem aprova. Entram já como regra do onion-queue, com teste de mutante?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-10"
       locality: "pessoa"
+  - id: E_JQ_RAW_UTF8_BOUNDARY_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-11-22"
+    verified_against: "jq-1.7 da VPS (pacote 1.7.1-3ubuntu0.24.04.2), medido em 2026-11-22: 4094 'a' + 'é' por jq -Rsj . volta adulterado; 4093 e 4095 voltam íntegros; o emoji de 4 bytes depois de 4092 a 4094 também falha; --rawfile e --arg voltam íntegros nos mesmos casos"
+    label: "O jq 1.7 corrompe o caractere UTF-8 multibyte que cruza o byte 4096 da entrada crua (-R, -Rs, -Rsj); o --rawfile e o --arg não têm o defeito, e recusam o mesmo conjunto de bytes inválidos que o -R recusava."
+    narrative: "Relatado pela messaging e reproduzido pelo core. No a2a-send.sh a conferência de UTF-8 recusava um corpo válido acima de 4 KiB e o sinal ia para a dead-letter (sign:sign-failed); nos pareceres do revisor um comentário longo em pt-BR saía adulterado. A correção upstream é o PR jqlang/jq#3421 (mergeado em 2025-10-31), listado nas notas do jq 1.8.1/1.8.2. Bytes inválidos medidos (truncado, 0xFF, overlong, surrogate, acima de U+10FFFF, continuação solta) são recusados igualmente pelo -Rsj e pelo --rawfile."
+    provenance:
+      source: "jq do sistema na VPS e gh release view do jqlang/jq"
+      locator: "reprodução python3/subprocess de 2026-11-22; gh release view jq-1.8.2 -R jqlang/jq (linha «Fix raw input flag not to corrupt multi-byte characters. #3421»)"
+      method: "measurement: ida e volta byte a byte por posição na fronteira, 2026-11-22"
+      locality: "host"
+  - id: A_JQ_RAWFILE_CURE_1122
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "bancada run_jq_raw_utf8_selftests e os --selftest do review-verdict.sh e do review-gate-health.sh, verdes em 2026-11-22, com mutante que volta ao jq -R mordendo em cada ponto"
+    label: "Cura sem depender da versão: os quatro usos de jq -R no core passaram ao --rawfile (a2a-send.sh, merge-onion-hooks.sh, review-verdict.sh, review-gate-health.sh), e a bancada carrega o caso da fronteira com 'é' e emoji de 4 bytes."
+    narrative: "A conferência de UTF-8 do a2a-send.sh passou a usar o MESMO --rawfile que monta o envelope, então o invariante (o corpo que viaja é o arquivo assinado) é julgado pelo decodificador que o produz. O fixture da bancada A2A (_env) também saiu do -Rs. O jq -Rn --arg do a2a-accept.sh e do a2a-doctor.sh não lê entrada crua (o -n ignora o stdin) e ficou. Num jq já corrigido o mutante é equivalente: a bancada mede o jq do host por sonda e declara."
+    trace: ".claude/utils/federation-transport/a2a-send.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_jq_raw_utf8_selftests; review-verdict.sh (ACH-k); ops/review-gate-health.sh parecer_envelope"
+      method: "measurement: bancada e mutantes por ops/mutate-and-restore.sh, 2026-11-22"
+      locality: "host"
+  - id: C_JQ_SYSTEM_LAG_1122
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 2
+    confidence: 0.9
+    label: "O jq da VPS está defasado: o pacote 1.7.1 do Ubuntu 24.04 (que se declara jq-1.7) contra o jq 1.8.2 upstream (2026-06-20), que traz a correção do -R e a do CVE-2026-49839 (estouro de heap no --rawfile após «String too long», versões até 1.8.1)."
+    narrative: "Subir o pacote do sistema é ato do maestro. O código já não depende da versão para o defeito da fronteira. O CVE do --rawfile pede uma string longa demais para o jq; os corpos A2A têm teto de 8192 bytes. Pronto quando: o maestro decidir subir o jq (fonte oficial) ou registrar que fica no pacote da distribuição."
 edges:
   - from: A_A2A_SEND_NEXT_STEP_1110
     to: E_A2A_RT_FRICTION_1109
@@ -174,4 +217,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_QUEUE_HARVEST_OPENCLAW_NOW_1110
     to: C_A2A_AUTO_ACCEPT_AS_DATA_FOUR_CONDITIONS_1110
+    edge_type: TRACES_TO
+  - from: A_JQ_RAWFILE_CURE_1122
+    to: E_JQ_RAW_UTF8_BOUNDARY_1122
+    edge_type: TRACES_TO
+  - from: C_JQ_SYSTEM_LAG_1122
+    to: E_JQ_RAW_UTF8_BOUNDARY_1122
     edge_type: TRACES_TO
