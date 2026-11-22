@@ -199,7 +199,15 @@ adoptable() {
 #   · só a app http (e tls, que a diretiva `tls` do site gera); nada de admin, storage ou logging;
 #   · escuta só em :443/:80, e TODA rota de nível superior com host, todo host na coluna de hosts;
 #   · todo reverse_proxy com upstream na coluna de upstreams (fecha a API admin :2019 e o loopback de outro serviço),
-#     sem upstream dinâmico; nada de file_server nem templates (leriam disco como a conta do Caddy, que lê os segredos).
+#     sem upstream dinâmico;
+#   · handler só da ALLOWLIST (subroute, reverse_proxy, static_response, rewrite, headers, encode, request_body, vars,
+#     error): file_server, templates, acme_server, metrics e o que vier depois ficam de fora;
+#   · nenhuma string com `{file.` ou `{env.`: esses placeholders leem disco e ambiente do processo do Caddy EM TEMPO DE
+#     EXECUÇÃO, e a conta do Caddy lê os vhosts geridos que carregam segredo (2ª passada do refutador, 2026-11-22);
+#   · na app tls, só `automation.policies` com `subjects` dentro dos hosts e sem on_demand: `tls <cert> <key>` carregaria
+#     arquivos arbitrários no cache de certificados, que é global ao Caddy.
+# Limite declarado: o adapt roda sobre o arquivo isolado; fonte de serviço que importe snippet do Caddyfile do core é
+# recusada (nenhuma das quatro medidas importa).
 adapt_guard() {  # adapt_guard <nome> <arquivo-fonte>
   local name="$1" src="$2" tmp json
   tmp="$(mktemp "$SRC_CACHE/adapt.XXXXXX")"
@@ -214,6 +222,14 @@ def no(msg): sys.exit("limite do repo: " + msg)
 if set(cfg) - {"apps"}: no("chave global fora de apps: %s" % sorted(set(cfg) - {"apps"}))
 apps = cfg.get("apps", {})
 if set(apps) - {"http", "tls"}: no("app fora de http/tls: %s" % sorted(set(apps) - {"http", "tls"}))
+tls = apps.get("tls", {})
+if set(tls) - {"automation"}: no("tls fora de automation: %s" % sorted(set(tls) - {"automation"}))
+if set(tls.get("automation", {})) - {"policies"}: no("tls.automation fora de policies")
+for pol in tls.get("automation", {}).get("policies", []):
+    if pol.get("on_demand"): no("tls on_demand")
+    out = [h for h in pol.get("subjects", []) if h not in hosts]
+    if out or not pol.get("subjects"): no("política tls fora dos hosts: %s" % (out or "sem subjects"))
+OK_HANDLERS = {"subroute", "reverse_proxy", "static_response", "rewrite", "headers", "encode", "request_body", "vars", "error"}
 servers = apps.get("http", {}).get("servers", {})
 if not servers: no("nenhum site")
 for srv in servers.values():
@@ -228,7 +244,7 @@ for srv in servers.values():
 def walk(x):
     if isinstance(x, dict):
         h = x.get("handler")
-        if h in ("file_server", "templates"): no("handler %s proibido" % h)
+        if h is not None and h not in OK_HANDLERS: no("handler fora da allowlist: %s" % h)
         if h == "reverse_proxy":
             if "dynamic_upstreams" in x: no("upstream dinâmico")
             for u in x.get("upstreams", []):
@@ -236,6 +252,8 @@ def walk(x):
         for v in x.values(): walk(v)
     elif isinstance(x, list):
         for v in x: walk(v)
+    elif isinstance(x, str) and ("{file." in x or "{env." in x):
+        no("placeholder que lê disco ou ambiente: %s" % x[:80])
 walk(cfg)
 ' <<< "$json" || die "fonte de $name recusada pelo limite do repo (veja acima)"
 }
@@ -710,6 +728,12 @@ STUB
     printf 'waha.example {\n  respond "a{b"\n}\nonionevolve.com {\n  respond "c}d"\n}\n' > "$svc/caddy/waha.caddy"; git -C "$svc" "${gc[@]}" commit -qam quote
     REAL_CADDY="$real" t "serviço (caddy real): host alheio escondido por chave entre aspas → apply RECUSA" 2 apply_config
     ok "serviço (caddy real): quem recusa as aspas é o adapt_guard (host fora da lista no JSON)" 'set +e; _o="$( set -e; REAL_CADDY="$real" apply_config 2>&1 )"; set -e; [[ "$_o" == *"limite do repo: host fora da lista"* ]]'
+    printf 'waha.example {\n  respond "{file./etc/hostname}"\n}\n' > "$svc/caddy/waha.caddy"; git -C "$svc" "${gc[@]}" commit -qam file
+    REAL_CADDY="$real" t "serviço (caddy real): placeholder {file.*} no corpo → apply RECUSA" 2 apply_config
+    printf 'waha.example {\n  tls /etc/caddy/a.pem /etc/caddy/a.key\n  reverse_proxy 127.0.0.1:3999\n}\n' > "$svc/caddy/waha.caddy"; git -C "$svc" "${gc[@]}" commit -qam tlsfiles
+    REAL_CADDY="$real" t "serviço (caddy real): tls carregando arquivo de certificado → apply RECUSA" 2 apply_config
+    printf 'waha.example {\n  metrics\n}\n' > "$svc/caddy/waha.caddy"; git -C "$svc" "${gc[@]}" commit -qam metrics
+    REAL_CADDY="$real" t "serviço (caddy real): handler fora da allowlist (metrics) → apply RECUSA" 2 apply_config
   else
     echo "  ⊘ casos com caddy real pulados: sem caddy nesta máquina (o dublê do adapt não vê aspas nem TAB)"
   fi

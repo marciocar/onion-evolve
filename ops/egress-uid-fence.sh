@@ -177,6 +177,8 @@ rule_count() {  # pacotes da regra de comentário $1
 }
 # probe <conta> <comentário da regra que TEM de contar> → "contou" ou "não contou". Para quem passa, a regra é o
 # RETURN dela: "não mexeu no REJECT" sozinho ficaria verde até com a sonda sem rodar (refutador, 2026-11-22).
+# Limite: o contador é da regra, não da sonda. Uma conexão real do Caddy (ou um RST de outra conta) na mesma janela
+# de 3 s também conta e pode deixar o item verde sem a sonda; o risco foi aceito como baixo.
 probe() {
   local before after
   before="$(rule_count "$2")"
