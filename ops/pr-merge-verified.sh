@@ -1201,7 +1201,9 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
     _rb_out="${_FR_OUT}"; _rb_rc=0
   else
   say "PR #${PR} ${_rb_state} — auto-rebase ${_rebases}/${_REBASE_MAX} na worktree ${_wt} (pr-finalize --rebase --push)"
-  _rb_out="$(cd "$_wt" && bash ops/pr-finalize.sh --rebase --push 2>&1)"; _rb_rc=$?
+  # o teto da espera pelo lease fica ABAIXO do timeout de quem chama (o merge-serial dá 1200 s ao verificado, e o
+  # lease espera 1800 s por padrão): sem isto o timeout vencia antes e o adiamento virava "não sei" (revisão de 2026-11-22)
+  _rb_out="$(cd "$_wt" && ONION_LOAD_WAIT_MAX="${ONION_MERGE_LEASE_WAIT_MAX:-600}" bash ops/pr-finalize.sh --rebase --push 2>&1)"; _rb_rc=$?
   fi
   # ══ ADIADO PELA CARGA (defeito medido em 2026-11-21/22) ═══════════════════════════════════════════════════════
   # O pr-finalize pega a vaga do lease de carga depois do rebase LOCAL e antes do pré-voo, do lint e do push; quando o
@@ -1212,7 +1214,7 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
   # com a linha `PR-FINALIZE: carga: … load-lease rc=4`, e ela vale igual. Sai rc 5, próprio, sem rastro no PR
   # (nada mudou nele). O lease que NÃO MEDIU (rc 2) também não é conflito de fonte: para nomeando o lease.
   if [ "$_rb_rc" -eq 75 ] || { [ "$_rb_rc" -eq 1 ] && LC_ALL=C grep -q '^PR-FINALIZE: carga: .*load-lease rc=4' <<< "$_rb_out"; }; then
-    printf '✗ auto-rebase ADIADO PELA CARGA — o lease de carga não liberou a vaga do pr-finalize (pr-finalize rc=%s); nada foi enviado, a branch do PR segue no head de antes (o rebase local, se houve, fica na worktree) e NÃO é conflito de fonte. Rode de novo quando a carga cair (bash ops/load-lease.sh status). pr-finalize disse: %s\n' \
+    printf '✗ auto-rebase ADIADO PELA CARGA — o lease de carga não liberou a vaga do pr-finalize (pr-finalize rc=%s); nada foi enviado, a branch do PR segue no head de antes (o rebase local, se houve, fica na worktree) e NÃO é conflito de fonte. Rode de novo quando a carga cair (bash ops/load-lease.sh status); com o rebase local na worktree, a próxima rodada espera o CI do head novo. pr-finalize disse: %s\n' \
       "$_rb_rc" "$(printf '%s\n' "$_rb_out" | LC_ALL=C grep 'carga' | tail -1)"
     exit 5
   fi

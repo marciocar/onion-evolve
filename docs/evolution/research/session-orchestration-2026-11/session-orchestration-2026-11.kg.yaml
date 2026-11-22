@@ -288,7 +288,26 @@ nodes:
       locator: "cláusulas 1 a 5 e a fronteira; bancada em .claude/validation/lint-selftest.sh (run_maestro_ask_selftests, run_batuta_census_selftests, run_load_lease_selftests)"
       method: "measurement: bancada com mutante e dogfood no repo real, 2026-11-10"
       locality: "repo"
+  - id: C_SO_VAGA_ORFA_E_ADIADO_PELA_CARGA_1122
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-22"
+    verified_against: "dogfood real em 2026-11-22 com o lease antigo (git show origin/main:ops/load-lease.sh) contra o novo, num diretório de vagas à parte: dono morto com o fd num filho (antigo rc 4 no teto, novo rc 0 na vaga extra) e dono vivo órfão de ppid 1 por setsid (antigo rc 4, novo rc 0 com teto de 2 s; com o teto de 7200 s segue contando); lsof das vagas reais mostrou o fd do pr-finalize em subshells e python3 do pré-voo; bancada load_lease (u a y, com u3, v2, v3, w2 e w3 da revisão) e pr_merge_verified (ld-a a ld-d), cada caso reprovando contra o mutante"
+    label: "A vaga do lease presa por dono morto, de pid reusado ou órfão há mais de ONION_LOAD_ORPHAN_MAX (7200 s) sai da conta sem matar ninguém; e o pr-finalize recusado pelo lease sai rc 75, que o pr-merge-verified relata como ADIADO PELA CARGA (rc 5), nunca como conflito de fonte."
+    narrative: "Dois defeitos medidos em 21-22/11. (1) Um lint-selftest completo órfão (reparentado ao PID 1) segurou uma vaga por 7h42 e as filas das outras sessões pararam. Medido como o lease registra o dono: o flock é do fd e o slot.<i>.holder diz pid, quem e desde; pego sourçado (o pr-finalize), o fd desce a todo filho, e o filho que sobrevive ao dono segura a vaga. Pego pelo run, o dono é o próprio run, vivo e órfão se a sessão acabou. Não se solta flock alheio sem matar o processo, e matar processo de outra sessão está fora: a vaga só sai da conta, a varredura abre uma vaga extra por órfã (até 2×SLOTS_MAX) e a admissão por carga segue valendo. O holder grava também o início do processo (campo 22 do stat, contra pid reusado), o pai (órfão = o pai mudou, sob qualquer subreaper) e o PID namespace (outro namespace conta), e passa a ser gravado sob a trava de admissão; holder com menos de 5 s não se julga morto. A revisão independente de 2026-11-22 (REJECTED_AND_FIXED) reproduziu um bloqueador: a vaga extra só era varrida enquanto a órfã existia, e o dono legítimo dela sumia da conta; a varredura passou a contar sempre 2×SLOTS_MAX. Teto de 7200 s escolhido sem o maestro: cobre a bancada completa mais lenta medida (70 min sob carga). (2) O pr-merge-verified lia o rc 1 do pr-finalize recusado pelo lease como conflito de fonte e mandava resolver à mão. O pr-finalize sai rc 75 (EX_TEMPFAIL) no teto do lease; o motor antigo da branch (rc 1 com a linha de carga) vale igual; rc 5 próprio, sem rastro no PR. Refutação: uma vaga que saia da conta com dono legítimo vivo (pai vivo), ou um adiamento pela carga relatado como conflito, derruba o nó."
+    provenance:
+      source: "ops/load-lease.sh"
+      locator: "bloco VAGA ÓRFÃ (_ll_slot_stale) e load_lease_acquire; ops/pr-merge-verified.sh bloco ADIADO PELA CARGA; ops/pr-finalize.sh exit 75; bancada run_load_lease_selftests (u a y) e run_pr_merge_verified_selftests (ld-a a ld-d)"
+      method: "measurement: dogfood do lease antigo contra o novo e bancada com mutante, 2026-11-22"
+      locality: "repo"
 edges:
+  - from: C_SO_VAGA_ORFA_E_ADIADO_PELA_CARGA_1122
+    to: C_SO_BATUTA_V1_1110
+    edge_type: SUPPORTS
   - from: E_SO_MERCADO_SUPERVISAO_1110
     to: C_SO_BATUTA_V1_1110
     edge_type: SUPPORTS

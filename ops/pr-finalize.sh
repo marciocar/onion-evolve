@@ -389,7 +389,8 @@ if [ -r ops/load-lease.sh ]; then
   # sempre, o auto-rebase lia o teto do lease como "conflito de FONTE". O rc 2 (não mediu) segue rc 1: não é adiamento.
   if [ "${_ll_rc}" = 4 ]; then
     _ll_kept=""; [ "${REBASE}" = 1 ] && _ll_kept="; o rebase local já feito FICA na worktree, sem envio"
-    echo "PR-FINALIZE: carga: a máquina não liberou a rodada (load-lease rc=4, teto estourado) — ADIADO, nada enviado nem pré-voo/lint${_ll_kept}; rode de novo (bash ops/load-lease.sh status)" >&2
+    [ "${_PRECOMMIT}" = 1 ] && _ll_kept="${_ll_kept}; o commit '${SUBJ}' do índice sujo também FICA (o gate do commit já rodou)"
+    echo "PR-FINALIZE: carga: a máquina não liberou a rodada (load-lease rc=4, teto estourado) — ADIADO, nada enviado, sem pré-voo nem lint do commit${_ll_kept}; rode de novo (bash ops/load-lease.sh status)" >&2
     exit 75
   fi
   [ "${_ll_rc}" = 0 ] || die "carga: a máquina não liberou a rodada (load-lease rc=${_ll_rc}; 2 = não mediu) — nada rodou; veja bash ops/load-lease.sh status"
