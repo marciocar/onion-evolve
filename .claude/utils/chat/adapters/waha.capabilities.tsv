@@ -1,7 +1,7 @@
 # WhatsApp pelo WAHA (não oficial): o 1º adapter do contrato onion.chat/v1. Só canais internos e com os sócios
 # (D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121); cliente final vem pela Cloud API oficial, com outro adapter.
 # O executável NÃO mora no core: roda na peça de mensageria (envio em tools/notify-partner, recepção no vigia e na
-# fila), que lê a chave da própria unidade. Medido em 2026-11-22 no repo da peça em db94954 (= origin/main), só por
+# fila), que lê a chave da própria unidade. Medido em 2026-11-22 na origin/main do repo da peça, só por
 # leitura do código; nada aqui foi rodado contra o WAHA.
 # Formato no molde do task-manager; conferido por conformance.py capabilities. status: implemented | partial |
 # not_implemented | unverified. source: piece:messaging/<caminho> = onde se mede, no repo da peça de mensageria; - = nada a apontar.

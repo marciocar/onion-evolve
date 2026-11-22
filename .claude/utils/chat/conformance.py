@@ -163,7 +163,7 @@ def check_received(obj, where, acc, seen, received_ids):
             out(where, "DUPLICADO", f"mesma mensagem do provedor já entregue em {seen[key]}: o adapter deduplica antes do agente", acc)
         else:
             seen[key] = where
-        received_ids.setdefault((obj.get("provider"), pid), obj)
+        received_ids.setdefault((obj.get("provider"), pid), []).append(obj)
 
 
 def check_reply(obj, where, acc):
@@ -263,7 +263,9 @@ def cmd_check(path):
             replies.append((where, obj))
     if received_ids:
         for where, obj in replies:
-            ev = received_ids.get((obj.get("provider"), obj.get("in_reply_to")))
+            evs = received_ids.get((obj.get("provider"), obj.get("in_reply_to"))) or []
+            # o mesmo id do provedor pode existir em dois lugares (a dedupe é por lugar): vale o do lugar da resposta
+            ev = next((e for e in evs if dig(e, ("place", "id")) == dig(obj, ("place", "id"))), evs[0] if evs else None)
             if ev is None:
                 out(where, "FIO", "in_reply_to não aponta para nenhuma mensagem recebida neste fluxo", acc)
             else:

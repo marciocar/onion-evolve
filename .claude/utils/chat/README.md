@@ -43,7 +43,8 @@ declara. Um adapter que escreva `resolved_by: provider_id` tendo tirado a pessoa
 bancada da peça, com mutantes, pega. Também não confere: o frescor da audiência (só a ordem em relação à resposta), a
 coerência entre quem pede e a mesma pessoa na audiência, a normalização do id na dedupe (a chave é exata: normalizar
 é dever do adapter), campo extra fora do contrato (o schema é aberto no topo), nem a resposta sem o evento no mesmo
-fluxo (aí o cruzamento com a mensagem respondida não roda).
+fluxo (aí o cruzamento com a mensagem respondida não roda). A heurística de número no texto da resposta é
+heurística: telefone escrito com `:` ou `/` ou com traço tipográfico passa, e lista de números curtos pode reprovar.
 
 ## A síntese do Delphi (registro)
 

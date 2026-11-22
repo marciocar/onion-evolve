@@ -16,7 +16,7 @@ unidade; o agente nunca vê a chave. Hoje a peça tem:
   CloudEvent 1.0 com o corpo bruto; a fila deduplica e tem `ack`, reentrega e dead-letter.
 
 A declaração do que cada parte cumpre está em [`waha.capabilities.tsv`](waha.capabilities.tsv), medida por leitura
-do código em 2026-11-22 (repo da peça em `db94954`, igual à `origin/main`). Nada foi rodado contra o WAHA.
+do código em 2026-11-22 (a `origin/main` do repo da peça, conferida por `git ls-remote`). Nada foi rodado contra o WAHA.
 
 ## O que falta para ficar conforme (lado da peça)
 
