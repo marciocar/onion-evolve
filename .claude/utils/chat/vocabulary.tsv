@@ -1,0 +1,28 @@
+# Vocabulário do contrato de canal de conversa (onion.chat/v1): a lista FECHADA de capacidades que todo
+# adapters/<p>.capabilities.tsv declara, uma linha cada. Lida por conformance.py (modo capabilities).
+# kind: verb = operação do adapter · rule = regra do núcleo que o adapter cumpre em toda mensagem.
+# requirement: required = o adapter só fica conforme com ela implementada · optional = pode faltar, declarada.
+# Decisão: D_CHAT_CHANNEL_CONTRACT_SDAAL_1121 (grafo coordenacao-selos-arquivo-2026-11). Detalhe em interface.md.
+capability	kind	requirement	meaning
+message.receive	verb	required	entrega ao agente o evento normalizado (os 5 campos), por evento e não por sondagem
+message.send	verb	required	envia a um destino da lista fechada, dizendo quem pediu
+message.reply_thread	verb	required	responde no fio da mensagem que pediu (reply_to do provedor)
+message.ack	verb	required	confirma que o evento foi processado, para a recepção durável parar de reentregar
+audience.list	verb	required	lista quem mais vê a conversa, ANTES de responder
+identity.resolve	verb	required	resolve quem pede e o papel pelo id do provedor (nunca pelo nome exibido nem pelo texto)
+served.ask	verb	required	o passo «serviu?» no fio, depois da resposta
+conversation.list	verb	optional	lista as conversas e grupos que o adapter alcança
+media.send	verb	optional	envia arquivo ou mídia, com teto
+media.download	verb	optional	baixa a mídia recebida para quarentena
+message.react	verb	optional	reage a uma mensagem
+page.handoff	verb	optional	extra, não núcleo: manda o link de uma página e recebe o resultado de volta
+rule.leak_guard	rule	required	guarda de vazamento sobre tudo o que sai (número, chave, dado de quem não está na audiência)
+rule.dedupe_provider_id	rule	required	dedupe pelo id da mensagem no provedor (entrega pelo menos uma vez, processa uma vez)
+rule.rate_cap_pending	rule	required	ritmo por conversa e teto por destino e dia, com a linha pending gravada antes do envio
+rule.media_cap	rule	required	teto de tamanho e de tipo da mídia
+rule.retention	rule	required	corpos e mídias tratados como dado de terceiros: prazo, fora do backup externo ou cifrados
+rule.audit_log	rule	required	registro do ato com quem pediu, sem número nem texto
+rule.latency_field	rule	required	hora do pedido e hora em que o agente viu, medidas e expostas
+rule.secret_never_out	rule	required	número e chave nunca em saída, log ou erro
+rule.read_marker	rule	required	marca de quem leu, entre sessões
+rule.channel_loss_keeps_queue	rule	required	perder o canal (número banido, token revogado) não perde a fila

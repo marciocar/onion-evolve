@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onion.dev/schemas/chat/onion.chat.v1.json",
+  "title": "onion.chat/v1",
+  "description": "Mensagem normalizada do contrato de canal de conversa (D_CHAT_CHANNEL_CONTRACT_SDAAL_1121). Dois tipos: o evento recebido (message.received) e a resposta que sai (message.reply). A forma é conferida aqui; as regras que cruzam campos (dedupe, ordem das horas, quem pede na audiência, vazamento) estão em conformance.py.",
+  "oneOf": [
+    { "$ref": "#/$defs/received" },
+    { "$ref": "#/$defs/reply" }
+  ],
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,9})?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "nonEmpty": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "provider": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,31}$" },
+    "requester": {
+      "type": "object",
+      "required": ["provider_id", "resolved_by", "person", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "provider_id": { "$ref": "#/$defs/nonEmpty" },
+        "resolved_by": { "const": "provider_id" },
+        "person": { "type": ["string", "null"], "minLength": 1 },
+        "role": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "place": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmpty" },
+        "kind": { "enum": ["direct", "group", "channel"] },
+        "name": { "type": "string" }
+      }
+    },
+    "member": {
+      "type": "object",
+      "required": ["provider_id", "person", "external"],
+      "properties": {
+        "provider_id": { "$ref": "#/$defs/nonEmpty" },
+        "person": { "type": ["string", "null"] },
+        "external": { "type": "boolean" }
+      }
+    },
+    "received": {
+      "type": "object",
+      "required": ["contract", "kind", "provider", "provider_message_id", "requested_at", "seen_at",
+                   "requester", "place", "thread", "audience", "body", "retention"],
+      "properties": {
+        "contract": { "const": "onion.chat/v1" },
+        "kind": { "const": "message.received" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "provider_message_id": { "$ref": "#/$defs/nonEmpty" },
+        "requested_at": { "$ref": "#/$defs/timestamp" },
+        "seen_at": { "$ref": "#/$defs/timestamp" },
+        "requester": { "$ref": "#/$defs/requester" },
+        "place": { "$ref": "#/$defs/place" },
+        "thread": {
+          "type": "object",
+          "required": ["id", "reply_to"],
+          "properties": {
+            "id": { "$ref": "#/$defs/nonEmpty" },
+            "reply_to": { "type": ["string", "null"] }
+          }
+        },
+        "audience": {
+          "type": "object",
+          "required": ["listed_at", "complete", "members"],
+          "properties": {
+            "listed_at": { "$ref": "#/$defs/timestamp" },
+            "complete": { "type": "boolean" },
+            "members": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/member" } }
+          }
+        },
+        "body": {
+          "type": "object",
+          "required": ["text", "untrusted"],
+          "properties": {
+            "text": { "type": "string" },
+            "untrusted": { "const": true }
+          }
+        },
+        "retention": {
+          "type": "object",
+          "required": ["class", "expires_at"],
+          "properties": {
+            "class": { "enum": ["third_party", "internal"] },
+            "expires_at": { "$ref": "#/$defs/timestamp" }
+          }
+        },
+        "mention": {
+          "type": "object",
+          "properties": {
+            "direct": { "type": "boolean" },
+            "by_context": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "reply": {
+      "type": "object",
+      "required": ["contract", "kind", "provider", "in_reply_to", "place", "thread", "signed_by", "on_behalf_of",
+                   "audience_checked", "leak_guard", "latency", "served", "audit", "body"],
+      "properties": {
+        "contract": { "const": "onion.chat/v1" },
+        "kind": { "const": "message.reply" },
+        "provider": { "$ref": "#/$defs/provider" },
+        "in_reply_to": { "$ref": "#/$defs/nonEmpty" },
+        "place": { "$ref": "#/$defs/place" },
+        "thread": {
+          "type": "object",
+          "required": ["id"],
+          "properties": { "id": { "$ref": "#/$defs/nonEmpty" } }
+        },
+        "signed_by": { "$ref": "#/$defs/nonEmpty" },
+        "on_behalf_of": { "$ref": "#/$defs/requester" },
+        "audience_checked": {
+          "type": "object",
+          "required": ["listed_at", "verdict"],
+          "properties": {
+            "listed_at": { "$ref": "#/$defs/timestamp" },
+            "verdict": { "enum": ["ok", "blocked"] }
+          }
+        },
+        "leak_guard": {
+          "type": "object",
+          "required": ["verdict"],
+          "properties": { "verdict": { "enum": ["passed", "blocked"] } }
+        },
+        "latency": {
+          "type": "object",
+          "required": ["requested_at", "seen_at", "replied_at"],
+          "properties": {
+            "requested_at": { "$ref": "#/$defs/timestamp" },
+            "seen_at": { "$ref": "#/$defs/timestamp" },
+            "replied_at": { "$ref": "#/$defs/timestamp" }
+          }
+        },
+        "served": {
+          "type": "object",
+          "required": ["asked"],
+          "properties": {
+            "asked": { "type": "boolean" },
+            "reason": { "type": "string" }
+          }
+        },
+        "audit": {
+          "type": "object",
+          "required": ["id"],
+          "properties": { "id": { "$ref": "#/$defs/nonEmpty" } }
+        },
+        "body": {
+          "type": "object",
+          "required": ["text"],
+          "properties": { "text": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
