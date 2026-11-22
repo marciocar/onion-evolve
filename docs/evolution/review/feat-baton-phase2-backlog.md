@@ -2,8 +2,7 @@
 branch: feat/baton-phase2-backlog
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 3f6aa52bd5012ac7f4ff56a958c69e14e5a2ef69345f6d297e77b8609a7dc6da
-reviewed_code_sha256: dd7d7c9962a89195ae262053cda7c9ff796160f678e264d9041a930bf88ba61d
+reviewed_diff_sha256: pendente
 findings_total: 19
 findings_real: 12
 findings_blocking: 3
@@ -62,3 +61,10 @@ Ajustes em casos antigos: o (a) e o (au) mudaram de âncora, e o (aa) passou a c
 - **Achado 11:** uma sessão ociosa que não vai pegar o card faz toda batida falar. Uma memória de «oferta já feita» seria a fase 3 (precisa de estado gravado por padrão, o que o nível 0 não faz).
 - **«aceita» sai `-` no `pulses.tsv`:** o pulso não vê se a sessão pegou o card. A aceitação se lê cruzando batidas.
 - **Só o Linear tem o `item.list`:** nos outros providers o backlog é lacuna declarada.
+
+## Re-revisão: a pilha desfeita (22/11)
+
+O #1716, base deste PR, entrou na main por squash. O rebase `--onto origin/main` tirou daqui os commits do #1716 que
+já estão na main; o diff deste PR passa a ser só a fase 2 da batuta, sobre a main. Nenhuma linha da fase 2 mudou: o
+hash de código mudou porque a base passou da branch do #1716 para a main. O carimbo volta a `pendente` para o
+`pr-finalize` carimbar de novo.
