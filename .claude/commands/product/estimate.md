@@ -197,7 +197,7 @@ SE range de estimativa > 50%:
   
   Ações:
   1. Identificar fontes de incerteza
-  2. Propor spike/POC para reduzir incerteza
+  2. Propor spike/POC para reduzir incerteza (`/engineer:spike`)
   3. Sugerir estimativa conservadora (maior valor do range)
   4. Documentar riscos e dependências
 ```
@@ -346,7 +346,7 @@ Se métricas históricas disponíveis:
 2. [ ] Definir responsável (se não definido)
 3. [ ] Criar task no gerenciador (se não criado)
 4. [ ] Documentar como reference story (se aplicável)
-5. [ ] Agendar spike/POC (se recomendado)
+5. [ ] Agendar spike/POC (se recomendado) com `/engineer:spike`
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```

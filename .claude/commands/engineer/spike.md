@@ -28,7 +28,9 @@ ponta a ponta no nosso contexto?»): o molde é o mesmo e muda só o tamanho da 
 passar pelo gate seguinte.
 
 **Por que `engineer:` e não `meta:`:** o spike vem **antes** do `/engineer:plan` em qualquer projeto que usa o
-Onion, não na evolução do próprio framework. Por isso ele viaja com a vertical de engenharia.
+Onion, não na evolução do próprio framework. Por isso ele viaja com a vertical de engenharia. O mesmo comando
+atende a pergunta técnica («é possível?») e a hipótese de valor («vale a pena?»); a segunda acrescenta o
+avaliador cego.
 
 ## O que este comando reusa (não recopia)
 
@@ -36,7 +38,10 @@ Onion, não na evolução do próprio framework. Por isso ele viaja com a vertic
   linha «PoC / spike»): a camada, o grau de certeza e a regra de nunca promover pulando o gate.
 - **Spike de hipótese de produto** ([`onion-drive-doctrine.md` §3.1](../../../docs/knowledge-base/concepts/onion-drive-doctrine.md)):
   quando a pergunta é de **valor** («isto vale a pena?»), valem o critério com **denominador fixo** e o
-  **avaliador cego**. Este comando aplica as duas regras e não as reescreve.
+  **avaliador cego**. Este comando aplica as duas regras e não as reescreve. Em uma linha cada, para quem
+  instalou só a vertical de engenharia: o denominador do critério (o «de quantos») não muda depois da medida; e
+  um agente separado, que não vê a hipótese, marca cada resultado manter ou descartar, porque sobreviver à
+  checagem premia a proposta trivial.
 - **`/product:estimate`** propõe spike quando a incerteza é alta. É dele que o spike costuma nascer.
 - **`/meta:peek`** e **`/onion-research`**: se a pergunta é «como o mercado faz?», ela não é spike. Espie ou pesquise.
 
@@ -49,7 +54,9 @@ Onion, não na evolução do próprio framework. Por isso ele viaja com a vertic
    depende de opinião de mercado, vá para o `/meta:peek`.
 3. **Preencha a ficha** (abaixo) e grave a pergunta como nó `Q_` com os campos `x_spike_*`.
    **Faça o commit ANTES de colher a amostra.** A ordem fica verificável no `git log`: critério antes do
-   resultado. Trocar o critério ou o denominador depois de medir é mover a régua.
+   resultado. Trocar o critério ou o denominador depois de medir é mover a régua. Se o merge for por squash, a
+   prova da ordem fica nos commits do PR: cite o sha do commit do critério na `evidence`. Ensaio da FORMA da
+   ficha antes do commit vale; colher a amostra que o critério julga, não.
 4. **Rode dentro da caixa**, numa pasta descartável fora do produto (`x_spike_workdir`). Não toque no que a
    ficha diz que não toca.
 5. **Estourou o tempo?** «Não respondeu no tempo» também é resultado. Registre-o e decida: matar ou abrir um
@@ -58,8 +65,13 @@ Onion, não na evolução do próprio framework. Por isso ele viaja com a vertic
    próximo degrau) e feche a pergunta (`status: done`). Spike com agente ou LLM declara o custo pelo contrato da
    casa: `run_id` · `tokens` · `agents` · `duration_min`.
 7. **Valide o grafo:** `bash .claude/validation/kg-radar.sh <grafo> --integrity --schema` tem de sair **exit 0**.
-   O nó `Q_` precisa de aresta para o nó que ele destrava: pergunta solta é nó órfão, e o radar a reprova.
-8. **Descarte ou promova.** `discard` apaga a pasta do spike; `poc` abre um spike novo com pergunta de PoC;
+   O nó `Q_` precisa de aresta para o nó que ele destrava já no commit 1: pergunta solta é nó órfão, e o radar
+   a reprova. O `label` fica em até 280 caracteres, e o resto vai para `narrative`: o contrato do grafo reprova o
+   label longo (onde o verificador do contrato estiver instalado; o radar não mede o tamanho). As duas regras
+   saíram do spike de prova deste molde.
+8. **Descarte ou promova.** Critério de morte disparado leva só a `discard`: a pasta do spike morre e a lição
+   fica no grafo. Se a lição pede outra tentativa, ela é um spike NOVO, com `Q_` novo e critério commitado antes;
+   nunca uma 2ª amostra do mesmo spike. Sem o critério disparado: `poc` abre um spike novo com pergunta de PoC, e
    `slice` segue para o `/engineer:plan` com a lição citada pelo id do nó.
 
 ## A ficha do spike
@@ -71,7 +83,7 @@ Onion, não na evolução do próprio framework. Por isso ele viaja com a vertic
 - **Destrava:** <nó ou funcionalidade que depende da resposta>
 - **Critério de morte** (escrito antes da amostra, com denominador fixo): <morre se ...>
 - **Critério de sucesso:** <passa se ...>
-- **Avaliador cego** (só em hipótese de valor): <agente separado que não vê a hipótese>
+- **Avaliador cego** (só em hipótese de valor): <agente separado que não vê a hipótese e marca manter ou descartar>
 - **Tempo-caixa:** <horas, não dias> · **prazo:** <AAAA-MM-DD>
 - **Prova:** <o que o resultado mostra>
 - **Não toca:** <produção, dados reais, repos, serviços que ficam fora>
@@ -116,7 +128,7 @@ nodes:
     node_type: decision
     status: confirmed
     label: "<o próximo degrau e por quê>"
-    x_spike_next: slice                # discard | poc | slice
+    x_spike_next: slice                # discard | poc | slice; critério de morte disparado = discard
 edges:
   - from: <nó que o spike destrava>    # commit 1: sem esta aresta a pergunta é nó órfão
     to: Q_SPIKE_<SLUG>_<MMDD>
@@ -133,7 +145,7 @@ edges:
 ```
 
 O bloco mostra só os campos do spike. Os campos de todo nó (`layer`, `plane`, `impact`, `confidence`,
-`verified_at`, `provenance`) seguem o contrato do grafo. No core, o primeiro spike deste molde está no grafo
+`verified_at`, `verified_against`, `provenance`) seguem o contrato do grafo. No core, o primeiro spike deste molde está no grafo
 `spike-standard-2026-11`, validado pelo radar e pelo contrato.
 
 ## O que este comando NÃO faz
@@ -141,5 +153,6 @@ O bloco mostra só os campos do spike. Os campos de todo nó (`layer`, `plane`, 
 - **Não pesquisa mercado.** Pergunta de mercado vai para o `/meta:peek` ou o `/onion-research`.
 - **Não promove.** O spike verde não é MVP. A promoção passa pelo `/engineer:plan` e pelo gate da escada.
 - **Não mede a ordem por você.** A regra «critério antes da amostra» fica no `git log`, e hoje nada a reprova.
-  O medidor que confere a ordem e o prazo vencido fica para quando houver spikes registrados para medir.
+  Os valores dos campos `x_spike_*` também não são conferidos por juiz nenhum. O medidor da ordem, do prazo
+  vencido e dos campos fica para quando houver spikes registrados para medir.
 - **Não guarda o código do spike** no produto. A pasta é descartável; o que fica é o grafo.

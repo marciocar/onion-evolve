@@ -9,4 +9,4 @@ Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento orga
 ## 🎯 Visão Geral
 
 O **Sistema Onion** é um **framework template em `.claude/`** — instalável em qualquer projeto (novo, legado ou regulado), plataforma única Claude Code, sem produto npm e sem CLI standalone. Inclui:
-   - 122 comandos invocáveis em 11 categorias
+   - 123 comandos invocáveis em 11 categorias

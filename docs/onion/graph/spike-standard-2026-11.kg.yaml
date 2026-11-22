@@ -9,8 +9,8 @@ meta:
   review_after: "2026-12-22"   # 30d: o molde é cunhagem a medir pelos primeiros spikes dos projetos
   x_supersedes_none: "Superfície nova: nenhum grafo anterior é superado. As peças vizinhas (escada de promoção, drive §3.1, peek) são citadas, não substituídas."
   # ═══ TETO: 12 NÓS ═══
-  # Nascem 7 (a decisão da forja, o sinal do hub, o spike de prova em 3 nós e a pergunta do medidor; o 7º é a
-  # decisão do spike). A folga é para o medidor da ordem e os primeiros spikes de projeto que o core registrar aqui.
+  # Nascem 9: a decisão da forja, o sinal do hub, os 2 spikes de prova em 3 nós cada (pergunta, evidência,
+  # decisão; o 1º morreu pelo critério) e a pergunta do medidor. A folga é para o medidor da ordem e os primeiros spikes de projeto que o core registrar aqui.
 nodes:
   - id: D_SPIKE_COMMAND_IN_ENGINEER_1122
     node_type: decision
@@ -19,7 +19,7 @@ nodes:
     status: open
     owner: core
     impact: 4
-    confidence: 0.6
+    confidence: 0.8
     verified_at: "2026-11-22"
     verified_against: "forge-census.sh no core em 2026-11-22: nenhum comando de spike entre os 67 candidatos; spike citado só em /product:estimate e em duas doutrinas"
     label: "O padrão de spike/PoC vira o comando /engineer:spike, com a ficha, a forma no grafo (Q_ -> evidence -> decision) e o reuso da escada de promoção e do drive §3.1."
@@ -49,7 +49,7 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 3
     confidence: 0.5
@@ -69,6 +69,84 @@ nodes:
       locator: ".claude/commands/engineer/spike.md, seção A forma no grafo"
       method: "testimony: pergunta da forja"
       locality: "host"
+  - id: E_SPIKE_XFIELDS_PASS_GATES_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "1ª amostra: commit 1 com 3 de 3 rc 0; estado do commit 2 com radar rc 0, yaml rc 0 e kg-contract-check rc 1 (SHOULD form.range.node.label). medida sem pré-registro depois de encurtar o label: 3 de 3 rc 0, não conta. Mutante com edge_type ANSWERS: radar rc 1"
+    label: "1ª amostra do spike de prova: 5 de 6. O contrato reprovou um label acima de 280 caracteres, e o critério de morte disparou."
+    narrative: "O label reprovado era o desta própria evidência: o primeiro texto passava de 280 caracteres, e o contrato manda a afirmação curta para o label e o resto para a narrative. A forma (Q_ com x_spike_*, evidence, decision e as arestas) passou nos três juízes; o que faltava era o molde DIZER o limite do label. Achado do ensaio no scratch, antes do commit 1: a pergunta sem aresta reprova no contrato (integrity.orphan-node), por isso o molde liga o Q_ ao nó que ele destrava já no commit 1. Depois de encurtar o label os três juízes saíram rc 0, mas essa medida não tem critério pré-registrado e não conta: o molde corrigido é julgado pelo spike novo Q_SPIKE_MOLDE_V2_1122. O critério deste spike está no commit 926f82435, anterior a esta evidência."
+    trace: "bash .claude/validation/kg-radar.sh docs/onion/graph/spike-standard-2026-11.kg.yaml --integrity --schema ; bash .claude/validation/kg-contract-check.sh docs/onion/graph/spike-standard-2026-11.kg.yaml"
+    x_spike_answered: "yes"
+    x_spike_cost: "run_id=n/a (sem agente nem LLM no spike) tokens=n/a agents=0 duration_min=25"
+    provenance:
+      source: "rodada do spike pela forja"
+      locator: "os dois commits deste grafo na branch feat/spike-command"
+      method: "measurement: rc dos três juízes"
+      locality: "host"
+  - id: D_SPIKE_XFIELDS_PASS_GATES_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: core
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-22"
+    verified_against: "E_SPIKE_XFIELDS_PASS_GATES_1122"
+    label: "O spike de prova morreu pelo critério escrito: discard. A lição entra no molde (label até 280 caracteres, aresta do nó destravado para o Q_ no commit 1), e o molde corrigido vai a um spike novo, Q_SPIKE_MOLDE_V2_1122."
+    narrative: "A 1ª versão desta decisão dizia slice, apoiada numa 2ª medida sem critério pré-registrado. O refutador da forja a derrubou (critério de morte disparado e spike promovido assim mesmo), e a cura entrou no passo 8 do comando: critério disparado leva só a discard, e outra tentativa é spike novo."
+    x_spike_next: discard
+    provenance:
+      source: "fechamento do spike pela forja"
+      locator: "E_SPIKE_XFIELDS_PASS_GATES_1122"
+      method: "judges: quem conduziu o spike, pela régua escrita antes"
+      locality: "host"
+  - id: Q_SPIKE_ORDER_MEASURER_1122
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-22"
+    verified_against: "forja do /engineer:spike em 2026-11-22: 1 spike registrado pelo molde (este grafo); nenhum medidor confere a ordem critério-antes-da-amostra"
+    label: "Medidor do spike: achar os nós com x_spike_kill nos grafos rastreados e reprovar o critério que chegou junto com a evidence ou depois, o prazo vencido com a pergunta open e valor de x_spike_* fora do enum; com bancada contra mutante."
+    narrative: "Peças 3 e 7 da forja, fora desta onda porque com 1 spike registrado não há série para o medidor ler (objeção N=1). Gatilho: 3 spikes registrados pelo molde em grafos rastreados, ou o primeiro caso medido de critério escrito depois da amostra. A bancada mora no lint-selftest.sh, então o PR dele toca guarda e o merge é do maestro."
+    provenance:
+      source: "forja do /engineer:spike"
+      locator: ".claude/commands/engineer/spike.md, seção O que este comando NÃO faz"
+      method: "testimony: decisão da forja"
+      locality: "host"
+  - id: Q_SPIKE_MOLDE_V2_1122
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-22"
+    verified_against: "critério escrito e commitado antes da amostra, depois do discard de Q_SPIKE_XFIELDS_PASS_GATES_1122"
+    label: "O molde corrigido (label até 280, aresta para o nó destravado no commit 1) passa nos 3 juízes com o resultado registrado, e a regra da aresta reprova quando violada?"
+    x_spike_kill: "morre se qualquer juiz (kg-radar --integrity --schema, kg-contract-check, yaml.safe_load) sair rc diferente de 0 neste grafo com a evidence e a decision deste spike (denominador fixo: 3 rodadas), ou se o mutante abaixo passar no radar"
+    x_spike_success: "3 de 3 rc 0, e o mutante deste grafo sem a aresta D_SPIKE_COMMAND_IN_ENGINEER_1122 -> Q_SPIKE_MOLDE_V2_1122 reprova no radar por nó órfão"
+    x_spike_timebox: "30min"
+    x_spike_deadline: "2026-11-22"
+    x_spike_proves: "que o molde corrigido é aceito pelos juízes e que a regra da aresta tem dente"
+    x_spike_untouched: "nenhum outro grafo rastreado; nenhum juiz é editado"
+    x_spike_undo: "reverter os commits deste spike; o mutante vive só no scratch"
+    x_spike_workdir: "scratch da sessão, fora do produto"
+    provenance:
+      source: "forja do /engineer:spike, depois do refutador"
+      locator: ".claude/commands/engineer/spike.md, passo 8"
+      method: "testimony: pergunta da forja"
+      locality: "host"
 edges:
   - from: D_SPIKE_COMMAND_IN_ENGINEER_1122
     to: Q_SPIKE_XFIELDS_PASS_GATES_1122
@@ -76,3 +154,18 @@ edges:
   - from: E_HUB_ASKED_SPIKE_STANDARD_1121
     to: D_SPIKE_COMMAND_IN_ENGINEER_1122
     edge_type: SUPPORTS
+  - from: E_SPIKE_XFIELDS_PASS_GATES_1122
+    to: Q_SPIKE_XFIELDS_PASS_GATES_1122
+    edge_type: TRACES_TO
+  - from: E_SPIKE_XFIELDS_PASS_GATES_1122
+    to: D_SPIKE_XFIELDS_PASS_GATES_1122
+    edge_type: SUPPORTS
+  - from: D_SPIKE_XFIELDS_PASS_GATES_1122
+    to: Q_SPIKE_XFIELDS_PASS_GATES_1122
+    edge_type: TRACES_TO
+  - from: Q_SPIKE_ORDER_MEASURER_1122
+    to: D_SPIKE_COMMAND_IN_ENGINEER_1122
+    edge_type: TRACES_TO
+  - from: D_SPIKE_COMMAND_IN_ENGINEER_1122
+    to: Q_SPIKE_MOLDE_V2_1122
+    edge_type: DEPENDS_ON

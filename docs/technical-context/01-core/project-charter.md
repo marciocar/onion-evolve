@@ -39,4 +39,4 @@ Não há métricas de produto (não é um app com usuários finais) — o crité
 
 | Área | Descrição | Fonte |
 |---|---|---|
-| Comandos invocáveis | 122 comandos em 11 categorias (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md`, `catch-up.md` no root | `docs/onion/inventory.md:8-9,15-29` (SSOT gerada) |
+| Comandos invocáveis | 123 comandos em 11 categorias (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md`, `catch-up.md` no root | `docs/onion/inventory.md:8-9,15-29` (SSOT gerada) |
