@@ -61630,22 +61630,23 @@ if s.count(o) == 1: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ
 }
 _family run_market_peek_selftests
 
-# ENTRADA CRUA DO jq NA FRONTEIRA DE 4096 BYTES (2026-11-22). O jq 1.7 corrompe o caractere UTF-8 multibyte que
-# cruza o byte 4096 quando lê entrada crua (`-R`, `-Rs`, `-Rsj`); o 'é' depois de 4094 bytes e o emoji de 4 bytes
-# depois de 4092 a 4094 reprovam, e a correção veio no jq 1.8.1 (jqlang/jq#3421). O `--rawfile` e o `--arg` não
-# têm o defeito (medido). Os pontos curados passaram a usar o `--rawfile`; aqui cada um é exercido com o
-# multibyte na fronteira, e cada caso morre num mutante que volta ao `jq -R`, plantado na CÓPIA.
+# ENTRADA CRUA DO jq NA FRONTEIRA DE BLOCO (2026-11-22). O jq até 1.8.1 corrompe o caractere UTF-8 multibyte que
+# cruza cada bloco de leitura de ~4 KiB da entrada crua (`-R`, `-Rs`, `-Rsj`): o 'é' depois de 4094 bytes, o emoji
+# de 4 bytes depois de 4092 a 4094 e de novo perto de 8192 (o teto do corpo A2A) reprovam; a correção veio no
+# jq 1.8.2 (jqlang/jq#3421). O `--rawfile` e o `--arg` não têm o defeito (medido até 65536). Os pontos curados
+# passaram a usar um dos dois; aqui cada um é exercido com o multibyte na fronteira, e cada caso morre num
+# mutante que volta ao `jq -R`, plantado na CÓPIA.
 #   (a) a2a-send.sh: corpo válido acima de 4 KiB é aceito e viaja byte a byte; corpo inválido segue recusado.
-#   (b) merge-onion-hooks.sh: regra aposentada com multibyte na fronteira do fluxo sai do deny do alvo.
+#   (b) merge-onion-hooks.sh: regra aposentada com multibyte na fronteira sai do deny do alvo; leitor que falha para o merge.
 #   Os pareceres (review-verdict.sh e ops/review-gate-health.sh) têm o caso no --selftest de cada um.
 run_jq_raw_utf8_selftests() {
   echo ""
-  echo "▸ jq-raw-utf8 — multibyte na fronteira de 4096 bytes da entrada crua do jq (o --rawfile no lugar do -R)"
+  echo "▸ jq-raw-utf8 — multibyte na fronteira de bloco (~4 KiB) da entrada crua do jq (o --rawfile ou o --arg no lugar do -R)"
   local ft="${REPO_ROOT}/.claude/utils/federation-transport" ad="${REPO_ROOT}/.claude/utils/adopt"
   if ! command -v jq >/dev/null 2>&1 || ! command -v openssl >/dev/null 2>&1; then
     record_skip "jq-raw-utf8: jq/openssl ausente (SUT não exercido)"; return; fi
   local sb; sb="$(TMPDIR=/tmp mktemp -d)"
-  _jru_body() { printf '%*s' "$1" '' | tr ' ' a; printf '%s' "$2"; printf 'b%.0s' $(seq 1 100); }  # $1=prefixo $2=multibyte
+  _jru_body() { printf '%*s' "$1" '' | tr ' ' a; printf '%s' "$2"; printf '%*s' "${3:-100}" '' | tr ' ' b; }  # $1=prefixo $2=multibyte $3=cauda
   _jru_copy() { # $1=SUT $2=destino $3=antigo $4=novo (vazio = cópia fiel) · a âncora tem de ocorrer 1 vez
     if [ -z "$3" ]; then cp "$1" "$2"; return 0; fi
     python3 -c 'import sys
@@ -61654,7 +61655,7 @@ if s.count(a)!=1: sys.exit(3)
 open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,n))' "$1" "$2" "$3" "$4"
   }
   local cases="4094:é 4093:😀 4092:😀" c jv defect=0
-  # O mutante só pode morder num jq que TEM o defeito (≤ 1.8.0). Num jq corrigido o `-R` volta íntegro e o mutante é
+  # O mutante só pode morder num jq que TEM o defeito (≤ 1.8.1). Num jq corrigido o `-R` volta íntegro e o mutante é
   # equivalente: a sonda mede o jq do host, e o veredito do mutante segue a sonda, declarado (nunca um ✓ mudo).
   jv="$(jq --version 2>&1)"
   _jru_body 4094 'é' > "${sb}/probe.txt"
@@ -61663,7 +61664,7 @@ open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,n))' "$1" "$2" "$3" "$4
     if [ "${defect}" = 1 ]; then
       if [ "$2" -ne 0 ]; then record_pass "jq-raw-utf8: $1 mutante que volta ao jq -R morde (${jv}, com o defeito)"
       else record_fail "jq-raw-utf8: $1 mutante (volta ao jq -R) NÃO morde" "${jv} tem o defeito (sonda) e o caso passou com o mutante"; fi
-    elif [ "$2" -eq 0 ]; then record_pass "jq-raw-utf8: $1 ${jv} sem o defeito (sonda): o mutante é equivalente aqui; ele morde num jq ≤ 1.8.0"
+    elif [ "$2" -eq 0 ]; then record_pass "jq-raw-utf8: $1 ${jv} sem o defeito (sonda): o mutante é equivalente aqui; ele morde num jq ≤ 1.8.1"
     else record_fail "jq-raw-utf8: $1 mutante reprovou num jq sem o defeito" "${jv}: o caso depende de outra coisa além do -R"; fi
   }
 
@@ -61674,15 +61675,16 @@ open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,n))' "$1" "$2" "$3" "$4
       HOME="${sb}/h" XDG_CONFIG_HOME="${sb}/h/.config" bash "$1" --from acme --to core-x --key "${sb}/k.pem" \
         --body-file "$2" --dry-run > "${sb}/env.json" 2>"${sb}/send.err"
     }
-    _jru_a_ok() { # $1=script · todos os corpos de fronteira aceitos e byte a byte
-      local c; for c in ${cases}; do
-        _jru_body "${c%%:*}" "${c#*:}" > "${sb}/b.txt"
+    _jru_a_ok() { # $1=script · todos os corpos de fronteira aceitos e byte a byte (o último fecha no teto de 8192)
+      local c; for c in ${cases} 8187:😀:1; do
+        c="${c}:100"; IFS=: read -r _p _m _t _ <<< "${c}"
+        _jru_body "${_p}" "${_m}" "${_t}" > "${sb}/b.txt"
         _jru_send "$1" "${sb}/b.txt" || return 1
         jq -j .signal.body "${sb}/env.json" | cmp -s - "${sb}/b.txt" || return 1
       done
     }
     cp "${ft}/a2a-send.sh" "${sb}/send.sh"
-    if _jru_a_ok "${sb}/send.sh"; then record_pass "jq-raw-utf8: (a) a2a-send aceita corpo com é/emoji na fronteira de 4096 e o envelope o carrega byte a byte"
+    if _jru_a_ok "${sb}/send.sh"; then record_pass "jq-raw-utf8: (a) a2a-send aceita corpo com é/emoji na fronteira de 4096 e de 8192 (no teto) e o envelope o carrega byte a byte"
     else record_fail "jq-raw-utf8: (a) a2a-send recusou ou adulterou corpo válido na fronteira" "$(head -c 200 "${sb}/send.err")"; fi
     printf 'ab\303' > "${sb}/bad.txt"
     if ! _jru_send "${sb}/send.sh" "${sb}/bad.txt" && grep -q 'não é UTF-8 válido' "${sb}/send.err"; then
@@ -61708,13 +61710,29 @@ open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,n))' "$1" "$2" "$3" "$4
         [ "$(jq -c '.permissions.deny' "${d}/out.json")" = '["Bash(keep)"]' ] || return 1
       done
     }
-    if _jru_b_ok "${ad}/merge-onion-hooks.sh"; then record_pass "jq-raw-utf8: (b) merge-onion-hooks retira do alvo a regra aposentada com é/emoji na fronteira de 4096"
+    if _jru_b_ok "${ad}/merge-onion-hooks.sh"; then record_pass "jq-raw-utf8: (b) merge-onion-hooks retira do alvo a regra aposentada com é/emoji na fronteira de ~4 KiB"
     else record_fail "jq-raw-utf8: (b) regra aposentada com multibyte na fronteira ficou no alvo" "$(head -c 200 "${sb}/mo/err")"; fi
     if _jru_copy "${ad}/merge-onion-hooks.sh" "${sb}/merge-m.sh" \
-         'jq -nc --rawfile v <(bash "${_HERE}/deny-retired-list.sh" "${_HERE}/deny-retired.tsv") \' \
-         'bash "${_HERE}/deny-retired-list.sh" "${_HERE}/deny-retired.tsv" | jq -R . | jq -sc .; return 0; \'; then
+         'jq -nc --arg v "${l}" '"'"'$v | split("\n") | map(select(. != ""))'"'"'' \
+         'printf "%s\n" "${l}" | jq -R . | jq -sc .'; then
       local mrc=0; _jru_b_ok "${sb}/merge-m.sh" || mrc=1; _jru_mut "(b)" "${mrc}"
-    else record_fail "jq-raw-utf8: (b) mutante não aplicou" "âncora do --rawfile ausente ou repetida no merge-onion-hooks.sh"; fi
+    else record_fail "jq-raw-utf8: (b) mutante não aplicou" "âncora do --arg ausente ou repetida no merge-onion-hooks.sh"; fi
+    # (b2) o leitor da lista que falha PARA o merge (o pipeline antigo com pipefail parava; o --arg não pode afrouxar)
+    _jru_b2() { # $1=script do merge → 0 se o merge parou com o leitor falho
+      local d="${sb}/mo2"; rm -rf "${d}"; mkdir -p "${d}"; cp "$1" "${d}/merge-onion-hooks.sh"
+      printf '#!/usr/bin/env bash\necho "Bash(rm *)"; exit 1\n' > "${d}/deny-retired-list.sh"; : > "${d}/deny-retired.tsv"
+      printf '{"hooks":{},"permissions":{"deny":[]}}' > "${d}/src.json"
+      printf '{"permissions":{"deny":["Bash(rm *)","Bash(keep)"]}}' > "${d}/tgt.json"
+      ! bash "${d}/merge-onion-hooks.sh" "${d}/src.json" "${d}/tgt.json" > "${d}/out.json" 2>"${d}/err"
+    }
+    if _jru_b2 "${ad}/merge-onion-hooks.sh"; then record_pass "jq-raw-utf8: (b2) leitor da lista que falha para o merge (nada sai do alvo pela metade)"
+    else record_fail "jq-raw-utf8: (b2) leitor falho e o merge seguiu" "$(head -c 200 "${sb}/mo2/err")"; fi
+    if _jru_copy "${ad}/merge-onion-hooks.sh" "${sb}/merge-m2.sh" \
+         'l="$(bash "${_HERE}/deny-retired-list.sh" "${_HERE}/deny-retired.tsv")" || return 1' \
+         'l="$(bash "${_HERE}/deny-retired-list.sh" "${_HERE}/deny-retired.tsv")" || true'; then
+      if _jru_b2 "${sb}/merge-m2.sh"; then record_fail "jq-raw-utf8: (b2) mutante (|| true) NÃO morde" "o merge parou mesmo engolindo a falha do leitor"
+      else record_pass "jq-raw-utf8: (b2) mutante que engole a falha do leitor morde"; fi
+    else record_fail "jq-raw-utf8: (b2) mutante não aplicou" "âncora do leitor ausente ou repetida no merge-onion-hooks.sh"; fi
   else record_skip "jq-raw-utf8: (b) adopt/merge-onion-hooks.sh ausente"; fi
   rm -rf "${sb}"
 }
