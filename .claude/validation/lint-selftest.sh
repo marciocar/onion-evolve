@@ -38884,7 +38884,7 @@ run_egress_uid_fence_selftests() {
   local rc=0 out
   out="$(bash "${ef}" --selftest 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ]; then
-    record_pass "egress-uid-fence: bancada sandbox verde ($(printf '%s' "${out}" | grep -o '[0-9]* pass' | head -1))"
+    record_pass "egress-uid-fence: bancada sandbox verde ($(printf '%s' "${out}" | grep -o '[0-9][0-9]* pass /' | sed 's| /$||' | head -1))"
   else
     record_fail "egress-uid-fence: --selftest" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
   fi
