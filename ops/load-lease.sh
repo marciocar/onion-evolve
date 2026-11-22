@@ -33,6 +33,10 @@
 #   · A VAGA DE BANCADA CHEIA é um arquivo de lock por usuário, no MESMO lugar das vagas da bancada
 #     (/run/user/<uid>/ se for meu, senão /tmp/…-<uid>): comum a toda worktree e sessão. O fd da vaga NÃO
 #     desce ao <cmd> (neto órfão não segura vaga; dono morto por kill -9 solta a vaga com o próprio fd).
+#   · VAGA ÓRFÃ (2026-11-22): quem pega a vaga SOURÇADO (o pr-finalize) passa o fd a todo filho, e o filho que
+#     sobrevive ao dono segura o flock. Ao contar, a vaga presa cujo dono registrado morreu (ou cujo pid foi
+#     reusado) não conta; a do dono vivo mas órfão (ppid 1) deixa de contar depois de ONION_LOAD_ORPHAN_MAX.
+#     Ninguém é morto: a vaga só sai da conta, e a admissão por carga segue valendo. Fonte trocável: ONION_LOAD_PROC.
 #   · ANINHADO: quem já foi admitido exporta ONION_LOAD_LEASE_HELD; um chamador de dentro (o pre-commit que
 #     o pr-finalize dispara, uma família da bancada que invoca o hook) não espera de novo nem disputa a vaga
 #     que o pai segura (deadlock). A bancada exporta ONION_LOAD_LEASE_HELD=bench para as famílias.
@@ -64,6 +68,7 @@ _ll_load_settings() {
   LL_PSI_HIGH="$(_ll_conf ONION_LOAD_PSI_HIGH '')"
   LL_SLOTS_MAX="$(_ll_conf ONION_LOAD_SLOTS_MAX 4)"
   LL_SLOT_CPUS="$(_ll_conf ONION_LOAD_SLOT_CPUS 2)"
+  LL_ORPHAN_MAX="$(_ll_conf ONION_LOAD_ORPHAN_MAX 7200)"
   local bad=""
   if [ -n "${LL_PSI_HIGH}" ]; then _ll_num "${LL_PSI_HIGH}" || bad="ONION_LOAD_PSI_HIGH='${LL_PSI_HIGH}'"; fi
   _ll_num "${LL_HIGH}" || bad="ONION_LOAD_HIGH='${LL_HIGH}'"
@@ -71,6 +76,7 @@ _ll_load_settings() {
   case "${LL_MAX}" in ''|*[!0-9]*) bad="${bad:+${bad} }ONION_LOAD_WAIT_MAX='${LL_MAX}'" ;; esac
   case "${LL_POLL}" in ''|*[!0-9]*|0) bad="${bad:+${bad} }ONION_LOAD_POLL='${LL_POLL}'" ;; esac
   case "${LL_SLOTS_MAX}" in ''|*[!0-9]*|0) bad="${bad:+${bad} }ONION_LOAD_SLOTS_MAX='${LL_SLOTS_MAX}'" ;; esac
+  case "${LL_ORPHAN_MAX}" in ''|*[!0-9]*) bad="${bad:+${bad} }ONION_LOAD_ORPHAN_MAX='${LL_ORPHAN_MAX}'" ;; esac
   _ll_num "${LL_SLOT_CPUS}" && LC_ALL=C awk -v c="${LL_SLOT_CPUS}" 'BEGIN { exit !(c > 0) }' || bad="${bad:+${bad} }ONION_LOAD_SLOT_CPUS='${LL_SLOT_CPUS}'"
   if [ -n "${bad}" ]; then echo "load-lease: régua inválida (${bad}) — não julgo carga com número que não é número" >&2; return 2; fi
   if LC_ALL=C awk -v r="${LL_RESUME}" -v h="${LL_HIGH}" 'BEGIN { exit !(r > h) }'; then
@@ -185,14 +191,74 @@ _ll_slots() {  # $1 = load1 → N
 }
 _ll_holders() {  # quem segura as vagas, numa linha
   local d="$1" f out=""
-  for f in "${d}"/slot.*.holder; do [ -s "${f}" ] && out="${out:+${out} | }$(basename "${f}" .holder): $(cat "${f}")"; done
+  local i why
+  for f in "${d}"/slot.*.holder; do
+    [ -s "${f}" ] || continue
+    i="${f##*/slot.}"; i="${i%.holder}"; why=""
+    why="$(_ll_slot_stale "${d}" "${i}")" || why=""
+    out="${out:+${out} | }$(basename "${f}" .holder): $(cat "${f}")${why:+ [fora da conta: ${why}]}"
+  done
   printf '%s' "${out:-nenhum dono registrado}"
+}
+# ── VAGA ÓRFÃ (defeito medido em 2026-11-21/22) ──────────────────────────────────────────────────────────────
+# Um lint-selftest completo cujo pai já tinha morrido (reparentado ao PID 1) segurou uma vaga por 7h42, e as filas
+# das outras sessões pararam atrás dele. Medido como o lease registra o dono: o flock é do fd, e o slot.<i>.holder
+# diz `pid <dono> · <quem> · desde <UTC>`. Pego SOURÇADO (o pr-finalize), o fd desce a TODO filho (lsof em
+# 2026-11-22: o fd da vaga aberto em bash, subshells e python3 do pré-voo); o dono morre e o filho segue com a
+# vaga. Pego pelo `run`, o dono é o próprio `run`, vivo enquanto o comando roda, e órfão se a sessão que o
+# chamou acabou. Não dá para soltar o flock de outro processo sem matá-lo, e matar processo alheio está fora:
+# a vaga presa sem dono legítimo SÓ SAI DA CONTA, e a varredura olha uma vaga extra por vaga órfã achada (até
+# 2×SLOTS_MAX), para que a órfã não ocupe o lugar de uma livre. Critérios, com o pid lido de ONION_LOAD_PROC:
+#   · dono registrado MORTO (sem /proc/<pid>), ou pid REUSADO (o início do processo difere do gravado) ⇒ na hora;
+#   · dono vivo e ÓRFÃO (ppid 1, ou pai `systemd`, o subreaper) há ONION_LOAD_ORPHAN_MAX s ou mais ⇒ sai da conta;
+#   · vaga presa SEM dono registrado (holder vazio) há ONION_LOAD_ORPHAN_MAX s pelo mtime do holder ⇒ sai da conta;
+#   · holder em formato desconhecido, ou sem /proc nesta plataforma ⇒ CONTA (na dúvida a vaga é do dono).
+_ll_proc() { printf '%s' "${ONION_LOAD_PROC:-/proc}"; }
+_ll_pstat() {  # $1 = pid → "ppid início" (campos 4 e 22 do stat) · rc 1 se o processo não existe
+  local s; s="$(cat "$(_ll_proc)/$1/stat" 2>/dev/null)" || return 1
+  [ -n "${s}" ] || return 1
+  s="${s##*) }"   # o comm pode ter espaço e parêntese: corta até o ÚLTIMO ") "
+  LC_ALL=C awk '{ print $2, $20 }' <<< "${s}"
+}
+_ll_mystart() { local v; v="$(_ll_pstat "$$")" && printf '%s' "${v#* }"; }
+# _ll_slot_stale <dir> <i> → rc 0 (e o motivo no stdout) = a vaga está presa sem dono legítimo · rc 1 = conta
+_ll_slot_stale() {
+  local h="$1/slot.$2.holder" rec pid since st0 cur ppid start now t age pcomm
+  [ -d "$(_ll_proc)" ] || return 1
+  [ -e "${h}" ] || return 1
+  now="$(date -u +%s)"
+  rec="$(cat "${h}" 2>/dev/null)"
+  if [ -z "${rec}" ]; then
+    t="$(stat -c %Y "${h}" 2>/dev/null)" || return 1
+    age=$(( now - t ))
+    [ "${age}" -ge "${LL_ORPHAN_MAX}" ] || return 1
+    printf 'presa sem dono registrado há %ss (teto %ss)' "${age}" "${LL_ORPHAN_MAX}"; return 0
+  fi
+  pid="$(LC_ALL=C sed -n 's/^pid \([0-9][0-9]*\) .*/\1/p' <<< "${rec}")"
+  [ -n "${pid}" ] || return 1
+  since="$(LC_ALL=C sed -n 's/.* desde \([0-9][0-9T:-]*Z\).*/\1/p' <<< "${rec}")"
+  st0="$(LC_ALL=C sed -n 's/.* início \([0-9][0-9]*\).*/\1/p' <<< "${rec}")"
+  if ! cur="$(_ll_pstat "${pid}")"; then
+    printf 'dono pid %s MORTO' "${pid}"; return 0
+  fi
+  ppid="${cur%% *}"; start="${cur#* }"
+  if [ -n "${st0}" ] && [ "${st0}" != "${start}" ]; then
+    printf 'dono pid %s MORTO (o pid foi reusado: início %s, gravado %s)' "${pid}" "${start}" "${st0}"; return 0
+  fi
+  pcomm="$(cat "$(_ll_proc)/${ppid}/comm" 2>/dev/null)"
+  if [ "${ppid}" = 1 ] || [ "${pcomm}" = systemd ]; then
+    t="$(date -u -d "${since}" +%s 2>/dev/null)" || return 1
+    age=$(( now - t ))
+    [ "${age}" -ge "${LL_ORPHAN_MAX}" ] || return 1
+    printf 'dono pid %s ÓRFÃO (ppid %s) há %ss, acima do teto de %ss' "${pid}" "${ppid}" "${age}" "${LL_ORPHAN_MAX}"; return 0
+  fi
+  return 1
 }
 # load_lease_acquire [teto] → rc 0 com a vaga em LL_FD (exporta ONION_LOAD_LEASE_HELD) · 4 teto · 2 erro
 # Só serve SOURÇADO: a vaga vive enquanto o shell que a pegou viver (é fd, não arquivo).
 load_lease_acquire() {
   _ll_load_settings || return 2
-  local max="${1:-${LL_MAX}}" t0=${SECONDS} rc d l k i fd afd busy cand ci said=0 left
+  local max="${1:-${LL_MAX}}" t0=${SECONDS} rc d l k i fd afd busy cand ci said=0 left stale why scan stale_said=0
   case "${max}" in ''|*[!0-9]*) echo "load-lease: teto '${max}' não é inteiro de segundos" >&2; return 2 ;; esac
   _ll_bypass && return 0
   command -v flock >/dev/null 2>&1 || { echo "load-lease: flock ausente (util-linux) — não há vaga para dar" >&2; return 2; }
@@ -217,17 +283,25 @@ load_lease_acquire() {
     # as tomadas e só entro se tomadas < N, na 1ª livre.
     exec {afd}>>"${d}/admit.lock" || { echo "load-lease: não abri ${d}/admit.lock" >&2; return 2; }
     flock -w 10 "${afd}" || { exec {afd}>&-; echo "load-lease: a trava de admissão ficou presa 10 s" >&2; return 2; }
-    busy=0; cand=""; ci=""
-    for (( i = 0; i < LL_SLOTS_MAX; i++ )); do
+    busy=0; cand=""; ci=""; stale=0; scan="${LL_SLOTS_MAX}"
+    for (( i = 0; i < scan; i++ )); do
       exec {fd}>>"${d}/slot.${i}.lock" || { exec {afd}>&-; echo "load-lease: não abri ${d}/slot.${i}.lock" >&2; return 2; }
       if flock -n "${fd}"; then
         if [ -z "${cand}" ]; then cand="${fd}"; ci="${i}"; else exec {fd}>&-; fi
+      elif why="$(_ll_slot_stale "${d}" "${i}")"; then
+        # vaga ÓRFÃ: sai da conta e abre uma vaga a mais na varredura (teto 2×SLOTS_MAX)
+        exec {fd}>&-; stale=$(( stale + 1 ))
+        [ "${scan}" -lt $(( 2 * LL_SLOTS_MAX )) ] && scan=$(( scan + 1 ))
+        [ "${stale_said}" = 1 ] || echo "load-lease: vaga slot.${i} presa sem dono legítimo NÃO conta — ${why}; ninguém foi morto: a vaga só saiu da conta" >&2
       else busy=$(( busy + 1 )); exec {fd}>&-; fi
     done
+    [ "${stale}" -gt 0 ] && stale_said=1
     if [ -n "${cand}" ] && [ "${busy}" -lt "${k}" ]; then
-      exec {afd}>&-
       LL_FD="${cand}"; LL_LOCK="${d}/slot.${ci}.lock"
-      printf 'pid %s · %s · desde %s\n' "$$" "${ONION_LOAD_LEASE_WHO:-${0##*/}}" "$(date -u +%FT%TZ)" > "${d}/slot.${ci}.holder" 2>/dev/null || true
+      # o holder se grava AINDA SOB a trava de admissão: escrito depois, quem contasse no meio leria o dono anterior
+      # (morto) e tiraria da conta uma vaga que acabou de ter dono
+      printf 'pid %s · %s · desde %s · início %s\n' "$$" "${ONION_LOAD_LEASE_WHO:-${0##*/}}" "$(date -u +%FT%TZ)" "$(_ll_mystart)" > "${d}/slot.${ci}.holder" 2>/dev/null || true
+      exec {afd}>&-
       export ONION_LOAD_LEASE_HELD="${LL_LOCK}"
       echo "load-lease: vaga de passo pesado PEGA ($(( busy + 1 )) de ${k}: N derivado de load ${l}; ${LL_LOCK})" >&2
       return 0
