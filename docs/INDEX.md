@@ -10,4 +10,4 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- **123 comandos invocáveis** em 11 categorias + root (+ 30 fragmentos `common/` + 11 READMEs de categoria)
+- **124 comandos invocáveis** em 11 categorias + root (+ 30 fragmentos `common/` + 11 READMEs de categoria)
