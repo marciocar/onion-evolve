@@ -2,7 +2,8 @@
 branch: fix/adopt-three-defects
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8862659e6eedf8bad9c51c693a8911d97dcbe1236a25e86221e9f5ca4fb06139
+reviewed_code_sha256: 01592d04f34c9af57dcfa9bc6014684b0938a9d9e95e12a77a49917b5624c7b3
 findings_total: 11
 findings_real: 9
 findings_blocking: 5

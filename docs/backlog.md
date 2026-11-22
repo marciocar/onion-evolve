@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1209 itens abertos** em 178 grafo(s) com aberto (de 237 no escopo) · 171 grupo(s), agrupados por `owner:` (74 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1210 itens abertos** em 179 grafo(s) com aberto (de 238 no escopo) · 171 grupo(s), agrupados por `owner:` (75 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1127,7 +1127,7 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## core — 48 item(ns)
+## core — 49 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1140,6 +1140,7 @@
 | 13.6 | `Q_CORE_AGENT_CARD_A2A_1_0_1118` | outside-in-primaries-2026-11 | O Agent Card do core declara o protocolo A2A atual e só os esquemas que respondem? |
 | 12.5 | `Q_PF_IDENTITY_ROLE_1123` | persona-fases-2-3-2026-11 | A resolução de identidade e papel: o usuário do chat vira pessoa pelo provedor de identidade da família, e a pessoa vira papel |
 | 10.0 | `Q_PF_CHAT_SESSION_BRIDGE_1124` | persona-fases-2-3-2026-11 | A ponte entre o serviço do chat e a sessão do adotante: contrato versionado e daemon na mensageria, com a instância rodando com |
+| 9.6 | `Q_ADOPT_GREENFIELD_TRES_DEFEITOS_1122` | adopt-greenfield-defects-2026-11 | os três defeitos da adoção greenfield (linha core efêmera, corrida das provas do gate, __pycache__ fora do .gitignore) estão  |
 | 9.6 | `Q_BATON_PHASE2_MATCH_AND_MEASURE_1112` | forge-baton-2026-11 | fase 2: casar a sessão ociosa com a fila dela (oferta, nunca ordem) e medir por um dia as horas ociosas com fila, antes e depois  |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
