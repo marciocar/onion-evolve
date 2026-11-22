@@ -2,8 +2,7 @@
 branch: feat/gokapi-oidc-provision
 pr: 1736
 date: 2026-11-22
-reviewed_diff_sha256: 64e119d12408606d6614a383efa17d2939c840fc683511d4d5e3ccf48fd54ffa
-reviewed_code_sha256: 6adcb22cbf5b473c38583cf7b916c5003d37da811a02a125bc96d7c5497c7d4e
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 6
 findings_blocking: 3
@@ -12,6 +11,7 @@ duration_min: 4
 findings_fixed: 6
 verdict: FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: general-purpose opus (refutador isolado, mandato refutar: vazamento de segredo e idempotência)
 nota: "A bancada foi de 26 para 30 casos com as curas; mutantes por ops/mutate-and-restore.sh: 19 plantadas, 18 mortes de primeira; o sobrevivente virou o caso 3b e morreu na replantação."
 ---
