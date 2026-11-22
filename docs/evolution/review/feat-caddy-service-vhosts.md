@@ -2,7 +2,8 @@
 branch: feat/caddy-service-vhosts
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: cce9abcb1f84a72227131305160ca97838a677843ff718a6086bf04f2ca5d372
+reviewed_code_sha256: 2fd7fe25b519e6aa9114e3d764aca4390b4ddd068399cf67a3806b7d8a3ec4cc
 findings_total: 17
 findings_real: 17
 findings_blocking: 3
