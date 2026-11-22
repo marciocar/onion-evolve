@@ -57,7 +57,7 @@ nodes:
     impact: 3
     confidence: 0.75
     verified_at: "2026-11-22"
-    verified_against: "leitura do código do onion-messaging em db94954 (igual à origin/main medida por git ls-remote): tools/notify/remind.py, watcher/onion_watcher/channels.py e events.py, queue/onion_queue/daemon.py; conformance.py capabilities --strict sobre a declaração"
+    verified_against: "leitura do código da peça de mensageria na origin/main de 2026-11-22 (conferida por git ls-remote; o commit fica fora deste repo público, REGRA 121): tools/notify/remind.py, watcher/onion_watcher/channels.py e events.py, queue/onion_queue/daemon.py; conformance.py capabilities --strict sobre a declaração"
     label: "O adapter WAHA na peça onion-messaging cumpre 3 de 17 capacidades obrigatórias: envio, ack e teto de mídia; a recepção entrega o corpo bruto, sem os 5 campos"
     narrative: "A 1ª declaração contava 6; a revisão isolada mostrou que guarda de vazamento (não reconhece dado de quem não está na audiência), teto (sem ritmo por conversa) e segredo fora da saída (medido só no envio) são parciais pelas notas das próprias linhas. Parciais: recepção (CloudEvent com o corpo bruto do WAHA), audiência (só --groups), dedupe (pelo sha256 do corpo, não pelo id da mensagem), retenção (prune do dono, sem prazo de corpos de terceiros), auditoria (só do envio), além das três acima. Faltam: responder no fio, mapa de identidade, «serviu?», latência e marca de quem leu; a perda do número não foi medida. Medida por leitura, nada rodado contra o WAHA."
     provenance:

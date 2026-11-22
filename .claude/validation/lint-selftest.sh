@@ -52211,6 +52211,9 @@ w("otherplace", ev, mut(rp, lambda o: o["place"].update(id="other-group@example"
 w("otherthread", ev, mut(rp, lambda o: o["thread"].update(id="msg-example-9999")))
 w("otherreq", ev, mut(rp, lambda o: o["on_behalf_of"].update(provider_id="member-b@example", person="person-b")))
 w("otherlat", ev, mut(rp, lambda o: o["latency"].update(requested_at="2026-11-22T12:00:00Z")))
+w("otherrole", ev, mut(rp, lambda o: o["on_behalf_of"].update(role="admin")))
+w("otherperson", ev, mut(rp, lambda o: o["on_behalf_of"].update(person="person-b")))
+w("twoplaces", ev, mut(ev, lambda o: o["place"].update(id="other-group@example")), mut(rp, lambda o: o["place"].update(id="other-group@example")))
 open(f"{d}/notjson.jsonl", "w").write("isto nao e json\n")
 open(f"{d}/emptylist.json", "w").write("[]\n")
 rows = open(sys.argv[1] + "/../adapters/waha.capabilities.tsv").read().splitlines()
@@ -52225,7 +52228,8 @@ PY
   _cc check "${ex}/reply.example.json"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${d}/stream.jsonl"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${d}/datetext.jsonl"; [ "${rc}" = 0 ] || a_ok=0
-  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0); data e hora no texto não contam como número"
+  _cc check "${d}/twoplaces.jsonl"; [ "${rc}" = 0 ] || a_ok=0
+  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0); data e hora no texto não contam como número; mesmo id em dois lugares, a resposta ao 2º vale"
   else record_fail "chat-conformance: (a) exemplos conformes" "rc=${rc} out=[${out}]"; fi
   # (b..m) cada falta reprova com rc 1 e o código dela
   local c f code
@@ -52257,6 +52261,8 @@ l10|otherthread|FIO
 l11|otherreq|IDENTIDADE-FORA-DO-ID
 l12|otherlat|LATENCIA
 l13|notjson|NAO-E-JSON
+l14|otherrole|IDENTIDADE-FORA-DO-ID
+l15|otherperson|IDENTIDADE-FORA-DO-ID
 CASES
   # (m) a declaração real do adapter WAHA está bem formada (rc 0); com --strict, o adapter reprova pelo que falta
   _cc capabilities "${tsv}"

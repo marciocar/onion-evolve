@@ -3,16 +3,16 @@ branch: feat/chat-channel-contract
 pr: pendente
 date: 2026-11-22
 reviewed_diff_sha256: pendente
-findings_total: 14
-findings_real: 14
+findings_total: 19
+findings_real: 19
 findings_blocking: 6
-tokens: 147754
-duration_min: 6
-findings_fixed: 9
+tokens: 317279
+duration_min: 8
+findings_fixed: 11
 verdict: REJECTED_AND_FIXED
 elenxo: false
 reviewer: general-purpose (opus), isolado
-nota: "revisor isolado com mandato de refutar, sem ver o raciocínio da sessão; tokens e duração são os do agente revisor. Os 6 que bloqueavam foram curados; dos 8 limites, 3 foram curados (nomes privados, pontos do Delphi, fonte do nó de origem) e 5 ficam declarados no README e abaixo."
+nota: "duas passadas do mesmo revisor isolado (14 achados na 1ª, 5 novos na 2ª, sobre as curas); revisor isolado com mandato de refutar, sem ver o raciocínio da sessão; tokens e duração são os do agente revisor. Os 6 que bloqueavam foram curados; dos 8 limites, 3 foram curados (nomes privados, pontos do Delphi, fonte do nó de origem) e 5 ficam declarados no README e abaixo."
 ---
 
 # Passada adversarial: `feat/chat-channel-contract`
@@ -57,17 +57,30 @@ Revisor isolado, 14 achados, 14 reais, 6 bloqueavam. Todos os 6 curados.
 12. **(c) e (d) passam pelo mesmo `const`.** Real, não bloqueia: os dois ficam porque nomeiam os dois desvios que o
     Delphi proíbe (texto e nome exibido); o mutante M02 morde os dois.
 
+### 2ª passada (sobre as curas, commit c4f2e8940): APROVADO COM LIMITES, 0 bloqueiam
+
+13. **N5 — só a comparação de `provider_id` estava testada no cruzamento.** Curado: casos (l14) papel e (l15) pessoa,
+    mutante M28.
+14. **N3 — o cruzamento guardava só o 1º evento de cada id do provedor.** Curado: com o mesmo id em dois lugares, vale o
+    evento do lugar da resposta; o caso (a) leva esse fluxo, mutante M29.
+15. **N1 — telefone escrito com `:` ou `/` ou com traço tipográfico passa** (a retirada de horas e datas abre o desvio).
+    Limite declarado no README.
+16. **N2 — lista de números curtos no texto pode reprovar como VAZAMENTO.** Limite declarado no README.
+17. **N4 — `piece:messaging/…` não diz qual repo é a quem lê a declaração.** Limite: o repo da peça é privado (REGRA 36
+    (Superfície VENDORIZADA sem nome comercial de cliente) e REGRA 121 (Grafo novo ou tocado não cita repositório não
+    conferível por terceiro)); a ligação fica no grafo do core.
+
 ## Mutantes
 
-27 mutantes plantados no próprio juiz (`conformance.py` e `message.schema.json`) por `ops/mutate-and-restore.sh`, com
-`LC_ALL=C`: **27 mortos, 0 sobreviventes**, e cada um morto pelo caso que o nomeia (conferido no log de cada um):
+29 mutantes plantados no próprio juiz (`conformance.py` e `message.schema.json`) por `ops/mutate-and-restore.sh`, com
+`LC_ALL=C`: **29 mortos, 0 sobreviventes**, e cada um morto pelo caso que o nomeia (conferido no log de cada um):
 M01 schema sem `provider_message_id` → (b); M02 `resolved_by` livre → (c) e (d); M03 schema sem `audience` → (e);
 M04 dedupe desligada → (f); M05 quem pede fora da audiência → (g); M06 veredito da guarda ignorado → (h); M07
 telefone com um separador só → (l2); M08 data contada como número → (a); M09 audiência depois da resposta → (j);
 M10 «serviu?» → (k); M11 resposta órfã → (l); M12 e M13 latência no evento e na resposta → (l3) e (l4); M14 retenção
 → (l5); M15 papel sem pessoa → (l6); M16 kind desconhecido → (l7); M17 data impossível → (l8); M18 a M21 cruzamento
 com a mensagem respondida (lugar, fio, em nome de quem, horas) → (l9) a (l12); M22 não é JSON → (l13); M23 lista
-vazia → (o); M24 a M26 declaração (ausente, requisito, sem fonte) → (n); M27 `--strict` → (m).
+vazia → (o); M24 a M26 declaração (ausente, requisito, sem fonte) → (n); M27 `--strict` → (m); M28 cruzamento só por `provider_id` → (l14) e (l15); M29 resposta casada com o 1º evento do id, sem olhar o lugar → (a).
 
 Equivalente declarado (não plantado): tirar o `if not raw.strip()` do arquivo vazio cai no «nenhuma mensagem», que
 também é rc 2; o comportamento é o mesmo.
@@ -76,7 +89,7 @@ também é rc 2; o comportamento é o mesmo.
 
 - O juiz confere forma e regras que cruzam campos; não sabe se o id do provedor é verdadeiro, se a identidade resolvida
   é a pessoa certa, nem se a guarda de vazamento da peça funciona. Isso é da bancada da peça.
-- A declaração do WAHA foi medida por LEITURA do código da peça em `db94954`; nada rodou contra o WAHA.
+- A declaração do WAHA foi medida por LEITURA do código da peça (a origin/main de 2026-11-22); nada rodou contra o WAHA.
 - O adapter WAHA fica com `none:` no `enforcement.tsv` (passivo SOFT da REGRA 107 sobe de 7 para 8 de 19): o
   executável roda fora do core; gatilho declarado.
 - A origem do contrato (`E_CHAT_ORIGIN_MAESTRO_ASK_1121`) tem fonte fora do git deste repo; o lugar do pedido (o canal
