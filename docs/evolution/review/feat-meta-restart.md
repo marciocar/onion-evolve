@@ -2,7 +2,8 @@
 branch: feat/meta-restart
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fd821723dfc2a85af19f00d7c57c18b907a680397f33f52e9aea418a7877c61a
+reviewed_code_sha256: 4fef80baa2ae2d3a67b2092343063847840a26bb1e7d01e922ce276a6483f1a7
 findings_total: 22
 findings_real: 22
 findings_blocking: 7
