@@ -399,6 +399,7 @@
 .claude/utils/federation-transport/a2a-rt-mcp.py	A_A2A_INBOX_CENSUS_1110	docs/onion/graph/a2a-outbound-2026-11.kg.yaml
 .claude/utils/federation-transport/a2a-rt-mcp.py	C_DEFEITO_A2A_RT_MCP_ECOA_VERSAO	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/utils/federation-transport/a2a-rt-send.sh	A_A2A_SEND_NEXT_STEP_1110	docs/onion/graph/a2a-outbound-2026-11.kg.yaml
+.claude/utils/federation-transport/a2a-send.sh	A_JQ_RAWFILE_CURE_1122	docs/onion/graph/a2a-outbound-2026-11.kg.yaml
 .claude/utils/federation-transport/a2a-send.sh	C_TETO_AGENTGATEWAY	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/utils/federation-transport/a2a-ssrf-check.sh	E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	C_TETO_GATES_DE_SEGURANCA_SEM_MAPA	docs/evolution/research/member-paths-2026-11/member-paths-2026-11.kg.yaml
