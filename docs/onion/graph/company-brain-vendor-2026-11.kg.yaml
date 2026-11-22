@@ -6,7 +6,7 @@ meta:
   date: "2026-11-22"
   baseline: "2026-11-22"
   review_after: "2026-12-06"
-  purpose: "O maestro selou em 2026-11-22, no grafo do produto Onion Company Brain (repo privado do produto, não conferível por terceiro), que o motor do contexto do Company Brain vive no repo do produto e o core o vendoriza por tag; que o comando entra por PR do core; e que o Company Brain é opcional. Este grafo registra a entrada da tag company-brain-v0.1.0 no core, a conferência medida e as pendências que a vendorização deixou."
+  purpose: "O maestro selou em 2026-11-22, no grafo do produto Onion Company Brain (repo privado do produto, não conferível por terceiro), que o motor do contexto do Company Brain vive no repo do produto e o core o vendoriza por tag; que o comando entra por PR do core; e que o Company Brain é opcional. Este grafo registra a entrada do motor no core (tag company-brain-v0.1.0, subida no mesmo PR para a v0.1.1), a conferência medida e as pendências que a vendorização deixou."
   note: "TETO, declarado: 5 nós. O selo é do grafo do produto e não se repete aqui; este grafo guarda só o que o PR do core mediu e deixou aberto. Nenhum nome de cliente ou empresa. Consequência declarada (refutador, 2026-11-22): o repo do produto é privado e o core é público, então os 64 arquivos do recorte ficam públicos pelo vendor; é o efeito do selo de vendorizar por tag, não um vazamento, e o recorte não traz dado de empresa (templates com marcadores)."
   # ═══ TETO: 5 NÓS ═══
 nodes:
@@ -18,10 +18,10 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "2026-11-22"
-    verified_against: "python3 -I .claude/validation/company-brain-vendor-check.py check → rc 0 (64 arquivos); verify --source <clone raso da tag company-brain-v0.1.0> → rc 0, commit 15af74dc5193"
+    verified_against: "python3 -I .claude/validation/company-brain-vendor-check.py update --tag company-brain-v0.1.1 → rc 0; check → rc 0 (64 arquivos); verify --source <clone raso da tag company-brain-v0.1.1> → rc 0, commit c80aa7efe57f (a v0.1.0, commit 15af74dc5193, conferiu igual antes da subida)"
     trace: "vendor/company-brain/.company-brain-version"
-    label: "vendor/company-brain traz o recorte da tag company-brain-v0.1.0 (README.md, builder, spec, templates, tests, tools: 64 arquivos), com carimbo de tag, commit, sha256 e modo de cada arquivo, conferido contra um clone da tag"
-    narrative: "O molde da kg-ssot (kg_vendor.py) não coube: ele fixa o produto, lê um manifesto de release dentro da tag e confere atestação, e a tag do Company Brain não tem manifesto e o core leva só um recorte. Reproduziu-se o proporcional num verificador do próprio produto, sem vendorizador genérico: update (substitui a pasta pelo recorte da tag e carimba), check (vendor x carimbo, offline) e verify (carimbo x blobs da tag, lidos por ls-tree e cat-file, não pelo git archive). A passada adversarial pegou link de diretório calado, carimbo malformado com rc 1, update que apagava qualquer destino e modo não conferido; as quatro curas têm caso na bancada. A bancada run_company_brain_vendor_selftests cobre os três modos e um mutante."
+    label: "vendor/company-brain traz o recorte da tag company-brain-v0.1.1 (README.md, builder, spec, templates, tests, tools: 64 arquivos), com carimbo de tag, commit, sha256 e modo de cada arquivo, conferido contra um clone da tag"
+    narrative: "O molde da kg-ssot (kg_vendor.py) não coube: ele fixa o produto, lê um manifesto de release dentro da tag e confere atestação, e a tag do Company Brain não tem manifesto e o core leva só um recorte. Reproduziu-se o proporcional num verificador do próprio produto, sem vendorizador genérico: update (substitui a pasta pelo recorte da tag e carimba), check (vendor x carimbo, offline) e verify (carimbo x blobs da tag, lidos por ls-tree e cat-file, não pelo git archive). A passada adversarial pegou link de diretório calado, carimbo malformado com rc 1, update que apagava qualquer destino e modo não conferido; as quatro curas têm caso na bancada. A bancada run_company_brain_vendor_selftests cobre os três modos e um mutante. A subida de v0.1.0 para v0.1.1 pelo próprio update mudou só tests/voice-conduct-conformance.sh e o carimbo."
     provenance:
       source: "company-brain-vendor-check.py deste repo"
       locator: ".claude/validation/company-brain-vendor-check.py e vendor/company-brain/.company-brain-version"
@@ -35,10 +35,10 @@ nodes:
     impact: 3
     confidence: 0.85
     verified_at: "2026-11-22"
-    verified_against: "cd vendor/company-brain && GIT_DIR=<git-dir do core> GIT_WORK_TREE=$PWD bash tests/voice-conduct-conformance.sh → rc 0, «59 casos, 21 códigos cobertos»; sem as variáveis, rc 1 (o teste faz cd para a raiz do core)"
+    verified_against: "v0.1.1: cd vendor/company-brain && env -u GIT_DIR -u GIT_WORK_TREE bash tests/voice-conduct-conformance.sh → rc 0, «59 casos, 21 códigos cobertos»; o mesmo de um cwd fora do repo, pelo caminho absoluto, → rc 0. Na v0.1.0 só passava com GIT_WORK_TREE (sem ele, rc 1)"
     trace: "vendor/company-brain/tests/voice-conduct-conformance.sh"
-    label: "A conformidade do motor roda verde a partir do vendor (59 casos, 21 códigos cobertos), mas só com GIT_WORK_TREE apontando a pasta do vendor: o teste faz cd para a raiz do repositório git e procura spec/ ali"
-    narrative: "O número bate com o que o produto mediu no repo dele. O desvio é de portabilidade do teste, não do validador: «cd \"$(git rev-parse --show-toplevel)\"» supõe que o motor é a raiz do repositório. Cura proposta ao produto (Q_CBV_TESTE_SUPOE_RAIZ): cd para a pasta do próprio script (dirname do script, mais um nível)."
+    label: "A conformidade do motor roda verde a partir do vendor (59 casos, 21 códigos cobertos) sem variável de ambiente, desde a v0.1.1; na v0.1.0 o teste fazia cd para a raiz do repositório git e só passava com GIT_WORK_TREE"
+    narrative: "O número bate com o que o produto mediu no repo dele. O desvio é de portabilidade do teste, não do validador: «cd \"$(git rev-parse --show-toplevel)\"» supõe que o motor é a raiz do repositório. Cura proposta ao produto (Q_CBV_TESTE_SUPOE_RAIZ): cd para a pasta do próprio script (dirname do script, mais um nível). O produto a soltou na tag v0.1.1 e o core subiu o vendor para ela no mesmo PR."
     provenance:
       source: "tests/voice-conduct-conformance.sh do vendor"
       locator: "vendor/company-brain/tests/voice-conduct-conformance.sh, linha do cd"
@@ -48,10 +48,12 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: company-brain
     impact: 2
-    confidence: 0.8
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "tag company-brain-v0.1.1 no remoto (git ls-remote: c80aa7efe57f); vendor subido por update, check e verify rc 0 contra clone raso; tests/voice-conduct-conformance.sh rodado de dentro do vendor sem GIT_DIR/GIT_WORK_TREE → rc 0, 59 casos, 21 códigos; a linha do cd agora é «cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\"»"
     label: "O teste de conformidade do motor supõe estar na raiz do repositório git; vendorizado, ele procura spec/ na raiz do core e sai vermelho (2 casos). Pedir ao produto o cd relativo ao script na próxima tag"
     narrative: "Pronto quando: uma tag do motor cujo tests/voice-conduct-conformance.sh sai rc 0 rodado de dentro de vendor/company-brain sem variável de ambiente, e o vendor do core subir para ela. Até lá, o core roda com GIT_WORK_TREE (C_CBV_CONFORMIDADE_DO_VENDOR). O core não escreve no repo do produto: o aviso vai pela federação."
   - id: Q_CBV_MIGRAR_VALIDADOR_V1

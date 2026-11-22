@@ -7,8 +7,10 @@
 #   cobertura     → todo código do esquema (semantic_rules + structural_codes) tem ao menos um mutante
 #   --if-present  → arquivo ausente sai 0 (o produto é opcional)
 # Data fixa, para a revisão periódica não virar falso vermelho com o tempo.
+# A raiz é a pasta do motor, achada pelo próprio script (tests/..), nunca pelo git: vendorizado em outro repo,
+# a raiz do git é a do hospedeiro e os caminhos relativos cairiam fora do motor.
 set -uo pipefail
-cd "$(git rev-parse --show-toplevel)" || exit 2
+cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 2
 dir=spec/conformance/voice-conduct
 check=(python3 -I tools/voice_conduct_check.py)
 today=2026-11-22
