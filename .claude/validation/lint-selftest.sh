@@ -52207,13 +52207,13 @@ w("ret", mut(ev, lambda o: o["retention"].update(expires_at="2026-11-22T12:00:00
 w("role", mut(ev, lambda o: o["requester"].update(person=None)))
 w("badkind", mut(ev, lambda o: o.update(kind="message.edited")))
 w("baddate", mut(rp, lambda o: o["audience_checked"].update(listed_at="2026-11-22T13:00:99Z")))
-w("otherplace", ev, mut(rp, lambda o: o["place"].update(id="other-group@example")))
+w("otherplace", ev, mut(rp, lambda o: o["place"].update(id="waha:other-group")))
 w("otherthread", ev, mut(rp, lambda o: o["thread"].update(id="msg-example-9999")))
-w("otherreq", ev, mut(rp, lambda o: o["on_behalf_of"].update(provider_id="waha:b81e0c4f7a9d3e12", person="person-b")))
+w("otherreq", ev, mut(rp, lambda o: o["on_behalf_of"].update(provider_id="waha:linoampkecbhgdaf", person="person-b")))
 w("otherlat", ev, mut(rp, lambda o: o["latency"].update(requested_at="2026-11-22T12:00:00Z")))
 w("otherrole", ev, mut(rp, lambda o: o["on_behalf_of"].update(role="internal")))
 w("otherperson", ev, mut(rp, lambda o: o["on_behalf_of"].update(person="person-b")))
-w("twoplaces", ev, mut(ev, lambda o: o["place"].update(id="other-group@example")), mut(rp, lambda o: o["place"].update(id="other-group@example")))
+w("twoplaces", ev, mut(ev, lambda o: o["place"].update(id="waha:other-group")), mut(rp, lambda o: o["place"].update(id="waha:other-group")))
 RAW = "5511987654321@c.us"
 def raw_req(o):
     o["requester"]["provider_id"] = RAW; o["audience"]["members"][0]["provider_id"] = RAW
@@ -52221,13 +52221,19 @@ w("rawreq", mut(ev, raw_req))
 w("rawmember", mut(ev, lambda o: o["audience"]["members"][1].update(provider_id="pessoa@empresa.com.br")))
 w("rawplace", mut(ev, lambda o: o["place"].update(id=RAW)))
 w("rawmsg", mut(ev, lambda o: o.update(provider_message_id="true_" + RAW + "_3EB0")))
+w("rawsep", mut(ev, lambda o: o["audience"]["members"][1].update(provider_id="+55 11 98765-4321")))
+w("rawnotld", mut(ev, lambda o: o["audience"]["members"][1].update(provider_id="pessoa@empresa")))
 w("customerwaha", mut(ev, lambda o: o["requester"].update(role="customer")))
+w("customerother", mut(ev, lambda o: (o.update(provider="whatsapp-web"), o["requester"].update(role="customer"))))
+w("customercloud", mut(ev, lambda o: (o.update(provider="whatsapp-cloud"), o["requester"].update(role="customer"))))
 w("badrole", mut(ev, lambda o: o["requester"].update(role="unknown")))
-PSEUDO = "waha:1234567890abcdef"
+PSEUDO = "waha:aphcdjnlokbemfgi"   # a forma recomendada <provider>:[a-p]{16}: sem dígito
+HEX8 = "waha:dfbe38e56365871c"     # hex do HMAC com 8 dígitos seguidos (56365871): recusado, sem exceção
 def pseudo(o):
     who = o.get("requester") or o.get("on_behalf_of"); who["provider_id"] = PSEUDO
     if "audience" in o: o["audience"]["members"][0]["provider_id"] = PSEUDO
-w("pseudodigits", mut(ev, pseudo), mut(rp, pseudo))
+w("pseudoap", mut(ev, pseudo), mut(rp, pseudo))
+w("hex8", mut(ev, lambda o: o["audience"]["members"][1].update(provider_id=HEX8)))
 def unresolved(o):
     o["requester"].update(person=None, role="external"); o["audience"]["members"][0]["person"] = None
 w("unresolved", mut(ev, unresolved))
@@ -52246,9 +52252,10 @@ PY
   _cc check "${d}/stream.jsonl"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${d}/datetext.jsonl"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${d}/twoplaces.jsonl"; [ "${rc}" = 0 ] || a_ok=0
-  _cc check "${d}/pseudodigits.jsonl"; [ "${rc}" = 0 ] || a_ok=0
+  _cc check "${d}/pseudoap.jsonl"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${d}/unresolved.jsonl"; [ "${rc}" = 0 ] || a_ok=0
-  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0); data e hora no texto não contam como número; mesmo id em dois lugares, a resposta ao 2º vale; pseudônimo <provider>:<16 hex> com dígitos e quem não está no mapa como external passam"
+  _cc check "${d}/customercloud.jsonl"; [ "${rc}" = 0 ] || a_ok=0
+  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0); data e hora no texto não contam como número; mesmo id em dois lugares, a resposta ao 2º vale; pseudônimo na forma recomendada <provider>:[a-p]{16} e quem não está no mapa como external passam; customer só no whatsapp-cloud"
   else record_fail "chat-conformance: (a) exemplos conformes" "rc=${rc} out=[${out}]"; fi
   # (b..m) cada falta reprova com rc 1 e o código dela
   local c f code
@@ -52286,7 +52293,11 @@ l16|rawreq|ID-COM-NUMERO
 l17|rawmember|ID-COM-NUMERO
 l18|rawplace|ID-COM-NUMERO
 l19|rawmsg|ID-COM-NUMERO
+l19b|rawsep|ID-COM-NUMERO
+l19c|rawnotld|ID-COM-NUMERO
+l19d|hex8|ID-COM-NUMERO
 l20|customerwaha|PAPEL
+l20b|customerother|PAPEL
 l21|badrole|FORMA
 CASES
   # (m) a declaração real do adapter WAHA está bem formada (rc 0); com --strict, o adapter reprova pelo que falta

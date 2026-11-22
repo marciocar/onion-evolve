@@ -2,18 +2,17 @@
 branch: feat/chat-channel-contract
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 862d86a2583f2dc35f4eafd5e3348abe8a801d70c17f4b22322e2809b30a9420
-reviewed_code_sha256: 318c49c91417a415795441af2ba10a7287e760728bea238f545aa80db6cb7d51
-findings_total: 19
-findings_real: 19
-findings_blocking: 6
-tokens: 317279
-duration_min: 8
-findings_fixed: 11
+reviewed_diff_sha256: pendente
+findings_total: 24
+findings_real: 24
+findings_blocking: 7
+tokens: 505926
+duration_min: 10
+findings_fixed: 14
 verdict: REJECTED_AND_FIXED
 elenxo: false
 reviewer: general-purpose (opus), isolado
-nota: "duas passadas do mesmo revisor isolado (14 achados na 1ª, 5 novos na 2ª, sobre as curas); revisor isolado com mandato de refutar, sem ver o raciocínio da sessão; tokens e duração são os do agente revisor. Os 6 que bloqueavam foram curados; dos 8 limites, 3 foram curados (nomes privados, pontos do Delphi, fonte do nó de origem) e 5 ficam declarados no README e abaixo."
+nota: "três passadas do mesmo revisor isolado (14 achados na 1ª, 5 novos na 2ª, 5 na 3ª sobre a emenda do pseudônimo e do papel); revisor isolado com mandato de refutar, sem ver o raciocínio da sessão; tokens e duração são os do agente revisor. Os 6 que bloqueavam foram curados; dos 8 limites, 3 foram curados (nomes privados, pontos do Delphi, fonte do nó de origem) e 5 ficam declarados no README e abaixo."
 ---
 
 # Passada adversarial: `feat/chat-channel-contract`
@@ -71,10 +70,43 @@ Revisor isolado, 14 achados, 14 reais, 6 bloqueavam. Todos os 6 curados.
     (Superfície VENDORIZADA sem nome comercial de cliente) e REGRA 121 (Grafo novo ou tocado não cita repositório não
     conferível por terceiro)); a ligação fica no grafo do core.
 
+## Re-revisão (emenda antes do merge, 2026-11-22)
+
+**O que mudou depois da 2ª passada.** A sessão da mensageria apontou, pela coordenadora, que o id cru do WhatsApp
+é `<número>@c.us` e contradiz `rule.secret_never_out`. Emenda, **decisão do core, reversível**
+(`D_CHAT_PSEUDONYM_IDS_AND_ROLE_VOCAB_1122`):
+
+- todo identificador que sai do adapter é pseudônimo. Isso vale para `provider_id` de quem pede, da audiência e de
+  `on_behalf_of`, e também (extensão desta implementação, pela mesma causa) para lugar, fio e ids de mensagem;
+- o juiz recusa (`ID-COM-NUMERO`) 8 ou mais dígitos, admitido um separador entre eles, ou a forma `local@domínio`,
+  **sem exceção**;
+- a forma recomendada é `<provider>:[a-p]{16}`: os 64 primeiros bits do HMAC-SHA256 do id cru, um nibble por letra.
+  A 1ª versão desta emenda aceitava `<provider>:<16 hex>` como exceção. A bancada da mensageria mediu cerca de 20% de
+  hex com 8 dígitos seguidos, e a coordenadora pediu a troca;
+- o papel é vocabulário fechado: `internal | partner | external | customer` (enum no schema e linhas `role.*` no
+  vocabulário, com a coerência conferida pelo juiz). Quem não está no mapa sai `external` com `person: null` (antes
+  era `unknown`). `customer` só vale do provedor `whatsapp-cloud`, numa lista fechada (`PAPEL`).
+
+**3ª passada do revisor isolado**, sobre o commit `33d31a129`: 1 bloqueio e 4 limites.
+
+18. **X1 (BLOQUEAVA) — id cru com separador ou e-mail sem TLD escapava** (`+55 11 98765-4321`, `fulano@empresa`).
+    Curado: separador admitido na contagem e `local@domínio` sem TLD; casos (l19b) e (l19c).
+19. **X2 — `<provider>:<16 dígitos>` passava como hex.** Curado pela troca para `[a-p]{16}` sem exceção; o caso
+    (l19d) prova que hex com 8 dígitos é recusado e o (a) que a forma recomendada passa.
+20. **X5 — `customer` barrado só para o nome `waha`.** Curado: lista fechada de provedores oficiais; casos (l20b) e
+    `whatsapp-cloud` no (a).
+21. **X3 — id nativo numérico (Slack `ts`, chat do Telegram) e apelido com data ou `@` reprovam.** Limite declarado
+    no `interface.md`: todo id de mensagem e de lugar também tem de ser pseudônimo.
+22. **X4 — a guarda de id não cobre `person`, `place.name`, `signed_by` nem `audit.id`.** Limite declarado no
+    `interface.md`.
+
+Casos novos na bancada: (l16) a (l19d) `ID-COM-NUMERO`, (l20) e (l20b) `PAPEL`, (l21) papel fora do enum; no (a), a
+forma recomendada, `external` sem pessoa e `customer` no `whatsapp-cloud`.
+
 ## Mutantes
 
-29 mutantes plantados no próprio juiz (`conformance.py` e `message.schema.json`) por `ops/mutate-and-restore.sh`, com
-`LC_ALL=C`: **29 mortos, 0 sobreviventes**, e cada um morto pelo caso que o nomeia (conferido no log de cada um):
+38 mutantes plantados no próprio juiz (`conformance.py` e `message.schema.json`) por `ops/mutate-and-restore.sh`, com
+`LC_ALL=C`: **38 mortos, 0 sobreviventes**, e cada um morto pelo caso que o nomeia (conferido no log de cada um):
 M01 schema sem `provider_message_id` → (b); M02 `resolved_by` livre → (c) e (d); M03 schema sem `audience` → (e);
 M04 dedupe desligada → (f); M05 quem pede fora da audiência → (g); M06 veredito da guarda ignorado → (h); M07
 telefone com um separador só → (l2); M08 data contada como número → (a); M09 audiência depois da resposta → (j);
@@ -82,6 +114,11 @@ M10 «serviu?» → (k); M11 resposta órfã → (l); M12 e M13 latência no eve
 → (l5); M15 papel sem pessoa → (l6); M16 kind desconhecido → (l7); M17 data impossível → (l8); M18 a M21 cruzamento
 com a mensagem respondida (lugar, fio, em nome de quem, horas) → (l9) a (l12); M22 não é JSON → (l13); M23 lista
 vazia → (o); M24 a M26 declaração (ausente, requisito, sem fonte) → (n); M27 `--strict` → (m); M28 cruzamento só por `provider_id` → (l14) e (l15); M29 resposta casada com o 1º evento do id, sem olhar o lugar → (a).
+
+Emenda: M30 guarda de id desligada → (l16) a (l19); M32b `customer` livre → (l20); M33 papel livre no schema →
+morre pela checagem de coerência schema × vocabulário (rc 2 em todos os casos), não só pelo (l21); M34 audiência fora
+da guarda → (l17); M35 sem pessoa com qualquer papel → (l6); M36 a exceção do hex de volta → (l19d); M37 8 dígitos
+sem separador → (l19b); M38 e-mail exige TLD → (l19c); M39 `customer` barrado por lista de proibidos → (l20b). O M31 da 1ª versão da emenda (tirar a exceção do hex) deixou de existir junto com a exceção.
 
 Equivalente declarado (não plantado): tirar o `if not raw.strip()` do arquivo vazio cai no «nenhuma mensagem», que
 também é rc 2; o comportamento é o mesmo.

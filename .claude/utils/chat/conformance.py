@@ -30,7 +30,8 @@ O que confere no evento recebido (message.received), além da forma do message.s
   - e as regras que cruzam campos: quem pede está na audiência, a hora em que o agente viu não vem antes da hora
     do pedido, a retenção vence depois do pedido, pessoa não resolvida tem papel «external», e «customer» nunca no WAHA;
   - ID-COM-NUMERO: nenhum identificador (provider_id de quem pede e da audiência, lugar, fio, ids de mensagem) leva
-    o id cru com telefone ou e-mail (8+ dígitos seguidos ou forma de e-mail), salvo a forma <provider>:<16 hex>.
+    o id cru com telefone ou e-mail (8+ dígitos, admitido um separador entre eles, ou local@domínio), sem exceção;
+    a forma recomendada <provider>:[a-p]{16} não tem dígito.
 Na resposta (message.reply): a guarda de vazamento e a audiência passaram antes de sair, a ordem das horas
 (pedido, visto, respondido), o passo «serviu?» declarado, o registro de auditoria, e nenhum número no texto
 (heurística declarada: 10 ou mais dígitos com separadores de telefone, depois de tirar datas e horas). Com eventos
@@ -57,16 +58,22 @@ STATUSES = ("implemented", "partial", "not_implemented", "unverified")
 DIGIT_RUN = re.compile(r"(?:\d[\s.()+-]{0,3}){10,}")
 DATE_TIME = re.compile(r"\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?\b|\b\d{1,2}:\d{2}(?::\d{2})?\b|\b\d{1,2}/\d{1,2}/\d{2,4}\b")
 # Identificador que sai do adapter é pseudônimo: nunca o id cru com telefone ou e-mail (no WAHA, <número>@c.us).
-# Forma recomendada: <provider>:<HMAC-SHA256 do id cru com chave privada da instância, 16 hex>; o apelido da lista
-# fechada também serve. A forma recomendada é aceita mesmo quando o hex sorteia 8 dígitos seguidos.
-PSEUDONYM = re.compile(r"^[a-z][a-z0-9-]{1,31}:[0-9a-f]{16}$")
-EIGHT_DIGITS = re.compile(r"\d{8}")
-EMAIL_LIKE = re.compile(r"[^\s@]+@[^\s@]+\.[^\s@]+")
+# Forma recomendada: <provider>: mais os 64 primeiros bits do HMAC-SHA256 do id cru (chave privada da instância), um
+# nibble por letra de a a p: <provider>:[a-p]{16}, sem nenhum dígito. O apelido da lista fechada também serve. A guarda
+# de 8 dígitos NÃO tem exceção: em hex, cerca de 20% dos pseudônimos sorteiam 8 dígitos seguidos (medido pela
+# bancada da mensageria), e esses são recusados como qualquer outro.
+# 8 ou mais dígitos, admitindo um separador entre eles ("+55 11 98765-4321", "5511_98765_4321"); e qualquer
+# local@domínio, com ou sem TLD ("pessoa@empresa", "<número>@c.us", "<id>@lid", "<id>@g.us").
+EIGHT_DIGITS = re.compile(r"(?:\d[\s.()+_-]?){8,}")
+EMAIL_LIKE = re.compile(r"[^\s@]+@[^\s@]+")
 ID_FIELDS = {
     "received": (("provider_message_id",), ("requester", "provider_id"), ("place", "id"), ("thread", "id"),
                  ("thread", "reply_to")),
     "reply": (("in_reply_to",), ("on_behalf_of", "provider_id"), ("place", "id"), ("thread", "id")),
 }
+# customer é reservado ao canal OFICIAL com cliente final: lista fechada (allowlist), não lista de proibidos, para que
+# um provedor novo não oficial (outro nome para o WhatsApp não oficial) não herde o papel por omissão.
+CUSTOMER_PROVIDERS = frozenset({"whatsapp-cloud"})
 TS_FIELDS = {
     "received": (("requested_at",), ("seen_at",), ("audience", "listed_at"), ("retention", "expires_at")),
     "reply": (("audience_checked", "listed_at"), ("latency", "requested_at"), ("latency", "seen_at"), ("latency", "replied_at")),
@@ -155,7 +162,7 @@ def check_timestamps(obj, kind, where, acc):
 
 
 def raw_id(value):
-    if not isinstance(value, str) or PSEUDONYM.match(value):
+    if not isinstance(value, str):
         return False
     return bool(EIGHT_DIGITS.search(value) or EMAIL_LIKE.search(value))
 
@@ -171,15 +178,15 @@ def check_ids(obj, kind, where, acc):
         for k in path:
             v = v[k] if isinstance(v, list) and isinstance(k, int) and k < len(v) else (v.get(k) if isinstance(v, dict) else None)
         if raw_id(v):
-            out(where, "ID-COM-NUMERO", f"{'/'.join(str(p) for p in path)}: identificador cru com 8+ dígitos ou forma de e-mail; use pseudônimo (<provider>:<hmac 16 hex>) ou apelido", acc)
+            out(where, "ID-COM-NUMERO", f"{'/'.join(str(p) for p in path)}: identificador cru com 8+ dígitos ou forma de e-mail; use pseudônimo (<provider>:[a-p]{16}) ou apelido", acc)
 
 
 def check_role(person_holder, provider, field, where, acc):
     role = (person_holder or {}).get("role")
     if (person_holder or {}).get("person") is None and role not in (None, "external"):
         out(where, "IDENTIDADE-FORA-DO-ID", f"{field}: pessoa não resolvida com papel {role!r}: sem pessoa no mapa, o papel é «external»", acc)
-    if role == "customer" and provider == "waha":
-        out(where, "PAPEL", f"{field}: papel customer no WAHA; cliente final só no canal oficial (D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121)", acc)
+    if role == "customer" and provider not in CUSTOMER_PROVIDERS:
+        out(where, "PAPEL", f"{field}: papel customer no provedor {provider!r}; cliente final só no canal oficial {sorted(CUSTOMER_PROVIDERS)} (D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121)", acc)
 
 
 def check_received(obj, where, acc, seen, received_ids):

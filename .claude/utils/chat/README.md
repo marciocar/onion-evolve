@@ -21,8 +21,11 @@ isso todo canal entrega a mesma mensagem normalizada e cumpre as mesmas regras d
   sócios; o cliente final vem depois pela Cloud API oficial do WhatsApp Business, mesmo contrato, outro adapter.
 
 - **Decisões do core de 2026-11-22, reversíveis** (lacuna apontada pela sessão da mensageria antes do merge):
-  (1) todo identificador que sai do adapter é pseudônimo (`<provider>:<HMAC-SHA256 16 hex>` ou apelido), porque o id
-  cru do WhatsApp é o número e contradiz `rule.secret_never_out`; (2) o papel de quem pede é vocabulário fechado,
+  (1) todo identificador que sai do adapter é pseudônimo, porque o id cru do WhatsApp é o número e contradiz
+  `rule.secret_never_out`. Forma recomendada: `<provider>:[a-p]{16}` (os 64 primeiros bits do HMAC-SHA256 do id cru
+  com a chave privada da instância, um nibble por letra de `a` a `p`), ou o apelido da lista fechada. Hex não serve: a
+  bancada da mensageria mediu cerca de 20% de pseudônimos em hex com 8 dígitos seguidos, e a guarda de 8 dígitos não
+  tem exceção; (2) o papel de quem pede é vocabulário fechado,
   `internal | partner | external | customer`, com `customer` reservado ao canal oficial com cliente final e quem não
   está no mapa como `external` com `person: null`. Detalhe em [`interface.md`](interface.md).
 
