@@ -28697,7 +28697,7 @@ PFSTUB
   _ldcase "(ld-b) motor ANTIGO da branch (rc 1 + 'PR-FINALIZE: carga: … load-lease rc=4') ⇒ rc 5 ADIADO PELA CARGA" load-legacy _p_ld \
     ".*load-lease rc=4' <<< \"\$_rb_out\"; }; then" ".*load-lease rc=X' <<< \"\$_rb_out\"; }; then"
   _p_ldc() { [ "${_mv_rc}" -eq 1 ] && grep -qF "o lease de carga não mediu" <<< "${_mv_out}" && ! grep -qF "conflito de FONTE" <<< "${_mv_out}" \
-             && [ ! -s "${d}/margs" ]; }
+             && [ ! -s "${d}/margs" ] && [ ! -s "${d}/comment" ]; }
   _ldcase "(ld-c) lease que NÃO MEDIU (rc=2) ⇒ para nomeando o lease, nunca 'conflito de FONTE'" load-unmeasured _p_ldc \
     ".*load-lease rc=2' <<< \"\$_rb_out\"; then" ".*load-lease rc=X' <<< \"\$_rb_out\"; then"
   # (ld-d) o CONTRATO do lado do pr-finalize real: o teto do lease (rc 4) sai exit 75 com a linha que o SUT lê
@@ -60760,29 +60760,62 @@ if o in s:
   _llorph() { # $1=conteúdo do holder (vazio = holder vazio) $2=idade do mtime do holder → "rc|saída" do run com a vaga 0 presa
     _llset 3.00; rm -rf "${d}/proc" "${d}/ran"; mkdir -p "${d}/proc"
     _llhold || { echo "9|o dono de teste não pegou a vaga"; return; }
-    printf '%s' "$1" > "${d}/vaga/slot.0.holder"; [ -n "${2:-}" ] && touch -d "$2" "${d}/vaga/slot.0.holder"
+    printf '%s' "$1" > "${d}/vaga/slot.0.holder"; touch -d "${2:--1 minute}" "${d}/vaga/slot.0.holder"
     LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "${LLW}" run --max 2 -- touch "${d}/ran"; _llunhold; }
   _llnow() { date -u -d "${1:-now}" +%FT%TZ; }
   _c_odead() { local a; a="$(LLW="$1" _llorph "pid 999999 · pr-finalize · desde $(_llnow)")"; LL_WHY="${a}"
     [ "${a%%|*}" = 0 ] && [ -e "${d}/ran" ] && [[ "${a#*|}" == *"dono pid 999999 MORTO"* ]] && [[ "${a#*|}" == *"slot.1.lock"* ]]; }
   _llcase "(u) dono registrado MORTO (o fd ficou com um filho) ⇒ a vaga sai da conta e o run entra" \
     'if ! cur="$(_ll_pstat "${pid}")"; then' 'if false; then' _c_odead
-  _llcase "(u2) a vaga órfã abre uma vaga extra na varredura (senão a órfã ocupa o lugar de uma livre)" \
-    '[ "${scan}" -lt $(( 2 * LL_SLOTS_MAX )) ] && scan=$(( scan + 1 ))' ':' _c_odead
+  _llcase "(u2) a varredura vai além de SLOTS_MAX (senão a órfã ocupa o lugar de uma livre)" \
+    'scan=$(( 2 * LL_SLOTS_MAX ))' 'scan="${LL_SLOTS_MAX}"' _c_odead
+  # (u3) BLOQUEADOR da revisão de 2026-11-22: a órfã soltou, e o dono LEGÍTIMO da vaga extra (slot.1) tem de seguir
+  #      na conta — com a varredura só até SLOTS_MAX ele ficava invisível e um 2º passo pesado entrava com N=1
+  _c_extra() { rm -rf "${d}/proc" "${d}/ran"; _llset 3.00; LL_HOLD="1" _llhold || return 1
+    local a; a="$(LLR_ENV='ONION_LOAD_SLOTS_MAX=1' _llr "$1" run --max 2 -- touch "${d}/ran")"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ] && [[ "${a#*|}" == *"1 donos para 1 vagas"* ]]; }
+  _llcase "(u3) dono legítimo na vaga extra (slot.1) segue na conta: com N=1 o 2º passo pesado não entra" \
+    'scan=$(( 2 * LL_SLOTS_MAX ))' 'scan="${LL_SLOTS_MAX}"' _c_extra
+  # (v2) holder recém-gravado (menos de 5 s) não se julga morto: o motor antigo grava o holder fora da trava
+  _c_ofresh() { local a; a="$(LLW="$1" _llorph "pid 999999 · pr-finalize · desde $(_llnow)" now)"; LL_WHY="${a}"
+    [ "${a%%|*}" = 4 ] && [ ! -e "${d}/ran" ]; }
+  _llcase "(v2) holder gravado agora com pid morto CONTA (janela do motor antigo, que grava fora da trava)" \
+    '[ $(( now - t )) -ge "${LL_STALE_GRACE}" ] || return 1' ': || return 1' _c_ofresh
+  # (v3) holder de OUTRO PID namespace (sandbox) CONTA: o pid gravado não é o deste /proc
+  _c_ons() { rm -rf "${d}/proc" "${d}/ran"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc/self/ns"; ln -s 'pid:[222]' "${d}/proc/self/ns/pid"
+    printf 'pid 999999 · pr-finalize · desde %s · início 5 · pai 7 · pidns 111' "$(_llnow)" > "${d}/vaga/slot.0.holder"; touch -d '-1 minute' "${d}/vaga/slot.0.holder"
+    local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [[ "${a#*|}" != *"NÃO conta"* ]]; }
+  _llcase "(v3) holder de outro PID namespace CONTA (na dúvida a vaga é do dono)" \
+    '[ -n "${ns0}" ] && [ -n "${nsme}" ] && [ "${ns0}" != "${nsme}" ] && return 1' ':' _c_ons
   _c_oreuse_w() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4242 100 7
-    printf 'pid 4242 · pr-finalize · desde %s · início 5' "$(_llnow)" > "${d}/vaga/slot.0.holder"
+    printf 'pid 4242 · pr-finalize · desde %s · início 5' "$(_llnow)" > "${d}/vaga/slot.0.holder"; touch -d '-1 minute' "${d}/vaga/slot.0.holder"
     local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
     LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"pid foi reusado"* ]]; }
   _llcase "(v) pid do dono REUSADO (o início do processo difere do gravado) ⇒ a vaga sai da conta" \
     'if [ -n "${st0}" ] && [ "${st0}" != "${start}" ]; then' 'if false; then' _c_oreuse_w
   _c_oaged() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4243 1 9
-    printf 'pid 4243 · lint-selftest (direto) · desde %s · início 9' "$(_llnow '-3 hours')" > "${d}/vaga/slot.0.holder"
+    printf 'pid 4243 · lint-selftest (direto) · desde %s · início 9' "$(_llnow '-3 hours')" > "${d}/vaga/slot.0.holder"; touch -d '-1 minute' "${d}/vaga/slot.0.holder"
     local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
     LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"dono pid 4243 ÓRFÃO (ppid 1)"*"acima do teto de 7200s"* ]]; }
   _llcase "(w) dono vivo ÓRFÃO (ppid 1) há 3 h, acima do teto de 7200 s ⇒ a vaga sai da conta" \
-    'if [ "${ppid}" = 1 ] || [ "${pcomm}" = systemd ]; then' 'if false; then' _c_oaged
+    'if [ "${ppid}" = 1 ] || [ "${pcomm}" = systemd ]; then orphan=1; fi' ':' _c_oaged
+  # (w2) órfão sob OUTRO subreaper (tini, shim): o pai mudou desde a pegada (pai 100 gravado, ppid 200 agora)
+  _c_osub() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4246 200 9
+    printf 'pid 4246 · lint-selftest (direto) · desde %s · início 9 · pai 100' "$(_llnow '-3 hours')" > "${d}/vaga/slot.0.holder"; touch -d '-1 minute' "${d}/vaga/slot.0.holder"
+    local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"dono pid 4246 ÓRFÃO (ppid 200)"* ]]; }
+  _llcase "(w2) órfão sob outro subreaper (o pai mudou desde a pegada) há 3 h ⇒ a vaga sai da conta" \
+    'if [ -n "${pai0}" ] && [ "${ppid}" != "${pai0}" ]; then orphan=1; fi' ':' _c_osub
+  # (w3) holder ANTIGO (sem o pai gravado) e o pai atual é `systemd` (subreaper de usuário, ppid ≠ 1)
+  _c_osysd() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc/300"; printf 'systemd\n' > "${d}/proc/300/comm"; _llproc 4247 300 9
+    printf 'pid 4247 · lint-selftest (direto) · desde %s · início 9' "$(_llnow '-3 hours')" > "${d}/vaga/slot.0.holder"; touch -d '-1 minute' "${d}/vaga/slot.0.holder"
+    local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
+    LL_WHY="${a}"; [ "${a%%|*}" = 0 ] && [[ "${a#*|}" == *"dono pid 4247 ÓRFÃO (ppid 300)"* ]]; }
+  _llcase "(w3) holder antigo com o pai atual systemd (subreaper de usuário) há 3 h ⇒ a vaga sai da conta" \
+    'if [ "${ppid}" = 1 ] || [ "${pcomm}" = systemd ]; then orphan=1; fi' 'if [ "${ppid}" = 1 ]; then orphan=1; fi' _c_osysd
   _c_oyoung() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4244 1 9
-    printf 'pid 4244 · lint-selftest (direto) · desde %s · início 9' "$(_llnow '-10 minutes')" > "${d}/vaga/slot.0.holder"
+    printf 'pid 4244 · lint-selftest (direto) · desde %s · início 9' "$(_llnow '-10 minutes')" > "${d}/vaga/slot.0.holder"; touch -d '-1 minute' "${d}/vaga/slot.0.holder"
     local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
     LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [[ "${a#*|}" != *"NÃO conta"* ]]; }
   _llcase "(x) dono órfão há só 10 min (abaixo do teto) CONTA: a bancada longa e legítima não perde a vaga" \
@@ -60790,7 +60823,7 @@ if o in s:
     printf '"'"'dono pid' ': || return 1
     printf '"'"'dono pid' _c_oyoung
   _c_olegit() { rm -rf "${d}/proc"; _llset 3.00; _llhold || return 1; mkdir -p "${d}/proc"; _llproc 4245 100 9
-    printf 'pid 4245 · pr-finalize · desde %s · início 9' "$(_llnow '-5 hours')" > "${d}/vaga/slot.0.holder"
+    printf 'pid 4245 · pr-finalize · desde %s · início 9' "$(_llnow '-5 hours')" > "${d}/vaga/slot.0.holder"; touch -d '-1 minute' "${d}/vaga/slot.0.holder"
     local a; a="$(LLR_ENV="ONION_LOAD_SLOTS_MAX=1 ONION_LOAD_PROC=${d}/proc" _llr "$1" run --max 2 -- true)"; _llunhold
     LL_WHY="${a}"; [ "${a%%|*}" = 4 ] && [[ "${a#*|}" != *"NÃO conta"* ]]; }
   _llcase "(x2) dono vivo, com pai vivo, há 5 h CONTA: só o órfão tem teto de idade" \

@@ -207,10 +207,12 @@ _ll_holders() {  # quem segura as vagas, numa linha
 # 2026-11-22: o fd da vaga aberto em bash, subshells e python3 do pré-voo); o dono morre e o filho segue com a
 # vaga. Pego pelo `run`, o dono é o próprio `run`, vivo enquanto o comando roda, e órfão se a sessão que o
 # chamou acabou. Não dá para soltar o flock de outro processo sem matá-lo, e matar processo alheio está fora:
-# a vaga presa sem dono legítimo SÓ SAI DA CONTA, e a varredura olha uma vaga extra por vaga órfã achada (até
-# 2×SLOTS_MAX), para que a órfã não ocupe o lugar de uma livre. Critérios, com o pid lido de ONION_LOAD_PROC:
+# a vaga presa sem dono legítimo SÓ SAI DA CONTA. A varredura conta sempre 2×SLOTS_MAX vagas, e o candidato pode
+# cair numa vaga além de SLOTS_MAX (uma por órfã), para que a órfã não ocupe o lugar de uma livre. Critérios, com o pid lido de ONION_LOAD_PROC:
 #   · dono registrado MORTO (sem /proc/<pid>), ou pid REUSADO (o início do processo difere do gravado) ⇒ na hora;
-#   · dono vivo e ÓRFÃO (ppid 1, ou pai `systemd`, o subreaper) há ONION_LOAD_ORPHAN_MAX s ou mais ⇒ sai da conta;
+#   · dono vivo e ÓRFÃO (o pai mudou desde a pegada; no holder antigo, ppid 1 ou pai `systemd`) há
+#     ONION_LOAD_ORPHAN_MAX s ou mais ⇒ sai da conta;
+#   · holder de outro PID namespace, ou gravado há menos de LL_STALE_GRACE s ⇒ CONTA;
 #   · vaga presa SEM dono registrado (holder vazio) há ONION_LOAD_ORPHAN_MAX s pelo mtime do holder ⇒ sai da conta;
 #   · holder em formato desconhecido, ou sem /proc nesta plataforma ⇒ CONTA (na dúvida a vaga é do dono).
 _ll_proc() { printf '%s' "${ONION_LOAD_PROC:-/proc}"; }
@@ -221,9 +223,11 @@ _ll_pstat() {  # $1 = pid → "ppid início" (campos 4 e 22 do stat) · rc 1 se 
   LC_ALL=C awk '{ print $2, $20 }' <<< "${s}"
 }
 _ll_mystart() { local v; v="$(_ll_pstat "$$")" && printf '%s' "${v#* }"; }
+_ll_pidns() { local v; v="$(readlink "$(_ll_proc)/${1:-self}/ns/pid" 2>/dev/null)" && printf '%s' "${v//[^0-9]/}"; }
+LL_STALE_GRACE=5   # s: holder mais novo que isto acabou de ser gravado (motor antigo grava FORA da trava de admissão)
 # _ll_slot_stale <dir> <i> → rc 0 (e o motivo no stdout) = a vaga está presa sem dono legítimo · rc 1 = conta
 _ll_slot_stale() {
-  local h="$1/slot.$2.holder" rec pid since st0 cur ppid start now t age pcomm
+  local h="$1/slot.$2.holder" rec pid since st0 pai0 ns0 nsme cur ppid start now t age pcomm orphan
   [ -d "$(_ll_proc)" ] || return 1
   [ -e "${h}" ] || return 1
   now="$(date -u +%s)"
@@ -238,6 +242,15 @@ _ll_slot_stale() {
   [ -n "${pid}" ] || return 1
   since="$(LC_ALL=C sed -n 's/.* desde \([0-9][0-9T:-]*Z\).*/\1/p' <<< "${rec}")"
   st0="$(LC_ALL=C sed -n 's/.* início \([0-9][0-9]*\).*/\1/p' <<< "${rec}")"
+  pai0="$(LC_ALL=C sed -n 's/.* pai \([0-9][0-9]*\).*/\1/p' <<< "${rec}")"
+  ns0="$(LC_ALL=C sed -n 's/.* pidns \([0-9][0-9]*\).*/\1/p' <<< "${rec}")"
+  # outro PID namespace (sandbox, contêiner): o pid gravado não é o deste /proc — na dúvida, CONTA
+  nsme="$(_ll_pidns)"
+  [ -n "${ns0}" ] && [ -n "${nsme}" ] && [ "${ns0}" != "${nsme}" ] && return 1
+  # holder recém-gravado não se julga como morto: o motor ANTIGO grava o holder depois de soltar a trava de
+  # admissão, e nessa janela o arquivo ainda traz o dono anterior (achado da revisão independente de 2026-11-22)
+  t="$(stat -c %Y "${h}" 2>/dev/null)" || return 1
+  [ $(( now - t )) -ge "${LL_STALE_GRACE}" ] || return 1
   if ! cur="$(_ll_pstat "${pid}")"; then
     printf 'dono pid %s MORTO' "${pid}"; return 0
   fi
@@ -245,8 +258,12 @@ _ll_slot_stale() {
   if [ -n "${st0}" ] && [ "${st0}" != "${start}" ]; then
     printf 'dono pid %s MORTO (o pid foi reusado: início %s, gravado %s)' "${pid}" "${start}" "${st0}"; return 0
   fi
-  pcomm="$(cat "$(_ll_proc)/${ppid}/comm" 2>/dev/null)"
-  if [ "${ppid}" = 1 ] || [ "${pcomm}" = systemd ]; then
+  # ÓRFÃO: o pai mudou desde a pegada (reparentado a QUALQUER subreaper: tini, shim, systemd --user), ou, no
+  # holder antigo sem o pai gravado, ppid 1 ou pai `systemd`
+  pcomm="$(cat "$(_ll_proc)/${ppid}/comm" 2>/dev/null)"; orphan=0
+  if [ -n "${pai0}" ] && [ "${ppid}" != "${pai0}" ]; then orphan=1; fi
+  if [ "${ppid}" = 1 ] || [ "${pcomm}" = systemd ]; then orphan=1; fi
+  if [ "${orphan}" = 1 ]; then
     t="$(date -u -d "${since}" +%s 2>/dev/null)" || return 1
     age=$(( now - t ))
     [ "${age}" -ge "${LL_ORPHAN_MAX}" ] || return 1
@@ -283,15 +300,18 @@ load_lease_acquire() {
     # as tomadas e só entro se tomadas < N, na 1ª livre.
     exec {afd}>>"${d}/admit.lock" || { echo "load-lease: não abri ${d}/admit.lock" >&2; return 2; }
     flock -w 10 "${afd}" || { exec {afd}>&-; echo "load-lease: a trava de admissão ficou presa 10 s" >&2; return 2; }
-    busy=0; cand=""; ci=""; stale=0; scan="${LL_SLOTS_MAX}"
+    # varre SEMPRE 2×SLOTS_MAX: um dono legítimo numa vaga extra (aberta por uma órfã que depois soltou) tem de
+    # seguir na conta; varrer só até SLOTS_MAX o deixava invisível e admitia além de N (achado da revisão
+    # independente de 2026-11-22, reproduzido). O candidato é a 1ª livre; ele nunca passa de SLOTS_MAX + órfãs, porque
+    # com todas as vagas abaixo disso tomadas os donos legítimos já são SLOTS_MAX ≥ N.
+    busy=0; cand=""; ci=""; stale=0; scan=$(( 2 * LL_SLOTS_MAX ))
     for (( i = 0; i < scan; i++ )); do
       exec {fd}>>"${d}/slot.${i}.lock" || { exec {afd}>&-; echo "load-lease: não abri ${d}/slot.${i}.lock" >&2; return 2; }
       if flock -n "${fd}"; then
         if [ -z "${cand}" ]; then cand="${fd}"; ci="${i}"; else exec {fd}>&-; fi
       elif why="$(_ll_slot_stale "${d}" "${i}")"; then
-        # vaga ÓRFÃ: sai da conta e abre uma vaga a mais na varredura (teto 2×SLOTS_MAX)
+        # vaga ÓRFÃ: sai da conta (a varredura de 2×SLOTS_MAX acha a livre além dela)
         exec {fd}>&-; stale=$(( stale + 1 ))
-        [ "${scan}" -lt $(( 2 * LL_SLOTS_MAX )) ] && scan=$(( scan + 1 ))
         [ "${stale_said}" = 1 ] || echo "load-lease: vaga slot.${i} presa sem dono legítimo NÃO conta — ${why}; ninguém foi morto: a vaga só saiu da conta" >&2
       else busy=$(( busy + 1 )); exec {fd}>&-; fi
     done
@@ -300,7 +320,8 @@ load_lease_acquire() {
       LL_FD="${cand}"; LL_LOCK="${d}/slot.${ci}.lock"
       # o holder se grava AINDA SOB a trava de admissão: escrito depois, quem contasse no meio leria o dono anterior
       # (morto) e tiraria da conta uma vaga que acabou de ter dono
-      printf 'pid %s · %s · desde %s · início %s\n' "$$" "${ONION_LOAD_LEASE_WHO:-${0##*/}}" "$(date -u +%FT%TZ)" "$(_ll_mystart)" > "${d}/slot.${ci}.holder" 2>/dev/null || true
+      printf 'pid %s · %s · desde %s · início %s · pai %s · pidns %s\n' "$$" "${ONION_LOAD_LEASE_WHO:-${0##*/}}" "$(date -u +%FT%TZ)" \
+        "$(_ll_mystart)" "${PPID}" "$(_ll_pidns)" > "${d}/slot.${ci}.holder" 2>/dev/null || true
       exec {afd}>&-
       export ONION_LOAD_LEASE_HELD="${LL_LOCK}"
       echo "load-lease: vaga de passo pesado PEGA ($(( busy + 1 )) de ${k}: N derivado de load ${l}; ${LL_LOCK})" >&2
