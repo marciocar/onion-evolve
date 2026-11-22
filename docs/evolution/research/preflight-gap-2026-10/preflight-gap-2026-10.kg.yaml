@@ -81,6 +81,22 @@ nodes:
       method: "testimony: decisão do maestro por pergunta com opções, 2026-10-15"
       locality: "pessoa"
 
+  - id: E_PRE_VOO_SEM_MAPA_PARA_REGRA_1735
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "preflight-families.sh rodado na cabeça 98eeb09f2 do PR #1735 (antes da cura das fixtures) e o run 44991946027 do onion-selftest"
+    label: "O pré-voo do #1735 (REGRA 122 no lint-artifacts.sh) escolheu shell_pipefail_robustness,agent_color,door_mini, sem fixtures nem lint_hard_file, e o CI reprovou 9 fixtures boas e o lint-hard-file (b)."
+    narrative: "No CI o lint-artifacts.sh é infraestrutura da bancada e compra a completa; o pré-voo não tinha mapa nenhum para ele. A cura (fix/preflight-selects-fixtures) deriva do lint do índice a superfície das regras (o lint, o rules-registry, o lint-rules, a pasta fixtures/ e todo .sh/.py/.tsv do 1º nível de .claude/validation/ que o lint cita, menos a bancada) e, quando o diff a toca, soma fixtures, sweep_fixtures e lint_hard_file, lista curta conferida pela bancada. Na mesma cabeça, com a cura, a saída passou a incluir as três. Custo declarado: fixtures é a família mais cara da bancada (4306 s somadas no CI), então um PR de regra paga isso no fechamento; a questão das famílias baratas segue aberta e não muda. Achado no caminho: o bloco do mini tratava o Python que cai (rc 1) como não toca; agora o rc de não toca é 10 e o resto põe a família."
+    provenance:
+      source: "ops/testing/preflight-families.sh na cabeça 98eeb09f2; gh run view 44991946027 --log-failed"
+      locator: "saída antes: shell_pipefail_robustness,agent_color,door_mini; depois: + fixtures,sweep_fixtures,lint_hard_file"
+      method: "measurement: reprodução do seletor na cabeça do PR, antes e depois da cura"
+      locality: "repo"
+
 edges:
   - from: Q_FAMILIAS_BARATAS_DO_MAPA_NO_PRE_VOO
     to: D_PRE_VOO_SEMPRE_E_SOMBRA
@@ -96,4 +112,7 @@ edges:
     edge_type: SUPPORTS
   - from: D_PRE_VOO_SEMPRE_E_SOMBRA
     to: E_PRE_VOO_RODOU_EM_21_POR_CENTO
+    edge_type: TRACES_TO
+  - from: E_PRE_VOO_SEM_MAPA_PARA_REGRA_1735
+    to: D_PRE_VOO_SEMPRE_E_SOMBRA
     edge_type: TRACES_TO
