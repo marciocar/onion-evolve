@@ -2,8 +2,7 @@
 branch: fix/preflight-selects-fixtures
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 8fae5454310031045a3474fcdf68f2d1a543a7ad69860ef15c2a1658cded497f
-reviewed_code_sha256: 298130df1b762c57921459779795c87aab76e0c27f4c42a8cf14c2e166a029f5
+reviewed_diff_sha256: pendente
 findings_total: 14
 findings_real: 12
 findings_blocking: 6
@@ -12,6 +11,7 @@ duration_min: 7
 findings_fixed: 8
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: dois subagentes general-purpose (opus), mandato de refutar, só leitura (diff inteiro; depois o delta do --jobs)
 nota: "A passada refutou a 1ª forma (superfície só do 1º nível citado pelo lint) com juízes chamados por checks, lib/, utils/ e check apagado escapando; curados por fecho e candidatos da base. Duas premissas do comentário estavam erradas e foram corrigidas. O custo de parede de fixtures no pré-voo fica como limite declarado, medido no dogfood."
 ---
@@ -100,3 +100,10 @@ A 1ª passada pegou um mutante sobrevivente no ramo "não decidi": o grep solto 
   (por exemplo `members.yaml`).
 - **Casamento pelo nome em `.claude/validation/`.** Dois arquivos de mesmo nome em pastas diferentes entram juntos.
   O erro é para o lado de rodar mais.
+
+## Correção da declaração (22/11)
+
+O revisor desta passada foi um agente separado do autor, como dizem o campo `reviewer:` e o corpo, mas o
+frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
+sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
+código foi apagado, para o `pr-finalize` carimbar de novo.
