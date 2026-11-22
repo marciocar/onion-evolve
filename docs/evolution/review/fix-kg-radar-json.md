@@ -1,9 +1,8 @@
 ---
 branch: fix/kg-radar-json
-pr: pendente
+pr: 1734
 date: 2026-11-22
-reviewed_diff_sha256: 0498c67bf1acfe2828af6230daeb7845e9a17603d1a8ad192a73f6a07918dcc8
-reviewed_code_sha256: b1b4cf61648ae804628b87ac2ee059d22d82672d221a6b0ed84af6f1e9c470f7
+reviewed_diff_sha256: pendente
 findings_total: 9
 findings_real: 8
 findings_blocking: 6
@@ -73,3 +72,11 @@ schema_version e review_after, e `kg-contract-check` sem `as_source`. Total: 15 
   25 scripts) e o `kg-decide-seal.sh`, que escreve por texto: lacuna nomeada no nó
   `Q_LEITORES_DO_CORPUS_SO_ENUMERAM_KG_YAML_1122`. O core não tem `.kg.json` próprio hoje.
 - Itens 1 e 2 do sinal (o `kg_gate.py` não descobre `.kg.json`; `external_edges` no perfil JSON) são do kg-ssot.
+
+## Re-revisão por rebase (2026-11-22)
+
+O #1734 ficou em conflito com a main depois que o #1733 (`/engineer:spike`) entrou: inventário, backlog e
+projeções geradas. Rebase pela casa (`ops/pr-finalize.sh --rebase --push`), com a projeção regenerada pelo
+gerador e nunca editada à mão, e os dois blocos mantidos se a âncora do `lint-selftest.sh` colidisse. O código
+revisado (radar, contract-check, bancada, grafo) não muda no rebase; o diff volta a `pendente` e o
+`pr-finalize` carimba de novo.
