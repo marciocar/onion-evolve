@@ -46,7 +46,7 @@
 #                          x_notice_response (ciente | recusou | sem_resposta | autora_do_aviso;
 #                          com notice_absent, só nao_avisado | recusou)
 #          action:         x_owner (id de um participant, ou NAO_ESPECIFICADO) · x_area
-#          risk:           x_area (x_owner opcional)
+#          risk:           x_area (x_owner opcional: participant ou NAO_ESPECIFICADO) · x_due "AAAA-MM-DD" onde houver
 #
 # AUSÊNCIA DE AVISO: reunião em que de fato não houve aviso não pode inventar um `notice_attempt`. O registro
 # `notice_absent` é registro válido (rc 0) e sai como SOFT no stdout, `SOFT:AVISO-AUSENTE\t<nó>\t<n> pessoa(s)…`.
@@ -72,6 +72,8 @@
 #            AREA-FORA-DO-PAPEL (x_area só em ação e risco) · AREAS-INVALIDAS (meeting-areas.txt malformado) ·
 #            FECHADO-SEM-MOTIVO (ação ou risco fechado sem verified_at e verified_against) · ESCALAR-CONTINUADO
 #            (linha mais funda depois de `chave: valor`: o YAML junta ao valor, e o leitor via só a 1ª linha)
+#            · RISCO-DONO-INEXISTENTE (x_owner de risco que não é participant nem NAO_ESPECIFICADO) · x_due fora de
+#            AAAA-MM-DD sai CAMPO-FORA-DO-TIPO (o backlog imprime os dois como campo)
 #   resumo:  RESUMO-AUSENTE · RESUMO-SEM-NO (o grafo tem, o resumo não) · RESUMO-ITEM-SEM-NO (o resumo tem, o
 #            grafo não) · RESUMO-NO-INEXISTENTE (id citado que não é fato do grafo) · RESUMO-SECAO-ERRADA
 #   backlog: CARRY-REPROVADO (grafo anterior fora do gate) · CARRY-FORA-DE-ORDEM (data posterior à da reunião,
@@ -127,6 +129,8 @@ def val(line):
     if v[:1] == "'" and v[-1:] == "'" and len(v) >= 2: return nfc(v[1:-1].replace("''", "'"))
     return nfc(re.sub(r"\s+#.*$", "", v))
 def ind(line): return len(line) - len(line.lstrip(" "))
+BLOCK_RX = r"[|>]([+-]?\d?|\d[+-])"   # |, >, |-, |2, |2-, |-2 ...
+def bare(v): return re.sub(r"(^|\s)#.*$", "", v).strip()   # o valor sem o comentário de fim de linha
 # LEITOR: a forma estrita do radar, sem confiar em coluna fixa e sem deixar nada escapar calado.
 #  · comentário (`#`, qualquer coluna) nunca abre seção; seção = chave de topo `^[A-Za-z_]...:` (1ª passada);
 #  · conteúdo de bloco literal (`|`, `>`) é texto, não chave (um `- id:` dentro de label não cria nó);
@@ -151,12 +155,14 @@ for raw in open(g, encoding="utf-8"):
         fail("ESCALAR-CONTINUADO", prev_id, f"linha mais funda depois de um valor escalar (continuação que o YAML junta ao valor): {s[:60]}")
     _kv = (s[2:] if s.startswith("- ") else s)
     _v = _kv.split(":", 1)[1].strip() if ":" in _kv and re.match(r"^[A-Za-z_][\w-]*\s*:", _kv) else (_kv if s.startswith("- ") else "")
-    prev_eff = (ind(line) + (2 if s.startswith("- ") else 0)) if (_v and not re.fullmatch(r"[|>][+-]?\d?", _v)) else None
+    _v = bare(_v)
+    _v = "" if re.fullmatch(r"[&!]\S+", _v) else _v   # âncora ou tag sozinha abre valor aninhado, não escalar
+    prev_eff = (ind(line) + (2 if s.startswith("- ") else 0)) if (_v and not re.fullmatch(BLOCK_RX, _v)) else None
     m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):", line)
     if m: sec = m.group(1); cur = None; nodecol = None; continue
     key = s[2:] if s.startswith("- ") else s
     k = key.split(":", 1)[0].strip() if ":" in key else ""
-    if ":" in key and re.fullmatch(r"[|>][+-]?", key.split(":", 1)[1].strip()): block = ind(line)
+    if ":" in key and re.fullmatch(BLOCK_RX, bare(key.split(":", 1)[1])): block = ind(line)
     if re.search(r"consent", k.lower()): consent_keys.append(k)
     if sec == "meta" and ind(line) == 2 and k and not s.startswith("- "): meta[k] = val(key)
     elif sec == "nodes":
@@ -288,6 +294,10 @@ for i, r in roles.items():
         o = n.get("x_owner", "")
         if not (o == "NAO_ESPECIFICADO" or roles.get(o) == "participant"):
             fail("ACAO-SEM-DONO", i, f"x_owner {o or '(vazio)'} não é participant nem NAO_ESPECIFICADO")
+    if r == "risk" and "x_owner" in n and not (n["x_owner"] == "NAO_ESPECIFICADO" or roles.get(n["x_owner"]) == "participant"):
+        fail("RISCO-DONO-INEXISTENTE", i, f"x_owner {n['x_owner'] or '(vazio)'} não é participant nem NAO_ESPECIFICADO")
+    if "x_due" in n and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", n["x_due"]):
+        fail("CAMPO-FORA-DO-TIPO", i, f"x_due {n['x_due'] or '(vazio)'!r}: AAAA-MM-DD")
 # A PARADA é amarrada à RECUSA: existe, não passa da 1ª recusa, e nada além do nó da reunião cita trecho
 # que TERMINE depois dela (2ª passada, achado 7: participante e aviso também são captura)
 if refusal_lines and stop_line is None:
@@ -316,7 +326,7 @@ for i, r in roles.items():
         fail("AREA-FORA-DO-PAPEL", i, f"x_area num nó {r}: a área é de ação e risco, onde o backlog agrupa")
     if r in AREA_ROLES and n.get("status") in CLOSED and not (n.get("verified_at") and n.get("verified_against")):
         fail("FECHADO-SEM-MOTIVO", i, f"{r} com status {n.get('status')}: fechar exige verified_at e verified_against (o motivo), senão o item some do backlog calado")
-    if r in AREA_ROLES and re.fullmatch(r"[|>][+-]?\d?", n.get("label", "")):
+    if r in AREA_ROLES and re.fullmatch(BLOCK_RX, n.get("label", "")):
         fail("CAMPO-FORA-DO-TIPO", i, "label em bloco (|, >): o label é uma linha só, até 280 caracteres")
     if r in AREA_ROLES:
         a = n.get("x_area")
@@ -334,48 +344,67 @@ if summary:
                  ("risk", r"\brisco|\brisk"))
         def kind(h):
             h = strip(h)
-            if re.search(r"timeline|cronograma|pendenc|resumo", h): return None   # a seção é de outra coisa, mesmo citando fatos
+            if re.search(r"timeline|cronograma|pendenc|resumo|conex|expectativ|ambiguidad", h): return frozenset()   # seção nomeada de outra coisa
             ks = frozenset(k for k, rx in KINDS if re.search(rx, h))
             return ks or None
         text = open(summary, encoding="utf-8", errors="replace").read()
         text = re.sub(r"<!--.*?-->", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)   # comentário HTML não renderiza
-        cited, in_sec, items, sec, fence, cand, list_col, prev_txt, in_table = set(), set(), [], None, False, None, None, "", False
+        cited, in_sec, items, sec, sec_lvl, fence, cand, list_col, in_table = set(), set(), [], None, 9, False, None, None, False
+        listed, prev_kind, op = {}, "blank", None   # op = o item aberto: [linha, seção, texto, ids próprios, aninhado?]
+        def close():
+            global op
+            if op is None: return
+            ln0, sk, txt, own, _n = op; op = None
+            if not own: items.append((ln0, "/".join(sorted(sk)), txt)); return
+            t = own[0]   # o fato do item é o 1º id dele; os outros são referência (limita, depende de...)
+            if facts[t] not in sk:
+                fail("RESUMO-SECAO-ERRADA", t, f"`{t}` é {facts[t]} e está num item da seção de {'/'.join(sorted(sk))} (linha {ln0})"); return
+            if t in listed: items.append((ln0, "/".join(sorted(sk)), f"reusa `{t}`, já listado na linha {listed[t]}: {txt}")); return
+            listed[t] = ln0; in_sec.add(t)
+        def heading(txt, lvl):
+            global sec, sec_lvl, list_col, in_table, prev_kind
+            close(); k = kind(txt)
+            # subtítulo sem nome de seção («Técnicas») herda a seção de cima; seção nomeada de outra coisa a encerra
+            if not (k is None and sec is not None and lvl > sec_lvl): sec, sec_lvl = (k or None), lvl
+            list_col = None; in_table = False; prev_kind = "blank"
         for ln, raw in enumerate(text.split("\n"), 1):
             line = nfc(raw.rstrip("\r"))
             if re.match(r"^\s{0,3}(```|~~~)", line): fence = not fence; continue
             if fence: continue
             line = re.sub(r"^\s{0,3}(>\s?)+", "", line)   # citação: o item dentro dela é item
-            hm = re.match(r"^\s{0,3}#{1,6}\s+(.*?)\s*#*\s*$", line) or re.fullmatch(r"\s{0,3}(?:\*\*|__)([^*_]+)(?:\*\*|__)\s*:?\s*", line)
-            if hm: sec = kind(hm.group(1)); list_col = None; in_table = False; prev_txt = ""; continue
-            if re.fullmatch(r"\s{0,3}(=+|-+)\s*", line) and prev_txt and not in_table:   # título setext
-                sec = kind(prev_txt); list_col = None; prev_txt = ""
-                if items and items[-1][0] == ln - 1: items.pop()
-                continue
-            if not line.strip(): in_table = False; prev_txt = ""; continue
+            hm = re.match(r"^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$", line)
+            if hm: heading(hm.group(2), len(hm.group(1))); continue
+            bm = re.fullmatch(r"\s{0,3}(?:\*\*|__)([^*_]+)(?:\*\*|__)\s*:?\s*", line)
+            if bm: heading(bm.group(1), 7); continue
+            if re.fullmatch(r"\s{0,3}(=+|-+)\s*", line) and prev_kind == "para" and op is not None and op[4] == "para":
+                txt = op[2]; op = None; heading(txt, 1 if "=" in line else 2); continue   # setext: só depois de parágrafo
+            if not line.strip():
+                if op is not None and op[4] == "para": close()
+                in_table = False; prev_kind = "blank"; continue
             ids = [t for t in re.findall(r"`([A-Za-z0-9_]+)`", line) if t in facts or re.fullmatch(r"[DAR]_[A-Z0-9_]+", t)]
+            good = []
             for t in ids:
-                if t not in facts:
-                    fail("RESUMO-NO-INEXISTENTE", t, f"o resumo cita `{t}` na linha {ln}, e o grafo não tem esse fato")
-                    continue
-                cited.add(t)
-                if sec and facts[t] in sec: in_sec.add(t)
-                elif sec:
-                    fail("RESUMO-SECAO-ERRADA", t, f"`{t}` é {facts[t]} e está na seção de {'/'.join(sorted(sec))} (linha {ln})")
-            prev_txt = line.strip()
-            if sec is None: continue
+                if t not in facts: fail("RESUMO-NO-INEXISTENTE", t, f"o resumo cita `{t}` na linha {ln}, e o grafo não tem esse fato")
+                else: cited.add(t); good.append(t)
+            if sec is None: prev_kind = "other"; continue
             if "|" in line and re.fullmatch(r"\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*", line):
-                if cand is not None and items and items[-1][0] == cand: items.pop()   # cabeçalho da tabela
-                in_table = True; continue
+                if op is not None and op[4] == "row" and op[0] == cand: op = None   # cabeçalho da tabela
+                in_table = True; prev_kind = "table"; continue
             im = re.match(r"^( *)([-*+•]|\d+[.)])\s+\S", line)
-            is_item = False
-            if im:
-                col = len(im.group(1))
-                if list_col is None or col < list_col:   # sub-item fica na coluna do conteúdo do item de cima ou além
-                    if col <= 3: is_item = True; list_col = col + len(im.group(2)) + 1
-            elif "|" in line and (in_table or line.lstrip().startswith("|")):
-                is_item = True
-            cand = ln if ("|" in line and not im) else None
-            if is_item and not ids: items.append((ln, "/".join(sorted(sec)), line.strip()[:60]))
+            col = len(im.group(1)) if im else len(line) - len(line.lstrip())
+            if im and (list_col is None or col < list_col) and col <= 3:   # item de topo
+                close(); op = [ln, sec, line.strip()[:60], list(good), False]; list_col = col + len(im.group(2)) + 1; prev_kind = "item"
+            elif "|" in line and not im and (in_table or line.lstrip().startswith("|")):
+                close(); op = [ln, sec, line.strip()[:60], list(good), "row"]; cand = ln; prev_kind = "row"
+            elif op is not None and op[4] != "row" and (prev_kind != "blank" or (list_col is not None and col >= list_col)):
+                if op[4] == "para": op[3].extend(good)   # o parágrafo continua
+                else:
+                    if im: op[4] = True   # sub-item: dali em diante os ids são referência, não o fato do item
+                    if op[4] is False: op[3].extend(good)
+                prev_kind = "para" if op[4] == "para" else "item"
+            else:   # texto corrido numa seção de fatos é cobrado como item
+                close(); op = [ln, sec, line.strip()[:60], list(good), "para"]; prev_kind = "para"
+        close()
         for ln, k, txt in items:
             fail("RESUMO-ITEM-SEM-NO", f"L{ln}", f"item da seção de {k} sem o id do nó do grafo: {txt}")
         for t in sorted(set(facts) - in_sec):
@@ -522,6 +551,12 @@ if [ "${1:-}" = "--selftest" ]; then
   _case "ação fechada sem motivo reprova" SO:FECHADO-SEM-MOTIVO "s=s.replace('    x_area: tecnico\n    plane: DEV\n    status: open','    x_area: tecnico\n    plane: DEV\n    status: done',1)"
   _case "ação fechada com motivo passa" OK "s=s.replace('    x_area: tecnico\n    plane: DEV\n    status: open','    x_area: tecnico\n    plane: DEV\n    status: done\n    verified_at: \"2026-10-23\"\n    verified_against: \"gerador entregue, registro fictício\"',1)"
   _case "label em bloco da ação reprova" CAMPO-FORA-DO-TIPO "s=s.replace('    label: \"Carla Modelo monta','    label: >-\n      Carla Modelo monta',1).replace('2026-10-23.\"\n    trace','2026-10-23.\n    trace',1)"
+  # ── 2ª passada do refutador: campos que o backlog imprime são validados; YAML válido não é continuação ──
+  _case "x_due fora de data reprova" CAMPO-FORA-DO-TIPO "s=s.replace('x_due: \"2026-10-23\"','x_due: \"sexta\"',1)"
+  _case "dono de risco inexistente reprova" SO:RISCO-DONO-INEXISTENTE "i=s.rindex('    x_area: tecnico\n'); s=s[:i]+'    x_area: tecnico\n    x_owner: P_NINGUEM\n'+s[i+len('    x_area: tecnico\n'):]"
+  _case "bloco com comentário não é continuação" OK "i=s.rindex('    x_area: tecnico\n'); s=s[:i]+'    x_area: tecnico\n    narrative: | # nota\n      texto do bloco, fictício\n'+s[i+len('    x_area: tecnico\n'):]"
+  _case "bloco com indentação explícita não é continuação" OK "i=s.rindex('    x_area: tecnico\n'); s=s[:i]+'    x_area: tecnico\n    narrative: |2-\n      texto do bloco, fictício\n'+s[i+len('    x_area: tecnico\n'):]"
+  _case "âncora sozinha não é continuação" OK "s=s.replace('    provenance:\n','    provenance: &prov\n',1)"
   # ── AUSÊNCIA DE AVISO: passa na forma como SOFT, nunca como conformidade, e não abre brecha ──
   _case "aviso de verdade com nao_avisado reprova" NAO-AVISADO-SEM-AUSENCIA "s=s.replace('x_notice_response: ciente','x_notice_response: nao_avisado',1)"
   BASE="${FIX}/meeting-notice-absent.kg.yaml"
@@ -566,21 +601,29 @@ if [ "${1:-}" = "--selftest" ]; then
   _scase "decisão do resumo sem nó reprova" RESUMO-ITEM-SEM-NO "s=s.replace('### Ações','- ✅ Decisão que o grafo não tem.\n\n### Ações',1)"
   _scase "linha da tabela de ações sem nó reprova" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Riscos','\n| Bruno Exemplo | Revisar o PDF | — | — |\n\n### Riscos',1)"
   _scase "id do resumo que o grafo não tem reprova" RESUMO-NO-INEXISTENTE "s=s.replace('### Riscos','### Riscos\n- ⚠️ Outro risco. \`R_INVENTADO\`',1)"
-  _scase "fato na seção errada reprova" RESUMO-SECAO-ERRADA "s=s.replace(' \`R_LIB_PDF_SEM_MANUTENCAO\`','',1).replace('### Pendências','### Pendências',1).replace('o HTML fica de fora por enquanto. \`D_RELATORIO_PDF_PLANILHA\`','o HTML fica de fora por enquanto. \`D_RELATORIO_PDF_PLANILHA\` \`R_LIB_PDF_SEM_MANUTENCAO\`',1)"
+  _scase "fato na seção errada reprova" RESUMO-SECAO-ERRADA "s=s.replace('\n- ⚠️ A biblioteca de PDF em uso está sem manutenção há um ano. \`R_LIB_PDF_SEM_MANUTENCAO\`','',1).replace('\n\n### Ações','\n- ⚠️ A biblioteca de PDF em uso está sem manutenção há um ano. \`R_LIB_PDF_SEM_MANUTENCAO\`\n\n### Ações',1)"
   _scase "pendência sem nó não é cobrada" OK "s=s.replace('### Timeline','- ⚠️ Outra pendência sem nó.\n\n### Timeline',1)"
   _scase "item em bloco de código não conta" OK "s=s.replace('### Pendências','\`\`\`\n- exemplo sem nó\n\`\`\`\n\n### Pendências',1)"
   _scase "resumo ausente reprova" AUSENTE "pass"
   _scase "id só em comentário HTML não conta" RESUMO-SEM-NO "s=s.replace('- ✅ O relatório','<!-- - ✅ O relatório',1).replace('por enquanto. \`D_RELATORIO_PDF_PLANILHA\`','por enquanto. \`D_RELATORIO_PDF_PLANILHA\` -->',1)"
-  _scase "tabela sem barra inicial é lida" RESUMO-ITEM-SEM-NO "s=s.replace('| \`A_GERADOR_PLANILHA\` |\n','| \`A_GERADOR_PLANILHA\` |\nBruno Exemplo | Revisar o PDF | — | —\n',1)"
+  _scase "tabela sem barra inicial é lida" RESUMO-ITEM-SEM-NO "s=s.replace('| Carla Modelo | Montar o gerador de planilha | 2026-10-23 | \`A_GERADOR_PLANILHA\` |\n','Carla Modelo | Montar o gerador de planilha | 2026-10-23 | \`A_GERADOR_PLANILHA\`\nBruno Exemplo | Revisar o PDF | — | —\n',1)"
   _scase "seção Próximos passos é de ações" RESUMO-ITEM-SEM-NO "s=s.replace('### Pendências','### Próximos passos\n- Revisar o PDF antes do envio.\n\n### Pendências',1)"
   _scase "item com marcador • conta" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Ações','\n• Outra decisão sem nó.\n\n### Ações',1)"
-  _scase "item em citação conta" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Ações','\n\n> - Decisão citada sem nó.\n\n### Ações',1)"
-  _scase "item recuado em 2 espaços conta" RESUMO-ITEM-SEM-NO "s=s.replace('### Decisões\n','### Decisões\n  - ✅ Decisão recuada sem nó.\n',1)"
+  _scase "item em citação conta" RESUMO-ITEM-SEM-NO "s=s.replace('\n  - justificativa: os dois formatos cobrem quem lê e quem recalcula.','',1).replace('- ✅ O relatório','> - ✅ O relatório',1).replace('por enquanto. \`D_RELATORIO_PDF_PLANILHA\`\n','por enquanto. \`D_RELATORIO_PDF_PLANILHA\`\n> - ✅ Decisão citada sem nó.\n',1)"
+  _scase "item recuado em 2 espaços conta" RESUMO-ITEM-SEM-NO "s=s.replace('\n  - justificativa: os dois formatos cobrem quem lê e quem recalcula.','',1).replace('- ✅ O relatório','  - ✅ O relatório',1).replace('por enquanto. \`D_RELATORIO_PDF_PLANILHA\`\n','por enquanto. \`D_RELATORIO_PDF_PLANILHA\`\n  - ✅ Decisão recuada sem nó.\n',1)"
   _scase "risco citado só em Pendências reprova" RESUMO-SEM-NO "s=s.replace('\n- ⚠️ A biblioteca de PDF em uso está sem manutenção há um ano. \`R_LIB_PDF_SEM_MANUTENCAO\`','',1).replace('não foi definido.','não foi definido. \`R_LIB_PDF_SEM_MANUTENCAO\`',1)"
   _scase "Timeline das decisões não é seção de decisão" OK "s=s.replace('### Timeline','### Timeline das decisões',1)"
   _scase "seção mista aceita os dois papéis" OK "s=s.replace('### Riscos','### Decisões e riscos',1)"
   _scase "título setext abre seção" OK "s=s.replace('### Riscos','Riscos\n------',1)"
   _scase "título em negrito abre seção" OK "s=s.replace('### Riscos','**Riscos**',1)"
+  _scase "item que cita outro fato como referência passa" OK "s=s.replace('há um ano. \`R_LIB_PDF_SEM_MANUTENCAO\`','há um ano. \`R_LIB_PDF_SEM_MANUTENCAO\` (limita \`D_RELATORIO_PDF_PLANILHA\`)',1)"
+  _scase "id só no sub-item não salva o item" RESUMO-ITEM-SEM-NO "s=s.replace('por enquanto. \`D_RELATORIO_PDF_PLANILHA\`\n','por enquanto.\n  - nó: \`D_RELATORIO_PDF_PLANILHA\`\n',1)"
+  _scase "subtítulo dentro da seção herda" OK "s=s.replace('### Decisões\n','### Decisões\n#### Técnicas\n',1)"
+  _scase "subtítulo em negrito não esconde item sem nó" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Ações','\n\n**Detalhes**\n- ✅ Decisão sem nó escondida.\n\n### Ações',1)"
+  _scase "id repetido em dois itens reprova" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Ações','\n- ✅ Outra decisão inventada. \`D_RELATORIO_PDF_PLANILHA\`\n\n### Ações',1)"
+  _scase "parágrafo solto na seção de decisões reprova" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Ações','\n\nDecidimos também migrar o banco.\n\n### Ações',1)"
+  _scase "linha horizontal depois de item não esconde item" RESUMO-ITEM-SEM-NO "s=s.replace('\n\n### Ações','\n- ✅ Decisão sem nó.\n---\n\n### Ações',1)"
+  _scase "item quebrado em duas linhas com o id na continuação passa" OK "s=s.replace('o HTML fica de fora por enquanto. \`D_','o HTML fica de fora\n  por enquanto. \`D_',1)"
   # ── BACKLOG POR ÁREA (SAC-480): projeção do grafo, só de grafos conformes, com carry-over ──
   SELF="${HERE}/$(basename "${BASH_SOURCE[0]}")"
   _mk() { python3 -I -B -c "import sys; s=open(sys.argv[1]).read(); ${2}; open(sys.argv[2],'w').write(s)" "${3:-${FIX}/meeting-ok.kg.yaml}" "${T}/$1"; }
@@ -634,6 +677,8 @@ if [ "${1:-}" = "--selftest" ]; then
   _rcase "backlog em diretório inexistente não julga" 2 "diretório da saída inexistente" cur.kg.yaml --backlog sumiu/saida.md
   cp "${FIX}/meeting-ok-extract.md" "${T}/resumo-keep-extract.md"
   _rcase "backlog não sobrescreve o que não é projeção" 2 "não é uma projeção do backlog" cur.kg.yaml --backlog resumo-keep-extract.md
+  ln -sf cur.kg.yaml "${T}/backlog-l.md.tmp"
+  _rcase "temporário não segue link plantado" 0 "backlog por área gravado" cur.kg.yaml --backlog backlog-l.md
   # O CONTRATO só julga onde o vendor existe (o core): o caso roda com a raiz do repo do checador, e fora dele
   # sai ⊘ declarado — nunca verde por vacuidade, nunca falha por ambiente.
   CROOT="$(git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || true)"
@@ -701,13 +746,14 @@ if [ -n "${BACKLOG}" ]; then
   fi
   if [ "${rc}" -eq 0 ]; then
     python3 -I -B - "${D}" "${k}" "${ROOT}" "${BACKLOG}" <<'PYB'
-import json, os, re, sys
+import json, os, re, sys, tempfile
 d, k, root, out = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]
 DONE = {"confirmed", "done", "superseded", "refuted"}   # a mesma régua do radar (trabalhoPendente)
 cur = json.load(open(os.path.join(d, "0.json"), encoding="utf-8"))
 prev = [json.load(open(os.path.join(d, f"{i}.json"), encoding="utf-8")) for i in range(1, k + 1)]
 rroot = os.path.realpath(root)
-rel = lambda p: os.path.relpath(os.path.realpath(p), rroot) if os.path.realpath(p).startswith(rroot + os.sep) else p
+_rel = lambda p: os.path.relpath(os.path.realpath(p), rroot) if os.path.realpath(p).startswith(rroot + os.sep) else p
+rel = lambda p: _rel(p).replace("`", "'")   # o caminho sai entre crases: crase no nome não fecha o código
 bad, seen, seen_ids = [], {os.path.realpath(cur["graph"])}, {cur["id"]}
 for p in prev:
     rp = os.path.realpath(p["graph"])
@@ -727,7 +773,7 @@ for src in [cur] + sorted(prev, key=lambda p: p["date"], reverse=True):
         else: n_cur += 1
         line += f" — {esc(it['label'])}"   # o texto livre por último: nada nele se passa por campo
         groups.setdefault(it["area"], []).append(line)
-md = [f"# Backlog por área: {cur['id']} ({cur['date']})", "",
+md = [f"# Backlog por área: {esc(cur['id'])} ({cur['date']})", "",
       f"> Projeção do grafo `{rel(cur['graph'])}`" + (f" e de {len(prev)} reunião(ões) anterior(es)" if prev else "")
       + ", gerada pelo `meeting-graph-check.sh --backlog`. Não edite à mão: o item fecha no grafo dele e some daqui na próxima geração.",
       f"> Itens abertos: {n_cur + n_prev} ({n_cur} desta reunião, {n_prev} de reuniões anteriores). Fora da projeção por estarem fechados: {len(closed)}.", ""]
@@ -736,11 +782,13 @@ for a in order + [x for x in groups if x not in order]:
     md += [f"## {a}" + (" (a triar)" if a == "NAO_ESPECIFICADO" else ""), ""] + groups[a] + [""]
 if n_cur + n_prev == 0: md += ["Nenhum item aberto.", ""]
 if closed: md += ["## Fechados (fora da projeção)", "", "Fecharam no grafo de origem, com o motivo em `verified_against`: " + ", ".join(closed) + ".", ""]
-tmp = out + ".tmp"
-try:
-    with open(tmp, "w", encoding="utf-8") as fh: fh.write("\n".join(md))
+tmp = None
+try:   # temporário de nome imprevisível no mesmo diretório: um link plantado em <saída>.tmp não desvia a escrita
+    fd, tmp = tempfile.mkstemp(prefix=".backlog-", suffix=".tmp", dir=os.path.dirname(os.path.abspath(out)))
+    with os.fdopen(fd, "w", encoding="utf-8") as fh: fh.write("\n".join(md))
     os.replace(tmp, out)
 except OSError as e:
+    if tmp and os.path.exists(tmp): os.unlink(tmp)
     print(f"meeting-graph-check: não pude gravar {out}: {e}", file=sys.stderr); sys.exit(2)
 PYB
     rc=$?
