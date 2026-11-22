@@ -2,8 +2,7 @@
 branch: chore/vendor-company-brain-0.1.0
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 35aa84d64ae6bf915aaad91798f017e8abff0db881eae3dcf7194cb4b53aef26
-reviewed_code_sha256: 6c547a860923a525299454a92ec730aa4459a670588b4f6d47f11367dcb799a7
+reviewed_diff_sha256: pendente
 findings_total: 8
 findings_real: 8
 findings_blocking: 1
@@ -54,3 +53,11 @@ nota: "O achado 8 foi curado em parte: o parâmetro sources deixou de prometer l
 - **Validador v1.** O validador v1 do core recusa o arquivo v2 que o comando gera. A migração está em `Q_CBV_MIGRAR_VALIDADOR_V1`, e o comando declara esse limite.
 - **Repo privado.** O repo do produto é privado, e o vendor torna públicos os 64 arquivos do recorte. Isso é efeito do selo de vendorizar por tag. O recorte não traz dado de empresa.
 - **Guia e help.** O comando ainda não aparece em `docs/onion/commands-guide.md` nem em `.claude/commands/docs/help.md`.
+
+## Re-revisão: subida do vendor para a v0.1.1 (2026-11-22)
+
+- **O que mudou.** O produto soltou a tag `company-brain-v0.1.1` (commit `c80aa7ef`), conferida no remoto com `git ls-remote`. O vendor subiu pelo próprio `update`, contra um clone raso da tag. `check` e `verify` deram rc 0, com os mesmos 64 arquivos.
+- **Diff do vendor.** Mudaram só `tests/voice-conduct-conformance.sh` (a linha do `cd` passou a ser `cd "$(dirname "${BASH_SOURCE[0]}")/.."`, com duas linhas de comentário) e o carimbo (tag, commit, versão e o sha256 desse teste). Nenhum outro arquivo do motor mudou, e o verificador, o comando e a bancada não foram tocados.
+- **Medida.** A conformidade rodou de dentro de `vendor/company-brain` sem `GIT_DIR` nem `GIT_WORK_TREE`: rc 0, 59 casos, 21 códigos. De um cwd fora do repo, pelo caminho absoluto, também deu rc 0. Isso fecha `Q_CBV_TESTE_SUPOE_RAIZ` no grafo, e `C_CBV_VENDOR_V010_CONFERE` e `C_CBV_CONFORMIDADE_DO_VENDOR` foram re-carimbados com essas medidas.
+- **Quem re-revisou.** O próprio agente de execução, lendo o diff inteiro do delta (o teste e o carimbo). A passada isolada do refutador vale para o resto do diff, que não mudou. O delta é código de terceiro vendorizado, conferido por sha256 contra a tag, e não código do core.
+
