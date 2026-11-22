@@ -148,6 +148,130 @@ fi
     '             --freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples|--validade|--doorbell' >&2
   exit 2; }
 
+# ══ LEITURA POR FORMATO: .kg.json ENTRA PELO MESMO PARSER (2026-11-22) ═══════════════════════════
+# A kg-ssot 4.56.0 trouxe `kg_migrate.py format --to json`, e o contrato aceita o grafo em JSON
+# (`as_source`: todo nome que termina em `.json`, sensível a maiúsculas). Este radar lê YAML por
+# LINHA, e um .kg.json saía com "nenhum nó encontrado" e rc 1: o grafo correto reprovava, e a casa
+# perdia o radar no primeiro grafo migrado (sinal do hub, 2026-11-21; reproduzido aqui).
+# A CURA É NO PONTO DE LEITURA, e não um segundo awk: o JSON é lido pelo `json` da biblioteca
+# padrão e reescrito como YAML de BLOCO na gramática que o awk abaixo já lê (lista com traço
+# indentado, campo do nó na coluna do `id:`, todo texto entre aspas duplas sem escape, que o `trim`
+# do awk devolve cru). O arquivo traduzido é entrada DESTE awk, não YAML para outro leitor. Daí em
+# diante é o MESMO awk, com as MESMAS guardas: um formato, um veredito. Duas ordens são impostas,
+# porque o awk depende delas e o mapa do JSON não tem ordem: `id` abre o item de `nodes` e `from`
+# abre o item de `edges`.
+# TETO DECLARADO: o texto livre (label, verified_against) aparece CRU nos dois, e o escape que o
+# .kg.yaml escreveu à mão (\" entre aspas duplas, '' entre simples) não volta do JSON, que guarda só
+# o valor: nesses campos a saída mostra o valor, e o .kg.yaml mostrava a grafia. Veredito e colunas
+# estruturadas (id, tipo, plano, status, pesos, datas) são iguais, medidos em 5 grafos do core.
+# FAIL-CLOSED com rc 2 (erro de arquivo, nunca veredito): python3 ausente, sintaxe fora da RFC 8259,
+# NaN/Infinity, CHAVE REPETIDA e raiz que não é objeto. A chave repetida o YAML deste radar acusa
+# no --integrity; no JSON ela não sobrevive à tradução (o mapa guarda uma só), e o perfil JSON do
+# contrato a recusa como parse.duplicate-key, então aqui ela para a leitura com o nome do código.
+# O que o radar NÃO julga no .kg.yaml ele também não julga no .kg.json: faixa de número (I-JSON) e
+# profundidade são do contrato (kg-contract-check.sh), nos dois formatos.
+# O nome original segue em `arq` (o sufixo .proposal.kg.json liga o modo proposta), e o leitor do
+# contrato no --due recebe o arquivo ORIGINAL, que ele lê em JSON por conta própria.
+READ_FILE="$FILE"
+case "$FILE" in *.json)
+  command -v python3 >/dev/null 2>&1 || { printf 'kg-radar: %s é .kg.json e python3 está ausente: sem leitor de JSON, não opino (fail-closed).\n' "$FILE" >&2; exit 2; }
+  _json_tmp="$(mktemp -d)"; trap 'rm -rf "${_json_tmp}"' EXIT
+  _json_rc=0
+  python3 -I -B -c '
+import json, re, sys
+src, out = sys.argv[1], sys.argv[2]
+def die(code, msg):
+    sys.stderr.write("kg-radar: %s ilegível como .kg.json (%s): %s\n" % (src, code, msg))
+    sys.exit(2)
+try:
+    text = open(src, encoding="utf-8").read()
+except (OSError, UnicodeDecodeError) as exc:
+    die("parse.yaml-error", "leitura falhou: %s" % exc)
+if text.startswith("﻿"):
+    text = text[1:]
+if not text.strip(" \t\n\r"):
+    die("parse.empty-document", "arquivo vazio")
+dups = []
+def pairs(items):
+    obj = {}
+    for k, v in items:
+        if k in obj:
+            dups.append(k)
+        obj[k] = v
+    return obj
+def no_const(name):
+    raise ValueError("%s não é JSON (RFC 8259)" % name)
+try:
+    doc = json.loads(text, object_pairs_hook=pairs, parse_constant=no_const)
+except (ValueError, RecursionError) as exc:
+    die("parse.yaml-error", str(exc)[:200])
+if dups:
+    die("parse.duplicate-key", "chave repetida: %s" % ", ".join(sorted(set(map(str, dups))))[:200])
+if not isinstance(doc, dict):
+    die("parse.root-not-mapping", "a raiz não é objeto")
+BARE = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*$")
+def key(k):
+    return k if BARE.match(k) else json.dumps(k, ensure_ascii=False)
+def scalar(v):
+    if v is None:
+        return "null"
+    if v is True:
+        return "true"
+    if v is False:
+        return "false"
+    if isinstance(v, str):
+        # O awk não lê escape: o trim tira UMA aspa de cada ponta e devolve o miolo cru. Então o texto vai
+        # entre aspas duplas SEM escapar, e o radar vê o valor do JSON. Só o caractere de controle (a quebra
+        # de linha partiria a linha do awk) sai no escape do JSON.
+        if any(ord(c) < 32 or ord(c) == 127 for c in v):
+            return json.dumps(v, ensure_ascii=False)
+        return chr(34) + v + chr(34)
+    return json.dumps(v)
+def first(d, k):
+    if isinstance(d, dict) and k in d:
+        return dict([(k, d[k])] + [(a, b) for a, b in d.items() if a != k])
+    return d
+lines = []
+def emit_map(d, ind, lead=None):
+    for i, (k, v) in enumerate(d.items()):
+        pre = (lead if (lead is not None and i == 0) else " " * ind) + key(k) + ":"
+        if isinstance(v, dict) and v:
+            lines.append(pre); emit_map(v, ind + 2)
+        elif isinstance(v, list) and v:
+            lines.append(pre); emit_list(v, ind + 2)
+        elif isinstance(v, dict):
+            lines.append(pre + " {}")
+        elif isinstance(v, list):
+            lines.append(pre + " []")
+        else:
+            lines.append(pre + " " + scalar(v))
+def emit_list(items, ind):
+    for it in items:
+        if isinstance(it, dict) and it:
+            emit_map(it, ind + 2, lead=" " * ind + "- ")
+        elif isinstance(it, list) and it:
+            lines.append(" " * ind + "-"); emit_list(it, ind + 2)
+        elif isinstance(it, dict):
+            lines.append(" " * ind + "- {}")
+        elif isinstance(it, list):
+            lines.append(" " * ind + "- []")
+        else:
+            lines.append(" " * ind + "- " + scalar(it))
+for sect, k in (("nodes", "id"), ("edges", "from")):
+    if isinstance(doc.get(sect), list):
+        doc[sect] = [first(it, k) for it in doc[sect]]
+emit_map(doc, 0)
+try:
+    body = "".join(l + "\n" for l in lines).encode("utf-8")
+except UnicodeEncodeError:
+    die("parse.yaml-error", "surrogate solto (I-JSON)")
+with open(out, "wb") as fh:
+    fh.write(body)
+' "$FILE" "${_json_tmp}/graph.kg.yaml" || _json_rc=$?
+  [ "${_json_rc}" -eq 0 ] || exit 2
+  READ_FILE="${_json_tmp}/graph.kg.yaml" ;;
+esac
+
 # ══ CAMPAINHA: SINAL SEM ACK ALÉM DO TETO (SAC-383) ══════════════════════════════════════════════
 # O prazo é o teto da própria campainha: ela marca `expired_at` quando esgota os avisos sem ack. Retido
 # (`held`) é o excesso da 1ª execução, que nunca toca e por isso nunca expira: entra na cobrança junto.
@@ -214,7 +338,7 @@ HOJE="$(date -u +%Y-%m-%d)"
 # ONION_KG_DUE_VALIDATOR troca o leitor (bancada e cópia mutante do radar, que mora fora do repo).
 DUE_STATE="skip"; DUE_REPORT=""; DUE_FILE=""
 case "$MODE" in --all|--freshness)
-  if grep -qE '^[[:space:]]*(-[[:space:]]+)?reverify_(every|on)[[:space:]]*:' -- "$FILE"; then
+  if grep -qE '^[[:space:]]*(-[[:space:]]+)?reverify_(every|on)[[:space:]]*:' -- "$READ_FILE"; then
     _due_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
     . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg/kgssot-tools.sh" 2>/dev/null || kgssot_tools_dir() { return 1; }  # resolver único (sem ele: o caminho de hoje)
     _due_t="$(kgssot_tools_dir "${_due_root}")" || _due_t="${_due_root}/vendor/kg-ssot/tools"
@@ -224,7 +348,7 @@ case "$MODE" in --all|--freshness)
     elif ! command -v python3 >/dev/null 2>&1; then
       DUE_STATE="unmeasured"; DUE_REPORT="python3 ausente"
     else
-      _due_tmp="$(mktemp -d)"; trap 'rm -rf "${_due_tmp}"' EXIT
+      _due_tmp="$(mktemp -d)"; trap 'rm -rf "${_due_tmp}" "${_json_tmp:-}"' EXIT  # o tmp do .kg.json junto: trap novo substitui o anterior
       _due_rc=0
       python3 -I -B "${_due_v}" --due "${HOJE}" --format json -- "$FILE" >"${_due_tmp}/due.json" 2>"${_due_tmp}/due.err" || _due_rc=$?
       if [ "${_due_rc}" -ne 0 ]; then
@@ -1332,16 +1456,16 @@ END {
     #
     # ELE NUNCA É SILENCIOSO. Um gate que afrouxa sem dizer é a mesma classe que esta casa persegue:
     # quem lê `✅` precisa saber que leu o ✅ de um fragmento, não o de um grafo.
-    isProposal = (metaTarget != "" || arq ~ /\.proposal\.kg\.yaml$/)
+    isProposal = (metaTarget != "" || arq ~ /\.proposal\.kg\.(yaml|json)$/)
     # `target:` PRESENTE MAS VAZIO: o arquivo se declara proposta e o modo não engata — fail-closed,
     # que é a direção certa, mas MUDO. Quem escreveu a chave acredita estar em modo proposta e
     # recebe exatamente o erro que o modo existe para não dar. Dizer o porquê custa uma linha.
     if (!isProposal && metaTargetSeen) {
       print "  ⚠ `target:` está presente em meta: mas VAZIO — o MODO PROPOSTA NÃO foi ativado."
-      print "    Declare o grafo de destino, ou renomeie o arquivo para *.proposal.kg.yaml."
+      print "    Declare o grafo de destino, ou renomeie o arquivo para *.proposal.kg.yaml (ou .kg.json)."
     }
     if (isProposal) {
-      propWhy = (metaTarget != "" ? "meta.target: " metaTarget : "sufixo .proposal.kg.yaml")
+      propWhy = (metaTarget != "" ? "meta.target: " metaTarget : "sufixo .proposal.kg." (arq ~ /json$/ ? "json" : "yaml"))
       print "  ◆ MODO PROPOSTA (" propWhy ") — este arquivo é FRAGMENTO, não grafo fechado."
       print "    Relaxados: grau 0 e referência para fora do arquivo. Todo o resto continua reprovando."
     }
@@ -1420,4 +1544,4 @@ END {
 
   exit (problems > 0 ? 1 : 0)
 }
-' "$FILE"
+' "$READ_FILE"

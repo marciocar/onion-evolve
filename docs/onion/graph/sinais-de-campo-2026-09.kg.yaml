@@ -1900,6 +1900,50 @@ nodes:
     confidence: 0.5
     label: "LACUNA NOMEADA: a ponta Codex da composição segue sem medida, porque o Codex CLI não está instalado. O maestro autoriza instalar o @openai/codex 0.171.0 pela fonte oficial (npm i -g @openai/codex@0.171.0) e usar o login do Codex que já existe na conta dele nesta máquina?"
     narrative: "Medido em 2026-11-22: codex --version dá «command not found» (rc 127), e o npm global só tem corepack e npm; a versão atual é a 0.171.0, pelo npm view @openai/codex version. Há dois binários soltos de um teste outside-in de 2026-11-09, com procedência não conferida, e o diretório de configuração do Codex na conta, com um login de 2026-11-14. Por ordem da sessão principal, nada disso foi usado: instalar globalmente e gastar a conta OpenAI do maestro pedem a palavra dele. Com o sim, roda o mesmo rehearsal.sh, trocando o mcp_client.py pelo Codex como cliente do a2a-rt-mcp.py no lado do par, e mede o que o E_COMPOSICAO_ENSAIO_LOCAL_SEM_CODEX_1122 deixou aberto: o tools/list visto pelo Codex, o Always allow sem abrir o envio e o bypass do lado Codex. Fecha com essa medida, ou com a decisão do maestro de não instalar."
+  - id: E_SINAL_RADAR_ABORTA_KG_JSON_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-11-22"
+    verified_against: "reproduzido no core em 2026-11-22 sobre origin/main 399f84a81: 5 grafos de docs/onion/graph convertidos com o kg_migrate.py format --to json vendorizado (4.56.0) num repo de scratch; o kg-radar.sh deu rc 0 no .kg.yaml e rc 1 no .kg.json com a linha nenhum nó encontrado"
+    label: "O kg-radar.sh lia YAML por linha e reprovava com rc 1 todo .kg.json correto (nenhum nó encontrado), o formato que a kg-ssot 4.56.0 passou a produzir: item 3 do sinal do hub de 2026-11-21."
+    narrative: "Os itens 1 e 2 do mesmo sinal (o kg_gate.py não descobre os .kg.json rastreados e as external_edges no perfil JSON) são do produto kg-ssot, que já os tem em consulta Delphi repassada ao hub pelo core; não ganham nó aqui. O kg-contract-check.sh já lê .kg.json, porque julga pelo kg_gate do vendor: medido no mesmo scratch, ele julgou o grafo convertido e só acusou a ponta externa ausente, que é do scratch."
+    trace: "docs/evolution/inbox/_processed/2026-11-21-signal-gate-ignores-kg-json.md"
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "a guarda LEGIBILIDADE (nenhum nó encontrado) do awk, alcançada pelo .kg.json antes da cura"
+      method: "measurement: kg-radar.sh rodado nos dois formatos do mesmo grafo, rc e saída comparados"
+      locality: "repo"
+  - id: D_RADAR_LE_KG_JSON_PELO_MESMO_AWK_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "bancada radar_json_format (5 casos) e 6 mutantes plantados pelo mutate-and-restore.sh; 75 rodadas (5 grafos do core em 15 modos) com rc igual nos dois formatos"
+    label: "O kg-radar.sh lê o .kg.json no ponto de leitura: o json da biblioteca padrão traduz para o YAML de bloco que o mesmo awk já lê, e chave repetida, NaN ou sintaxe fora da RFC 8259 param com rc 2."
+    narrative: "Um formato, um veredito: nenhum segundo parser de grafo. A tradução impõe id no início do item de nodes e from no início do item de edges, porque o awk depende dessas ordens e o mapa do JSON não tem ordem. Teto declarado: o texto livre aparece com o valor do JSON, e o escape escrito à mão no .kg.yaml não volta; nas 75 rodadas, 8 saídas diferem só nesses campos, e as colunas estruturadas e o rc são iguais em todas."
+    trace: ".claude/validation/kg-radar.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_radar_json_format_selftests"
+      method: "measurement: bancada com um caso por formato e o mesmo veredito nos dois, mais mutantes"
+      locality: "repo"
+  - id: Q_LEITORES_DO_CORPUS_SO_ENUMERAM_KG_YAML_1122
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/validation/kg-corpus-grep.sh"
+    label: "Os leitores de corpus do core enumeram só *.kg.yaml (kg-corpus-grep, kg-backlog-project, kg-census-extract e mais 25 scripts de validação), e o kg-decide-seal escreve por texto em YAML: um .kg.json no corpus fica invisível a eles."
+    narrative: "Lacuna nomeada, não curada nesta passada: o core não tem nenhum .kg.json próprio hoje (os 32 rastreados são fixtures do vendor), então nenhum desses leitores está no caminho de um grafo vivo. A cura natural é a mesma do radar (traduzir na leitura) ou delegar ao leitor do contrato; decidir quando o primeiro grafo do core migrar, ou antes se um adotante migrar."
 edges:
   - from: E_IDA_E_VOLTA_P12_RETESTE_1109
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
@@ -2263,4 +2307,10 @@ edges:
     edge_type: SUPPORTS
   - from: Q_COMPOSICAO_PERNA_CODEX_LACUNA_1122
     to: E_COMPOSICAO_ENSAIO_LOCAL_SEM_CODEX_1122
+    edge_type: TRACES_TO
+  - from: D_RADAR_LE_KG_JSON_PELO_MESMO_AWK_1122
+    to: E_SINAL_RADAR_ABORTA_KG_JSON_1122
+    edge_type: TRACES_TO
+  - from: Q_LEITORES_DO_CORPUS_SO_ENUMERAM_KG_YAML_1122
+    to: E_SINAL_RADAR_ABORTA_KG_JSON_1122
     edge_type: TRACES_TO
