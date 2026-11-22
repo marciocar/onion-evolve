@@ -2,7 +2,7 @@
 branch: feat/caddy-service-vhosts
 pr: 1737
 date: 2026-11-22
-reviewed_diff_sha256: 247dab0b137e176780c4483ce8d660dc0e944f258ae2d35653ae37ee6950a292
+reviewed_diff_sha256: 85ab00c5eb05731e41b3ece5a3201fc860efe474bb96d83914249ce03c955856
 reviewed_code_sha256: 2fd7fe25b519e6aa9114e3d764aca4390b4ddd068399cf67a3806b7d8a3ec4cc
 findings_total: 17
 findings_real: 17
