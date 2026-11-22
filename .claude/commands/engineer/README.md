@@ -2,12 +2,13 @@
 
 Comandos da **dimensão de engenharia** do Onion: o ciclo faseado e retomável que vai de **planejamento** a **entrega de PR**, sobre o motor GitFlow e os adapters de forge e task-manager. Use quando for desenvolver uma feature, corrigir produção ou preparar/abrir um Pull Request.
 
-O fluxo principal é uma cadeia retomável com sessões persistentes em `.claude/sessions/`: `plan` → `start` → `work` → `pre-pr` → `pr` → `pr-update`.
+O fluxo principal é uma cadeia retomável com sessões persistentes em `.claude/sessions/`: `plan` → `start` → `work` → `pre-pr` → `pr` → `pr-update`. Quando a incerteza é alta, um `spike` vem antes do `plan`.
 
 ## Comandos
 
 | Comando | Finalidade |
 |---------|-----------|
+| [`/engineer:spike`](spike.md) | Spike ou PoC antes de construir: pergunta fechada, critério de morte antes da amostra, tempo-caixa; o resultado vai ao grafo (`Q_` → evidence → decision). |
 | [`/engineer:plan`](plan.md) | Planejamento de feature: analisa e cria plano estruturado (`plan.md` da sessão). |
 | [`/engineer:start`](start.md) | Inicia o desenvolvimento: cria a sessão e analisa as tasks do provider ativo (via `TASK_MANAGER_PROVIDER`). |
 | [`/engineer:work`](work.md) | Continua a feature ativa: lê a sessão, identifica a próxima fase e atualiza progresso via task-manager abstraction. |

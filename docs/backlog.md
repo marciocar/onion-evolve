@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1207 itens abertos** em 177 grafo(s) com aberto (de 236 no escopo) · 171 grupo(s), agrupados por `owner:` (72 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1208 itens abertos** em 178 grafo(s) com aberto (de 237 no escopo) · 171 grupo(s), agrupados por `owner:` (73 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1126,7 +1126,7 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## core — 47 item(ns)
+## core — 48 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1175,6 +1175,7 @@
 | 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
 | 3.0 | `Q_IT_QUEUE_REDELIVERY_AFTER_EFFECT` | inbox-triage-1108 | A fila do onion-messaging reentrega o job à sessão que já agiu e perdeu o lease: falta o teste, e a decisão de pôr ou não um |
 | 3.0 | `Q_MD_PLUGINS_DIRECTORY_UNTRUSTED_HOOK_1109` | maestro-decisions-1109b | O hook do onion-plugins funciona em pasta não confiada, e quais são os requisitos duros do diretório comunitário? |
+| 3.0 | `Q_SPIKE_ORDER_MEASURER_1122` | spike-standard-2026-11 | Medidor do spike: descobrir os nós com x_spike_kill nos grafos rastreados e reprovar o critério que chegou no mesmo commit da ev |
 | 2.0 | `Q_IT_QUEUE_ACK_OUTCOME_AND_FANOUT` | inbox-triage-1108 | O ack da fila leva resultado? E o aviso a N sessões segue como N mensagens ou vira cursor por tópico? |
 | 0.8 | `Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE` | coordenacao-sessoes-2026-10 | Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by  |
 

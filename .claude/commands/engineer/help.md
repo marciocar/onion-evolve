@@ -27,6 +27,7 @@ Ajuda contextual da **dimensão de engenharia** do Onion: o ciclo faseado e reto
 
 | Comando | Finalidade |
 |---------|-----------|
+| `spike` | Antes do `plan`, quando a incerteza é alta: uma pergunta fechada com critério de morte e tempo-caixa; o resultado vai ao grafo. |
 | `plan` | Planejamento de feature: analisa e cria o `plan.md` estruturado da sessão. |
 | `start` | Inicia o desenvolvimento: cria a sessão e analisa as tasks do provider ativo. |
 | `work` | Continua a feature ativa: lê a sessão, identifica a próxima fase e atualiza progresso. |
