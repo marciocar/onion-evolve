@@ -2,8 +2,7 @@
 branch: feat/caddy-service-vhosts
 pr: 1737
 date: 2026-11-22
-reviewed_diff_sha256: adff28bdb172fc7d599fdae13a52f0aa10513347f1f246ea53ff98c2dc671ef1
-reviewed_code_sha256: 2fd7fe25b519e6aa9114e3d764aca4390b4ddd068399cf67a3806b7d8a3ec4cc
+reviewed_diff_sha256: pendente
 findings_total: 17
 findings_real: 17
 findings_blocking: 3
@@ -12,6 +11,7 @@ duration_min: 9
 findings_fixed: 13
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: "subagente general-purpose (opus), mandato REFUTAR, contexto isolado (só o diff e o objetivo)"
 nota: "Duas passadas do mesmo refutador: a 1ª sobre o diff inteiro (12 achados, 2 bloqueantes), a 2ª só sobre as curas (5 achados, 1 bloqueante). Os 3 bloqueantes foram curados; os limites que ficam estão declarados abaixo."
 ---
