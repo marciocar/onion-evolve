@@ -170,7 +170,8 @@ if [ -f "$DEST/.claude/settings.json" ]; then
 else
   # a statusLine nunca viaja (a do projeto apagaria a de cada pessoa; a oferta é o passo 6c): sai na cópia também
   jq 'del(.statusLine)' "$SOURCE_ROOT/.claude/settings.json" > "$DEST/.claude/settings.json" 2>/dev/null \
-    || cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"
+    || { cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"
+         grep -q '"statusLine"' "$DEST/.claude/settings.json" && echo "⚠️ sem jq: a statusLine da fonte NÃO foi retirada do settings do alvo; tire à mão." >&2; true; }
 fi
 
 # (2) starter docs/evolution/ — DOIS canais simétricos: inbox/ (upstream: consumidor→core) e

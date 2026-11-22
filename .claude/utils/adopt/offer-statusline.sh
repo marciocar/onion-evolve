@@ -90,10 +90,13 @@ def census_path(val):
 
 st, val = status_line(user) if user else ("sem-home", None)
 on = census_path(val) if st == "presente" else None
-if on and os.path.isfile(on):
+if on and not os.path.isabs(on):
+    print(f"⚠️ AVISO: o settings do usuário ({user}) liga o censo por caminho RELATIVO ({on}): no settings do usuário o "
+          "cwd muda a cada sessão, e a linha quebra fora deste repo. Troque pelo bloco abaixo.")
+elif on and os.path.isfile(on):
     print(f"✓ statusLine do censo já ligada no settings do usuário ({user}): nada a colar.")
     sys.exit(0)
-if on:
+elif on:
     print(f"⚠️ AVISO: o settings do usuário ({user}) liga o censo em {on}, que NÃO existe mais (worktree removida?): "
           "a barra fica vazia. Troque pelo bloco abaixo.")
 elif st == "sem-home":

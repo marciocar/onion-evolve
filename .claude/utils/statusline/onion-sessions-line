@@ -119,14 +119,18 @@ def main():
     wait = [x for x in rows if x.get("state") == "blocked" or x.get("status") == "waiting"]
     work = [x for x in rows if x.get("status") == "busy" and x not in wait]
     # estado que esta linha não conhece (o esquema mudou) aparece contado, nunca some num zero
+    # um campo conhecido não mascara o outro: status OU state fora do medido (ausência conta como conhecida)
     other = [x for x in rows if x not in wait and x not in work
-             and x.get("status") not in KNOWN_STATUS and x.get("state") not in KNOWN_STATE]
+             and ((x.get("status") is not None and x.get("status") not in KNOWN_STATUS)
+                  or (x.get("state") is not None and x.get("state") not in KNOWN_STATE))]
     line = f"sessões: {len(work)} trabalhando · {len(wait)} esperam você"
     if wait:
         line += ": " + ", ".join(clean(x.get("name")) for x in wait)
     if other:
         line += f" · {len(other)} em estado desconhecido"
-    if current > STALE:
+    if current < 0:
+        line += " (leitura com data no futuro)"  # relógio que voltou e a releitura falhou: não passa por atual
+    elif current > STALE:
         line += f" (leitura de {int(current)} s atrás)"
     say(line)
 
