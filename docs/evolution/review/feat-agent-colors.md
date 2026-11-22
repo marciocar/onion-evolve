@@ -2,7 +2,8 @@
 branch: feat/agent-colors
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: cc871668e7bf792fec44adaec0459962e3e4517e015ef811d57c1d258162fe03
+reviewed_code_sha256: 775377f0743bc222cc03f1857c6bbf7880ffcc571df2c7d3f60aa5e033cbb066
 findings_total: 5
 findings_real: 5
 findings_blocking: 0
