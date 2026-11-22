@@ -5,4 +5,4 @@
 # Arquivo auxiliar em adapters/ (não é adapter) declara <!-- adapter-auxiliar: <adapter> --> nas 5 primeiras linhas.
 # O executável de todo adapter de chat roda na peça que opera o canal, nunca no core (D_CHAT_CHANNEL_CONTRACT_SDAAL_1121):
 # a cobrança no core é o juiz conformance.py, que a bancada da peça roda sobre a saída do adapter.
-waha	none:o executável roda na peça onion-messaging, fora do core, e a cobrança é o conformance.py na bancada dela; gatilho: a peça publicar a saída normalizada do adapter (fixture com o WAHA simulado) que o CI do core possa conferir
+waha	none:o executável roda na peça de mensageria, fora do core, e a cobrança é o conformance.py na bancada dela; gatilho: a peça publicar a saída normalizada do adapter (fixture com o WAHA simulado) que o CI do core possa conferir

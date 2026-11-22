@@ -1,30 +1,30 @@
 # WhatsApp pelo WAHA (não oficial): o 1º adapter do contrato onion.chat/v1. Só canais internos e com os sócios
 # (D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121); cliente final vem pela Cloud API oficial, com outro adapter.
-# O executável NÃO mora no core: roda na peça onion-messaging (envio em tools/notify-partner, recepção no vigia e na
-# fila), que lê a chave da própria unidade. Medido em 2026-11-22 no onion-messaging em db94954 (= origin/main),
-# só por leitura do código; nada aqui foi rodado contra o WAHA.
+# O executável NÃO mora no core: roda na peça de mensageria (envio em tools/notify-partner, recepção no vigia e na
+# fila), que lê a chave da própria unidade. Medido em 2026-11-22 no repo da peça em db94954 (= origin/main), só por
+# leitura do código; nada aqui foi rodado contra o WAHA.
 # Formato no molde do task-manager; conferido por conformance.py capabilities. status: implemented | partial |
-# not_implemented | unverified. source: piece:<repo>/<caminho> = onde se mede na peça; - = nada a apontar.
+# not_implemented | unverified. source: piece:messaging/<caminho> = onde se mede, no repo da peça de mensageria; - = nada a apontar.
 capability	requirement	status	api_version	source	note
-message.receive	required	partial	WAHA (versão não pinada)	piece:onion-messaging/watcher/onion_watcher/channels.py;piece:onion-messaging/watcher/onion_watcher/events.py	o vigia confere o HMAC do webhook do WAHA e põe na fila durável um CloudEvent 1.0 com o corpo BRUTO do WAHA; falta a mensagem normalizada com os 5 campos
-message.send	required	implemented	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	notify-partner: texto fixo, texto livre ou anexo a um apelido da lista fechada, com --on-behalf-of em cada envio
+message.receive	required	partial	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/channels.py;piece:messaging/watcher/onion_watcher/events.py	o vigia confere o HMAC do webhook do WAHA e põe na fila durável um CloudEvent 1.0 com o corpo BRUTO do WAHA; falta a mensagem normalizada com os 5 campos
+message.send	required	implemented	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	notify-partner: texto fixo, texto livre ou anexo a um apelido da lista fechada, com --on-behalf-of em cada envio
 message.reply_thread	required	not_implemented	WAHA (versão não pinada)	-	o envio vai à conversa, sem citar a mensagem que pediu (nenhum reply_to no código)
-message.ack	required	implemented	WAHA (versão não pinada)	piece:onion-messaging/queue/onion_queue/daemon.py	op_ack da fila: sem ack o evento volta até o teto e depois vai à dead-letter
-audience.list	required	partial	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	--groups lista os grupos com a contagem de participantes e os 4 últimos dígitos; não é verbo por conversa antes de responder, nem resolve pessoa
+message.ack	required	implemented	WAHA (versão não pinada)	piece:messaging/queue/onion_queue/daemon.py	op_ack da fila: sem ack o evento volta até o teto e depois vai à dead-letter
+audience.list	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	--groups lista os grupos com a contagem de participantes e os 4 últimos dígitos; não é verbo por conversa antes de responder, nem resolve pessoa
 identity.resolve	required	not_implemented	WAHA (versão não pinada)	-	falta o mapa id do provedor para pessoa e papel
 served.ask	required	not_implemented	WAHA (versão não pinada)	-
-conversation.list	optional	partial	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	só grupos (--groups); conversas diretas não
-media.send	optional	implemented	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	PDF, XLSX ou CSV até 10 MB, conferido pelo conteúdo; /api/sendFile pode ser só da edição paga do WAHA
+conversation.list	optional	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	só grupos (--groups); conversas diretas não
+media.send	optional	implemented	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	PDF, XLSX ou CSV até 10 MB, conferido pelo conteúdo; /api/sendFile pode ser só da edição paga do WAHA
 media.download	optional	not_implemented	WAHA (versão não pinada)	-
 message.react	optional	not_implemented	WAHA (versão não pinada)	-
 page.handoff	optional	not_implemented	WAHA (versão não pinada)	-	extra, não núcleo
-rule.leak_guard	required	implemented	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	texto, legenda, CSV, PDF e XML da planilha passam pela guarda (nenhum número da lista nem a chave); não reconhece dado de cliente
-rule.dedupe_provider_id	required	partial	WAHA (versão não pinada)	piece:onion-messaging/watcher/onion_watcher/events.py;piece:onion-messaging/queue/onion_queue/daemon.py	a fila deduplica por destino + source + id, e o id é o sha256 do corpo assinado, não o id da mensagem no WhatsApp: um reenvio com corpo diferente passa
-rule.rate_cap_pending	required	implemented	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	DAILY_MAX por apelido e dia, linha pending antes do envio, sob flock; ritmo por conversa (mensagens por segundo) não medido
-rule.media_cap	required	implemented	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	10 MB e três tipos, conferidos pelo conteúdo
-rule.retention	required	partial	WAHA (versão não pinada)	piece:onion-messaging/queue/onion_queue/daemon.py	prune do dono poda dedupe e dead-letter (30 dias por padrão); sem prazo de corpos e mídias como dado de terceiros, nem cifra
-rule.audit_log	required	partial	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	o envio grava {id, at, to, on_behalf_of, kind, status} sem número nem texto; a recepção não registra quem pediu
+rule.leak_guard	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	texto, legenda, CSV, PDF e XML da planilha passam pela guarda (nenhum número da lista nem a chave); não reconhece dado de quem não está na audiência nem dado de cliente, que o vocabulário pede
+rule.dedupe_provider_id	required	partial	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/events.py;piece:messaging/queue/onion_queue/daemon.py	a fila deduplica por destino + source + id, e o id é o sha256 do corpo assinado, não o id da mensagem no WhatsApp: um reenvio com corpo diferente passa
+rule.rate_cap_pending	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	DAILY_MAX por apelido e dia, linha pending antes do envio, sob flock; falta o ritmo por conversa (mensagens por segundo), que o vocabulário pede
+rule.media_cap	required	implemented	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	10 MB e três tipos, conferidos pelo conteúdo
+rule.retention	required	partial	WAHA (versão não pinada)	piece:messaging/queue/onion_queue/daemon.py	prune do dono poda dedupe e dead-letter (30 dias por padrão); sem prazo de corpos e mídias como dado de terceiros, nem cifra
+rule.audit_log	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	o envio grava {id, at, to, on_behalf_of, kind, status} sem número nem texto; a recepção não registra quem pediu
 rule.latency_field	required	not_implemented	WAHA (versão não pinada)	-	o CloudEvent só traz time quando vem de campo assinado; não há hora em que o agente viu
-rule.secret_never_out	required	implemented	WAHA (versão não pinada)	piece:onion-messaging/tools/notify/remind.py	saída JSON sem número, chave nem texto; o log idem
+rule.secret_never_out	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py;piece:messaging/watcher/onion_watcher/server.py	medido só no envio: saída JSON e log sem número, chave nem texto; o vigia registra o texto da exceção no log, e ninguém mediu se ele pode levar dado
 rule.read_marker	required	not_implemented	WAHA (versão não pinada)	-
 rule.channel_loss_keeps_queue	required	unverified	WAHA (versão não pinada)	-	a fila é independente do WAHA, mas ninguém mediu a perda do número

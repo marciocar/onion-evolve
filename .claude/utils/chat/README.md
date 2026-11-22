@@ -34,21 +34,24 @@ python3 -I -B .claude/utils/chat/conformance.py --vocabulary
 rc 0 conforme · 1 viola (uma linha `VIOLA` por achado, com código: `SEM-ID-DO-PROVEDOR`, `IDENTIDADE-FORA-DO-ID`,
 `SEM-AUDIENCIA`, `DUPLICADO`, `VAZAMENTO`, `LATENCIA`, `RETENCAO`, `SERVIU`, `FIO`, `FORMA`…) · 2 não mediu (arquivo
 ausente ou vazio, `jsonschema` ausente). A peça roda o juiz na própria bancada, sobre a saída do adapter com o
-provedor simulado; a bancada do core (`run_chat_conformance_selftests`) prova que o juiz reprova cada falta.
+provedor simulado; a bancada do core (`run_chat_conformance_selftests`) tem um caso para cada código de falta e
+prova, com mutantes do próprio juiz, que os casos mordem.
 
 **Limite declarado:** o juiz confere forma e regras que cruzam campos. Não sabe se o id do provedor é verdadeiro,
 se a identidade resolvida é a pessoa certa, nem se a guarda de vazamento da peça funciona; lê o veredito que ela
 declara. Um adapter que escreva `resolved_by: provider_id` tendo tirado a pessoa do texto passa aqui: isso só a
-bancada da peça, com mutantes, pega.
+bancada da peça, com mutantes, pega. Também não confere: o frescor da audiência (só a ordem em relação à resposta), a
+coerência entre quem pede e a mesma pessoa na audiência, a normalização do id na dedupe (a chave é exata: normalizar
+é dever do adapter), campo extra fora do contrato (o schema é aberto no topo), nem a resposta sem o evento no mesmo
+fluxo (aí o cruzamento com a mensagem respondida não roda).
 
 ## A síntese do Delphi (registro)
 
 Delphi `chat-channel-contract-1121`, 3 rodadas (posições independentes, crítica cruzada sem autor, convergência),
-participantes `onion-messaging`, `onion-vps-ops`, `company-brain` e `onion-curation`, sobre a dissecação da categoria
+participantes: as sessões donas da mensageria, da operação dos serviços da VPS, do Company Brain e da curadoria, sobre a dissecação da categoria
 «canal de conversa» feita pela curadoria em 2026-11-21 (veredito «perseguir»: nenhum dos seis frameworks abertos
 confrontados entrega o pacote, e nenhum traz privilégio por quem pede). Até este registro, a síntese só existia no
-estado do Delphi, fora do git (achado 1 do resíduo do PR #1726). Texto da síntese levada à rodada 3, sem edição de
-conteúdo:
+estado do Delphi, fora do git. Texto da síntese levada à rodada 3, sem edição de conteúdo:
 
 **Pergunta:** contrato SDAAL de canal de conversa (WhatsApp/WAHA, Slack, Teams, Telegram): (a) o contrato e o
 executável moram no core (`.claude/utils/chat/`, molde do task-manager) e cada adapter na peça dona? (b) a forma de
@@ -88,10 +91,10 @@ ou cifradas; latência com hora do pedido e hora em que o Brain viu.
 
 | participante | rodada 1 | rodada 2 | rodada 3 |
 |---|---|---|---|
-| onion-messaging | 0.7 | 0.75 | 0.8 |
-| onion-vps-ops | 0.65 | 0.7 | 0.8 |
-| company-brain | 0.7 | 0.7 | 0.8 |
-| onion-curation | s/conf | 0.78 | 0.85 |
+| mensageria | 0.7 | 0.75 | 0.8 |
+| operação da VPS | 0.65 | 0.7 | 0.8 |
+| Company Brain | 0.7 | 0.7 | 0.8 |
+| curadoria | s/conf | 0.78 | 0.85 |
 
 **Como a síntese virou contrato aqui** (escolhas desta implementação, não do Delphi): os 5 campos viraram o
 `message.received` do schema; as regras do núcleo viraram as 10 linhas `rule.*` do vocabulário, que cada adapter

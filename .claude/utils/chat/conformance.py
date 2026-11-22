@@ -16,7 +16,8 @@ Uso:
   conformance.py --vocabulary               imprime as capacidades do contrato (capability, kind, requirement)
 
 Saída: uma linha por violação, «VIOLA<TAB><onde><TAB><código><TAB><mensagem>», no stdout; diagnóstico no stderr.
-rc 0 conforme · 1 viola · 2 não mediu (uso, arquivo ausente ou vazio, jsonschema ausente, contrato ilegível).
+rc 0 conforme · 1 viola · 2 não mediu (uso, arquivo ausente ou vazio, nenhuma mensagem, jsonschema ausente, contrato
+ilegível).
 Entrada que não é JSON é violação (rc 1): o adapter entregou algo que não é mensagem.
 
 O que confere no evento recebido (message.received), além da forma do message.schema.json:
@@ -29,9 +30,10 @@ O que confere no evento recebido (message.received), além da forma do message.s
   - e as regras que cruzam campos: quem pede está na audiência, a hora em que o agente viu não vem antes da hora
     do pedido, a retenção vence depois do pedido, pessoa não resolvida tem papel «unknown».
 Na resposta (message.reply): a guarda de vazamento e a audiência passaram antes de sair, a ordem das horas
-(pedido, visto, respondido), o passo «serviu?» declarado, o registro de auditoria, e nenhuma sequência de 10 ou
-mais dígitos no texto (heurística de número de telefone, declarada). Com eventos no mesmo fluxo, a resposta tem de
-apontar para um deles.
+(pedido, visto, respondido), o passo «serviu?» declarado, o registro de auditoria, e nenhum número no texto
+(heurística declarada: 10 ou mais dígitos com separadores de telefone, depois de tirar datas e horas). Com eventos
+no mesmo fluxo, a resposta tem de apontar para um deles, no mesmo lugar e fio, em nome de quem pediu e com as horas
+da mensagem respondida. Data com a forma certa mas impossível é FORMA, porque desligaria as checagens de ordem.
 
 O que NÃO confere (limite declarado): se o id do provedor é verdadeiro, se a resolução de identidade acertou a
 pessoa, se a guarda de vazamento da peça funciona (aqui só se lê o veredito que ela declara). Isso se mede na
@@ -48,7 +50,14 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 SCHEMA_PATH = os.path.join(HERE, "message.schema.json")
 VOCAB_PATH = os.path.join(HERE, "vocabulary.tsv")
 STATUSES = ("implemented", "partial", "not_implemented", "unverified")
-DIGIT_RUN = re.compile(r"(?:\d[\s.()+-]?){10,}")
+# Telefone: 10 ou mais dígitos com até 3 separadores de telefone entre eles ("(11) 98765-4321", "+55 (11) 9 8765-4321").
+# Datas e horas saem antes da busca, para "2026-11-22 13:00" não parecer número.
+DIGIT_RUN = re.compile(r"(?:\d[\s.()+-]{0,3}){10,}")
+DATE_TIME = re.compile(r"\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?\b|\b\d{1,2}:\d{2}(?::\d{2})?\b|\b\d{1,2}/\d{1,2}/\d{2,4}\b")
+TS_FIELDS = {
+    "received": (("requested_at",), ("seen_at",), ("audience", "listed_at"), ("retention", "expires_at")),
+    "reply": (("audience_checked", "listed_at"), ("latency", "requested_at"), ("latency", "seen_at"), ("latency", "replied_at")),
+}
 
 
 class NotMeasured(Exception):
@@ -118,6 +127,20 @@ def classify_schema_error(path, keyword, message):
     return "FORMA"
 
 
+def dig(obj, path):
+    for k in path:
+        obj = obj.get(k) if isinstance(obj, dict) else None
+    return obj
+
+
+def check_timestamps(obj, kind, where, acc):
+    """Data com a forma certa mas impossível (13:00:99, 30 de fevereiro) desligaria em silêncio as checagens de ordem."""
+    for path in TS_FIELDS[kind]:
+        v = dig(obj, path)
+        if isinstance(v, str) and parse_ts(v) is None:
+            out(where, "FORMA", f"{'/'.join(path)}: data ou hora impossível ({v!r})", acc)
+
+
 def check_received(obj, where, acc, seen, received_ids):
     req = obj.get("requester") or {}
     aud = obj.get("audience") or {}
@@ -140,7 +163,7 @@ def check_received(obj, where, acc, seen, received_ids):
             out(where, "DUPLICADO", f"mesma mensagem do provedor já entregue em {seen[key]}: o adapter deduplica antes do agente", acc)
         else:
             seen[key] = where
-        received_ids.add((obj.get("provider"), pid))
+        received_ids.setdefault((obj.get("provider"), pid), obj)
 
 
 def check_reply(obj, where, acc):
@@ -162,8 +185,24 @@ def check_reply(obj, where, acc):
     if served.get("asked") is False and not str(served.get("reason") or "").strip():
         out(where, "SERVIU", "o passo «serviu?» foi pulado sem motivo declarado", acc)
     text = (obj.get("body") or {}).get("text")
-    if isinstance(text, str) and DIGIT_RUN.search(text):
-        out(where, "VAZAMENTO", "o texto que sai tem 10 ou mais dígitos seguidos (cara de número de telefone)", acc)
+    if isinstance(text, str) and DIGIT_RUN.search(DATE_TIME.sub(" ", text)):
+        out(where, "VAZAMENTO", "o texto que sai tem 10 ou mais dígitos com separadores de telefone (cara de número)", acc)
+
+
+def check_reply_against(obj, ev, where, acc):
+    """A resposta tem de ser À mensagem que pediu: mesmo lugar, mesmo fio, em nome de quem pediu, com as horas dela."""
+    if dig(obj, ("place", "id")) != dig(ev, ("place", "id")):
+        out(where, "FIO", "a resposta vai a outro lugar que não o da mensagem que pediu (outra audiência)", acc)
+    if dig(obj, ("thread", "id")) != dig(ev, ("thread", "id")):
+        out(where, "FIO", "a resposta vai a outro fio que não o da mensagem que pediu", acc)
+    for k in ("provider_id", "person", "role"):
+        if dig(obj, ("on_behalf_of", k)) != dig(ev, ("requester", k)):
+            out(where, "IDENTIDADE-FORA-DO-ID", f"on_behalf_of.{k} não é o de quem pediu na mensagem respondida", acc)
+            break
+    for k in ("requested_at", "seen_at"):
+        a, b = parse_ts(dig(obj, ("latency", k))), parse_ts(ev.get(k))
+        if a and b and a != b:
+            out(where, "LATENCIA", f"latency.{k} não é o {k} da mensagem respondida", acc)
 
 
 def read_messages(path):
@@ -194,8 +233,11 @@ def read_messages(path):
 def cmd_check(path):
     schema = load_schema()
     validators = {"received": validator_for(schema, "received"), "reply": validator_for(schema, "reply")}
-    acc, seen, received_ids, replies = [], {}, set(), []
-    for n, obj, err in read_messages(path):
+    acc, seen, received_ids, replies = [], {}, {}, []
+    msgs = read_messages(path)
+    if not msgs:
+        raise NotMeasured(f"nenhuma mensagem em {path}: sem saída do adapter, nada a medir")
+    for n, obj, err in msgs:
         where = f"{path}:{n}"
         if err is not None:
             out(where, "NAO-E-JSON", f"linha não é JSON: {err}", acc)
@@ -213,6 +255,7 @@ def cmd_check(path):
             continue
         for p, kw, msg in schema_errors(v, obj):
             out(where, classify_schema_error(p, kw, msg), f"{p}: {msg}", acc)
+        check_timestamps(obj, "received" if kind == "message.received" else "reply", where, acc)
         if kind == "message.received":
             check_received(obj, where, acc, seen, received_ids)
         else:
@@ -220,8 +263,11 @@ def cmd_check(path):
             replies.append((where, obj))
     if received_ids:
         for where, obj in replies:
-            if (obj.get("provider"), obj.get("in_reply_to")) not in received_ids:
+            ev = received_ids.get((obj.get("provider"), obj.get("in_reply_to")))
+            if ev is None:
                 out(where, "FIO", "in_reply_to não aponta para nenhuma mensagem recebida neste fluxo", acc)
+            else:
+                check_reply_against(obj, ev, where, acc)
     return acc
 
 

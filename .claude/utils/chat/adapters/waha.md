@@ -7,7 +7,7 @@
 
 ## Onde roda
 
-**Não no core.** O executável mora na peça `onion-messaging`, que opera o canal e lê a chave do WAHA pela própria
+**Não no core.** O executável mora na peça de mensageria, que opera o canal e lê a chave do WAHA pela própria
 unidade; o agente nunca vê a chave. Hoje a peça tem:
 
 - **envio**: `tools/notify-partner` (código em `tools/notify/remind.py`), por apelido da lista fechada, com quem
@@ -16,14 +16,16 @@ unidade; o agente nunca vê a chave. Hoje a peça tem:
   CloudEvent 1.0 com o corpo bruto; a fila deduplica e tem `ack`, reentrega e dead-letter.
 
 A declaração do que cada parte cumpre está em [`waha.capabilities.tsv`](waha.capabilities.tsv), medida por leitura
-do código em 2026-11-22 (onion-messaging `db94954`, igual à `origin/main`). Nada foi rodado contra o WAHA.
+do código em 2026-11-22 (repo da peça em `db94954`, igual à `origin/main`). Nada foi rodado contra o WAHA.
 
 ## O que falta para ficar conforme (lado da peça)
 
-Medido com `conformance.py capabilities adapters/waha.capabilities.tsv --strict`: 6 de 17 capacidades
+Medido com `conformance.py capabilities adapters/waha.capabilities.tsv --strict`: 3 de 17 capacidades
 obrigatórias implementadas. A ordem abaixo segue o 1º entregável que o Delphi pediu (os 5 campos, o mapa de
 identidade e a recepção durável):
 
+0. **A chave do WAHA sai do arquivo privado para o credstore da unidade** (`LoadCredential`), acréscimo que o
+   Delphi pôs no 1º entregável.
 1. **Normalizar a recepção**: do CloudEvent com o corpo bruto do WAHA para o `message.received` com os 5 campos, e
    rodar `conformance.py check` sobre essa saída na bancada da peça, com o WAHA simulado e mutantes.
 2. **Mapa de identidade** (`identity.resolve`): id do WhatsApp para pessoa e papel; sem pessoa, papel `unknown`.
@@ -33,6 +35,8 @@ identidade e a recepção durável):
    e hora em que o agente viu).
 6. **Retenção** dos corpos e mídias como dado de terceiros (prazo, fora do backup externo ou cifrados), **auditoria
    da recepção** com quem pediu, **marca de quem leu**, e a **perda do número** medida sem perder a fila.
+7. **Fechar as parciais**: a guarda de vazamento reconhecer dado de quem não está na audiência, o ritmo por conversa,
+   e medir se o log do vigia (texto da exceção) pode levar número ou dado.
 
 ## Mapeamento WAHA → contrato (o que a peça precisa ler)
 

@@ -55,7 +55,8 @@ E toda resposta que sai (`message.reply`) declara: `in_reply_to` (o `provider_me
 
 > ⚠️ **O id do provedor pode ser um número de telefone** (no WhatsApp, `<número>@c.us`). Ele circula entre o
 > adapter e o agente porque a identidade só se resolve por ele; ele **não sai** em resposta, log ou erro
-> (`rule.secret_never_out`). O juiz confere isso só no texto da resposta, por heurística (10 dígitos seguidos).
+> (`rule.secret_never_out`). O juiz confere isso só no texto da resposta, por heurística (10 ou mais dígitos com
+> separadores de telefone, depois de tirar datas e horas).
 
 ## Verbos e regras do núcleo
 
