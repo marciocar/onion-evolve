@@ -3,16 +3,16 @@ branch: feat/caddy-service-vhosts
 pr: pendente
 date: 2026-11-22
 reviewed_diff_sha256: pendente
-findings_total: 12
-findings_real: 12
-findings_blocking: 2
-tokens: 155444
-duration_min: 6
-findings_fixed: 10
+findings_total: 17
+findings_real: 17
+findings_blocking: 3
+tokens: 351103
+duration_min: 9
+findings_fixed: 13
 verdict: REJECTED_AND_FIXED
 elenxo: true
 reviewer: "subagente general-purpose (opus), mandato REFUTAR, contexto isolado (só o diff e o objetivo)"
-nota: "Os 2 bloqueantes foram curados, e mais 8 limites. Os 2 restantes (achados 8 e 11) ficam declarados abaixo, com o porquê."
+nota: "Duas passadas do mesmo refutador: a 1ª sobre o diff inteiro (12 achados, 2 bloqueantes), a 2ª só sobre as curas (5 achados, 1 bloqueante). Os 3 bloqueantes foram curados; os limites que ficam estão declarados abaixo."
 ---
 
 # Passada adversarial: `feat/caddy-service-vhosts`
@@ -74,11 +74,25 @@ nota: "Os 2 bloqueantes foram curados, e mais 8 limites. Os 2 restantes (achados
 12. **Limite, curado.** O verify só reprovava escuta em `[::]`, `*` e `0.0.0.0`.
     - **Cura:** reprova qualquer escuta na porta que não seja `127.0.0.1:3050`.
 
+### 2ª passada (só o diff das curas, a07911f1b..HEAD)
+
+13. **BLOQUEIA, curado.** O comentário do `adapt_guard` dizia que ele impedia ler disco, e era falso. O placeholder `{file.*}` lê qualquer arquivo em tempo de execução, e `{env.*}` lê o ambiente do processo.
+    - O refutador provou com um Caddy de teste: `respond "{file./etc/hostname}"` serviu o arquivo.
+    - Um repo de serviço publicaria os segredos dos vhosts geridos, que a conta do Caddy lê.
+    - **Cura:** toda string do JSON com `{file.` ou `{env.` recusa. O caso com caddy real está na bancada, e o mutante C13 morre.
+    - Os READMEs dos PRs dos repos citam `{env.*}` como via de valor sensível: essa via fica fechada, e a vps-ops é avisada.
+14. **Limite, curado.** A app tls entrava inteira: `tls <cert> <key>` carrega arquivo arbitrário no cache global, e `on_demand` também passava.
+    - **Cura:** só `automation.policies` com `subjects` dentro dos hosts, e sem `on_demand`. Caso na bancada; o mutante C14 morre.
+15. **Limite, curado.** A lista negra de handlers deixava passar `acme_server`, `metrics` e o que viesse depois.
+    - **Cura:** allowlist (subroute, reverse_proxy, static_response, rewrite, headers, encode, request_body, vars, error). As quatro fontes reais passam no ensaio. Caso com `metrics`; o mutante C15 morre.
+16. **Limite, declarado.** O adapt roda sobre o arquivo isolado: fonte que importe snippet do Caddyfile do core é recusada. Nenhuma das quatro importa (medido no ensaio: adotar e criar verdes).
+17. **Limite, declarado no comentário.** O contador da sonda é da regra: uma conexão real do Caddy, ou um RST de outra conta, na janela de 3 s também conta.
+
 ## Mutantes
 
 Todos plantados por `ops/mutate-and-restore.sh`, com `LC_ALL=C`, contra a bancada embutida de cada script.
 
-- **install-caddy-config: 12 de 12 mortos.**
+- **install-caddy-config: 15 de 15 mortos.**
   - C1, adoção sem `cmp`;
   - C2, host fora da lista aceito no filtro de texto;
   - C3, pendente vira órfão;
@@ -90,7 +104,10 @@ Todos plantados por `ops/mutate-and-restore.sh`, com `LC_ALL=C`, contra a bancad
   - C9, `adapt_guard` sem conferir host (morre no caso de aspas com caddy real);
   - C10, upstream sem lista;
   - C11, `file_server` aceito;
-  - C12, serviço com o carimbo do core.
+  - C12, serviço com o carimbo do core;
+  - C13, placeholder `{file.}`/`{env.}` aceito;
+  - C14, tls com certificados aceito;
+  - C15, handler fora da allowlist aceito.
 - **egress-uid-fence: 10 de 10 mortos.**
   - E1, salto no fim do OUTPUT;
   - E2, sem REJECT no loopback;
