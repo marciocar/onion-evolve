@@ -2,8 +2,7 @@
 branch: feat/meta-restart
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: fd821723dfc2a85af19f00d7c57c18b907a680397f33f52e9aea418a7877c61a
-reviewed_code_sha256: 4fef80baa2ae2d3a67b2092343063847840a26bb1e7d01e922ce276a6483f1a7
+reviewed_diff_sha256: pendente
 findings_total: 22
 findings_real: 22
 findings_blocking: 7
@@ -76,6 +75,17 @@ comando novo dentro de `.claude/validation/` e da sonda, num conjunto que ainda 
 2.1.330 do Claude Code, alheia a este diff, tratada pela rodada do `/meta:cc-update`). Nada do comportamento revisado
 mudou, por isso o carimbo foi refeito sem nova passada. O mesmo vale para o rebase sobre a origin/main de
 2026-11-21, que só trouxe código de outros PRs para a base e um conflito de contagem (knowledge bases 117 → 118).
+
+## Re-revisão depois do rebase de 2026-11-22 (o #1733 entrou na main)
+
+O #1733 (`/engineer:spike`) entrou e também subiu o inventário; com os dois, são 124 comandos. O rebase deu um conflito
+só de contagem, em `docs/onion/agents-reference.md`: fiquei com o lado da main e regenerei pela máquina
+(`inventory.sh --markdown` e `lint-artifacts.sh --fix`), nunca à mão. O carimbo de código mudou porque a **base** mudou.
+Para saber se o **meu** código mudou, comparei as linhas adicionadas e removidas por este PR, arquivo por arquivo, antes
+e depois do rebase (`git diff <base>..<head> -- <arquivo>`, só as linhas `+`/`-`, hash md5): `restart.md`,
+`restart-drain.sh`, `background-task-probe.sh`, `baton-pulse.sh`, `lint-selftest.sh` e `roles.yaml` dão o **mesmo hash
+nos dois lados**. O patch revisado é o mesmo, byte a byte, então a revisão vale e o carimbo é refeito sem nova passada
+do revisor. A bancada roda de novo no pré-voo do `pr-finalize` e no CI, sobre a base nova.
 
 ## Limites declarados
 
