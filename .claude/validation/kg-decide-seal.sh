@@ -4,9 +4,11 @@
 #
 # Uso:
 #   bash .claude/validation/kg-decide-seal.sh <grafo.kg.yaml> <NODE_ID> \
-#        --chosen "<opção escolhida>" --rejected "<a|b|c>" --date AAAA-MM-DD --question "<pergunta>" [--other]
+#        --chosen "<opção escolhida>" --rejected "<a|b|c>" --date AAAA-MM-DD --question "<pergunta>" [--other] \
+#        --destination mechanism --guard <CARD-123|Q_ID>   |   --destination design
 #   bash .claude/validation/kg-decide-seal.sh <grafo.kg.yaml> --new <D_ID> --label "<afirmação ≤280>" \
-#        --link <ID_EXISTENTE> [--edge-type TRACES_TO] [--impact 3] --chosen ... --rejected ... --date ... --question ...
+#        --link <ID_EXISTENTE> [--edge-type TRACES_TO] [--impact 3] --chosen ... --rejected ... --date ... --question ... \
+#        --destination mechanism|design [--guard ...]
 #   bash .claude/validation/kg-decide-seal.sh --batch <lote.tsv> --preview --date AAAA-MM-DD --question "<pergunta>"   (a lista VISÍVEL + o sha256)
 #   bash .claude/validation/kg-decide-seal.sh --batch <lote.tsv> --approve <sha256> --date AAAA-MM-DD --question "<pergunta>"
 #
@@ -40,6 +42,16 @@
 #   promoção a PROD é de quem EXECUTA a decisão e mede o artefato, não do selo. Achado do dogfood da forja
 #   (2026-10-12): a 1ª versão subia para PROD e o kg-contract-check reprovou o próprio grafo da forja.
 #   `--other` = a resposta livre do maestro, fora das opções oferecidas — também é selo, e a narrative diz que foi livre.
+#   DESTINO DECLARADO (melhoria D da retro de 14 a 21/11/2026, ADR onion-adr-decision-destination-2026-11): todo
+#   selo novo, no nó existente e no --new, exige `--destination mechanism|design`, gravado como `x_destination`.
+#   `mechanism` = a decisão vira guarda, e exige `--guard`: a chave de um card (forma LETRAS-N, ex. SAC-123) ou o id
+#   de um nó `Q_*` que EXISTE no mesmo grafo (a guarda a construir), gravado como `x_guard`. `design` = a decisão é
+#   desenho, fica como texto e não é cobrada; `--guard` com `design` é recusado (destino ambíguo). O medidor do
+#   /meta:decide (decide-census.sh, linha guard-debt) conta as decisões `mechanism` com a guarda ainda não feita.
+#   É CATRACA: o selador só exige o campo do selo que ELE grava agora; selo antigo sem o campo segue válido, e nada
+#   no corpus é reprovado por não tê-lo. O modo lote não sela decisão do maestro (obsoleto e pedido): não leva o campo.
+#   Dano medido que motivou (2026-11-21): dos 49 selos da semana, 9 viraram mecanismo e 40 ficaram texto, e não havia
+#   como separar o desenho de propósito da decisão que devia ter virado guarda e não virou.
 # Com --new: cria o nó `D_*` com as mesmas marcas e uma aresta <D_ID> --<edge-type>--> <ID_EXISTENTE>
 #   (nó sem aresta reprova no radar como órfão; a ligação é o que diz DE ONDE a decisão veio).
 #
@@ -48,7 +60,8 @@
 #   voto de ninguém além do humano) · id duplicado ou fora da forma de bloco · data inválida · --rejected
 #   vazio · --new com id existente ou fora de `D_[A-Z0-9_]+`, sem --label/--link, ou link inexistente ·
 #   grafo que JÁ reprova no radar ou JÁ piora o contrato antes do selo (dívida alheia não vira culpa do selo) ·
-#   --question ausente · --chosen vazio · opção com « » · escolhida também em --rejected (sem caixa) · data futura ·
+#   --question ausente · --destination ausente ou fora de mechanism|design · mechanism sem --guard · --guard fora
+#   da forma (card LETRAS-N ou Q_*) ou Q_ inexistente no grafo · design com --guard · --chosen vazio · opção com « » · escolhida também em --rejected (sem caixa) · data futura ·
 #   --new num grafo no escopo da REGRA 58 (`# kg-backlog-guard: on`) cujo TETO do `meta:` o nó novo estouraria, ou
 #   que não declara TETO (o mesmo kg-backlog-check.sh julga o grafo como ficaria; dano de 2026-10-13: 65º nó, teto 64).
 #   A narrative anterior fica VERBATIM num bloco `|-`; a proveniência anterior vai inteira para ela.
@@ -78,7 +91,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RADAR="${DECIDE_SEAL_RADAR:-${HERE}/kg-radar.sh}"
 [ -n "${DECIDE_SEAL_RADAR:-}" ] && echo "kg-decide-seal: ⚠️ override ativo — DECIDE_SEAL_RADAR=${DECIDE_SEAL_RADAR} (não é o gate de produção)" >&2
 GRAPH=""; NODE=""; NEW=""; CHOSEN=""; REJECTED=""; DATE=""; QUESTION=""; OTHER="0"; LABEL=""; LINK=""; ETYPE="TRACES_TO"; IMPACT="3"
-BATCH=""; APPROVE=""; PREVIEW="0"
+BATCH=""; APPROVE=""; PREVIEW="0"; DESTINATION=""; GUARD=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "kg-decide-seal: $1 exige um valor" >&2; exit 2; }; }
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -92,6 +105,8 @@ while [ $# -gt 0 ]; do
     --edge-type) _need "$@"; ETYPE="$2"; shift ;;
     --impact) _need "$@"; IMPACT="$2"; shift ;;
     --other) OTHER="1" ;;
+    --destination) _need "$@"; DESTINATION="$2"; shift ;;
+    --guard) _need "$@"; GUARD="$2"; shift ;;
     --batch) _need "$@"; BATCH="$2"; shift ;;
     --approve) _need "$@"; APPROVE="$2"; shift ;;
     --preview) PREVIEW="1" ;;
@@ -360,8 +375,8 @@ print(f"kg-decide-seal: lote {sha12} em {graph}: " + ', '.join(f"{it['id']}→{'
 LOT
 }
 if [ -n "${BATCH}" ] && [ -z "${GRAPH}" ]; then
-  [ -z "${NODE}${NEW}${CHOSEN}${REJECTED}${LABEL}${LINK}" ] && [ "${OTHER}" = "0" ] \
-    || { echo "kg-decide-seal: --batch não se mistura com nó, --new, --chosen, --rejected, --label, --link nem --other" >&2; exit 2; }
+  [ -z "${NODE}${NEW}${CHOSEN}${REJECTED}${LABEL}${LINK}${DESTINATION}${GUARD}" ] && [ "${OTHER}" = "0" ] \
+    || { echo "kg-decide-seal: --batch não se mistura com nó, --new, --chosen, --rejected, --label, --link, --other, --destination nem --guard (o lote não sela decisão do maestro: não leva destino)" >&2; exit 2; }
   command -v python3 >/dev/null 2>&1 || { echo "kg-decide-seal: python3 ausente" >&2; exit 2; }
   if [ "${PREVIEW}" = "1" ]; then _lot_py check "${BATCH}" "" "${DATE}" "${QUESTION}" - - 1; exit $?; fi
   LOTG="$(_lot_py check "${BATCH}" "${APPROVE}" "${DATE}" "${QUESTION}" - - 0)" || exit 2
@@ -392,8 +407,8 @@ if [ -n "${BATCH}" ] && [ -z "${GRAPH}" ]; then
   exit 0
 fi
 if [ -n "${BATCH}" ]; then
-  [ -z "${NODE}${NEW}${CHOSEN}${REJECTED}${LABEL}${LINK}" ] && [ "${OTHER}" = "0" ] && [ "${PREVIEW}" = "0" ] \
-    || { echo "kg-decide-seal: --batch por grafo não se mistura com nó, --new, --chosen, --rejected, --label, --link, --other nem --preview" >&2; exit 2; }
+  [ -z "${NODE}${NEW}${CHOSEN}${REJECTED}${LABEL}${LINK}${DESTINATION}${GUARD}" ] && [ "${OTHER}" = "0" ] && [ "${PREVIEW}" = "0" ] \
+    || { echo "kg-decide-seal: --batch por grafo não se mistura com nó, --new, --chosen, --rejected, --label, --link, --other, --destination, --guard nem --preview" >&2; exit 2; }
 fi
 [ -n "${GRAPH}" ] || { sed -n '/^# Uso:/,/^# O que escreve/p' "$0" | sed '$d' >&2; exit 2; }
 [ -f "${GRAPH}" ] || { echo "kg-decide-seal: grafo inexistente: ${GRAPH}" >&2; exit 2; }
@@ -405,6 +420,18 @@ if [ -z "${BATCH}" ]; then
 [ -n "${NEW}${NODE}" ] || { echo "kg-decide-seal: falta o nó (<NODE_ID> ou --new <D_ID>)" >&2; exit 2; }
 [ -n "${CHOSEN}" ] || { echo "kg-decide-seal: falta --chosen (a opção que o maestro escolheu, literal)" >&2; exit 2; }
 [ -n "${REJECTED}" ] || { echo "kg-decide-seal: falta --rejected (as opções oferecidas e descartadas, separadas por |) — o selo registra o que foi recusado" >&2; exit 2; }
+# o DESTINO declarado (ADR onion-adr-decision-destination-2026-11): a forma é conferida aqui; o Q_ existir no grafo,
+# no Python que lê o grafo
+case "${DESTINATION}" in
+  mechanism)
+    [ -n "${GUARD}" ] || { echo "kg-decide-seal: --destination mechanism exige --guard <CARD-123|Q_ID> (a guarda a construir: sem ponteiro, a dívida não se conta) — nada escrito" >&2; exit 2; }
+    [[ "${GUARD}" =~ ^[A-Z][A-Z0-9]*-[0-9]+$ || "${GUARD}" =~ ^Q_[A-Z0-9_]+$ ]] \
+      || { echo "kg-decide-seal: --guard fora da forma: chave de card (LETRAS-N, ex. SAC-123) ou id de nó Q_* do mesmo grafo (recebi: ${GUARD}) — nada escrito" >&2; exit 2; } ;;
+  design)
+    [ -z "${GUARD}" ] || { echo "kg-decide-seal: --destination design não leva --guard (desenho fica como texto, sem guarda a cobrar); se há guarda a construir, o destino é mechanism — nada escrito" >&2; exit 2; } ;;
+  '') echo "kg-decide-seal: falta --destination mechanism|design (todo selo novo declara se a decisão vira guarda ou é desenho; ADR onion-adr-decision-destination-2026-11) — nada escrito" >&2; exit 2 ;;
+  *) echo "kg-decide-seal: --destination aceita mechanism ou design (recebi: ${DESTINATION}) — nada escrito" >&2; exit 2 ;;
+esac
 fi
 [ -n "${DATE}" ] || { echo "kg-decide-seal: falta --date AAAA-MM-DD" >&2; exit 2; }
 # a PERGUNTA é obrigatória: é o único rastro, no selo, de que houve pergunta (achado 8 do refutador)
@@ -507,9 +534,9 @@ if [ -n "${BATCH}" ]; then
   PYOUT="$(_lot_py write "${BATCH}" "${APPROVE}" "${DATE}" "${QUESTION}" "${GRAPH}" "${STAGE}" 0)" || exit 2
 else
 PYOUT="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${GRAPH}" "${NODE}" "${NEW}" "${CHOSEN}" "${REJECTED}" "${DATE}" \
-  "${QUESTION}" "${OTHER}" "${LABEL}" "${LINK}" "${ETYPE}" "${IMPACT}" "${STAGE}" <<'PY'
+  "${QUESTION}" "${OTHER}" "${LABEL}" "${LINK}" "${ETYPE}" "${IMPACT}" "${STAGE}" "${DESTINATION}" "${GUARD}" <<'PY'
 import sys, re, datetime
-path, node, new, chosen, rejected, date, question, other, label, link, etype, impact, stage = sys.argv[1:14]
+path, node, new, chosen, rejected, date, question, other, label, link, etype, impact, stage, dest, guard = sys.argv[1:16]
 def die(m): print('kg-decide-seal: ' + m + ' — nada escrito', file=sys.stderr); sys.exit(2)
 try:
     import yaml
@@ -536,9 +563,20 @@ for n in nodes:
     if isinstance(n, dict) and 'id' in n: byid.setdefault(str(n['id']), []).append(n)
 def q(s): return '"' + one(s).replace('\\', '\\\\').replace('"', '\\"') + '"'
 lines = txt.split('\n')
+if dest not in ('mechanism', 'design'): die(f'--destination fora de mechanism|design: {dest!r}')
+if dest == 'mechanism' and guard.startswith('Q_') and guard not in byid:
+    die(f'--guard {guard}: nó Q_ inexistente em {path} — crie antes o nó da guarda a construir, ou aponte o card')
+# a guarda não pode ser o PRÓPRIO nó selado: o selo fecha o nó, e o medidor daria a guarda por feita (achado da revisão)
+if dest == 'mechanism' and guard in (node, new):
+    die(f'--guard {guard} é o próprio nó selado: o selo o fecha e a dívida sumiria — aponte o nó Q_ ou o card da guarda a construir')
+dest_txt = (' Destino: mecanismo (vira guarda; a guarda a construir está no campo x_guard).' if dest == 'mechanism'
+            else ' Destino: desenho (fica como texto, sem guarda a cobrar).')
 seal_txt = (f'Selado por /meta:decide em {date}: escolhida «{chosen}»'
             + (' (resposta livre do maestro, fora das opções oferecidas)' if other == '1' else '')
-            + '; descartadas: ' + ' · '.join(f'«{r}»' for r in rej) + '.')
+            + '; descartadas: ' + ' · '.join(f'«{r}»' for r in rej) + '.' + dest_txt)
+def dest_lines(fi):
+    s = ' ' * fi
+    return [f'{s}x_destination: {dest}'] + ([f'{s}x_guard: {q(guard)}'] if dest == 'mechanism' else [])
 vag = f'decisão do maestro em {date}, por pergunta com opções (/meta:decide): escolhida «{chosen}»'
 method = f'testimony: decisão do maestro por pergunta com opções, {date}'
 locator = f'pergunta com opções de {date}' + (f': «{one(question)}»' if question else '')
@@ -585,7 +623,7 @@ if not new:
         if lind < ind or (lind == ind and l.lstrip().startswith('-')) or (lind <= ind and l.lstrip().startswith('#')):
             end = j; break
     while end > i + 1 and not lines[end - 1].strip(): end -= 1
-    drop = {'status', 'verified_at', 'verified_against', 'provenance', 'narrative', 'plane'}
+    drop = {'status', 'verified_at', 'verified_against', 'provenance', 'narrative', 'plane', 'x_destination', 'x_guard', 'x_guard_done'}
     body = []; k = i + 1
     while k < end:
         l = lines[k]; lind = len(l) - len(l.lstrip())
@@ -604,9 +642,11 @@ if not new:
     if n.get('verified_against'): prev.append(f'verified_against anterior: «{one(n["verified_against"])}»')
     if isinstance(n.get('provenance'), dict) and n['provenance']:
         prev.append('proveniência anterior: ' + ' · '.join(f'{k} «{one(v)}»' for k, v in n['provenance'].items()))
+    for _k in ('x_destination', 'x_guard', 'x_guard_done'):   # o destino anterior (raro: nó open) fica com rastro
+        if n.get(_k) is not None: prev.append(f'{_k} anterior: «{one(n[_k])}»')
     if n.get('plane') == 'PROD': prev.append('plane anterior: PROD, rebaixado a DEV porque a base do selo é testemunho (contrato: integrity.testimony-in-prod)')
     s = ' ' * fi
-    add = [f'{s}status: done', f'{s}plane: DEV']
+    add = [f'{s}status: done', f'{s}plane: DEV'] + dest_lines(fi)
     add += [f'{s}verified_at: "{date}"', f'{s}verified_against: {q(vag)}', ] + narr_block(fi, oldn, prev + [seal_txt]) + prov_lines(fi)
     out = '\n'.join(lines[:i + 1] + body + add + lines[end:])
     target = node
@@ -629,7 +669,7 @@ else:
     s = ' ' * (ii + 2)
     nl = [f'{" " * ii}- id: {new}', f'{s}node_type: decision', f'{s}layer: audit', f'{s}plane: DEV', f'{s}status: done',
           f'{s}impact: {impact}', f'{s}confidence: 0.9', f'{s}verified_at: "{date}"', f'{s}verified_against: {q(vag)}',
-          f'{s}label: {q(label)}', f'{s}narrative: {q(seal_txt)}'] + prov_lines(ii + 2)
+          f'{s}label: {q(label)}', f'{s}narrative: {q(seal_txt)}'] + dest_lines(ii + 2) + prov_lines(ii + 2)
     lines = lines[:b] + nl + lines[b:]
     et = [i for i, l in enumerate(lines) if re.match(r'^edges\s*:', l)]
     if len(et) > 1: die('mais de um `edges:` no nível 0')
@@ -658,10 +698,13 @@ n2 = m2[0]
 if (n2.get('status') != 'done' or n2.get('plane') != 'DEV' or str(n2.get('verified_at')) != date or (n2.get('provenance') or {}).get('method') != method
         or f'«{chosen}»' not in str(n2.get('narrative')) or any(f'«{r}»' not in str(n2.get('narrative')) for r in rej)):
     die('a escrita não releu como escrita (status/verified_at/method/narrative)')
+if n2.get('x_destination') != dest or (dest == 'mechanism' and str(n2.get('x_guard')) != guard) or (dest == 'design' and 'x_guard' in n2):
+    die('a escrita não releu com o destino declarado (x_destination/x_guard)')
 if not new and oldn and not str(n2.get('narrative')).startswith(oldn):
     die('a narrative anterior não sobreviveu verbatim à escrita')
 open(stage, 'w', encoding='utf-8').write(out)
-print(f'kg-decide-seal: escrito {target} em {path} — escolhida «{chosen}», descartadas {len(rej)}')
+print(f'kg-decide-seal: escrito {target} em {path} — escolhida «{chosen}», descartadas {len(rej)}, destino {dest}'
+      + (f' (guarda a construir: {guard})' if dest == 'mechanism' else ''))
 PY
 )" || exit 2
 fi

@@ -56853,7 +56853,7 @@ GHP
   # ── o SELADOR, sobre cópia descartável fora de git (o gate é só o radar) ──────────────────
   g="${sb}/s.kg.yaml"; cp "${r}/docs/a/a.kg.yaml" "${g}"
   # (s1) selo de decisão existente: marcas escritas, plane DEV (testemunho em PROD reprova no contrato), radar exit 0
-  if out="$(bash "${seal}" "${g}" D_VELHO --chosen "caminho um" --rejected "caminho dois|pesquisar antes" --date 2026-10-12 --question "qual?" 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${g}" D_VELHO --chosen "caminho um" --rejected "caminho dois|pesquisar antes" --date 2026-10-12 --question "qual?" --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && python3 - "${g}" <<'DEC_PY'
 import sys, yaml
 n = [x for x in yaml.safe_load(open(sys.argv[1]))['nodes'] if x['id'] == 'D_VELHO'][0]
@@ -56884,7 +56884,7 @@ DEC_PY
     fi
     cp "${r}/docs/a/a.kg.yaml" "${_sm}/${_smv}/s.kg.yaml"
     # verde = o selador saiu 0 E gravou; o método gravado é o veredito (o mutante tem de gravar o alias, nunca quebrar)
-    if bash "${_sm}/${_smv}/validation/kg-decide-seal.sh" "${_sm}/${_smv}/s.kg.yaml" D_VELHO --chosen "caminho um" --rejected "caminho dois" --date 2026-11-10 --question "qual?" > "${_sm}/${_smv}.out" 2>&1; then
+    if bash "${_sm}/${_smv}/validation/kg-decide-seal.sh" "${_sm}/${_smv}/s.kg.yaml" D_VELHO --chosen "caminho um" --rejected "caminho dois" --date 2026-11-10 --question "qual?" --destination design > "${_sm}/${_smv}.out" 2>&1; then
       _smm="$(python3 -I -B -c 'import sys,yaml; print([x for x in yaml.safe_load(open(sys.argv[1]))["nodes"] if x["id"]=="D_VELHO"][0]["provenance"]["method"])' "${_sm}/${_smv}/s.kg.yaml" 2>&1)"
       _smres="${_smres} ${_smv}:${_smm%%:*}"
     else _smres="${_smres} ${_smv}:rc($(tail -1 "${_sm}/${_smv}.out"))"; fi
@@ -56894,24 +56894,24 @@ DEC_PY
   else record_fail "decide: (s1m)" "esperava a cópia limpa gravando testimony e o mutante gravando testemunho (classe gravada por cópia):${_smres}"; fi
   # (s2) nó inexistente → rc 2 e o arquivo intacto
   h0="$(sha256sum "${g}" | cut -d' ' -f1)"
-  if out="$(bash "${seal}" "${g}" D_NAO_EXISTE --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${g}" D_NAO_EXISTE --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 2 ] && grep -q 'nó inexistente' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
     record_pass "decide: (s2) nó inexistente → rc 2, nada escrito"
   else record_fail "decide: (s2)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
   # (s3) nó já done (o selado em s1) → rc 2 e intacto: selo não se re-carimba
-  if out="$(bash "${seal}" "${g}" D_VELHO --chosen x --rejected y --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${g}" D_VELHO --chosen x --rejected y --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 2 ] && grep -q 'está done, não open' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
     record_pass "decide: (s3) nó já done → rc 2, nada escrito"
   else record_fail "decide: (s3)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
   # (s4) o gate reprova DEPOIS da escrita → rc 3 e a escrita DESFEITA byte a byte (radar falso que reprova o selado)
   printf '#!/usr/bin/env bash\ngrep -q "meta:decide" "$1" && exit 1\nexit 0\n' > "${sb}/radar-reprova-selo.sh"
   cp "${r}/docs/a/a.kg.yaml" "${sb}/u.kg.yaml"; h0="$(sha256sum "${sb}/u.kg.yaml" | cut -d' ' -f1)"
-  if out="$(DECIDE_SEAL_RADAR="${sb}/radar-reprova-selo.sh" bash "${seal}" "${sb}/u.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(DECIDE_SEAL_RADAR="${sb}/radar-reprova-selo.sh" bash "${seal}" "${sb}/u.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 3 ] && grep -q 'escrita DESFEITA' <<< "${out}" && [ "$(sha256sum "${sb}/u.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
     record_pass "decide: (s4) radar reprovando o selado → rc 3 e o arquivo volta byte a byte"
   else record_fail "decide: (s4)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
   # (s5) decisão sem nó: --new cria D_ ligado ao nó de origem, com as mesmas marcas, e o radar sai 0
-  if out="$(bash "${seal}" "${g}" --new D_NOVA_DA_SESSAO --label "decidiu-se X" --link Q_CITADO --chosen "X" --rejected "Y|Z" --date 2026-10-12 --question q --other 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${g}" --new D_NOVA_DA_SESSAO --label "decidiu-se X" --link Q_CITADO --chosen "X" --rejected "Y|Z" --date 2026-10-12 --question q --other --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && python3 - "${g}" <<'DEC_PY'
 import sys, yaml
 d = yaml.safe_load(open(sys.argv[1]))
@@ -56926,25 +56926,25 @@ DEC_PY
   # (s6) nó com campo CEGO → rc 2: gate humano às cegas não recebe selo de sessão
   cp "${r}/docs/a/a.kg.yaml" "${sb}/b.kg.yaml"
   sed -i 's/^    label: "qual caminho?"$/&\n    x_blind_verdict: ""/' "${sb}/b.kg.yaml"; h0="$(sha256sum "${sb}/b.kg.yaml" | cut -d' ' -f1)"
-  if out="$(bash "${seal}" "${sb}/b.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${sb}/b.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   local _rc1="${rc}" _o1="${out}"
   # e o cego ANINHADO (achado 9 do refutador): `x_gate: {kind: blind}` não pode passar por não ser chave de 1º nível
   cp "${r}/docs/a/a.kg.yaml" "${sb}/b2.kg.yaml"
   sed -i 's/^    label: "qual caminho?"$/&\n    x_gate:\n      kind: blind/' "${sb}/b2.kg.yaml"
-  if out="$(bash "${seal}" "${sb}/b2.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${sb}/b2.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${_rc1}" -eq 2 ] && grep -q 'campo CEGO' <<< "${_o1}" && [ "$(sha256sum "${sb}/b.kg.yaml" | cut -d' ' -f1)" = "${h0}" ] \
      && [ "${rc}" -eq 2 ] && grep -q 'campo CEGO' <<< "${out}"; then
     record_pass "decide: (s6) nó com campo cego (chave de 1º nível ou valor aninhado) → rc 2, nada escrito"
   else record_fail "decide: (s6)" "1º nível rc=${_rc1}; aninhado rc=${rc} $(_emit "${out}" | tail -1)"; fi
   # (s8) só `open` se sela (achado 1 do refutador, BLOQUEAVA): nó `confirmed` com proveniência MEDIDA não é re-carimbado
   cp "${r}/docs/a/a.kg.yaml" "${sb}/c.kg.yaml"; h0="$(sha256sum "${sb}/c.kg.yaml" | cut -d' ' -f1)"
-  if out="$(bash "${seal}" "${sb}/c.kg.yaml" D_CONF --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${sb}/c.kg.yaml" D_CONF --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 2 ] && grep -q 'está confirmed, não open' <<< "${out}" && [ "$(sha256sum "${sb}/c.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
     record_pass "decide: (s8) nó confirmed (proveniência medida) → rc 2, nada escrito: só open se sela"
   else record_fail "decide: (s8)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
   # (s9) a narrative anterior sobrevive VERBATIM (bloco com lista e parágrafos) e a proveniência anterior vai INTEIRA
   #      (achados 2 e 3 do refutador: o achatamento mutilava a lista e só o source sobrevivia)
-  if out="$(bash "${seal}" "${sb}/c.kg.yaml" D_COM_HISTORIA --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${sb}/c.kg.yaml" D_COM_HISTORIA --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && python3 - "${sb}/c.kg.yaml" <<'DEC_PY'
 import sys, yaml
 n = [x for x in yaml.safe_load(open(sys.argv[1]))['nodes'] if x['id'] == 'D_COM_HISTORIA'][0]
@@ -56964,7 +56964,7 @@ DEC_PY
             "--chosen|a|--rejected|b|--date|2026-10-12" "--chosen|a «x»|--rejected|b|--date|2026-10-12|--question|q" \
             "--chosen|Opção A|--rejected|opção a|--date|2026-10-12|--question|q"; do
     local -a _args; IFS='|' read -r -a _args <<< "${_a}"
-    if out="$(bash "${seal}" "${sb}/e.kg.yaml" Q_CITADO "${_args[@]}" 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${sb}/e.kg.yaml" Q_CITADO "${_args[@]}" --destination design 2>&1)"; then rc=0; else rc=$?; fi
     [ "${rc}" -eq 2 ] || _bad="${_bad} [${_a}→rc ${rc}]"
   done
   if [ -z "${_bad}" ] && [ "$(sha256sum "${sb}/e.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
@@ -56976,10 +56976,10 @@ DEC_PY
   if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && python3 -c 'import jsonschema' >/dev/null 2>&1; then
     ln -s "${REPO_ROOT}/vendor/kg-ssot" "${r}/vendor/kg-ssot"
     g="${r}/docs/b/b.kg.yaml"; h0="$(sha256sum "${g}" | cut -d' ' -f1)"
-    if out="$(bash "${seal}" "${g}" D_B --chosen "ir de /home/alguem/repo" --rejected "ficar" --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${g}" D_B --chosen "ir de /home/alguem/repo" --rejected "ficar" --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
     if [ "${rc}" -eq 3 ] && grep -q 'o contrato REPROVOU' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
       # caminho RELATIVO, de outro cwd (achado 6 do refutador: o contrato ficava "não julgado" e o selo saía 0)
-      if out="$(cd "${r}/docs" && bash "${seal}" b/b.kg.yaml D_B --chosen "ir pelo caminho curto" --rejected "ficar" --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+      if out="$(cd "${r}/docs" && bash "${seal}" b/b.kg.yaml D_B --chosen "ir pelo caminho curto" --rejected "ficar" --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
       if [ "${rc}" -eq 0 ] && ! grep -q 'NÃO JULGADO\|não vendorizado' <<< "${out}"; then
         record_pass "decide: (s7) o contrato é o 2º gate: caminho de máquina na opção → rc 3 desfeito; selo limpo → rc 0 julgado"
       else record_fail "decide: (s7)" "selo limpo: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
@@ -56987,7 +56987,7 @@ DEC_PY
     # (s11) dívida de contrato que o grafo JÁ tinha na árvore → rc 2 no passo 0, nunca rc 3 "culpa do selo" (achado 5)
     g="${r}/docs/c/c.kg.yaml"
     sed -i 's/^    label: "decidir c"$/&\n    verified_at: 2026-10-01/' "${g}"; h0="$(sha256sum "${g}" | cut -d' ' -f1)"
-    if out="$(bash "${seal}" "${g}" D_C --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${g}" D_C --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
     if [ "${rc}" -eq 2 ] && grep -q 'JÁ piora o contrato antes do selo' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
       record_pass "decide: (s11) dívida de contrato pré-existente → rc 2 no passo 0 (não é culpa do selo), nada escrito"
     else record_fail "decide: (s11)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
@@ -57002,10 +57002,10 @@ DEC_PY
   "${G[@]}" -C "${rk}" init -q . 2>/dev/null
   printf 'import sys\nsys.exit(1 if "\u00ab" in open(sys.argv[-1], encoding="utf-8").read() else 0)\n' > "${rk}/tools/kg_validate.py"
   cp "${r}/docs/a/a.kg.yaml" "${rk}/docs/g.kg.yaml"; h0="$(sha256sum "${rk}/docs/g.kg.yaml" | cut -d' ' -f1)"
-  if out="$(bash "${seal}" "${rk}/docs/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${rk}/docs/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 3 ] && grep -q 'o contrato REPROVOU o grafo selado' <<< "${out}" && [ "$(sha256sum "${rk}/docs/g.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
     printf 'import sys\nsys.exit(0)\n' > "${rk}/tools/kg_validate.py"
-    if out="$(bash "${seal}" "${rk}/docs/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${rk}/docs/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
     if [ "${rc}" -eq 0 ] && grep -q 'contrato rc 0 por tools/kg_validate.py' <<< "${out}"; then
       record_pass "decide: (s12) sem vendor, o tools/kg_validate.py do produto é o 2º gate: reprova → rc 3 desfeito; passa → rc 0 nomeando o leitor"
     else record_fail "decide: (s12)" "leitor local que passa: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
@@ -57022,7 +57022,7 @@ n = ("  - id: E_NOVO_ORFAO\n    node_type: evidence\n    layer: audit\n    plane
 i = s.index("\nedges:"); open(p, "w").write(s[:i] + "\n" + n.rstrip("\n") + s[i:])
 DEC_ORF
   local _ko=""
-  if out="$(bash "${seal}" "${ro}" --new D_DA_EVIDENCIA_NOVA --label "decidiu-se pela evidência nova" --link E_NOVO_ORFAO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${ro}" --new D_DA_EVIDENCIA_NOVA --label "decidiu-se pela evidência nova" --link E_NOVO_ORFAO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   { [ "${rc}" -eq 0 ] && grep -q 'órfão antes do selo — tolerado' <<< "${out}"; } || _ko="${_ko} link-para-orfao-rc${rc}"
   cp "${r}/docs/a/a.kg.yaml" "${ro}"
   python3 - "${ro}" <<'DEC_ORF2'
@@ -57033,7 +57033,7 @@ n = ("  - id: E_OUTRO_ORFAO\n    node_type: evidence\n    layer: audit\n    plan
      "    provenance:\n      source: \"S\"\n      locator: \"L\"\n      method: \"medição: M\"\n      locality: \"repo\"\n")
 i = s.index("\nedges:"); open(p, "w").write(s[:i] + "\n" + n.rstrip("\n") + s[i:])
 DEC_ORF2
-  if out="$(bash "${seal}" "${ro}" --new D_OUTRA --label "outra" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${ro}" --new D_OUTRA --label "outra" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   { [ "${rc}" -eq 2 ] && grep -q 'JÁ reprova no radar' <<< "${out}"; } || _ko="${_ko} orfao-alheio-nao-recusou-rc${rc}"
   if [ -z "${_ko}" ]; then
     record_pass "decide: (s14) --link para nó nascido no mesmo movimento é tolerado; órfão de OUTRO nó segue recusado (rc 2)"
@@ -57051,20 +57051,20 @@ DEC_ORF2
     } > "${rt}"
   }
   _dec_teto on "${nn}"; h1="$(sha256sum "${rt}" | cut -d' ' -f1)"
-  if out="$(bash "${seal}" "${rt}" --new D_ESTOURA --label "estoura" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${rt}" --new D_ESTOURA --label "estoura" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   { [ "${rc}" -eq 2 ] && [ "$(sha256sum "${rt}" | cut -d' ' -f1)" = "${h1}" ] && grep -q '\[TETO\]' <<< "${out}" \
     && grep -q "teto declarado ${nn}" <<< "${out}" && grep -q 'Nada escrito' <<< "${out}"; } || _kt="${_kt} estoura-rc${rc}"
   _dec_teto on "$((nn + 1))"
-  if out="$(bash "${seal}" "${rt}" --new D_CABE --label "cabe" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${rt}" --new D_CABE --label "cabe" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   { [ "${rc}" -eq 0 ] && [ "$(grep -c '^  - id:' "${rt}")" -eq "$((nn + 1))" ]; } || _kt="${_kt} cabe-rc${rc}"
   _dec_teto on ""; h1="$(sha256sum "${rt}" | cut -d' ' -f1)"
-  if out="$(bash "${seal}" "${rt}" --new D_SEM_TETO --label "sem teto" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${rt}" --new D_SEM_TETO --label "sem teto" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   { [ "${rc}" -eq 2 ] && [ "$(sha256sum "${rt}" | cut -d' ' -f1)" = "${h1}" ] && grep -q '\[SEM-TETO\]' <<< "${out}"; } || _kt="${_kt} sem-teto-rc${rc}"
   _dec_teto off "${nn}"
-  if out="$(bash "${seal}" "${rt}" --new D_FORA_DO_ESCOPO --label "fora" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${rt}" --new D_FORA_DO_ESCOPO --label "fora" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   [ "${rc}" -eq 0 ] || _kt="${_kt} sem-marcador-rc${rc}"
   _dec_teto on "${nn}"
-  if out="$(bash "${seal}" "${rt}" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${rt}" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   [ "${rc}" -eq 0 ] || _kt="${_kt} existente-no-teto-rc${rc}"
   if [ -z "${_kt}" ]; then
     record_pass "decide: (s15) --new que não cabe no TETO do meta: (ou sem TETO) → rc 2, nada escrito; cabe, sem marcador e nó existente selam"
@@ -57072,7 +57072,7 @@ DEC_ORF2
   # (s13) repo git sem leitor nenhum: a mensagem diz que falta o LEITOR, não "fora de repo git"
   local rn="${sb}/semleitor"; mkdir -p "${rn}"; "${G[@]}" -C "${rn}" init -q . 2>/dev/null
   cp "${r}/docs/a/a.kg.yaml" "${rn}/g.kg.yaml"
-  if out="$(bash "${seal}" "${rn}/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${rn}/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -q 'repo git sem leitor de contrato' <<< "${out}" && ! grep -q 'fora de repo git' <<< "${out}" \
      && grep -q 'lint de nomes não rodou — o repo não tem o kg_vocab.py' <<< "${out}" && grep -q '✅ selado.* · nomes NÃO julgados$' <<< "${out}"; then
     record_pass "decide: (s13) repo git sem leitor de contrato é nomeado como tal, não como 'fora de repo git'; o lint de nomes ausente é DECLARADO"
@@ -57096,19 +57096,19 @@ DEC_ORF2
     "${G[@]}" -C "${rv}" add docs/g.kg.yaml
     "${G[@]}" -C "${rv}" commit -q -m c1
     h0="$(sha256sum "${gv}" | cut -d' ' -f1)"
-    if out="$(bash "${seal}" "${gv}" D_SOLTO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${gv}" D_SOLTO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
     { [ "${rc}" -eq 3 ] && [ "$(sha256sum "${gv}" | cut -d' ' -f1)" = "${h0}" ] && grep -q 'o lint de nomes REPROVOU o que o selo escreveu' <<< "${out}" \
       && grep -q '✗ «r99» no campo narrative do nó D_SOLTO (vocab.code-unresolved)' <<< "${out}"; } || _kv="${_kv} solto-rc${rc}"
-    if out="$(bash "${seal}" "${gv}" D_GLOSADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${gv}" D_GLOSADO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
     { [ "${rc}" -eq 0 ] && grep -q '✅ selado.* · nomes sem achado novo por kg_vocab.py$' <<< "${out}" \
       && grep -q 'dissect:N2' "${gv}"; } || _kv="${_kv} glosado-rc${rc}"
     # o código de um sistema DE FORA, declarado nas externas do repo (.kg-ssot/vocab-externals.tsv), resolve sem termo
     mkdir -p "${rv}/.kg-ssot"; printf '# esquema\tregex\nfora\tAB12\n' > "${rv}/.kg-ssot/vocab-externals.tsv"
-    if out="$(bash "${seal}" "${gv}" D_EXTERNA --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${gv}" D_EXTERNA --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
     [ "${rc}" -eq 0 ] || _kv="${_kv} externa-rc${rc}"
     # o grafo NÃO rastreado o lint não lê: o selo segue, e a falta é declarada (nunca "sem achado" calado)
     cp "${gv}" "${rv}/docs/novo.kg.yaml"; sed -i 's/^  id: nomes$/  id: nomes-novo/' "${rv}/docs/novo.kg.yaml"
-    if out="$(bash "${seal}" "${rv}/docs/novo.kg.yaml" D_SOLTO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${rv}/docs/novo.kg.yaml" D_SOLTO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
     { [ "${rc}" -eq 0 ] && grep -q 'lint de nomes não rodou — o grafo não é rastreado' <<< "${out}"; } || _kv="${_kv} nao-rastreado-rc${rc}"
     if [ -z "${_kv}" ]; then
       record_pass "decide: (s16) o lint de nomes é gate do selo: código solto copiado para a narrative → rc 3 desfeito; glosado → rc 0; não rastreado → declarado"
@@ -57127,7 +57127,7 @@ DEC_ORF2
     # rastreado: num repo git o corpus do kg_query é o que o git conhece (o grafo não rastreado não existe para ele)
     "${G[@]}" -C "${rq}" add docs/g.kg.yaml
     "${G[@]}" -C "${rq}" commit -q -m c1
-    if out="$(bash "${seal}" "${gq}" --new D_SELO_CADEIA --label "decidiu-se pela cadeia" --link Q_ALVO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${gq}" --new D_SELO_CADEIA --label "decidiu-se pela cadeia" --link Q_ALVO --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
     [ "${rc}" -eq 0 ] || _kq="${_kq} selo-rc${rc}"
     if out="$(python3 -I "${REPO_ROOT}/vendor/kg-ssot/tools/kg_query.py" --root "${rq}" --chain D_SELO_CADEIA --format json 2>/dev/null)"; then rc=0; else rc=$?; fi
     [ "${rc}" -eq 0 ] || _kq="${_kq} chain-rc${rc}"
@@ -57143,6 +57143,136 @@ sys.exit(0 if ok else 1)' <<< "${out}" 2>/dev/null || _kq="${_kq} cadeia-errada"
       record_pass "decide: (s17) o selo é a origem da própria cadeia (kg_query --chain): method testimony, e a TRACES_TO para a pergunta em edges_not_followed"
     else record_fail "decide: (s17)" "${_kq} $(_emit "${out}" | head -c 300 | tr '\n' ' ')"; fi
   else record_skip "decide: (s17) kg_query.py não vendorizado (a cadeia do selo NÃO verificada)"; fi
+  # (s19) DESTINO DECLARADO (melhoria D da retro de 14 a 21/11/2026, ADR onion-adr-decision-destination-2026-11): todo
+  #       selo novo exige --destination mechanism|design, e mechanism exige --guard (card LETRAS-N ou nó Q_ do mesmo
+  #       grafo). Recusas rc 2 sem escrever: sem destino, destino torto, mechanism sem guard, guard fora da forma, Q_
+  #       inexistente, design com guard, lote com destino. Polaridades rc 0: mechanism com Q_ e com card no nó
+  #       existente, design no --new (sem x_guard). Mutantes, cada um na MESMA cópia que a limpa (selador e resolver
+  #       copiados, radar por repasse): sem a checagem do Q_ existir (M1), design aceitando guard (M2).
+  local gd="${sb}/dest.kg.yaml" _sd="" _sa h0d
+  _dec_graph dest "$(_dec_node D_DEST_Q decision open 'decidir com guarda Q')" "$(_dec_node D_DEST_CARD decision open 'decidir com card')" \
+    "$(_dec_node Q_GUARDA_A_FAZER question open 'construir a guarda')" > "${gd}"
+  h0d="$(sha256sum "${gd}" | cut -d' ' -f1)"
+  for _sa in "" "--destination|talvez" "--destination|mechanism" "--destination|mechanism|--guard|sac-1" \
+             "--destination|mechanism|--guard|Q_NAO_EXISTE" "--destination|design|--guard|SAC-1" "--destination|mechanism|--guard|E_ANCORA"; do
+    local -a _sx=(); [ -n "${_sa}" ] && IFS='|' read -r -a _sx <<< "${_sa}"
+    if out="$(bash "${seal}" "${gd}" D_DEST_Q --chosen a --rejected b --date 2026-10-12 --question q ${_sx[@]+"${_sx[@]}"} 2>&1)"; then rc=0; else rc=$?; fi
+    [ "${rc}" -eq 2 ] || _sd="${_sd} [${_sa:-sem-destino}→rc ${rc}]"
+  done
+  [ "$(sha256sum "${gd}" | cut -d' ' -f1)" = "${h0d}" ] || _sd="${_sd} recusa-escreveu"
+  if out="$(bash "${seal}" "${gd}" D_DEST_Q --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  grep -q 'falta --destination mechanism|design' <<< "${out}" || _sd="${_sd} msg-sem-destino"
+  printf '%s\t%s\tobsolete\t%s\t-\tmotivo\n' "${gd}" D_DEST_CARD D_DEST_Q > "${sb}/lote-dest.tsv"
+  if out="$(bash "${seal}" --batch "${sb}/lote-dest.tsv" --preview --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && grep -q 'não leva destino' <<< "${out}"; } || _sd="${_sd} lote-com-destino-rc${rc}"
+  if out="$(bash "${seal}" "${gd}" D_DEST_Q --chosen a --rejected b --date 2026-10-12 --question q --destination mechanism --guard Q_GUARDA_A_FAZER 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _sd="${_sd} mech-Q-rc${rc}"
+  if out="$(bash "${seal}" "${gd}" D_DEST_CARD --chosen a --rejected b --date 2026-10-12 --question q --destination mechanism --guard SAC-123 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _sd="${_sd} mech-card-rc${rc}"
+  if out="$(bash "${seal}" "${gd}" --new D_DEST_DESENHO --label "nome curto" --link Q_GUARDA_A_FAZER --chosen a --rejected b --date 2026-10-12 --question q --destination design 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _sd="${_sd} design-new-rc${rc}"
+  python3 -I -B - "${gd}" <<'DEC_DEST' || _sd="${_sd} campos-errados"
+import sys, yaml
+n = {x['id']: x for x in yaml.safe_load(open(sys.argv[1]))['nodes']}
+ok = (n['D_DEST_Q'].get('x_destination') == 'mechanism' and n['D_DEST_Q'].get('x_guard') == 'Q_GUARDA_A_FAZER'
+      and n['D_DEST_CARD'].get('x_destination') == 'mechanism' and n['D_DEST_CARD'].get('x_guard') == 'SAC-123'
+      and n['D_DEST_DESENHO'].get('x_destination') == 'design' and 'x_guard' not in n['D_DEST_DESENHO']
+      and 'Destino: mecanismo' in n['D_DEST_Q']['narrative'] and 'Destino: desenho' in n['D_DEST_DESENHO']['narrative'])
+sys.exit(0 if ok else 1)
+DEC_DEST
+  bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${gd}" --integrity --schema >/dev/null 2>&1 || _sd="${_sd} radar-reprova"
+  # a guarda não pode ser o próprio nó selado (o selo o fecharia e a dívida sumiria); e um x_guard_done antigo num nó
+  # open não sobrevive ao selo novo (daria a guarda nova por feita): sai do nó e fica com rastro na narrative
+  h0d="$(sha256sum "${gd}" | cut -d' ' -f1)"
+  if out="$(bash "${seal}" "${gd}" Q_GUARDA_A_FAZER --chosen a --rejected b --date 2026-10-12 --question q --destination mechanism --guard Q_GUARDA_A_FAZER 2>&1)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && grep -q 'é o próprio nó selado' <<< "${out}" && [ "$(sha256sum "${gd}" | cut -d' ' -f1)" = "${h0d}" ]; } || _sd="${_sd} guarda-propria-rc${rc}"
+  local gv2="${sb}/dest-velho.kg.yaml"
+  _dec_graph destv "$(_dec_node D_DEST_VELHO decision open 'decidir de novo')" > "${gv2}"
+  sed -i 's/^    label: "decidir de novo"$/&\n    x_guard_done: "2026-10-01"/' "${gv2}"
+  if out="$(bash "${seal}" "${gv2}" D_DEST_VELHO --chosen a --rejected b --date 2026-10-12 --question q --destination mechanism --guard SAC-77 2>&1)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 0 ] && python3 -I -B -c 'import sys,yaml; n=[x for x in yaml.safe_load(open(sys.argv[1]))["nodes"] if x["id"]=="D_DEST_VELHO"][0]; sys.exit(0 if "x_guard_done" not in n and "x_guard_done anterior: «2026-10-01»" in n["narrative"] else 1)' "${gv2}"; } || _sd="${_sd} guard-done-antigo-rc${rc}"
+  local _dm="${sb}/seal-dest" _dmv _dmres=""
+  for _dmv in limpa m1 m2 m3; do
+    rm -rf "${_dm}/${_dmv}"; mkdir -p "${_dm}/${_dmv}/validation" "${_dm}/${_dmv}/utils/kg"
+    cp "${seal}" "${_dm}/${_dmv}/validation/"
+    printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "${REPO_ROOT}/.claude/validation/kg-radar.sh" > "${_dm}/${_dmv}/validation/kg-radar.sh"
+    cp "${REPO_ROOT}/.claude/utils/kg/kgssot-tools.sh" "${_dm}/${_dmv}/utils/kg/"
+    case "${_dmv}" in
+      m1) sed -i "s|^if dest == 'mechanism' and guard.startswith('Q_') and guard not in byid:|if False:|" "${_dm}/${_dmv}/validation/kg-decide-seal.sh" ;;
+      m2) sed -i 's|^    \[ -z "\${GUARD}" \] \|\| { echo "kg-decide-seal: --destination design não leva|    true \|\| { echo "kg-decide-seal: --destination design não leva|' "${_dm}/${_dmv}/validation/kg-decide-seal.sh" ;;
+      m3) sed -i "s|^if dest == 'mechanism' and guard in (node, new):|if False:|" "${_dm}/${_dmv}/validation/kg-decide-seal.sh" ;;
+    esac
+    if [ "${_dmv}" != limpa ] && cmp -s "${seal}" "${_dm}/${_dmv}/validation/kg-decide-seal.sh"; then _dmres="${_dmres} ${_dmv}:âncora-não-casou"; continue; fi
+    _dec_graph dest "$(_dec_node D_DEST_Q decision open 'decidir com guarda Q')" "$(_dec_node Q_GUARDA_A_FAZER question open 'construir a guarda')" > "${_dm}/${_dmv}/g.kg.yaml"
+    local _r1=0 _r2=0
+    bash "${_dm}/${_dmv}/validation/kg-decide-seal.sh" "${_dm}/${_dmv}/g.kg.yaml" D_DEST_Q --chosen a --rejected b --date 2026-10-12 --question q --destination mechanism --guard Q_NAO_EXISTE >/dev/null 2>&1 || _r1=$?
+    cp "${_dm}/${_dmv}/g.kg.yaml" "${_dm}/${_dmv}/g0.kg.yaml"
+    _dec_graph dest "$(_dec_node D_DEST_Q decision open 'decidir com guarda Q')" "$(_dec_node Q_GUARDA_A_FAZER question open 'construir a guarda')" > "${_dm}/${_dmv}/g.kg.yaml"
+    bash "${_dm}/${_dmv}/validation/kg-decide-seal.sh" "${_dm}/${_dmv}/g.kg.yaml" D_DEST_Q --chosen a --rejected b --date 2026-10-12 --question q --destination design --guard SAC-1 >/dev/null 2>&1 || _r2=$?
+    _dec_graph dest "$(_dec_node D_DEST_Q decision open 'decidir com guarda Q')" "$(_dec_node Q_GUARDA_A_FAZER question open 'construir a guarda')" > "${_dm}/${_dmv}/g.kg.yaml"
+    local _r3=0
+    bash "${_dm}/${_dmv}/validation/kg-decide-seal.sh" "${_dm}/${_dmv}/g.kg.yaml" Q_GUARDA_A_FAZER --chosen a --rejected b --date 2026-10-12 --question q --destination mechanism --guard Q_GUARDA_A_FAZER >/dev/null 2>&1 || _r3=$?
+    _dmres="${_dmres} ${_dmv}:${_r1}/${_r2}/${_r3}"
+  done
+  [ "${_dmres}" = " limpa:2/2/2 m1:0/2/2 m2:2/0/2 m3:2/2/0" ] || _sd="${_sd} mutantes(${_dmres})"
+  if [ -z "${_sd}" ]; then
+    record_pass "decide: (s19) destino declarado: sem destino, torto, mechanism sem guard, guard fora da forma ou Q_ inexistente, design com guard e lote com destino → rc 2 sem escrever; mechanism com Q_ e com card, design no --new gravam x_destination/x_guard e o radar sai 0; (MUT) sem a checagem do Q_, design aceitando guard e guarda igual ao próprio nó reprovam, a cópia limpa passa; guarda própria recusada e x_guard_done antigo não sobrevive"
+  else record_fail "decide: (s19)" "${_sd} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (s20) a DÍVIDA DE GUARDA no medidor: decisão mechanism sem a guarda feita vira linha guard-debt; feita (o Q_ fechado,
+  #       ou x_guard_done) não; design não; o selo ANTIGO sem o campo não (catraca); o Q_ que não existe vira linha e
+  #       aviso. Mutantes, na mesma cópia que a limpa: o Q_ fechado deixa de quitar (M3), o selo sem campo entra na
+  #       conta (M4).
+  local r5="${sb}/r5" _gb=""
+  "${G[@]}" -C "${sb}" init -q r5; mkdir -p "${r5}/docs"
+  _dec_dnode() {  # $1=id $2=x_destination $3=x_guard (vazio = sem) [$4=x_guard_done]
+    printf '  - id: %s\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: done\n    impact: 3\n    confidence: 0.9\n    label: "decidido %s"' "$1" "$1"
+    [ -n "$2" ] && printf '\n    x_destination: %s' "$2"
+    [ -n "$3" ] && printf '\n    x_guard: "%s"' "$3"
+    [ -n "${4:-}" ] && printf '\n    x_guard_done: "%s"' "$4"
+    return 0
+  }
+  _dec_graph divida "$(_dec_dnode D_MECH_Q mechanism Q_ABERTA)" "$(_dec_dnode D_MECH_QDONE mechanism Q_FECHADA)" \
+    "$(_dec_dnode D_MECH_CARD mechanism SAC-9)" "$(_dec_dnode D_MECH_FEITA mechanism SAC-10 2026-11-20)" \
+    "$(_dec_dnode D_DESENHO design '')" "$(_dec_dnode D_ANTIGO '' '')" "$(_dec_dnode D_MECH_FANTASMA mechanism Q_FANTASMA)" \
+    "$(_dec_dnode D_MECH_DUP mechanism Q_DUP)" "$(_dec_dnode D_MECH_SUP mechanism Q_SUP)" \
+    "$(_dec_node Q_ABERTA question open 'guarda a fazer')" "$(_dec_node Q_FECHADA question done 'guarda feita')" \
+    "$(_dec_node Q_DUP question open 'guarda repetida, aberta aqui')" "$(_dec_node Q_SUP question superseded 'guarda descartada')" \
+    "$(printf '  - id: D_MECH_ABERTA\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    label: \"ainda aberta\"\n    x_destination: mechanism\n    x_guard: \"SAC-11\"')" > "${r5}/docs/d.kg.yaml"
+  # o mesmo id Q_DUP, FECHADO, num grafo que o corpus lê ANTES (docs/a… < docs/d…): a busca no corpus primeiro o quitaria
+  _dec_graph outro "$(_dec_node Q_DUP question done 'homônimo fechado em outro grafo')" > "${r5}/docs/a.kg.yaml"
+  "${G[@]}" -C "${r5}" add -A; "${G[@]}" -C "${r5}" commit -q -m d1
+  _gd_rows() {  # $1=medidor → os ids das linhas guard-debt, ordenados, separados por espaço
+    DECIDE_TODAY=2026-10-12 bash "$1" "${r5}" --tsv --no-gh 2>/dev/null | awk -F'\t' '$1 == "guard-debt" { print $2 }' | sort | paste -sd' ' -
+  }
+  [ "$(_gd_rows "${sut}")" = "D_MECH_CARD D_MECH_DUP D_MECH_FANTASMA D_MECH_Q D_MECH_SUP" ] || _gb="${_gb} linhas($(_gd_rows "${sut}"))"
+  if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r5}" --tsv --no-gh 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _gb="${_gb} rc=${rc}"
+  grep -q "^guard-debt${T}D_MECH_Q${T}docs/d.kg.yaml:[0-9]*${T}decidido D_MECH_Q${T}guarda a construir: Q_ABERTA (open)${T}x_destination${T}.*${T}faço-eu${T}construo a guarda do nó Q_ABERTA" <<< "${out}" || _gb="${_gb} linha-Q"
+  grep -q "^guard-debt${T}D_MECH_CARD${T}.*${T}guarda a construir: card SAC-9${T}.*x_guard_done: AAAA-MM-DD" <<< "${out}" || _gb="${_gb} linha-card"
+  grep -q "^warn${T}-${T}-${T}decisão mechanism com x_guard inexistente no corpus rastreado: D_MECH_FANTASMA → Q_FANTASMA" <<< "${out}" || _gb="${_gb} fantasma-sem-aviso"
+  grep -q "^warn${T}-${T}-${T}decisão mechanism com a guarda descartada: D_MECH_SUP → Q_SUP está superseded" <<< "${out}" || _gb="${_gb} descartada-sem-aviso"
+  grep -q "^guard-debt${T}D_MECH_SUP${T}.*${T}a guarda Q_SUP foi descartada (superseded)" <<< "${out}" || _gb="${_gb} descartada-acao"
+  if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r5}" --markdown --no-gh 2>&1)"; then rc=0; else rc=$?; fi
+  grep -q 'dívida de guarda=5 de 7 decisão(ões) mechanism' <<< "${out}" || _gb="${_gb} fontes-md"
+  grep -q '^## guard-debt — decisões com destino mecanismo' <<< "${out}" || _gb="${_gb} secao-md"
+  local _cm="${sb}/census-dest" _cmv _cmres=""
+  for _cmv in limpa m3 m4 m5 m6; do
+    mkdir -p "${_cm}/${_cmv}"; cp "${sut}" "${_cm}/${_cmv}/decide-census.sh"
+    case "${_cmv}" in
+      m3) sed -i "s|^        if tgt and tgt\[2\] in ('done', 'confirmed'): continue|        pass|" "${_cm}/${_cmv}/decide-census.sh" ;;
+      m4) sed -i "s|if n.get('x_destination') == 'mechanism' and|if n.get('x_destination', 'mechanism') == 'mechanism' and|" "${_cm}/${_cmv}/decide-census.sh" ;;
+      m5) sed -i "s|if n.get('x_destination') == 'mechanism' and n.get('status') in ('done', 'confirmed'):|if n.get('x_destination') == 'mechanism':|" "${_cm}/${_cmv}/decide-census.sh" ;;
+      m6) sed -i "s|tgt = (m\['graph'\], 'question', m\['local'\]\[gd\]) if gd in m\['local'\] else all_ids.get(gd)|tgt = all_ids.get(gd)|" "${_cm}/${_cmv}/decide-census.sh" ;;
+    esac
+    if [ "${_cmv}" != limpa ] && cmp -s "${sut}" "${_cm}/${_cmv}/decide-census.sh"; then _cmres="${_cmres} ${_cmv}:âncora-não-casou"; continue; fi
+    _cmres="${_cmres} ${_cmv}:[$(_gd_rows "${_cm}/${_cmv}/decide-census.sh")]"
+  done
+  local _L="D_MECH_CARD D_MECH_DUP D_MECH_FANTASMA D_MECH_Q D_MECH_SUP"
+  [ "${_cmres}" = " limpa:[${_L}] m3:[D_MECH_CARD D_MECH_DUP D_MECH_FANTASMA D_MECH_Q D_MECH_QDONE D_MECH_SUP] m4:[D_ANTIGO ${_L} Q_DUP Q_FECHADA] m5:[D_MECH_ABERTA ${_L}] m6:[D_MECH_CARD D_MECH_FANTASMA D_MECH_Q D_MECH_SUP]" ] \
+    || _gb="${_gb} mutantes(${_cmres})"
+  if [ -z "${_gb}" ]; then
+    record_pass "decide: (s20) dívida de guarda: mechanism com Q_ aberto, com card e com Q_ inexistente (e aviso) viram guard-debt; Q_ fechado, x_guard_done, design e selo antigo sem o campo não; (MUT) Q_ fechado que não quita, selo sem campo na conta, decisão ainda open na conta e Q_ homônimo de outro grafo quitando reprovam, a cópia limpa passa; Q_ descartado vira linha e aviso"
+  else record_fail "decide: (s20)" "${_gb}"; fi
   # ── o PAINEL opcional (decide-panel.sh, cláusula 9; D_INTELLIGENT_UI_1021, 2026-10-21) ──────────────────
   #   (pn1) PARIDADE: o painel e o AskUserQuestion saem do MESMO censo com as mesmas opções, na mesma ordem, a
   #         recomendada primeiro (e só ela marcada), na ordem do censo; as opções de ATO são as da classe medida.
@@ -57171,9 +57301,9 @@ sys.exit(0 if ok else 1)' <<< "${out}" 2>/dev/null || _kq="${_kq} cadeia-errada"
  {"ref": "Q_CITADO", "header": "Caminho", "question": "Qual caminho seguimos?", "options": [
    {"label": "caminho um", "description": "custo baixo", "cost": "1 h"},
    {"label": "caminho dois", "description": "destrava a fase 2", "cost": "1 dia"},
-   {"label": "pesquisar antes", "description": "roda /onion-research", "cost": "um run"}], "recommended": 1},
+   {"label": "pesquisar antes", "description": "roda /onion-research", "cost": "um run"}], "recommended": 1, "destination": "design"},
  {"ref": "D_NOVO", "header": "Novo", "question": "Decidimos o novo?", "options": [
-   {"label": "sim", "description": "fecha"}, {"label": "não", "description": "fica aberto"}], "recommended": null},
+   {"label": "sim", "description": "fecha"}, {"label": "não", "description": "fica aberto"}], "recommended": null, "destination": "mechanism", "guard": "SAC-1"},
  {"ref": "PR#7", "question": "Conserto o check vermelho do PR 7?"}
 ]}
 PN_JSON
@@ -57231,6 +57361,7 @@ PN_ANS
   [ "$(tr -cd '\n' < "${pnd}/argv.log" | wc -c)" -eq 1 ] || _p2="${_p2} chamadas=$(tr -cd '\n' < "${pnd}/argv.log" | wc -c)"
   local _av; _av="$(tr '\0' '\n' < "${pnd}/argv.log" | head -10 | paste -sd'|' -)"
   grep -qxF 'docs/a/a.kg.yaml|Q_CITADO|--chosen|caminho dois|--rejected|caminho um|pesquisar antes|--date|2026-10-12|--question|Qual caminho seguimos?' <<< "${_av}" || _p2="${_p2} argv:$(tr '\0' '|' < "${pnd}/argv.log" | head -c 200)"
+  [ "$(tr '\0' '\n' < "${pnd}/argv.log" | sed -n '11,12p' | paste -sd'|' -)" = '--destination|design' ] || _p2="${_p2} sem-destino-no-argv"
   grep -q '"state": "executar"' <<< "${st}" || _p2="${_p2} ato-sem-executar"
   # o selo REAL, pelo selador de produção: grava e passa pelo radar
   if st="$(bash "${pnl}" seal "${pnd}/round.json" "${pnd}/a2.json" --repo "${pnr}" 2>&1)"; then :; else _p2="${_p2} real-rc$?"; fi
@@ -57309,10 +57440,18 @@ PN_FORGE
   python3 -c 'import sys,json; d=json.load(open(sys.argv[1])); d["questions"].append(dict(d["questions"][0])); json.dump(d,open(sys.argv[2],"w"))' "${pnd}/compose.json" "${pnd}/compose-rep.json" || _p4="${_p4} sem-compose-rep"
   if bash "${pnl}" round "${r}" --compose "${pnd}/compose-rep.json" --from-tsv "${pnd}/census.tsv" --today 2026-10-12 >/dev/null 2>&1; then rc=0; else rc=$?; fi
   [ "${rc}" -eq 2 ] || _p4="${_p4} ref-repetido-aceito-rc${rc}"
+  # destino declarado (ADR onion-adr-decision-destination-2026-11): pergunta de selo sem destination, mechanism sem guard
+  # e design com guard não viram rodada (rc 2), para o painel não nascer com um selo que o selador recusaria
+  local _pdv
+  for _pdv in 'q.pop("destination")' 'q.update(destination="mechanism")' 'q.update(guard="SAC-2")'; do
+    python3 -c 'import sys,json; d=json.load(open(sys.argv[1])); q=d["questions"][0]; exec(sys.argv[3]); json.dump(d,open(sys.argv[2],"w"))' "${pnd}/compose.json" "${pnd}/compose-dest.json" "${_pdv}" || _p4="${_p4} sem-compose-dest"
+    if bash "${pnl}" round "${r}" --compose "${pnd}/compose-dest.json" --from-tsv "${pnd}/census.tsv" --today 2026-10-12 >/dev/null 2>&1; then rc=0; else rc=$?; fi
+    [ "${rc}" -eq 2 ] || _p4="${_p4} destino-torto-aceito(${_pdv})-rc${rc}"
+  done
   st="$(DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${pnl}" seal "${pnd}/round.json" "${pnd}/a2.json" --repo "${pnr}" 2>/dev/null)" || _p4="${_p4} seal-rc$?"
   python3 -c 'import sys,json; d=json.loads(sys.argv[1]); sys.exit(0 if d["items"] and all(v.get("round_id")==d["round_id"] for v in d["items"].values()) else 1)' "${st}" 2>/dev/null || _p4="${_p4} estado-sem-round_id"
   if [ -z "${_p4}" ]; then
-    record_pass "decide: (pn4) nonce dá outro round_id na reemissão; data trocada, nó-flag e grafo fora da raiz recusados mesmo com hash recalculado; ref repetido recusado; estado leva o round_id"
+    record_pass "decide: (pn4) nonce dá outro round_id na reemissão; data trocada, nó-flag e grafo fora da raiz recusados mesmo com hash recalculado; ref repetido recusado; destino ausente ou torto recusado; estado leva o round_id"
   else record_fail "decide: (pn4)" "${_p4}"; fi
   fi
   fi

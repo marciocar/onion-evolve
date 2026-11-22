@@ -30,11 +30,15 @@
 # Arquivo de composição (a sessão escreve; é o julgamento do passo 2 e 3 do comando, não do medidor):
 #   {"questions": [
 #     {"ref": "<ID do nó, linha seal do censo>", "header": "≤12", "question": "...",
-#      "options": [{"label": "...", "description": "...", "cost": "..."}, ...], "recommended": 0},
+#      "options": [{"label": "...", "description": "...", "cost": "..."}, ...], "recommended": 0,
+#      "destination": "mechanism", "guard": "<CARD-123|Q_ID>"},          (ou "destination": "design", sem guard)
 #     {"ref": "<ref de linha de ATO do censo: PR#7, a branch, o grafo do checkpoint>", "question": "..."}
 #   ]}
 #   - pergunta de SELO: 2 a 4 opções compostas; `recommended` = índice (ou null: empate declarado, sem marca).
 #     A recomendada vai para o 1º lugar e ganha " (Recomendado)" no rótulo.
+#     `destination` é obrigatório (mechanism|design), e `guard` só com mechanism: vão ao selador como --destination e
+#     --guard (ADR onion-adr-decision-destination-2026-11). A forma é conferida aqui, para a rodada não nascer com um
+#     selo que o selador recusaria; o Q_ existir no grafo, o selador confere.
 #   - pergunta de ATO: as opções NÃO se compõem, saem da classe medida (cláusula 8): faço-eu =
 #     "Eu faço agora (Recomendado)" · "Me dê o passo a passo" · "Depois"; maestro-com-! e maestro-fora =
 #     "Me dê o passo a passo (Recomendado)" · "Já fiz, confira" · "Depois". outro-dono não vira pergunta.
@@ -158,8 +162,13 @@ for i, q in enumerate(qs):
         if len({o['label'].casefold() for o in ol}) != len(ol): die(f'{ref}: rótulos repetidos')
         g = r['origin'].rsplit(':', 1)[0]
         header = clean(q.get('header'), f'{ref}: header', 12)
+        dest, guard = q.get('destination'), q.get('guard')
+        if dest not in ('mechanism', 'design'): die(f'{ref}: destination obrigatório, mechanism ou design (todo selo novo declara o destino)')
+        if dest == 'mechanism' and not (isinstance(guard, str) and re.fullmatch(r'[A-Z][A-Z0-9]*-[0-9]+|Q_[A-Z0-9_]+', guard)):
+            die(f'{ref}: destination mechanism exige guard na forma de card (LETRAS-N) ou nó Q_*')
+        if dest == 'design' and guard is not None: die(f'{ref}: destination design não leva guard')
         item = {'kind': 'seal', 'ref': ref, 'header': header, 'question': question, 'options': ol, 'allow_other': True,
-                'actor': 'faço-eu', 'seal': {'graph': g, 'node': ref}, 'origin': r['origin'],
+                'actor': 'faço-eu', 'seal': {'graph': g, 'node': ref, 'destination': dest, **({'guard': guard} if dest == 'mechanism' else {})}, 'origin': r['origin'],
                 'card': (r.get('hint') or '')}
     else:
         actor = r.get('actor', '')
@@ -277,11 +286,14 @@ for q in qs:
         st = {'Eu faço agora (Recomendado)': 'executar', 'Me dê o passo a passo': 'card pendente',
               'Me dê o passo a passo (Recomendado)': 'card pendente', 'Já fiz, confira': 'conferir', 'Depois': 'depois'}.get(ch, 'ambígua')
         status[qid] = {'state': st, 'detail': q.get('card') or ''}; continue
+    if q['seal'].get('destination') not in ('mechanism', 'design'):   # rodada emitida antes do destino declarado
+        status[qid] = {'state': 'recusada', 'detail': 'rodada sem destino declarado (mechanism|design): recomponha a rodada'}; continue
     strip = lambda s: s[:-len(' (Recomendado)')] if s.endswith(' (Recomendado)') else s
     chosen = ot or strip(ch)
     rejected = [strip(l) for l in labels if l != ch]
     argv = ['bash', seal, q['seal']['graph'], q['seal']['node'], '--chosen', chosen, '--rejected', '|'.join(rejected),
-            '--date', date, '--question', q['question']] + (['--other'] if ot else [])
+            '--date', date, '--question', q['question']] + (['--other'] if ot else []) \
+           + ['--destination', q['seal']['destination']] + (['--guard', q['seal']['guard']] if q['seal'].get('guard') else [])
     if dry == '1':
         status[qid] = {'state': 'ensaio', 'detail': 'não chamado (--dry-run)', 'argv': argv[1:]}; continue
     # lista de argumentos, NUNCA shell: o texto do painel é dado, não comando

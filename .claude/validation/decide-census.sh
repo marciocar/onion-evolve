@@ -20,6 +20,12 @@
 #   signal      sinais da campainha SEM ACK neste repo (o leitor doorbell-state.py do co-evolution, achado AO LADO
 #               deste medidor, em ../utils/co-evolution/; a cópia do censo que viaja sem ele diz que a campainha
 #               não está disponível naquele papel, em vez de citar um caminho que só resolve no core)
+#   guard-debt  decisões seladas com `x_destination: mechanism` cuja guarda ainda NÃO foi feita: a dívida de decisão que
+#               devia virar guarda (ADR onion-adr-decision-destination-2026-11). Feita = o nó tem `x_guard_done`, ou o
+#               `x_guard` é um nó Q_ do corpus rastreado já fechado (done ou confirmed). O card de fora o medidor não lê:
+#               a guarda de card feita se marca com `x_guard_done: AAAA-MM-DD` no nó. Selo sem o campo (todo selo
+#               anterior ao campo) NÃO entra: é catraca, só o selo novo declara o destino. Mechanism com o Q_
+#               inexistente no corpus vira linha E aviso (o ponteiro quebrou)
 #   ask         reservas de PERGUNTA AO MAESTRO desta máquina (.claude/utils/orchestration/maestro-ask.sh): chave, dona, prazo,
 #               viva ou vencida. A linha seal cujo nó já tem dona em outra sessão passa a `outro-dono`
 #
@@ -175,6 +181,7 @@ open_nodes = []          # dicts
 checkpoints = []
 STATUS = {'open', 'confirmed', 'drifted', 'unverifiable', 'refuted', 'superseded', 'done'}
 all_ids = {}             # id → (grafo, node_type, status) de TODO nó rastreado: para nomear o citado que não está na fila
+mech_nodes = []          # decisões com x_destination: mechanism (o destino declarado): a dívida de guarda sai delas
 for g in graphs:
     p = os.path.join(repo, g)
     if not os.path.isfile(p):
@@ -202,6 +209,11 @@ for g in graphs:
     # não como trecho da prosa — medido na forja: 4 das 159 decisões abertas, e o padrão fixo sobre a prosa não as
     # via (o dogfood selou uma cópia de D_UNIDADE_BILHETAVEL_DO_ONION enxergando 4 das 6 opções).
     ntype_of = {str(n.get('id')): n.get('node_type') for n in (d.get('nodes') or []) if isinstance(n, dict)}
+    # status por id DESTE grafo: o x_guard Q_ se procura primeiro aqui (o selador garante o Q_ no mesmo grafo), e só
+    # depois no corpus; id repetido entre grafos esconderia dívida (achado da revisão: 3 Q_ repetidos no corpus real)
+    local_status = {}
+    for _n in d.get('nodes') or []:
+        if isinstance(_n, dict): local_status.setdefault(str(_n.get('id')), _n.get('status'))
     incoming = {}
     for e in d.get('edges') or []:
         if isinstance(e, dict) and e.get('to') is not None and e.get('from') is not None:
@@ -216,6 +228,10 @@ for g in graphs:
     for n in d.get('nodes') or []:
         if not isinstance(n, dict): continue
         all_ids.setdefault(str(n.get('id')), (g, n.get('node_type'), n.get('status')))
+        if n.get('x_destination') == 'mechanism' and n.get('status') in ('done', 'confirmed'):
+            mech_nodes.append({'graph': g, 'id': str(n.get('id')), 'label': one(n.get('label') or ''), 'local': local_status,
+                               'guard': one(n.get('x_guard') or ''), 'built': bool(n.get('x_guard_done')),
+                               'line': idline.get(str(n.get('id')), (0, 0))[0], 'impact': n.get('impact') or 0})
         if n.get('node_type') in ('decision', 'question') and n.get('status') not in STATUS:
             avisos.append(f"decision/question com status fora do vocabulário (não medido como aberto): {n.get('id')} = {n.get('status')!r} em {g}")
         if n.get('node_type') not in ('decision', 'question') or n.get('status') != 'open': continue
@@ -250,6 +266,34 @@ for g in graphs:
                            'label': one(n.get('label') or ''), 'narrative': one(n.get('narrative') or ''),
                            'line': ln, 'end': end, 'sense': sense, 'incoming': incoming.get(nid, [])})
 
+# ── dívida de guarda: decisão mechanism sem a guarda feita (depois do laço: o Q_ pode morar em outro grafo) ────────
+guard_rows = []
+for m in mech_nodes:
+    if m['built']: continue
+    gd = m['guard']
+    if gd.startswith('Q_'):
+        tgt = (m['graph'], 'question', m['local'][gd]) if gd in m['local'] else all_ids.get(gd)
+        if tgt and tgt[2] in ('done', 'confirmed'): continue
+        if not tgt:
+            avisos.append(f"decisão mechanism com x_guard inexistente no corpus rastreado: {m['id']} → {gd} em {m['graph']} (o ponteiro da guarda quebrou)")
+        if tgt and tgt[2] in ('superseded', 'refuted'):
+            avisos.append(f"decisão mechanism com a guarda descartada: {m['id']} → {gd} está {tgt[2]} (troque o ponteiro ou o destino)")
+            act = f"a guarda {gd} foi descartada ({tgt[2]}): troco o x_guard de {m['id']} pela guarda que a substitui, ou o maestro revê o destino"
+        elif tgt:
+            act = f"construo a guarda do nó {gd} (/meta:forge-guard) e fecho o {gd}; a dívida some quando ele fechar"
+        else:
+            act = f"conserto o ponteiro: crio o nó {gd} ou troco o x_guard de {m['id']} pelo card da guarda"
+        st = f"guarda a construir: {gd} ({tgt[2] if tgt else 'INEXISTENTE'})"
+    elif gd:
+        act = f"construo a guarda do card {gd} (/meta:forge-guard) e, feita, gravo `x_guard_done: AAAA-MM-DD` no nó {m['id']}"
+        st = f"guarda a construir: card {gd}"
+    else:
+        avisos.append(f"decisão mechanism sem x_guard: {m['id']} em {m['graph']} (selo escrito à mão? o selador exige o ponteiro)")
+        act = f"aponto a guarda: gravo `x_guard: <CARD-123|Q_ID>` no nó {m['id']}"
+        st = 'sem ponteiro de guarda'
+    guard_rows.append({'kind': 'guard-debt', 'ref': m['id'], 'origin': f"{m['graph']}:{m['line']}", 'label': clip(m['label'], 220),
+                       'state': st, 'via': 'x_destination', 'options': '', 'incoming': '', 'pri': 7, 'imp': m['impact'],
+                       'actor': 'faço-eu', 'action': act})
 # ── (a) citados por id ──────────────────────────────────────────────────────────────────────
 cited = set()
 if cite:
@@ -351,7 +395,7 @@ for n in open_nodes:
                       'state': f"{n['type']} impacto {n['impact']}", 'via': ','.join(via),
                       'options': ' ⟂ '.join(opts), 'pri': pri, 'imp': n['impact'],
                       'incoming': ' · '.join(n['incoming']), 'actor': 'faço-eu',
-                      'action': f"depois da resposta: `bash .claude/validation/kg-decide-seal.sh {n['graph']} {n['id']} --chosen \"…\" --rejected \"…\" --date {today} --question \"…\"`",
+                      'action': f"depois da resposta: `bash .claude/validation/kg-decide-seal.sh {n['graph']} {n['id']} --chosen \"…\" --rejected \"…\" --date {today} --question \"…\" --destination <mechanism --guard <CARD-123|Q_ID> | design>`",
                       'hint': ' ⟂ '.join(manual_of(n))})
 
 # ── PRs abertos (gh) — falha é AVISO NOMEADO ────────────────────────────────────────────────
@@ -626,8 +670,8 @@ for r in merge_rows:
         r['actor'] = 'outro-dono'
         r['action'] = f"a branch está na worktree {other_branches[r['origin']]}, de outra sessão ou agente (I3): não toco antes de ela fechar"
 for r in checkpoints: r.update(pri=0, imp=0)
-rows = checkpoints + access_rows + merge_rows + seal_rows + ask_rows + thread_rows + signal_rows + triage_rows
-KORD = {'checkpoint': 0, 'access': 1, 'merge': 2, 'seal': 3, 'ask': 4, 'thread': 5, 'signal': 6, 'triage': 7}
+rows = checkpoints + access_rows + merge_rows + seal_rows + ask_rows + thread_rows + signal_rows + triage_rows + guard_rows
+KORD = {'checkpoint': 0, 'access': 1, 'merge': 2, 'seal': 3, 'ask': 4, 'thread': 5, 'signal': 6, 'triage': 7, 'guard-debt': 8}
 rows.sort(key=lambda r: (r['pri'], KORD.get(r['kind'], 9), -int(r['imp'] or 0), r['ref']))
 
 def tsvc(s): return str(s).replace('\t', ' ').replace('\n', ' ')
@@ -645,11 +689,13 @@ KH = {'checkpoint': 'checkpoint pendente — BLOQUEIA (P0.5 do /meta:drive: o lo
       'thread': 'thread — worktrees com trabalho não commitado ou não empurrado',
       'triage': 'triage — inbox/inbound/kg-inbox com itens não processados',
       'ask': 'ask — perguntas ao maestro com dona (uma sessão por chave; a vencida se assume com --takeover; «eu» é o id da sessão, de --self ou do CLAUDE_CODE_SESSION_ID)',
-      'signal': 'signal — sinais da campainha sem ack'}
+      'signal': 'signal — sinais da campainha sem ack',
+      'guard-debt': 'guard-debt — decisões com destino mecanismo e a guarda ainda não feita (a dívida de decisão sem guarda)'}
 print(f'# decide-census · {today} · {len(rows)} linha(s) em voo')
 print(f'fontes: grafos={len(graphs)} · nós decision/question open={len(open_nodes)} · janela={base_desc} · '
       f'cite={cite_label or "—"} · tema={(chr(34) + theme + chr(34)) if terms else "—"} · PRs={pr_desc} · '
-      f'parado={idle_h}h · campainha={bell_desc} · perguntas={ask_desc}')
+      f'parado={idle_h}h · campainha={bell_desc} · perguntas={ask_desc} · '
+      f'dívida de guarda={len(guard_rows)} de {len(mech_nodes)} decisão(ões) mechanism')
 # quem executa, contado: a sessão lê isto antes de compor (o que é "faço-eu" vira oferta, o "maestro-*" vira card)
 ACT = {'faço-eu': '🤖 faço-eu', 'maestro-com-!': '⌨️ maestro-com-!', 'maestro-fora': '🙋 maestro-fora', 'outro-dono': '↪️ outro-dono'}
 cnt = {}; nseal = 0
@@ -663,7 +709,7 @@ if avisos:
     for a in avisos: print(f'- {a}')
 shown = rows[:top]; rest = rows[top:]
 # o comando que se REPETE linha a linha sai uma vez, no cabeçalho da seção; a linha ▶ fica para o que é único
-SH = {'seal': f"  ▶ 🗳️ a decisão é do maestro; o selo, depois da resposta, é {ACT['faço-eu']} — `bash .claude/validation/kg-decide-seal.sh <grafo> <ID> --chosen \"…\" --rejected \"…\" --date {today} --question \"…\"`",
+SH = {'seal': f"  ▶ 🗳️ a decisão é do maestro; o selo, depois da resposta, é {ACT['faço-eu']} — `bash .claude/validation/kg-decide-seal.sh <grafo> <ID> --chosen \"…\" --rejected \"…\" --date {today} --question \"…\" --destination <mechanism --guard <CARD-123|Q_ID> | design>`",
       'thread': f"  ▶ {ACT['outro-dono']} = de outra sessão ou agente (I3): não toco; confiro o dono com `git -C <caminho> log -1 --format='%h %cr %s'`, e quem a abriu empurra ou remove"}
 def badge(r): return ACT.get(r.get('actor'), '⚠️ sem classe')
 cur = None

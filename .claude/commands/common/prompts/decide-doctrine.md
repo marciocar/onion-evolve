@@ -89,6 +89,20 @@ versão subia para PROD, e o `kg-contract-check.sh` reprovou o próprio grafo da
 exit 0** (e o contrato, onde vendorizado); senão **desfaz** byte a byte e sai 3. Selar depois, "no
 fim da sessão", é o selo que evapora quando a sessão cai — a lição `grafo-sempre-atualizado`.
 
+**Destino declarado** (melhoria D da retro de 14 a 21/11/2026; ADR `onion-adr-decision-destination-2026-11`):
+todo selo novo diz se a decisão **vira guarda** ou **é desenho**. O selador exige `--destination mechanism`
+com `--guard <CARD-123|Q_ID>` (a guarda a construir: a chave de um card, ou um nó `Q_` que existe no mesmo
+grafo, nunca o próprio nó selado) ou `--destination design` (fica como texto, sem cobrança; `--guard` junto é
+recusado), e grava
+`x_destination` e `x_guard` no nó. Sem o destino, rc 2 e nada escrito. A pergunta que decide o destino é
+«isto precisa de uma guarda para não se repetir?»: se sim, `mechanism`; escolha de nome, forma ou prioridade
+é `design`. O medidor conta a dívida na linha `guard-debt`: decisão `mechanism` cuja guarda não foi feita
+(o `Q_` que não fechou em done ou confirmed, procurado primeiro no mesmo grafo; descartado, superseded ou
+refuted, vira também aviso; ou o card sem `x_guard_done: AAAA-MM-DD` no nó). É catraca: o selo antigo, sem o
+campo, segue válido e não entra na conta. O lote (cláusula 10) não sela decisão do maestro e não leva destino.
+Dano medido: dos 49 selos da semana de 14 a 21/11, 9 viraram mecanismo e 40 ficaram texto, sem como separar
+o desenho de propósito da decisão que devia ter virado guarda.
+
 ### 7. Nunca selar às cegas, nem campo humano, nem o que não foi perguntado
 A sessão grava **só** o que o maestro respondeu. Pergunta pulada não sela; recomendação da sessão não
 é resposta. E nó com campo **cego** (gate humano às cegas: o voto de qualquer outro o anula) é

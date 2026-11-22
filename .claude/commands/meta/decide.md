@@ -111,7 +111,9 @@ conta as quatro classes. A classe só sai onde a medição a prova; a **pista de
 5. **SELAR** (cláusulas 5 a 7), resposta a resposta, **antes** da rodada seguinte, sempre pelo selador
    (peça 5), nunca editando o grafo à mão:
    - nó existente (`decision`/`question` `open`):
-     `bash .claude/validation/kg-decide-seal.sh <grafo> <NODE_ID> --chosen "<opção>" --rejected "<a|b>" --date <hoje> --question "<pergunta>"`
+     `bash .claude/validation/kg-decide-seal.sh <grafo> <NODE_ID> --chosen "<opção>" --rejected "<a|b>" --date <hoje> --question "<pergunta>" --destination mechanism --guard <CARD-123|Q_ID>`
+     (ou `--destination design`, sem `--guard`): todo selo declara se a decisão vira guarda ou é desenho
+     (cláusula 6); o medidor conta a dívida das `mechanism` sem guarda feita na linha `guard-debt`;
    - decisão sem nó: `--new D_<ID> --label "<afirmação>" --link <nó de onde veio>` no grafo do tema;
    - resposta livre ("Other"): a mesma chamada com `--other`; ambígua → não sela, pergunta de novo.
    - **checkpoint** do `/meta:drive` respondido "selar": o selo é do mecanismo dele,
@@ -142,7 +144,8 @@ painel no navegador ou no celular. **Sem as ferramentas Artifact e ArtifactData 
 "painel indisponível nesta sessão" e siga pelo terminal**: não simule o painel.
 
 1. **Compor** como no passo 3, num arquivo JSON (forma no cabeçalho de `.claude/validation/decide-panel.sh`):
-   para cada pergunta, o `ref` da linha do censo; nas de selo, `header`, opções e `recommended`. As de ato
+   para cada pergunta, o `ref` da linha do censo; nas de selo, `header`, opções, `recommended` e o destino
+   (`destination` mechanism com `guard`, ou design). As de ato
    não levam opções: elas saem da classe medida. Depois:
    `bash .claude/validation/decide-panel.sh round . --compose <arq> > <round.json>`, e com `--ask` o payload
    do `AskUserQuestion` da **mesma** rodada. Ref que o censo não mediu sai rc 2.
