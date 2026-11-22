@@ -23,11 +23,11 @@ nodes:
     plane: DEV
     status: confirmed
     impact: 3
-    confidence: 0.8
+    confidence: 0.7
     verified_at: "2026-11-21"
     verified_against: "pedido do maestro à sessão do core em 2026-11-21, que a sessão registrou na memória dela e repassou à curadoria como encomenda da dissecação «canal de conversa» (campo request do sinal de 2026-11-21 da curadoria ao core)"
     label: "Origem do contrato: o maestro pediu em 2026-11-21 um contrato SDAAL de canal de conversa em que o agente responde e age na hora, quando chamado (@brain) ou quando entende pelo contexto que é com ele"
-    narrative: "Fala do maestro registrada pela sessão do core: «a conversa com você tem que ser imediata, a pessoa escreve te chamando (ex: @brain) ou você entendendo que é com você, deve tomar as decisões e ações». Dela saíram a encomenda à curadoria (dissecar a categoria, com a conversa imediata no contrato), o Delphi de 4 sessões e o selo D_CHAT_CHANNEL_CONTRACT_SDAAL_1121. O brief da sessão do core diz que o pedido veio do canal do maestro com os sócios; o lugar não foi medido por este registro, só o conteúdo."
+    narrative: "Fala do maestro registrada pela sessão do core: «a conversa com você tem que ser imediata, a pessoa escreve te chamando (ex: @brain) ou você entendendo que é com você, deve tomar as decisões e ações». Dela saíram a encomenda à curadoria (dissecar a categoria, com a conversa imediata no contrato), o Delphi de 4 sessões e o selo D_CHAT_CHANNEL_CONTRACT_SDAAL_1121. O brief da sessão do core diz que o pedido veio do canal do maestro com os sócios; o lugar não foi medido por este registro, só o conteúdo. As duas fontes vivem fora do git deste repo (a memória da sessão e o sinal da curadoria ainda não processado): o localizador não se reproduz a partir do repo, e por isso a confiança é 0.7."
     provenance:
       source: "maestro, na sessão do core de 2026-11-21"
       locator: "memória da sessão do core (chat-agent-immediate-action, 2026-11-21) e o campo request do sinal da curadoria «Dissecação da categoria canal de conversa» de 2026-11-21"
@@ -41,7 +41,7 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "2026-11-22"
-    verified_against: "python3 -I -B .claude/utils/chat/conformance.py sobre os exemplos (rc 0) e sobre os casos com falta (rc 1); família run_chat_conformance_selftests da bancada, com mutantes"
+    verified_against: "python3 -I -B .claude/utils/chat/conformance.py sobre os exemplos (rc 0) e sobre os casos com falta (rc 1); família run_chat_conformance_selftests da bancada, um caso por código de falta, e mutantes plantados no próprio juiz por mutate-and-restore"
     label: "O contrato onion.chat/v1 existe no core: schema da mensagem normalizada com os 5 campos, vocabulário fechado de 22 capacidades (7 verbos obrigatórios, 5 opcionais, 10 regras do núcleo) e o juiz conformance.py (rc 0 conforme, 1 viola, 2 não mediu)"
     narrative: "Construído em .claude/utils/chat/ no molde do task-manager, sem adapter com segredo nem chamada ao provedor. O juiz reprova evento sem id do provedor, quem pede fora do id do provedor, sem audiência e duplicado; na resposta, vazamento, audiência reprovada ou listada depois, horas fora de ordem e «serviu?» pulado sem motivo. Limite declarado: não sabe se a identidade resolvida é a pessoa certa nem se a guarda da peça funciona."
     provenance:
@@ -58,8 +58,8 @@ nodes:
     confidence: 0.75
     verified_at: "2026-11-22"
     verified_against: "leitura do código do onion-messaging em db94954 (igual à origin/main medida por git ls-remote): tools/notify/remind.py, watcher/onion_watcher/channels.py e events.py, queue/onion_queue/daemon.py; conformance.py capabilities --strict sobre a declaração"
-    label: "O adapter WAHA na peça onion-messaging cumpre 6 de 17 capacidades obrigatórias: envio, ack, guarda de vazamento, teto com pending, teto de mídia e segredo fora da saída; a recepção entrega o corpo bruto, sem os 5 campos"
-    narrative: "Parciais: recepção (CloudEvent com o corpo bruto do WAHA), audiência (só --groups), dedupe (pelo sha256 do corpo, não pelo id da mensagem), retenção (prune do dono, sem prazo de corpos de terceiros) e auditoria (só do envio). Faltam: responder no fio, mapa de identidade, «serviu?», latência e marca de quem leu; a perda do número não foi medida. Medida por leitura, nada rodado contra o WAHA."
+    label: "O adapter WAHA na peça onion-messaging cumpre 3 de 17 capacidades obrigatórias: envio, ack e teto de mídia; a recepção entrega o corpo bruto, sem os 5 campos"
+    narrative: "A 1ª declaração contava 6; a revisão isolada mostrou que guarda de vazamento (não reconhece dado de quem não está na audiência), teto (sem ritmo por conversa) e segredo fora da saída (medido só no envio) são parciais pelas notas das próprias linhas. Parciais: recepção (CloudEvent com o corpo bruto do WAHA), audiência (só --groups), dedupe (pelo sha256 do corpo, não pelo id da mensagem), retenção (prune do dono, sem prazo de corpos de terceiros), auditoria (só do envio), além das três acima. Faltam: responder no fio, mapa de identidade, «serviu?», latência e marca de quem leu; a perda do número não foi medida. Medida por leitura, nada rodado contra o WAHA."
     provenance:
       source: "sessão do core, leitura do repositório onion-messaging"
       locator: ".claude/utils/chat/adapters/waha.capabilities.tsv"

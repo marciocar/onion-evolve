@@ -20,7 +20,7 @@ rule.leak_guard	rule	required	guarda de vazamento sobre tudo o que sai (número,
 rule.dedupe_provider_id	rule	required	dedupe pelo id da mensagem no provedor (entrega pelo menos uma vez, processa uma vez)
 rule.rate_cap_pending	rule	required	ritmo por conversa e teto por destino e dia, com a linha pending gravada antes do envio
 rule.media_cap	rule	required	teto de tamanho e de tipo da mídia
-rule.retention	rule	required	corpos e mídias tratados como dado de terceiros: prazo, fora do backup externo ou cifrados
+rule.retention	rule	required	corpos e mídias tratados como dado de terceiros: prazo, fora do backup externo ou cifrados, na conta da empresa quando for Brain
 rule.audit_log	rule	required	registro do ato com quem pediu, sem número nem texto
 rule.latency_field	rule	required	hora do pedido e hora em que o agente viu, medidas e expostas
 rule.secret_never_out	rule	required	número e chave nunca em saída, log ou erro

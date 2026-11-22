@@ -52199,10 +52199,24 @@ w("digits", mut(rp, lambda o: o["body"].update(text="ligue para 11 98765 4321 ai
 w("audlate", mut(rp, lambda o: o["audience_checked"].update(listed_at="2026-11-22T13:00:30Z")))
 w("noserved", mut(rp, lambda o: o["served"].update(asked=False)))
 w("orphan", ev, mut(rp, lambda o: o.update(in_reply_to="msg-que-nao-veio")))
+w("phonebr", mut(rp, lambda o: o["body"].update(text="me liga no (11) 98765-4321")))
+w("datetext", mut(rp, lambda o: o["body"].update(text="combinado para 2026-11-22 13:00, sala 3")))
+w("latev", mut(ev, lambda o: o.update(seen_at="2026-11-22T12:59:00Z")))
+w("latrep", mut(rp, lambda o: o["latency"].update(replied_at="2026-11-22T13:00:01Z")))
+w("ret", mut(ev, lambda o: o["retention"].update(expires_at="2026-11-22T12:00:00Z")))
+w("role", mut(ev, lambda o: o["requester"].update(person=None)))
+w("badkind", mut(ev, lambda o: o.update(kind="message.edited")))
+w("baddate", mut(rp, lambda o: o["audience_checked"].update(listed_at="2026-11-22T13:00:99Z")))
+w("otherplace", ev, mut(rp, lambda o: o["place"].update(id="other-group@example")))
+w("otherthread", ev, mut(rp, lambda o: o["thread"].update(id="msg-example-9999")))
+w("otherreq", ev, mut(rp, lambda o: o["on_behalf_of"].update(provider_id="member-b@example", person="person-b")))
+w("otherlat", ev, mut(rp, lambda o: o["latency"].update(requested_at="2026-11-22T12:00:00Z")))
+open(f"{d}/notjson.jsonl", "w").write("isto nao e json\n")
+open(f"{d}/emptylist.json", "w").write("[]\n")
 rows = open(sys.argv[1] + "/../adapters/waha.capabilities.tsv").read().splitlines()
 open(f"{d}/caps-missing.tsv", "w").write("\n".join(r for r in rows if not r.startswith("served.ask\t")) + "\n")
 open(f"{d}/caps-req.tsv", "w").write("\n".join(r.replace("served.ask\trequired", "served.ask\toptional") for r in rows) + "\n")
-open(f"{d}/caps-nosrc.tsv", "w").write("\n".join(r.replace("piece:onion-messaging/queue/onion_queue/daemon.py\top_ack", "-\top_ack") for r in rows) + "\n")
+open(f"{d}/caps-nosrc.tsv", "w").write("\n".join(r.replace("piece:messaging/queue/onion_queue/daemon.py\top_ack", "-\top_ack") for r in rows) + "\n")
 PY
   then record_fail "chat-conformance: fixtures" "o gerador python falhou"; rm -rf "${d}"; unset -f _cc; return; fi
   # (a) os exemplos do contrato, sozinhos e juntos no mesmo fluxo, saem conformes
@@ -52210,7 +52224,8 @@ PY
   _cc check "${ex}/received.example.json"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${ex}/reply.example.json"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${d}/stream.jsonl"; [ "${rc}" = 0 ] || a_ok=0
-  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0)"
+  _cc check "${d}/datetext.jsonl"; [ "${rc}" = 0 ] || a_ok=0
+  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0); data e hora no texto não contam como número"
   else record_fail "chat-conformance: (a) exemplos conformes" "rc=${rc} out=[${out}]"; fi
   # (b..m) cada falta reprova com rc 1 e o código dela
   local c f code
@@ -52230,6 +52245,18 @@ i|digits|VAZAMENTO
 j|audlate|SEM-AUDIENCIA
 k|noserved|SERVIU
 l|orphan|FIO
+l2|phonebr|VAZAMENTO
+l3|latev|LATENCIA
+l4|latrep|LATENCIA
+l5|ret|RETENCAO
+l6|role|IDENTIDADE-FORA-DO-ID
+l7|badkind|FORMA
+l8|baddate|FORMA
+l9|otherplace|FIO
+l10|otherthread|FIO
+l11|otherreq|IDENTIDADE-FORA-DO-ID
+l12|otherlat|LATENCIA
+l13|notjson|NAO-E-JSON
 CASES
   # (m) a declaração real do adapter WAHA está bem formada (rc 0); com --strict, o adapter reprova pelo que falta
   _cc capabilities "${tsv}"
@@ -52245,12 +52272,13 @@ CASES
   _cc capabilities "${d}/caps-nosrc.tsv"; { [ "${rc}" = 1 ] && grep -q '	SEM-FONTE	' <<< "${out}"; } || n_miss="${n_miss} SEM-FONTE"
   if [ -z "${n_miss}" ]; then record_pass "chat-conformance: (n) capacidade ausente, requisito trocado e implemented sem fonte: cada um reprova"
   else record_fail "chat-conformance: (n) declaração" "faltaram:${n_miss}"; fi
-  # (o) não mediu é rc 2, nunca 0: arquivo vazio e arquivo ausente
+  # (o) não mediu é rc 2, nunca 0: arquivo vazio, lista vazia (adapter sem saída) e arquivo ausente
   : > "${d}/empty.json"
   _cc check "${d}/empty.json"; local o1="${rc}"
+  _cc check "${d}/emptylist.json"; local o2="${rc}"
   _cc check "${d}/nao-existe.json"
-  if [ "${o1}" = 2 ] && [ "${rc}" = 2 ]; then record_pass "chat-conformance: (o) arquivo vazio e ausente saem rc 2 (não mediu)"
-  else record_fail "chat-conformance: (o) rc 2" "vazio=${o1} ausente=${rc}"; fi
+  if [ "${o1}" = 2 ] && [ "${o2}" = 2 ] && [ "${rc}" = 2 ]; then record_pass "chat-conformance: (o) arquivo vazio, lista vazia e arquivo ausente saem rc 2 (não mediu)"
+  else record_fail "chat-conformance: (o) rc 2" "vazio=${o1} lista-vazia=${o2} ausente=${rc}"; fi
   unset -f _cc
   rm -rf "${d}"
 }
