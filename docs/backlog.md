@@ -987,9 +987,9 @@
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 7.7 | `D_GOKAPI_OIDC_BY_API_2026_11` | m2-bridge-logto-2026-07 | O app OIDC do Gokapi e o credstore saem de um ato por API (sem console, sem colar segredo); auto-cadastro é do tenant, o app ganh |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
-| 6.8 | `C_GOKAPI_EGRESS_UID_FENCE_1122` | vps-shared-tools-2026-07 | Cerca de saída por uid do Gokapi pronta como ato do core (ops/egress-uid-fence.sh): 127.0.0.1:3050 só para caddy e a conta do t |
+| 6.8 | `C_GOKAPI_EGRESS_UID_FENCE_1122` | vps-shared-tools-2026-07 | Cerca de saída por uid do Gokapi pronta como ato do core (ops/egress-uid-fence.sh): 3050 só caddy e túnel, 53842 só root; falt |
 | 6.0 | `Q_MD_BRAIN_PROMOTION_DETAILS_1109` | maestro-decisions-1109b | Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório? |
-| 5.1 | `C_CADDY_WRAPPER_READS_SERVICE_REPOS_1122` | vps-shared-tools-2026-07 | O ops/install-caddy-config.sh lê os vhosts dos repos de serviço (ops/caddy/service-vhosts.tsv): blob commitado na ref, adoção  |
+| 5.1 | `C_CADDY_WRAPPER_READS_SERVICE_REPOS_1122` | vps-shared-tools-2026-07 | O install-caddy-config.sh lê os vhosts dos repos de serviço (blob na ref, adoção só se igual, limite julgado no caddy adapt); |
 | 4.8 | `Q_MN_LEGAL_READING_1109` | meeting-notice-absence-2026-11 | Falta leitura jurídica de LGPD para reuniões registradas sem aviso, antes do uso em dado real. |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
