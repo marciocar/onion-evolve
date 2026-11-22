@@ -3822,8 +3822,8 @@ JSON
       case_ok=0; record_fail "radar-json: (a) grafo são, modo ${m}" "rc yaml=${ry} json=${rj}; saídas $( [ "${oy}" = "${oj}" ] && echo iguais || echo DIFERENTES)"
     fi
   done
-  ry=0; bash "${rad}" "${d}/ok.kg.json" --integrity >/dev/null 2>&1 || ry=$?
-  if [ "${case_ok}" = 1 ] && [ "${ry}" = 0 ] && ! bash "${rad}" "${d}/ok.kg.json" --integrity 2>&1 | grep -q 'nenhum nó encontrado'; then
+  ry=0; oj="$(bash "${rad}" "${d}/ok.kg.json" --integrity 2>&1)" || ry=$?
+  if [ "${case_ok}" = 1 ] && [ "${ry}" = 0 ] && ! grep -q 'nenhum nó encontrado' <<< "${oj}"; then
     record_pass "radar-json: (a) grafo são → .kg.yaml e .kg.json com o mesmo rc 0 e a mesma saída em 6 modos"
   elif [ "${case_ok}" = 1 ]; then record_fail "radar-json: (a)" "o .kg.json são não passou (rc=${ry})"; fi
   ry=0; oy="$(bash "${rad}" "${d}/bad.kg.yaml" --integrity --schema 2>&1 | sed "s#${d}/bad.kg.yaml#G#g")" || ry=$?
