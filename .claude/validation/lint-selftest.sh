@@ -58138,7 +58138,7 @@ esc = lambda x: re.sub(r"([\\\\\`*_\\[\\]<>|])", r"\\\\\\1", x)$(printf '\x1f')e
     [ "\$(realpath -m -- "\${_in}")" != "\${_out_real}" ] ||$(printf '\x1f')    true ||$(printf '\x1f')backlog sobre o próprio grafo é recusado
   case "\${BACKLOG}" in *.md) ;; *)$(printf '\x1f')  case "\${BACKLOG}" in *) ;; *.md)$(printf '\x1f')backlog que não é .md é recusado
   [ -d "\$(dirname -- "\${BACKLOG}")" ] ||$(printf '\x1f')  true ||$(printf '\x1f')backlog em diretório inexistente não julga
-  if [ -e "\${BACKLOG}" ] && ! head -n1$(printf '\x1f')  if false && ! head -n1$(printf '\x1f')backlog não sobrescreve o que não é projeção
+  if [ -e "\${BACKLOG}" ] && ! grep -q$(printf '\x1f')  if false && ! grep -q$(printf '\x1f')backlog não sobrescreve o que não é projeção
     if "x_due" in n and not re.fullmatch($(printf '\x1f')    if 0 and not re.fullmatch($(printf '\x1f')x_due fora de data reprova
     if r == "risk" and "x_owner" in n and not ($(printf '\x1f')    if 0 and "x_owner" in n and not ($(printf '\x1f')dono de risco inexistente reprova
 def bare(v): return re.sub(r"(^|\\s)#.*\$", "", v).strip()$(printf '\x1f')def bare(v): return v.strip()$(printf '\x1f')bloco com comentário não é continuação
