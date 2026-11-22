@@ -2,8 +2,7 @@
 branch: fix/kg-decide-seal-decided-by-1121
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 623cbd67dff76690ace2e990db6d13d68354bb0ae435545db7f5b38fdce6b960
-reviewed_code_sha256: 4ae51fbd367a0ac6a1e9a915a5e3f46356ccf5fb962461424ad9be4be07b8d1c
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 4
 findings_blocking: 0
@@ -12,8 +11,9 @@ duration_min: 12
 findings_fixed: 3
 verdict: APPROVED
 elenxo: true
+elenxo_isolado: true
 reviewer: "agente revisor isolado (general-purpose), que não escreveu o código"
-nota: "tokens e duração medidos pelo harness do agente revisor (125455 tokens, 740 s)"
+nota: "tokens e duração medidos pelo harness do agente revisor (125455 tokens, 740 s); elenxo_isolado: true declarado em 2026-11-22 pela sessão do core a partir do reviewer e dos achados (revisor que não escreveu o código, comparou byte a byte e plantou mutantes próprios)"
 ---
 
 # Passada adversarial: `fix/kg-decide-seal-decided-by-1121`
