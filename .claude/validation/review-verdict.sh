@@ -454,7 +454,7 @@ JSON
   # O parecer deixou de ser advisory, entao erro de CONTAGEM agora bloqueia merge — ou, pior,
   # DEIXA passar defeito. Os dois lados precisam de caso, e os casos precisam poder FALHAR.
   _mkres() { # $1=arquivo  $2=texto do parecer
-    # Por --rawfile, nunca `jq -Rs`: o jq 1.7 corrompe o multibyte que cruza o byte 4096 da entrada crua.
+    # Por --rawfile, nunca `jq -Rs`: o jq até 1.8.1 corrompe o multibyte que cruza cada bloco de ~4 KiB da entrada crua.
     printf '%s' "$2" > "${d}/$1.txt"
     jq -nc --rawfile r "${d}/$1.txt" \
       '{type:"result",subtype:"success",is_error:false,num_turns:5,total_cost_usd:0.5,result:$r}' > "${d}/$1.json"
@@ -544,9 +544,10 @@ VEREDITO: 2 violacoes
   [ "${_dec_ok}" = "1" ] \
     && printf '  ✓ review-verdict: (ACH-j) decoracao markdown (- > ##) e BOM nao apagam o gate\n'
 
-  # (ACH-k) PARECER LONGO EM pt-BR (2026-11-22): o jq 1.7 corrompe o multibyte que cruza o byte 4096 da
-  #    entrada crua (`jq -R`/`-Rs`), e o fixture saia adulterado. O resultado tem de ser o texto, byte a byte,
-  #    com o 'e' acentuado e o emoji de 4 bytes exatamente na fronteira.
+  # (ACH-k) PARECER LONGO EM pt-BR (2026-11-22): o jq ate 1.8.1 corrompe o multibyte que cruza cada bloco de
+  #    ~4 KiB da entrada crua (`jq -R`/`-Rs`), e o FIXTURE desta bancada saia adulterado (o script em producao
+  #    le o JSON do CLI e nao tem `jq -R`; o que toca a producao e a contagem). O resultado tem de ser o texto,
+  #    byte a byte, com o 'e' acentuado e o emoji de 4 bytes exatamente na fronteira.
   local _bk _bk_ok=1 _bk_txt
   for _bk in "4094:é" "4093:😀" "4092:😀"; do
     _bk_txt="$(printf '%*s' "${_bk%%:*}" '' | tr ' ' a)${_bk#*:}b

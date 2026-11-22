@@ -53,8 +53,8 @@ classify_pr() { # $1=achados do parecer (N|-1|vazio)  $2=conclusao do check (suc
   [ "${concl}" = "success" ] && printf '%s' MEASURED || printf '%s' MISMATCH
 }
 
-# O parecer vira o JSON que o review-verdict.sh lê. O corpo entra por --rawfile, nunca por `jq -Rs`: o jq 1.7
-# corrompe o caractere multibyte que cruza o byte 4096 da entrada crua (corrigido no jq 1.8.1), e um parecer
+# O parecer vira o JSON que o review-verdict.sh lê. O corpo entra por --rawfile, nunca por `jq -Rs`: o jq até
+# 1.8.1 corrompe o multibyte que cruza cada bloco de ~4 KiB da entrada crua (corrigido no jq 1.8.2), e um parecer
 # longo em pt-BR saía adulterado (medido em 2026-11-22).
 parecer_envelope() { # $1=corpo do parecer  $2=arquivo de saida
   local b; b="$(mktemp)"; printf '%s' "$1" > "${b}"

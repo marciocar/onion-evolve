@@ -47,10 +47,12 @@ set -euo pipefail
 _HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 _retired_json() {
   [ -f "${_HERE}/deny-retired-list.sh" ] || { echo "AVISO: leitor da lista de regras aposentadas ausente — nada foi retirado." >&2; echo '[]'; return 0; }
-  # Uma string por linha, como o `jq -R .` fazia, mas por --rawfile: o jq 1.7 corrompe o multibyte que cruza
-  # o byte 4096 da entrada crua (corrigido no jq 1.8.1). A linha vazia do fim (o \n final) não é linha.
-  jq -nc --rawfile v <(bash "${_HERE}/deny-retired-list.sh" "${_HERE}/deny-retired.tsv") \
-    '($v | split("\n")) as $l | if ($l | length) > 0 and $l[-1] == "" then $l[:-1] else $l end' 
+  # Uma string por linha, como o `jq -R .` fazia, mas por --arg: o jq até 1.8.1 corrompe o multibyte que cruza
+  # cada bloco de ~4 KiB da entrada crua (corrigido no jq 1.8.2). O --arg existe desde o jq 1.5 (o --rawfile só
+  # no 1.6), e a falha do leitor segue parando o merge, como no pipeline com pipefail. O leitor nunca imprime
+  # linha vazia (o awk pula ^$).
+  local l; l="$(bash "${_HERE}/deny-retired-list.sh" "${_HERE}/deny-retired.tsv")" || return 1
+  jq -nc --arg v "${l}" '$v | split("\n") | map(select(. != ""))'
 }
 
 # ── MODO --diff <antes.json> <depois.json>: o diff de hooks que o RELATÓRIO do --update cola ─────────
