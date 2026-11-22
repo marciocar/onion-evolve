@@ -2,8 +2,7 @@
 branch: feat/aside-routes-reforco-nota-1120
 pr: pendente
 date: 2026-11-20
-reviewed_diff_sha256: a0cb1d4825acd1ad7d7910bf18009dd9354f29dd168d3252decccc742f7456bd
-reviewed_code_sha256: e819326a9192600d66dfcec844caaa9224aba8aad34a93fb4a3b85f0748724c8
+reviewed_diff_sha256: pendente
 findings_total: 10
 findings_real: 10
 findings_blocking: 0
@@ -11,10 +10,10 @@ tokens: 92944
 duration_min: 11
 findings_fixed: 9
 verdict: FIXED
-elenxo: false
+elenxo: true
 elenxo_isolado: true
 reviewer: "subagente code-reviewer isolado, sem a conclusão do autor, com mandato de refutar e rodar comandos (proibido criar card real)"
-nota: "tokens = os do subagente revisor. elenxo: false porque não é o Elenxo de workflow; elenxo_isolado: true porque o revisor não escreveu o diff e não recebeu a conclusão. 0 bloqueantes, 6 ressalvas, 3 nits; 8 curados e 1 aceito (dívida: como prefixo vira dúvida, coerente com 0 usos da palavra própria)."
+nota: "tokens = os do subagente revisor. elenxo: true (corrigido em 2026-11-22 pela sessão do core; antes false porque não era o Elenxo de workflow): no esquema do resíduo o campo declara se houve passada adversarial, e houve, por revisor com mandato de refutar; elenxo_isolado: true porque o revisor não escreveu o diff e não recebeu a conclusão. 0 bloqueantes, 6 ressalvas, 3 nits; 8 curados e 1 aceito (dívida: como prefixo vira dúvida, coerente com 0 usos da palavra própria)."
 ---
 
 # Passada adversarial: `feat/aside-routes-reforco-nota-1120`
