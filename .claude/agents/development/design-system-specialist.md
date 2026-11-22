@@ -17,7 +17,7 @@ tools:
   - Grep
   - Glob
   - TodoWrite
-color: orange
+color: blue
 expertise: ["design-tokens", "css-variables", "tailwind-v4", "shadcn-ui", "wcag-accessibility"]
 related_agents: ["react-developer", "branding-positioning-specialist", "brand-generator"]
 ---

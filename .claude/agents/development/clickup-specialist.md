@@ -14,7 +14,7 @@ tools:
   - TodoWrite
   - Bash        # REST da ClickUp API (curl) — API-first; MCP é transporte OPCIONAL via adapter
 
-color: orange
+color: blue
 priority: alta
 category: development
 

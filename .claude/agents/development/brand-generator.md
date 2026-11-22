@@ -15,7 +15,7 @@ tools:
   - Grep
   - Glob
   - TodoWrite
-color: purple
+color: blue
 expertise: ["visual-identity", "color-palette", "design-tokens", "wcag-contrast", "divergent-generation"]
 related_agents: ["design-system-specialist", "branding-positioning-specialist"]
 ---

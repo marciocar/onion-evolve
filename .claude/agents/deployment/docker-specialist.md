@@ -15,7 +15,7 @@ tools:
   - TodoWrite
   - WebSearch
 
-color: blue
+color: orange
 priority: média
 category: deployment
 

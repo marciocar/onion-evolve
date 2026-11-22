@@ -1,0 +1,115 @@
+# kg-backlog-guard: on
+# ═══ TETO: 10 NÓS ═══
+meta:
+  id: agent-color-2026-11
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-11-22"
+  review_after: "2027-01-22"
+  note: "Forja da REGRA 122 (Cor de agente presente, na paleta do Claude Code e igual à da categoria), card SAC-409, a partir da proposta da curadoria de 2026-11-21. O mapa categoria→cor, a guarda, o molde do agent-creator e o template de agente nasceram no mesmo PR. O merge é do maestro: a guarda muda o gate de todos."
+nodes:
+  - id: E_CORES_FORA_DA_CATEGORIA_1122
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    valid_from: "2026-11-21"
+    verified_at: "2026-11-22"
+    verified_against: "LC_ALL=C bash .claude/validation/agent-color-check.sh <checkout da main de 2026-11-22> --tsv (rc 1)"
+    label: "O DEFEITO: na main de 2026-11-22, 38 dos 51 agentes não batiam a cor da categoria: 7 fora da paleta (teal, black, indigo), 1 sem a chave (runflow-specialist) e 30 com uma cor da paleta trocada. O molde do agent-creator vazava o placeholder [cor da categoria]."
+    narrative: "a curadoria contou ~21 fora da paleta, com placeholder ou sem cor; a diferença é de população: ela somou os 9 README.md de categoria (sem cor) e os 2 placeholders do CORPO do molde, que não são frontmatter. Medido pela própria guarda contra a main, a contagem real é 7 + 1 fora/ausente e 30 trocadas. A REGRA 102 confere a chave color, não o valor; por isso nada pegava."
+    provenance:
+      source: ".claude/validation/agent-color-check.sh"
+      locator: "modo --tsv contra a main de 2026-11-22: 1 COR-AUSENTE, 7 COR-FORA-DA-PALETA, 30 COR-DIVERGE-DA-CATEGORIA"
+      method: "measurement: a guarda nova rodada contra o checkout principal antes da cura"
+      locality: "repo"
+
+  - id: E_PALETA_DOC_E_BINARIO_2_1_330
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    valid_from: "2026-11-22"
+    verified_at: "2026-11-22"
+    verified_against: "https://code.claude.com/docs/en/sub-agents (tabela de campos do frontmatter) e ⟨o binário instalado do Claude Code 2.1.330⟩"
+    label: "A paleta aceita hoje é de 8 valores: red, blue, green, yellow, purple, orange, pink, cyan. A doc diz 'Accepts red, blue, green, yellow, purple, orange, pink, or cyan'; o binário 2.1.330 tem as mesmas 8 chaves em V0 e testa a cor com sT.includes(e), comparação exata."
+    narrative: "a comparação exata quer dizer que 'Blue' não pinta, por isso a guarda compara sem normalizar caixa. Valor fora da lista é ignorado em silêncio: o agente fica sem cor e nada avisa. A doc também diz que color não é aceito no --agents JSON."
+    provenance:
+      source: "https://code.claude.com/docs/en/sub-agents"
+      locator: "linha color da tabela de campos do frontmatter; no binário, var V0={red:…,cyan:…},sT=Object.keys(V0);function UW(e){return e!==void 0&&sT.includes(e)}"
+      method: "reading: a doc oficial via WebFetch e grep no binário instalado"
+      locality: "web"
+
+  - id: D_MAPA_CATEGORIA_COR_GIT_DEPLOYMENT_ORANGE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/validation/agent-colors.tsv"
+    label: "O mapa: development blue, testing green, review yellow, compliance red, meta purple, product cyan, git e deployment orange, research pink. São 9 categorias e 8 cores; git e deployment dividem o orange, a 1ª opção da curadoria. Decidido pelo core dentro do card, sem o maestro."
+    narrative: "a alternativa da curadoria (research com cyan junto de product, deployment com pink) ficou de fora: git e deployment são o par mais próximo (entrega/ops). A SSOT é agent-colors.tsv, com a paleta e a fonte; o template de agente e o molde do agent-creator têm cópias legíveis, e o caso (t) da bancada barra a deriva delas."
+
+  - id: D_GUARDA_NOVA_E_NAO_EXTENSAO_DA_102
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    trace: ".claude/validation/agent-color-check.sh"
+    label: "Substrato: check de lint novo (REGRA 122) com juiz próprio, molde agent-frontmatter-keys-check.sh (REGRA 102). Não estendi a 102 porque o teto dela diz que ela não julga valor, e misturar chave e valor mudaria a semântica dela."
+    narrative: "HARD na fonte com passivo ZERO (curado no mesmo PR), SOFT no adotante e na porta, onde a categoria e a cor podem ser do adotante. A categoria vem do diretório, como o pedido do card; a coerência entre diretório e o campo category é da REGRA 23."
+
+  - id: E_BANCADA_AGENT_COLOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    valid_from: "2026-11-22"
+    verified_at: "2026-11-22"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families agent_color"
+    label: "Bancada run_agent_color_selftests: --selftest de 29 casos (13 acusa, 7 cala, 8 fail-closed, 1 derivado), corpus real, CLI fonte e derivado, sem mapa rc 2, dispatcher de produção HARD e SOFT, cópias do mapa batendo o .tsv e 27 mutantes que mordem."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_agent_color_selftests"
+      method: "measurement: só a família, LC_ALL=C"
+      locality: "repo"
+
+  - id: C_TETO_COR_SO_DE_TOPO_E_DIRETORIO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "TETO: só color de topo sem indentação; color repetido vale o último; valor em bloco é acusado pelo texto da 1ª linha; a categoria vem do diretório; agentes de plugin, de usuário e do --agents JSON não entram."
+
+  - id: C_TETO_PALETA_DATADA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "TETO: a paleta é a da doc e do binário 2.1.330 em 2026-11-22. Cor nova do Claude Code é acusada até entrar no .tsv; o /meta:cc-update reconfere a linha color da doc e as chaves de V0."
+
+edges:
+  - from: E_CORES_FORA_DA_CATEGORIA_1122
+    to: D_GUARDA_NOVA_E_NAO_EXTENSAO_DA_102
+    edge_type: SUPPORTS
+  - from: E_CORES_FORA_DA_CATEGORIA_1122
+    to: D_MAPA_CATEGORIA_COR_GIT_DEPLOYMENT_ORANGE
+    edge_type: SUPPORTS
+  - from: E_PALETA_DOC_E_BINARIO_2_1_330
+    to: D_MAPA_CATEGORIA_COR_GIT_DEPLOYMENT_ORANGE
+    edge_type: SUPPORTS
+  - from: E_BANCADA_AGENT_COLOR
+    to: D_GUARDA_NOVA_E_NAO_EXTENSAO_DA_102
+    edge_type: SUPPORTS
+  - from: C_TETO_COR_SO_DE_TOPO_E_DIRETORIO
+    to: D_GUARDA_NOVA_E_NAO_EXTENSAO_DA_102
+    edge_type: DEPENDS_ON
+  - from: C_TETO_PALETA_DATADA
+    to: E_PALETA_DOC_E_BINARIO_2_1_330
+    edge_type: DEPENDS_ON

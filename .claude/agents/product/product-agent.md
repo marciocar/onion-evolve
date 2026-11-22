@@ -13,7 +13,7 @@ tools:
   - TodoWrite
   - Bash
 
-color: yellow
+color: cyan
 priority: alta
 category: product
 

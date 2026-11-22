@@ -14,7 +14,7 @@ tools:
   - Glob
   - TodoWrite
 
-color: cyan
+color: orange
 priority: média
 category: git
 

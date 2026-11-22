@@ -13,7 +13,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: teal
+color: orange
 priority: alta
 category: git
 

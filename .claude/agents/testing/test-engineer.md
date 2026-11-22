@@ -12,7 +12,7 @@ tools:
   - Grep
   - TodoWrite
 
-color: cyan
+color: green
 priority: média
 category: testing
 

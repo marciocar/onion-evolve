@@ -14,7 +14,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: purple
+color: cyan
 priority: alta
 category: product
 

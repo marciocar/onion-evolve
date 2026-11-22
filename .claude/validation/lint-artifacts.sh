@@ -6692,6 +6692,47 @@ check_private_repo_cite() {
 check_private_repo_cite
 
 # ===========================================================================
+# REGRA 122 — Cor de agente presente, na paleta do Claude Code e igual à da categoria [HARD + SOFT]
+# previne: agente com color: fora da paleta, placeholder, ausente ou trocado — o Claude Code ignora o valor em silêncio
+#   DANO MEDIDO (SAC-409, proposta da curadoria de 2026-11-21, reconferido em 2026-11-22): 38 dos 51 agentes não
+#   batiam a categoria (7 fora da paleta — teal, black, indigo —, 1 sem a chave, 30 com a cor trocada), e o molde
+#   do @agent-creator-specialist vazava o placeholder "[cor da categoria]". A REGRA 102 (Chave de frontmatter de
+#   agente pertence à allowlist (oficiais + as da casa)) confere a chave, não o valor. A SSOT é agent-colors.tsv
+#   (a paleta da doc sub-agents e do binário 2.1.330, mais a cor de cada categoria); o juiz, agent-color-check.sh.
+#   Passivo curado no mesmo PR: ZERO, por isso nasce HARD e sem catraca. No adotante/porta (IS_DERIVED) sai SOFT:
+#   lá o agente e a categoria podem ser autoria do adotante.
+# ===========================================================================
+check_agent_color() {
+  local helper="${SCRIPT_DIR}/agent-color-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */agents/*.md|*/agent-color*|*/lint-artifacts.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err _flag=""
+  [ "${IS_DERIVED}" -eq 1 ] && _flag="--derived"
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --tsv ${_flag} 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    if [ "${_sev}" = "HARD" ]; then
+      violation "HARD" "${REPO_ROOT}/${_path#./}" "[${_code}] ${_msg}"
+    else
+      violation "SOFT" "${REPO_ROOT}/${_path#./}" "[${_code}] ${_msg}"
+    fi
+  done <<< "${_out}"
+  # helper >=2 ⇒ declarou que NAO pode julgar; rc!=0 sem linha também (morte calada). Nunca aprovação.
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/agent-color-check.sh" "a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — a cor dos agentes não foi verificada; isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_agent_color
+
+# ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
 _LINT_SUMMARY_REACHED=1   # daqui para baixo, a saida E veredito (ver o trap no topo)

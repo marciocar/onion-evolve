@@ -12,7 +12,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: blue
+color: red
 priority: alta
 category: compliance
 

@@ -15,7 +15,7 @@ tools:
   - Glob
   - TodoWrite
 
-color: cyan
+color: green
 priority: alta
 category: testing
 

@@ -13,7 +13,7 @@ tools:
   - WebSearch
   - TodoWrite
 
-color: teal
+color: cyan
 priority: alta
 category: product
 
