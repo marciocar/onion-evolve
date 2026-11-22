@@ -2,7 +2,7 @@
 branch: feat/house-gloss-commit-and-signals-1121
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: b5bbce53e0dc5f8251f13bde78b8285da7eb8baa494d6e73b6107ab1b6b132fa
+reviewed_diff_sha256: a4fdd4175929b3aa10d4bd6f609e1b189a7acd620cca6eb83eddca6576dfab22
 reviewed_code_sha256: 8ca52a9fb93f28c2f41f2b6cdbef35b270cd40778e20c0ac261ec6a194e7313b
 findings_total: 5
 findings_real: 5
