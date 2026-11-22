@@ -6,7 +6,7 @@ to: onion-evolve (core)
 type: doctrine-proposal
 family: pratica
 request: "Core → curadoria (2026-11-21): medir o fragmento .claude/commands/common/prompts/execution-agent-preamble.md contra o que os agentes erraram (resíduo com reviewed_code_sha256 manual; timeout curto que matou o lint; git encadeado com rc perdido; agente parado esperando tarefa de fundo) e propor o texto. SAC-422 + SAC-434 juntos."
-reviewed_for_public: false  # o carteiro mediu a visibilidade deste repo: public
+reviewed_for_public: true  # relido pelo core em 2026-11-22: só o preâmbulo, sem cliente, pessoa, segredo ou incidente
 ---
 
 # Proposta — preâmbulo do agente de execução (SAC-422 + SAC-434)

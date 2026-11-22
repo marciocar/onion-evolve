@@ -2,8 +2,7 @@
 branch: docs/seals-wait-causes-1122
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 3d7262980f7a92a6acacba6fe4a9293538bd3e688bb3f2de959b9a4c4c118746
-reviewed_code_sha256: 5c294b6b15f6b858a4b1e7d0ccbcb9a8aad59c5ea8b20b1a863e392e097206a3
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 2
 findings_blocking: 0
