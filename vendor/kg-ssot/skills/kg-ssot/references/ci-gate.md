@@ -26,14 +26,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install kg-ssot==4.56.0
+      - run: pip install kg-ssot==4.56.1
       - run: kg-gate
 ```
 
 - Pin the version, so the contract only changes when you choose to update it.
 - A repository that vendors the kit by tag runs `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` instead, after
   `kg_vendor.py check --dest vendor/kg-ssot`.
-- The gate measures only `.kg.yaml`. Validate `.kg.json` files in a step of their own with `kg-validate`.
+- The gate measures `.kg.yaml` and `.kg.json` alike (up to 4.56.0 it measured only `.kg.yaml`).
 - `kg-gate --sources` (off by default) also fails when a cited `provenance.sha256` or `node_sha256` no longer matches
   the file in the repository. It reads only files that git tracks, and it does not go to the network: a source outside
   the index fails as missing, and a URL source is counted as not checked. With `--touched`, it checks only what the change touches.

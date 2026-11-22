@@ -5,10 +5,11 @@ A ponta externa das external_edges (v4.3) é conferida contra TODOS os .kg.yaml 
 excluídos do corpus: alvo inexistente ou apagado reprova quem aponta (integrity.dangling-external). O .kg.json é alvo
 desde o v4.7.
 
-Um .kg.json no repo fica fora da medição do gate: a 4.8.0 lê .kg.json no kg_validate, no armazém e no MCP, e o gate
-mede só os .kg.yaml.
+O .kg.json rastreado é medido como o .kg.yaml, em todos os modos: lido pelo leitor do kg_validate no perfil JSON do
+contrato, entra no corpus, na linha de base, no --touched, na saída e nas conferências opcionais. Até a 4.56.0 o gate
+media só os .kg.yaml, e um grafo novo em .kg.json entrava sem gate nenhum ver (achado de campo).
 
-Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/*, docs/materials/* e o vendor
+Mede os .kg.yaml e .kg.json rastreados por git no repo (árvore de trabalho; fora */fixtures/*, docs/materials/* e o vendor
 do KG-SSOT, qualquer pasta com o carimbo .kg-ssot-version: os excluídos padrão; ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
   failing — grafo → códigos MUST que ele carrega hoje (a dívida herdada, nomeada por caminho);
   debt    — código SHOULD → quantos grafos o carregam (granularity graph, o padrão) ou quantas ocorrências, somadas
@@ -42,7 +43,7 @@ Para ver as ocorrências de um grafo: kg_validate.py <grafo> (sem --schema, o me
 
 --update mostra a comparação antes de gravar; se algo piorou, só grava com --accept-regression "<motivo>", e o
 motivo fica na base. rc 2: entrada quebrada (não é repo git, base ilegível, fora do formato ou ausente sem
---update, .kg.yaml ilegível).
+--update, grafo ilegível).
 
 Rodando de um vendor trazido pelo kg_vendor.py update --ref (a bancada antes da tag; o carimbo diz unreleased), o gate
 reprova (rc 1) sem --allow-unreleased, e nunca grava a base a partir de um.
@@ -86,8 +87,8 @@ de um grafo que parseia não é lido. O grafo que não
 parseia é lido como texto, linha a linha. Cada achado reprova (rc 1) e sai como grafo, nó e campo, com a linha do padrão
 no arquivo, nunca o padrão nem o valor: a chave, o id de nó e o caminho do grafo que contêm um padrão saem mascarados
 (<key #i>, <node #i>, <graph #i>). O arquivo ilegível ou sem nenhum padrão é entrada quebrada (rc 2): uma lista vazia
-não confere nada. Lê só os grafos que o gate mede: nunca o .kg.json, nem, por padrão, as fixtures, docs/materials e o
-vendor, nem o que o --exclude tira. Não combina com --update.
+não confere nada. Lê só os grafos que o gate mede (o .kg.yaml e o .kg.json): nunca, por padrão, as fixtures,
+docs/materials e o vendor, nem o que o --exclude tira. Não combina com --update.
 
 --classification-floor NÍVEL --area-policy ARQ (contrato v4.23), juntos, nos dois modos: reprova (rc 1) o grafo cujo
 meta.x_classification está em NÍVEL ou acima, pela ordem de levels do arquivo de política do kg-mcp (o mesmo do
@@ -167,6 +168,7 @@ N_ = kg_i18n.N_  # marca para o catálogo; traduz depois, no _(msgid) do worse()
 DEFAULT_BASELINE = ".kg-ssot/gate"  # a pasta, desde a 4.16.0: um registro por grafo
 LEGACY_BASELINE = ".kg-ssot/gate.json"  # o arquivo único de antes da 4.16.0, ainda lido; o --update troca pela pasta
 DEFAULT_EXCLUDE = ("*/fixtures/*", "docs/materials/*")
+GRAPH_SUFFIXES = (".kg.yaml", ".kg.json")  # o que o gate mede (o .kg.json depois da 4.56.0) e o que a ponta externa cita
 
 
 class Broken(Exception):
@@ -186,6 +188,7 @@ def measure_texts(items, corpus=None):
     must, should = validators()
     out = {}
     for name, text in items:
+        text = text if isinstance(text, kg_validate.JsonText) else kg_validate.as_source(name, text)  # *.json: perfil JSON
         counts = kg_validate.warning_counts(text, must, should, corpus)
         out[name] = {"must": kg_validate.codes(text, must, corpus), "should": sorted(counts), "should_counts": dict(counts),
                      "id": graph_id(text)}
@@ -201,14 +204,15 @@ def graph_id(text):
 
 
 def selected(name, exclude):
-    return name.endswith(".kg.yaml") and not any(fnmatch.fnmatchcase(name, g) for g in exclude)
+    return name.endswith(GRAPH_SUFFIXES) and not any(fnmatch.fnmatchcase(name, g) for g in exclude)
 
 
 VENDOR_STAMP = kg_validate.VENDOR_STAMP  # o carimbo que o kg_vendor.py grava na raiz do vendor
 
 
 def corpus(repo, exclude=DEFAULT_EXCLUDE, skip_vendor=True):
-    """Os .kg.yaml do adotante. Com skip_vendor (o padrão, que o --no-default-excludes desliga), fica de fora tudo o que
+    """Os .kg.yaml e .kg.json do adotante, cada texto na forma do leitor (kg_validate.as_source: o .kg.json vira
+    JsonText e é lido no perfil JSON). Com skip_vendor (o padrão, que o --no-default-excludes desliga), fica de fora tudo o que
     está numa pasta com o carimbo do vendor do KG-SSOT, onde quer que ela esteja: desde a 4.19.0 a release leva um
     exemplo real (spec/vocab-examples/), que não é grafo do adotante e entraria na base num --update (achado de campo
     do brain na 4.19.0)."""
@@ -223,7 +227,7 @@ def corpus(repo, exclude=DEFAULT_EXCLUDE, skip_vendor=True):
     for n in names:
         path = pathlib.Path(repo) / n
         if path.is_file():  # rastreado mas apagado na árvore de trabalho: saiu do corpus
-            items.append((n, path.read_text(encoding="utf-8")))
+            items.append((n, kg_validate.as_source(n, path.read_text(encoding="utf-8"))))
     return items
 
 
@@ -408,7 +412,8 @@ def private_repo_check(items, patterns):
     hits = []
     for gi, (name, text) in enumerate(items):
         graph = f"<graph #{gi}>" if masked(name) else name
-        _raw, doc, err = kg_validate.parse_v1(text)
+        _raw, doc, err = kg_validate.parse_v1(text if isinstance(text, kg_validate.JsonText)
+                                              else kg_validate.as_source(name, text))
         if err or doc is None:  # o grafo que não parseia é lido como texto, linha a linha: nunca fica de fora
             values = [(f"line {i}", "(text)", line) for i, line in enumerate(text.splitlines(), 1)]
         else:
@@ -802,7 +807,6 @@ def classification_check(items, floor, level):
 
 # --classification-downgrade (contrato v4.24): a queda do nível frente à base exige o registro em meta.x_downgrade, com o
 # aprovador diferente de quem mudou o nível (a lacuna "The level is declared, not checked", decidida em 2026-11-16)
-GRAPH_SUFFIXES = (".kg.yaml", ".kg.json")
 DOWNGRADE_KEYS = ("from", "to", "reason", "approved_by", "ref", "date")
 _DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 _IDENT = re.compile(r"^(.*) <([^<>]*)> \d+ [+-]\d{4}$")
@@ -1226,7 +1230,8 @@ def _base_text(repo, rev, name):
     out = _git_out(repo, "show", f"{rev}:./{name}")
     if out.returncode != 0:
         return None
-    return out.stdout.decode("utf-8", "replace").replace("\r\n", "\n").replace("\r", "\n")
+    # na forma do leitor, como o corpus: o .kg.json da base é lido no perfil JSON, nunca pelo loader YAML
+    return kg_validate.as_source(name, out.stdout.decode("utf-8", "replace").replace("\r\n", "\n").replace("\r", "\n"))
 
 
 def touched_debt(repo, rev, items, exclude, skip_vendor=True):
@@ -1611,7 +1616,8 @@ def _utf8_stdio():
 
 HELP = """The adopter's gate: a repository's graphs against the contract, with a per-graph ratchet.
 
-It measures the git-tracked .kg.yaml files (outside */fixtures/*, docs/materials/* and the KG-SSOT vendor, any folder
+It measures the git-tracked .kg.yaml and .kg.json files (a .kg.json is read by the kg_validate reader in the JSON
+profile of the contract, in every mode, after 4.56.0; outside */fixtures/*, docs/materials/* and the KG-SSOT vendor, any folder
 with the .kg-ssot-version stamp: the default excludes; or what --exclude says) against the MUST and the SHOULD of the current contract, and compares them with the baseline:
   failing - graph → MUST codes it carries today (the inherited debt, named by path);
   debt    - SHOULD code → how many graphs carry it (granularity graph, the default) or how many occurrences
@@ -1625,7 +1631,7 @@ in with --update.
 The baseline is the .kg-ssot/gate/ folder: contract.json, graphs/<meta.id>.json (one record per graph) and accepted/
 (one accepted regression per file). --update shows the comparison before writing; if something got worse, it only
 writes with --accept-regression "<reason>", and the reason stays in the baseline. rc 2: broken input (not a git
-repository, unreadable or out-of-format baseline, missing baseline without --update, unreadable .kg.yaml).
+repository, unreadable or out-of-format baseline, missing baseline without --update, unreadable graph).
 
 Run from a vendor brought by kg_vendor.py update --ref (the bench before a tag; the stamp says unreleased), the gate
 fails (rc 1) unless --allow-unreleased is given, and it never writes the baseline from one.
@@ -1669,8 +1675,8 @@ characters are not covered, a pattern with an invisible format character (Unicod
 comment in a graph that parses is not read. A graph that does not parse is read as text, line by line. Each hit fails (rc 1) and is printed as graph,
 node and field, with the line of the pattern in the file, never the pattern or the value: a key, a node id, or a graph
 path that contains a pattern is masked (<key #i>, <node #i>, <graph #i>). A file that cannot be read or has no pattern is
-broken input (rc 2): an empty list checks nothing. It reads only the graphs the gate measures: never .kg.json, nor,
-by default, the fixtures, docs/materials, and the vendor, nor what --exclude leaves out. It does not go with --update.
+broken input (rc 2): an empty list checks nothing. It reads only the graphs the gate measures (.kg.yaml and .kg.json):
+never, by default, the fixtures, docs/materials, and the vendor, nor what --exclude leaves out. It does not go with --update.
 
 --classification-floor LEVEL --area-policy FILE (contract v4.23), together, in both modes: fails (rc 1) when a graph has
 its meta.x_classification at LEVEL or above, in the order of levels in the kg-mcp policy file (the same file as its

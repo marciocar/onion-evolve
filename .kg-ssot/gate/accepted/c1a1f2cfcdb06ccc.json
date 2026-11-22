@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-22",
+  "reason": "kg-ssot 4.56.1: o gate passou a medir 2 propostas arquivadas em docs/evolution/kg-inbox/_rejected e _sealed (historicas, de 2026-08, sem provenance) e +1 decisao sem trace que ja existia na main; divida herdada, nao introduzida por este PR",
+  "worse": [
+    "✗ PIOROU  docs/evolution/kg-inbox/_rejected/grana-ai-mapeamento-2026-08-20260821-215957.proposal.kg.yaml falha no MUST: form.required.node.provenance",
+    "✗ PIOROU  docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml falha no MUST: form.required.node.provenance",
+    "✗ PIOROU  debt.integrity.untraced-decision: 35 → 36"
+  ]
+}

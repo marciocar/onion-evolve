@@ -21,7 +21,7 @@ Run this at the root of your repository, with Python 3.12 or later (the floor si
 ```bash
 # 1. bring in the release, by tag, from the public repository
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.56.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.56.1 --dest vendor/kg-ssot
 
 # 2. the dependencies in a venv, then the baseline (the gate only measures tracked files: git add first)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -53,8 +53,12 @@ workflow is in section 3 of [`ADOPTING.md`](../../ADOPTING.md#3-the-ci-step), th
 
 Fixing one graph does not make up for breaking another: the gate compares MUST graph by graph.
 
-The gate measures only `.kg.yaml` files. A `.kg.json` file in the repository stays outside it. If you want CI to
-check those files, run `kg_validate.py` on them in a step of its own.
+The gate measures `.kg.yaml` and `.kg.json` files alike: a tracked `.kg.json` is read under the contract's JSON
+profile and goes through the same baseline, the same `--touched`, and the same optional checks. Up to 4.56.0 the gate
+measured only `.kg.yaml`; if you update from there with a `.kg.json` already tracked, the first run shows it as a new
+graph. If it passes MUST and carries no SHOULD debt, the gate passes and `--update` records it. If it raises the
+debt, write the baseline with the reason, `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression
+"<reason>"`; if it fails MUST, fix it, or accept it as inherited debt the same way.
 
 ## Output language in CI
 

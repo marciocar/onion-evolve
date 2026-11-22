@@ -260,9 +260,12 @@ outside any manifest, an unknown folder.
 
 ## `kg_gate.py`: the per-graph ratchet
 
-The gate is for the CI of a repository that keeps graphs. It measures every `.kg.yaml` file **that git tracks** and
-compares the result with a baseline (the `.kg-ssot/gate/` folder). The rule: **nothing gets worse**. A graph that
-already failed is recorded as inherited debt; a new graph has to pass.
+The gate is for the CI of a repository that keeps graphs. It measures every `.kg.yaml` and `.kg.json` file **that git
+tracks** and compares the result with a baseline (the `.kg-ssot/gate/` folder). The rule: **nothing gets worse**. A
+graph that already failed is recorded as inherited debt; a new graph has to pass. A `.kg.json` is read by the same
+reader as `kg_validate.py`, under the contract's JSON profile, and goes everywhere a `.kg.yaml` goes: the corpus and
+its excludes, the baseline, `--touched`, the output, and the optional checks. Up to 4.56.0 the gate measured only
+`.kg.yaml`, and a new graph in `.kg.json` got in with no gate looking at it.
 
 Without a baseline, the gate refuses to run:
 
@@ -318,7 +321,7 @@ rc 0, with a request to lock in the gain. Run `--update` in the same PR so the d
 | `--exclude GLOB` | Removes paths from the corpus (repeatable). `*/fixtures/*`, `docs/materials/*`, and the KG-SSOT vendor (any folder with the `.kg-ssot-version` stamp, since 4.19.1) are excluded by default; `--no-default-excludes` brings them back |
 | `--granularity node` | With `--update`: counts the SHOULD debt per occurrence, not per graph |
 | `--touched BASE` | Since 4.47, another mode, with no baseline: fails only when a node touched since the common ancestor of `BASE` and `HEAD` carries `integrity.bare-decision` or `integrity.superseded-without-successor`. The freshness stamp (`verified_at`, `verified_against`) and, since 4.50, the `provenance.method` class swapped between a Portuguese alias and its canonical English class with the detail after `: ` byte for byte the same (the `kg_migrate.py methods` swap) do not touch a node; any other change does, the method's included. `--touched` does not look at the MUST level; with two nodes of the same id, which the MUST level already fails, the last one counts |
-| `--sources` | Off by default. Also checks each cited source of the measured graphs, as `kg_trace.py check --strict-sources` does: a `sha256` or `node_sha256` that does not match, a locator read by its `scheme` that is not found, or a cited file that is gone from git fails (rc 1). With `--touched`, only the changed graphs and the nodes whose cited source changed. Only tracked files are read, from the index blob (a local edit counts after `git add`); a source outside the index is missing, and a submodule not checked out, a `.git`, `.` or `..` segment, and a URL are counted as not checked. `.kg.json` is not checked here. Not with `--update` |
+| `--sources` | Off by default. Also checks each cited source of the measured graphs, as `kg_trace.py check --strict-sources` does: a `sha256` or `node_sha256` that does not match, a locator read by its `scheme` that is not found, or a cited file that is gone from git fails (rc 1). With `--touched`, only the changed graphs and the nodes whose cited source changed. Only tracked files are read, from the index blob (a local edit counts after `git add`); a source outside the index is missing, and a submodule not checked out, a `.git`, `.` or `..` segment, and a URL are counted as not checked. The sources of a `.kg.json` are checked too, since 4.56.1. Not with `--update` |
 | `--private-repos FILE` | Since 4.51. Off by default. Fails (rc 1) when a private repository is cited without the `private-cite:<id>` marker (contract v4.22); see *A private repository cited without the marker* below. Not with `--update` |
 | `--classification-floor LEVEL --area-policy FILE` | Since 4.52. Off by default. Fails (rc 1) when a tracked `.kg.yaml` or `.kg.json` (with `--touched`, a changed one; the default excludes do not apply, only `--exclude`) has its `meta.x_classification` at `LEVEL` or above, in the order of the policy's `levels` (contract v4.23); see *A classification floor* below. Not with `--update` |
 | `--classification-cites --area-policy FILE` | Since 4.54.0. Off by default, with or without the floor. Fails (rc 1) when a graph cites, in a structured field, a tracked graph of a higher level than its own, in the order of the policy's `levels`; see *Citations between levels* below. Not with `--update` |
@@ -360,8 +363,9 @@ that ports it:
    file is private, and so is what matched it. A key, a node id, or a graph path that contains a pattern is masked
    (`<key #i>`, the position in the field path; `<node #i>`, the index of the node; `<graph #i>`), because next to the
    line number it would tie the line to the name. A summary line counts patterns, graphs, and fields.
-5. **What it does not read.** Only the graphs the gate measures: never a `.kg.json`, nor, by default, the fixtures,
-   `docs/materials/`, and the vendor, nor what `--exclude` leaves out.
+5. **What it does not read.** It reads only the graphs the gate measures, `.kg.yaml` and `.kg.json` (the `.kg.json`
+   since 4.56.1): never, by default, the fixtures, `docs/materials/`, and the vendor, nor what
+   `--exclude` leaves out.
 
 Off by default, nothing changes without it. It works in both modes: in the ratchet, and with `--touched` (where it reads
 every measured graph, not only the touched ones). It does not go with `--update`: the check is not part of the baseline.
