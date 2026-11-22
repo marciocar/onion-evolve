@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1212 itens abertos** em 178 grafo(s) com aberto (de 237 no escopo) · 171 grupo(s), agrupados por `owner:` (77 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1213 itens abertos** em 179 grafo(s) com aberto (de 238 no escopo) · 171 grupo(s), agrupados por `owner:` (78 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1653,11 +1653,12 @@
 | 4.2 | `Q_CONSOLO_INVISIVEL_A_FORMA` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objet |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
 
-## onion-messaging — 1 item(ns)
+## onion-messaging — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.7 | `Q_MESSAGING_SOURCE_URI_REFERENCE_1115` | outside-in-primaries-2026-11 | A fila do onion-messaging recusa o source de CloudEvent que não é URI-reference? Hoje confere presença, não forma. |
+| 4.0 | `Q_CHAT_WAHA_ADAPTER_CONFORMANT_1122` | chat-channel-contract-2026-11 | O adapter WAHA da onion-messaging entrega o evento com os 5 campos e passa no conformance.py --strict? |
 
 ## fila-2026-10-06 — 5 item(ns)
 
