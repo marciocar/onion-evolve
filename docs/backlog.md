@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1215 itens abertos** em 179 grafo(s) com aberto (de 238 no escopo) · 171 grupo(s), agrupados por `owner:` (79 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1209 itens abertos** em 179 grafo(s) com aberto (de 238 no escopo) · 171 grupo(s), agrupados por `owner:` (74 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -921,7 +921,7 @@
 | 3.2 | `C_TETO_SO_CHAVE_DE_TOPO` | agent-frontmatter-keys-2026-10 | TETO: a guarda julga só a chave de TOPO; chave aninhada (dentro de hooks, mcpServers, experimental) e VALOR ficam com outras regr |
 | 3.0 | `C_TETO_DOC_OFICIAL_ENVELHECE` | agent-frontmatter-keys-2026-10 | TETO: a lista oficial é a da doc em 2026-10-11; chave oficial nova é acusada até entrar no .tsv, e chave que a doc remover cont |
 
-## sinais-de-campo-2026-09 — 12 item(ns)
+## sinais-de-campo-2026-09 — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -930,7 +930,6 @@
 | 8.0 | `Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027` | sinais-de-campo-2026-09 | Como o core constrói o design-context como contexto de primeira classe (setup, skill resolvedora, auditoria de frescor e ligaçõ |
 | 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
 | 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
-| 4.8 | `Q_LEITORES_DO_CORPUS_SO_ENUMERAM_KG_YAML_1122` | sinais-de-campo-2026-09 | Os leitores de corpus do core enumeram só *.kg.yaml (kg-corpus-grep, kg-backlog-project, kg-census-extract e mais 25 scripts de v |
 | 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
 | 3.6 | `Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029` | sinais-de-campo-2026-09 | O core.hooksPath absoluto deve ser reescrito para .githooks por um hook, em vez de só avisado? Recorrência medida em 2 repos (co |
 | 2.0 | `Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029` | sinais-de-campo-2026-09 | O /docs:build-business-docs ganha um modo ou seção de engajamento de consultoria, em que o negócio descrito é o de um cliente  |
@@ -978,7 +977,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 23 item(ns)
+## maestro — 18 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -986,17 +985,12 @@
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
-| 7.7 | `D_GOKAPI_OIDC_BY_API_2026_11` | m2-bridge-logto-2026-07 | O app OIDC do Gokapi e o credstore saem de um ato por API (sem console, sem colar segredo); auto-cadastro é do tenant, o app ganh |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
-| 6.8 | `C_GOKAPI_EGRESS_UID_FENCE_1122` | vps-shared-tools-2026-07 | Cerca de saída por uid do Gokapi pronta como ato do core (ops/egress-uid-fence.sh): 3050 só caddy e túnel, 53842 só root; falt |
 | 6.0 | `Q_MD_BRAIN_PROMOTION_DETAILS_1109` | maestro-decisions-1109b | Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório? |
-| 5.1 | `C_CADDY_WRAPPER_READS_SERVICE_REPOS_1122` | vps-shared-tools-2026-07 | O install-caddy-config.sh lê os vhosts dos repos de serviço (blob na ref, adoção só se igual, limite julgado no caddy adapt); |
 | 4.8 | `Q_MN_LEGAL_READING_1109` | meeting-notice-absence-2026-11 | Falta leitura jurídica de LGPD para reuniões registradas sem aviso, antes do uso em dado real. |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
-| 4.0 | `Q_COMPOSICAO_PERNA_CODEX_LACUNA_1122` | sinais-de-campo-2026-09 | LACUNA NOMEADA: a ponta Codex da composição segue sem medida, porque o Codex CLI não está instalado. O maestro autoriza instal |
-| 3.6 | `C_JQ_SYSTEM_LAG_1122` | a2a-outbound-2026-11 | O jq da VPS está defasado: o pacote 1.7.1 do Ubuntu 24.04 (que se declara jq-1.7) contra o jq 1.8.2 upstream (2026-06-20), que tr |
 | 3.2 | `Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO` | coordenacao-sessoes-2026-10 | O índice do diário (.claude/diary/index.md) carrega um nome de host da VPS desde julho; o maestro decide se limpa. |
 | 3.0 | `D_A2A_OUTBOUND_IROH_PHASE2_1110` | a2a-outbound-2026-11 | Caminho do transporte VPS↔notebook: Fase 2 com iroh, caminho próprio ou parquear; aguarda validação das estimativas (próprio |
 | 3.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe. |
@@ -1132,7 +1126,7 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## core — 48 item(ns)
+## core — 49 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1170,6 +1164,7 @@
 | 3.6 | `Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO` | coordenacao-sessoes-2026-10 | O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando bra |
 | 3.6 | `Q_IT_SIGNAL_RECEIVER_WARN` | inbox-triage-1108 | A anonimização no receptor: o inbox do core avisa padrão de segredo ou de dado pessoal no sinal que entra. |
 | 3.6 | `Q_IT_SIGNAL_RECORD_COMMAND` | inbox-triage-1108 | O comando local que grava o sinal nos quatro campos com listas fechadas, e o lint que só avisa. |
+| 3.6 | `Q_MB_OPEN_GAPS_1122` | meeting-backlog-by-area-2026-11 | Ficam abertas as lacunas 3 e 4 do teste de campo (aviso por campo estruturado, acusar entrada truncada) e a marca de novo × refor |
 | 3.6 | `Q_MD_CONSULTING_NEXT_UPDATE_1109` | maestro-decisions-1108 | O próximo update do Onion no adotante de consultoria depende da cura da SAC-302: o pr-merge-verified não modela repo sem CI. |
 | 3.2 | `Q_IT_RESIDUE_GUARD_REMOTE_BRANCH` | inbox-triage-1108 | O aviso de PR sem resíduo usa o nome local da branch quando o comando não traz --head, e sai falso com branch local e remota de  |
 | 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
@@ -1655,12 +1650,11 @@
 | 4.2 | `Q_CONSOLO_INVISIVEL_A_FORMA` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objet |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
 
-## onion-messaging — 2 item(ns)
+## onion-messaging — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.7 | `Q_MESSAGING_SOURCE_URI_REFERENCE_1115` | outside-in-primaries-2026-11 | A fila do onion-messaging recusa o source de CloudEvent que não é URI-reference? Hoje confere presença, não forma. |
-| 4.0 | `Q_CHAT_WAHA_ADAPTER_CONFORMANT_1122` | chat-channel-contract-2026-11 | O adapter WAHA da onion-messaging entrega o evento com os 5 campos e passa no conformance.py --strict? |
 
 ## fila-2026-10-06 — 5 item(ns)
 
