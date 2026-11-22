@@ -2,7 +2,8 @@
 branch: feat/spike-command
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: db7e7297cd75e2e81fa93d2c367339c2974a5264609c5e8025b301364860c2e6
+reviewed_code_sha256: 5afa45dc95f1a360fa5e95557e1936f525013b6e8487a7f093d0ba9623df5a1e
 findings_total: 10
 findings_real: 9
 findings_blocking: 1
