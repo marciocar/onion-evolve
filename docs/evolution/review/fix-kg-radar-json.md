@@ -2,8 +2,7 @@
 branch: fix/kg-radar-json
 pr: 1734
 date: 2026-11-22
-reviewed_diff_sha256: 3a2c56896e6359fedf7d6ee85638a2455c8b2130a0d691a1542bdddf31625e8e
-reviewed_code_sha256: b1b4cf61648ae804628b87ac2ee059d22d82672d221a6b0ed84af6f1e9c470f7
+reviewed_diff_sha256: pendente
 findings_total: 9
 findings_real: 8
 findings_blocking: 6
@@ -12,6 +11,7 @@ duration_min: 25
 findings_fixed: 7
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: "subagente general-purpose (opus), mandato refutar, sobre ea8e26ff2"
 nota: "Refutador comparou os 75 grafos de docs/onion/graph convertidos pelo kg_migrate em 15 modos (1125 rodadas, rc igual em todas) e achou os defeitos em JSON válido no contrato que o kg_migrate não produz hoje. Re-medido depois das curas: 1125 rodadas, rc igual, 43 saídas de texto diferentes, 42 só no escape do texto livre e 1 por o JSON ter sido gerado de uma versão anterior do grafo editado nesta branch."
 ---
@@ -81,3 +81,10 @@ projeções geradas. Rebase pela casa (`ops/pr-finalize.sh --rebase --push`), co
 gerador e nunca editada à mão, e os dois blocos mantidos se a âncora do `lint-selftest.sh` colidisse. O código
 revisado (radar, contract-check, bancada, grafo) não muda no rebase; o diff volta a `pendente` e o
 `pr-finalize` carimba de novo.
+
+## Correção da declaração (22/11)
+
+O revisor desta passada foi um agente separado do autor, como dizem o campo `reviewer:` e o corpo, mas o
+frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
+sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
+código foi apagado, para o `pr-finalize` carimbar de novo.
