@@ -79,6 +79,7 @@ nodes:
   - id: A_ADJUST_FORM
     node_type: claim
     x_meeting_role: action
+    x_area: produto
     x_owner: P_ELISA
     x_due: "2026-10-21"
     plane: DEV
@@ -90,6 +91,7 @@ nodes:
   - id: R_VALIDATION_SERVICE
     node_type: claim
     x_meeting_role: risk
+    x_area: tecnico
     plane: DEV
     status: open
     impact: 3

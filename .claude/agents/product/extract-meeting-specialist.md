@@ -320,6 +320,13 @@ que é juízo jurídico e não fato da transcrição. Sem aviso na transcrição
 contagem de pessoas e o estado `⚠️ NÃO HOUVE AVISO`: registra o fato, não supre a transparência, nunca é conformidade, e o uso fica retido. Se alguém recusou, a captura para na linha da recusa (`x_capture_stopped_at`), e
 nada depois dela entra no grafo.
 
+**Área e reconciliação.** Toda ação e todo risco leva `x_area`, **um** termo do vocabulário fechado do repo
+(`docs/meetings/meeting-areas.txt`, ou o padrão `produto · tecnico · negocio · compliance · design · operacoes ·
+pesquisa`), ou `NAO_ESPECIFICADO` quando ninguém nomeou a área. No resumo executivo, as seções Decisões, Ações e
+Riscos listam exatamente os fatos do grafo, cada item com o id do nó entre crases: o gate (`--summary`) reprova o que
+um tem e o outro não. O backlog por área (`<nome>-backlog.md`) é projeção do grafo pelo gate (`--backlog`), nunca
+escrito à mão.
+
 ## 🎯 Exemplos de Aplicação
 
 ### Input: Transcrição Bruta
