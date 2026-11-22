@@ -1769,6 +1769,7 @@ docs/evolution/inbox/_processed/2026-11-08-reply-chat-persona-pilot-resumo.md	E_
 docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md	D_IT_ADOPTER_SIGNAL_SEAL_1108	docs/onion/graph/inbox-triage-1108.kg.yaml
 docs/evolution/inbox/_processed/2026-11-08-signal-adopter-signal-four-fields.md	E_IT_SIGNALS_MEASURED_1108	docs/onion/graph/inbox-triage-1108.kg.yaml
 docs/evolution/inbox/_processed/2026-11-08-signal-campainha-gaps.md	E_DB_LACUNAS_MEDIDAS_NO_HUB_1108	docs/onion/graph/doorbell-hardening-2026-11.kg.yaml
+docs/evolution/inbox/_processed/2026-11-21-question-spike-poc-standard.md	E_HUB_ASKED_SPIKE_STANDARD_1121	docs/onion/graph/spike-standard-2026-11.kg.yaml
 docs/evolution/inbox/_processed/2026-11-21-signal-gate-ignores-kg-json.md	E_SINAL_RADAR_ABORTA_KG_JSON_1122	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
