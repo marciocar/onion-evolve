@@ -16,14 +16,14 @@ nodes:
     node_type: decision
     layer: audit
     plane: DEV
-    status: open
+    status: confirmed
     owner: core
     impact: 4
-    confidence: 0.8
+    confidence: 0.7
     verified_at: "2026-11-22"
     verified_against: "forge-census.sh no core em 2026-11-22: nenhum comando de spike entre os 67 candidatos; spike citado só em /product:estimate e em duas doutrinas"
     label: "O padrão de spike/PoC vira o comando /engineer:spike, com a ficha, a forma no grafo (Q_ -> evidence -> decision) e o reuso da escada de promoção e do drive §3.1."
-    narrative: "Categoria engineer, e não meta: o spike vem antes do /engineer:plan em qualquer projeto que usa o Onion, e não é peça da evolução do framework; assim ele viaja com a vertical de engenharia, sem subir o teto do meta. Doutrina nova não nasce: a escada de promoção (a camada PoC/spike) e o drive §3.1 (critério com denominador fixo e avaliador cego) já são a doutrina, e o comando as cita. Medidor e bancada (peças 3 e 7 da forja) ficam para Q_SPIKE_ORDER_MEASURER_1122. Esta decisão depende do spike de prova do molde."
+    narrative: "Categoria engineer, e não meta: o spike vem antes do /engineer:plan em qualquer projeto que usa o Onion, e não é peça da evolução do framework; assim ele viaja com a vertical de engenharia, sem subir o teto do meta. Doutrina nova não nasce: a escada de promoção (a camada PoC/spike) e o drive §3.1 (critério com denominador fixo e avaliador cego) já são a doutrina, e o comando as cita. Medidor e bancada (peças 3 e 7 da forja) ficam para Q_SPIKE_ORDER_MEASURER_1122. Esta decisão depende dos spikes de prova do molde. Os dois morreram pelo critério escrito: o 1º por um label longo, o 2º porque a aresta do nó destravado não tem dente no estado final. Nos dois, a forma passou nos três juízes. O comando sai com as duas lições escritas e com o limite declarado; a cobrança mecânica fica em Q_SPIKE_ORDER_MEASURER_1122."
     provenance:
       source: "forja do /engineer:spike pela sessão do core"
       locator: ".claude/commands/engineer/spike.md"
@@ -116,7 +116,7 @@ nodes:
     confidence: 0.5
     verified_at: "2026-11-22"
     verified_against: "forja do /engineer:spike em 2026-11-22: 1 spike registrado pelo molde (este grafo); nenhum medidor confere a ordem critério-antes-da-amostra"
-    label: "Medidor do spike: achar os nós com x_spike_kill nos grafos rastreados e reprovar o critério que chegou junto com a evidence ou depois, o prazo vencido com a pergunta open e valor de x_spike_* fora do enum; com bancada contra mutante."
+    label: "Medidor do spike: achar os nós com x_spike_kill nos grafos rastreados e reprovar o critério que chegou junto com a evidence ou depois, o prazo vencido, o x_spike_* fora do enum e o Q_ sem aresta de entrada do nó destravado; com bancada contra mutante."
     narrative: "Peças 3 e 7 da forja, fora desta onda porque com 1 spike registrado não há série para o medidor ler (objeção N=1). Gatilho: 3 spikes registrados pelo molde em grafos rastreados, ou o primeiro caso medido de critério escrito depois da amostra. A bancada mora no lint-selftest.sh, então o PR dele toca guarda e o merge é do maestro."
     provenance:
       source: "forja do /engineer:spike"
@@ -127,7 +127,7 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 3
     confidence: 0.5
@@ -146,6 +146,42 @@ nodes:
       source: "forja do /engineer:spike, depois do refutador"
       locator: ".claude/commands/engineer/spike.md, passo 8"
       method: "testimony: pergunta da forja"
+      locality: "host"
+  - id: E_SPIKE_MOLDE_V2_1122
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-22"
+    verified_against: "neste grafo, com esta evidence e a decision do spike: kg-radar --integrity --schema rc 0, kg-contract-check rc 0, yaml.safe_load rc 0; mutante sem a aresta D_SPIKE_COMMAND_IN_ENGINEER_1122 -> Q_SPIKE_MOLDE_V2_1122: radar rc 0, o mutante PASSOU"
+    label: "Spike do molde corrigido: 3 de 3 juízes rc 0, mas o mutante sem a aresta do nó destravado PASSOU no radar. O critério de morte disparou."
+    narrative: "O critério deste spike está no commit d9d9e65d1, anterior a esta evidência. Por que o mutante passou: depois do resultado, a pergunta já tem as arestas da evidence e da decision, então não fica órfã sem a aresta do nó destravado. O radar só protege essa aresta no commit 1, quando ela é a única. A forma do molde passou nos três juízes nas duas rodadas; o que caiu foi a minha suposição de que a regra da aresta tinha dente no estado final. O mutante vive só no scratch."
+    trace: "bash .claude/validation/kg-radar.sh docs/onion/graph/spike-standard-2026-11.kg.yaml --integrity --schema ; bash .claude/validation/kg-contract-check.sh docs/onion/graph/spike-standard-2026-11.kg.yaml"
+    x_spike_answered: "yes"
+    x_spike_cost: "run_id=n/a (sem agente nem LLM no spike) tokens=n/a agents=0 duration_min=10"
+    provenance:
+      source: "rodada do spike pela forja"
+      locator: "commit d9d9e65d1 (critério) e o commit seguinte (resultado) na branch feat/spike-command"
+      method: "measurement: rc dos três juízes e do mutante"
+      locality: "host"
+  - id: D_SPIKE_MOLDE_V2_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: core
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-22"
+    verified_against: "E_SPIKE_MOLDE_V2_1122"
+    label: "O spike do molde corrigido morreu pelo critério: discard. A lição vai ao comando (a aresta do nó destravado só é cobrada pelo radar no commit 1) e ao escopo do medidor, que passa a conferir essa aresta no estado final."
+    x_spike_next: discard
+    provenance:
+      source: "fechamento do spike pela forja"
+      locator: "E_SPIKE_MOLDE_V2_1122"
+      method: "judges: quem conduziu o spike, pela régua escrita antes"
       locality: "host"
 edges:
   - from: D_SPIKE_COMMAND_IN_ENGINEER_1122
@@ -169,3 +205,12 @@ edges:
   - from: D_SPIKE_COMMAND_IN_ENGINEER_1122
     to: Q_SPIKE_MOLDE_V2_1122
     edge_type: DEPENDS_ON
+  - from: E_SPIKE_MOLDE_V2_1122
+    to: Q_SPIKE_MOLDE_V2_1122
+    edge_type: TRACES_TO
+  - from: E_SPIKE_MOLDE_V2_1122
+    to: D_SPIKE_MOLDE_V2_1122
+    edge_type: SUPPORTS
+  - from: D_SPIKE_MOLDE_V2_1122
+    to: Q_SPIKE_MOLDE_V2_1122
+    edge_type: TRACES_TO

@@ -66,7 +66,8 @@ avaliador cego.
    casa: `run_id` · `tokens` · `agents` · `duration_min`.
 7. **Valide o grafo:** `bash .claude/validation/kg-radar.sh <grafo> --integrity --schema` tem de sair **exit 0**.
    O nó `Q_` precisa de aresta para o nó que ele destrava já no commit 1: pergunta solta é nó órfão, e o radar
-   a reprova. O `label` fica em até 280 caracteres, e o resto vai para `narrative`: o contrato do grafo reprova o
+   a reprova. Depois do resultado, as arestas da `evidence` e da `decision` escondem a falta dessa aresta, e o
+   radar não a cobra mais: confira-a você. O `label` fica em até 280 caracteres, e o resto vai para `narrative`: o contrato do grafo reprova o
    label longo (onde o verificador do contrato estiver instalado; o radar não mede o tamanho). As duas regras
    saíram do spike de prova deste molde.
 8. **Descarte ou promova.** Critério de morte disparado leva só a `discard`: a pasta do spike morre e a lição
