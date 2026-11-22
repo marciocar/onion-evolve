@@ -24,10 +24,18 @@
 # Exit: 0 = limpo (ou só SOFT) · 1 = violação HARD · 2 = não pôde julgar (NAO VERIFICADO; nunca é verde)
 #
 # TETO (o que esta guarda NÃO vê):
-#   - só color: de TOPO, sem indentação; color: repetido: vale o ÚLTIMO (YAML duplicado é da REGRA 17);
-#   - valor em bloco (`color: |`) ou em várias linhas é lido como o texto da 1ª linha e acusado;
-#   - agente sem frontmatter na linha 1, ou sem fecho, não é julgado (é da REGRA 1);
-#   - a categoria vem do DIRETÓRIO, não do campo category: (a coerência dos dois é da REGRA 23);
+#   - só color: de TOPO, sem indentação; color: repetido vale o ÚLTIMO, como no YAML do Claude Code (nenhuma regra
+#     acusa chave duplicada);
+#   - FALSO POSITIVO raro, declarado (Elenxo da forja, medido contra o leitor do Claude Code em bun): valor em bloco
+#     (`color: >-`), em várias linhas, alias de âncora (`*a`), tag (`!!str purple`), escape (`"pur\x70le"`) e
+#     frontmatter todo indentado são cor válida para o Claude Code e acusados aqui; nenhum agente real os usa;
+#   - `---` no meio do frontmatter corta a cor no Claude Code e passa aqui: é da REGRA 102 (Chave de frontmatter de
+#     agente pertence à allowlist (oficiais + as da casa)), classe FECHO-AMBIGUO;
+#   - agente sem frontmatter na linha 1, sem fecho ou sem name: não é julgado: o Claude Code o descarta (é da
+#     REGRA 1 (Frontmatter de agente: name:, description:, tools: obrigatórios));
+#   - a categoria vem do DIRETÓRIO, não do campo category: (a coerência dos dois é da REGRA 23 (Frontmatter:
+#     category: em agentes (a metade 'model: em comandos' foi REVOGADA pela REGRA 71)));
+#   - no lint com --only num agente, a guarda julga a árvore inteira (como a REGRA 102): pode repetir acusações;
 #   - o --agents JSON e os agentes de plugin/usuário (~/.claude/agents) não entram;
 #   - a paleta é a da doc e do binário no dia da leitura: cor nova do Claude Code é acusada até entrar no .tsv.
 # =============================================================================
@@ -77,6 +85,7 @@ _judge() {
     function emit(cls, m) { print sev "\t" cls "\t" rel "\t" m; if (sev == "HARD") hard = 1 }
     # julga no FECHO: arquivo que não fecha não tem frontmatter para o Claude Code (é da REGRA 1)
     function verdict(   want) {
+      if (!named) return   # o Claude Code descarta agente sem name: (o loader devolve null): nada a pintar
       if (!(category in cat)) {
         emit("CATEGORIA-SEM-COR", "o agente está em \"" category "\", categoria sem cor em .claude/validation/agent-colors.tsv — acrescente a linha category da categoria (a cor sai da paleta: " plist ")")
         return
@@ -94,7 +103,7 @@ _judge() {
       if (val != want) emit("COR-DIVERGE-DA-CATEGORIA", "color: \"" val "\" diverge da cor da categoria " category " — use \"color: " want "\" (agent-colors.tsv: a cor sai da categoria, não do agente)")
     }
     FNR == 1 {
-      infm = 0; done = 0; seen = 0; val = ""
+      infm = 0; done = 0; seen = 0; val = ""; named = 0
       rel = FILENAME; if (index(rel, root) == 1) rel = substr(rel, length(root) + 1)
       category = rel; sub(/^\.claude\/agents\//, "", category)
       if (index(category, "/") > 0) category = substr(category, 1, index(category, "/") - 1); else category = ""
@@ -103,6 +112,7 @@ _judge() {
     { sub(/\r$/, "") }
     FNR == 1 { sub(/^\357\273\277/, ""); if ($0 ~ /^---[ \t]*$/) infm = 1; else done = 1; next }
     infm && $0 ~ /^---[ \t]*$/ { done = 1; verdict(); next }
+    infm && /^("name"|\047name\047|name)[ \t]*:[ \t]*[^ \t]/ { named = 1 }
     infm && /^("color"|\047color\047|color)[ \t]*:/ {
       seen = 1; v = $0; sub(/^[^:]*:[ \t]*/, "", v)
       if (v ~ /^"/) { v = substr(v, 2); p = index(v, "\""); if (p > 0) v = substr(v, 1, p - 1) }
@@ -172,8 +182,12 @@ if [ "${MODE}" = "selftest" ]; then
   check "cala: fecho '---' com tab no fim fecha o frontmatter" "${M}" "${A}/meta/tabclose.md" '' 0
   mk meta/unclosed '---\nname: x\ncolor: teal\n'
   check "cala: frontmatter sem fecho não é julgado (é da REGRA 1)" "${M}" "${A}/meta/unclosed.md" '' 0
-  mk meta/nofm    'sem frontmatter\ncolor: teal\n---\n'
+  mk meta/nofm    'sem frontmatter\nname: x\ncolor: teal\n---\n'
   check "cala: arquivo sem frontmatter na linha 1 (é da REGRA 1)" "${M}" "${A}/meta/nofm.md" '' 0
+  mk meta/noname  '---\ndescription: fragmento, não agente\ncolor: teal\n---\n'
+  check "cala: frontmatter sem name: (o Claude Code descarta o arquivo)" "${M}" "${A}/meta/noname.md" '' 0
+  mk meta/emptyname '---\nname:\ncolor: teal\n---\n'
+  check "cala: name: vazio também é descartado" "${M}" "${A}/meta/emptyname.md" '' 0
   # ── fail-closed (não pude julgar ≠ verde) ─────────────────────────────────────────────────────────
   check "rc 2: mapa ausente" "${T}/nao-existe.tsv" "${A}/meta/honest.md" 'NAO VERIFICADO' 2
   printf '# so comentario\n\n' > "${T}/vazio.tsv"
@@ -202,6 +216,8 @@ fi
 ROOT="$(cd "${ROOT}" 2>/dev/null && pwd)" || { echo "agent-color: raiz inválida — NAO VERIFICADO" >&2; exit 2; }
 AGDIR="${ROOT}/.claude/agents"
 [ -d "${AGDIR}" ] || exit 0   # repo sem agentes: nada a julgar (não é defeito)
+# diretório ilegível no meio da árvore: o find avisa e segue, e "0 agentes" sairia verde (Elenxo, achado 3)
+find "${AGDIR}" -name '*.md' -print > /dev/null 2>&1 || { echo "agent-color: não consegui ler toda a árvore de ${AGDIR} — NAO VERIFICADO" >&2; exit 2; }
 mapfile -d '' FILES < <(find "${AGDIR}" -name '*.md' ! -iname 'readme.md' -print0 2>/dev/null | sort -z)
 SEV="HARD"; [ "${DERIVED}" = 1 ] && SEV="SOFT"
 OUT=""; rc=0

@@ -58016,7 +58016,7 @@ _family run_agent_frontmatter_keys_selftests
 # de 2026-11-21. O Claude Code ignora em silêncio a cor fora da paleta: 38 dos 51 agentes não batiam a categoria. A
 # SSOT é agent-colors.tsv; o juiz, agent-color-check.sh. Casos: (a) as polaridades do --selftest · (b) o modo que o
 # lint consome, no corpus real · (c) a CLI num repo-sandbox, fonte e derivado · (e) sem o mapa → rc 2 · (d) o
-# dispatcher de produção, fonte (HARD) e adotante (SOFT) · (t) as cópias legíveis do mapa (Tabela de Cores do
+# dispatcher de produção, fonte (HARD) e adotante (SOFT) · (f) diretório ilegível → rc 2 · (t) as cópias legíveis do mapa (Tabela de Cores do
 # template e a linha "Hoje:" do molde do agent-creator) batem o .tsv · (m) UM MUTANTE POR CASO, na CÓPIA da guarda —
 # mutante que não se aplica é FALHA, nunca verde por vacuidade.
 run_agent_color_selftests() {
@@ -58052,6 +58052,13 @@ run_agent_color_selftests() {
   if [ "${rc}" -eq 2 ]; then record_pass "agent-color: (e) sem o mapa → rc 2 (não julga, não passa)"
   else record_fail "agent-color: (e)" "sem o mapa saiu rc=${rc}"; fi
   mv "${sb}/mp.bak" "${sb}/.claude/validation/agent-colors.tsv"
+  # (f) diretório ILEGÍVEL na árvore de agentes → rc 2, nunca "0 agentes" verde (Elenxo da forja, achado 3)
+  mkdir -p "${sb}/.claude/agents/trancado"; chmod 000 "${sb}/.claude/agents/trancado"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  chmod 700 "${sb}/.claude/agents/trancado"
+  if [ "$(id -u)" = 0 ]; then record_skip "agent-color: (f) como root o chmod 000 não tranca: diretório ilegível não exercido"
+  elif [ "${rc}" -eq 2 ]; then record_pass "agent-color: (f) diretório ilegível → rc 2 (não julga, não passa)"
+  else record_fail "agent-color: (f)" "diretório ilegível saiu rc=${rc}: ${o}"; fi
   # (d) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, num repo com a cor trocada, emite a REGRA 122 — HARD na fonte e
   #     SOFT no adotante (o carimbo role: adopted liga IS_DERIVED). A HARD é lida no ONION_LINT_HARD_FILE.
   local sd l l2 hf hf2; sd="$(TMPDIR=/tmp mktemp -d)"; hf="${sd}.hard"; hf2="${sd}.hard2"; : > "${hf}"; : > "${hf2}"
@@ -58111,6 +58118,8 @@ else if (v ~ /^\\047/) {$(printf '\x1f')else if (0) {$(printf '\x1f')cala: valor
 infm && \$0 ~ /^---[ \\t]*\$/ { done = 1; verdict(); next }$(printf '\x1f')infm && \$0 == "---" { done = 1; verdict(); next }$(printf '\x1f')cala: fecho '---' com tab
 END { if (bad) exit 2;$(printf '\x1f')END { if (infm && !done) verdict(); if (bad) exit 2;$(printf '\x1f')cala: frontmatter sem fecho
 if (\$0 ~ /^---[ \\t]*\$/) infm = 1; else done = 1; next }$(printf '\x1f')infm = 1; next }$(printf '\x1f')cala: arquivo sem frontmatter
+      if (!named) return$(printf '\x1f')      if (0) return$(printf '\x1f')cala: frontmatter sem name:
+/^("name"|\\047name\\047|name)[ \\t]*:[ \\t]*[^ \\t]/$(printf '\x1f')/^("name"|\\047name\\047|name)[ \\t]*:/$(printf '\x1f')cala: name: vazio também é descartado
 if (c[2] in pal) {$(printf '\x1f')if (0) {$(printf '\x1f')rc 2: cor duplicada na paleta
 if (c[2] in cat) {$(printf '\x1f')if (0) {$(printf '\x1f')rc 2: categoria duplicada
 c[1] == "category" && n >= 4 && c[2] != "" && c[3] != "" && c[4] != ""$(printf '\x1f')c[1] == "category" && n >= 3 && c[2] != "" && c[3] != ""$(printf '\x1f')rc 2: linha de categoria sem a razão

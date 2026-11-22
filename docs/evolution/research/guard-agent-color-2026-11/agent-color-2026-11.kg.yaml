@@ -71,7 +71,8 @@ nodes:
     valid_from: "2026-11-22"
     verified_at: "2026-11-22"
     verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families agent_color"
-    label: "Bancada run_agent_color_selftests: --selftest de 29 casos (13 acusa, 7 cala, 8 fail-closed, 1 derivado), corpus real, CLI fonte e derivado, sem mapa rc 2, dispatcher de produção HARD e SOFT, cópias do mapa batendo o .tsv e 27 mutantes que mordem."
+    label: "Bancada run_agent_color_selftests: --selftest de 31 casos (13 acusa, 9 cala, 8 fail-closed, 1 derivado), corpus real, CLI fonte e derivado, sem mapa rc 2, diretório ilegível rc 2, dispatcher de produção HARD e SOFT, cópias do mapa batendo o .tsv e 29 mutantes que mordem."
+    narrative: "o Elenxo da forja (refutador opus, só leitura) aprovou sem bloqueio e achou 4 limites e 1 estilo; curados no código o arquivo sem name: (o Claude Code o descarta) e o diretório ilegível que saía verde; declarados no TETO as formas raras de YAML e o --only que julga a árvore. Na 1ª rodada 3 mutantes não morderam por defeito nos casos, curados."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_agent_color_selftests"
