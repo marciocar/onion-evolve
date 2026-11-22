@@ -2,8 +2,7 @@
 branch: fix/merge-lease-orphan
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 619b6f39a140b44b50582051595dd7e08299e68b4a2ed18fb813da919bab9af4
-reviewed_code_sha256: f2631a80799cecea31aa33443efbf3cc8811d4e7a237f6f2529ed78e6d34d2ce
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 7
 findings_blocking: 1
@@ -12,6 +11,7 @@ duration_min: 9
 findings_fixed: 7
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: subagente general-purpose (opus) com mandato de REFUTAR o diff do commit 37e839ee9, isolado do autor
 nota: "o refutador não rodou a bancada (carga 14,87, acima de 12; parou a própria rodada). A bancada das duas famílias rodou pelo autor depois das curas."
 ---
@@ -69,3 +69,10 @@ Cada caso novo reprova contra o seu mutante plantado pela própria família (`_l
   medida (70 min sob carga).
 - A vaga órfã sai da conta, mas o processo órfão segue rodando e gastando CPU; a admissão por carga é o que
   segura a máquina.
+
+## Correção da declaração (22/11)
+
+O revisor desta passada foi um agente separado do autor, como dizem o campo `reviewer:` e o corpo, mas o
+frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
+sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
+código foi apagado, para o `pr-finalize` carimbar de novo.
