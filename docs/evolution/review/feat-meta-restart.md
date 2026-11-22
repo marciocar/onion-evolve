@@ -2,8 +2,7 @@
 branch: feat/meta-restart
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 922f4fbc53e8b85cff98cfbfac4cd838901115da10977dcce014b2f8ba72de43
-reviewed_code_sha256: b92b9bb9aeeef90daab4b88a127d00bf0c777b2a83ef682cc89db5e35849ff87
+reviewed_diff_sha256: pendente
 findings_total: 22
 findings_real: 22
 findings_blocking: 7
@@ -12,6 +11,7 @@ tokens: 267000
 duration_min: 23
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: "revisor isolado (agente branch-code-reviewer que não escreveu o código), duas passadas: o artefato inteiro e depois só as curas"
 nota: >-
   /meta:restart: reinício gracioso (drain) antes de atualizar ou reabrir o Claude Code, que mata os subagentes e as
@@ -100,3 +100,10 @@ do revisor. A bancada roda de novo no pré-voo do `pr-finalize` e no CI, sobre a
 - Que o id do agente sobreviva ao reinício e aceite `SendMessage` é o que se mediu em 2026-11-21; para o agente da
   ferramenta Workflow (`<run>/<id>`) não está medido.
 - O marcador é aviso, não trava: nada barra um despacho com ele presente.
+
+## Correção da declaração (22/11)
+
+O revisor desta passada foi um agente separado do autor, como dizem o campo `reviewer:` e o corpo, mas o
+frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
+sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
+código foi apagado, para o `pr-finalize` carimbar de novo.
