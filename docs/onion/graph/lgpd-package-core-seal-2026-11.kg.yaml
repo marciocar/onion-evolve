@@ -63,6 +63,7 @@ nodes:
     layer: audit
     plane: DEV
     status: open
+    x_wait: "steer do maestro em 2026-11-17: «LGPD rasa por ora, não aprofundar»; volta só se ele reabrir o LGPD"
     owner: curadoria
     impact: 4
     confidence: 0.5

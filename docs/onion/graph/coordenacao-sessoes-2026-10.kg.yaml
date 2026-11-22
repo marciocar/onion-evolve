@@ -361,6 +361,7 @@ nodes:
     layer: audit
     plane: DEV
     status: open
+    x_wait: "parqueado com gatilho pela D_CROSS_REPO_CONTRACT_1104 (no repo onion-kg-ssot): reabre com um caso confirmado de objeção perdida entre repos ou um adotante externo que precise validar a forma"
     owner: kg-ssot
     impact: 3
     confidence: 0.5
@@ -470,6 +471,7 @@ nodes:
     layer: audit
     plane: DEV
     status: open
+    x_wait: "gatilho: um dos 4 gatilhos de campo cruzar a régua escrita na narrativa; nenhum disparou, e quem medir o campo e ver a régua cruzada avisa o kg-ssot"
     owner: kg-ssot
     impact: 3
     confidence: 0.5
