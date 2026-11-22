@@ -52193,7 +52193,7 @@ w("fromtext", mut(ev, lambda o: o["requester"].update(resolved_by="text")))
 w("display", mut(ev, lambda o: o["requester"].update(resolved_by="display_name")))
 w("noaud", mut(ev, lambda o: o.pop("audience")))
 w("dup", ev, ev)
-w("outsider", mut(ev, lambda o: o["requester"].update(provider_id="someone-else@example")))
+w("outsider", mut(ev, lambda o: o["requester"].update(provider_id="waha:someone-else")))
 w("leak", mut(rp, lambda o: o["leak_guard"].update(verdict="blocked")))
 w("digits", mut(rp, lambda o: o["body"].update(text="ligue para 11 98765 4321 ainda hoje")))
 w("audlate", mut(rp, lambda o: o["audience_checked"].update(listed_at="2026-11-22T13:00:30Z")))
@@ -52209,11 +52209,28 @@ w("badkind", mut(ev, lambda o: o.update(kind="message.edited")))
 w("baddate", mut(rp, lambda o: o["audience_checked"].update(listed_at="2026-11-22T13:00:99Z")))
 w("otherplace", ev, mut(rp, lambda o: o["place"].update(id="other-group@example")))
 w("otherthread", ev, mut(rp, lambda o: o["thread"].update(id="msg-example-9999")))
-w("otherreq", ev, mut(rp, lambda o: o["on_behalf_of"].update(provider_id="member-b@example", person="person-b")))
+w("otherreq", ev, mut(rp, lambda o: o["on_behalf_of"].update(provider_id="waha:b81e0c4f7a9d3e12", person="person-b")))
 w("otherlat", ev, mut(rp, lambda o: o["latency"].update(requested_at="2026-11-22T12:00:00Z")))
-w("otherrole", ev, mut(rp, lambda o: o["on_behalf_of"].update(role="admin")))
+w("otherrole", ev, mut(rp, lambda o: o["on_behalf_of"].update(role="internal")))
 w("otherperson", ev, mut(rp, lambda o: o["on_behalf_of"].update(person="person-b")))
 w("twoplaces", ev, mut(ev, lambda o: o["place"].update(id="other-group@example")), mut(rp, lambda o: o["place"].update(id="other-group@example")))
+RAW = "5511987654321@c.us"
+def raw_req(o):
+    o["requester"]["provider_id"] = RAW; o["audience"]["members"][0]["provider_id"] = RAW
+w("rawreq", mut(ev, raw_req))
+w("rawmember", mut(ev, lambda o: o["audience"]["members"][1].update(provider_id="pessoa@empresa.com.br")))
+w("rawplace", mut(ev, lambda o: o["place"].update(id=RAW)))
+w("rawmsg", mut(ev, lambda o: o.update(provider_message_id="true_" + RAW + "_3EB0")))
+w("customerwaha", mut(ev, lambda o: o["requester"].update(role="customer")))
+w("badrole", mut(ev, lambda o: o["requester"].update(role="unknown")))
+PSEUDO = "waha:1234567890abcdef"
+def pseudo(o):
+    who = o.get("requester") or o.get("on_behalf_of"); who["provider_id"] = PSEUDO
+    if "audience" in o: o["audience"]["members"][0]["provider_id"] = PSEUDO
+w("pseudodigits", mut(ev, pseudo), mut(rp, pseudo))
+def unresolved(o):
+    o["requester"].update(person=None, role="external"); o["audience"]["members"][0]["person"] = None
+w("unresolved", mut(ev, unresolved))
 open(f"{d}/notjson.jsonl", "w").write("isto nao e json\n")
 open(f"{d}/emptylist.json", "w").write("[]\n")
 rows = open(sys.argv[1] + "/../adapters/waha.capabilities.tsv").read().splitlines()
@@ -52229,7 +52246,9 @@ PY
   _cc check "${d}/stream.jsonl"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${d}/datetext.jsonl"; [ "${rc}" = 0 ] || a_ok=0
   _cc check "${d}/twoplaces.jsonl"; [ "${rc}" = 0 ] || a_ok=0
-  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0); data e hora no texto não contam como número; mesmo id em dois lugares, a resposta ao 2º vale"
+  _cc check "${d}/pseudodigits.jsonl"; [ "${rc}" = 0 ] || a_ok=0
+  _cc check "${d}/unresolved.jsonl"; [ "${rc}" = 0 ] || a_ok=0
+  if [ "${a_ok}" = 1 ]; then record_pass "chat-conformance: (a) evento e resposta de exemplo, sozinhos e no mesmo fluxo, conformes (rc 0); data e hora no texto não contam como número; mesmo id em dois lugares, a resposta ao 2º vale; pseudônimo <provider>:<16 hex> com dígitos e quem não está no mapa como external passam"
   else record_fail "chat-conformance: (a) exemplos conformes" "rc=${rc} out=[${out}]"; fi
   # (b..m) cada falta reprova com rc 1 e o código dela
   local c f code
@@ -52263,6 +52282,12 @@ l12|otherlat|LATENCIA
 l13|notjson|NAO-E-JSON
 l14|otherrole|IDENTIDADE-FORA-DO-ID
 l15|otherperson|IDENTIDADE-FORA-DO-ID
+l16|rawreq|ID-COM-NUMERO
+l17|rawmember|ID-COM-NUMERO
+l18|rawplace|ID-COM-NUMERO
+l19|rawmsg|ID-COM-NUMERO
+l20|customerwaha|PAPEL
+l21|badrole|FORMA
 CASES
   # (m) a declaração real do adapter WAHA está bem formada (rc 0); com --strict, o adapter reprova pelo que falta
   _cc capabilities "${tsv}"

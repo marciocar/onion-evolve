@@ -22,7 +22,7 @@
         "provider_id": { "$ref": "#/$defs/nonEmpty" },
         "resolved_by": { "const": "provider_id" },
         "person": { "type": ["string", "null"], "minLength": 1 },
-        "role": { "$ref": "#/$defs/nonEmpty" }
+        "role": { "enum": ["internal", "partner", "external", "customer"] }
       }
     },
     "place": {

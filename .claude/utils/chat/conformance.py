@@ -28,7 +28,9 @@ O que confere no evento recebido (message.received), além da forma do message.s
   - DUPLICADO: o mesmo (provider, place.id, provider_message_id) duas vezes no mesmo fluxo. O provedor entrega pelo
     menos uma vez; o adapter deduplica antes de entregar ao agente;
   - e as regras que cruzam campos: quem pede está na audiência, a hora em que o agente viu não vem antes da hora
-    do pedido, a retenção vence depois do pedido, pessoa não resolvida tem papel «unknown».
+    do pedido, a retenção vence depois do pedido, pessoa não resolvida tem papel «external», e «customer» nunca no WAHA;
+  - ID-COM-NUMERO: nenhum identificador (provider_id de quem pede e da audiência, lugar, fio, ids de mensagem) leva
+    o id cru com telefone ou e-mail (8+ dígitos seguidos ou forma de e-mail), salvo a forma <provider>:<16 hex>.
 Na resposta (message.reply): a guarda de vazamento e a audiência passaram antes de sair, a ordem das horas
 (pedido, visto, respondido), o passo «serviu?» declarado, o registro de auditoria, e nenhum número no texto
 (heurística declarada: 10 ou mais dígitos com separadores de telefone, depois de tirar datas e horas). Com eventos
@@ -54,6 +56,17 @@ STATUSES = ("implemented", "partial", "not_implemented", "unverified")
 # Datas e horas saem antes da busca, para "2026-11-22 13:00" não parecer número.
 DIGIT_RUN = re.compile(r"(?:\d[\s.()+-]{0,3}){10,}")
 DATE_TIME = re.compile(r"\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?\b|\b\d{1,2}:\d{2}(?::\d{2})?\b|\b\d{1,2}/\d{1,2}/\d{2,4}\b")
+# Identificador que sai do adapter é pseudônimo: nunca o id cru com telefone ou e-mail (no WAHA, <número>@c.us).
+# Forma recomendada: <provider>:<HMAC-SHA256 do id cru com chave privada da instância, 16 hex>; o apelido da lista
+# fechada também serve. A forma recomendada é aceita mesmo quando o hex sorteia 8 dígitos seguidos.
+PSEUDONYM = re.compile(r"^[a-z][a-z0-9-]{1,31}:[0-9a-f]{16}$")
+EIGHT_DIGITS = re.compile(r"\d{8}")
+EMAIL_LIKE = re.compile(r"[^\s@]+@[^\s@]+\.[^\s@]+")
+ID_FIELDS = {
+    "received": (("provider_message_id",), ("requester", "provider_id"), ("place", "id"), ("thread", "id"),
+                 ("thread", "reply_to")),
+    "reply": (("in_reply_to",), ("on_behalf_of", "provider_id"), ("place", "id"), ("thread", "id")),
+}
 TS_FIELDS = {
     "received": (("requested_at",), ("seen_at",), ("audience", "listed_at"), ("retention", "expires_at")),
     "reply": (("audience_checked", "listed_at"), ("latency", "requested_at"), ("latency", "seen_at"), ("latency", "replied_at")),
@@ -141,6 +154,34 @@ def check_timestamps(obj, kind, where, acc):
             out(where, "FORMA", f"{'/'.join(path)}: data ou hora impossível ({v!r})", acc)
 
 
+def raw_id(value):
+    if not isinstance(value, str) or PSEUDONYM.match(value):
+        return False
+    return bool(EIGHT_DIGITS.search(value) or EMAIL_LIKE.search(value))
+
+
+def check_ids(obj, kind, where, acc):
+    """Guarda de vazamento sobre os identificadores: o id cru com telefone ou e-mail fica dentro do adapter."""
+    paths = list(ID_FIELDS[kind])
+    if kind == "received":
+        members = dig(obj, ("audience", "members"))
+        paths += [("audience", "members", i, "provider_id") for i in range(len(members) if isinstance(members, list) else 0)]
+    for path in paths:
+        v = obj
+        for k in path:
+            v = v[k] if isinstance(v, list) and isinstance(k, int) and k < len(v) else (v.get(k) if isinstance(v, dict) else None)
+        if raw_id(v):
+            out(where, "ID-COM-NUMERO", f"{'/'.join(str(p) for p in path)}: identificador cru com 8+ dígitos ou forma de e-mail; use pseudônimo (<provider>:<hmac 16 hex>) ou apelido", acc)
+
+
+def check_role(person_holder, provider, field, where, acc):
+    role = (person_holder or {}).get("role")
+    if (person_holder or {}).get("person") is None and role not in (None, "external"):
+        out(where, "IDENTIDADE-FORA-DO-ID", f"{field}: pessoa não resolvida com papel {role!r}: sem pessoa no mapa, o papel é «external»", acc)
+    if role == "customer" and provider == "waha":
+        out(where, "PAPEL", f"{field}: papel customer no WAHA; cliente final só no canal oficial (D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121)", acc)
+
+
 def check_received(obj, where, acc, seen, received_ids):
     req = obj.get("requester") or {}
     aud = obj.get("audience") or {}
@@ -148,8 +189,7 @@ def check_received(obj, where, acc, seen, received_ids):
     ids = {m.get("provider_id") for m in members if isinstance(m, dict)}
     if req.get("provider_id") and members and req["provider_id"] not in ids:
         out(where, "SEM-AUDIENCIA", "quem pede não está na audiência: a lista não é de quem vê esta conversa", acc)
-    if req.get("person") is None and req.get("role") not in (None, "unknown"):
-        out(where, "IDENTIDADE-FORA-DO-ID", "pessoa não resolvida com papel atribuído: sem pessoa, o papel é «unknown»", acc)
+    check_role(req, obj.get("provider"), "requester", where, acc)
     t_req, t_seen = parse_ts(obj.get("requested_at")), parse_ts(obj.get("seen_at"))
     if t_req and t_seen and t_seen < t_req:
         out(where, "LATENCIA", "seen_at antes de requested_at: a latência sairia negativa", acc)
@@ -232,6 +272,10 @@ def read_messages(path):
 
 def cmd_check(path):
     schema = load_schema()
+    roles_schema = set(schema.get("$defs", {}).get("requester", {}).get("properties", {}).get("role", {}).get("enum") or [])
+    roles_vocab = {k.split(".", 1)[1] for k in load_vocab("role")}
+    if roles_schema != roles_vocab:
+        raise NotMeasured(f"contrato incoerente: papéis do schema {sorted(roles_schema)} != do vocabulário {sorted(roles_vocab)}")
     validators = {"received": validator_for(schema, "received"), "reply": validator_for(schema, "reply")}
     acc, seen, received_ids, replies = [], {}, {}, []
     msgs = read_messages(path)
@@ -255,7 +299,11 @@ def cmd_check(path):
             continue
         for p, kw, msg in schema_errors(v, obj):
             out(where, classify_schema_error(p, kw, msg), f"{p}: {msg}", acc)
-        check_timestamps(obj, "received" if kind == "message.received" else "reply", where, acc)
+        k2 = "received" if kind == "message.received" else "reply"
+        check_timestamps(obj, k2, where, acc)
+        check_ids(obj, k2, where, acc)
+        if k2 == "reply":
+            check_role(obj.get("on_behalf_of"), obj.get("provider"), "on_behalf_of", where, acc)
         if kind == "message.received":
             check_received(obj, where, acc, seen, received_ids)
         else:
@@ -273,7 +321,8 @@ def cmd_check(path):
     return acc
 
 
-def load_vocab():
+def load_vocab(kind="capability"):
+    """kind=capability: verbos e regras (o que o adapter declara) · kind=role: o vocabulário fechado de papel."""
     try:
         rows = open(VOCAB_PATH, encoding="utf-8").read().splitlines()
     except OSError as exc:
@@ -285,7 +334,8 @@ def load_vocab():
         cols = line.split("\t")
         if len(cols) < 3:
             raise NotMeasured(f"vocabulário malformado: {line!r}")
-        vocab[cols[0]] = (cols[1], cols[2])
+        if (cols[1] == "role") == (kind == "role"):
+            vocab[cols[0]] = (cols[1], cols[2])
     if not vocab:
         raise NotMeasured("vocabulário vazio")
     return vocab
