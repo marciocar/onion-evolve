@@ -987,12 +987,13 @@
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 7.7 | `D_GOKAPI_OIDC_BY_API_2026_11` | m2-bridge-logto-2026-07 | O app OIDC do Gokapi e o credstore saem de um ato por API (sem console, sem colar segredo); auto-cadastro é do tenant, o app ganh |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
+| 6.8 | `C_GOKAPI_EGRESS_UID_FENCE_1122` | vps-shared-tools-2026-07 | Cerca de saída por uid do Gokapi pronta como ato do core (ops/egress-uid-fence.sh): 127.0.0.1:3050 só para caddy e a conta do t |
 | 6.0 | `Q_MD_BRAIN_PROMOTION_DETAILS_1109` | maestro-decisions-1109b | Quais são os detalhes de promoção do Company Brain, e como se resolve o atrito entre CODEOWNERS e permissão por repositório? |
+| 5.1 | `C_CADDY_WRAPPER_READS_SERVICE_REPOS_1122` | vps-shared-tools-2026-07 | O ops/install-caddy-config.sh lê os vhosts dos repos de serviço (ops/caddy/service-vhosts.tsv): blob commitado na ref, adoção  |
 | 4.8 | `Q_MN_LEGAL_READING_1109` | meeting-notice-absence-2026-11 | Falta leitura jurídica de LGPD para reuniões registradas sem aviso, antes do uso em dado real. |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
-| 4.0 | `Q_COMPOSICAO_PERNA_CODEX_LACUNA_1122` | sinais-de-campo-2026-09 | LACUNA NOMEADA: a ponta Codex da composição segue sem medida, porque o Codex CLI não está instalado. O maestro autoriza instal |
 | 3.2 | `Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO` | coordenacao-sessoes-2026-10 | O índice do diário (.claude/diary/index.md) carrega um nome de host da VPS desde julho; o maestro decide se limpa. |
 | 3.0 | `D_A2A_OUTBOUND_IROH_PHASE2_1110` | a2a-outbound-2026-11 | Caminho do transporte VPS↔notebook: Fase 2 com iroh, caminho próprio ou parquear; aguarda validação das estimativas (próprio |
 | 3.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe. |
