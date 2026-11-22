@@ -2,8 +2,7 @@
 branch: docs/kg-grammar-discarded-as-node
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: f2b11a4cbf75dd386d079695ac86338a062d808a88392e53495167943a4853a2
-reviewed_code_sha256: 692ffbad7b3098b6f653c3f9a8f442c01a7eeb3680629e9fb09617e0e859c0c1
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 6
 findings_blocking: 1
@@ -12,12 +11,14 @@ duration_min: 3
 findings_fixed: 5
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: code-reviewer (agente separado, brief sem a conclusão do autor)
 nota: >-
   Um refutador separado leu o diff inteiro, conferiu a citação do MADR 4.0.0, rodou o radar e o
   contrato e recontou os números da curadoria. Achou 1 bloqueio (o caso CONSTRAINS dava status
   refuted, que zera o nó no radar) e 5 limites. Cinco foram curados no mesmo PR; o sexto (cópia
-  original no inbox do checkout principal) é operacional e fica com a sessão do core.
+  original no inbox do checkout principal) é operacional e fica com a sessão do core. Em 2026-11-22 a sessão do core declarou
+  elenxo_isolado: true pelo reviewer e por esta nota (refutador separado, brief sem a conclusão do autor).
 ---
 
 # Passada adversarial: o descartado também é nó
