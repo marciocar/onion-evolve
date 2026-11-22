@@ -28,7 +28,11 @@ identidade e a recepção durável):
    Delphi pôs no 1º entregável.
 1. **Normalizar a recepção**: do CloudEvent com o corpo bruto do WAHA para o `message.received` com os 5 campos, e
    rodar `conformance.py check` sobre essa saída na bancada da peça, com o WAHA simulado e mutantes.
-2. **Mapa de identidade** (`identity.resolve`): id do WhatsApp para pessoa e papel; sem pessoa, papel `unknown`.
+2. **Mapa de identidade e pseudônimos** (`identity.resolve`): id do WhatsApp para pessoa e papel (`internal`,
+   `partner` ou `external`; `customer` nunca aqui); sem pessoa, `external` com `person: null`. **Nada sai cru:** o
+   remetente, os participantes, o chat e os ids de mensagem viram `waha:<HMAC-SHA256 do id cru com a chave privada da
+   instância, 16 hex>` (ou o apelido da lista fechada), e o caminho de volta (responder no fio) resolve o pseudônimo
+   dentro da peça. A chave do HMAC é segredo da unidade, como a do WAHA.
 3. **Dedupe pelo id da mensagem do WhatsApp**, não só pelo sha256 do corpo assinado (`rule.dedupe_provider_id`).
 4. **Audiência por conversa antes de responder** (`audience.list`), com a lista de participantes do grupo.
 5. **Responder no fio** (`message.reply_thread`), o **passo «serviu?»** (`served.ask`) e a **latência** (hora do pedido
@@ -42,10 +46,10 @@ identidade e a recepção durável):
 
 | campo do contrato | de onde vem no WAHA |
 |---|---|
-| `provider_message_id` | o id da mensagem no evento `message` do webhook |
+| `provider_message_id` | o id da mensagem no evento `message` do webhook, pseudonimizado (ele leva o número) |
 | `requested_at` | o carimbo da mensagem no WhatsApp (assinado no corpo), não a hora de recebimento |
-| `requester.provider_id` | o remetente (no grupo, o participante; não o grupo) |
-| `place.id` / `place.kind` | o chat (`@g.us` = `group`, `@c.us` ou LID = `direct`) |
+| `requester.provider_id` | o remetente (no grupo, o participante; não o grupo), pseudonimizado |
+| `place.id` / `place.kind` | o chat (`@g.us` = `group`, `@c.us` ou LID = `direct`); o id, pseudonimizado |
 | `thread.reply_to` | a mensagem citada, quando houver |
 | `audience.members` | os participantes do grupo; na conversa direta, as duas pontas |
 

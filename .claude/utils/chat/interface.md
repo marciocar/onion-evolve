@@ -27,10 +27,10 @@ interface ChatMessageReceived {
   seen_at: Timestamp;
   // 2. quem pede e o papel, resolvidos pelo id do provedor
   requester: {
-    provider_id: string;
+    provider_id: string;         // PSEUDÔNIMO estável, nunca o id cru (ver «Identificadores» abaixo)
     resolved_by: 'provider_id';  // único valor aceito: nome exibido e texto da mensagem não identificam
     person: string | null;       // a pessoa no mapa de identidade; null = não resolvida
-    role: string;                // 'unknown' quando person é null (nega por padrão)
+    role: 'internal' | 'partner' | 'external' | 'customer';  // 'external' quando person é null; 'customer' só no canal oficial
   };
   // 3. o lugar
   place: { id: string; kind: 'direct' | 'group' | 'channel'; name?: string };
@@ -53,10 +53,25 @@ E toda resposta que sai (`message.reply`) declara: `in_reply_to` (o `provider_me
 `ok`), `leak_guard` (`verdict` `passed`), `latency` (`requested_at`, `seen_at`, `replied_at`), `served` (o passo
 «serviu?»: `asked`, e `reason` quando `asked` é `false`), `audit` (`id` do registro) e `body`.
 
-> ⚠️ **O id do provedor pode ser um número de telefone** (no WhatsApp, `<número>@c.us`). Ele circula entre o
-> adapter e o agente porque a identidade só se resolve por ele; ele **não sai** em resposta, log ou erro
-> (`rule.secret_never_out`). O juiz confere isso só no texto da resposta, por heurística (10 ou mais dígitos com
-> separadores de telefone, depois de tirar datas e horas).
+## Identificadores: pseudônimo, nunca o id cru
+
+No WhatsApp o id cru é `<número>@c.us`, e o id de mensagem do WAHA também leva o número. Por isso **nenhum
+identificador sai do adapter cru**: `provider_id` (de `requester`, de `audience.members[]` e de `on_behalf_of`),
+`place.id`, `thread.id`, `thread.reply_to`, `provider_message_id` e `in_reply_to` são **pseudônimos estáveis**.
+Forma recomendada: `<provider>:` mais o HMAC-SHA256 do id cru com uma chave privada da instância, em 16 hex (ex.:
+`waha:3f9a1c0be47d2a65`); o apelido da lista fechada também serve. A resolução do id cru para pessoa, e de volta
+para responder no fio, acontece **só dentro do adapter**. O juiz recusa (`ID-COM-NUMERO`) identificador com 8 ou mais
+dígitos seguidos ou com forma de e-mail, salvo a forma `<provider>:<16 hex>`.
+
+No texto da resposta, a guarda de número é heurística (10 ou mais dígitos com separadores de telefone, depois de
+tirar datas e horas).
+
+## Papel de quem pede: vocabulário fechado
+
+`internal` (gente de dentro), `partner` (sócio), `external` (fora do mapa, ou contato de fora) e `customer` (cliente
+final). Quem não está no mapa de identidade sai `external` com `person: null`. `customer` é reservado ao canal oficial
+com cliente final: no WAHA o juiz o recusa (`PAPEL`). O enum vive no schema e as linhas `role.*` do vocabulário; o juiz
+recusa medir (rc 2) se os dois divergirem. Decisão do core de 2026-11-22, reversível.
 
 ## Verbos e regras do núcleo
 

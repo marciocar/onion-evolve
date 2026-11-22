@@ -20,6 +20,12 @@ isso todo canal entrega a mesma mensagem normalizada e cumpre as mesmas regras d
 - **`D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121`**: o WAHA (não oficial) só nos canais internos e com os
   sócios; o cliente final vem depois pela Cloud API oficial do WhatsApp Business, mesmo contrato, outro adapter.
 
+- **Decisões do core de 2026-11-22, reversíveis** (lacuna apontada pela sessão da mensageria antes do merge):
+  (1) todo identificador que sai do adapter é pseudônimo (`<provider>:<HMAC-SHA256 16 hex>` ou apelido), porque o id
+  cru do WhatsApp é o número e contradiz `rule.secret_never_out`; (2) o papel de quem pede é vocabulário fechado,
+  `internal | partner | external | customer`, com `customer` reservado ao canal oficial com cliente final e quem não
+  está no mapa como `external` com `person: null`. Detalhe em [`interface.md`](interface.md).
+
 **Por que não há `factory.md` nem `detector.md` aqui**, ao contrário do task-manager: o core não escolhe nem chama
 o adapter. Quem roteia é a peça que opera o canal. O core guarda o contrato e o juiz.
 
@@ -31,7 +37,7 @@ python3 -I -B .claude/utils/chat/conformance.py capabilities adapters/<p>.capabi
 python3 -I -B .claude/utils/chat/conformance.py --vocabulary
 ```
 
-rc 0 conforme · 1 viola (uma linha `VIOLA` por achado, com código: `SEM-ID-DO-PROVEDOR`, `IDENTIDADE-FORA-DO-ID`,
+rc 0 conforme · 1 viola (uma linha `VIOLA` por achado, com código: `SEM-ID-DO-PROVEDOR`, `ID-COM-NUMERO`, `PAPEL`, `IDENTIDADE-FORA-DO-ID`,
 `SEM-AUDIENCIA`, `DUPLICADO`, `VAZAMENTO`, `LATENCIA`, `RETENCAO`, `SERVIU`, `FIO`, `FORMA`…) · 2 não mediu (arquivo
 ausente ou vazio, `jsonschema` ausente). A peça roda o juiz na própria bancada, sobre a saída do adapter com o
 provedor simulado; a bancada do core (`run_chat_conformance_selftests`) tem um caso para cada código de falta e

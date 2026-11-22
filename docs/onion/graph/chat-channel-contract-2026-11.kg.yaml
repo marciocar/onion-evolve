@@ -65,6 +65,23 @@ nodes:
       locator: ".claude/utils/chat/adapters/waha.capabilities.tsv"
       method: "measurement: leitura do código da peça e conformance.py --strict"
       locality: "repo"
+  - id: D_CHAT_PSEUDONYM_IDS_AND_ROLE_VOCAB_1122
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-22"
+    owner: "core"
+    verified_against: "lacuna apontada pela sessão da mensageria no PR #1732 antes do merge, repassada pela sessão coordenadora do core; conformance.py e a família run_chat_conformance_selftests com os casos ID-COM-NUMERO e PAPEL e os mutantes M30 a M35"
+    label: "Decisão do core, reversível: identificador que sai do adapter de chat é pseudônimo (<provider>:<hmac 16 hex> ou apelido), nunca id cru com telefone ou e-mail; papel é internal, partner, external ou customer (só no canal oficial)"
+    narrative: "No WAHA o id cru é <número>@c.us, e o id de mensagem também leva o número: carregá-los no evento contradizia rule.secret_never_out e a guarda de vazamento. A resolução do id cru para pessoa, e de volta para o fio, fica dentro do adapter. O juiz recusa identificador com 8 ou mais dígitos seguidos ou com forma de e-mail, salvo a forma <provider>:<16 hex>. A extensão da guarda além do provider_id (lugar, fio e ids de mensagem) é escolha desta implementação, pela mesma causa. Quem não está no mapa sai external com person null (antes era unknown). Revisão do maestro pendente: se ele discordar, o contrato muda."
+    provenance:
+      source: "sessão do core, na emenda do PR #1732"
+      locator: ".claude/utils/chat/interface.md (seções Identificadores e Papel) e README.md (A decisão)"
+      method: "testimony: decisão do core, reversível, sobre sinal da sessão da mensageria"
+      locality: "repo"
   - id: Q_CHAT_WAHA_ADAPTER_CONFORMANT_1122
     node_type: question
     layer: audit
@@ -76,6 +93,9 @@ nodes:
     label: "O adapter WAHA da onion-messaging entrega o evento com os 5 campos e passa no conformance.py --strict?"
     narrative: "Pronto quando: a bancada da peça roda conformance.py check sobre a saída do adapter com o WAHA simulado e mutantes, com rc 0, e a declaração waha.capabilities.tsv é atualizada no core com a fonte de cada capacidade nova. O 1º entregável que o Delphi pediu (os 5 campos, o mapa de identidade e a recepção durável) é o primeiro passo. Prazo a calibrar com a peça dona: sai de pontos e histórico."
 edges:
+  - from: D_CHAT_PSEUDONYM_IDS_AND_ROLE_VOCAB_1122
+    to: E_CHAT_CONTRACT_BUILT_1122
+    edge_type: CONSTRAINS
   - from: E_CHAT_CONTRACT_BUILT_1122
     to: E_CHAT_ORIGIN_MAESTRO_ASK_1121
     edge_type: TRACES_TO

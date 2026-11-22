@@ -2,6 +2,8 @@
 # adapters/<p>.capabilities.tsv declara, uma linha cada. Lida por conformance.py (modo capabilities).
 # kind: verb = operação do adapter · rule = regra do núcleo que o adapter cumpre em toda mensagem.
 # requirement: required = o adapter só fica conforme com ela implementada · optional = pode faltar, declarada.
+# kind: role = o vocabulário FECHADO de papel de quem pede (requester.role); não é capacidade, não se declara por adapter.
+#   Decisão do core de 2026-11-22, reversível. Tem de bater com o enum de role do message.schema.json (o juiz confere).
 # Decisão: D_CHAT_CHANNEL_CONTRACT_SDAAL_1121 (grafo coordenacao-selos-arquivo-2026-11). Detalhe em interface.md.
 capability	kind	requirement	meaning
 message.receive	verb	required	entrega ao agente o evento normalizado (os 5 campos), por evento e não por sondagem
@@ -26,3 +28,7 @@ rule.latency_field	rule	required	hora do pedido e hora em que o agente viu, medi
 rule.secret_never_out	rule	required	número e chave nunca em saída, log ou erro
 rule.read_marker	rule	required	marca de quem leu, entre sessões
 rule.channel_loss_keeps_queue	rule	required	perder o canal (número banido, token revogado) não perde a fila
+role.internal	role	-	gente de dentro (o time da instância)
+role.partner	role	-	sócio
+role.external	role	-	quem não está no mapa de identidade, ou está como contato de fora; sem pessoa, o papel é este
+role.customer	role	-	cliente final: reservado ao canal oficial com cliente (nunca no WAHA, D_WAHA_INTERNAL_ONLY_OFFICIAL_FOR_CUSTOMERS_1121)

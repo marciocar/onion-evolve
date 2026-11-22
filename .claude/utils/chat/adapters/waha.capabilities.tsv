@@ -11,7 +11,7 @@ message.send	required	implemented	WAHA (versão não pinada)	piece:messaging/too
 message.reply_thread	required	not_implemented	WAHA (versão não pinada)	-	o envio vai à conversa, sem citar a mensagem que pediu (nenhum reply_to no código)
 message.ack	required	implemented	WAHA (versão não pinada)	piece:messaging/queue/onion_queue/daemon.py	op_ack da fila: sem ack o evento volta até o teto e depois vai à dead-letter
 audience.list	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	--groups lista os grupos com a contagem de participantes e os 4 últimos dígitos; não é verbo por conversa antes de responder, nem resolve pessoa
-identity.resolve	required	not_implemented	WAHA (versão não pinada)	-	falta o mapa id do provedor para pessoa e papel
+identity.resolve	required	not_implemented	WAHA (versão não pinada)	-	falta o mapa id do provedor para pessoa e papel (internal, partner, external) e os pseudônimos: hoje o corpo bruto leva o id cru <número>@c.us
 served.ask	required	not_implemented	WAHA (versão não pinada)	-
 conversation.list	optional	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	só grupos (--groups); conversas diretas não
 media.send	optional	implemented	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	PDF, XLSX ou CSV até 10 MB, conferido pelo conteúdo; /api/sendFile pode ser só da edição paga do WAHA
