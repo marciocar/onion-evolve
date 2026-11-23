@@ -48,6 +48,11 @@ nodes:
     trace: ".claude/validation/private-repo-cite-check.sh"
     label: "substrato: check de lint (REGRA 121, aplica-se só à fonte), molde da catraca da REGRA 99; julga só os .kg.yaml que o diff contra o merge-base com origin/main toca; aviso SOFT, catraca HARD"
     narrative: "Lint e não hook porque o pre-commit e o CI já rodam o lint. Visibilidade pela lista versionada public-repos.tsv: o CI não consulta a rede, e o --verify-allowlist reconfere com gh fora dele. Donos julgados: os owner da lista mais os donos das URLs do members.yaml. A citação nova é aviso por decisão do maestro. A catraca é HARD porque re-emitir o baseline é o jeito de calar o aviso, e o maestro mandou que o número só caia; quando a lista perde um repo no mesmo diff (virou privado), o crescimento sai SOFT. Baseline e saída tsv levam o repo por hash: a saída do CI de um repo público é pública."
+    provenance:
+      source: "sessão do core, /meta:forge-guard da guarda de citação de repo privado, 2026-11-10"
+      locator: "PR da guarda private-repo-cite-check.sh (REGRA 121) e este nó; a parte «aviso SOFT, catraca HARD» é a ordem do maestro citada na narrative"
+      method: "testimony: decisão de desenho da sessão do core na forja da guarda, com as duas ordens do maestro (aviso na citação nova; o número só cai)"
+      locality: "pessoa"
   - id: D_VOCABULARIO_DO_NOME_NU_POR_TRES_FONTES
     node_type: decision
     layer: audit
@@ -60,6 +65,11 @@ nodes:
     trace: "docs/evolution/federation/public-repos.tsv"
     label: "repo@sha sem dono é a forma dominante (um repo privado aparece 84 vezes assim) e o members.yaml não o registra; o nome nu vem do registro, das URLs de dono julgado no corpus e de uma lista medida guardada por hash"
     narrative: "A 1ª redação derivava o nome nu só do members.yaml e via 2 das 84 ocorrências do repo mais citado. Acusar todo palavra@sha traria ruído medido (grafo@, core@, develop@, número@), o que a cláusula 4 da doutrina recusa. Ficou: o registro, as URLs de dono julgado no corpus e 13 nomes medidos (privados ou que não resolvem), gravados como nome#<hash>. O hash curto se enumera e não esconde o nome; só evita gravá-lo em claro num arquivo público."
+    provenance:
+      source: "sessão do core, /meta:forge-guard da guarda de citação de repo privado, 2026-11-10"
+      locator: "contagem de <nome>@<sha> no corpus e gh repo view de cada nome (verified_against deste nó); passada adversarial de 2026-11-10"
+      method: "testimony: decisão de desenho da sessão do core, apoiada na medição do corpus em 2026-11-10"
+      locality: "pessoa"
   - id: E_MUTANTES_DO_VOCABULARIO_MORDEM
     node_type: evidence
     layer: audit
