@@ -72,3 +72,12 @@ faixas. A bancada local não rodou nele (teto de 500 s esperando a vaga de carga
 | 13 | O modelo de heredoc numa linha só não roda se copiado | sim | não | Curado: «modelo, não literal: o heredoc abre e fecha em linhas próprias» |
 | 14 | `findings_blocking: 0` com o item 10 bloqueante no corpo | sim | não | Curado: `findings_blocking: 1` |
 | 15 | `dívida:` roteia como dúvida | aceito | não | Já aceito no item 9 |
+
+## Re-revisão pós-rebase (2026-11-23)
+
+O #1701 (rota `tarefa:`) entrou antes e tocou os mesmos pontos. Conflitos resolvidos por união, sem mudar o
+comportamento de nenhum dos dois: em `lint-selftest.sh` as duas famílias novas ficam lado a lado
+(`aside_router_task` e `aside_router_routes`, cada uma com o seu `_family`); em `warm-up.md` a lista de marcadores
+traz `tarefa:` e a nota de `reforço:`/`nota:`; no KB a linha de aliases soma `faça:`→`tarefa:` à redação nova de
+`fyi:`/`avisa:`, e as duas seções (rota `tarefa:` e revisão por medição) ficam. As três famílias passam juntas
+(`--families aside_router,aside_router_task,aside_router_routes`: OK, todas reagiram).
