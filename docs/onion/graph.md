@@ -826,6 +826,12 @@ onion-standalone	specialization	public-distribution
 onion-standalone	specialization	role-scoped-adopt	
 onion-standalone	tier	standalone	
 onion-standalone	trust-advises	onion-evolve	
+onion-svc-gokapi	adopts	onion-evolve	
+onion-svc-gokapi	mode	greenfield	
+onion-svc-gokapi	pin	n/a	
+onion-svc-gokapi	specialization	servico-vps	
+onion-svc-gokapi	tier	standalone	
+onion-svc-gokapi	trust-advises	onion-evolve	
 onion-svc-librechat	adopts	onion-evolve	
 onion-svc-librechat	mode	greenfield	
 onion-svc-librechat	pin	n/a	
