@@ -2,7 +2,7 @@
 branch: fix/pr-merge-verified-three-defects-1121
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 339cd2241b09e5f2bbae8c40566cf18a7012838dac3f831c4eebd8935cd4c178
+reviewed_diff_sha256: 170917c100fc38c6a91cabbff5fb22b6b4aa5b2df720e042951fec7678f5d34a
 reviewed_code_sha256: 5060cb60c533abf79e4b9d36ed10c9552ae718f82561d11cc21b647c2fc62a34
 findings_total: 9
 findings_real: 9
