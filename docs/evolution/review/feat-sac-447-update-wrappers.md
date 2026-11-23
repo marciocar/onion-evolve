@@ -2,8 +2,7 @@
 branch: feat/sac-447-update-wrappers
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: cbd98a8a9be4333916d405b6cd6ec3f931dcc27b506fa120ea9b964e724c6d9e
-reviewed_code_sha256: 885384417663c1c1e1ff7dee89d56b11d5ec8dd619519e004264816be74f4148
+reviewed_diff_sha256: pendente
 findings_total: 11
 findings_real: 11
 findings_blocking: 2
@@ -89,3 +88,7 @@ no diff, e a prova do hub passou a procurar o `hub=` dentro da linha "listening"
 - O ensaio contra a produção foi rodado pelo condutor (só leitura, mais o fetch declarado no clone do worker): persona
   em dia (NOOP), hub recusado porque a worktree do worker ainda não existe, com o ato de migração impresso. O `--apply`
   não foi rodado: é ato do maestro.
+
+## Re-revisão pós-rebase (2026-11-23)
+
+Conflito só na lista `SELFTEST_CORE_ONLY_FAMILIES` do `lint-selftest.sh`: a main ganhou famílias novas e o PR acrescenta `update_persona_hub`; resolvido pela união das duas listas, sem mudar nenhum caso. Projeções geradas ficaram com a versão da main e se regeneram no fechamento.
