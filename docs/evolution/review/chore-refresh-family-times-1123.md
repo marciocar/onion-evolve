@@ -2,7 +2,8 @@
 branch: chore/refresh-family-times-1123
 pr: 1748
 date: 2026-11-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: bf244e10aabd6a0f3fe9081b5f7167b23b02c9a66ef6c30e773b3f6e660b650f
+reviewed_code_sha256: b5c8147590d0b5d59cf53a9739744eb7137a15eaea4bd82ae7a62d1469669766
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
