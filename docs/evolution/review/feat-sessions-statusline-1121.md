@@ -2,8 +2,8 @@
 branch: feat/sessions-statusline-1121
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: 03c8d5a023ff9408245a470f82f95ad02a1b2eae267a596116ed216aad3e8fc9
-reviewed_code_sha256: 02d1d902b90d499b58faa389979b9a49abe8f483d610496e7ae602c9c3e7137c
+reviewed_diff_sha256: pendente
+reviewed_code_sha256: pendente
 findings_total: 11
 findings_real: 10
 findings_blocking: 1
@@ -53,3 +53,12 @@ O adopt **nunca escreve** statusLine no projeto. Os motivos estão abaixo e os d
 - Pasta plantada por outro uid de verdade: foi simulada com o modo e com symlink.
 - Trava sob concorrência real.
 - Sessão background que estivesse trabalhando de fato, cujo formato de `state` não foi visto.
+
+## Re-revisão pós-rebase (2026-11-23, sessão do core)
+
+A fila de merges rebaseou a branch sobre a main (que recebeu #1731, #1735, #1739 a #1743) e o hash de código mudou.
+`git range-diff` dos 8 commits antes e depois do rebase: 6 idênticos (`=`); os 2 que mudaram (`!`) mudaram só no
+contexto. No `a776915c1`, a família `sessions_statusline` entra no `lint-selftest.sh` logo depois de uma família
+que a main acrescentou (`run_jq_raw_utf8_selftests`), em vez de depois de `run_market_peek_selftests`; o corpo da
+família e o `onion-sessions-line` são os mesmos byte a byte. O outro é projeção gerada. Nenhuma linha de código da
+PR mudou de sentido, então a revisão isolada acima segue valendo para o head novo.
