@@ -36,6 +36,7 @@ flowchart TD
   bomtexto["bomtexto<br/>standalone · greenfield"]:::standalone
   maestro_notebook_test["maestro-notebook-test<br/>standalone · greenfield"]:::standalone
   maestro_peer_test["maestro-peer-test<br/>standalone · greenfield"]:::standalone
+  watcher_onion_evolve["watcher-onion-evolve<br/>standalone · greenfield"]:::standalone
   onion_vps_ops["onion-vps-ops<br/>standalone · greenfield"]:::standalone
   onion_messaging["onion-messaging<br/>standalone · greenfield"]:::standalone
   consultoria_analise_de_caso["consultoria-analise-de-caso<br/>standalone · greenfield"]:::standalone
@@ -71,6 +72,7 @@ flowchart TD
   bomtexto -->|adopts| onion_evolve
   maestro_notebook_test -->|adopts| onion_evolve
   maestro_peer_test -->|adopts| onion_evolve
+  watcher_onion_evolve -->|adopts| onion_evolve
   onion_vps_ops -->|adopts| onion_evolve
   onion_messaging -->|adopts| onion_evolve
   consultoria_analise_de_caso -->|adopts| onion_evolve
@@ -114,6 +116,7 @@ flowchart TD
 | bomtexto | standalone | greenfield |  | `bd769f168411` |
 | maestro-notebook-test | standalone | greenfield | a2a-spike | `n/a` |
 | maestro-peer-test | standalone | greenfield | a2a-spike | `n/a` |
+| watcher-onion-evolve | standalone | greenfield | webhooks, a2a | `n/a` |
 | onion-vps-ops | standalone | greenfield | operacao, infra, vps | `6760a7bede50` |
 | onion-messaging | standalone | greenfield | mensageria, channels-mcp, a2a | `e4c954ebad47` |
 | consultoria-analise-de-caso | standalone | greenfield | consultoria, extract-meeting, pain-price | `e4c954ebad47` |

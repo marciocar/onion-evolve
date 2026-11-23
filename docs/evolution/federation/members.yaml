@@ -913,6 +913,28 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: watcher-onion-evolve
+    name: watcher-onion-evolve (o vigia de webhooks da messaging, instância do core)
+    role: standalone            # tier 3: fala só com o core
+    kind: method                # serviço sem repo próprio, como os membros de teste (lacuna L7): o código é o watcher/ do onion-messaging
+    parent: onion-evolve        # tier 3 pendura na fonte; quem o constrói e instala é o onion-messaging (tools/acts/watcher-install.sh, PR #62 dele)
+    onion_version: n/a          # não vendoriza o framework; só assina sinais
+    adopted_at: 2026-11-23
+    mode: greenfield
+    personality_summary: "O vigia que recebe webhooks (WAHA, GitHub, Linear, Slack) em hooks.onionevolve.com, confere a assinatura de cada canal e entrega ao core como sinal assinado na fila A2A; quem pede vem por pseudônimo e papel, nunca por número (contrato do canal de conversa, core #1732)."
+    specializations: [webhooks, a2a]
+    personality_last_sync: 2026-11-23
+    a2a:
+      sends_to: onion-evolve
+      keys: [watcher-onion-evolve-1]   # pinado em jwks/watcher-onion-evolve-1.pem (sha256:ee989e9a…fc86, RSA 3072), gerado pelo core em 2026-11-23 com a2a-keygen.sh; a privada fica em ~/.config/onion/a2a (0600)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: onion-vps-ops
     name: onion-vps-ops (operação dos serviços da VPS)
     role: standalone
