@@ -2,8 +2,7 @@
 branch: fix/drive-audit-seal-radar
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 0b8c4115f9da5578de8c1e2b9824d2d2fc06b0b9b7cd9406874f0d0bedf446c7
-reviewed_code_sha256: 7e690b941325b5a3b2ef1f746c44763da7ca4c8cee4e03a1046a1ab0bc86f1de
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 4
 findings_blocking: 2
@@ -85,3 +84,10 @@ Pendente no momento da escrita deste resíduo; atualizado abaixo quando voltar.
 - O card nomeia o defeito (a) como «ciclo calado no AUDIT». O brief da tarefa o leu como «o ciclo do laço não
   reporta o que fez»; a fonte (o relatório da revisão de 2026-11-20, §4, defeito 1) diz que é o **ciclo de
   `DEPENDS_ON`** que o censo AUDIT não acusa. Curei o que a fonte descreve.
+
+## Re-revisão pós-rebase (2026-11-23, sessão do core)
+
+A fila de merges rebaseou a branch sobre a main (173 commits à frente). `git range-diff` do commit antes e depois:
+o código da PR (`kg-drive-project.sh`, as duas fixtures, a família da bancada e o trecho da doutrina) é o mesmo;
+o que mudou é só projeção gerada (`docs/onion/testing-inventory.md`, as contagens da bancada), que o pr-finalize
+regenera. Nenhuma linha de código desta PR mudou de sentido; a revisão isolada acima segue valendo.
