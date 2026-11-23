@@ -57514,8 +57514,8 @@ DEC_PY
       cmp -s "${seal}" "${_cb}/${_cbv}/validation/kg-decide-seal.sh" && { _cbres="${_cbres} mut:âncora-não-casou"; continue; }
     fi
     cp "${r}/docs/a/a.kg.yaml" "${_cb}/${_cbv}/s.kg.yaml"
-    if bash "${_cb}/${_cbv}/validation/kg-decide-seal.sh" "${_cb}/${_cbv}/s.kg.yaml" D_VELHO --chosen "caminho um" --rejected "caminho dois" --date 2026-11-21 --question "qual?" --decided-by core > "${_cb}/${_cbv}.out" 2>&1 \
-       && bash "${_cb}/${_cbv}/validation/kg-decide-seal.sh" "${_cb}/${_cbv}/s.kg.yaml" --new D_DO_CORE --label "o core decidiu" --link Q_CITADO --chosen "X" --rejected "Y" --date 2026-11-21 --question "qual?" --decided-by core >> "${_cb}/${_cbv}.out" 2>&1; then
+    if bash "${_cb}/${_cbv}/validation/kg-decide-seal.sh" "${_cb}/${_cbv}/s.kg.yaml" D_VELHO --chosen "caminho um" --rejected "caminho dois" --date 2026-11-21 --question "qual?" --decided-by core --destination design > "${_cb}/${_cbv}.out" 2>&1 \
+       && bash "${_cb}/${_cbv}/validation/kg-decide-seal.sh" "${_cb}/${_cbv}/s.kg.yaml" --new D_DO_CORE --label "o core decidiu" --link Q_CITADO --chosen "X" --rejected "Y" --date 2026-11-21 --question "qual?" --destination mechanism --guard SAC-1 --decided-by core >> "${_cb}/${_cbv}.out" 2>&1; then
       if python3 -I -B - "${_cb}/${_cbv}/s.kg.yaml" <<'DEC_PY'
 import sys, yaml
 ns = {x['id']: x for x in yaml.safe_load(open(sys.argv[1]))['nodes']}
@@ -57528,6 +57528,9 @@ for nid in ('D_VELHO', 'D_DO_CORE'):
                  and p['locator'] == 'pergunta registrada de 2026-11-21: «qual?»'
                  and n['verified_against'].startswith('decisão do core em 2026-11-21') and 'revisão do maestro pendente' in n['verified_against']
                  and 'Selado pelo core por /meta:decide em 2026-11-21' in n['narrative'] and 'Revisão do maestro pendente' in n['narrative'])
+# as duas flags juntas (rebase sobre o --destination de 2026-11-21): a autoria do core não apaga o destino declarado
+ok = ok and ns['D_VELHO'].get('x_destination') == 'design' and 'x_guard' not in ns['D_VELHO']
+ok = ok and ns['D_DO_CORE'].get('x_destination') == 'mechanism' and str(ns['D_DO_CORE'].get('x_guard')) == 'SAC-1'
 sys.exit(0 if ok else 1)
 DEC_PY
       then _cbres="${_cbres} ${_cbv}:core"; else _cbres="${_cbres} ${_cbv}:maestro"; fi
@@ -57537,7 +57540,7 @@ DEC_PY
   cp "${r}/docs/a/a.kg.yaml" "${sb}/core-ref.kg.yaml"; h0="$(sha256sum "${sb}/core-ref.kg.yaml" | cut -d' ' -f1)"
   for _cbo in "--decided-by core --other" "--decided-by ninguem" "--decided-by" "--decided-by core --decided-by maestro"; do
     # shellcheck disable=SC2086
-    if bash "${seal}" "${sb}/core-ref.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-11-21 --question q ${_cbo} >/dev/null 2>&1; then _cbrc=0; else _cbrc=$?; fi
+    if bash "${seal}" "${sb}/core-ref.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-11-21 --question q --destination design ${_cbo} >/dev/null 2>&1; then _cbrc=0; else _cbrc=$?; fi
     [ "${_cbrc}" -eq 2 ] && [ "$(sha256sum "${sb}/core-ref.kg.yaml" | cut -d' ' -f1)" = "${h0}" ] || _cbref="${_cbref} [${_cbo}]:rc${_cbrc}"
   done
   # o lote recusa o core pela recusa PRÓPRIA (a mensagem é o veredito: um lote vazio também sairia rc 2 por outro motivo)
