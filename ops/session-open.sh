@@ -85,7 +85,7 @@ ID_RE='^[A-Za-z0-9][A-Za-z0-9-]{7,63}$'
 [ -z "${RESUME}" ] || [[ "${RESUME}" =~ ${ID_RE} ]] || die "id de sessão inválido: «${RESUME}»"
 case "${MODE}" in ''|default|acceptEdits|plan|auto|dontAsk|bypassPermissions) ;; *) die "--mode fora da lista (default, acceptEdits, plan, auto, dontAsk, bypassPermissions): «${MODE}»" ;; esac
 
-valid_name() { [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]; }
+valid_name() { [[ "$1" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$ ]]; }   # sem ponto: o tmux grava a.b como a_b e o has-session não acharia
 
 # pids de `claude` cujo cwd é a pasta. $2 = "out" (fora de tmux) | "any". Erro de leitura NÃO vira «nenhum»: rc 2 —
 # MAS só quando o processo é do MESMO dono (falha fechada real). Se o cwd/environ não se lê e o processo é de OUTRA
