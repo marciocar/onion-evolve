@@ -2,7 +2,8 @@
 branch: fix/kg-provenance-private-cite-1123
 pr: pendente
 date: 2026-11-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 129726e8b941cc1bb3a0f647860ff11238a2ff09cbe5642f62fd708b5dc4b570
+reviewed_code_sha256: 73521fc6412d779ec2b63344e7d2749f303d998be6e14ce86e7b7400ea674089
 findings_total: 1
 findings_real: 0
 findings_blocking: 0
