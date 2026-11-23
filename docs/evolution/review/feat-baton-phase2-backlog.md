@@ -2,7 +2,7 @@
 branch: feat/baton-phase2-backlog
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: fa5c7ef74124857709a0667dca4cdd8d8bd8f4d4cc23a724b3ec2a0e10a3d08e
+reviewed_diff_sha256: e91b500030781050c90977487146cfd818c0be54bb07c610cb8b540aaceaf76d
 reviewed_code_sha256: 18da9500e3bef8d30ceb1eb6f8e33e9233c8cf012706e9a1d69edd6c982438c2
 findings_total: 19
 findings_real: 12
