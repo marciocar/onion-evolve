@@ -2,7 +2,7 @@
 branch: feat/session-open-per-session-server
 pr: pendente
 date: 2026-11-22
-reviewed_diff_sha256: e34cf724f82a3ce1074964922a9ed470b7e944ead38d0774adc15478d16c6ce6
+reviewed_diff_sha256: 3c66c727f0fe3b79189a29fdc2fdcfd32775773e5b7560dd1ecde32a56f5cc66
 reviewed_code_sha256: 06cb695ddded54bc809bf0ad58fd57db00ba7c01e17053cbda129885d35d473d
 findings_total: 4
 findings_real: 3
