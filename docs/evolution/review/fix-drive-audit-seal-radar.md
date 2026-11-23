@@ -2,7 +2,8 @@
 branch: fix/drive-audit-seal-radar
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ac2caa2288318147bf36162dbc2a6e0e8e70ff7d920db52a118f4383f9ebaf0f
+reviewed_code_sha256: 7e690b941325b5a3b2ef1f746c44763da7ca4c8cee4e03a1046a1ab0bc86f1de
 findings_total: 6
 findings_real: 4
 findings_blocking: 2
