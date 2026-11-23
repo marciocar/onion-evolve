@@ -22,6 +22,8 @@ na própria gramática.** O documento completo vive no repo da curadoria; o esse
 
 ## A prática principal (acrescentar à gramática, após "A regra que mais custa esquecer")
 
+> Nota (2026-11-23): o texto abaixo foi superado pela redação da gramática (`.claude/rules/kg-grammar.md`); não copie daqui.
+
 > **E o que foi descartado também é nó.** Quando uma decisão é selada com opções rejeitadas (o campo
 > «descartadas:» do `/meta:decide`, ou uma alternativa de desenho considerada e recusada), cada opção rejeitada
 > **substantiva** vira um nó (`claim`/`decision`, status `refuted` se derrubada ou `superseded` se trocada) com

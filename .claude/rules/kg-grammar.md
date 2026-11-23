@@ -61,7 +61,7 @@ ao dissent, por isso ele a *restringe*, não a derruba.
 opções de **desenho** rejeitadas que têm conteúdo próprio, cada uma vira nó (`claim`/`decision`) ligado à
 decisão: a opção que a decisão **mata** fica `refuted`, com `REFUTES` da decisão para ela; a que foi
 **trocada** fica `superseded`, com `SUPERSEDES` da decisão para ela; a que **sobrevive como limite** fica
-`open`/`confirmed`, com `CONSTRAINS` dela para a decisão (pela regra acima: limite não é derrota). Opção
+`open`/`confirmed` (`confirmed` só com `provenance`), com `CONSTRAINS` dela para a decisão (pela regra acima: limite não é derrota). Opção
 que mora só no «descartadas:» da narrative some do `kg_query` e do próximo leitor. A rejeição
 **procedimental** do `/meta:decide` («Confirmo com ajuste», «Não selar», «Ainda não») **não** vira nó. Em
 grafo com `# kg-backlog-guard: on`, o nó novo respeita o TETO: colha antes, ou suba o teto no mesmo PR
