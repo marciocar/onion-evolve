@@ -2,7 +2,7 @@
 branch: feat/kg-writer-daily-backup
 pr: pendente
 date: 2026-11-17
-reviewed_diff_sha256: 3c62c51d26eaff8770e0fa75d6a1c2ffcd0d39b46897c600bc136b0e9c13ee6d
+reviewed_diff_sha256: 7fc26e42de41b9ce1b351ac542fd95b80362cf3f925f9c6a8a0755bdffccb7e4
 reviewed_code_sha256: 30214e03c49d17648d4c9058543c94b86f7ba618bef863ed86f12854c5335dde
 findings_total: 13
 findings_real: 11
