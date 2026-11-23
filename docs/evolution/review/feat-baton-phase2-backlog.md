@@ -2,8 +2,7 @@
 branch: feat/baton-phase2-backlog
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 82fdcd4c1a170e25b649382d2b34b3c4e8f74af5093853436552fdcc4326b8d5
-reviewed_code_sha256: 5db5e7a5ef08c3e9e2a02673ca2fc935e7b570af629fc69a63b206a8ed2f5ff5
+reviewed_diff_sha256: pendente
 findings_total: 19
 findings_real: 12
 findings_blocking: 3
@@ -69,3 +68,25 @@ O #1716, base deste PR, entrou na main por squash. O rebase `--onto origin/main`
 já estão na main; o diff deste PR passa a ser só a fase 2 da batuta, sobre a main. Nenhuma linha da fase 2 mudou: o
 hash de código mudou porque a base passou da branch do #1716 para a main. O carimbo volta a `pendente` para o
 `pr-finalize` carimbar de novo.
+
+## Re-revisão pós-rebase (2026-11-23)
+
+A main ganhou, desde a base deste PR, o `/meta:restart` (ac055e161), que acrescentou ao `baton-pulse.sh` a leitura do
+marcador «sem despacho novo» (`<sid>.draining`) e do bilhete de retomada (`<sid>.tsv`), com aviso e a chave `rs` no
+sha do estado. O rebase sobre a `origin/main` deu conflito em dois pontos do `baton-pulse.sh`, e os dois lados eram
+acréscimos independentes no mesmo lugar:
+
+- o bloco do reinício gracioso (main) e o bloco das ofertas da fase 2 (este PR) ficaram os dois, nessa ordem: o
+  primeiro só escreve em `warns`, o segundo em `gaps` e `OFFERS`, sem dependência entre eles;
+- o `state` do sha guarda as duas chaves novas, `'rs': sorted(RS)` (main) e `'of'` das ofertas (este PR).
+
+O resto (doutrina, `baton.md`, `lint-selftest.sh`) entrou sem conflito. `bash -n` limpo.
+
+Bancada: `lint-selftest.sh --families baton_pulse,restart_drain` (a segunda exercita o aviso do marcador dentro do
+`baton-pulse.sh`, o lado da main): **190 passaram, 0 pularam, 0 falharam**.
+
+Limite declarado, sem mudança de comportamento neste rebase: uma sessão em drenagem que esteja `IDLE_WITH_BACKLOG`
+ainda recebe oferta de card, ao lado do aviso «SEM DESPACHO NOVO». Os dois saem na mesma batida; tirar a oferta da
+sessão em drenagem é mudança de desenho, que pede caso e mutante próprios, e fica para depois.
+
+O carimbo volta a `pendente` para o `pr-finalize` carimbar de novo.
