@@ -2,7 +2,8 @@
 branch: feat/member-agente-whatsapp
 pr: pendente
 date: 2026-11-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 28ce763a14f29a5137e455cc65ace7c5a6870fb882e282ff921b457c440462b2
+reviewed_code_sha256: 715b9f35cb95b190601eabfbe688819eaa38ac1a6ed181002ac4cc5a7e54fe48
 findings_total: 2
 findings_real: 2
 findings_blocking: 0
