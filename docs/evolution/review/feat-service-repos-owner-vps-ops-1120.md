@@ -2,7 +2,7 @@
 branch: feat/service-repos-owner-vps-ops-1120
 pr: 1703
 date: 2026-11-20
-reviewed_diff_sha256: ea13641141e8200b814398323a174703ddfdaafa7011652023bd051d4bb36f46
+reviewed_diff_sha256: bd3d83d3332995b6777026ba5be1269ba58a05f43231e394afcf2dee179f89dc
 reviewed_code_sha256: 3215be4cb9f26c3a77c445edfde51a3e6450f2f18779af26f8751b70eeecfb6c
 findings_total: 16
 findings_real: 14
