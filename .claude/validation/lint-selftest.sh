@@ -27051,6 +27051,11 @@ run_githook_selftests() {
 # O `gh` e esbocado porque o SUT fala com a rede; o esboco ESPELHA as consultas reais
 # (headRefOid, headRepositoryOwner, statusCheckRollup, check-runs, pr checks, state+mergedAt).
 run_pr_merge_verified_selftests() {
+  # Hermético: os casos usam remotos https de mentira (onion-bancada/*). Sem isto, num checkout com helper de
+  # credencial o `git fetch` espera uma senha que ninguém digita (medido em 2026-11-23: 2 h pendurado no pré-voo).
+  local GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=/bin/false GCM_INTERACTIVE=never
+  local GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=credential.helper GIT_CONFIG_VALUE_0=
+  export GIT_TERMINAL_PROMPT GIT_ASKPASS GCM_INTERACTIVE GIT_CONFIG_COUNT GIT_CONFIG_KEY_0 GIT_CONFIG_VALUE_0
   local sut="${REPO_ROOT}/ops/pr-merge-verified.sh"
   [ -f "${sut}" ] || { record_skip "pr-merge-verified: ops/ ausente (adotante) → pulado"; return; }
   local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN

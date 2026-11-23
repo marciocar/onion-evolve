@@ -1,13 +1,12 @@
 ---
 branch: feat/service-repos-owner-vps-ops-1120
-pr: pendente
+pr: 1703
 date: 2026-11-20
-reviewed_diff_sha256: af99a7de372fdde5eb769e416351c6bf266f7b37a37ed1bf5b8a789864565604
-reviewed_code_sha256: d276f924dac2366cdc4e096759f453e169810c70d22f161be4137053cdc7752c
-findings_total: 15
-findings_real: 13
+reviewed_diff_sha256: pendente
+findings_total: 16
+findings_real: 14
 findings_blocking: 2
-findings_fixed: 9
+findings_fixed: 10
 tokens: 270000
 duration_min: 7
 verdict: FIXED
@@ -89,3 +88,13 @@ agora chama o `_pmv_member_row` para o alvo, e a extração quebrou. O extrator 
 
 O revisor confirmou que a paridade compara o awk que a catraca usa de fato. O mutante do (q) muda o leitor `ownership.sh` e segue
 morrendo pela causa. As famílias `session_open` e `pr_merge_verified` passaram com 0 falhas.
+
+## Re-revisão pós-rebase (2026-11-23)
+
+O rebase sobre a main (201 commits) passou sem conflito. O pré-voo do pr-finalize ficou 2 h pendurado: os casos `sv*`
+da família `pr_merge_verified` usam remotos https de mentira (`onion-bancada/*`), e num checkout com helper de credencial
+o `git fetch` esperava uma senha. No CI do GitHub o fetch falha rápido; aqui não.
+
+| # | achado | real? | bloq.? | destino |
+|---|---|---|---|---|
+| 16 | A família `pr_merge_verified` não é hermética: `git fetch` a remoto https de mentira pendura num checkout com helper de credencial | sim, medido | não (CI passa) | Curado: a família exporta `GIT_TERMINAL_PROMPT=0`, `GIT_ASKPASS=/bin/false` e `credential.helper` vazio; a família passou local (OK, todas reagiram) |
