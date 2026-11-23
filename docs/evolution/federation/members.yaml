@@ -1022,7 +1022,7 @@ members:
     remote: https://github.com/marciocar/onion-vps-gokapi (privado)
     local_path: /home/marcio/onion-vps-gokapi
     onion_version: n/a          # não vendoriza o framework (sem .claude/)
-    integration_branch: main
+    integration_branch: master
     adopted_at: 2026-11-23      # data do registro; não houve adoção
     mode: greenfield
     personality_summary: "Repo de serviço da VPS (Gokapi, transfer.onionevolve.com): compose, i18n e ops/local-gate.sh. Dono: a sessão onion-vps-ops. O upload pelo core usa ops/gokapi-upload.sh."
