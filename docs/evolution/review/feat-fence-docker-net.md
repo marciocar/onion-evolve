@@ -2,7 +2,7 @@
 branch: feat/fence-docker-net
 pr: pendente
 date: 2026-11-23
-reviewed_diff_sha256: 31d74cb174f7347cadf091cfb7cdb518019c11b271dfd199e754f1b60f540604
+reviewed_diff_sha256: 9330ee83ed4f94c95b98bfd3959aa25c03cbc11914e65d5c6ab4e8f55f02bd53
 reviewed_code_sha256: 404be8d700352d35992bc195c132f749e85928780d47405adac14c7b3dc921a4
 findings_total: 15
 findings_real: 13
