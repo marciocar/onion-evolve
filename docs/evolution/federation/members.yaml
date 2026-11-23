@@ -785,6 +785,27 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: agente-whatsapp
+    name: agente-whatsapp (agente de conversa no WhatsApp)
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    remote: https://github.com/marciocar/agente-whatsapp (privado)
+    local_path: /home/marcio/agente-whatsapp
+    onion_version: 6276201205d3   # adoção greenfield pelo core em 2026-11-22, PR #1 merjado em 2026-11-23
+    adopted_at: 2026-11-23
+    mode: greenfield
+    personality_summary: "O agente de conversa no WhatsApp: o que ele entende, decide e responde, dentro do contrato do canal de conversa do Onion (quem pede vem por pseudônimo e papel, nunca por número). O transporte (WAHA, vigia de webhooks, lista fechada) é da onion-messaging; aqui não se sobe outro WAHA."
+    specializations: [whatsapp, agente-de-conversa, canal-de-conversa]
+    personality_last_sync: 2026-11-23
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: onion-company-brain-product
     # id com prefixo onion- e sufixo -product: não colide com a vertical company-brain nem com a skill onion-company-brain-context (REGRAS 36 e 106); o repo segue company-brain
     name: onion-company-brain-product (produto Onion Company Brain)
