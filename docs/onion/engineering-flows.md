@@ -1150,4 +1150,4 @@ O roteamento para o especialista depende de `TASK_MANAGER_PROVIDER`:
 
 ## 🔗 Documentos Relacionados
 
-- [Guia de Comandos](./commands-guide.md) — Referência completa de comandos (124 comandos em 11 categorias)
+- [Guia de Comandos](./commands-guide.md) — Referência completa de comandos (125 comandos em 11 categorias)
