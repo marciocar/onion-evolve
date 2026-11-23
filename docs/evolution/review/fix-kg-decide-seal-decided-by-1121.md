@@ -2,7 +2,8 @@
 branch: fix/kg-decide-seal-decided-by-1121
 pr: 1713
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 81a043372c890cdac699240787f2a1d9a39483704a378ecc3f43edffebce5179
+reviewed_code_sha256: b11eb7eded34eb9397c5f2123efc282baf8e66479fc18942c634ed4990580cc1
 findings_total: 11
 findings_real: 7
 findings_blocking: 0
