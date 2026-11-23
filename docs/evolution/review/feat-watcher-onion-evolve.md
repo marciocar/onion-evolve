@@ -2,7 +2,8 @@
 branch: feat/watcher-onion-evolve
 pr: pendente
 date: 2026-11-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1bda6ef3101c508db634fb7d50f816266b388b870cafd0870060551fed41ada1
+reviewed_code_sha256: 3c8b068460350d2eb2250e4d10b1eba7f338bfa7f7b10f05724e7defef3b132d
 findings_total: 4
 findings_real: 3
 findings_blocking: 1

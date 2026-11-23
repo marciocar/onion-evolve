@@ -945,6 +945,13 @@ vendas-pdi-enterprise	specialization	spec-as-code
 vendas-pdi-enterprise	specialization	vendas	
 vendas-pdi-enterprise	tier	standalone	
 vendas-pdi-enterprise	trust-advises	onion-evolve	
+watcher-onion-evolve	adopts	onion-evolve	
+watcher-onion-evolve	mode	greenfield	
+watcher-onion-evolve	pin	n/a	
+watcher-onion-evolve	specialization	a2a	
+watcher-onion-evolve	specialization	webhooks	
+watcher-onion-evolve	tier	standalone	
+watcher-onion-evolve	trust-advises	onion-evolve	
 whisper-specialist	related	/product/consolidate-meetings	
 whisper-specialist	related	/product/convert-to-tasks	
 whisper-specialist	related	/product/extract-meeting	
