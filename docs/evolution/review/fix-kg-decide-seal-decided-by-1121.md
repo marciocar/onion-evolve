@@ -1,15 +1,15 @@
 ---
 branch: fix/kg-decide-seal-decided-by-1121
-pr: pendente
+pr: 1713
 date: 2026-11-21
 reviewed_diff_sha256: 9e79f231b11ea408686dd995746f862645288189aec100161d052a8ec68dbcb2
 reviewed_code_sha256: 4ae51fbd367a0ac6a1e9a915a5e3f46356ccf5fb962461424ad9be4be07b8d1c
-findings_total: 7
-findings_real: 4
+findings_total: 11
+findings_real: 7
 findings_blocking: 0
 tokens: 125455
 duration_min: 12
-findings_fixed: 3
+findings_fixed: 4
 verdict: APPROVED
 elenxo: true
 elenxo_isolado: true
@@ -60,3 +60,16 @@ dizer que o texto do selador foi reescrito à mão.
   do maestro (achado 3).
 - D_DISCARDED_OPTION_AS_NODE_1121 vive só no PR #1711, ainda aberto: a narrative dele não é tocada aqui. O método
   escrito à mão lá («decisão do core na ausência do maestro…») difere da forma que o selador grava agora.
+
+## Revisão isolada (2026-11-23)
+
+Subagente general-purpose (opus), isolado, mandato REFUTAR. Veredito: **APPROVED**. Rodou o selador numa cópia de grafo:
+`core` grava a proveniência do core, sem flag grava maestro, variantes erradas dão rc 2. A bancada `decide` não rodou
+nele (timeout com carga 14,8); o CI do PR a roda.
+
+| # | achado | real? | bloq.? | destino |
+|---|---|---|---|---|
+| 1 | O padrão segue `maestro`: um selo do core sem a flag grava autoria do maestro | sim | não | Declarado como limite; peça futura: `--decided-by` explícito fora de rodada com o maestro (card #95/#63) |
+| 2 | `--decided-by` repetido: valia o último em silêncio (`core` + `maestro` gravava maestro) | sim, medido | não | Curado: repetido sai rc 2, nada escrito; caso novo no s18 |
+| 3 | Escalada (gravar «core» onde decidiu o maestro) rebaixa a autoridade; o radar não aceita «decisão do core» como selo do maestro | refutado | — | — |
+| 4 | Não há caminho para baixar a marca «revisão do maestro pendente» quando ele concorda | sim | não | Já declarado (achado 3 acima); peça própria |

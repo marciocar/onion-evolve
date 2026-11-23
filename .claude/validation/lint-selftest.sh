@@ -57535,7 +57535,7 @@ DEC_PY
   done
   local _cbo _cbrc _cbref=""
   cp "${r}/docs/a/a.kg.yaml" "${sb}/core-ref.kg.yaml"; h0="$(sha256sum "${sb}/core-ref.kg.yaml" | cut -d' ' -f1)"
-  for _cbo in "--decided-by core --other" "--decided-by ninguem" "--decided-by"; do
+  for _cbo in "--decided-by core --other" "--decided-by ninguem" "--decided-by" "--decided-by core --decided-by maestro"; do
     # shellcheck disable=SC2086
     if bash "${seal}" "${sb}/core-ref.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-11-21 --question q ${_cbo} >/dev/null 2>&1; then _cbrc=0; else _cbrc=$?; fi
     [ "${_cbrc}" -eq 2 ] && [ "$(sha256sum "${sb}/core-ref.kg.yaml" | cut -d' ' -f1)" = "${h0}" ] || _cbref="${_cbref} [${_cbo}]:rc${_cbrc}"
