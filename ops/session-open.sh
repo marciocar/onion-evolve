@@ -30,7 +30,9 @@
 #     noutro lugar (a cópia escreveria no mesmo histórico: incidente de 2026-11-16). Nunca mata processo.
 #   · PREFLIGHT na abertura: «este repo merja sozinho? sim|não, e por quê», pela parte estática da catraca do
 #     ops/pr-merge-verified.sh, lida pelo ownership.sh (sem reimplementar aqui).
-#   · O tmux NÃO sobrevive a reboot: depois de um, `--all` reabre as sessões donas do registro, cada uma pelo seu id.
+#   · O tmux NÃO sobrevive a reboot: depois de um, `--all` reabre as sessões donas do registro, cada uma pelo seu id
+#     (no boot, pelo systemd do usuário: ops/session-boot.sh install). Cada sessão vive no PRÓPRIO servidor tmux
+#     (`tmux -L <nome>`): a queda de um servidor leva só aquela sessão (2026-11-22: o servidor único levou cinco).
 #     O core (kind: source, sem owner_session) fica FORA do --all por desenho deste passo: ele é quem roda o abridor;
 #     abre-se à mão (`session-open.sh core`). Entrar no --all é decisão do maestro (2º passo da migração).
 #   · A lista de peers do harness é obrigatória para CRIAR: a sessão de fundo não aparece no /proc como `claude`, e só a
@@ -114,7 +116,21 @@ claude_pids() {
   printf '%s' "${out% }"
 }
 
-has_tmux_session() { "${TMUX_BIN}" has-session -t "=$1" 2>/dev/null; }
+# UM SERVIDOR tmux POR SESSÃO (`tmux -L <nome>`): em 2026-11-22 o servidor único (o `default`) caiu e levou as
+# cinco sessões de uma vez. Com um servidor por sessão, a queda de um leva só aquela. A sessão aberta antes desta
+# mudança vive no servidor `default`: ela ainda é achada (e anexada lá), nunca duplicada. TMUX_SRV diz onde achou.
+TMUX_SRV=""
+has_tmux_session() {
+  TMUX_SRV=""
+  if "${TMUX_BIN}" -L "$1" has-session -t "=$1" 2>/dev/null; then TMUX_SRV="$1"; return 0; fi
+  if "${TMUX_BIN}" has-session -t "=$1" 2>/dev/null; then TMUX_SRV="default"; return 0; fi
+  return 1
+}
+# o comando de entrar, na forma que o maestro digita: servidor próprio (-L) ou o legado (default)
+attach_hint() {
+  if [ "${TMUX_SRV:-$1}" = default ]; then printf '%s attach -t %s' "${TMUX_BIN}" "$1"
+  else printf '%s -L %s attach -t %s' "${TMUX_BIN}" "$1" "$1"; fi
+}
 
 # a lista de peers do harness, como TSV: sessionId kind state pid name cwd. rc 1 = não medida (dito por quem chama).
 peers_tsv() {
@@ -162,7 +178,7 @@ resolve_id() {
     hits="$(awk -F'\t' -v n="${n}" '$5 == n' <<< "${PEERS}")"
     if [ -n "${hits}" ]; then
       while IFS=$'\t' read -r s k st p nm cw; do
-        peer_live "${k}" "${st}" && { say "session-open: a sessão «${n}» já está viva (id ${s}, ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia. Entre nela: ${TMUX_BIN} attach -t ${n}, ou claude attach ${s}." >&2; return 3; }
+        peer_live "${k}" "${st}" && { say "session-open: a sessão «${n}» já está viva (id ${s}, ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia. Entre nela: $(attach_hint "${n}"), ou claude attach ${s}." >&2; return 3; }
       done <<< "${hits}"
       ids="$(cut -f1 <<< "${hits}" | sort -u)"; cnt="$(wc -l <<< "${ids}")"
       if [ "${cnt}" -gt 1 ]; then say "session-open: o harness lista ${cnt} sessões paradas com o nome «${n}» ($(tr '\n' ' ' <<< "${ids}")): ambíguo, não escolho. Diga o id com --resume." >&2; return 5; fi
@@ -260,7 +276,7 @@ open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a 
       if [ -n "${o2}" ]; then
         die "já há um claude vivo em ${dir} FORA do tmux (pid ${o2}). Abrir outro duplica a sessão no checkout. Vá à janela dele, dê /exit, e rode este comando de novo." 3
       fi
-      die "já há um claude vivo em ${dir} (pid ${out}), noutra sessão tmux ou de outra conta, não na «${n}»: nunca duas sessões no mesmo checkout. Entre nela (${TMUX_BIN} ls) ou dê /exit lá; a 2ª sessão de trabalho vai para uma worktree (claude --worktree)." 3
+      die "já há um claude vivo em ${dir} (pid ${out}), noutra sessão tmux ou de outra conta, não na «${n}»: nunca duas sessões no mesmo checkout. Entre nela (bash ops/session-open.sh --list) ou dê /exit lá; a 2ª sessão de trabalho vai para uma worktree (claude --worktree)." 3
     fi
     resolve_id "${n}" "${dir}"; rc=$?
     [ -z "${PEERS_NOTE}" ] || say "session-open: ℹ️  ${PEERS_NOTE}"
@@ -277,17 +293,20 @@ open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a 
     if [ -f "${dir}/.mcp.json" ] && grep -q '"doorbell"' "${dir}/.mcp.json"; then
       cmd="${cmd} --dangerously-load-development-channels server:doorbell"
     fi
+    TMUX_SRV="${n}"
     if [ "${DRY}" -eq 1 ]; then
-      say "ensaio: ${TMUX_BIN} new-session -d -s ${n} -c ${dir} '${cmd}'"
+      say "ensaio: ${TMUX_BIN} -L ${n} new-session -d -s ${n} -c ${dir} '${cmd}'"
     else
-      "${TMUX_BIN}" new-session -d -s "${n}" -c "${dir}" "${cmd}" || die "o tmux não criou a sessão «${n}»" 4
-      say "session-open: criada a sessão tmux «${n}» em ${dir}."
+      "${TMUX_BIN}" -L "${n}" new-session -d -s "${n}" -c "${dir}" "${cmd}" || die "o tmux não criou a sessão «${n}»" 4
+      say "session-open: criada a sessão tmux «${n}» em ${dir}, no servidor próprio (-L ${n})."
     fi
   fi
 
-  [ "${attach}" -eq 1 ] || { say "session-open: para entrar: ${TMUX_BIN} attach -t ${n}"; return 0; }
-  if [ "${DRY}" -eq 1 ]; then say "ensaio: ${TMUX_BIN} attach -t ${n}"; return 0; fi
-  if [ -n "${TMUX:-}" ]; then "${TMUX_BIN}" switch-client -t "=${n}"; else "${TMUX_BIN}" attach -t "=${n}"; fi
+  [ "${attach}" -eq 1 ] || { say "session-open: para entrar: $(attach_hint "${n}")"; return 0; }
+  if [ "${DRY}" -eq 1 ]; then say "ensaio: $(attach_hint "${n}")"; return 0; fi
+  # dentro de um tmux só se troca de sessão no MESMO servidor; noutro servidor, o caminho é sair e anexar
+  if [ -n "${TMUX:-}" ]; then say "session-open: você está dentro de um tmux; saia (Ctrl-b d) e rode: $(attach_hint "${n}")"; return 0; fi
+  if [ "${TMUX_SRV}" = default ]; then "${TMUX_BIN}" attach -t "=${n}"; else "${TMUX_BIN}" -L "${n}" attach -t "=${n}"; fi
 }
 
 # toda sessão dona do registro de posse (members.yaml + lista privada) → «nome<TAB>pasta», só as que TÊM pasta git;
@@ -310,12 +329,12 @@ command -v "${TMUX_BIN}" >/dev/null 2>&1 || die "tmux ausente (${TMUX_BIN})" 4
 
 if [ "${LIST}" -eq 1 ]; then
   names="$(roster)" || exit $?
-  printf '%-22s %-8s %-18s %s\n' "nome" "tmux" "claude (pid)" "pasta"
+  printf '%-22s %-16s %-18s %s\n' "nome" "tmux (servidor)" "claude (pid)" "pasta"
   while IFS=$'\t' read -r n d; do
     [ -n "${n}" ] || continue
-    if has_tmux_session "${n}"; then t="sim"; else t="não"; fi
+    if has_tmux_session "${n}"; then t="${TMUX_SRV}"; else t="não"; fi
     p="$(claude_pids "${d}" any)" || p="NÃO MEDIDO"
-    printf '%-22s %-8s %-18s %s\n' "${n}" "${t}" "${p:--}" "${d}"
+    printf '%-22s %-16s %-18s %s\n' "${n}" "${t}" "${p:--}" "${d}"
   done <<< "${names}"
   exit 0
 fi
