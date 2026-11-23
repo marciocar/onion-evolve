@@ -2,7 +2,7 @@
 branch: feat/session-open-per-session-server
 pr: 1744
 date: 2026-11-22
-reviewed_diff_sha256: cfec57b47b256c3f5473d7c70d5c9ffdb4c9149558a83f6238a1f501d376975b
+reviewed_diff_sha256: 0048229bcd095f67f4b73679b7d44d60dc0b0cbe6ca62ce815b7bc4036404736
 reviewed_code_sha256: fb3dfa32474d956ba4df7eb4acd39c81b38268e39560b63b99fd983645e2bef3
 findings_total: 11
 findings_real: 10
