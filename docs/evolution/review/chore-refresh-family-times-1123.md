@@ -1,11 +1,10 @@
 ---
 branch: chore/refresh-family-times-1123
-pr: pendente
+pr: 1748
 date: 2026-11-23
-reviewed_diff_sha256: 56c68b1e0c2f23bfaffa30cd09c3621117dc7f7ff9981fa3594de904a5345619
-reviewed_code_sha256: a4795d2a9d100e1a36f0027f2e5155b46e56b31ff1c017c0ddbf1b4169b41e50
-findings_total: 1
-findings_real: 1
+reviewed_diff_sha256: pendente
+findings_total: 2
+findings_real: 2
 findings_blocking: 0
 tokens: 0
 duration_min: 15
@@ -34,3 +33,11 @@ reprovava a faixa 5 em todo PR de bancada completa.
 ## Conferido
 
 - `--list` × tabela: nenhuma família sem tempo. `fixtures` presente (4956 s); `selftest_selection` 528 s.
+
+## 2ª passada (CI do próprio PR, 2026-11-23)
+
+| # | achado | real? | bloq.? | destino |
+|---|---|---|---|---|
+| 2 | A re-medição inteira estoura o orçamento: pior faixa projetada 1007 s contra 897 s, e 9 pesadas dividem faixa com `fixtures` (casos h e n da `shard_plan`) | sim, medido no CI | sim para a tabela inteira | Curado pelo escopo: só as 13 famílias que faltavam entram com a mediana nova; as demais seguem com a medição anterior. A lentidão real vai ao card SAC-541 (somar faixa ou cortar custo) |
+
+`shard_plan` local: OK, todas as guardas reagiram. Tabela × `--list`: nenhuma família sem tempo.
