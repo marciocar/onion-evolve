@@ -1,14 +1,14 @@
 ---
 branch: feat/aside-task-dogfood-1120
-pr: pendente
+pr: 1701
 date: 2026-11-20
 reviewed_diff_sha256: pendente
-findings_total: 12
-findings_real: 11
+findings_total: 16
+findings_real: 15
 findings_blocking: 0
 tokens: 71467
 duration_min: 4
-findings_fixed: 9
+findings_fixed: 11
 verdict: FIXED
 elenxo: true
 elenxo_isolado: true
@@ -47,3 +47,15 @@ nota: "tokens = os do subagente revisor. elenxo: true (corrigido em 2026-11-22 p
 ## Bancada
 
 Família isolada (harness com `record_*`, a partir de `/`): 16 PASS, 0 FAIL — contratos (a)–(f) e mutantes M1–M8.
+
+## Revisão isolada (2026-11-23)
+
+Subagente general-purpose (opus), isolado, mandato REFUTAR. Veredito: FIXES_NEEDED, nada bloqueante no core. CI com a família
+`aside_router_task` 16/16 conferido nos logs; mutantes M1–M8 matam pelo motivo certo.
+
+| # | achado | real? | bloq.? | destino |
+|---|---|---|---|---|
+| 1 | No plugin o mapa nunca acha `commands/<cat>/<cmd>.md` (comandos soltos como `/<plugin>:<cmd>`), e a rota mandava dizer que faltou peça instalada | sim | não (core) | Curado no mínimo: a rota vazia manda conferir a lista instalada; o KB declara o limite. Resolver pelo `plugin-namespace-check.sh --map` fica para outro PR |
+| 2 | `_ART_LOCS="$locs"` e a linha do `miss` dentro do `$(...)` eram código morto com comentário enganoso | sim | não | Curado: apagadas |
+| 3 | O teste (c) contra o repo real passa por construção; quem dá dente é o M6 | sim | não | Declarado |
+| 4 | `CLAUDE_PROJECT_DIR` no teste (e) é inócuo | sim | não | Declarado: o hook acha o motor pelo `BASH_SOURCE` |

@@ -2576,8 +2576,6 @@ _art_recognition() {  # $1=motor $2=dir de fixtures → imprime os casos que fal
       [ -z "$out" ] || miss="${miss} ${loc}:$(basename "$f")(falso-positivo)"
     done
   done
-  [ "$locs" = "C" ] && miss="${miss# }" && : # só C rodou: o resumo do (a) diz isso (ver _ART_LOCS)
-  _ART_LOCS="$locs"
   printf '%s' "$miss"
 }
 _art_cited_missing() {  # $1=motor $2=raiz .claude → imprime os comandos citados na rota sem arquivo ("" = ok)
