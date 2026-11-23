@@ -1012,6 +1012,30 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: onion-svc-gokapi
+    name: onion-svc-gokapi (repo de serviço da VPS, Gokapi)
+    role: standalone
+    kind: method                # provisório: não há kind para repo de serviço sem vendor (lacuna L7)
+    owner_session: onion-vps-ops # a sessão dona merja o PR deste repo pelo caminho verificado (D_SERVICE_REPOS_OWNER_VPS_OPS_1120)
+    sponsor: maestro
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-vps-gokapi (privado)
+    local_path: /home/marcio/onion-vps-gokapi
+    onion_version: n/a          # não vendoriza o framework (sem .claude/)
+    integration_branch: main
+    adopted_at: 2026-11-23      # data do registro; não houve adoção
+    mode: greenfield
+    personality_summary: "Repo de serviço da VPS (Gokapi, transfer.onionevolve.com): compose, i18n e ops/local-gate.sh. Dono: a sessão onion-vps-ops. O upload pelo core usa ops/gokapi-upload.sh."
+    specializations: [servico-vps]
+    personality_last_sync: 2026-11-23
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: onion-svc-logto
     name: onion-svc-logto (repo de serviço da VPS, Logto)
     role: standalone
