@@ -116,7 +116,7 @@ while [ $# -gt 0 ]; do
     --other) OTHER="1" ;;
     --destination) _need "$@"; DESTINATION="$2"; shift ;;
     --guard) _need "$@"; GUARD="$2"; shift ;;
-    --decided-by) _need "$@"; DECIDED_BY="$2"; shift ;;
+    --decided-by) _need "$@"; [ -z "${_DB_SEEN:-}" ] || { echo "kg-decide-seal: --decided-by repetido (a autoria é uma só) — nada escrito" >&2; exit 2; }; _DB_SEEN=1; DECIDED_BY="$2"; shift ;;
     --batch) _need "$@"; BATCH="$2"; shift ;;
     --approve) _need "$@"; APPROVE="$2"; shift ;;
     --preview) PREVIEW="1" ;;
