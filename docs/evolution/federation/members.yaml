@@ -792,7 +792,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/agente-whatsapp (privado)
     local_path: /home/marcio/agente-whatsapp
-    onion_version: 6276201205d3   # adoção greenfield pelo core em 2026-11-22, PR #1 merjado em 2026-11-23
+    onion_version: 6276201205d3   # adoção greenfield pelo core em 2026-11-23, PR #1 merjado em 2026-11-23
     adopted_at: 2026-11-23
     mode: greenfield
     personality_summary: "O agente de conversa no WhatsApp: o que ele entende, decide e responde, dentro do contrato do canal de conversa do Onion (quem pede vem por pseudônimo e papel, nunca por número). O transporte (WAHA, vigia de webhooks, lista fechada) é da onion-messaging; aqui não se sobe outro WAHA."
