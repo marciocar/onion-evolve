@@ -40,6 +40,7 @@ flowchart TD
   watcher_onion_evolve["watcher-onion-evolve<br/>standalone · greenfield"]:::standalone
   onion_vps_ops["onion-vps-ops<br/>standalone · greenfield"]:::standalone
   onion_svc_librechat["onion-svc-librechat<br/>standalone · greenfield"]:::standalone
+  onion_svc_gokapi["onion-svc-gokapi<br/>standalone · greenfield"]:::standalone
   onion_svc_logto["onion-svc-logto<br/>standalone · greenfield"]:::standalone
   onion_svc_waha["onion-svc-waha<br/>standalone · greenfield"]:::standalone
   onion_svc_vaultwarden["onion-svc-vaultwarden<br/>standalone · greenfield"]:::standalone
@@ -81,6 +82,7 @@ flowchart TD
   watcher_onion_evolve -->|adopts| onion_evolve
   onion_vps_ops -->|adopts| onion_evolve
   onion_svc_librechat -->|adopts| onion_evolve
+  onion_svc_gokapi -->|adopts| onion_evolve
   onion_svc_logto -->|adopts| onion_evolve
   onion_svc_waha -->|adopts| onion_evolve
   onion_svc_vaultwarden -->|adopts| onion_evolve
@@ -130,6 +132,7 @@ flowchart TD
 | watcher-onion-evolve | standalone | greenfield | webhooks, a2a | `n/a` |
 | onion-vps-ops | standalone | greenfield | operacao, infra, vps | `6760a7bede50` |
 | onion-svc-librechat | standalone | greenfield | servico-vps | `n/a` |
+| onion-svc-gokapi | standalone | greenfield | servico-vps | `n/a` |
 | onion-svc-logto | standalone | greenfield | servico-vps | `n/a` |
 | onion-svc-waha | standalone | greenfield | servico-vps | `n/a` |
 | onion-svc-vaultwarden | standalone | greenfield | servico-vps | `n/a` |
