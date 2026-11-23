@@ -3,7 +3,6 @@ branch: feat/sessions-statusline-1121
 pr: pendente
 date: 2026-11-22
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 11
 findings_real: 10
 findings_blocking: 1
