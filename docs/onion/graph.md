@@ -277,6 +277,14 @@ agent-skills-specialist	related	/meta/create-skill
 agent-skills-specialist	related	agent-creator-specialist	
 agent-skills-specialist	related	claude-code-specialist	
 agent-skills-specialist	related	command-creator-specialist	
+agente-whatsapp	adopts	onion-evolve	
+agente-whatsapp	mode	greenfield	
+agente-whatsapp	pin	6276201205d3	
+agente-whatsapp	specialization	agente-de-conversa	
+agente-whatsapp	specialization	canal-de-conversa	
+agente-whatsapp	specialization	whatsapp	
+agente-whatsapp	tier	standalone	
+agente-whatsapp	trust-advises	onion-evolve	
 arandek	adopts	onion-evolve	
 arandek	mode	legacy	
 arandek	pin	40fe1629d59f	
