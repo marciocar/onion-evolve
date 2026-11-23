@@ -84,7 +84,9 @@ Workflow só por opt-in; (3) dogfood, rodando o artefato, com o irreversível (m
 
 O mapa é **dado** (`TASK_MAP` no motor), não prosa: a rota impressa só cita a peça cujo arquivo existe na
 instalação (o plugin e as portas não levam tudo), e `aside-router.sh task-map --check` reprova no core a linha
-cujo comando sumiu. A família `aside_router_task` do `lint-selftest.sh` cobre reconhecimento (com e sem acento,
+cujo comando sumiu. **Limite declarado:** o mapa resolve pelo caminho do core (`commands/<categoria>/<cmd>.md`); no
+plugin os comandos vivem soltos como `/<plugin>:<cmd>`, então ali a rota não cita peça e manda conferir a lista
+instalada em vez de afirmar que falta (resolver pelo `plugin-namespace-check.sh --map` fica para outro PR). A família `aside_router_task` do `lint-selftest.sh` cobre reconhecimento (com e sem acento,
 maiúscula, `LC_ALL=C` e UTF-8, no meio da frase mudo), mapa, rota citada, derivação e hook, com um mutante por
 contrato.
 

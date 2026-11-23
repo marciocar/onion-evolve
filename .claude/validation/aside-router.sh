@@ -91,7 +91,7 @@ route() {  # $1 = key
     PARALLEL)   printf 'APARTE paralelo — atividade/pesquisa em paralelo sem parar o fluxo. Dispare assíncrono (Ctrl+B/background) ou fan-out via onion-orchestration/Workflow; sintetize no retorno. Se escrever, respeite I3 (um escritor/repo). %s' "$SUFFIX" ;;
     TASK)
       local choices; choices="$(task_choices)"
-      [ -n "$choices" ] || choices="nenhuma peça do mapa existe nesta instalação"
+      [ -n "$choices" ] || choices="nenhuma peça do mapa achada pelo caminho do core (num plugin os comandos vivem como /<plugin>:<cmd>: confira a lista de comandos instalados antes de dizer que falta peça)"
       printf 'APARTE tarefa — execute PELA maquinaria do Onion, não à mão. (1) Escolha a peça do inventário: %s. Sem encaixe, diga qual peça faltou em vez de improvisar. (2) Antes de rodar, declare o custo estimado (tempo e tokens); Workflow ou fan-out só com opt-in do maestro. (3) Dogfood: rode o artefato de verdade, não pare no plano; o que for irreversível (merge, push na main, apagar): %s (4) Feche com evidência: o comando rodado e a saída observada. %s' "$choices" "$GATE" "$SUFFIX" ;;
     GUARDRAIL)  printf 'APARTE guarda-regra — instalar guardrail durável de comportamento. %s Prefira forcing-function (hook / .claude/rules path-scoped), não prosa "never do X"; registre a decisão no /meta:diary. %s' "$GATE" "$SUFFIX" ;;
     *) return 0 ;;
