@@ -3,12 +3,12 @@ branch: docs/kg-grammar-discarded-as-node
 pr: pendente
 date: 2026-11-21
 reviewed_diff_sha256: pendente
-findings_total: 6
-findings_real: 6
+findings_total: 9
+findings_real: 9
 findings_blocking: 1
 tokens: 81586
 duration_min: 3
-findings_fixed: 5
+findings_fixed: 7
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
@@ -52,3 +52,16 @@ Não se aplica: o PR é de documentação e grafo, sem código. Os gates rodados
 
 - Decisão do core na ausência do maestro, reversível; se ele discordar, o selo e o parágrafo se refazem.
 - Sem lint: o aviso «rejeitadas só em texto» só se decide depois de 30 dias de uso medido.
+
+## Revisão isolada pós-rebase (2026-11-23)
+
+Subagente general-purpose (opus), isolado, mandato REFUTAR, só leitura. Veredito: **APPROVED**. Gates no grafo
+tocado: `kg-radar.sh` rc 0, `--integrity --schema` rc 0, `kg-contract-check.sh` rc 0, `ops-citation-travel-check.sh` rc 0.
+
+| # | achado | real? | bloq.? | destino |
+|---|---|---|---|---|
+| 1 | `D_DISCARDED_OPTION_AS_NODE_1121` é `done` em `plane: DEV` com selo do core; a exceção da gramática cobre selo do maestro, então o radar avisa `decision-done-em-DEV` (SOFT) | sim | não | Declarado: mesmo caso de `D_PLAIN_LANGUAGE_STITCH_1121`; a cura é a autoria do core no selador (#1713) |
+| 2 | O caso CONSTRAINS diz `open`/`confirmed` sem lembrar que `confirmed` exige `provenance` | sim | não | Curado na linha 64 da gramática |
+| 3 | A proposta arquivada ainda mostra a forma superada | sim | não | Curado: nota de superação no topo da seção |
+
+Nenhum grafo do corpus muda de veredito: a regra é só texto.
