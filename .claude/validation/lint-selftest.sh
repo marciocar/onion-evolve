@@ -39560,6 +39560,21 @@ run_egress_uid_fence_selftests() {
   fi
 }
 
+# Regras órfãs do ufw (ops/ufw-orphan-rules.sh) — bancada embutida (--selftest, ufw e ss de mentira, nunca toca o
+# firewall): apaga só as portas da lista e só sem escuta, grava o desfazer (comentário original, 600) ANTES de
+# apagar, re-mede na hora, recusa ufw ilegível e desfazer adulterado. Nasceu da medição da vps-ops (SAC-465, 2026-11-23).
+run_ufw_orphan_rules_selftests() {
+  local uf="${REPO_ROOT}/ops/ufw-orphan-rules.sh"
+  if [ ! -f "${uf}" ]; then record_skip "ufw-orphan-rules: ops/ufw-orphan-rules.sh ausente"; return; fi
+  local rc=0 out
+  out="$(bash "${uf}" --selftest 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "ufw-orphan-rules: bancada sandbox verde ($(printf '%s' "${out}" | grep -o '[0-9][0-9]* pass /' | sed 's| /$||' | head -1))"
+  else
+    record_fail "ufw-orphan-rules: --selftest" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
+  fi
+}
+
 # Sync do Onion num workspace do /chat (ops/workspace-adopt-sync.sh) — bancada embutida (--selftest, sandbox
 # mktemp, sem sudo, nunca toca o diretório servido) e os mutantes de cada guarda (--selftest-mutants): vivo mudado
 # depois do stage, symlink, fora do prefixo, apply sem stage, staging alheio, symlink de fuga e segredo no staging.
@@ -45011,6 +45026,7 @@ _family run_plugin_private_url_selftests
 _family run_deploy_site_selftests
 _family run_install_caddy_config_selftests
 _family run_egress_uid_fence_selftests
+_family run_ufw_orphan_rules_selftests
 _family run_workspace_adopt_sync_selftests
 _family run_docker_engine_migrate_selftests
 _family run_realign_selftests

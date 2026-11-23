@@ -25,6 +25,27 @@
 #   · IPv6 fica de fora de propósito: o compose publica só 127.0.0.1, e o verify reprova qualquer escuta na porta
 #     que não seja 127.0.0.1:3050 (inclusive [::1], [::] e IP externo).
 #
+# A REDE DOS CONTAINERS (2026-11-23, medição da vps-ops, só leitura): da conta comum, quase todas as portas de
+#   container abriam pelo IP do container (bancos, busca, o cofre de senhas), e quem precisa abrir conexão para lá
+#   é só o docker-proxy (root): nenhum vhost aponta para IP de container. Por isso uma 3ª parte na mesma chain:
+#   conexão NOVA cujo destino ORIGINAL está em 172.16.0.0/12 (as redes do Docker), que NÃO sofreu DNAT
+#   (! --ctstate DNAT: a porta publicada que o Docker traduz no nat OUTPUT para o container fica fora, porque o
+#   destino original dela é do host) e cujo destino não é endereço do host (addrtype ! LOCAL: o gateway da bridge e
+#   os serviços do host que escutam nele ficam fora). O root passa (RETURN), e com ele QUALQUER processo uid 0, não
+#   só o docker-proxy: a liberação é por conta. As demais contas dependem do MODO (--docker-mode, gravado na unit):
+#     · log (padrão do 1º install): não barra, só registra no kernel quem SERIA barrado (prefixo onion-fence-docker:,
+#       com o uid), com limite POR DESTINO (hashlimit por IP e porta, 6 por minuto cada): um cliente barulhento num
+#       container não cala o registro de outro destino. O contador da regra (`iptables -L ONION-EGRESS-FENCE -v`)
+#       é a prova de volume, à parte do log. Uma semana de ensaio antes de barrar: quem aparecer é quem precisa de
+#       liberação;
+#     · reject: as demais contas levam RST. Só depois do ensaio, por decisão do maestro;
+#     · off: sem a 3ª parte (só o Gokapi, como era).
+#   Só TCP, como o resto da cerca (o salto do OUTPUT é -p tcp): UDP para container segue sem cerca, declarado.
+#   Não cobre porta publicada acessada pelo loopback ou pelo IP público (o destino original fica fora da faixa):
+#   essas passam pelo docker-proxy, que é root. E a faixa tem de conter TODA rede do Docker: o pool padrão manda a
+#   rede nova para 192.168.0.0/16 quando a 172.16/12 enche (hoje quase cheia), e ela ficaria fora sem aviso; por
+#   isso o `verify` confere cada rota de bridge (docker*, br-*) contra a faixa e reprova a que estiver fora.
+#
 # O QUE A CERCA NÃO FAZ (teto declarado):
 #   · não barra as contas que passam: o túnel é da conta do maestro, e qualquer processo dessa conta (inclusive as
 #     sessões de agente que rodam com ela) alcança o /setup. Fechar isso pediria conta dedicada ao túnel;
@@ -42,8 +63,8 @@
 #     do maestro por disciplina, não por catraca.
 #
 # Uso (o maestro roda os atos pelo `!`; SEM --apply é ensaio):
-#   ops/egress-uid-fence.sh plan [--tunnel-user U]            # ENSAIO (padrão): quem passa, as regras, a unit, o estado
-#   ops/egress-uid-fence.sh install --apply [--tunnel-user U] # instala a cópia de root, a unit, liga e verifica
+#   ops/egress-uid-fence.sh plan [--tunnel-user U] [--docker-mode log|reject|off]  # ENSAIO (padrão)
+#   ops/egress-uid-fence.sh install --apply [--tunnel-user U] [--docker-mode M]    # cópia de root, unit, liga e verifica
 #   ops/egress-uid-fence.sh undo --apply                      # o DESFAZER: desliga a unit, tira as regras, apaga unit e cópia
 #   ops/egress-uid-fence.sh verify                            # leitura + sonda: regras no lugar e o RST para quem não passa
 #   ops/egress-uid-fence.sh up | down                         # o que a unit chama (root); idempotentes
@@ -57,6 +78,8 @@ HOST_ADDR="127.0.0.1"
 HOST_PORT=3050          # o loopback publicado do Gokapi (docker-compose.yml do onion-vps-gokapi)
 CTR_PORT=53842          # a porta interna do Gokapi no container (fixa na imagem)
 CTR_ALLOW="root"        # quem abre conexão para a porta interna: o docker-proxy
+DOCKER_NET="172.16.0.0/12"   # as redes do Docker (bridge e redes do compose)
+DOCKER_ALLOW="root"          # quem abre conexão para IP de container: o docker-proxy
 UNIT_NAME="onion-vps-egress-fence"
 UNIT_DEST="/etc/systemd/system/${UNIT_NAME}.service"
 SBIN_DEST="/usr/local/sbin/${UNIT_NAME}.sh"
@@ -75,6 +98,15 @@ usage() { sed -n 's/^# \?//p' "${BASH_SOURCE[0]}" | sed -n '/^Uso/,/^$/p'; }
 # --tunnel-user, da unit (FENCE_TUNNEL_USER) ou de quem invoca (SUDO_USER, depois o usuário corrente).
 tunnel_user() { echo "${FENCE_TUNNEL_USER:-${SUDO_USER:-$(id -un)}}"; }
 host_allow() { echo "caddy $(tunnel_user)"; }
+# O modo da rede dos containers: --docker-mode, a unit (FENCE_DOCKER_MODE) ou o padrão log (ensaio sem barrar).
+docker_mode() {
+  # sem --docker-mode nem ambiente, vale o modo GRAVADO na unit instalada (um verify ou reinstall pelo shell não
+  # pode voltar ao log em silêncio depois de um install em reject); sem unit, o padrão log
+  local m="${FENCE_DOCKER_MODE:-}"
+  [[ -n "$m" ]] || m="$(sed -n 's/^Environment=FENCE_DOCKER_MODE=//p' "$UNIT_DEST" 2>/dev/null | head -n1)"
+  m="${m:-log}"
+  case "$m" in log|reject|off) echo "$m" ;; *) echo "modo inválido para a rede dos containers: «$m» (log, reject ou off)" >&2; return 1 ;; esac
+}
 
 uid_of() {  # uid de uma conta; vazio se não existe
   id -u "$1" 2>/dev/null || true
@@ -99,6 +131,22 @@ fence_rules() {
   done
   # porta interna do container: as demais contas, que chegariam pelo IP do container sem passar pelo 3050, levam RST
   echo "-p tcp -m conntrack --ctorigdstport $CTR_PORT -m comment --comment gokapi-ctr-deny-others -j REJECT --reject-with tcp-reset"
+  # a rede dos containers: destino original em $DOCKER_NET que não é endereço do host
+  local mode match="-p tcp -m conntrack --ctorigdst $DOCKER_NET ! --ctstate DNAT -m addrtype ! --dst-type LOCAL"
+  mode="$(docker_mode)" || return 1
+  [[ "$mode" == off ]] && return 0
+  for u in $DOCKER_ALLOW; do
+    uid="$(uid_of "$u")"; [[ -n "$uid" ]] || { echo "conta «$u» não existe" >&2; return 1; }
+    # o docker-proxy (root) passa: é ele que entrega o loopback publicado ao container
+    echo "$match -m owner --uid-owner $uid -m comment --comment docker-net-allow-$u -j RETURN"
+  done
+  if [[ "$mode" == log ]]; then
+    # ensaio: só registra quem SERIA barrado, com o uid, no máximo 6 por minuto POR DESTINO; a conexão segue
+    echo "$match -m hashlimit --hashlimit-upto 6/min --hashlimit-burst 6 --hashlimit-mode dstip,dstport --hashlimit-name onion-fence-docker -m comment --comment docker-net-log-others -j LOG --log-prefix onion-fence-docker: --log-uid"
+  else
+    # barrando: as demais contas levam RST
+    echo "$match -m comment --comment docker-net-deny-others -j REJECT --reject-with tcp-reset"
+  fi
 }
 
 # O salto: só conexão NOVA entra na chain (a resposta de uma já aceita não é reavaliada).
@@ -161,6 +209,7 @@ Before=docker.service
 Type=oneshot
 RemainAfterExit=yes
 Environment=FENCE_TUNNEL_USER=$(tunnel_user)
+Environment=FENCE_DOCKER_MODE=$(docker_mode)
 ExecStart=$SBIN_DEST up
 ExecReload=$SBIN_DEST up
 ExecStop=$SBIN_DEST down
@@ -168,6 +217,23 @@ ExecStop=$SBIN_DEST down
 [Install]
 WantedBy=multi-user.target
 EOF
+}
+
+# As redes de bridge do Docker fora de $DOCKER_NET (uma por linha). rc 2 = não medido (o `ip` falhou): o verify
+# reprova, nunca lê o vazio como "todas dentro". Pega as interfaces docker*, br-* e as de nome próprio que o
+# `docker network` declara (com.docker.network.bridge.name), quando o docker responde.
+IP_CMD="ip"
+DOCKER_CMD="docker"
+bridges_outside() {
+  local routes names net pfx a
+  routes="$($IP_CMD -4 route show proto kernel 2>/dev/null)" || return 2
+  names="$($DOCKER_CMD network ls -q --filter driver=bridge 2>/dev/null | while read -r id; do
+    $DOCKER_CMD network inspect -f '{{index .Options "com.docker.network.bridge.name"}}' "$id" 2>/dev/null; done | grep -v '^$' || true)"
+  net="${DOCKER_NET%/*}"; pfx="${DOCKER_NET#*/}"
+  awk -v names=" $(tr '\n' ' ' <<< "$names")" '$3 ~ /^(docker|br-)/ || index(names, " " $3 " ") {print $1}' <<< "$routes" \
+    | while IFS=/ read -r a _; do
+        python3 -I -c 'import ipaddress,sys; sys.exit(0 if ipaddress.ip_address(sys.argv[1]) in ipaddress.ip_network(sys.argv[2]) else 1)' "$a" "$net/$pfx" || echo "$a"
+      done
 }
 
 # A sonda: tenta conectar como <conta> e diz se o REJECT da regra <comentário> contou o pacote. Independe de o
@@ -200,6 +266,13 @@ verify() {
     [[ "$count" == "$want" ]] && echo "  ✓ chain $CHAIN com as $want regras esperadas" \
       || { echo "  ✗ chain $CHAIN com $count regras (esperado $want): sobra ou falta"; fail=1; }
   fi
+  if [[ "$(docker_mode)" != off ]]; then
+    local outside rcb=0
+    outside="$(bridges_outside)" || rcb=$?
+    if [[ "$rcb" -ne 0 ]]; then echo "  ✗ não medi as rotas das bridges do Docker (\`$IP_CMD -4 route\` falhou)"; fail=1
+    elif [[ -z "$outside" ]]; then echo "  ✓ toda rede de bridge do Docker está dentro de $DOCKER_NET"
+    else echo "  ✗ rede do Docker FORA de $DOCKER_NET (sem cerca): $(tr '\n' ' ' <<< "$outside")"; fail=1; fi
+  fi
   if jump_is_first && [[ "$(jump_lines | wc -l)" == 1 ]]; then echo "  ✓ salto único, na 1ª posição do OUTPUT (antes do ufw, que aceita lo)"
   else echo "  ✗ o salto NÃO é a 1ª regra do OUTPUT, ou há cópias (posições: $(jump_lines | tr '\n' ' '))"; fail=1; fi
   if [[ "$PROBE" == 1 ]]; then
@@ -223,6 +296,7 @@ plan() {
   echo "── ensaio: a cerca de saída por uid do Gokapi (nada muda)"
   echo "   passam em $HOST_ADDR:$HOST_PORT: $(for u in $(host_allow); do printf '%s(uid %s) ' "$u" "$(uid_of "$u" | sed 's/^$/AUSENTE/')"; done)"
   echo "   passam na porta interna $CTR_PORT: $CTR_ALLOW (o docker-proxy); as demais contas levam RST"
+  echo "   rede dos containers ($DOCKER_NET, fora os endereços do host e a porta publicada): modo $(docker_mode || echo INVÁLIDO) — $(case "$(docker_mode 2>/dev/null || echo x)" in log) echo "só registra quem seria barrado (journalctl -k | grep onion-fence-docker:)";; reject) echo "só $DOCKER_ALLOW passa, as demais contas levam RST";; off) echo "sem cerca";; *) echo "o install recusa";; esac)"
   rules="$(fence_rules)" || die "conta da lista não resolve; o install recusaria"
   echo "── as regras que o \`up\` monta (iptables-restore --noflush, numa transação):"
   echo "   *filter"; echo "   :$CHAIN - [0:0]"
@@ -239,10 +313,15 @@ plan() {
 install_fence() {
   local ts unit_tmp rc
   need_fw
+  docker_mode >/dev/null || die "modo da rede dos containers inválido (na flag, no ambiente ou na unit instalada); nada mudou"
   fence_rules >/dev/null || die "conta da lista não resolve; nada mudou"
   # pré-voo: o iptables daqui entende as duas extensões? (-C de regra inexistente sai 1; extensão ausente sai 2)
   rc=0; $SUDO_CMD $IPT -w -C OUTPUT -p tcp -m conntrack --ctorigdstport 1 -m owner --uid-owner 0 -j RETURN 2>/dev/null || rc=$?
   [[ "$rc" == 1 || "$rc" == 0 ]] || die "o iptables não aceita conntrack --ctorigdstport + owner --uid-owner (rc $rc); nada mudou"
+  if [[ "$(docker_mode)" != off ]]; then
+    rc=0; $SUDO_CMD $IPT -w -C OUTPUT -p tcp -m conntrack --ctorigdst $DOCKER_NET ! --ctstate DNAT -m addrtype ! --dst-type LOCAL -m hashlimit --hashlimit-upto 6/min --hashlimit-mode dstip,dstport --hashlimit-name onion-fence-probe -j LOG --log-prefix onion-fence-probe: --log-uid 2>/dev/null || rc=$?
+    [[ "$rc" == 1 || "$rc" == 0 ]] || die "o iptables não aceita conntrack ctorigdst/ctstate + addrtype + hashlimit + LOG --log-uid (rc $rc); nada mudou"
+  fi
   ts="$(date +%Y%m%d-%H%M%S)"
   $SUDO_CMD install -d -m 0700 "$BACKUP_DIR"
   for f in "$UNIT_DEST" "$SBIN_DEST"; do
@@ -296,6 +375,7 @@ case "$op" in
   -L) has_chain "$ch" || exit 1; echo "Chain $ch"; echo "num target prot opt source destination"
       grep -E -- "^-A $ch " "$FW" | awk '{k++; t="-"; for(i=1;i<NF;i++) if($i=="-j") t=$(i+1); print k, t, "all", "--", "0.0.0.0/0", "0.0.0.0/0"}' ;;
   -C) has_chain "$ch" || exit 1; case "$*" in *--ctorigdstport*) [ -n "${STUB_NO_EXT:-}" ] && exit 2;; esac
+      case "$*" in *hashlimit*) [ -n "${STUB_NO_EXT2:-}" ] && exit 2;; esac
       grep -qxF -- "-A $ch $*" "$FW" ;;
   -I) shift; line="-A $ch $*"; awk -v l="$line" -v c="-A $ch " 'BEGIN{d=0} !d && index($0,c)==1 {print l; d=1} {print} END{if(!d) print l}' "$FW" > "$FW.t" && mv "$FW.t" "$FW" ;;
   -D) if [[ "$1" =~ ^[0-9]+$ ]]; then awk -v c="-A $ch " -v n="$1" 'index($0,c)==1 {k++; if(k==n) next} {print}' "$FW" > "$FW.t"
@@ -330,6 +410,11 @@ STUB
   printf '#!/usr/bin/env bash\nargs=(); while [ $# -gt 0 ]; do case "$1" in -o|-g|-m) shift 2;; -d) shift; mkdir -p "$@"; exit 0;; *) args+=("$1"); shift;; esac; done; cp "${args[0]}" "${args[1]}"\n' > "$SB/bin/install"
   chmod +x "$SB/bin/iptables" "$SB/bin/iptables-restore" "$SB/bin/install"
   IPT="$SB/bin/iptables"; IPT_RESTORE="$SB/bin/iptables-restore"; SYSTEMCTL="fake_systemctl"
+  # ip e docker de mentira: as rotas vêm de $SB/routes; STUB_IP_FAIL faz o ip falhar; a bridge de nome próprio vem do docker
+  printf '#!/usr/bin/env bash\n[ -n "${STUB_IP_FAIL:-}" ] && exit 1\ncat "$SB/routes"\n' > "$SB/bin/ip"
+  printf '#!/usr/bin/env bash\ncase "$1 $2" in "network ls") echo n1;; "network inspect") echo "${STUB_BRNAME:-}";; esac\n' > "$SB/bin/docker"
+  chmod +x "$SB/bin/ip" "$SB/bin/docker"; IP_CMD="$SB/bin/ip"; DOCKER_CMD="$SB/bin/docker"
+  printf '172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1\n172.23.0.0/16 dev br-abc proto kernel scope link src 172.23.0.1\n10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.5\n' > "$SB/routes"
   export SB SBIN_DEST UNIT_DEST PATH="$SB/bin:$PATH"
   # a cópia de root, no sandbox, é este script apontado para os stubs
   export FENCE_TUNNEL_USER="$(id -un)"
@@ -356,11 +441,13 @@ STUB
   ok "up: caddy (999) passa no loopback" 'grep -qF -- "--ctorigdstport 3050 -m owner --uid-owner 999 -m comment --comment gokapi-loopback-allow-caddy -j RETURN" "$FW"'
   ok "up: o túnel passa no loopback" 'grep -qF -- "--uid-owner $(id -u) -m comment --comment gokapi-loopback-allow-$FENCE_TUNNEL_USER -j RETURN" "$FW"'
   ok "up: o REJECT do loopback vem DEPOIS das liberações" '[[ "$(grep -nF gokapi-loopback-deny-others "$FW" | cut -d: -f1)" -gt "$(grep -nF gokapi-loopback-allow-caddy "$FW" | cut -d: -f1)" ]]'
+  ok "up (log, o padrão): root passa na rede dos containers e as demais contas só são registradas, nunca barradas" 'grep -qF -- "--ctorigdst 172.16.0.0/12 ! --ctstate DNAT -m addrtype ! --dst-type LOCAL -m owner --uid-owner 0 -m comment --comment docker-net-allow-root -j RETURN" "$FW" && grep -qF -- "-m hashlimit --hashlimit-upto 6/min --hashlimit-burst 6 --hashlimit-mode dstip,dstport --hashlimit-name onion-fence-docker -m comment --comment docker-net-log-others -j LOG --log-prefix onion-fence-docker: --log-uid" "$FW" && grep -qF -- "! --ctstate DNAT -m addrtype ! --dst-type LOCAL -m owner --uid-owner 0" "$FW" && ! grep -qF docker-net-deny-others "$FW"'
+  ok "up (log): a rede dos containers vem DEPOIS das regras do Gokapi" '[[ "$(grep -nF docker-net-allow-root "$FW" | cut -d: -f1)" -gt "$(grep -nF gokapi-ctr-deny-others "$FW" | cut -d: -f1)" ]]'
   ok "up: só o root passa na porta interna 53842" 'grep -qF -- "--ctorigdstport 53842 -m owner --uid-owner 0 -m comment --comment gokapi-ctr-allow-root -j RETURN" "$FW" && grep -qF gokapi-ctr-deny-others "$FW"'
   t "verify: verde depois do up" 0 verify
   # 3. idempotência: up de novo não duplica salto nem regra
   t "up: idempotente" 0 up
-  ok "up 2x: um salto só e 5 regras na chain" '[[ "$(grep -c -- "-j $CHAIN" "$FW")" == 1 && "$(grep -c -- "^-A $CHAIN " "$FW")" == 5 ]]'
+  ok "up 2x: um salto só e 7 regras na chain (5 do Gokapi + 2 da rede dos containers em log)" '[[ "$(grep -c -- "-j $CHAIN" "$FW")" == 1 && "$(grep -c -- "^-A $CHAIN " "$FW")" == 7 ]]'
   # 4. o salto empurrado para baixo (alguém inseriu no topo) → verify acusa, up repõe sem janela
   "$IPT" -I OUTPUT 1 -o lo -j ACCEPT
   t "verify: salto fora do topo → acusa" 1 verify
@@ -372,6 +459,29 @@ STUB
   t "verify: regra de liberação sumida → acusa" 1 verify
   t "up: repõe a chain inteira" 0 up
   t "verify: verde de novo" 0 verify
+  # 5b. os modos da rede dos containers: reject barra, off tira, modo inválido recusa sem mexer
+  FENCE_DOCKER_MODE=reject t "up: modo reject" 0 up
+  ok "reject: as demais contas levam RST na rede dos containers, e o LOG sai" 'grep -qF -- "docker-net-deny-others -j REJECT --reject-with tcp-reset" "$FW" && ! grep -qF docker-net-log-others "$FW"'
+  ok "reject: a liberação do root vem ANTES do REJECT" '[[ "$(grep -nF docker-net-allow-root "$FW" | cut -d: -f1)" -lt "$(grep -nF docker-net-deny-others "$FW" | cut -d: -f1)" ]]'
+  FENCE_DOCKER_MODE=off t "up: modo off" 0 up
+  ok "off: sem nenhuma regra da rede dos containers, o Gokapi intacto" '! grep -qF docker-net- "$FW" && grep -qF gokapi-ctr-deny-others "$FW"'
+  cp "$FW" "$SB/fw.mode"
+  FENCE_DOCKER_MODE=barra-tudo t "up: modo inválido → recusa" 2 up
+  ok "modo inválido: firewall intocado" 'cmp -s "$FW" "$SB/fw.mode"'
+  t "main: --docker-mode inválido → recusa" 2 main plan --docker-mode barra-tudo
+  t "up: de volta ao log" 0 up
+  # 5c. as rotas das bridges: dentro da faixa → verde; uma fora (pool padrão em 192.168) → acusa; ip falhando → acusa
+  t "verify: bridges dentro de 172.16/12 → verde" 0 verify
+  ok "verify: não conta a eth0 (não é bridge do Docker)" '[[ "$out" == *"toda rede de bridge do Docker está dentro"* ]]'
+  echo "192.168.0.0/20 dev br-new proto kernel scope link src 192.168.0.1" >> "$SB/routes"
+  t "verify: bridge nova fora da faixa → acusa" 1 verify
+  ok "verify: diz qual rede ficou fora" '[[ "$out" == *"FORA de 172.16.0.0/12"*"192.168.0.0"* ]]'
+  sed -i "/br-new/d" "$SB/routes"
+  echo "192.168.5.0/24 dev meubr proto kernel scope link src 192.168.5.1" >> "$SB/routes"
+  STUB_BRNAME=meubr t "verify: bridge de nome próprio (docker network) fora da faixa → acusa" 1 verify
+  sed -i "/meubr/d" "$SB/routes"
+  STUB_IP_FAIL=1 t "verify: ip falha → acusa, nunca verde no escuro" 1 verify
+  ok "verify com ip falhando: diz que não mediu" '[[ "$out" == *"não medi as rotas"* ]]'
   # 6. conta que não resolve → up recusa e não mexe
   cp "$FW" "$SB/fw.ok"
   FENCE_TUNNEL_USER=conta-que-nao-existe-xyz t "up: conta do túnel inexistente → recusa" 2 up
@@ -392,6 +502,13 @@ STUB
   t "install: instala, liga e verifica" 0 install_fence
   ok "install: unit escrita com ExecStart/ExecStop e o túnel" 'grep -qF "ExecStart=$SBIN_DEST up" "$UNIT_DEST" && grep -qF "ExecStop=$SBIN_DEST down" "$UNIT_DEST" && grep -qF "Environment=FENCE_TUNNEL_USER=$FENCE_TUNNEL_USER" "$UNIT_DEST"'
   ok "install: unit antes do Docker" 'grep -qx "Before=docker.service" "$UNIT_DEST"'
+  ok "install: unit grava o modo da rede dos containers (log por padrão)" 'grep -qxF "Environment=FENCE_DOCKER_MODE=log" "$UNIT_DEST"'
+  # o modo gravado na unit vale para o shell sem flag: install em reject, depois verify e install sem flag
+  FENCE_DOCKER_MODE=reject t "install em reject" 0 install_fence
+  t "verify sem flag depois do install em reject: verde (lê o modo da unit)" 0 verify
+  t "install sem flag depois do reject: mantém reject" 0 install_fence
+  ok "reinstall sem flag: a unit segue em reject e o REJECT segue de pé" 'grep -qxF "Environment=FENCE_DOCKER_MODE=reject" "$UNIT_DEST" && grep -qF docker-net-deny-others "$FW"'
+  FENCE_DOCKER_MODE=log t "install de volta ao log (dito)" 0 install_fence
   ok "install: reload da unit é o up (repõe sem janela)" 'grep -qxF "ExecReload=$SBIN_DEST up" "$UNIT_DEST"'
   ok "install: cerca de pé" 'jump_first'
   t "install 2x: backup da unit anterior" 0 install_fence
@@ -404,6 +521,8 @@ STUB
   # 11. iptables sem a extensão → install recusa antes de tocar
   STUB_NO_EXT=1 t "install: iptables sem conntrack/owner → recusa" 2 install_fence
   ok "install sem extensão: nada instalado" '[[ ! -e "$UNIT_DEST" && ! -e "$SBIN_DEST" ]]'
+  STUB_NO_EXT2=1 t "install: iptables sem hashlimit/LOG --log-uid → recusa" 2 install_fence
+  ok "install sem hashlimit: nada instalado" '[[ ! -e "$UNIT_DEST" && ! -e "$SBIN_DEST" ]]'
   # 12. ato sem --apply é ensaio (gramática da linha de comando)
   t "install sem --apply → recusa" 2 main install
   t "undo sem --apply → recusa" 2 main undo
@@ -419,6 +538,7 @@ main() {
     case "$1" in
       --apply) apply=1 ;;
       --tunnel-user) [[ -n "${2:-}" ]] || die "--tunnel-user pede uma conta"; export FENCE_TUNNEL_USER="$2"; shift ;;
+      --docker-mode) [[ -n "${2:-}" ]] || die "--docker-mode pede log, reject ou off"; export FENCE_DOCKER_MODE="$2"; docker_mode >/dev/null || die "--docker-mode: use log, reject ou off"; shift ;;
       *) die "argumento desconhecido: $1 (use --help)" ;;
     esac
     shift
