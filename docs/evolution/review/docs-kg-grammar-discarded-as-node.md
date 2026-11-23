@@ -2,7 +2,8 @@
 branch: docs/kg-grammar-discarded-as-node
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1446fc6cfbba4249e80b3ca062b9163b8c631cfba39cbd8e5199fa57a53678f6
+reviewed_code_sha256: ebef16137134be46431b2a29a279974a370b1bbee4ae374d06885ea6c37bb468
 findings_total: 9
 findings_real: 9
 findings_blocking: 1
