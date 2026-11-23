@@ -2,8 +2,7 @@
 branch: feat/meta-restart
 pr: pendente
 date: 2026-11-21
-reviewed_diff_sha256: 922f4fbc53e8b85cff98cfbfac4cd838901115da10977dcce014b2f8ba72de43
-reviewed_code_sha256: b92b9bb9aeeef90daab4b88a127d00bf0c777b2a83ef682cc89db5e35849ff87
+reviewed_diff_sha256: pendente
 findings_total: 22
 findings_real: 22
 findings_blocking: 7
@@ -108,3 +107,11 @@ O revisor desta passada foi um agente separado do autor, como dizem o campo `rev
 frontmatter não declarava `elenxo_isolado: true`, e o `ops/pr-merge-verified.sh` recusa o merge de PR de guarda
 sem esse campo. Acrescentei só a declaração. O código revisado não mudou: o diff volta a `pendente` e o hash do
 código foi apagado, para o `pr-finalize` carimbar de novo.
+
+## Re-revisão pós-rebase (2026-11-23, sessão do core)
+
+A branch estava 127 commits atrás da main e o auto-rebase da fila parou num conflito real no `baton-pulse.sh`.
+Resolvido à mão: o conflito era só no cabeçalho de comentários, onde a main acrescentou o bloco «config» (pastas de
+config declaradas, SAC-484) e esta PR o bloco «reinício»; os dois ficaram, um depois do outro. O `getting-started.md`
+e o `testing-inventory.md` são projeção gerada, tomados da main e regenerados pelo pr-finalize. Nenhuma linha de
+código desta PR mudou de sentido; a revisão isolada acima segue valendo para o head novo.
