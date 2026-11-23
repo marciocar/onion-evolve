@@ -2,7 +2,8 @@
 branch: chore/review-action-v1.0.286
 pr: 1708
 date: 2026-11-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 56a0f36a4767e8947fd99de668a3e5b1e2144ccf8ffc9ef63b38a702b47ac31f
+reviewed_code_sha256: 69a5dd2b881d336d48c6314acc6afaece4e0a2f97243f10f215f5c2bb90b7ae1
 findings_total: 1
 findings_real: 1
 findings_blocking: 0
