@@ -61949,12 +61949,15 @@ run_session_open_selftests() {
   command -v git >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1 \
     || { record_skip "session-open: git/python3 ausentes (SUT não exercido)"; return; }
   local sb; sb="$(TMPDIR=/tmp mktemp -d)" || { record_skip "session-open: mktemp falhou"; return; }
-  # tmux de mentira: registra args em SO_TLOG; has-session rc 0 se o nome ∈ SO_TSESS (espaço-separado), senão rc 1
+  # tmux de mentira: registra args em SO_TLOG; has-session rc 0 se o nome está no servidor consultado: com `-L <nome>`
+  # o servidor próprio (SO_TSESS_L), sem -L o legado `default` (SO_TSESS); listas separadas por espaço
   cat > "${sb}/tmux" <<'SO_TMUX'
 #!/usr/bin/env bash
 printf '%s\n' "$*" >> "${SO_TLOG}"
+list="${SO_TSESS:-}"
+if [ "$1" = "-L" ]; then list="${SO_TSESS_L:-}"; shift 2; fi
 if [ "$1" = "has-session" ]; then
-  want="${3#=}"; for s in ${SO_TSESS:-}; do [ "${s}" = "${want}" ] && exit 0; done; exit 1
+  want="${3#=}"; for s in ${list}; do [ "${s}" = "${want}" ] && exit 0; done; exit 1
 fi
 exit 0
 SO_TMUX
@@ -61998,7 +62001,7 @@ SO_TMUX
             SESSION_OPEN_CLAUDE="${sb}/claude" SESSION_OPEN_PROJECTS="${PJ}" SESSION_OPEN_MEMBERS="${SO_MEMBERS:-${sb}/members.yaml}" \
             SESSION_OPEN_OWNERSHIP="${SO_OWN:-${own}}" ONION_PRIVATE_OWNERS_FILE="${SO_PRIV:-${sb}/sem-lista.tsv}" \
             ONION_OWNERSHIP_CORE=onion-bancada/core SO_AGENTS="${SO_AGENTS:-${sb}/agents-empty.json}" \
-            SO_TLOG="${sb}/tlog" SO_TSESS="${SO_TSESS:-}" SESSION_OPEN_UID="${SO_UID:-}" \
+            SO_TLOG="${sb}/tlog" SO_TSESS="${SO_TSESS:-}" SO_TSESS_L="${SO_TSESS_L:-}" SESSION_OPEN_UID="${SO_UID:-}" \
             LC_ALL=C bash "${w}" "$@" 2>&1)"; then rc=0; else rc=$?; fi
     printf '%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")"
   }
@@ -62023,7 +62026,7 @@ SO_TMUX
   # (a) cria quando não há sessão tmux: retoma pelo ID EXATO do transcript (o último título vale), nunca --continue,
   #     sem --name na retomada, e SEM canal doorbell (sem .mcp.json)
   _so_a() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
-    [ "${r%%$'\t'*}" = 0 ] && grep -qF "ensaio: ${sb}/tmux new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --resume 11111111-aaaa'" <<< "${r}" \
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF "ensaio: ${sb}/tmux -L myrepo new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --resume 11111111-aaaa'" <<< "${r}" \
       && grep -qF 'pelo id exato 11111111-aaaa (fonte: transcript' <<< "${r}" && ! grep -qE -- '--continue|server:doorbell' <<< "${r}"; }
   _so_case "(a) cria: retoma pelo id exato do transcript, nunca --continue, sem doorbell sem .mcp.json" _so_a \
     'cmd="$(printf '\''%q --resume %q'\'' "${CLAUDE_BIN}" "${RID}")" ;;' 'cmd="${CLAUDE_BIN} --continue" ;;'
@@ -62086,7 +62089,21 @@ SO_TMUX
     [ "${r%%$'\t'*}" = 0 ] && grep -qF 'a sessão tmux «myrepo» já existe — anexo, não crio outra.' <<< "${r}" \
       && ! grep -q 'new-session' "${sb}/tlog"; }
   _so_case "(b) sessão tmux existe: anexa e NÃO cria outra" _so_b \
-    'has_tmux_session() { "${TMUX_BIN}" has-session -t "=$1" 2>/dev/null; }' 'has_tmux_session() { false; }'
+    'has_tmux_session() {
+  TMUX_SRV=""' 'has_tmux_session() { return 1;
+  TMUX_SRV=""'
+  # (b2) a sessão vive no servidor PRÓPRIO (-L myrepo): anexa lá, e o caminho de entrar leva o -L; nada é criado
+  _so_b2() { local r; r="$(SO_TSESS="" SO_TSESS_L="myrepo" _so_run "$1" myrepo --dry-run --no-attach)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF "para entrar: ${sb}/tmux -L myrepo attach -t myrepo" <<< "${r}" \
+      && grep -qF 'a sessão tmux «myrepo» já existe' <<< "${r}" && ! grep -q 'new-session' <<< "${r}"; }
+  _so_case "(b2) sessão no servidor próprio: acha pelo -L e o caminho de entrar leva o -L" _so_b2 \
+    'if "${TMUX_BIN}" -L "$1" has-session -t "=$1" 2>/dev/null; then TMUX_SRV="$1"; return 0; fi' ':'
+  # (b3) sessão LEGADA no servidor default (aberta antes desta cura): achada lá, sem duplicar, e o caminho é sem -L
+  _so_b3() { local r; r="$(SO_TSESS="myrepo" SO_TSESS_L="" _so_run "$1" myrepo --dry-run --no-attach)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF "para entrar: ${sb}/tmux attach -t myrepo" <<< "${r}" \
+      && grep -qF 'a sessão tmux «myrepo» já existe' <<< "${r}" && ! grep -q 'new-session' <<< "${r}"; }
+  _so_case "(b3) sessão legada no servidor default: achada, não duplicada, entrar sem -L" _so_b3 \
+    'if [ "${TMUX_SRV:-$1}" = default ]; then printf' 'if false; then printf'
   # (c) claude vivo na pasta FORA do tmux: RECUSA rc 3, não abre às cegas
   _so_proc "${sb}/proc-out" "${HM}/myrepo" out
   _so_c() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-out" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
