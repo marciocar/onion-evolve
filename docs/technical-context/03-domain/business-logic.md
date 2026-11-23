@@ -280,4 +280,4 @@ interrompida (`.claude/commands/engineer/plan.md:24`).
 ## 5. Números-âncora (SSOT — nunca hardcode; sempre `docs/onion/inventory.md`)
 
 Lido de `docs/onion/inventory.md:11-14` (gerado por `.claude/validation/inventory.sh`, validado no
-CI): 124 comandos invocáveis (10 categorias + root), 51 agentes (9 categorias), 14 skills, 108
+CI): 125 comandos invocáveis (10 categorias + root), 51 agentes (9 categorias), 14 skills, 108

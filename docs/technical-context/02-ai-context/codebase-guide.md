@@ -25,4 +25,4 @@ date: 2026-08-13
 ```
 onion-evolve/
 ├── .claude/                    # o FRAMEWORK propriamente dito (o "produto")
-│   ├── commands/                # 124 comandos invocáveis, 11 categorias
+│   ├── commands/                # 125 comandos invocáveis, 11 categorias
