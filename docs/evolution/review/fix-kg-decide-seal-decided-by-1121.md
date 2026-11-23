@@ -2,8 +2,7 @@
 branch: fix/kg-decide-seal-decided-by-1121
 pr: 1713
 date: 2026-11-21
-reviewed_diff_sha256: 9e79f231b11ea408686dd995746f862645288189aec100161d052a8ec68dbcb2
-reviewed_code_sha256: 4ae51fbd367a0ac6a1e9a915a5e3f46356ccf5fb962461424ad9be4be07b8d1c
+reviewed_diff_sha256: pendente
 findings_total: 11
 findings_real: 7
 findings_blocking: 0
@@ -73,3 +72,7 @@ nele (timeout com carga 14,8); o CI do PR a roda.
 | 2 | `--decided-by` repetido: valia o último em silêncio (`core` + `maestro` gravava maestro) | sim, medido | não | Curado: repetido sai rc 2, nada escrito; caso novo no s18 |
 | 3 | Escalada (gravar «core» onde decidiu o maestro) rebaixa a autoridade; o radar não aceita «decisão do core» como selo do maestro | refutado | — | — |
 | 4 | Não há caminho para baixar a marca «revisão do maestro pendente» quando ele concorda | sim | não | Já declarado (achado 3 acima); peça própria |
+
+## Re-revisão pós-rebase (2026-11-23)
+
+A main ganhou `--destination mechanism|design` e `--guard` no mesmo selador. As duas flags foram unidas: cada uma funciona sozinha e juntas; o caso s18 da família `decide` agora sela com `--decided-by core` junto de `--destination` e confere que a autoria do core não apaga `x_destination`/`x_guard`. Família `decide`: 52 casos, 0 falhas.
