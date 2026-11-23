@@ -26,7 +26,12 @@ set -uo pipefail
 UNIT_NAME="onion-sessions.service"
 UNIT_DIR="${SESSION_BOOT_UNIT_DIR:-${HOME}/.config/systemd/user}"
 SYSTEMCTL="${SESSION_BOOT_SYSTEMCTL:-systemctl}"
-OPENER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/session-open.sh"
+# O caminho gravado na unidade é o do checkout PRINCIPAL (git-common-dir), nunca o de uma worktree: a worktree some
+# e o boot quebraria (revisão isolada de 2026-11-23, achado 3).
+_HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_MAIN="$(git -C "${_HERE}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
+_MAIN="${_MAIN%/.git}"
+if [ -n "${_MAIN}" ] && [ -f "${_MAIN}/ops/session-open.sh" ]; then OPENER="${_MAIN}/ops/session-open.sh"; else OPENER="${_HERE}/session-open.sh"; fi
 
 die() { printf 'session-boot: %s\n' "$1" >&2; exit "${2:-2}"; }
 
@@ -39,6 +44,10 @@ After=default.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+# Os servidores tmux nascem no cgroup desta unidade: sem KillMode=process, um --all com rc≠0 (uma sessão ambígua)
+# ou um stop da unidade mataria TODAS as sessões que ela abriu (medido em 2026-11-23, systemd 255).
+KillMode=process
+SuccessExitStatus=3 5
 Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
 ExecStart=/bin/bash ${OPENER} --all
 

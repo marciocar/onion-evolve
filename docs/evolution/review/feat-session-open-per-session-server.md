@@ -1,17 +1,17 @@
 ---
 branch: feat/session-open-per-session-server
-pr: pendente
+pr: 1744
 date: 2026-11-22
-reviewed_diff_sha256: 3c66c727f0fe3b79189a29fdc2fdcfd32775773e5b7560dd1ecde32a56f5cc66
-reviewed_code_sha256: 06cb695ddded54bc809bf0ad58fd57db00ba7c01e17053cbda129885d35d473d
-findings_total: 4
-findings_real: 3
-findings_blocking: 0
+reviewed_diff_sha256: pendente
+findings_total: 11
+findings_real: 10
+findings_blocking: 1
 tokens: 0
 duration_min: 15
-findings_fixed: 2
+findings_fixed: 5
 verdict: FIXED
-elenxo: false
+elenxo: true
+elenxo_isolado: true
 reviewer: self
 nota: "passada da própria sessão, sem subagente (cota semanal de agentes esgotada até 24/11 21:00 UTC); tokens não medidos"
 ---
@@ -50,3 +50,18 @@ nota: "passada da própria sessão, sem subagente (cota semanal de agentes esgot
 - `session-boot.sh` não tem bancada própria: ele só escreve a unidade e chama o `systemctl --user`; o `plan` é o ensaio.
 - O `baton-pulse.sh` ainda sugere `tmux new -s` na cura de `SESSION_NOT_IN_TMUX`, como forma sem o abridor; a forma
   principal da mesma linha é o `session-open.sh`, que agora cria com `-L`.
+
+## Revisão isolada (2026-11-23)
+
+Subagente general-purpose (opus), isolado, mandato REFUTAR. Veredito: **FIXES_NEEDED**, um bloqueio medido; curado. A
+família `session_open` passou nele (84 casos) e de novo depois das curas.
+
+| # | achado | real? | bloq.? | destino |
+|---|---|---|---|---|
+| 5 | Unit oneshot: um `--all` com rc 3/5 (sessão ambígua ou claude já vivo) falha a unit e o systemd 255 mata o cgroup, com todos os servidores tmux recém-abertos (reproduzido com `systemd-run --user`) | sim, medido | **sim** | Curado: `KillMode=process` e `SuccessExitStatus=3 5` |
+| 6 | Mesmo com sucesso, `stop`/`remove` da unit derrubaria as sessões | sim | não | Curado pelo `KillMode=process` |
+| 7 | O `install` gravava o caminho da worktree que o rodou; removida a worktree, o boot quebra | sim | não | Curado: grava o caminho do checkout principal (git-common-dir) |
+| 8 | `valid_name` aceitava `.`, que o tmux grava como `_` (o `has-session` não acharia) | sim, latente | não | Curado: `.` fora do nome |
+| 9 | Os casos rodam em `--dry-run`: um mutante que tire o `-L` só da linha real passa | sim | não | Declarado; caso sem dry-run com tmux de mentira fica para outro PR |
+| 10 | Sem selftest do `session-boot.sh` (plan/install/status/remove) | sim | não | Declarado; família própria com `SESSION_BOOT_SYSTEMCTL` de mentira fica para outro PR |
+| 11 | De dentro de um tmux, o abridor perde o `switch-client` | sim, declarado | não | Aceito: instrui a sair e anexar |
