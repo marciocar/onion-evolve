@@ -2,7 +2,8 @@
 branch: chore/waha-caps-conformance-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 201ac8dcd0bf5444553bdbd47d86be5ec3cfef09274b62f91ef923d36d552c55
+reviewed_code_sha256: e148223f6f4e688291f98bc14da5490ae9a74efc56d6ab674fd353b3933f759f
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
