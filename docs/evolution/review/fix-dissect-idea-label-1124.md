@@ -9,7 +9,7 @@ findings_blocking: 0
 tokens: 104000
 duration_min: 11
 findings_fixed: 1
-verdict: APPROVED_WITH_NOTES
+verdict: FIXED
 elenxo: true
 elenxo_isolado: true
 reviewer: "refutador INDEPENDENTE (agente separado, brief sem a conclusão do condutor; comparou o checador antes e depois nos grafos reais do core e da curadoria, mutou um clone da curadoria na pasta dele, rodou a bancada) não achou bloqueante: 0 falso positivo, corte por data respeitado, label não-string pego, ordem do continue certa, bancada discrimina"
