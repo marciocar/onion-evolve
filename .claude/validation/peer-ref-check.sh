@@ -26,7 +26,12 @@
 #             = <sha> (7 a 40 hex)                         → é commit E é ancestral da origin/main
 # Antes de medir: `git -C <par> fetch -q origin` (a origin/main de ontem não é a de agora).
 # Saída: uma linha em pt-BR, com o sha da origin/main medida.
-# Exit: 0 = existe / é ancestral · 1 = não existe / não é ancestral (a linha diz qual) ·
+#       Com nó, a linha diz também o `status` dele (open, done…): EXISTIR não é estar ABERTO (2026-11-24, a
+#       colheita da curadoria marcou candidata uma ideia cujo destino já estava done desde 27/10; o rc 0 da
+#       existência passou por «está vivo»).
+# Opção: --want-open (3º argumento, só com <caminho>#<ID>) — o nó tem de estar `status: open`; fechado sai rc 3.
+# Exit: 0 = existe / é ancestral (com --want-open: e está open) · 1 = não existe / não é ancestral (a linha diz qual) ·
+#       3 = existe mas NÃO está open (só com --want-open) ·
 #       2 = NÃO MEDIU (o par não é repo git, o fetch falhou, origin/main ausente, argumento malformado,
 #           grafo ilegível ou sem parser)
 # Env : ONION_KG_QUERY — caminho do kg_query.py (default: o vendor kg-ssot deste repo).
@@ -36,7 +41,9 @@ set -euo pipefail
 _out() { printf 'peer-ref-check: %s\n' "$*"; }
 _unmeasured() { _out "NÃO MEDIU — $*"; exit 2; }
 
-[ "$#" -eq 2 ] || _unmeasured "uso: peer-ref-check.sh <repo-do-par> <ref> (recebi $# argumento(s))"
+WANT_OPEN=0
+if [ "$#" -eq 3 ] && [ "$3" = "--want-open" ]; then WANT_OPEN=1; set -- "$1" "$2"; fi
+[ "$#" -eq 2 ] || _unmeasured "uso: peer-ref-check.sh <repo-do-par> <ref> [--want-open] (recebi $# argumento(s))"
 PAR="$1"; REF="$2"
 [ -n "${PAR}" ] && [ -n "${REF}" ] || _unmeasured "argumento vazio"
 case "${REF}" in -*|*[[:space:]]*|*[[:cntrl:]]*) _unmeasured "ref malformada: começa com '-' ou tem espaço/controle" ;; esac
@@ -110,6 +117,7 @@ case "${typ}" in
   "") _out "NÃO EXISTE — o arquivo ${P} não está ${AT}"; exit 1 ;;
   *) _out "NÃO EXISTE — ${P} ${AT} é ${typ}, não arquivo"; exit 1 ;;
 esac
+[ "${WANT_OPEN}" -eq 0 ] || [ -n "${ID}" ] || _unmeasured "--want-open só vale com <caminho>#<ID> (status é de nó)"
 [ -n "${ID}" ] || { _out "EXISTE — o arquivo ${P} está ${AT}"; exit 0; }
 
 command -v python3 >/dev/null 2>&1 || _unmeasured "python3 ausente: sem parser para ler o nó"
@@ -125,7 +133,7 @@ vrc=0
 if [ -f "${KQ}" ]; then
   # o PRODUTO lê: rc dele, JSON dele; `unreadable` não vazio = grafo ilegível = não mediu
   python3 -I -B "${KQ}" --id "${ID}" --format json "${G}" > "${TMP}/q.json" 2>/dev/null || _unmeasured "kg_query.py falhou ao ler ${P}"
-  python3 -I -B - "${TMP}/q.json" "${ID}" <<'PY' || vrc=$?
+  python3 -I -B - "${TMP}/q.json" "${ID}" "${TMP}/status" <<'PY' || vrc=$?
 import json, sys
 try:
     d = json.load(open(sys.argv[1], encoding="utf-8"))
@@ -133,12 +141,16 @@ except (OSError, ValueError):
     sys.exit(2)
 if d.get("unreadable"):
     sys.exit(2)
-ids = [n.get("id") for n in d.get("nodes", []) if isinstance(n, dict)]
-sys.exit(0 if sys.argv[2] in ids else 1)
+hit = [n for n in d.get("nodes", []) if isinstance(n, dict) and n.get("id") == sys.argv[2]]
+if not hit:
+    sys.exit(1)
+st = hit[0].get("status")
+open(sys.argv[3], "w", encoding="utf-8").write(st if isinstance(st, str) else "")
+sys.exit(0)
 PY
   VIA="kg_query.py"
 else
-  python3 -I -B - "${G}" "${ID}" <<'PY' || vrc=$?
+  python3 -I -B - "${G}" "${ID}" "${TMP}/status" <<'PY' || vrc=$?
 import json, sys
 p, want = sys.argv[1], sys.argv[2]
 try:
@@ -152,12 +164,22 @@ except Exception:
 nodes = d.get("nodes") if isinstance(d, dict) else None
 if not isinstance(nodes, list):
     sys.exit(2)
-sys.exit(0 if any(isinstance(n, dict) and n.get("id") == want for n in nodes) else 1)
+hit = [n for n in nodes if isinstance(n, dict) and n.get("id") == want]
+if not hit:
+    sys.exit(1)
+st = hit[0].get("status")
+open(sys.argv[3], "w", encoding="utf-8").write(st if isinstance(st, str) else "")
+sys.exit(0)
 PY
   VIA="PyYAML"
 fi
 case "${vrc}" in
-  0) _out "EXISTE — o nó ${ID} está em ${P} ${AT} (lido por ${VIA})"; exit 0 ;;
+  0) ST="$(cat "${TMP}/status" 2>/dev/null || true)"
+     if [ "${WANT_OPEN}" -eq 1 ]; then
+       [ -n "${ST}" ] || _unmeasured "o nó ${ID} existe em ${P} ${AT}, mas não declara status (--want-open não decide)"
+       [ "${ST}" = "open" ] || { _out "FECHADO — o nó ${ID} existe em ${P} ${AT}, mas está status: ${ST} (lido por ${VIA})"; exit 3; }
+     fi
+     _out "EXISTE — o nó ${ID} está em ${P} ${AT}, status: ${ST:-—} (lido por ${VIA})"; exit 0 ;;
   1) _out "NÃO EXISTE — o arquivo ${P} está ${AT}, mas o nó ${ID} não (id exato, lido por ${VIA})"; exit 1 ;;
   *) _unmeasured "o grafo ${P} ${AT} está ilegível para ${VIA} (ou PyYAML ausente)" ;;
 esac
