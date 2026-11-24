@@ -421,10 +421,12 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/emit-inbound-report.sh" "$SOURCE_ROOT" "$
   ${PREV:+--prev "$PREV"} --branch "$BR" --integration "$INTEGRATION_BRANCH" \
   --adopter-guard-line "$GUARD_LINE" ${VENDOR_LINE:+--vendor-line "$VENDOR_LINE"} \
   ${SETTINGS_BEFORE:+--settings-before "$SETTINGS_BEFORE"}
+rc=$?; [ "$rc" -eq 4 ] && { echo "PARE (emissor rc 4)" >&2; exit 4; }   # o PARE SEGURA: nada de commit durável depois dele
 # rc 0 escrito · rc 2 uso (DEST recusado pelo assert-dest: nada escrito) · rc 3 escrito COM lacuna: medição que não
 # rodou ou não foi informada (hooks sem --settings-before, vendor ou guard ausentes, --prev ausente no update) vai
 # «NÃO MEDIDO» no arquivo e no stderr · rc 4 escrito com PARE (deny perdido, prove-gate rc 4, plan rc 5): não commite
 # nem abra PR antes de investigar · rc 1 falha de escrita (nada escrito)
+# (o bloco é o mesmo nos dois caminhos, adoção e --update: a Fase 6 e o passo do --update chamam este procedimento)
 ```
 
 O que o helper põe em cada seção (o desenho e os rc no cabeçalho dele): **Arquivos aplicados** = o

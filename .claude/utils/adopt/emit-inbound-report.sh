@@ -45,7 +45,7 @@
 # commit darem UM arquivo só.
 # LINHAS DO CHAMADOR (--vendor-line, --adopter-guard-line, --branch): placeholder `<…>` (o bloco do procedimento
 # copiado sem preencher) vira lacuna declarada, nunca texto do relatório; o resto é ACHATADO numa linha só, com
-# `<!--`, crases e `#` no início neutralizados, para nenhuma linha forjar seção, comentário ou cerca no relatório.
+# todo `<`, crases e `#` no início (depois dos espaços) neutralizados, para nenhuma linha forjar seção, comentário ou cerca no relatório.
 # Determinístico, sem LLM. Exercitado por lint-selftest.sh (run_inbound_report_selftests).
 # =============================================================================
 set -uo pipefail
@@ -75,9 +75,10 @@ case "${OP}" in adopt|update) ;; *) usage "operação '${OP}' inválida (adopt|u
 GAPS=() STOPS=()
 gap() { GAPS+=("$1"); }
 stop_now() { STOPS+=("$1"); }
-# achata a linha do chamador (substituição entre aspas: no bash 5.2 o `&` cru da troca repete o casado): sem quebra, sem comentário HTML, sem crase, sem cabeçalho markdown no início
-_flat() { local v="${1//$'\r'/ }" lt='&lt;!--' q="'"; v="${v//$'\n'/ }"; v="${v//<!--/"${lt}"}"; v="${v//\`/"${q}"}"
-  [[ "${v}" == '#'* ]] && v="\\${v}"; printf '%s' "${v}"; }
+# achata a linha do chamador (substituição entre aspas: no bash 5.2 o `&` cru da troca repete o casado): sem quebra, todo `<` vira `&lt;` (`<!--`, `<?php`, `<![CDATA[`), sem crase, sem cabeçalho markdown no início
+_flat() { local v="${1//$'\r'/ }" lt='&lt;' q="'"; v="${v//$'\n'/ }"; v="${v//</"${lt}"}"; v="${v//\`/"${q}"}"
+  # sem espaço no início (até 3 espaços ainda fazem cabeçalho em markdown) e o `#` que sobrar na frente escapado
+  v="${v#"${v%%[![:space:]]*}"}"; [[ "${v}" == '#'* ]] && v="\\${v}"; printf '%s' "${v}"; }
 _is_ph() { [[ "$1" == \<*\> ]]; }
 if _is_ph "${INT}"; then INT=""; INT_PH=1; else INT_PH=0; fi
 if _is_ph "${BR}"; then BR=""; fi

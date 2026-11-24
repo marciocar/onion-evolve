@@ -21463,14 +21463,17 @@ run_inbound_report_selftests() {
     record_pass "inbound-report: (d2) placeholder no guard e na vendor → fora do relatório, as duas viram lacuna (rc 3)"
   else record_fail "inbound-report: (d2)" "rc=${rc} lacunas: $(grep '^>  - ' "${f}" 2>/dev/null | tr '\n' '|')"; fi
 
-  # (d3) linha do chamador que tenta FORJAR seção (quebra + `## …`, `<!--`, crase, `#` inicial) → achatada
+  # (d3) linha do chamador que tenta FORJAR seção (quebra + `## …`, `<!--`, crase, `#` inicial atrás de até 3 espaços,
+  #      `<?php`, `<![CDATA[`) → achatada: todo `<` vira `&lt;` e o cabeçalho não nasce
   t="${d}/d3"; _ir_mk "${t}"
   _ir_srun "${t}" update "${pin}" "${FULL[@]}" --vendor-line $'onion/vendor ok\n## Forjada\n<!-- oculto --> `x`' \
-    --adopter-guard-line '# adopter-guard: cabeçalho'
+    --adopter-guard-line '   ## Próximos passos (NO ALVO) <?php x ?> <![CDATA[ y ]]>'
   f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
   if [ "${rc}" -eq 0 ] && [ -f "${f}" ] && ! grep -q '^## Forjada' "${f}" && ! grep -qF '<!--' "${f}" \
-     && grep -qF 'onion/vendor ok ## Forjada &lt;!-- oculto --> '"'"'x'"'" "${f}" && ! grep -q '^# adopter-guard' "${f}"; then
-    record_pass "inbound-report: (d3) linha do chamador com quebra, <!--, crase e # → achatada, sem seção forjada"
+     && grep -qF 'onion/vendor ok ## Forjada &lt;!-- oculto --> '"'"'x'"'" "${f}" \
+     && [ "$(grep -cE '^[[:space:]]{0,3}## Próximos passos' "${f}")" = 1 ] && ! grep -qF '<?php' "${f}" && ! grep -qF '<![CDATA[' "${f}" \
+     && grep -qxF '\## Próximos passos (NO ALVO) &lt;?php x ?> &lt;![CDATA[ y ]]>' "${f}"; then
+    record_pass "inbound-report: (d3) linha do chamador com quebra, <!--, crase, '   ##', <?php e <![CDATA[ → achatada, sem seção forjada"
   else record_fail "inbound-report: (d3)" "rc=${rc} linhas: $(grep -n 'Forjada\|adopter-guard' "${f}" 2>/dev/null | tr '\n' '|')"; fi
 
   # (f) os rc raros dos irmãos, por stub: NÃO MEDIDO vira lacuna (rc 3); PARE vira PARE (rc 4, vence o 3)
@@ -21500,10 +21503,13 @@ run_inbound_report_selftests() {
   else record_skip "inbound-report: (g) o checkout da bancada não tem HEAD~2 (clone raso)"; fi
 
   # (e) registro: o procedimento do adopt.md CHAMA o helper e não guarda mais o heredoc de placeholders
+  #     e o PARE SEGURA: o rc 4 é capturado logo depois da chamada e sai antes do commit durável (prosa não segura)
   if grep -q 'emit-inbound-report.sh" "\$SOURCE_ROOT" "\$DEST"' "${REPO_ROOT}/.claude/commands/meta/adopt.md" \
-     && ! grep -q '<colar a saída' "${REPO_ROOT}/.claude/commands/meta/adopt.md"; then
-    record_pass "inbound-report: (e) o adopt.md chama o emissor e não tem mais placeholder <colar …>"
-  else record_fail "inbound-report: (e)" "o adopt.md não chama o emissor ou ainda tem <colar …>"; fi
+     && ! grep -q '<colar a saída' "${REPO_ROOT}/.claude/commands/meta/adopt.md" \
+     && grep -qF 'rc=$?; [ "$rc" -eq 4 ] && { echo "PARE (emissor rc 4)" >&2; exit 4; }' \
+          <<< "$(grep -A5 'emit-inbound-report.sh" "\$SOURCE_ROOT" "\$DEST"' "${REPO_ROOT}/.claude/commands/meta/adopt.md")"; then
+    record_pass "inbound-report: (e) o adopt.md chama o emissor, sem <colar …>, e o rc 4 (PARE) sai antes do commit durável"
+  else record_fail "inbound-report: (e)" "o adopt.md não chama o emissor, ainda tem <colar …> ou não captura o rc 4"; fi
   rm -rf "${d}"
 }
 _family run_inbound_report_selftests
