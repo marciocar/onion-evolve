@@ -232,8 +232,9 @@ resolve_id() {
   fi
   # a CÓPIA do id escolhido (por --resume ou pelo nome) está viva (fork_inherit): mandar a sessão ao fundo nativo dá a
   # ela um id NOVO, e o id antigo some da lista. Retomar o antigo abriria uma 2ª cópia da conversa que já vive. Medido em
-  # 2026-11-24 (2.1.331): a 1ª linha do transcript da cópia é history-suppression/fork_inherit e o 1º uuid dela está no
-  # transcript da origem.
+  # 2026-11-24 (2.1.331): a 1ª linha do transcript da cópia é history-suppression/fork_inherit (com o ts do fork) e o
+  # ÚLTIMO uuid herdado dela está no transcript da origem (o 1º se repete em irmãs). Cópia sem mensagem herdada ainda:
+  # não medido, dito, e não barra.
   if rt="$(transcript_of "${RID}")"; then
     while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
       [ -n "${s}" ] && [ "${s}" != "${RID}" ] && peer_live "${lv}" || continue
