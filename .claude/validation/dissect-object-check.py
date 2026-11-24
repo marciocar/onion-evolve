@@ -483,6 +483,11 @@ def ideas_check(add, meta, nodes, by_id):
         if not isinstance(idea, dict):
             add(9, "ideia-mal-formada", "%s: x_dissect_idea tem de ser um mapa {kind, onion, why, source}" % nid)
             continue
+        lab = n.get("label")
+        if not (isinstance(lab, str) and lab.strip()):
+            # o label é MUST do contrato do grafo, mas o radar só o mede no corpus inteiro; aqui o colhedor o vê na hora
+            # (a curadoria completou 6 nós sem label à mão em 2026-11-24, no 2º lote fino)
+            add(9, "ideia-sem-label", "%s: o nó da ideia exige label (a frase que diz a ideia); achado %r" % (nid, lab))
         kind = idea.get("kind")
         if kind not in IDEA_KINDS:
             add(9, "ideia-tipo-invalido", "%s: kind=%r; exigido %s" % (nid, kind, " | ".join(IDEA_KINDS)))

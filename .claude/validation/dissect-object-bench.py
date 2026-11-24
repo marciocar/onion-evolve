@@ -322,6 +322,8 @@ CASES = [
     ("rejeição no eliminatório do N0 com as ideias registradas (variante legítima)", None, eliminated, "ok", []),
     ("estudo sem registro de ideias (o estudo também colhe)", "sem-registro-de-ideias", seq(lambda g: (g["meta"].update(x_dissect_mode="study"), D(g).pop("x_dissect_verdict")), drop_ideas), "ok", []),
     ("ideia que não é mapa", "ideia-mal-formada", lambda g: [n for n in g["nodes"] if "x_dissect_idea" in n][0].update(x_dissect_idea="uma ideia solta"), "ok", []),
+    ("ideia sem label", "ideia-sem-label", lambda g: [n for n in g["nodes"] if "x_dissect_idea" in n][0].pop("label"), "ok", []),
+    ("ideia com label em branco", "ideia-sem-label", lambda g: [n for n in g["nodes"] if "x_dissect_idea" in n][1].update(label="  "), "ok", []),
     ("ideia de tipo fora do enum", "ideia-tipo-invalido", lambda g: idea(g).update(kind="feature"), "ok", []),
     ("ideia sem o comparativo ao Onion", "ideia-sem-comparativo", lambda g: idea(g).pop("onion"), "ok", []),
     ("ideia com o porquê vazio", "ideia-sem-comparativo", lambda g: idea(g, 1).update(why="  "), "ok", []),
