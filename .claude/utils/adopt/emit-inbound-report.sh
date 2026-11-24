@@ -80,8 +80,8 @@ INBOUND="${DEST}/docs/evolution/inbound"
 mkdir -p "${INBOUND}/_processed" || usage "não criei ${INBOUND}/_processed"
 
 # ── idempotência: mesmo <op>-<pin> já emitido? ───────────────────────────────────────────────────────
-_prev_file="$(find "${INBOUND}" -maxdepth 1 -type f -name "*-${OP}-${PIN}.md" 2>/dev/null | sort | head -1)"
-_done_file="$(find "${INBOUND}/_processed" -maxdepth 1 -type f -name "*-${OP}-${PIN}.md" 2>/dev/null | sort | head -1)"
+_prev_file="$(find "${INBOUND}" -maxdepth 1 -type f -name "*-${OP}-${PIN}.md" 2>/dev/null | sort | sed -n 1p)"
+_done_file="$(find "${INBOUND}/_processed" -maxdepth 1 -type f -name "*-${OP}-${PIN}.md" 2>/dev/null | sort | sed -n 1p)"
 if [ -z "${_prev_file}" ] && [ -n "${_done_file}" ]; then
   echo "relatório já processado pelo alvo: ${_done_file} — não re-emitido (o alvo já o leu)."
   exit 0
@@ -151,22 +151,22 @@ if [ "${OP}" = "update" ]; then
   else
     _o="$(bash "${HERE}/merge-onion-hooks.sh" --diff "${SETTINGS_BEFORE}" "${DEST}/.claude/settings.json" 2>&1)"; _r=$?
     if [ "${_r}" -eq 0 ]; then CFG="- hooks:"$'\n''```'$'\n'"${_o}"$'\n''```'
-    else CFG="- hooks: NÃO MEDIDO (merge-onion-hooks --diff rc ${_r}): $(printf '%s' "${_o}" | head -c 300 | tr '\n' ' ')"; lacuna "diff de hooks (rc ${_r})"; fi
+    else CFG="- hooks: NÃO MEDIDO (merge-onion-hooks --diff rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "diff de hooks (rc ${_r})"; fi
   fi
   _o="$(bash "${HERE}/deny-monotonic.sh" "${DEST}" "${INT}" 2>&1)"; _r=$?
   case "${_r}" in
     0) CFG="${CFG}"$'\n'"- ${_o//$'\n'/$'\n'  }" ;;
     1) CFG="${CFG}"$'\n'"- ⚠️ PARE — o update PERDEU regra de deny (deny-monotonic rc 1):"$'\n''```'$'\n'"${_o}"$'\n''```'
        echo "PARE: o update perdeu regra de deny (deny-monotonic rc 1)" >&2 ;;
-    *) CFG="${CFG}"$'\n'"- deny: NÃO MEDIDO (deny-monotonic rc ${_r}): $(printf '%s' "${_o}" | head -c 300 | tr '\n' ' ')"; lacuna "deny (deny-monotonic rc ${_r})" ;;
+    *) CFG="${CFG}"$'\n'"- deny: NÃO MEDIDO (deny-monotonic rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "deny (deny-monotonic rc ${_r})" ;;
   esac
   _o="$(bash "${HERE}/sandbox-deny-advice.sh" "${DEST}" 2>&1)"; _r=$?
   if [ "${_r}" -eq 0 ]; then CFG="${CFG}"$'\n'"- ${_o//$'\n'/$'\n'  }"
-  else CFG="${CFG}"$'\n'"- sandbox: NÃO MEDIDO (sandbox-deny-advice rc ${_r}): $(printf '%s' "${_o}" | head -c 300 | tr '\n' ' ')"; lacuna "sandbox (sandbox-deny-advice rc ${_r})"; fi
+  else CFG="${CFG}"$'\n'"- sandbox: NÃO MEDIDO (sandbox-deny-advice rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "sandbox (sandbox-deny-advice rc ${_r})"; fi
   _o="$(bash "${HERE}/remeasure-hard.sh" "${DEST}" 2>&1)"; _r=$?
   case "${_r}" in
     0|1) CFG="${CFG}"$'\n'$'\n''```'$'\n'"${_o}"$'\n''```' ;;
-    *) CFG="${CFG}"$'\n'$'\n'"HARD: NÃO MEDIDO (remeasure-hard rc ${_r}): $(printf '%s' "${_o}" | head -c 300 | tr '\n' ' ')"; lacuna "HARD (remeasure-hard rc ${_r})" ;;
+    *) CFG="${CFG}"$'\n'$'\n'"HARD: NÃO MEDIDO (remeasure-hard rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "HARD (remeasure-hard rc ${_r})" ;;
   esac
 fi
 
