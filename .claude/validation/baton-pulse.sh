@@ -45,6 +45,8 @@
 # ── CLASSES (saída de máquina, em inglês) ───────────────────────────────────────────────────────
 #   PARKED           tem linha viva no parked.tsv. Vence tudo: parada por ordem NUNCA vira ociosa.
 #   UNREACHABLE      a fonte diz que existiu e não há processo: pid morto, sessão de fundo sem pid, farol orphan|stale.
+#                    «Viva» na lista de peers é a REGRA ÚNICA de .claude/utils/orchestration/session-liveness.sh (2026-11-24),
+#                    a mesma do ops/session-open.sh (core-only): interativa listada, ou de fundo COM pid vivo; o `state` não decide.
 #   ACTIVE           o harness diz busy, ou houve atividade há menos de --idle-min (padrão 20).
 #   IDLE_WITH_QUEUE  ociosa e com fila pronta de dono declarado — o caso que a fase 2 ataca.
 #   IDLE_NO_QUEUE    ociosa e sem fila declarada.
@@ -109,6 +111,13 @@
 #   SESSION_NOT_IN_TMUX    sem TMUX e sem ancestral tmux (ex.: mosh-server→bash): sem reanexar e sem sobreviver a reboot/fim do terminal.
 #   SESSION_SAME_CHECKOUT  duas interativas vivas no mesmo topo git: a 2ª abre com `claude --worktree`.
 #   SESSION_CAP            SESSÕES interativas distintas (dedupe por sid; a retomada em dois terminais conta uma) acima de --max-interactive.
+#   SESSION_NATIVE_BG_LONG_DUTY (2026-11-24) sessão de FUNDO NATIVO viva que é dona de peça ou de batuta: owner_session do
+#                          registro de posse (members.yaml e lista privada; pelo nome sem o sufixo « (N)» ou pela pasta), dona de
+#                          peça, rótulo no owners.tsv, concessão no grants.tsv, ou a sessão do core. A cópia de fundo (tecla ←) nasce
+#                          sem o canal da campainha e o daemon de fundo é transitório. Cura: `claude stop <id> && bash
+#                          ops/session-open.sh <nome> --resume <id>` (core-only), que volta ao tmux com o canal.
+#   SESSION_STALE_BG_RECORD (2026-11-24) registro de fundo MORTO pela regra única e sem sinal de vida (startedAt ou mtime do
+#                          transcript) há mais de 24 h. Cura proposta: `claude rm <id>`, ATO DO MAESTRO: o pulso só oferece, nunca roda.
 #                          O padrão é SESSION_CAP_DEFAULT, logo abaixo do cabeçalho: o ÚNICO lugar do número no código, ao lado do
 #                          id da decisão vigente (SESSION_CAP_DECISION). O --check-cap confere que a decisão existe, não foi
 #                          superada (aresta SUPERSEDES) e diz o número, e que baton.md e baton-doctrine.md citam o mesmo.
@@ -131,10 +140,11 @@
 # Env (bancada; todo override ativo é DECLARADO na saída):
 #   BATON_NOW=<epoch>  BATON_STATE_DIR=<dir> (padrão ~/.local/state/onion/baton)  BATON_PROJECTS_DIR=<dir>
 #   BATON_DECIDE_TSV=<arquivo> (saída pronta do decide-census --tsv)  BATON_CLAUDE=<binário>  ONION_ASK_DIR=<dir>
-#   BATON_PROC=<dir> (um /proc falso: a bancada da higiene)  BATON_TOPLEVEL_TIMEOUT_S=<seg> (teto do rev-parse por cwd, padrão 5)
+#   BATON_LIVENESS=<session-liveness.sh> (bancada: a regra de «viva» mutada)  BATON_PROC=<dir> (um /proc falso: a bancada da higiene)  BATON_TOPLEVEL_TIMEOUT_S=<seg> (teto do rev-parse por cwd, padrão 5)
 #   BATON_TM=<tm.sh> (bancada: um task manager falso)  BATON_BACKLOG_TTL_S=<seg> (cache do backlog, padrão 300)
 #   BATON_CONFIG_DIRS=<dir[:dir]> (pastas de config extras; fonte de produção, não override: sai na linha «pastas de config»)
-# Exit: 0 = medido (inclusive com lacunas DECLARADAS) · 2 = entrada quebrada (opção, data, python3/PyYAML ausente).
+# Exit: 0 = medido (inclusive com lacunas DECLARADAS) · 2 = entrada quebrada (opção, data, python3/PyYAML ausente, ou a
+#       regra de «viva» ilegível com a lista de peers lida: não se classifica sessão às cegas).
 #       --check-cap: 0 = decisão, medidor e docs dizem o mesmo teto · 1 = desencontro (cada um nomeado) · 2 = entrada quebrada.
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_baton_pulse_selftests).
 # ===========================================================================
@@ -335,7 +345,7 @@ else
   fi
 fi
 
-OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE|PROC|TOPLEVEL_TIMEOUT_S|TM|BACKLOG_TTL_S)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
+OVR="$(env | LC_ALL=C grep -oE '^(BATON_(NOW|STATE_DIR|PROJECTS_DIR|DECIDE_TSV|CLAUDE|PROC|TOPLEVEL_TIMEOUT_S|TM|BACKLOG_TTL_S|LIVENESS)|ONION_ASK_DIR)=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${QUIET}" "${SINCE}" "${LAST}" "${IDLE}" "${PEERS}" "${PEERS_SRC}" \
   "${FAMILY}" "${SKIP}" "${SELF}" "${HERE}" "${DC_FILE}" "${DC_RC}" "${LOAD_LINE}" "${OVR}" "${STALL}" "${MAXI}" \
@@ -564,15 +574,6 @@ for s in S.values():
             t = int(max(os.path.getmtime(f) for f in fs))
             if s['act'] is None or t > s['act']: s['act'], s['act_src'] = t, 'transcript.mtime'
 
-def pid_alive(pid):
-    try: pid = int(pid)
-    except (TypeError, ValueError): return None
-    if pid <= 0: return False
-    try: os.kill(pid, 0); return True
-    except ProcessLookupError: return False
-    except PermissionError: return True
-    except OverflowError: return False
-
 # ── decide-census: PRs, worktrees, sinais, perguntas, selo, checkpoints ─────────────────
 dc = []
 if dc_rc in ('0', 'override'):
@@ -705,6 +706,28 @@ for ln in wtl.splitlines():
     if ln.startswith('worktree '): cur = real(ln[9:])
     elif ln.startswith('branch refs/heads/') and cur: wt_branch[ln[18:]] = cur
 
+# ── «viva» tem UMA regra (2026-11-24): .claude/utils/orchestration/session-liveness.sh, a mesma do ops/session-open.sh (core-only).
+# Viva = interativa listada, ou de fundo COM pid vivo (kill -0); pid listado e morto = morta. O `state` do registro não
+# decide. Antes daqui o pulso tinha a regra dele e o abridor outra: o mesmo registro de fundo (blocked, sem pid) era
+# UNREACHABLE aqui e «viva neste checkout» lá. Regra ilegível com a lista de peers lida = entrada quebrada (rc 2): não
+# se classifica sessão às cegas. BATON_LIVENESS troca o caminho (bancada).
+liv_tool = os.environ.get('BATON_LIVENESS') or os.path.normpath(os.path.join(here, '..', 'utils', 'orchestration', 'session-liveness.sh'))
+LIVE = {}   # sid → (viva, motivo, id curto)
+if PROCS:
+    try:
+        _r = subprocess.run(['bash', liv_tool, 'classify', '-'], input=json.dumps(PROCS), capture_output=True, text=True, timeout=30)
+        if _r.returncode != 0: raise RuntimeError(f'rc {_r.returncode}: {_r.stderr.strip()[:160]}')
+        for ln in _r.stdout.splitlines():
+            f = ln.split('\t')
+            if len(f) < 9: continue
+            prev = LIVE.get(f[0])
+            if prev and prev[0]: continue   # o mesmo sid em dois processos: basta um vivo
+            LIVE[f[0]] = (f[6] == 'live', f[8], f[7])
+    except Exception as e:
+        print(f'baton-pulse: a regra de «viva» não se leu ({liv_tool}: {type(e).__name__}: {e}): não classifico sessão às cegas', file=sys.stderr)
+        sys.exit(2)
+def peer_dead(s): return in_peers(s) and s['sid'] in LIVE and not LIVE[s['sid']][0]
+
 claimed_owner = set(); claimed_pr = set()
 def l_ok_labels(labels): return bool(labels) and backlog_ok
 for s in S.values():
@@ -726,15 +749,13 @@ for s in S.values():
     s['backlog'] = [c for l in labels for c in BACKLOG.get(str(l).lower(), [])] if l_ok_labels(labels) else []
     pk, why, warn = parked_of(s, labels)
     if warn: warns.append(warn)
-    alive = pid_alive(s['pid']) if s['pid'] is not None else None
+    dead = peer_dead(s)
     idle_for = None if s['act'] is None else now - s['act']
     s['idle_for'] = idle_for
     if pk: cls, note = 'PARKED', why
-    elif park_unknown and not (s['pid'] is not None and alive is False) and not (not in_peers(s) and s['beacon'] in ('orphan', 'stale')):
+    elif park_unknown and not dead and not (not in_peers(s) and s['beacon'] in ('orphan', 'stale')):
         cls, note = 'PARK_UNMEASURED', f'estado de parada não medido ({park_st}): sem oferta'
-    elif s['pid'] is not None and alive is False: cls, note = 'UNREACHABLE', f'pid {s["pid"]} morto'
-    elif in_peers(s) and s['pid'] is None and s['kind'] == 'background' and s['state'] != 'working':
-        cls, note = 'UNREACHABLE', f'sessão de fundo sem processo (state {s["state"] or "?"})'
+    elif dead: cls, note = 'UNREACHABLE', LIVE[s['sid']][1]
     elif not in_peers(s) and s['beacon'] in ('orphan', 'stale'): cls, note = 'UNREACHABLE', f'farol {s["beacon"]}'
     elif not in_peers(s) and peers_ok: cls, note = 'UNREACHABLE', f'farol {s["beacon"]}, mas fora da lista de peers do harness (que foi lida)'
     elif s['status'] == 'busy': cls, note = 'ACTIVE', 'harness: busy'
@@ -875,6 +896,7 @@ _live = [s for s in S.values() if s['cls'] != 'UNREACHABLE']
 # 1º degrau NÃO MEDIDO (a peça sai PIECE_UNMEASURED), nunca cai calado no owners.tsv ou no core.
 own_reader = os.environ.get('BATON_OWNERSHIP') or os.path.normpath(os.path.join(here, '..', 'utils', 'orchestration', 'ownership.sh'))
 own_map, own_err = None, ''
+own_dirs = set()   # a pasta de cada sessão dona (o 3º campo do `ownership.sh list`)
 if _members:
     try:
         _r = subprocess.run(['bash', own_reader, 'list', '--members', os.path.join(repo, 'docs/evolution/federation/members.yaml')],
@@ -883,7 +905,9 @@ if _members:
         own_map = {}
         for ln in _r.stdout.splitlines():
             f = ln.split('\t')
-            if len(f) >= 4 and f[0]: own_map[f[0]] = (f[1], 'lista privada' if f[3] == 'privada' else f[3])
+            if len(f) >= 4 and f[0]:
+                own_map[f[0]] = (f[1], 'lista privada' if f[3] == 'privada' else f[3])
+                if f[1] not in ('', '-'): own_dirs.add(real(f[2]) if f[2].startswith('/') else '')
     except Exception as e:
         own_err = f'{type(e).__name__}: {e}'
         gaps.append(f'leitor de posse NÃO lido ({own_reader}: {own_err}): o dono pela owner_session fica NÃO MEDIDO')
@@ -1030,8 +1054,44 @@ if peers_ok:
         proc_note = f' ({len(inter)} processo(s))' if len(inter) != inter_sessions else ''
         HY.append(('SESSION_CAP', None, f'{inter_sessions} sessão(ões) interativa(s) distinta(s){proc_note} acima do teto de {max_inter} ({cap_decision})',
                    'feche ou estacione (parked.tsv) a ociosa sem fila; agente em vez de sessão para trabalho curto'))
+    # ── fundo nativo (2026-11-24, Claude Code 2.1.331): a tecla ← manda a sessão ao fundo como CÓPIA de id novo, nascida de
+    # um `claude bg-spare` genérico SEM a flag do canal da campainha; o daemon de fundo é transitório (sai sem clientes) e
+    # aposenta sessão ociosa («retire … idle 8h» no ~/.claude/daemon.log). Para serviço longo a durabilidade é do tmux.
+    #   SESSION_NATIVE_BG_LONG_DUTY  sessão de fundo VIVA que é dona de peça ou de batuta: owner_session do registro de posse
+    #                                (members.yaml/lista privada, pelo nome sem o sufixo « (N)» do harness ou pela pasta), dona
+    #                                de peça, rótulo no owners.tsv, concessão no grants.tsv, ou a sessão do core (o checkout da
+    #                                fonte, que segura a batuta). Cura: o par de comandos do abridor, como texto.
+    #   SESSION_STALE_BG_RECORD      registro de fundo MORTO (a regra única) cuja última prova de vida (o mais novo entre
+    #                                startedAt e o mtime do transcript) passou de 24 h. Cura proposta: `claude rm <id>`, ATO
+    #                                DO MAESTRO: o pulso só oferece, nunca roda.
+    _owner_sessions = {v[0] for v in (own_map or {}).values() if v[0] not in ('', '-')}
+    _piece_owners = {pc['owner'] for pc in PIECES if pc.get('owner') not in (None, '', '?')}
+    for s in sorted(S.values(), key=lambda x: x['sid']):
+        if not in_peers(s) or s['kind'] != 'background' or s['sid'] not in LIVE: continue
+        _live, _why, _short = LIVE[s['sid']]
+        _base = re.sub(r' \(\d+\)$', '', s['name'] or '')
+        p = {'pid': int(s['pid']) if str(s['pid'] or '').isdigit() else 0, 'sid': s['sid'], 'name': s['name'], 'cwd': s['cwd']}
+        tag = f'{s["name"] or s["sid"][:8]} ({_short})'
+        if _live:
+            duty = []
+            if _base and _base in _owner_sessions: duty.append(f'owner_session «{_base}» no registro de posse')
+            elif s['cwd'] and s['cwd'] in own_dirs: duty.append('roda na pasta de uma sessão dona do registro de posse')
+            if _base and _base in _piece_owners: duty.append('dona de peça')
+            if s.get('lab_src') == 'owners.tsv': duty.append(f'rótulo {",".join(s["labels"])} no owners.tsv')
+            if s.get('grant') and s['grant'][1]: duty.append(f'batuta-de-projeto no grants.tsv ({s["grant"][0]})')
+            if 'core' in (s.get('labels') or []) and role == 'source': duty.append('a sessão do core (segura a batuta)')
+            if not duty: continue
+            _nm = _base if re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}', _base or '') else '<nome>'
+            HY.append(('SESSION_NATIVE_BG_LONG_DUTY', p, f'{tag} roda no fundo nativo com dever longo ({"; ".join(duty)}): '
+                       'a cópia de fundo nasce sem o canal da campainha e o daemon de fundo é transitório (aposenta sessão ociosa)',
+                       f'claude stop {_short} && bash ops/session-open.sh {_nm} --resume {s["sid"]}  (volta ao tmux com o canal; só entrar: claude attach {_short})'))  # (core-only): cita ops/session-open.sh (REGRA 100)
+        else:
+            _last = max([t for t in (s.get('started'), s.get('act')) if t is not None], default=None)
+            if _last is None or now - _last <= 24 * 3600: continue
+            HY.append(('SESSION_STALE_BG_RECORD', p, f'{tag}: registro de fundo sem processo ({_why}), sem sinal de vida há {(now - _last) // 3600} h',
+                       f'claude rm {_short}  (ato do maestro: a conversa fica, e o pulso só oferece, nunca roda)'))
 else: hy_gaps.append('lista de peers não lida: sem pid não há processo a medir')
-HORD = {c: i for i, c in enumerate(('SESSION_STOPPED', 'SESSION_NOT_IN_TMUX', 'SESSION_SAME_CHECKOUT', 'SESSION_CAP'))}
+HORD = {c: i for i, c in enumerate(('SESSION_STOPPED', 'SESSION_NOT_IN_TMUX', 'SESSION_SAME_CHECKOUT', 'SESSION_CAP', 'SESSION_NATIVE_BG_LONG_DUTY', 'SESSION_STALE_BG_RECORD'))}
 HY.sort(key=lambda h: (HORD[h[0]], h[1]['pid'] if h[1] else 0))
 for g in hy_gaps: gaps.append(f'higiene das sessões NÃO MEDIDA (HYGIENE_UNMEASURED): {g}')
 hy_line = f'higiene: {len(inter)} interativa(s) viva(s) · ' + (' · '.join(f'{c} {sum(1 for h in HY if h[0] == c)}' for c in HORD) if peers_ok else 'NÃO MEDIDA')

@@ -9,8 +9,8 @@ tags:
   - orchestration
   - sessions
   - restart
-version: "1.0.0"
-updated: "2026-11-21"
+version: "1.1.0"
+updated: "2026-11-24"
 related_commands:
   - /meta:baton
   - /meta:cc-update
@@ -73,7 +73,19 @@ agente não terminado sem escrita há mais que isso é resto de vida anterior e 
    - (e) imprime o comando de retomada: `bash ops/session-open.sh <nome> --resume <id>` (core-only), que reabre a sessão pelo id
      exato dentro do tmux. O nome é o último título da sessão (`customTitle`, ou `--name`). Onde o
      `ops/session-open.sh` (core-only) não existe (fora do core), ou o título está fora do padrão de nome dele (espaço, acento,
-     parênteses), imprime `claude --resume <id>` e diz por quê.
+     parênteses), imprime `claude --resume <id>` e diz por quê. O sufixo « (N)» que o harness acrescenta ao nome
+     repetido (medido: `onion-evolve (5)`) sai antes.
+   - (f) a receita **depende do modo da sessão**, medido na lista de peers (`claude agents --json`, pela regra única de
+     «viva» em `.claude/utils/orchestration/session-liveness.sh`) e na chave `TMUX` do ambiente do processo:
+
+     | Modo | Como se reconhece | Receita |
+     |---|---|---|
+     | tmux | interativa, com `TMUX` no ambiente | `bash ops/session-open.sh <nome> --resume <id>` (core-only) |
+     | fundo nativo | `kind: background` na lista de peers | `claude stop <id-curto> && bash ops/session-open.sh <nome> --resume <id>` (core-only): o stop para sem perder a conversa, e o abridor volta ao tmux e recupera o canal da campainha |
+     | terminal solto | interativa, sem `TMUX` | a receita do tmux, com o aviso: dê `/exit` nela antes |
+     | não medido | lista ou ambiente ilegíveis | a receita do tmux, com a lacuna dita |
+
+     O modo vai ao bilhete (`- modo da sessão:` no `.md`, 7ª coluna da linha `session` no `.tsv`).
 3. **Enquanto o marcador existir, não despache agente novo nem lance tarefa de fundo.** A batida (`/meta:baton`) avisa
    o marcador como «SEM DESPACHO NOVO» para esta sessão. Se um agente perguntar algo, responda; não dê tarefa nova.
 4. **Leia o resultado.** `rc 0`: zerou (ou `--now`), bilhete gravado. `rc 3`: o teto venceu com trabalho em curso; o
@@ -88,13 +100,21 @@ agente não terminado sem escrita há mais que isso é resto de vida anterior e 
 6. **Na volta, retome:**
    `bash .claude/utils/orchestration/restart-drain.sh --resume-check`
    Ele lista cada agente do bilhete com a mensagem pronta e, depois de listar, apaga o marcador e arquiva o bilhete
-   como `<sessão>.<epoch>.resumed.md`. Para cada agente listado, mande `SendMessage` com `to` = o id e o texto
+   como `<sessão>.<epoch>.resumed.md`. **O bilhete segue a cópia:** mandar a sessão ao fundo nativo (a tecla `←`) cria
+   uma cópia com id novo, e o bilhete ficou no id antigo. Chamado da cópia sem bilhete do próprio id, o `--resume-check`
+   segue o do **ancestral**: o bilhete pendente cujo transcript é a origem dela (1ª linha `history-suppression` com
+   `cause: fork_inherit`, e o 1º `uuid` da cópia presente no transcript da origem). Ele diz que seguiu. Para cada agente listado, mande `SendMessage` com `to` = o id e o texto
    «Reinício da sessão: retome de onde parou. Último passo: <o do bilhete>. Confira o estado (git status, PR, CI)
    antes de repetir qualquer passo.» As tarefas de fundo morreram com o processo: relance à mão só as que ainda
    forem necessárias. Sem bilhete, ele sai `rc 4` e diz isso. Bilhete com lacuna sai `rc 5` e repete o que não foi
    medido: aí confira os transcripts em `subagents/` antes de dar a retomada por completa.
 
 ## O que o bilhete não garante (teto declarado)
+
+- **Fundo nativo é para tarefa curta.** A sessão de serviço longo (dona de peça ou de batuta) vive no tmux, que tem o
+  canal da campainha e volta no boot pelo systemd do usuário. A cópia de fundo nasce de um `claude bg-spare` genérico,
+  sem a flag do canal, e o daemon de fundo é transitório (sai sem clientes, aposenta sessão ociosa). A batida avisa
+  (`SESSION_NATIVE_BG_LONG_DUTY`). Este comando nunca roda `claude stop`, `attach` nem `rm`: só os imprime.
 
 - **O id do agente sobrevive ao reinício** é o que se mediu em 2026-11-21 (os 5 agentes foram retomados por
   `SendMessage` ao id). Se um dia o harness deixar de aceitar, o bilhete ainda tem descrição, worktree, branch e passo

@@ -37,6 +37,16 @@
 #     abre-se à mão (`session-open.sh core`). Entrar no --all é decisão do maestro (2º passo da migração).
 #   · A lista de peers do harness é obrigatória para CRIAR: a sessão de fundo não aparece no /proc como `claude`, e só a
 #     lista diz que ela está viva neste checkout ou que o id já roda noutro lugar. Sem a lista, recusa (rc 3).
+#   · «VIVA» TEM UMA REGRA SÓ (2026-11-24): .claude/utils/orchestration/session-liveness.sh, a mesma do baton-pulse.sh.
+#     Viva = interativa listada, ou de fundo COM pid vivo (kill -0). O `state` do registro não decide: um registro de
+#     fundo `blocked` sem pid, de dias antes, barrou a reabertura do core enquanto o pulso o dava como UNREACHABLE.
+#   · FUNDO NATIVO E CÓPIA (2026-11-24, Claude Code 2.1.331): a tecla ← manda a sessão ao fundo como CÓPIA de id novo
+#     (transcript com history-suppression/fork_inherit na 1ª linha) e o processo antigo morre. Se uma sessão viva é cópia
+#     do id pedido, a recusa diz que a conversa já vive como <id> e não abre outra. Se a sessão viva é de fundo, a recusa
+#     dá a receita: `claude attach <id>`, ou, para voltar ao tmux com o canal da campainha (a cópia de fundo nasce de um
+#     `claude bg-spare` sem a flag do canal), `claude stop <id> && bash ops/session-open.sh <nome> --resume <id>`. A janela
+#     `claude attach <id>` é um `claude` com o cwd na pasta: o abridor a reconhece pelo cmdline e dá a mesma receita.
+#     Este abridor nunca roda stop, attach nem rm: só os imprime.
 #
 # Saída: 0 abriu/anexou/ensaiou · 2 uso ou pasta inválida · 3 recusa (sessão viva: duplicaria) · 4 tmux ou claude
 # ausente · 5 id não resolvido (ambíguo, ou nenhum sem --new).
@@ -51,6 +61,8 @@ TMUX_BIN="${SESSION_OPEN_TMUX:-tmux}"
 CLAUDE_BIN="${SESSION_OPEN_CLAUDE:-claude}"
 PROJECTS_DIR="${SESSION_OPEN_PROJECTS:-${HOME_DIR}/.claude/projects}"
 OWNERSHIP="${SESSION_OPEN_OWNERSHIP:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.claude/utils/orchestration/ownership.sh}"
+# a regra ÚNICA de «sessão viva» e a detecção da cópia (fork_inherit): a mesma que o baton-pulse.sh lê (2026-11-24)
+LIVENESS="${SESSION_OPEN_LIVENESS:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.claude/utils/orchestration/session-liveness.sh}"
 OWN_ARGS=()
 [ -n "${SESSION_OPEN_MEMBERS:-}" ] && OWN_ARGS+=(--members "${SESSION_OPEN_MEMBERS}")   # bancada: registro de fixture
 OWN_ARGS+=(--home "${HOME_DIR}")
@@ -116,6 +128,14 @@ claude_pids() {
   printf '%s' "${out% }"
 }
 
+# o alvo de um `claude attach <id>` (a janela de uma sessão de fundo nativo), lido do cmdline do processo; rc 1 = não é
+attach_target() {
+  local a
+  a="$(tr '\0' '\n' < "${PROC_DIR}/$1/cmdline" 2>/dev/null | sed -n '2,3p' | tr '\n' ' ')" || return 1
+  case "${a}" in "attach "?*) a="${a#attach }"; a="${a% }"; [[ "${a}" =~ ^[A-Za-z0-9-]{4,64}$ ]] && { printf '%s' "${a}"; return 0; } ;; esac
+  return 1
+}
+
 # UM SERVIDOR tmux POR SESSÃO (`tmux -L <nome>`): em 2026-11-22 o servidor único (o `default`) caiu e levou as
 # cinco sessões de uma vez. Com um servidor por sessão, a queda de um leva só aquela. A sessão aberta antes desta
 # mudança vive no servidor `default`: ela ainda é achada (e anexada lá), nunca duplicada. TMUX_SRV diz onde achou.
@@ -132,25 +152,25 @@ attach_hint() {
   else printf '%s -L %s attach -t %s' "${TMUX_BIN}" "$1" "$1"; fi
 }
 
-# a lista de peers do harness, como TSV: sessionId kind state pid name cwd. rc 1 = não medida (dito por quem chama).
+# a lista de peers do harness, como TSV: sessionId kind state pid name cwd live short motivo (o classify do
+# session-liveness.sh: campo vazio vira «-», porque o read com IFS de TAB funde tabs seguidos). rc 1 = não medida.
 peers_tsv() {
   local j
+  [ -f "${LIVENESS}" ] || return 1
   j="$(timeout 20 "${CLAUDE_BIN}" agents --json 2>/dev/null)" || return 1
-  python3 -I -c '
-import json, sys
-d = json.loads(sys.stdin.read() or "null")
-if not isinstance(d, list): sys.exit(1)
-for x in d:
-    if not isinstance(x, dict): continue
-    sid = str(x.get("sessionId") or x.get("id") or "")
-    if not sid: continue
-    # campo vazio vira «-»: o read com IFS de TAB funde tabs seguidos, e o campo seguinte escorregaria
-    f = [str(x.get(k)) if x.get(k) not in (None, "") else "-" for k in ("kind", "state", "pid", "name", "cwd")]
-    print("\t".join(v.replace("\t", " ").replace("\n", " ") for v in [sid] + f))
-' <<< "${j}" 2>/dev/null
+  bash "${LIVENESS}" classify - <<< "${j}" 2>/dev/null
 }
-# viva = interativa listada (o harness só lista interativa que roda) ou de fundo num estado de processo de pé
-peer_live() { case "$1:$2" in interactive:*) return 0 ;; *:working|*:blocked|*:done|*:idle|*:running) return 0 ;; esac; return 1; }
+# viva = o veredito da regra única (session-liveness.sh): interativa listada, ou de fundo COM pid vivo. Até
+# 2026-11-24 a regra daqui olhava o `state` e dava «viva» a um registro de fundo morto (blocked, sem pid), que o
+# baton-pulse.sh dava como UNREACHABLE: a sessão do core não reabriu por causa dele.
+peer_live() { [ "$1" = live ]; }
+# o transcript de um id, em qualquer pasta de projeto (o id é único); rc 1 = não achado
+transcript_of() { local f; for f in "${PROJECTS_DIR}"/*/"$1".jsonl; do [ -f "${f}" ] && { printf '%s' "${f}"; return 0; }; done; return 1; }
+# a receita da sessão de FUNDO NATIVO: entrar nela, ou trazê-la de volta ao tmux pelo abridor (que põe o canal da
+# campainha: a cópia de fundo nasce de um `claude bg-spare` genérico, sem a flag do canal). $1 id curto, $2 sessionId, $3 nome
+bg_recipe() {
+  printf 'É sessão de fundo nativo: entre nela com «claude attach %s»; para voltar ao tmux (e recuperar o canal da campainha): claude stop %s && bash ops/session-open.sh %s --resume %s' "$1" "$1" "$3" "$2"
+}
 
 # o último título (customTitle) de um transcript: só a linha do título, nunca a conversa
 title_of() { grep -oE '"customTitle":"[^"]*"' "$1" 2>/dev/null | tail -1 | sed -E 's/^"customTitle":"//; s/"$//'; }
@@ -167,18 +187,31 @@ resolve_id() {
   fi
   # nunca duas sessões no mesmo checkout: peer VIVO (qualquer nome) com o cwd nesta pasta. A sessão de fundo não aparece
   # no /proc como `claude` (o processo leva o nome da versão), então o /proc sozinho não a vê.
-  local s k st p nm cw
-  while IFS=$'\t' read -r s k st p nm cw; do
+  local s k st p nm cw lv sh wy rt ct frc
+  # a CÓPIA do id pedido (fork_inherit): mandar a sessão ao fundo nativo dá a ela um id NOVO, e o id antigo some da
+  # lista. Retomar o antigo abriria uma 2ª cópia da conversa que já vive. Medido em 2026-11-24 (2.1.331): a 1ª linha
+  # do transcript da cópia é history-suppression/fork_inherit e o 1º uuid dela está no transcript da origem.
+  if [ -n "${RESUME}" ] && rt="$(transcript_of "${RESUME}")"; then
+    while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
+      [ -n "${s}" ] && [ "${s}" != "${RESUME}" ] && peer_live "${lv}" || continue
+      ct="$(transcript_of "${s}")" || continue
+      bash "${LIVENESS}" fork-of "${ct}" "${rt}" 2>/dev/null; frc=$?
+      [ "${frc}" -eq 2 ] && { say "session-open: ⚠️ não medi se a sessão viva ${s} é cópia de ${RESUME} (transcript ilegível)." >&2; continue; }
+      [ "${frc}" -eq 0 ] || continue
+      say "session-open: a conversa ${RESUME} já vive como ${s} («${nm}», ${k}${st:+/${st}}, cwd ${cw}): é cópia dela (fork_inherit; a sessão mandada ao fundo ganha id novo). Não abro outra cópia. $(if [ "${k}" = background ]; then bg_recipe "${sh}" "${s}" "${n}"; else printf 'Entre nela.'; fi)" >&2; return 3
+    done <<< "${PEERS}"
+  fi
+  while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
     [ -n "${s}" ] && [ "${cw}" != "-" ] || continue
     [ "$(realpath -m -- "${cw}")" = "${dir}" ] || continue
-    peer_live "${k}" "${st}" && { say "session-open: a sessão «${nm}» (id ${s}, ${k}/${st}) já está viva neste checkout (${dir}): nunca duas sessões no mesmo checkout. Entre nela, ou abra a 2ª numa worktree (claude --worktree)." >&2; return 3; }
+    peer_live "${lv}" && { say "session-open: a sessão «${nm}» (id ${s}, ${k}/${st}: ${wy}) já está viva neste checkout (${dir}): nunca duas sessões no mesmo checkout. $(if [ "${k}" = background ]; then bg_recipe "${sh}" "${s}" "${n}"; else printf 'Entre nela, ou abra a 2ª numa worktree (claude --worktree).'; fi)" >&2; return 3; }
   done <<< "${PEERS}"
   if [ -n "${RESUME}" ]; then RID="${RESUME}"; RID_SRC="--resume"
   else
     hits="$(awk -F'\t' -v n="${n}" '$5 == n' <<< "${PEERS}")"
     if [ -n "${hits}" ]; then
-      while IFS=$'\t' read -r s k st p nm cw; do
-        peer_live "${k}" "${st}" && { say "session-open: a sessão «${n}» já está viva (id ${s}, ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia. Entre nela: $(attach_hint "${n}"), ou claude attach ${s}." >&2; return 3; }
+      while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
+        peer_live "${lv}" && { say "session-open: a sessão «${n}» já está viva (id ${s}, ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia. $(if [ "${k}" = background ]; then bg_recipe "${sh}" "${s}" "${n}"; else printf 'Entre nela: %s' "$(attach_hint "${n}")"; fi)" >&2; return 3; }
       done <<< "${hits}"
       ids="$(cut -f1 <<< "${hits}" | sort -u)"; cnt="$(wc -l <<< "${ids}")"
       if [ "${cnt}" -gt 1 ]; then say "session-open: o harness lista ${cnt} sessões paradas com o nome «${n}» ($(tr '\n' ' ' <<< "${ids}")): ambíguo, não escolho. Diga o id com --resume." >&2; return 5; fi
@@ -206,8 +239,8 @@ resolve_id() {
   # o id escolhido não pode estar vivo noutro lugar (outro nome, outra pasta): a cópia escreveria no mesmo histórico
   hits="$(awk -F'\t' -v s="${RID}" '$1 == s' <<< "${PEERS}")"
   if [ -n "${hits}" ]; then
-    while IFS=$'\t' read -r s k st p nm cw; do
-      peer_live "${k}" "${st}" && { say "session-open: o id ${RID} já está vivo (nome «${nm}», ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia do mesmo histórico." >&2; return 3; }
+    while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
+      peer_live "${lv}" && { say "session-open: o id ${RID} já está vivo (nome «${nm}», ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia do mesmo histórico.$(if [ "${k}" = background ]; then printf ' '; bg_recipe "${sh}" "${s}" "${n}"; fi)" >&2; return 3; }
     done <<< "${hits}"
   fi
   return 0
@@ -262,9 +295,9 @@ open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a 
     fi
     # e a sessão de FUNDO viva no checkout, que o /proc não vê como claude: aviso (anexar não abre uma 2ª)
     local pl; pl="$(peers_tsv)" || say "session-open: ⚠️ não li a lista de peers do harness: não sei se há sessão de fundo viva em ${dir}."
-    while IFS=$'\t' read -r _s _k _st _p _nm _cw; do
+    while IFS=$'\t' read -r _s _k _st _p _nm _cw _lv _sh _wy; do
       [ -n "${_s}" ] && [ "${_k}" = background ] && [ "${_cw}" != "-" ] && [ "$(realpath -m -- "${_cw}")" = "${dir}" ] || continue
-      peer_live "${_k}" "${_st}" && say "session-open: ⚠️ há também a sessão de fundo «${_nm}» (id ${_s}) viva em ${dir}: duas no mesmo checkout; pare uma (claude stop ${_s}) ou leve-a para uma worktree."
+      peer_live "${_lv}" && say "session-open: ⚠️ há também a sessão de fundo «${_nm}» (id ${_s}) viva em ${dir}: duas no mesmo checkout; pare uma (claude stop ${_sh}) ou leve-a para uma worktree."
     done <<< "${pl}"
   else
     # nunca duas sessões no mesmo checkout: QUALQUER claude vivo com o cwd na pasta (fora do tmux ou noutra sessão tmux)
@@ -274,6 +307,14 @@ open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a 
       local o2; o2="$(claude_pids "${dir}" out)"
       [ $? -eq 0 ] || die "já há um claude vivo em ${dir} (pid ${out}) e não li se ele está num tmux (${PROC_DIR} ilegível): não abro às cegas" 3
       if [ -n "${o2}" ]; then
+        # a janela `claude attach <id>` de uma sessão de FUNDO NATIVO também é um `claude` com o cwd na pasta (medido em
+        # 2026-11-24: o maestro anexado à cópia de fundo do core). Dar /exit nela não para a sessão: a receita é a do fundo.
+        local ap at; at=""
+        for ap in ${o2}; do at="$(attach_target "${ap}")" && break; done
+        if [ -n "${at}" ]; then
+          local afull; afull="$(peers_tsv | awk -F'\t' -v x="${at}" '$8 == x || $1 == x { print $1; exit }')"
+          die "o claude vivo em ${dir} fora do tmux (pid ${ap}) é a janela «claude attach ${at}» de uma sessão de fundo nativo: a sessão vive no fundo, não ali. $(bg_recipe "${at}" "${afull:-<id completo de ${at} no claude agents>}" "${n}")" 3
+        fi
         die "já há um claude vivo em ${dir} FORA do tmux (pid ${o2}). Abrir outro duplica a sessão no checkout. Vá à janela dele, dê /exit, e rode este comando de novo." 3
       fi
       die "já há um claude vivo em ${dir} (pid ${out}), noutra sessão tmux ou de outra conta, não na «${n}»: nunca duas sessões no mesmo checkout. Entre nela (bash ops/session-open.sh --list) ou dê /exit lá; a 2ª sessão de trabalho vai para uma worktree (claude --worktree)." 3

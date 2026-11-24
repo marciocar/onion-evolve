@@ -1,0 +1,74 @@
+meta:
+  schema_version: "1"
+  id: session-native-bg-2026-11
+  slug: session-native-bg-2026-11
+  title: "A sessão mandada ao fundo nativo: regra única de «viva», a cópia (fork_inherit) e a receita de volta ao tmux"
+  date: "2026-11-24"
+  baseline: "2026-11-24"
+  review_after: "2026-12-24"
+  purpose: "Guardar o que se mediu quando a sessão do core foi ao fundo nativo e não reabriu, e as cinco curas que o maestro aprovou."
+  note: "TETO, declarado: 4 nós. Nasceu à parte para não disputar âncora com o arquivo de selos."
+  # ═══ TETO: 4 NÓS ═══
+external_edges:
+  - from: D_SNB_FIVE_CURES_1124
+    to: "docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml#D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120"
+    edge_type: TRACES_TO
+  - from: E_SNB_FORK_AND_DEAD_RECORD_1124
+    to: "docs/onion/graph/doorbell-session-opener-2026-11.kg.yaml#E_DSO_CHANNEL_NEEDS_FLAG_1109"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_SNB_FORK_AND_DEAD_RECORD_1124
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-24"
+    verified_against: "claude agents --json, ⟨o log do daemon de fundo⟩, ⟨o roster do daemon⟩ e os transcripts 022965f2 e 535955f0 do core, lidos em 2026-11-24 no Claude Code 2.1.331"
+    label: "A tecla ← cria uma CÓPIA de id novo (fork_inherit) e mata o processo antigo; a cópia nasce de um bg-spare sem a flag do canal; o registro de fundo morto fica na lista com state e sem pid."
+    narrative: "Medido: a 1ª linha do transcript da cópia é history-suppression com cause fork_inherit e SEM o id de origem; todo sessionId do histórico é reescrito; o 1º uuid da cópia está idêntico no transcript da origem. O roster do daemon grava dispatch.launch.sessionId (o caminho do transcript de origem) com fork: true, mas só enquanto o worker vive. A sessão de fundo viva tem pid na lista; o registro f1eae138 (kind background, state blocked, sem pid, de 30/09) era morto: o abridor o dava como vivo pelo state e o pulso como UNREACHABLE. Um `claude attach <id>` é um processo claude com o cwd na pasta e sem TMUX."
+    provenance:
+      source: "estado do harness nesta máquina"
+      locator: "claude agents --json; ⟨transcript da cópia 535955f0, linha 1⟩; ⟨log do daemon: claimed-spare 535955f0⟩; ⟨cmdline do processo claude attach 535955f0⟩"
+      method: "measurement: leitura do estado do harness e dos transcripts"
+      locality: "repo"
+  - id: D_SNB_FIVE_CURES_1124
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-24"
+    verified_against: "aprovação do maestro às cinco curas, repassada pela sessão do core em 2026-11-24; famílias session_open, baton_pulse e restart_drain com um mutante por cura"
+    label: "Uma regra só de «viva» para o abridor e o pulso; o abridor reconhece o fundo e a cópia; o /meta:restart dá a receita pelo modo e o bilhete segue a cópia; o pulso avisa o fundo de dever longo; serviço longo fica no tmux."
+    narrative: "Peças: .claude/utils/orchestration/session-liveness.sh (live, classify, fork-of); ops/session-open.sh (core-only); restart-drain.sh; baton-pulse.sh com SESSION_NATIVE_BG_LONG_DUTY e SESSION_STALE_BG_RECORD. Nenhuma peça roda claude stop, attach ou rm: só os imprime; o rm é ato do maestro."
+    provenance:
+      source: "maestro, pela sessão do core"
+      locator: "brief do agente de execução de 2026-11-24, «As 5 curas (o maestro aprovou)»"
+      method: "testimony: aprovação do maestro repassada"
+      locality: "pessoa"
+  - id: E_SNB_LIMITS_DECLARED_1124
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-24"
+    verified_against: "leitura dos artefatos e dos casos das três famílias"
+    label: "O que não se mediu: se claude stop e attach aceitam o sessionId completo (usa-se o id curto do harness); se a janela attach sai sozinha depois do stop; e se a retomada interativa de uma sessão parada por stop mantém o mesmo id no 2.1.331."
+    narrative: "A cópia de uma cópia é reconhecida pelo uuid herdado, então conta como cópia do avô também. O modo «tmux» do restart lê só a chave TMUX do ambiente do processo, não a árvore. Os dois avisos novos do pulso são texto: nada barra."
+    provenance:
+      source: "leitura do próprio artefato"
+      locator: ".claude/utils/orchestration/session-liveness.sh; .claude/utils/orchestration/restart-drain.sh"
+      method: "reading: o artefato inteiro"
+      locality: "repo"
+edges:
+  - from: D_SNB_FIVE_CURES_1124
+    to: E_SNB_FORK_AND_DEAD_RECORD_1124
+    edge_type: TRACES_TO
+  - from: E_SNB_LIMITS_DECLARED_1124
+    to: D_SNB_FIVE_CURES_1124
+    edge_type: TRACES_TO

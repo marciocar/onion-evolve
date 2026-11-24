@@ -43,8 +43,17 @@
 #       na volta: lista quem retomar (do .tsv), apaga o marcador e arquiva o bilhete como <sid>.<epoch>.resumed.*.
 #   restart-drain.sh --status
 #       só lê: marcadores e bilhetes pendentes (TSV). Não apaga nada.
+# ── O MODO DA SESSÃO E A CÓPIA (2026-11-24, Claude Code 2.1.331) ─────────────────────────────────────
+#   A receita de retomada depende de onde a sessão roda, lido da lista de peers (`claude agents --json`, pela regra única
+#   de «viva» do session-liveness.sh, ao lado) e do ambiente do processo (a chave TMUX): tmux = a receita de sempre;
+#   fundo nativo = `claude stop <id> && bash ops/session-open.sh <nome> --resume <id>` (core-only), que volta ao tmux e
+#   recupera o canal da campainha; terminal solto = a mesma receita com o aviso de /exit antes; não medido = dito. O
+#   sufixo « (N)» que o harness põe no nome repetido sai antes de montar o comando do abridor.
+#   A tecla ← manda a sessão ao fundo como CÓPIA de id novo (fork_inherit). O --resume-check chamado da cópia, sem
+#   bilhete do próprio id, segue o bilhete do ANCESTRAL: o pendente cujo transcript é a origem dela (fork-of).
 # Ambiente (bancada): ONION_RESTART_DIR · RESTART_PROJECTS_DIR (padrão ~/.claude/projects) · RESTART_PULSE ·
-#   RESTART_PROBE · RESTART_SESSION_OPEN (padrão <repo>/ops/session-open.sh, core-only) · CLAUDE_CODE_SESSION_ID (o --session padrão).
+#   RESTART_PROBE · RESTART_SESSION_OPEN (padrão <repo>/ops/session-open.sh, core-only) · CLAUDE_CODE_SESSION_ID (o --session padrão) ·
+#   RESTART_CLAUDE (o binário do `agents --json`) · RESTART_LIVENESS (a regra de «viva») · RESTART_PROC (um /proc falso).
 # Saída: 0 zerou ou --now (bilhete gravado) · 3 teto vencido com trabalho em curso (bilhete gravado, o que corre é dito)
 #        · 5 bilhete gravado COM LACUNA (algo NÃO MEDIDO, no --now ou numa falha durante a espera; no --resume-check,
 #          bilhete que trazia lacuna) · 4 --resume-check sem bilhete · 2 uso, sessão sem id, ou medição impossível
@@ -68,6 +77,10 @@ PROJ = os.environ.get('RESTART_PROJECTS_DIR') or os.path.join(HOME, '.claude', '
 PULSE = os.environ.get('RESTART_PULSE') or os.path.normpath(os.path.join(HERE, '..', '..', 'validation', 'baton-pulse.sh'))
 PROBE = os.environ.get('RESTART_PROBE') or os.path.normpath(os.path.join(HERE, '..', '..', 'hooks', 'background-task-probe.sh'))
 NAME_RE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$')   # o valid_name do ops/session-open.sh (core-only)
+# a regra única de «viva» e a detecção da cópia (fork_inherit): .claude/utils/orchestration/session-liveness.sh, ao lado
+LIV = os.environ.get('RESTART_LIVENESS') or os.path.join(HERE, 'session-liveness.sh')
+CLAUDE = os.environ.get('RESTART_CLAUDE') or 'claude'
+PROCD = os.environ.get('RESTART_PROC') or '/proc'
 os.umask(0o077)   # marcador e bilhete trazem ids, caminhos e comandos: só o dono lê
 
 def die(msg, rc=2):
@@ -132,10 +145,28 @@ if opt['mode'] == 'status':
     sys.exit(0)
 
 # ── --resume-check: lista quem retomar, apaga o marcador, arquiva o bilhete ──
+def transcript_of(sid):
+    m = glob.glob(os.path.join(glob.escape(PROJ), '*', glob.escape(sid) + '.jsonl')); return m[0] if m else ''
 if opt['mode'] == 'resume':
     if opt['all']: sids = sorted({os.path.basename(p)[:-4] for p in glob.glob(os.path.join(glob.escape(RDIR), '*.tsv')) if '.resumed.' not in p})
     elif SID: sids = [SID]
     else: die('sem id de sessão: passe --session <sid> ou --all (CLAUDE_CODE_SESSION_ID vazio)')
+    # O BILHETE SEGUE A CÓPIA (2026-11-24): a sessão mandada ao fundo nativo (tecla ←) volta com id NOVO, e o bilhete
+    # ficou no id antigo. Sem bilhete do próprio id, vale o de um ancestral: o bilhete pendente cujo transcript é a
+    # origem desta cópia (fork_inherit + o 1º uuid da cópia presente na origem, pelo session-liveness.sh fork-of).
+    if not opt['all'] and SID and not os.path.exists(os.path.join(RDIR, f'{SID}.tsv')):
+        me = transcript_of(SID)
+        for p in (sorted(glob.glob(os.path.join(glob.escape(RDIR), '*.tsv'))) if me else []):
+            b = os.path.basename(p)[:-4]
+            if '.resumed.' in os.path.basename(p) or b == SID: continue
+            anc = transcript_of(b)
+            if not anc: continue
+            try: fr = subprocess.run(['bash', LIV, 'fork-of', me, anc], capture_output=True, text=True, timeout=120).returncode
+            except (OSError, subprocess.TimeoutExpired): fr = 2
+            if fr == 2: print(f'⚠️ não medi se esta sessão é cópia de {b} (fork-of falhou): o bilhete dele NÃO foi seguido')
+            if fr == 0:
+                print(f'esta sessão ({SID}) é cópia de {b} (fork_inherit: mandada ao fundo, ganhou id novo): sigo o bilhete do ancestral')
+                sids = [b]; break
     found = 0; ngaps = 0; now = int(time.time())
     for s in sids:
         tp = os.path.join(RDIR, f'{s}.tsv'); rows = read_tsv(tp)
@@ -335,17 +366,53 @@ if not opt['now']:
             outcome = 'medição falhou durante a espera: bilhete com a última medição boa'; break
         (live, old), tasks = r2, t2
 
+# ── o MODO da sessão (2026-11-24): a receita de retomada depende de onde ela roda ──
+#   tmux    interativa com a chave TMUX no ambiente do processo: a receita de sempre (o abridor reabre no tmux);
+#   bg      de fundo nativo (`kind: background` no `claude agents --json`): `claude stop <id>` e depois o abridor, que
+#           volta ao tmux e recupera o canal da campainha (a cópia de fundo nasce sem a flag do canal);
+#   loose   interativa SEM tmux (terminal solto): a mesma receita, com o aviso de dar /exit antes;
+#   unknown a lista de peers ou o ambiente não se leram: a receita de sempre, com a lacuna dita.
+def session_mode():
+    """→ (modo, id curto, nota)."""
+    try:
+        r = subprocess.run([CLAUDE, 'agents', '--json'], capture_output=True, text=True, timeout=20)
+        if r.returncode != 0: raise RuntimeError(f'{CLAUDE} agents --json rc {r.returncode}')
+        c = subprocess.run(['bash', LIV, 'classify', '-'], input=r.stdout, capture_output=True, text=True, timeout=30)
+        if c.returncode != 0: raise RuntimeError(f'regra de «viva» rc {c.returncode}')
+    except (OSError, subprocess.TimeoutExpired, RuntimeError) as e:
+        return 'unknown', '', f'modo da sessão NÃO medido ({type(e).__name__}: {e})'
+    row = next((f for f in (l.split('\t') for l in c.stdout.splitlines()) if f[0] == SID and len(f) >= 9), None)
+    if not row: return 'unknown', '', 'a sessão não está na lista de peers do harness: modo NÃO medido'
+    kind, pid, short = row[1], row[3], row[7]
+    if kind == 'background': return 'bg', short, ''
+    if kind != 'interactive': return 'unknown', short, f'kind «{kind}» desconhecido: modo NÃO medido'
+    try: env = open(os.path.join(PROCD, pid, 'environ'), 'rb').read() if pid.isdigit() else None
+    except OSError: env = None
+    if env is None: return 'unknown', short, f'ambiente do processo {pid} ilegível: tmux NÃO medido'
+    return ('tmux' if any(e.startswith(b'TMUX=') for e in env.split(b'\0')) else 'loose'), short, ''
+MODE, SHORT, MODE_NOTE = session_mode()
+
 # ── bilhete ──
 SO = os.environ.get('RESTART_SESSION_OPEN') or os.path.join(REPO, 'ops', 'session-open.sh')
-if os.path.isfile(SO) and NAME and NAME_RE.fullmatch(NAME):
-    resume_cmd, resume_note = f'bash ops/session-open.sh {shlex.quote(NAME)} --resume {shlex.quote(SID)}', ''  # (core-only): só quando o abridor existe (teste de presença acima)
+# o harness acrescenta « (N)» ao nome repetido (medido: «onion-evolve (5)»): o abridor quer o nome sem o sufixo
+OPEN_NAME = re.sub(r' \(\d+\)$', '', NAME or '')
+if os.path.isfile(SO) and OPEN_NAME and NAME_RE.fullmatch(OPEN_NAME):
+    resume_cmd, resume_note = f'bash ops/session-open.sh {shlex.quote(OPEN_NAME)} --resume {shlex.quote(SID)}', ''  # (core-only): só quando o abridor existe (teste de presença acima)
 else:
     resume_cmd = f'claude --resume {shlex.quote(SID)}'
     resume_note = (' (ops/session-open.sh ausente neste repo: retomada direta, sem tmux)' if not os.path.isfile(SO) else  # (core-only)
                    f' (título «{NAME or "?"}» fora do padrão de nome do ops/session-open.sh: retomada direta, sem tmux)')  # (core-only)
+if MODE == 'bg':
+    resume_cmd = f'claude stop {shlex.quote(SHORT)} && {resume_cmd}'
+    resume_note += (' (a sessão roda no FUNDO NATIVO: o stop a para sem perder a conversa, e o abridor a reabre no tmux com o canal da '
+                    'campainha; para só entrar nela, claude attach ' + SHORT + ')')
+elif MODE == 'loose':
+    resume_note += ' (⚠️ a sessão roda num terminal SOLTO, fora do tmux: dê /exit nela antes; o comando a reabre no tmux)'
+elif MODE == 'unknown':
+    resume_note += f' (⚠️ {MODE_NOTE}: confira se a sessão está no tmux, no fundo nativo ou num terminal solto)'
 def tsvc(x): return str(x if x is not None else '').replace('\t', ' ').replace('\n', ' ')
 with open(os.path.join(RDIR, f'{SID}.tsv.tmp'), 'w', encoding='utf-8') as f:
-    f.write('\t'.join(tsvc(x) for x in ('session', SID, NAME or '?', iso(time.time()), outcome, resume_cmd)) + '\n')
+    f.write('\t'.join(tsvc(x) for x in ('session', SID, NAME or '?', iso(time.time()), outcome, resume_cmd, MODE)) + '\n')
     for g in live: f.write('\t'.join(tsvc(x) for x in ('agent', g['aid'], g['cls'], g['desc'], g['wt'], g['br'], g['age'], g['step'])) + '\n')
     for t in tasks: f.write('\t'.join(tsvc(x) for x in ('task', t['id'], f'{t["of"]}: {t["line"]}')) + '\n')
     for g in gaps: f.write(f'gap\t{tsvc(g)}\n')
@@ -353,6 +420,7 @@ os.replace(os.path.join(RDIR, f'{SID}.tsv.tmp'), os.path.join(RDIR, f'{SID}.tsv'
 L = [f'# Bilhete de retomada · {NAME or "?"} ({SID})', '',
      f'- gravado: {iso(time.time())} · modo: {"--now" if opt["now"] else "drain"} · teto: {opt["timeout"]}s · resultado: {outcome}',
      f'- nome da sessão: {NAME or "?"} ({NAME_SRC})',
+     f'- modo da sessão: {MODE}' + (f' ({MODE_NOTE})' if MODE_NOTE else ''),
      f'- retomar a sessão: `{resume_cmd}`{resume_note}',
      f'- na volta: `bash .claude/utils/orchestration/restart-drain.sh --resume-check --session {SID}` (lista, apaga o marcador, arquiva este bilhete)', '',
      f'## Agentes em voo ({len(live) if agents_measured else "NÃO MEDIDOS"})', '']

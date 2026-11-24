@@ -14,7 +14,7 @@ date: 2026-07-11
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Categoria** | Concepts |
 | **Aplicação** | Tocar N questões do Onion em paralelo, cada uma isolada, sem colisão de escopo |
 | **SSOT de layout** | `worktree-convention-2026.md` (interno do core). *Dimensão:* a convenção que fixa localização e nomenclatura (`~/worktrees/<repo>/<branch-slug>`, umbrella dir), a doutrina W3 (um-escritor-por-escopo, handoff commitado) e o caveat do farol por-working-tree. |
@@ -81,6 +81,39 @@ cd ~/worktrees/<repo>/<tipo>-<slug> && claude
 git -C ~/<repo> worktree remove ~/worktrees/<repo>/<tipo>-<slug>
 git -C ~/<repo> worktree prune                 # higiene periódica
 ```
+
+### 3.5 Sessão de serviço longo: tmux ou fundo nativo? (medido em 2026-11-24)
+
+O Claude Code tem fundo **nativo**: a tecla `←` (ou `claude --bg`) põe a sessão num daemon, e `claude agents`,
+`attach`, `stop` e `rm` a operam. A escolha, para quem segura uma peça ou uma batuta por dias:
+
+| Uso | Onde | Por quê |
+|---|---|---|
+| Serviço longo (dona de peça, batuta, sessão do core) | **tmux** (um servidor por sessão), reaberto no boot pelo systemd do usuário | sobrevive a reboot e mantém a flag do canal de mensagens com que foi aberta |
+| Tarefa curta, ou trocar de terminal | **fundo nativo** | é para isso que ele existe: entra e sai com `claude attach` |
+
+O que se mediu no Claude Code 2.1.331, e decide a escolha:
+
+- **A tecla `←` cria uma CÓPIA com id novo**, e o processo antigo morre. O transcript da cópia abre com
+  `{"type":"history-suppression","cause":"fork_inherit"}`, **sem** o id de origem, e todo `sessionId` do histórico é
+  reescrito. O que liga as duas é o `uuid` das mensagens: o 1º `uuid` da cópia está, idêntico, no transcript da
+  origem. Retomar o id antigo abre uma **segunda** cópia da conversa que já vive.
+- **A cópia nasce de um `claude bg-spare` genérico**, sem as flags da sessão original: a sessão aberta com um canal de
+  desenvolvimento (a campainha de mensagens) volta **muda**. `claude --bg --resume <id>` continua a sessão no fundo
+  com o **mesmo** id, mas flag a mais na retomada abre cópia.
+- **O daemon é transitório**: sai sem clientes, e a sessão ociosa é aposentada depois de um tempo (no log do daemon:
+  `retire … idle 8h`). O registro dela continua na lista (`kind: background`, `state: blocked`), **sem pid**.
+- **«Viva» tem uma regra só**: interativa listada, ou de fundo **com** pid vivo (`kill -0`). O `state` é o último que o
+  harness gravou e sobrevive ao processo; quem o lê como vida barra a reabertura por causa de um registro morto (foi o
+  que aconteceu no core, com um registro de dias antes).
+
+Como as peças do Onion convivem com o nativo: **leem-no e não brigam com ele**. A regra única de «viva» mora em
+`.claude/utils/orchestration/session-liveness.sh`, e o abridor de sessões do core, o pulso da batuta
+(`/meta:baton`) e o reinício gracioso (`/meta:restart`) a usam. O abridor recusa abrir a 2ª cópia e dá a receita de
+volta ao tmux (`claude stop <id>`, depois reabrir pelo id no tmux); o pulso avisa a sessão de dever longo que está no
+fundo (`SESSION_NATIVE_BG_LONG_DUTY`) e oferece a limpeza do registro morto há mais de 24 h
+(`SESSION_STALE_BG_RECORD`, com `claude rm <id>`, que é ato do humano); o `/meta:restart` imprime a receita pelo modo
+da sessão e faz o bilhete de retomada seguir a cópia. Nenhuma delas roda `stop`, `attach` ou `rm`.
 
 ## 4. Invariantes (da convenção — repetidos porque mordem)
 
