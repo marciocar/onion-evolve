@@ -10957,12 +10957,24 @@ PY
   _case "merge-gate: git -C /outro push -u origin +feat/x → passa (não é dele)" 0 "${mg}" feat "git -C ${d}/outro-repo push -u origin +feat/x"
   # buracos antigos baratos (revisão isolada, limite 4): alias por -c e flag vinda de expansão ou de $(…)
   _pvmut "(or3) protect-main: git -c alias.c=clean c -fdx → VETO" 2 pretooluse-protect-main.sh feat \
-    'git -c alias.c=clean c -fdx' "${_ILF}" $'    if rest and rest[0].lower() in alias and alias[rest[0].lower()]:\n        rest = alias[rest[0].lower()] + rest[1:]\n' ''
+    'git -c alias.c=clean c -fdx' "${_ILF}" '        rest = alias[rest[0].lower()] + rest[1:]' '        break'
   _pvmut "(or4) protect-main: git clean \${F:--fdx} → VETO (flag de expansão conta como destrutiva)" 2 pretooluse-protect-main.sh feat \
     'git clean ${F:--fdx}' pretooluse-protect-main.sh '      if (t ~ /\$|__ONION_SUBST__|`/) { x = 1; continue }' ''
   _case "protect-main: git clean \$(echo -fdx) → VETO"         2 "${pm}" feat 'git clean $(echo -fdx)'
   _case "protect-main: git clean -n \$F → passa (simulação)"   0 "${pm}" feat 'git clean -n $F'
   _case "protect-main: git -c alias.p=push p -f origin feat → VETO" 2 "${pm}" feat 'git -c alias.p=push p -f origin feat'
+  # re-revisão isolada: alias sem caixa, recursivo com teto, valor partido por shlex; chaves como flag do clean
+  _pvmut "(or5) protect-main: git -c Alias.c=clean c -fdx (seção sem caixa) → VETO" 2 pretooluse-protect-main.sh feat \
+    'git -c Alias.c=clean c -fdx' "${_ILF}" '            am = re.match(r"^alias\.([^=]+)=(.*)$", kv, re.S | re.I)' '            am = re.match(r"^alias\.([^=]+)=(.*)$", kv, re.S)'
+  _pvmut "(or6) protect-main: git -c alias.d=c -c alias.c=clean d -fdx (alias de alias) → VETO" 2 pretooluse-protect-main.sh feat \
+    'git -c alias.d=c -c alias.c=clean d -fdx' "${_ILF}" '    for _ in range(8):' '    for _ in range(1):'
+  _pvmut "(or7) protect-main: git -c alias.c='clean \"-fdx\"' c (aspas no valor) → VETO" 2 pretooluse-protect-main.sh feat \
+    "git -c alias.c='clean \"-fdx\"' c" "${_ILF}" '                    alias[am.group(1).lower()] = shlex.split(am.group(2))' '                    alias[am.group(1).lower()] = am.group(2).split()'
+  _pvmut "(or8) protect-main: git clean {-x,} (flag por chaves) → VETO" 2 pretooluse-protect-main.sh feat \
+    'git clean {-x,}' pretooluse-protect-main.sh '      if (t ~ /\{.*,.*\}/) { x = 1; continue }' ''
+  _case "protect-main: git -c ALIAS.C=clean c -fdx → VETO"       2 "${pm}" feat 'git -c ALIAS.C=clean c -fdx'
+  _case "protect-main: git clean {-fdx,} -n → passa (simulação)" 0 "${pm}" feat 'git clean {-fdx,} -n'
+  _case "protect-main: alias em laço (alias.a=a) termina → passa" 0 "${pm}" feat 'git -c alias.a=a a -fdx'
   _case "merge-gate: git -C . push origin main → VETO"        2 "${mg}" feat 'git -C . push origin main'
   _case "merge-gate: git -C <raiz> push origin main → VETO"   2 "${mg}" feat "git -C ${d} push origin main"
   _case "merge-gate: git --git-dir=/outro/.git push origin main → passa" 0 "${mg}" feat "git --git-dir=${d}/outro-repo/.git push origin main"

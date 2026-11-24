@@ -899,9 +899,13 @@ def canonical_git(words, where, env=None):
             kv = words[i + 1]
             # `git -c alias.c=clean c -fdx` é `git clean -fdx` (fix/deny-field-notes-1124, revisão isolada): o alias
             # por `-c` se expande aqui. Alias de shell (`=!cmd`) não se prova e segue como estava (limite declarado).
-            am = re.match(r"^alias\.([^=]+)=(.*)$", kv, re.S)
+            # A seção e o nome não têm caixa (`Alias.C` é `alias.c`); o valor se parte como o git o parte (shlex).
+            am = re.match(r"^alias\.([^=]+)=(.*)$", kv, re.S | re.I)
             if am and not am.group(2).lstrip().startswith("!"):
-                alias[am.group(1).lower()] = am.group(2).split()
+                try:
+                    alias[am.group(1).lower()] = shlex.split(am.group(2))
+                except ValueError:
+                    alias[am.group(1).lower()] = am.group(2).split()
             if PUSH_CFG.match(kv):
                 if DYNAMIC.search(kv):
                     dyn_cfg = True
@@ -917,7 +921,10 @@ def canonical_git(words, where, env=None):
             i += 1; continue
         break
     rest = words[i:]
-    if rest and rest[0].lower() in alias and alias[rest[0].lower()]:
+    # alias de alias (`-c alias.d=c -c alias.c=clean d`) se expande também; o teto corta o laço (`alias.a=a`)
+    for _ in range(8):
+        if not (rest and rest[0].lower() in alias and alias[rest[0].lower()]):
+            break
         rest = alias[rest[0].lower()] + rest[1:]
     if not rest:
         return None, None, False
