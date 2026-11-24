@@ -93,9 +93,13 @@ CASES = [
     ("D61", "Bash", "git push origin +HEAD:refs/heads/feat/plus", "deny", 1),
     ("D62", "Bash", "git push origin +main", "deny", 1),
     ("D63", "Bash", "git push origin +refs/heads/x:refs/heads/y", "deny", 1),
-    ("D64", "Bash", "git -C . push +feat/x", "deny", 1),
     ("D65", "Bash", "git -C . push origin +feat/x", "deny", 1),
     ("D66", "Bash", "git push origin '+main'", "deny", 1),
+    # o prefixo de ambiente e o `command` não furam a regra (nota de campo da messaging, 23/11; medido em 2.1.331)
+    ("D67", "Bash", "FOO=1 git push origin +feat/x", "deny", 1),
+    ("D68", "Bash", "env FOO=1 git push -f origin feat/x", "deny", 1),
+    ("D69", "Bash", "command git push origin +feat/x", "deny", 1),
+    ("D70", "Bash", "FOO=1 git push --force origin feat/x", "deny", 1),
     # git clean que apaga ignorado: todo grupo de flags, com -x e com -X, nu e com git -C
     ("E01", "Bash", "git clean -x", "deny", 1), ("E02", "Bash", "git clean -fx", "deny", 1),
     ("E03", "Bash", "git clean -dfx", "deny", 1), ("E04", "Bash", "git clean -dx", "deny", 1),
@@ -103,7 +107,7 @@ CASES = [
     ("E07", "Bash", "git clean -fdX", "deny", 1), ("E08", "Bash", "git clean -dfX", "deny", 1),
     ("E09", "Bash", "git clean -dX", "deny", 1), ("E10", "Bash", "git clean -xf", "deny", 1),
     ("E11", "Bash", "git clean -fxd", "deny", 1), ("E12", "Bash", "git clean -xdf", "deny", 1),
-    ("E13", "Bash", "git clean -dxf", "deny", 1), ("E16", "Bash", "git clean -fdxq", "deny", 1),
+    ("E13", "Bash", "git clean -dxf", "deny", 1),
     ("E21", "Bash", "git -C . clean -x", "deny", 1), ("E22", "Bash", "git -C . clean -fx", "deny", 1),
     ("E23", "Bash", "git -C . clean -dfx", "deny", 1), ("E24", "Bash", "git -C . clean -dx", "deny", 1),
     ("E25", "Bash", "git -C . clean -X", "deny", 1), ("E26", "Bash", "git -C . clean -fX", "deny", 1),
@@ -184,6 +188,18 @@ CASES = [
     # o `+` que não abre argumento do push não cai
     ("N25", "Bash", "git push origin v1.0.0+build1", "pass", 0),
     ("N26", "Bash", 'git log -1 --grep "+main"', "pass", 1),
+    # notas de campo da messaging (23/11): o `+` do título de um PR no mesmo comando, quando o motor julga o comando
+    # inteiro (`$(…)` ou pipe), e a simulação com o -n depois do grupo (fix/deny-field-notes-1124; eram C09-C14)
+    ("N28", "Bash", 'git push -u origin feat/x && gh pr create --title "a +b" --body "$(cat README.md)"', "pass", 1),
+    ("N29", "Bash", 'git push -u origin feat/x; gh pr create --title "a +b" --body x | cat', "pass", 1),
+    ("N30", "Bash", "git push origin feat/x | tail -n +2", "pass", 0),
+    ("N31", "Bash", 'git push origin feat/x -o "ci +skip"', "pass", 0),
+    ("N32", "Bash", "git clean -fdx -n", "pass", 0),
+    ("N33", "Bash", "git clean -xn", "pass", 0),
+    ("N34", "Bash", "git clean -x --dry-run", "pass", 0),
+    ("N35", "Bash", "git clean -x -n", "pass", 0),
+    ("N36", "Bash", "git -C . clean -fdx -n", "pass", 0),
+    ("N37", "Bash", 'git -C . commit --allow-empty -m "docs: o git clean -x some"', "pass", 0),  # era o custo C06
     ("W10", "Write", "{P}/.env.example", "pass", 1),
     ("W11", "Bash", "cp .env.example sub/.env.copied && rm -f sub/.env.copied", "pass", 1),
     # ── custo declarado: a regra Read também pega inspeção de metadado no Bash; `test -f` é a saída ──
@@ -191,17 +207,10 @@ CASES = [
     ("C02", "Bash", "stat -c %s .env", "deny", 1),
     ("C03", "Bash", "ls {H}/.ssh", "deny", 1),
     ("C05", "Bash", 'git -C . commit --allow-empty -m "docs: proibe git push --force e afins"', "deny", 0),
-    ("C06", "Bash", 'git -C . commit --allow-empty -m "docs: o git clean -x some"', "deny", 0),
     ("C07", "Bash", "rm -f my-report /", "deny", 0),
     ("N27", "Bash", "git -C clean status -x", "pass", 0),  # era o custo C08: saiu com a regra `git -* clean * -x*`
-    # custo declarado do fix/deny-force-refspec-1120: o -n DEPOIS do grupo destrutivo, e o ` +` em mensagem com git -C
-    ("C09", "Bash", "git clean -x -n", "deny", 0),
-    ("C10", "Bash", "git clean -fdx --dry-run", "deny", 0),
+    # custo declarado: ` push origin +` em mensagem com git -C ainda cai em `git -* push origin +*` (o `*` do `-*` casa tudo)
     ("C11", "Bash", 'git -C . commit --allow-empty -m "push origin +main"', "deny", 0),
-    ("C12", "Bash", 'git push origin feat/x -o "ci +skip"', "deny", 0),
-    # o pipe é julgado inteiro (o && e o ; não): o `+2` do tail cai em `git push* +*`; saída: `| tail -n 2` ou `| sed 1d`
-    ("C13", "Bash", "git push origin feat/x | tail -n +2", "deny", 0),
-    ("C14", "Bash", "git clean -xn", "deny", 0),
     # ── limite medido: o deny NÃO alcança (o esperado é passar; se passar a barrar, a declaração muda) ──
     ("L04", "Bash", "python3 -c \"print(open('.env').read())\"", "pass", 1),
     ("L06", "Bash", "bash -c 'git push --force origin HEAD:refs/heads/feat/bc'", "pass", 1),
@@ -209,6 +218,9 @@ CASES = [
     ("L41", "Bash", "git clean -f -d -x", "pass", 0), ("L42", "Bash", "git clean -f -dx", "pass", 0),
     ("L43", "Bash", "git -C . clean -f -d -x", "pass", 0), ("L44", "Bash", "git -C . clean -f -X", "pass", 0),
     ("L45", "Bash", "git clean -e keep -fdx", "pass", 0),
+    # fix/deny-field-notes-1124: o deny guarda o grupo EXATO e o refspec com + logo depois de `origin`; o resto mora no hook
+    ("L50", "Bash", "git clean -fdxq", "pass", 0), ("L51", "Bash", "git clean -fdx sub/ext", "pass", 0),
+    ("L52", "Bash", "git push upstream +feat/x", "pass", 0), ("L53", "Bash", "git push -u origin +feat/x", "pass", 0),
     ("L10","Bash", "eval 'git push --force origin HEAD:refs/heads/feat/ev'", "pass", 1),
     ("L11", "Bash", "rm -Rf {W}/scratch/capital", "pass", 1),
     ("L12", "Bash", "find {W}/scratch/del -delete", "pass", 1),
@@ -237,6 +249,17 @@ CASES = [
     ("L37", "Bash", "git push -uvf origin feat/x", "pass", 0), ("L38", "Bash", "git push -vuf origin feat/x", "pass", 0),
     ("L39", "Bash", "git push -quf origin feat/x", "pass", 0), ("L40", "Bash", "git push -uqf origin feat/x", "pass", 0),
 ]
+
+# fix/deny-field-notes-1124: o deny do clean virou grupo EXATO; toda ordem de {f, d, x|X} tem regra própria e caso próprio
+# (os mutantes cobram). As formas sem caso acima nascem aqui: E40-E63.
+_have = {c[2] for c in CASES}
+_k = 40
+for _pre in ("git clean", "git -C . clean"):
+    for _X in ("x", "X"):
+        for _g in ("xf", "xd", "xfd", "xdf", "fxd", "dxf"):
+            _f = f"{_pre} -{_g.replace('x', _X)}"
+            if _f not in _have:
+                CASES.append((f"E{_k}", "Bash", _f, "deny", 1)); _k += 1
 
 SANDBOX_CASES = [
     ("S01", "Bash", 'set -a; source .env; set +a; test -n "$FAKE_KEY" && echo carregou'),

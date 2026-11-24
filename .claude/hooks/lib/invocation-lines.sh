@@ -44,7 +44,7 @@
 #     por `-c` cancelam; `cd` não seguido = diretório DESCONHECIDO. `gh`: só fora do nosso diretório, e
 #     todo repo nomeado (`-R`, `GH_REPO`, URL, `o/r#N`, `repos/o/r`) estrangeiro; API sem slug e GraphQL
 #     nunca; `gh` que nomeia o NOSSO repo (`set-default`, `checkout <URL>`) cancela as isenções seguintes;
-#  9. `git push` CANÔNICO: `+ref` e `--force*` → `--force`; destino normalizado (`refs/heads/`,
+#  9. `git push` CANÔNICO: `+ref`, `-f` e `--force` → `--force`; só lease → `--force-with-lease`; destino normalizado (`refs/heads/`,
 #     `heads/` saem); `HEAD`, `@` e push SEM refspec viram a branch ATUAL — ou o que a CONFIG manda
 #     (`remote.<r>.push/mirror`, `push.default=upstream|matching`, também via `-c` e `git config` na
 #     string); `--mirror/--all` e `:` → `main`; `send-pack` e `subtree push` são push; `gh` perde
@@ -935,13 +935,18 @@ def canonical_git(words, where, env=None):
     send_pack = rest[0] == "send-pack"
     if rest[0] != "push" and not send_pack:
         return "git " + " ".join(rest), None, False
-    force, flags, pos, j = False, [], [], 1
+    # `force` = força DURA (`-f`, `--force`, `+ref`, `--mirror`); `lease` = só `--force-with-lease`/`--force-if-includes`,
+    # que o git recusa se o remoto andou. A linha canônica as distingue (`--force` x `--force-with-lease`): o
+    # protect-main veta a dura em qualquer branch e a com lease só na produção (fix/deny-field-notes-1124).
+    force, lease, flags, pos, j = False, False, [], [], 1
     while j < len(rest):
         a = push_long_opt(rest[j])
         if a == "--":
             pos += rest[j + 1:]; break
         if a.startswith("--"):
-            if a.startswith("--force") or a == "--mirror":
+            if a.startswith(("--force-with-lease", "--force-if-includes")):
+                lease = True
+            elif a.startswith("--force") or a == "--mirror":
                 force = True
             if a in ("--mirror", "--all", "--branches"):
                 pos.append("__ALL__")
@@ -1006,7 +1011,7 @@ def canonical_git(words, where, env=None):
     # destino runtime: fechado com FORCE ou quando a substituição calcula a branch padrão. SEM force e
     # sem essa marca passa — sentar na main não basta: `for br in fix/a; do git push origin "$br"` era
     # o 2º falso positivo de produção (2026-09-01), reaberto pela 1ª reescrita (Elenxo, 2ª passada).
-    if "__DYNAMIC__" in dsts and force:
+    if "__DYNAMIC__" in dsts and (force or lease):
         dsts = ["main" if d == "__DYNAMIC__" else d for d in dsts]
     # o ramo de PRODUÇÃO resolvido (`master` num gitflow clássico) vira o token `main` que os hooks julgam;
     # vale também para o destino que veio da config/branch atual (push nu), que não passou pelo laço acima
@@ -1014,7 +1019,7 @@ def canonical_git(words, where, env=None):
     dsts = ["main" if d.lower() in prot else d for d in dsts]
     if "--dry-run" in flags or "-n" in flags:
         return "git push --dry-run (inerte)", remote, True
-    return "git push" + (" --force" if force else "") + "".join(" " + f for f in flags) + \
+    return "git push" + (" --force" if force else " --force-with-lease" if lease else "") + "".join(" " + f for f in flags) + \
            (" " + remote if remote else "") + "".join(" " + d for d in dsts), remote, True
 
 

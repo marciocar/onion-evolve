@@ -153,6 +153,16 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   `pretooluse-protect-main.sh`, que deixa passar `-n` e `--dry-run` (e veta `--exc -n`, porque o git toma o `-n` como
   padrão do `--exclude` abreviado). Teto: o `-n` DEPOIS do grupo (`git clean -fdx -n`, `git clean -x -n`) ou grudado no
   fim dele (`-xn`, `-fdxn`) segue barrado pelo deny; ponha o `-n` antes. `eval` segue fora dos dois. Saiu de brinde o custo `git -C clean status -x`.
+- **Notas de campo da messaging (2026-11-24, `fix/deny-field-notes-1124`, medido em 2.1.331):** com `$(…)` ou crase,
+  o motor também julga o comando INTEIRO. Por isso `git push … && gh pr create --title "a +b" --body "$(…)"` caía em
+  `git push* +*`. As três regras do `+` foram aposentadas e trocadas por `git push origin +*` e `git -* push origin +*`.
+  O `+` de refspec em outra posição (`push -u origin +x`, `push upstream +x`) passou ao hook `pretooluse-protect-main.sh`,
+  que agora veta a força DURA (`-f`, `--force`, `+ref`, `--mirror`) em qualquer branch. A lease segue vetada só na
+  produção. O hook julga o push depois de tirar `FOO=1`, `env` e `command`, e o `+` conta só quando abre um refspec do
+  push. Assim, `-o "ci +skip"`, `| tail -n +2` e `v1+build` deixam de cair. No clean, o `*` do fim (`git clean
+  -fdx*`) barrava o `-n` depois do grupo. O deny ficou com o grupo EXATO e com cada ordem de {f, d, x|X} (`-xfd`,
+  `-dxf`…); o grupo seguido de outra coisa (`-fdx sub/`, `-fdxq`) é do hook, e `git clean -fdx -n`, `-xn` e
+  `-x --dry-run` passam. O teto acima caiu. O custo que sobra é a menção ` push origin +` dentro de `git -C . commit -m`.
 
 ## O que esta doutrina NÃO promete
 

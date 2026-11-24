@@ -24,3 +24,39 @@ Bash(git clean* -ffX*)	2026-11-20	o * do meio casa -n e barrava a simulação; t
 Bash(git clean* -ffdX*)	2026-11-20	o * do meio casa -n e barrava a simulação; trocada por Bash(git clean -ffdX*) e o hook pretooluse-protect-main.sh
 Bash(git -* clean * -x*)	2026-11-20	o * do meio casa -n e barrava a simulação; a forma git -* clean -x* segue, e a ordem livre é do hook pretooluse-protect-main.sh
 Bash(git -* clean * -X*)	2026-11-20	o * do meio casa -n e barrava a simulação; a forma git -* clean -X* segue, e a ordem livre é do hook pretooluse-protect-main.sh
+# 2026-11-24 (fix/deny-field-notes-1124, notas de campo da sessão messaging de 23/11): as três regras do `+` casavam o `+` de
+# qualquer ponto do comando quando o motor o julga inteiro (com `$(…)` ou pipe), e barravam `git push … && gh pr create --title "a +b" --body "$(…)"`.
+# No lugar ficam `git push origin +*` e `git -* push origin +*`, e o `+` de refspec em qualquer posição passou ao hook pretooluse-protect-main.sh.
+# As 28 regras `git clean -<grupo>*` barravam a simulação com o -n depois do grupo (`git clean -fdx -n`, `-xn`, `-x --dry-run`):
+# cada uma virou o grupo EXATO (`git clean -fdx`), e o grupo seguido de outra coisa passou ao mesmo hook, que deixa passar o -n.
+Bash(git push* +*)	2026-11-24	o * casava o + de qualquer ponto do comando julgado inteiro (título de PR com $(…)); trocada por Bash(git push origin +*) e o hook pretooluse-protect-main.sh
+Bash(git -* push +*)	2026-11-24	o * casava o + de qualquer ponto do comando julgado inteiro (título de PR com $(…)); trocada por Bash(git push origin +*) e o hook pretooluse-protect-main.sh
+Bash(git -* push * +*)	2026-11-24	o * casava o + de qualquer ponto do comando julgado inteiro (título de PR com $(…)); trocada por Bash(git push origin +*) e o hook pretooluse-protect-main.sh
+Bash(git clean -x*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -x) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -fx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -fx) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -fdx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -fdx) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -dfx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -dfx) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -dx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -dx) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -X*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -X) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -fX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -fX) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -fdX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -fdX) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -dfX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -dfX) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -dX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -dX) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -ffx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -ffx) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -ffdx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -ffdx) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -ffX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -ffX) exata e o hook pretooluse-protect-main.sh
+Bash(git clean -ffdX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git clean -ffdX) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -x*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -x) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -fx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -fx) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -fdx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -fdx) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -dfx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -dfx) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -dx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -dx) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -X*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -X) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -fX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -fX) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -fdX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -fdX) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -dfX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -dfX) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -dX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -dX) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -ffx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -ffx) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -ffdx*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -ffdx) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -ffX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -ffX) exata e o hook pretooluse-protect-main.sh
+Bash(git -* clean -ffdX*)	2026-11-24	o * do fim casava o -n depois do grupo e barrava a simulação; trocada por Bash(git -* clean -ffdX) exata e o hook pretooluse-protect-main.sh
