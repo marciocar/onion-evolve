@@ -2,7 +2,8 @@
 branch: chore/waha-caps-reply-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 650a7a6dfc3547cabcc356d3db2332f0d1c821d908ff11e5ffb79438b738f718
+reviewed_code_sha256: 2453453f4a422114a38a05ed7388dc6f5e77a1e2e3b7cd72a6975ee6de10f7d8
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
