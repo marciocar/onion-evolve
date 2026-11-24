@@ -10938,7 +10938,31 @@ PY
   _case "protect-main: cd sob if → VETO"                   2 "${pm}" feat "if false; then cd ${d}/outro-repo; fi; git push -f origin main"
   _case "protect-main: cd … || true; push → VETO"          2 "${pm}" feat "cd ${d}/outro-repo || true; git push -f origin main"
   _case "merge-gate: git -C /outro/repo push origin main → passa (não é nosso repo)"  0 "${mg}" feat "git -C ${d}/outro-repo push origin main"
-  _case "protect-main: git -C /outro/repo push -f origin main → passa (não é nosso repo)" 0 "${pm}" feat "git -C ${d}/outro-repo push -f origin main"
+  # fix/deny-field-notes-1124, revisão isolada (bloqueios 1 e 2): a força DURA e o clean destrutivo valem em QUALQUER projeto.
+  # O deny deixou de barrar o `+ref` fora de `origin +` e o grupo do clean seguido de mais coisa; a isenção por projeto
+  # da lib os soltava nas duas camadas. Repo de origin estranho (x/adotante), CLAUDE_PROJECT_DIR na raiz do sandbox.
+  _case "protect-main: git -C /outro/repo push -f origin main → VETO (força dura vale em qualquer projeto)" 2 "${pm}" feat "git -C ${d}/outro-repo push -f origin main"
+  local _ILF=lib/invocation-lines.sh
+  _pvmut "(or1) protect-main: git -C /outro push -u origin +feat/x → VETO" 2 pretooluse-protect-main.sh feat \
+    "git -C ${d}/outro-repo push -u origin +feat/x" "${_ILF}" $'            if where is not None and not push_dest_ours(where, remote, LAST_CFG[0]) \\\n                    and not re.match(r"^git push --force( |$)", line or ""):' '            if where is not None and not push_dest_ours(where, remote, LAST_CFG[0]):'
+  _pvmut "(or2) protect-main: git -C /outro clean -fdx sub → VETO" 2 pretooluse-protect-main.sh feat \
+    "git -C ${d}/outro-repo clean -fdx sub" "${_ILF}" '        elif where and other_project(where) and not (line or "").startswith("git clean"):' '        elif where and other_project(where):'
+  _case "protect-main: cd /outro && git push -u origin +feat/x → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -u origin +feat/x"
+  _case "protect-main: git -C /outro push origin feat/x +feat/y → VETO" 2 "${pm}" feat "git -C ${d}/outro-repo push origin feat/x +feat/y"
+  _case "protect-main: git -C /outro push upstream +feat/x → VETO" 2 "${pm}" feat "git -C ${d}/outro-repo push upstream +feat/x"
+  _case "protect-main: cd /outro && git clean -fdxq → VETO"     2 "${pm}" feat "cd ${d}/outro-repo && git clean -fdxq"
+  _case "protect-main: git -C /outro clean -x -f → VETO"        2 "${pm}" feat "git -C ${d}/outro-repo clean -x -f"
+  _case "protect-main: git -C /outro push --force-with-lease origin main → passa (lease alheia)" 0 "${pm}" feat "git -C ${d}/outro-repo push --force-with-lease origin main"
+  _case "protect-main: git -C /outro clean -fdx -n → passa (simulação)" 0 "${pm}" feat "git -C ${d}/outro-repo clean -fdx -n"
+  _case "merge-gate: git -C /outro push -u origin +feat/x → passa (não é dele)" 0 "${mg}" feat "git -C ${d}/outro-repo push -u origin +feat/x"
+  # buracos antigos baratos (revisão isolada, limite 4): alias por -c e flag vinda de expansão ou de $(…)
+  _pvmut "(or3) protect-main: git -c alias.c=clean c -fdx → VETO" 2 pretooluse-protect-main.sh feat \
+    'git -c alias.c=clean c -fdx' "${_ILF}" $'    if rest and rest[0].lower() in alias and alias[rest[0].lower()]:\n        rest = alias[rest[0].lower()] + rest[1:]\n' ''
+  _pvmut "(or4) protect-main: git clean \${F:--fdx} → VETO (flag de expansão conta como destrutiva)" 2 pretooluse-protect-main.sh feat \
+    'git clean ${F:--fdx}' pretooluse-protect-main.sh '      if (t ~ /\$|__ONION_SUBST__|`/) { x = 1; continue }' ''
+  _case "protect-main: git clean \$(echo -fdx) → VETO"         2 "${pm}" feat 'git clean $(echo -fdx)'
+  _case "protect-main: git clean -n \$F → passa (simulação)"   0 "${pm}" feat 'git clean -n $F'
+  _case "protect-main: git -c alias.p=push p -f origin feat → VETO" 2 "${pm}" feat 'git -c alias.p=push p -f origin feat'
   _case "merge-gate: git -C . push origin main → VETO"        2 "${mg}" feat 'git -C . push origin main'
   _case "merge-gate: git -C <raiz> push origin main → VETO"   2 "${mg}" feat "git -C ${d} push origin main"
   _case "merge-gate: git --git-dir=/outro/.git push origin main → passa" 0 "${mg}" feat "git --git-dir=${d}/outro-repo/.git push origin main"
@@ -11175,7 +11199,9 @@ PY
   # `remote add` falhando sob set -e abortava o worker). O caso roda onde a forma existe; onde o git
   # a recusa, a própria recusa é a medição (e a forma deixa de ser vetor de escape).
   if git -C "${d}/outro-repo" remote add up/x https://github.com/x/adotante.git 2>/dev/null; then
-    _case "protect-main: cd outro && remoto up/x estrangeiro → passa" 0 "${pm}" feat "cd ${d}/outro-repo && git push -f up/x main"
+    # desde fix/deny-field-notes-1124 a força dura cai em qualquer projeto: a isenção do remoto estrangeiro se mede com a lease
+    _case "protect-main: cd outro && remoto up/x estrangeiro (lease) → passa" 0 "${pm}" feat "cd ${d}/outro-repo && git push --force-with-lease up/x main"
+    _case "protect-main: cd outro && remoto up/x estrangeiro, -f → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f up/x main"
   else
     # a recusa É a medição: onde o git não cria o remoto, `git push up/x` não tem para onde ir (o CI roda
     # STRICT e um ⊘ aqui reprovaria a faixa — medido no git 2.55 do runner, 2026-10-05)
@@ -56783,6 +56809,21 @@ PY
   elif jq -e '.permissions.deny | index("Bash(git push* +*)")' <<< "${out}" >/dev/null; then
     record_pass "update-base-deny: (fr2-MUT2) sem a linha do + na lista a regra velha fica no adotante — a retirada é load-bearing"
   else record_fail "update-base-deny: (fr2-MUT2)" "a regra saiu mesmo sem a linha na lista: $(jq -c '.permissions.deny' <<< "${out}" | head -c 400)"; fi
+  # (fr4) a retirada cuja cobertura passou a um hook avisa quando o hook não vale no alvo (disableAllHooks), e cala
+  #       quando vale (fix/deny-field-notes-1124, revisão isolada, limite 3). MUTANTE: sem o ramo do aviso, cala nos dois.
+  printf '%s\n' '{"disableAllHooks":true,"permissions":{"deny":["Bash(git push* +*)"]}}' > "${d}/fr-off.json"
+  printf '%s\n' '{"permissions":{"deny":["Bash(git push* +*)"]}}' > "${d}/fr-on.json"
+  local fro frn
+  fro="$(bash "${mh}" "${frs}" "${d}/fr-off.json" 2>&1 >/dev/null)"; frn="$(bash "${mh}" "${frs}" "${d}/fr-on.json" 2>&1 >/dev/null)"
+  if grep -qF 'passou ao hook pretooluse-protect-main.sh, e o alvo tem disableAllHooks' <<< "${fro}" && ! grep -qF 'passou ao hook' <<< "${frn}"; then
+    record_pass "update-base-deny: (fr4) retirada coberta por hook avisa com disableAllHooks no alvo e cala com o hook ligado"
+  else record_fail "update-base-deny: (fr4) aviso do hook" "off: ${fro:0:300} | on: ${frn:0:300}"; fi
+  cp "${REPO_ROOT}/.claude/utils/adopt/deny-retired.tsv" "${frm}/deny-retired.tsv"
+  sed 's/if jq -e .\.disableAllHooks == true. "\${TGT}"/if false/' "${REPO_ROOT}/.claude/utils/adopt/merge-onion-hooks.sh" > "${frm}/merge-onion-hooks.sh"
+  fro="$(bash "${frm}/merge-onion-hooks.sh" "${frs}" "${d}/fr-off.json" 2>&1 >/dev/null)"
+  if cmp -s "${frm}/merge-onion-hooks.sh" "${REPO_ROOT}/.claude/utils/adopt/merge-onion-hooks.sh"; then record_fail "update-base-deny: (fr4-MUT)" "o sed não achou o ramo do disableAllHooks (âncora mudou)"
+  elif ! grep -qF 'e o alvo tem disableAllHooks' <<< "${fro}"; then record_pass "update-base-deny: (fr4-MUT) sem o ramo do aviso a retirada cala — o aviso é load-bearing"
+  else record_fail "update-base-deny: (fr4-MUT)" "o mutante ainda avisou: ${fro:0:300}"; fi
   # (fr3) deny-monotonic: a ponta da integração tem a regra velha, o head do update não — retirada declarada, rc 0
   rm -rf "${d}/frg"; git init -q -b main "${d}/frg"; mkdir -p "${d}/frg/.claude"; printf '%s\n' "${frt}" > "${d}/frg/.claude/settings.json"
   _ub_git "${d}/frg" add -A; _ub_git "${d}/frg" commit -qm base

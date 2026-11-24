@@ -171,7 +171,18 @@ _retired="$(_retired_json)"
 while IFS= read -r _r; do
   case "${_r}" in
     keep:*) echo "AVISO: regra na lista de aposentadas e ainda na fonte, mantida no alvo: ${_r#keep:}" >&2 ;;
-    drop:*) echo "RETIRADA: regra de deny aposentada pelo core, removida do alvo: ${_r#drop:}" >&2 ;;
+    drop:*) echo "RETIRADA: regra de deny aposentada pelo core, removida do alvo: ${_r#drop:}" >&2
+      # a cobertura de algumas retiradas passou a um HOOK (fix/deny-field-notes-1124): sem ele ligado no alvo, a retirada
+      # afrouxa de verdade. O aviso diz qual hook falta; o merge não o põe à força (a forma do hook segue a regra acima).
+      _hk="$(awk -F'\t' -v r="${_r#drop:}" '$1 == r { if (match($3, /pretooluse-[a-z0-9-]+\.sh/)) print substr($3, RSTART, RLENGTH) }' "${_HERE}/deny-retired.tsv" 2>/dev/null | head -1)"
+      if [ -n "${_hk}" ]; then
+        if jq -e '.disableAllHooks == true' "${TGT}" >/dev/null 2>&1; then
+          echo "AVISO: a cobertura de ${_r#drop:} passou ao hook ${_hk}, e o alvo tem disableAllHooks: a retirada afrouxa a guarda." >&2
+        elif ! jq -e --arg h "${_hk}" '[.hooks.PreToolUse? // [] | .[]?.hooks[]?.command? | select(type == "string") | select(contains($h))] | length > 0' "${SRC}" >/dev/null 2>&1 \
+             || { [ ! -f "${_sdir}/${_hk}" ] && [ ! -f "${_tdir}/${_hk}" ]; }; then
+          echo "AVISO: a cobertura de ${_r#drop:} passou ao hook ${_hk}, que não fica ligado no alvo: a retirada afrouxa a guarda." >&2
+        fi
+      fi ;;
   esac
 done < <(jq -r --argjson r "${_retired}" --slurpfile s "${SRC}" '(($s[0].permissions.deny? // []) | if type == "array" then . else [] end) as $sd | (.permissions.deny? // []) | if type == "array" then .[] | select(. as $x | $r | index($x) != null) | (. as $x | if ($sd | index($x)) != null then "keep:" else "drop:" end) + . else empty end' "${TGT}" 2>/dev/null || true)
 

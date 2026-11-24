@@ -2,19 +2,18 @@
 branch: fix/deny-field-notes-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: 79e7146b8762c7ce5e42b725b999da023be7ec82473b732cedfdf61396f92f94
-reviewed_code_sha256: c955e5467b113bcdc606953314a5a98c85ad81d8cb04d57eced643eb0eb68f99
-findings_total: 4
-findings_real: 4
-findings_blocking: 2
+reviewed_diff_sha256: pendente
+findings_total: 9
+findings_real: 9
+findings_blocking: 4
 tokens: 0
 duration_min: 0
-findings_fixed: 3
-verdict: FIXED
+findings_fixed: 7
+verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: false
-reviewer: "Passada do próprio agente de execução, com medição no motor real do Claude Code 2.1.331 (ops/testing/permissions-deny-bench.py), no git real e no hook. A revisão isolada fica com a sessão principal."
-nota: "tokens e duração não medidos (0): a passada é do condutor, misturada à construção. O achado 4 é limite declarado, não código."
+reviewer: "Passada do próprio agente de execução, com medição no motor real do Claude Code 2.1.331 (ops/testing/permissions-deny-bench.py), no git real e no hook. A revisão isolada da sessão principal REPROVOU com 2 bloqueios e 3 limites, curados nesta re-revisão (seção Revisão isolada)."
+nota: "tokens e duração não medidos (0): a passada é do condutor, misturada à construção. Os achados 4 e 9 são limites declarados, e o achado 8 foi curado em parte (resto declarado)."
 ---
 
 # Passada adversarial: `fix/deny-field-notes-1124`
@@ -86,3 +85,43 @@ As curas:
 - `--force-with-lease` de branch de trabalho segue livre nas duas camadas (P01, e o caso da família `pretooluse_veto`).
   Não foi barrado aqui: o rebase e o fluxo de stack dependem dele, e ele não era barrado antes.
 - `eval "git push -f …"` e `bash -c` seguem como antes: o deny não os vê (L06, L10), e o hook os julga.
+
+## Revisão isolada
+
+A sessão principal fez a revisão isolada sobre o head `d45d17edc` e REPROVOU com 2 bloqueios. Os dois eram do mesmo
+tipo: o deny afrouxou, e a cobertura passou a um hook que isentava outro projeto. Tudo foi curado nesta worktree.
+Como o diff mudou, o resíduo volta a `pendente`.
+
+5. **Bloqueante, curado.** Push forçado com `+` em OUTRO repo passava nas duas camadas: `git -C /outro push -u origin
+   +feat/x`, `cd /outro && git push -u origin +feat/x`, `… origin feat/x +feat/y` e `… upstream +feat/x`. A lib o
+   descartava por `push_dest_ours`.
+   - Escolha: o hook julga a força dura ANTES da isenção por projeto, em vez de devolver essas formas ao deny. O glob
+     não sabe dizer "`+` só no refspec"; devolvê-las ao deny traria de volta a nota de campo 1. Reescrever a história
+     de um remoto é irreversível em qualquer projeto.
+   - Agora a lib só isenta o push de outro projeto quando ele não tem força dura. O `--force-with-lease` de outro
+     projeto continua isento.
+   - Bancada: (or1) com mutante, e mais 3 casos de outro repo de origin estranho (`x/adotante`), com
+     `CLAUDE_PROJECT_DIR` na raiz do sandbox. O caso antigo "`git -C /outro push -f origin main` passa" virou VETO.
+     O "remoto up/x estrangeiro" passou a se medir com a lease e ganhou a versão `-f` → VETO.
+6. **Bloqueante, curado.** `git clean` destrutivo em outro repo passava: `git -C /outro clean -fdx sub`,
+   `cd /outro && git clean -fdxq` e `git -C /outro clean -x -f`. O `elif where and other_project(where): return` da lib
+   o descartava, e o cabeçalho do hook dizia «vale em qualquer pasta». Agora o `git clean` segue para o juiz em
+   qualquer projeto, e o cabeçalho voltou a ser verdade. Bancada: (or2) com mutante, mais 2 casos, e a simulação
+   (`-fdx -n`) de outro repo passa.
+7. **Limite, curado.**
+   - Os motivos no `deny-retired.tsv` dizem para onde a cobertura foi. A troca das regras `git -* push …` agora cita
+     `Bash(git -* push origin +*)`.
+   - O `merge-onion-hooks.sh` (`--update`) avisa quando retira uma regra cuja cobertura passou a um hook que não vale
+     no alvo: quando o alvo tem `disableAllHooks`, ou quando o hook não está na fonte e o script não existe.
+   - Bancada: (fr4) com mutante.
+8. **Limite, curado em parte.**
+   - Curados: o alias por `-c` (`git -c alias.c=clean c -fdx`, e também `alias.p=push`) agora se expande na lib (or3,
+     com mutante). A flag vinda de expansão ou de `$(…)` (`${F:--fdx}`, `$(echo -fdx)`, `$F`) conta como destrutiva
+     no juiz do clean (or4, com mutante). O `-n` literal ao lado ainda simula.
+   - Declarados, não curados: `eval "git clean -fdx"`, `script -qc "git clean -fdx"`, alias de shell
+     (`-c alias.x=!cmd`) e alias criado por `git config alias.*` no mesmo comando.
+   - Custo novo: `git clean -fd $CAMINHO` sem `--` passa a ser vetado; a saída é `git clean -fd -- "$CAMINHO"`.
+9. **Limite, declarado.** `git push --force --no-force` é vetado: a lib não lê o `--no-force`. É falso positivo antigo
+   e está no cabeçalho do hook.
+
+A revisão isolada sobre este novo head fica com a sessão principal.

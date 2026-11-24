@@ -2,8 +2,12 @@
 # PreToolUse(Bash) — o 1º uso REAL da capacidade que compra o acoplamento (Onda 7, 2026-09-01).
 # Nega force-push para o ramo de PRODUÇÃO (main, ou o resolvido do repo): a ação irreversível mais barata de barrar. exit 2 = veto ANTES de executar.
 # Escopo: na produção, todo force (com lease inclusive). Fora dela, desde 2026-11-24, a força DURA (`-f`, `--force`,
-# `+ref`, `--mirror`) também cai, como no deny; o `--force-with-lease` de branch de trabalho segue livre (o fluxo
-# de stack e o rebase dependem dele).
+# `+ref`, `--mirror`) também cai, como no deny, e EM QUALQUER PROJETO: a lib não isenta a força dura nem o
+# `git clean` pelo projeto de destino, porque destruir é destruir em qualquer pasta (revisão isolada do
+# fix/deny-field-notes-1124). O `--force-with-lease` de branch de trabalho segue livre (o fluxo de stack e o
+# rebase dependem dele), e o de outro projeto também.
+# TETOS declarados: `--force --no-force` é vetado (a lib não lê o `--no-force`; falso positivo antigo); `eval`,
+# `script -qc` e alias de shell (`-c alias.x=!cmd`) não são vistos no clean.
 # ── git clean que apaga IGNORADO (desde 2026-11-20, fix/deny-force-refspec-1120) ─────────────────────────
 # Também nega `git clean` com -x/-X (apaga o ignorado: o .env some) SEM simulação (-n/--dry-run). Mora aqui
 # porque o deny nativo não sabe dizer "exceto -n": o glob não tem negação, e as regras `git clean* -x*`
@@ -53,6 +57,9 @@ clean_destroys_ignored() {
       if (skip) { skip = 0; continue }
       if (endopt) continue
       if (t == "--") { endopt = 1; continue }
+      # flag que vem de expansão (`$F`, `${F:--fdx}`) ou de substituição (`$(…)`, crase) não se lê aqui: conta como
+      # destrutiva (fix/deny-field-notes-1124, revisão isolada). O -n literal ao lado ainda simula.
+      if (t ~ /\$|__ONION_SUBST__|`/) { x = 1; continue }
       if (t ~ /^--/) {
         nm = t; sub(/=.*/, "", nm)
         if (length(nm) >= 3 && index("--dry-run", nm) == 1) n = 1
