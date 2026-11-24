@@ -2,7 +2,8 @@
 branch: docs/close-source-uri-ref-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6756528feb2993836adcba4e60eb59da08a1ce1035c3b439e9a97279d230865b
+reviewed_code_sha256: fa9192d3e835d99c360611d1c52994c357a70a105fada32fa10f15a80c083e80
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
