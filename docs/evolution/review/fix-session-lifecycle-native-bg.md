@@ -2,7 +2,8 @@
 branch: fix/session-lifecycle-native-bg
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e75a2d158c5909ff662eb879ee0d8b9d9ee7af93832efd78a2e8835e434a2b3a
+reviewed_code_sha256: 7bc144398a9a1d693647dbea5071e11673518064e8bbc770c848943d94a0d54f
 findings_total: 11
 findings_real: 11
 findings_blocking: 2
