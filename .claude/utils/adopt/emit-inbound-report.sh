@@ -72,9 +72,9 @@ case "${OP}" in adopt|update) ;; *) usage "operação '${OP}' inválida (adopt|u
 # O pin vira nome de arquivo: só hexadecimal, para nenhum `/` ou `..` sair do inbound/.
 [[ "${PIN}" =~ ^[0-9a-f]{7,40}$ ]] || usage "PIN '${PIN}' não é um commit em hexadecimal (7 a 40)"
 [ -z "${PREV}" ] || [[ "${PREV}" =~ ^[0-9a-f]{7,40}$ ]] || usage "--prev '${PREV}' não é um commit em hexadecimal (7 a 40)"
-LACUNAS=() PARES=()
-lacuna() { LACUNAS+=("$1"); }
-pare() { PARES+=("$1"); }
+GAPS=() STOPS=()
+gap() { GAPS+=("$1"); }
+stop_now() { STOPS+=("$1"); }
 # achata a linha do chamador (substituição entre aspas: no bash 5.2 o `&` cru da troca repete o casado): sem quebra, sem comentário HTML, sem crase, sem cabeçalho markdown no início
 _flat() { local v="${1//$'\r'/ }" lt='&lt;!--' q="'"; v="${v//$'\n'/ }"; v="${v//<!--/"${lt}"}"; v="${v//\`/"${q}"}"
   [[ "${v}" == '#'* ]] && v="\\${v}"; printf '%s' "${v}"; }
@@ -82,10 +82,10 @@ _is_ph() { [[ "$1" == \<*\> ]]; }
 if _is_ph "${INT}"; then INT=""; INT_PH=1; else INT_PH=0; fi
 if _is_ph "${BR}"; then BR=""; fi
 if _is_ph "${SETTINGS_BEFORE}"; then SETTINGS_BEFORE=""; fi
-if _is_ph "${GUARD_LINE}"; then GUARD_LINE=""; lacuna "linha do adopter-guard (placeholder não preenchido)"
-elif [ -z "${GUARD_LINE}" ]; then lacuna "linha do adopter-guard (não informada ao emissor)"; fi
-if _is_ph "${VENDOR_LINE}"; then VENDOR_LINE=""; lacuna "linha da onion/vendor (placeholder não preenchido)"
-elif [ -z "${VENDOR_LINE}" ] && [ "${OP}" = "update" ]; then lacuna "linha da onion/vendor (não informada ao emissor)"; fi
+if _is_ph "${GUARD_LINE}"; then GUARD_LINE=""; gap "linha do adopter-guard (placeholder não preenchido)"
+elif [ -z "${GUARD_LINE}" ]; then gap "linha do adopter-guard (não informada ao emissor)"; fi
+if _is_ph "${VENDOR_LINE}"; then VENDOR_LINE=""; gap "linha da onion/vendor (placeholder não preenchido)"
+elif [ -z "${VENDOR_LINE}" ] && [ "${OP}" = "update" ]; then gap "linha da onion/vendor (não informada ao emissor)"; fi
 case "${SRC}" in ''|*'<'*|*'>'*) usage "SOURCE_ROOT vazio ou com placeholder: '${SRC}'" ;; esac
 [ -d "${SRC}" ] || usage "SOURCE_ROOT não é diretório: ${SRC}"
 bash "${HERE}/assert-dest.sh" "${DEST}" || exit 2
@@ -137,7 +137,7 @@ AD_OUT="$(bash "${HERE}/applied-delta.sh" "${DEST}" "${INT}" 2>"${TMP}/ad.err")"
 if [ "${AD_RC}" -eq 0 ]; then AD_TXT="${AD_OUT}"
 else
   AD_TXT="NÃO MEDIDO (applied-delta rc ${AD_RC}): $(head -c 400 "${TMP}/ad.err" | tr '\n' ' ')"
-  lacuna "arquivos aplicados (applied-delta rc ${AD_RC})"
+  gap "arquivos aplicados (applied-delta rc ${AD_RC})"
 fi
 
 # ── Contrato KG-SSOT ──────────────────────────────────────────────────────────────────────────────────
@@ -146,15 +146,15 @@ case "${RC_RC}" in
   0) RC_MEAN="todo grafo passa no MUST" ;;
   1) RC_MEAN="há dívida MUST (o número e o caminho estão acima; o update segue)" ;;
   4) RC_MEAN="não se aplica (alvo sem o contrato ou sem grafo)" ;;
-  *) RC_MEAN="NÃO MEDIDO"; lacuna "contrato KG-SSOT (remeasure-contract rc ${RC_RC})" ;;
+  *) RC_MEAN="NÃO MEDIDO"; gap "contrato KG-SSOT (remeasure-contract rc ${RC_RC})" ;;
 esac
 PL_OUT="$(bash "${HERE}/plan-contract-migration.sh" "${DEST}" 2>&1)"; PL_RC=$?
 case "${PL_RC}" in
   0) PL_MEAN="plano gerado: o resumo e a planilha estão acima; aplicar é do dono do corpus" ;;
   2) PL_MEAN="há dívida MUST e falta o perfil: a orientação está acima" ;;
   4) PL_MEAN="não roda (o corpus passa no MUST ou o contrato não se aplica)" ;;
-  5) PL_MEAN="o alvo MUDOU durante o plan: PARE e investigue"; pare "migração planejada: o alvo mudou durante o plan (plan-contract-migration rc 5)" ;;
-  *) PL_MEAN="NÃO MEDIDO"; lacuna "migração planejada (plan-contract-migration rc ${PL_RC})" ;;
+  5) PL_MEAN="o alvo MUDOU durante o plan: PARE e investigue"; stop_now "migração planejada: o alvo mudou durante o plan (plan-contract-migration rc 5)" ;;
+  *) PL_MEAN="NÃO MEDIDO"; gap "migração planejada (plan-contract-migration rc ${PL_RC})" ;;
 esac
 
 # ── Gate do alvo ──────────────────────────────────────────────────────────────────────────────────────
@@ -163,34 +163,34 @@ PG_LAST="$(printf '%s\n' "${PG_OUT}" | sed '/^[[:space:]]*$/d' | tail -n 1)"
 [ -n "${PG_LAST}" ] || PG_LAST="bloqueio NÃO PROVADO: prove-gate-blocks não imprimiu veredito (rc ${PG_RC})"
 case "${PG_RC}" in
   0|1) ;;   # 0 PROVADO · 1 NÃO PROVADO por defeito do gate: as duas são medição (o defeito é o achado)
-  4) pare "gate do alvo: o checkout real mudou durante a prova (prove-gate-blocks rc 4)" ;;
-  *) lacuna "gate do alvo (prove-gate-blocks rc ${PG_RC})" ;;
+  4) stop_now "gate do alvo: o checkout real mudou durante a prova (prove-gate-blocks rc 4)" ;;
+  *) gap "gate do alvo (prove-gate-blocks rc ${PG_RC})" ;;
 esac
 
 # ── Configuração e HARD (só no --update) ──────────────────────────────────────────────────────────────
 CFG=""
 if [ "${OP}" = "update" ]; then
   if [ -z "${SETTINGS_BEFORE}" ]; then CFG="- hooks: NÃO MEDIDO (o settings.json de antes do merge não foi passado ao emissor; --settings-before)"
-    lacuna "diff de hooks (sem --settings-before)"
+    gap "diff de hooks (sem --settings-before)"
   else
     _o="$(bash "${HERE}/merge-onion-hooks.sh" --diff "${SETTINGS_BEFORE}" "${DEST}/.claude/settings.json" 2>&1)"; _r=$?
     if [ "${_r}" -eq 0 ]; then CFG="- hooks:"$'\n''```'$'\n'"${_o}"$'\n''```'
-    else CFG="- hooks: NÃO MEDIDO (merge-onion-hooks --diff rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "diff de hooks (rc ${_r})"; fi
+    else CFG="- hooks: NÃO MEDIDO (merge-onion-hooks --diff rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; gap "diff de hooks (rc ${_r})"; fi
   fi
   _o="$(bash "${HERE}/deny-monotonic.sh" "${DEST}" "${INT}" 2>&1)"; _r=$?
   case "${_r}" in
     0) CFG="${CFG}"$'\n'"- ${_o//$'\n'/$'\n'  }" ;;
     1) CFG="${CFG}"$'\n'"- ⚠️ PARE — o update PERDEU regra de deny (deny-monotonic rc 1):"$'\n''```'$'\n'"${_o}"$'\n''```'
-       pare "deny: o update PERDEU regra de deny (deny-monotonic rc 1)" ;;
-    *) CFG="${CFG}"$'\n'"- deny: NÃO MEDIDO (deny-monotonic rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "deny (deny-monotonic rc ${_r})" ;;
+       stop_now "deny: o update PERDEU regra de deny (deny-monotonic rc 1)" ;;
+    *) CFG="${CFG}"$'\n'"- deny: NÃO MEDIDO (deny-monotonic rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; gap "deny (deny-monotonic rc ${_r})" ;;
   esac
   _o="$(bash "${HERE}/sandbox-deny-advice.sh" "${DEST}" 2>&1)"; _r=$?
   if [ "${_r}" -eq 0 ]; then CFG="${CFG}"$'\n'"- ${_o//$'\n'/$'\n'  }"
-  else CFG="${CFG}"$'\n'"- sandbox: NÃO MEDIDO (sandbox-deny-advice rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "sandbox (sandbox-deny-advice rc ${_r})"; fi
+  else CFG="${CFG}"$'\n'"- sandbox: NÃO MEDIDO (sandbox-deny-advice rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; gap "sandbox (sandbox-deny-advice rc ${_r})"; fi
   _o="$(bash "${HERE}/remeasure-hard.sh" "${DEST}" 2>&1)"; _r=$?
   case "${_r}" in
     0|1) CFG="${CFG}"$'\n'$'\n''```'$'\n'"${_o}"$'\n''```' ;;
-    *) CFG="${CFG}"$'\n'$'\n'"HARD: NÃO MEDIDO (remeasure-hard rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "HARD (remeasure-hard rc ${_r})" ;;
+    *) CFG="${CFG}"$'\n'$'\n'"HARD: NÃO MEDIDO (remeasure-hard rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; gap "HARD (remeasure-hard rc ${_r})" ;;
   esac
 fi
 
@@ -200,13 +200,13 @@ if [ -z "${PREV}" ] && [ "${OP}" = "adopt" ]; then
   NEWS="Sem pin anterior (1ª adoção): o histórico da fonte não é listado."
 elif [ -z "${PREV}" ]; then
   NEWS="NÃO MEDIDO: pin anterior não informado ao emissor (--prev); o histórico da fonte não é listado."
-  lacuna "novidades (pin anterior não informado)"
+  gap "novidades (pin anterior não informado)"
 elif [ "${PIN_OK}" != 1 ] || [ "${PREV_OK}" != 1 ]; then
   NEWS="NÃO MEDIDO: ${PREV} ou ${PIN} não existe na fonte (${SRC})."
-  lacuna "novidades (pin ausente na fonte)"
+  gap "novidades (pin ausente na fonte)"
 elif ! git -C "${SRC}" log --oneline --no-decorate "${PREV}..${PIN}" > "${TMP}/log" 2>"${TMP}/log.err"; then
   NEWS="NÃO MEDIDO: git log ${PREV}..${PIN} falhou na fonte: $(head -c 300 "${TMP}/log.err" | tr '\n' ' ')"
-  lacuna "novidades (git log falhou)"
+  gap "novidades (git log falhou)"
 else
   _n="$(wc -l < "${TMP}/log" | tr -d ' ')"
   if [ "${_n}" -eq 0 ]; then NEWS="Nenhum commit na fonte entre ${PREV} e ${PIN}."
@@ -234,14 +234,14 @@ OUT="$(mktemp "${INBOUND}/.inbound-report.XXXXXX")" || usage "não criei arquivo
   printf -- "---\n\n"
   printf "# Relatório de %s — pin %s\n\n" "${OP}" "${PIN}"
   printf "Gerado pelo emissor do /meta:adopt: cada seção é a saída de uma medição, nenhuma é preenchida à mão.\n\n"
-  if [ "${#PARES[@]}" -gt 0 ]; then
+  if [ "${#STOPS[@]}" -gt 0 ]; then
     printf "> ⛔ **PARE** — não commite nem abra PR antes de investigar:\n"
-    for l in "${PARES[@]}"; do printf ">  - %s\n" "${l}"; done
+    for l in "${STOPS[@]}"; do printf ">  - %s\n" "${l}"; done
     printf "\n"
   fi
-  if [ "${#LACUNAS[@]}" -gt 0 ]; then
+  if [ "${#GAPS[@]}" -gt 0 ]; then
     printf "> ⚠️ **Medição que não rodou** (vai como NÃO MEDIDO na seção, nunca como número):\n"
-    for l in "${LACUNAS[@]}"; do printf ">  - %s\n" "${l}"; done
+    for l in "${GAPS[@]}"; do printf ">  - %s\n" "${l}"; done
     printf "\n"
   fi
   printf "## Arquivos aplicados\n\n"
@@ -270,8 +270,8 @@ chmod 0644 "${OUT}" 2>/dev/null || true
 mv -f "${OUT}" "${REPORT}" || { rm -f "${OUT}"; echo "emit-inbound-report: falha ao mover para ${REPORT} (nada escrito)" >&2; exit 1; }
 
 echo "relatório escrito: ${REPORT}"
-for l in "${PARES[@]+"${PARES[@]}"}"; do echo "PARE: ${l}" >&2; done
-for l in "${LACUNAS[@]+"${LACUNAS[@]}"}"; do echo "NÃO MEDIDO: ${l}" >&2; done
-[ "${#PARES[@]}" -gt 0 ] && exit 4
-[ "${#LACUNAS[@]}" -gt 0 ] && exit 3
+for l in "${STOPS[@]+"${STOPS[@]}"}"; do echo "PARE: ${l}" >&2; done
+for l in "${GAPS[@]+"${GAPS[@]}"}"; do echo "NÃO MEDIDO: ${l}" >&2; done
+[ "${#STOPS[@]}" -gt 0 ] && exit 4
+[ "${#GAPS[@]}" -gt 0 ] && exit 3
 exit 0
