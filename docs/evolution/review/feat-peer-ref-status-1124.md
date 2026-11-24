@@ -2,7 +2,7 @@
 branch: feat/peer-ref-status-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: a1eb5e88f9150c1e6802f77e90a6069127ce822526696d8ec309967af5a66e54
+reviewed_diff_sha256: 3eebc3216d99e27b9af8057d2151515ce70d9da3108f1c171cd27a5d67020088
 reviewed_code_sha256: b3cad32673ef08d01a3d6f63597a47745033c1ffb65729c3071e289336bdf6c0
 findings_total: 9
 findings_real: 9
