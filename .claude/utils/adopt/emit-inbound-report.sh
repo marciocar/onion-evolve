@@ -33,17 +33,25 @@
 # ENV  : ONION_INBOUND_LOG_MAX (teto de linhas das Novidades, default 60)
 # EXIT : 0 = relatório escrito com toda medição obrigatória feita
 #        2 = uso (argumento faltando ou inválido, DEST recusado pelo assert-dest) — nada escrito
-#        3 = relatório ESCRITO, mas alguma medição obrigatória não rodou: a lacuna vai declarada no arquivo
-#            («NÃO MEDIDO» com o motivo) e listada no stderr. Nunca um número inventado no lugar.
-#        1 = falha de E/S ao gravar o arquivo: NADA escrito (distinto do 3, que sempre deixa o relatório)
-# PLACEHOLDER NAS LINHAS: valor de opção no formato `<…>` (o bloco do procedimento copiado sem preencher) não vai
-# ao relatório como se fosse medição: vira lacuna declarada (as linhas) ou cai no padrão declarado (integração).
+#        3 = relatório ESCRITO, mas alguma medição obrigatória não rodou ou não foi informada: a lacuna vai
+#            declarada no arquivo («NÃO MEDIDO» com o motivo) e listada no stderr. Nunca um número inventado no lugar.
+#            Conta como lacuna: medição que saiu NÃO MEDIDO, o diff de hooks sem --settings-before (update), a linha
+#            da onion/vendor ausente (update), a linha do adopter-guard ausente, o pin anterior ausente (update).
+#        4 = relatório ESCRITO e há um PARE (vence o 3): o update perdeu regra de deny (deny-monotonic rc 1), o
+#            checkout real do alvo mudou durante a prova do gate (prove-gate-blocks rc 4) ou o alvo mudou durante
+#            o plano da migração (plan-contract-migration rc 5). Não commite nem abra PR antes de investigar.
+#        1 = falha de E/S ao gravar o arquivo: NADA escrito (distinto do 3 e do 4, que sempre deixam o relatório)
+# PIN: normalizado para 12 caracteres pela fonte (`rev-parse --short=12`), para 7, 12 ou 40 caracteres do mesmo
+# commit darem UM arquivo só.
+# LINHAS DO CHAMADOR (--vendor-line, --adopter-guard-line, --branch): placeholder `<…>` (o bloco do procedimento
+# copiado sem preencher) vira lacuna declarada, nunca texto do relatório; o resto é ACHATADO numa linha só, com
+# `<!--`, crases e `#` no início neutralizados, para nenhuma linha forjar seção, comentário ou cerca no relatório.
 # Determinístico, sem LLM. Exercitado por lint-selftest.sh (run_inbound_report_selftests).
 # =============================================================================
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-usage() { echo "uso: emit-inbound-report.sh <SOURCE_ROOT> <DEST> <adopt|update> <PIN> [--prev <pin>] [--branch <br>] [--integration <branch>] [--vendor-line <linha>] [--adopter-guard-line <linha>]" >&2; [ -n "${1:-}" ] && echo "emit-inbound-report: $1" >&2; exit 2; }
+usage() { echo "uso: emit-inbound-report.sh <SOURCE_ROOT> <DEST> <adopt|update> <PIN> [--prev <pin>] [--branch <br>] [--integration <branch>] [--vendor-line <linha>] [--adopter-guard-line <linha>] [--settings-before <settings.json>]" >&2; [ -n "${1:-}" ] && echo "emit-inbound-report: $1" >&2; exit 2; }
 
 [ $# -ge 4 ] || usage "faltam argumentos posicionais"
 SRC="$1"; DEST="$2"; OP="$3"; PIN="$4"; shift 4
@@ -64,17 +72,32 @@ case "${OP}" in adopt|update) ;; *) usage "operação '${OP}' inválida (adopt|u
 # O pin vira nome de arquivo: só hexadecimal, para nenhum `/` ou `..` sair do inbound/.
 [[ "${PIN}" =~ ^[0-9a-f]{7,40}$ ]] || usage "PIN '${PIN}' não é um commit em hexadecimal (7 a 40)"
 [ -z "${PREV}" ] || [[ "${PREV}" =~ ^[0-9a-f]{7,40}$ ]] || usage "--prev '${PREV}' não é um commit em hexadecimal (7 a 40)"
-LACUNAS=()
+LACUNAS=() PARES=()
 lacuna() { LACUNAS+=("$1"); }
+pare() { PARES+=("$1"); }
+# achata a linha do chamador (substituição entre aspas: no bash 5.2 o `&` cru da troca repete o casado): sem quebra, sem comentário HTML, sem crase, sem cabeçalho markdown no início
+_flat() { local v="${1//$'\r'/ }" lt='&lt;!--' q="'"; v="${v//$'\n'/ }"; v="${v//<!--/"${lt}"}"; v="${v//\`/"${q}"}"
+  [[ "${v}" == '#'* ]] && v="\\${v}"; printf '%s' "${v}"; }
 _is_ph() { [[ "$1" == \<*\> ]]; }
 if _is_ph "${INT}"; then INT=""; INT_PH=1; else INT_PH=0; fi
 if _is_ph "${BR}"; then BR=""; fi
 if _is_ph "${SETTINGS_BEFORE}"; then SETTINGS_BEFORE=""; fi
-if _is_ph "${GUARD_LINE}"; then GUARD_LINE=""; lacuna "linha do adopter-guard (placeholder não preenchido)"; fi
-if _is_ph "${VENDOR_LINE}"; then VENDOR_LINE=""; lacuna "linha da onion/vendor (placeholder não preenchido)"; fi
+if _is_ph "${GUARD_LINE}"; then GUARD_LINE=""; lacuna "linha do adopter-guard (placeholder não preenchido)"
+elif [ -z "${GUARD_LINE}" ]; then lacuna "linha do adopter-guard (não informada ao emissor)"; fi
+if _is_ph "${VENDOR_LINE}"; then VENDOR_LINE=""; lacuna "linha da onion/vendor (placeholder não preenchido)"
+elif [ -z "${VENDOR_LINE}" ] && [ "${OP}" = "update" ]; then lacuna "linha da onion/vendor (não informada ao emissor)"; fi
 case "${SRC}" in ''|*'<'*|*'>'*) usage "SOURCE_ROOT vazio ou com placeholder: '${SRC}'" ;; esac
 [ -d "${SRC}" ] || usage "SOURCE_ROOT não é diretório: ${SRC}"
 bash "${HERE}/assert-dest.sh" "${DEST}" || exit 2
+DEST="$(cd "${DEST}" && pwd -P)" || usage "DEST não resolvido"
+VENDOR_LINE="$(_flat "${VENDOR_LINE}")"; GUARD_LINE="$(_flat "${GUARD_LINE}")"; BR="$(_flat "${BR}")"
+# o pin canônico: 12 caracteres resolvidos na FONTE (7, 12 ou 40 do mesmo commit = o mesmo arquivo)
+_norm() { git -C "${SRC}" rev-parse --short=12 --verify --quiet "$1^{commit}" 2>/dev/null; }
+if _p="$(_norm "${PIN}")" && [ -n "${_p}" ]; then PIN="${_p}"; PIN_OK=1
+else PIN="${PIN:0:12}"; PIN_OK=0; fi
+if [ -n "${PREV}" ]; then
+  if _p="$(_norm "${PREV}")" && [ -n "${_p}" ]; then PREV="${_p}"; PREV_OK=1; else PREV="${PREV:0:12}"; PREV_OK=0; fi
+fi
 
 INBOUND="${DEST}/docs/evolution/inbound"
 mkdir -p "${INBOUND}/_processed" || usage "não criei ${INBOUND}/_processed"
@@ -130,7 +153,7 @@ case "${PL_RC}" in
   0) PL_MEAN="plano gerado: o resumo e a planilha estão acima; aplicar é do dono do corpus" ;;
   2) PL_MEAN="há dívida MUST e falta o perfil: a orientação está acima" ;;
   4) PL_MEAN="não roda (o corpus passa no MUST ou o contrato não se aplica)" ;;
-  5) PL_MEAN="o alvo MUDOU durante o plan: PARE e investigue"; lacuna "migração planejada (plan-contract-migration rc 5: o alvo mudou)" ;;
+  5) PL_MEAN="o alvo MUDOU durante o plan: PARE e investigue"; pare "migração planejada: o alvo mudou durante o plan (plan-contract-migration rc 5)" ;;
   *) PL_MEAN="NÃO MEDIDO"; lacuna "migração planejada (plan-contract-migration rc ${PL_RC})" ;;
 esac
 
@@ -140,14 +163,15 @@ PG_LAST="$(printf '%s\n' "${PG_OUT}" | sed '/^[[:space:]]*$/d' | tail -n 1)"
 [ -n "${PG_LAST}" ] || PG_LAST="bloqueio NÃO PROVADO: prove-gate-blocks não imprimiu veredito (rc ${PG_RC})"
 case "${PG_RC}" in
   0|1) ;;   # 0 PROVADO · 1 NÃO PROVADO por defeito do gate: as duas são medição (o defeito é o achado)
-  4) lacuna "gate do alvo (prove-gate-blocks rc 4: o checkout real mudou, PARE)" ;;
+  4) pare "gate do alvo: o checkout real mudou durante a prova (prove-gate-blocks rc 4)" ;;
   *) lacuna "gate do alvo (prove-gate-blocks rc ${PG_RC})" ;;
 esac
 
 # ── Configuração e HARD (só no --update) ──────────────────────────────────────────────────────────────
 CFG=""
 if [ "${OP}" = "update" ]; then
-  if [ -z "${SETTINGS_BEFORE}" ]; then CFG="- hooks: diff não medido aqui (o settings.json de antes do merge não foi passado ao emissor; --settings-before)"
+  if [ -z "${SETTINGS_BEFORE}" ]; then CFG="- hooks: NÃO MEDIDO (o settings.json de antes do merge não foi passado ao emissor; --settings-before)"
+    lacuna "diff de hooks (sem --settings-before)"
   else
     _o="$(bash "${HERE}/merge-onion-hooks.sh" --diff "${SETTINGS_BEFORE}" "${DEST}/.claude/settings.json" 2>&1)"; _r=$?
     if [ "${_r}" -eq 0 ]; then CFG="- hooks:"$'\n''```'$'\n'"${_o}"$'\n''```'
@@ -157,7 +181,7 @@ if [ "${OP}" = "update" ]; then
   case "${_r}" in
     0) CFG="${CFG}"$'\n'"- ${_o//$'\n'/$'\n'  }" ;;
     1) CFG="${CFG}"$'\n'"- ⚠️ PARE — o update PERDEU regra de deny (deny-monotonic rc 1):"$'\n''```'$'\n'"${_o}"$'\n''```'
-       echo "PARE: o update perdeu regra de deny (deny-monotonic rc 1)" >&2 ;;
+       pare "deny: o update PERDEU regra de deny (deny-monotonic rc 1)" ;;
     *) CFG="${CFG}"$'\n'"- deny: NÃO MEDIDO (deny-monotonic rc ${_r}): $(tr '\n' ' ' <<< "${_o:0:300}")"; lacuna "deny (deny-monotonic rc ${_r})" ;;
   esac
   _o="$(bash "${HERE}/sandbox-deny-advice.sh" "${DEST}" 2>&1)"; _r=$?
@@ -172,10 +196,12 @@ fi
 
 # ── Novidades: o log da FONTE, não prosa ──────────────────────────────────────────────────────────────
 LOG_MAX="${ONION_INBOUND_LOG_MAX:-60}"; [[ "${LOG_MAX}" =~ ^[0-9]+$ ]] && [ "${LOG_MAX}" -gt 0 ] || LOG_MAX=60
-if [ -z "${PREV}" ]; then
+if [ -z "${PREV}" ] && [ "${OP}" = "adopt" ]; then
   NEWS="Sem pin anterior (1ª adoção): o histórico da fonte não é listado."
-elif ! git -C "${SRC}" rev-parse --verify --quiet "${PIN}^{commit}" >/dev/null 2>&1 \
-     || ! git -C "${SRC}" rev-parse --verify --quiet "${PREV}^{commit}" >/dev/null 2>&1; then
+elif [ -z "${PREV}" ]; then
+  NEWS="NÃO MEDIDO: pin anterior não informado ao emissor (--prev); o histórico da fonte não é listado."
+  lacuna "novidades (pin anterior não informado)"
+elif [ "${PIN_OK}" != 1 ] || [ "${PREV_OK}" != 1 ]; then
   NEWS="NÃO MEDIDO: ${PREV} ou ${PIN} não existe na fonte (${SRC})."
   lacuna "novidades (pin ausente na fonte)"
 elif ! git -C "${SRC}" log --oneline --no-decorate "${PREV}..${PIN}" > "${TMP}/log" 2>"${TMP}/log.err"; then
@@ -208,6 +234,11 @@ OUT="$(mktemp "${INBOUND}/.inbound-report.XXXXXX")" || usage "não criei arquivo
   printf -- "---\n\n"
   printf "# Relatório de %s — pin %s\n\n" "${OP}" "${PIN}"
   printf "Gerado pelo emissor do /meta:adopt: cada seção é a saída de uma medição, nenhuma é preenchida à mão.\n\n"
+  if [ "${#PARES[@]}" -gt 0 ]; then
+    printf "> ⛔ **PARE** — não commite nem abra PR antes de investigar:\n"
+    for l in "${PARES[@]}"; do printf ">  - %s\n" "${l}"; done
+    printf "\n"
+  fi
   if [ "${#LACUNAS[@]}" -gt 0 ]; then
     printf "> ⚠️ **Medição que não rodou** (vai como NÃO MEDIDO na seção, nunca como número):\n"
     for l in "${LACUNAS[@]}"; do printf ">  - %s\n" "${l}"; done
@@ -217,7 +248,7 @@ OUT="$(mktemp "${INBOUND}/.inbound-report.XXXXXX")" || usage "não criei arquivo
   printf "Integração: \`%s\` (%s).\n\n" "${INT}" "${INT_NOTE}"
   printf '```\n%s\n```\n' "${AD_TXT}"
   if [ -n "${VENDOR_LINE}" ]; then printf "\n%s\n" "${VENDOR_LINE}"
-  elif [ "${OP}" = "update" ]; then printf "\nLinha da onion/vendor remota: não informada ao emissor.\n"; fi
+  elif [ "${OP}" = "update" ]; then printf "\nLinha da onion/vendor remota: NÃO MEDIDO (não informada ao emissor).\n"; fi
   printf "\n## Contrato KG-SSOT do corpus\n\n"
   printf "remeasure-contract rc %s: %s.\n\n" "${RC_RC}" "${RC_MEAN}"
   printf '```\n%s\n```\n\n' "${RC_OUT}"
@@ -226,7 +257,7 @@ OUT="$(mktemp "${INBOUND}/.inbound-report.XXXXXX")" || usage "não criei arquivo
   printf "\n## Gate do alvo\n\n"
   printf "%s\n" "${PG_LAST}"
   if [ -n "${GUARD_LINE}" ]; then printf "\n%s\n" "${GUARD_LINE}"
-  else printf "\nadopter-guard: linha não informada ao emissor.\n"; fi
+  else printf "\nadopter-guard: NÃO MEDIDO (linha não informada ao emissor).\n"; fi
   if [ "${OP}" = "update" ]; then printf "\n## Configuração e HARD\n\n%s\n" "${CFG}"; fi
   printf "\n## Novidades / capacidades novas\n\n%s\n" "${NEWS}"
   printf "\n## Próximos passos (NO ALVO)\n\n"
@@ -239,8 +270,8 @@ chmod 0644 "${OUT}" 2>/dev/null || true
 mv -f "${OUT}" "${REPORT}" || { rm -f "${OUT}"; echo "emit-inbound-report: falha ao mover para ${REPORT} (nada escrito)" >&2; exit 1; }
 
 echo "relatório escrito: ${REPORT}"
-if [ "${#LACUNAS[@]}" -gt 0 ]; then
-  for l in "${LACUNAS[@]}"; do echo "NÃO MEDIDO: ${l}" >&2; done
-  exit 3
-fi
+for l in "${PARES[@]+"${PARES[@]}"}"; do echo "PARE: ${l}" >&2; done
+for l in "${LACUNAS[@]+"${LACUNAS[@]}"}"; do echo "NÃO MEDIDO: ${l}" >&2; done
+[ "${#PARES[@]}" -gt 0 ] && exit 4
+[ "${#LACUNAS[@]}" -gt 0 ] && exit 3
 exit 0
