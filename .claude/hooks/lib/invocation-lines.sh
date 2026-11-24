@@ -891,12 +891,17 @@ def dst_of(s, force):
 
 def canonical_git(words, where, env=None):
     """-> (linha canônica, remoto, é-push?); a config de `-c` fica em LAST_CFG para a isenção."""
-    i, cfg, dyn_cfg = 1, {}, False
+    i, cfg, dyn_cfg, alias = 1, {}, False, {}
     LAST_CFG[0] = cfg
     while i < len(words):
         w = words[i]
         if w == "-c" and i + 1 < len(words):
             kv = words[i + 1]
+            # `git -c alias.c=clean c -fdx` é `git clean -fdx` (fix/deny-field-notes-1124, revisão isolada): o alias
+            # por `-c` se expande aqui. Alias de shell (`=!cmd`) não se prova e segue como estava (limite declarado).
+            am = re.match(r"^alias\.([^=]+)=(.*)$", kv, re.S)
+            if am and not am.group(2).lstrip().startswith("!"):
+                alias[am.group(1).lower()] = am.group(2).split()
             if PUSH_CFG.match(kv):
                 if DYNAMIC.search(kv):
                     dyn_cfg = True
@@ -912,6 +917,8 @@ def canonical_git(words, where, env=None):
             i += 1; continue
         break
     rest = words[i:]
+    if rest and rest[0].lower() in alias and alias[rest[0].lower()]:
+        rest = alias[rest[0].lower()] + rest[1:]
     if not rest:
         return None, None, False
     if env and any(k.startswith("GIT_CONFIG") for k in env):
@@ -1593,9 +1600,13 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         line, remote, is_push = canonical_git(words, where, env)
         if is_push:
             # isenção pelo DESTINO do push, nunca pelo `origin` do diretório (Elenxo, 2ª passada, B1)
-            if where is not None and not push_dest_ours(where, remote, LAST_CFG[0]):
+            # ...MENOS a força DURA: reescrever a história de um remoto é irreversível em qualquer projeto, e o deny
+            # deixou de barrar o `+ref` fora de `origin +` (fix/deny-field-notes-1124, revisão isolada, bloqueio 1)
+            if where is not None and not push_dest_ours(where, remote, LAST_CFG[0]) \
+                    and not re.match(r"^git push --force( |$)", line or ""):
                 return
-        elif where and other_project(where):
+        elif where and other_project(where) and not (line or "").startswith("git clean"):
+            # o `git clean` de outro projeto segue para o juiz: apagar o ignorado é perda em qualquer pasta (bloqueio 2)
             return
         if line:
             OUT.append(line)

@@ -162,7 +162,11 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
   push. Assim, `-o "ci +skip"`, `| tail -n +2` e `v1+build` deixam de cair. No clean, o `*` do fim (`git clean
   -fdx*`) barrava o `-n` depois do grupo. O deny ficou com o grupo EXATO e com cada ordem de {f, d, x|X} (`-xfd`,
   `-dxf`…); o grupo seguido de outra coisa (`-fdx sub/`, `-fdxq`) é do hook, e `git clean -fdx -n`, `-xn` e
-  `-x --dry-run` passam. O teto acima caiu. O custo que sobra é a menção ` push origin +` dentro de `git -C . commit -m`.
+  `-x --dry-run` passam. O teto acima caiu. O custo que sobra é a menção ` push origin +` dentro de `git -C . commit -m`. A revisão isolada
+  achou o buraco desta troca: a lib isentava OUTRO projeto, e o `+ref` e o clean destrutivo nele passavam nas duas
+  camadas. Agora a força dura e o `git clean` são julgados antes da isenção por projeto. O alias por `-c` se expande, e a
+  flag do clean vinda de `$X` ou de `$(…)` conta como destrutiva (saída: `git clean -fd -- "$X"`). O `--update` avisa
+  quando a retirada depende de um hook que não vale no alvo.
 
 ## O que esta doutrina NÃO promete
 
