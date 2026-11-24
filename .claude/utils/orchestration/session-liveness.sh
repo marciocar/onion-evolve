@@ -19,8 +19,9 @@
 # Mandar a sessão ao fundo nativo (a tecla ←) cria uma CÓPIA com id novo. Formato medido no transcript da cópia
 # (~/.claude/projects/<pasta>/<id-novo>.jsonl): a 1ª linha é {"type":"history-suppression","cause":"fork_inherit",…}
 # SEM o id de origem (com o `ts` do fork), e todo `sessionId` do histórico copiado é reescrito para o id novo. O que
-# liga as duas é o `uuid` das mensagens. Vale o ÚLTIMO uuid herdado (a última mensagem com `timestamp` anterior ao `ts`
-# do fork), não o primeiro: o primeiro é a fronteira da compactação e se repete em IRMÃS (duas cópias da mesma origem). (O daemon grava a origem em
+# liga as duas é o `uuid` das mensagens: a cópia descende da origem quando um uuid HERDADO por ela (timestamp anterior ao
+# `ts` do fork) está na parte PRÓPRIA da origem (o que a origem escreveu depois do próprio fork, ou tudo, se ela não é
+# cópia). Só «estar na origem» não basta: o uuid herdado reaparece em filhas e irmãs mais novas, como herança delas. (O daemon grava a origem em
 # ~/.claude/daemon/roster.json, `dispatch.launch.sessionId` com `fork: true`, mas só enquanto o worker vive: não é
 # fonte durável, e é estado interno do harness.)
 #
@@ -31,12 +32,13 @@
 #                                                      (campo vazio vira «-»; live = live|dead; short = o `id` curto do
 #                                                      harness, ou os 8 primeiros caracteres do sessionId)
 #   session-liveness.sh fork-of <copia.jsonl> <origem.jsonl>
-#                                                      rc 0 a cópia descende da origem (fork_inherit + o ÚLTIMO uuid
-#                                                      herdado presente na origem) · 1 não descende (ou não é cópia)
+#                                                      rc 0 a cópia descende da origem, direta ou em cadeia
+#                                                      (fork_inherit + uuid herdado na parte PRÓPRIA da origem)
+#                                                      · 1 não descende (ou não é cópia; filha e irmã não são origem)
 #                                                      · 2 não medido (arquivo ilegível, cópia sem ts, ou cópia
 #                                                      recém-criada sem mensagem herdada)
 # Saída: 0/1 como acima · 2 uso ou entrada ilegível (classify: JSON que não é lista).
-# Só lê. Da cópia lê a herança até a 1ª mensagem nova (uuid e timestamp); na origem procura só aquele uuid (grep -F).
+# Só lê. Da cópia lê a herança até a 1ª mensagem nova (uuid e timestamp); da origem, a 1ª linha e a busca dos uuids (grep -F -f).
 # Bancada: run_session_open_selftests, run_baton_pulse_selftests e run_restart_drain_selftests (lint-selftest.sh).
 # ===========================================================================
 set -uo pipefail
@@ -100,42 +102,61 @@ for x in d:
   fork-of)
     [ $# -eq 2 ] || _usage
     exec python3 -I -c '
-import json, subprocess, sys
+import json, os, subprocess, sys, tempfile
 copy, origin = sys.argv[1:3]
-# A ORIGEM é a sessão que contém o ÚLTIMO uuid herdado (a última mensagem com timestamp anterior ao ts da linha
-# history-suppression), não o primeiro: o primeiro é a fronteira da compactação e é o mesmo em IRMÃS (duas cópias da
-# mesma origem), medido em 2026-11-24 (022965f2 e ed9f72cc).
-try:
-    with open(copy, encoding="utf-8", errors="replace") as f:
-        first = None; fork_ts = None; last = None
+# A cópia DESCENDE da origem quando um uuid HERDADO pela cópia está na parte PRÓPRIA da origem: o que a origem escreveu
+# depois do próprio fork (todo o transcript, se a origem não é cópia). O uuid herdado reaparece em toda descendente e
+# em toda irmã mais nova, mas lá ele é HERANÇA (timestamp anterior ao ts do fork delas), nunca parte própria. Assim a
+# relação é ASSIMÉTRICA: filha e irmã não saem como origem. E a cadeia vale: a neta casa com a avó pelo que a avó
+# escreveu antes do fork da mãe. (Medido em 2026-11-24: o 1º uuid se repete em irmãs; o último herdado reaparece na filha.)
+def head(path):
+    """→ (é cópia, ts do fork ou None) pela 1ª linha JSON do transcript."""
+    with open(path, encoding="utf-8", errors="replace") as f:
         for line in f:
             line = line.strip()
             if not line: continue
             try: o = json.loads(line)
             except ValueError: continue
             if not isinstance(o, dict): continue
-            if first is None:
-                first = o
-                if o.get("type") != "history-suppression" or o.get("cause") != "fork_inherit": sys.exit(1)   # não é cópia
-                fork_ts = o.get("ts") if isinstance(o.get("ts"), str) else None
-                if not fork_ts:
-                    print("session-liveness: cópia sem o ts do fork: origem NÃO medida", file=sys.stderr); sys.exit(2)
-                continue
+            if o.get("type") == "history-suppression" and o.get("cause") == "fork_inherit":
+                return True, (o.get("ts") if isinstance(o.get("ts"), str) else None)
+            return False, None
+    return False, None
+try:
+    is_copy, fork_ts = head(copy)
+    if not is_copy: sys.exit(1)   # não é cópia
+    if not fork_ts:
+        print("session-liveness: cópia sem o ts do fork: origem NÃO medida", file=sys.stderr); sys.exit(2)
+    inherited = []   # (uuid, timestamp) herdados pela cópia, até a 1ª mensagem nova dela
+    with open(copy, encoding="utf-8", errors="replace") as f:
+        next(f, None)
+        for line in f:
+            line = line.strip()
+            if not line: continue
+            try: o = json.loads(line)
+            except ValueError: continue
+            if not isinstance(o, dict): continue
             u = o.get("uuid"); t = o.get("timestamp")
             if not (isinstance(u, str) and u): continue
             if isinstance(t, str) and t >= fork_ts: break   # 1ª mensagem nova da cópia: a herança acabou
-            last = u
+            inherited.append((u, t if isinstance(t, str) else None))
 except OSError as e:
     print(f"session-liveness: cópia ilegível ({e})", file=sys.stderr); sys.exit(2)
-if first is None: sys.exit(1)
-if last is None:
+if not inherited:
     # cópia recém-criada, só com a linha history-suppression: ainda não há o que casar
     print("session-liveness: cópia sem mensagem herdada ainda: origem NÃO medida", file=sys.stderr); sys.exit(2)
-try: open(origin, "rb").close()
+try: o_copy, o_ts = head(origin)
 except OSError as e:
     print(f"session-liveness: origem ilegível ({e})", file=sys.stderr); sys.exit(2)
-needle = "\"uuid\":\"" + last + "\""
-r = subprocess.run(["grep", "-a", "-q", "-F", "--", needle, origin])
+if o_copy and not o_ts:
+    print("session-liveness: origem é cópia sem o ts do fork: NÃO medida", file=sys.stderr); sys.exit(2)
+# só o que a origem escreveu DEPOIS do próprio fork é parte própria dela
+cand = [u for u, t in inherited if (not o_copy) or (t is not None and t >= o_ts)]
+if not cand: sys.exit(1)
+with tempfile.NamedTemporaryFile("w", suffix=".pat", delete=False) as pf:
+    pf.write("".join("\"uuid\":\"" + u + "\"\n" for u in cand)); pat = pf.name
+try: r = subprocess.run(["grep", "-a", "-q", "-F", "-f", pat, "--", origin])
+finally: os.unlink(pat)
 sys.exit(0 if r.returncode == 0 else (1 if r.returncode == 1 else 2))
 ' "$@"
     ;;

@@ -476,7 +476,7 @@ if peers_file and not peers_src.startswith(('falhou', 'ausente', 'desligada')):
             sid = str(x.get('sessionId') or x.get('id') or '')
             if not sid: continue
             s = sess(sid); s['src'].append('peers')
-            s['name'] = str(x.get('name') or ''); s['cwd'] = real(str(x.get('cwd') or ''))
+            s['name'] = str(x.get('name') or ''); s['cwd'] = real(str(x['cwd'])) if x.get('cwd') else ''
             s['pid'] = x.get('pid'); s['status'] = str(x.get('status') or ''); s['state'] = str(x.get('state') or '')
             s['kind'] = str(x.get('kind') or '')
             if x.get('startedAt'): s['started'] = int(x['startedAt']) // (1000 if int(x['startedAt']) > 10**11 else 1)
@@ -515,7 +515,7 @@ for ln in open(cfg_file, encoding='utf-8', errors='replace').read().splitlines()
         fresh = sid not in S
         s = sess(sid); s['src'].append(f'peers@{lab}')
         if fresh or not s['name']:
-            s['name'] = str(x.get('name') or ''); s['cwd'] = real(str(x.get('cwd') or ''))
+            s['name'] = str(x.get('name') or ''); s['cwd'] = real(str(x['cwd'])) if x.get('cwd') else ''
             s['pid'] = x.get('pid'); s['status'] = str(x.get('status') or ''); s['state'] = str(x.get('state') or '')
             s['kind'] = str(x.get('kind') or '')
             if x.get('startedAt'): s['started'] = int(x['startedAt']) // (1000 if int(x['startedAt']) > 10**11 else 1)
@@ -722,7 +722,7 @@ if PROCS:
             if len(f) < 9: continue
             prev = LIVE.get(f[0])
             if prev and prev[0]: continue   # o mesmo sid em dois processos: basta um vivo
-            LIVE[f[0]] = (f[6] == 'live', f[8], f[7], f[1], None if f[3] == '-' else f[3])
+            LIVE[f[0]] = (f[6] == 'live', f[8], f[7], f[1], None if f[3] == '-' else f[3], '' if f[4] == '-' else f[4], '' if f[5] == '-' else f[5])
     except Exception as e:
         print(f'baton-pulse: a regra de «viva» não se leu ({liv_tool}: {type(e).__name__}: {e}): não classifico sessão às cegas', file=sys.stderr)
         sys.exit(2)
@@ -732,6 +732,8 @@ for _sid, _v in LIVE.items():
     if _sid in S and _v[0]:
         S[_sid]['kind'] = _v[3]
         S[_sid]['pid'] = int(_v[4]) if str(_v[4] or '').isdigit() else _v[4]
+        S[_sid]['name'] = _v[5]   # o rótulo (derivado do nome e da pasta) também sai da linha viva
+        S[_sid]['cwd'] = real(_v[6]) if _v[6] else ''
 def peer_dead(s): return in_peers(s) and s['sid'] in LIVE and not LIVE[s['sid']][0]
 
 claimed_owner = set(); claimed_pr = set()
@@ -1081,7 +1083,8 @@ if peers_ok:
         if _live:
             duty = []
             if _base and _base in _owner_sessions: duty.append(f'owner_session «{_base}» no registro de posse')
-            elif s['cwd'] and s['cwd'] in own_dirs: duty.append('roda na pasta de uma sessão dona do registro de posse')
+            # own_dirs só tem caminho absoluto: a sessão sem pasta ('') nunca casa
+            elif s['cwd'] in own_dirs: duty.append('roda na pasta de uma sessão dona do registro de posse')
             if _base and _base in _piece_owners: duty.append('dona de peça')
             if s.get('lab_src') == 'owners.tsv': duty.append(f'rótulo {",".join(s["labels"])} no owners.tsv')
             if s.get('grant') and s['grant'][1]: duty.append(f'batuta-de-projeto no grants.tsv ({s["grant"][0]})')

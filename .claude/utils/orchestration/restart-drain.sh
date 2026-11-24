@@ -152,12 +152,19 @@ if opt['mode'] == 'resume':
     elif SID: sids = [SID]
     else: die('sem id de sessão: passe --session <sid> ou --all (CLAUDE_CODE_SESSION_ID vazio)')
     # O BILHETE SEGUE A CÓPIA (2026-11-24): a sessão mandada ao fundo nativo (tecla ←) volta com id NOVO, e o bilhete
-    # ficou no id antigo. Sem bilhete do próprio id, vale o de um ancestral: o bilhete pendente cujo transcript é a
-    # origem desta cópia (fork_inherit + o ÚLTIMO uuid herdado presente na origem, pelo session-liveness.sh fork-of;
-    # o 1º se repete em IRMÃS e seguiria o bilhete de uma delas). O ancestral que guarda a herança inteira também casa. Com dois bilhetes de ancestrais, vale o
-    # gravado POR ÚLTIMO (a drenagem que precedeu esta cópia), e os outros são ditos, nunca arquivados em silêncio.
+    # ficou no id antigo. Sem bilhete do próprio id, vale o de um ANCESTRAL: o bilhete pendente cuja sessão é origem desta
+    # cópia pelo session-liveness.sh fork-of (um uuid herdado pela cópia está na parte PRÓPRIA da origem; filha e irmã
+    # não casam, porque lá o uuid é herança). Duas travas a mais: o bilhete tem de ter sido gravado ANTES do fork desta
+    # cópia (a drenagem precede o fork), e, com dois ancestrais, vale o gravado por último, com os outros ditos, nunca
+    # arquivados em silêncio. A cadeia (o avô) só casa enquanto a cópia ainda carrega o que o avô escreveu: a compactação
+    # apaga essa parte, e aí o bilhete do avô não é seguido (limite declarado).
     if not opt['all'] and SID and not os.path.exists(os.path.join(RDIR, f'{SID}.tsv')):
-        me = transcript_of(SID); hits = []
+        me = transcript_of(SID); hits = []; my_fork_ts = ''
+        try:
+            with open(me, encoding='utf-8', errors='replace') as f:
+                _h = json.loads(f.readline() or 'null')
+            if isinstance(_h, dict) and _h.get('cause') == 'fork_inherit': my_fork_ts = str(_h.get('ts') or '')
+        except (OSError, ValueError, TypeError): my_fork_ts = ''
         for p in (sorted(glob.glob(os.path.join(glob.escape(RDIR), '*.tsv'))) if me else []):
             b = os.path.basename(p)[:-4]
             if '.resumed.' in os.path.basename(p) or b == SID: continue
@@ -168,7 +175,10 @@ if opt['mode'] == 'resume':
             if fr == 2: print(f'⚠️ não medi se esta sessão é cópia de {b} (fork-of falhou): o bilhete dele NÃO foi seguido')
             if fr == 0:
                 h = next((r for r in (read_tsv(p) or []) if r and r[0] == 'session'), ['session', b, '?', ''])
-                hits.append((h[3] if len(h) > 3 else '', b))
+                h_ts = h[3] if len(h) > 3 else ''
+                if my_fork_ts and h_ts and h_ts[:19] > my_fork_ts[:19]:   # segundos: os dois formatos ISO diferem nas frações
+                    print(f'  ⚠️ {b} é ancestral, mas o bilhete dele ({h_ts}) é de DEPOIS do fork desta cópia ({my_fork_ts}): não o sigo'); continue
+                hits.append((h_ts, b))
         if hits:
             hits.sort(); b = hits[-1][1]
             print(f'esta sessão ({SID}) é cópia de {b} (fork_inherit: mandada ao fundo, ganhou id novo): sigo o bilhete do ancestral')

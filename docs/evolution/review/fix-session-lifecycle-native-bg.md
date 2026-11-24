@@ -2,14 +2,13 @@
 branch: fix/session-lifecycle-native-bg
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: e75a2d158c5909ff662eb879ee0d8b9d9ee7af93832efd78a2e8835e434a2b3a
-reviewed_code_sha256: 7bc144398a9a1d693647dbea5071e11673518064e8bbc770c848943d94a0d54f
-findings_total: 11
-findings_real: 11
-findings_blocking: 2
+reviewed_diff_sha256: pendente
+findings_total: 16
+findings_real: 16
+findings_blocking: 3
 tokens: 154748
 duration_min: 6
-findings_fixed: 10
+findings_fixed: 15
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
@@ -105,4 +104,35 @@ A sessão do core revisou o diff isolada e **reprovou com 2 bloqueios**. Esta re
 Mutantes que sobreviviam e agora morrem: **M1**, EPERM tratado como morto, caso (y), que pula declarado quando roda
 como root; **M3**, `fork-of` sem exigir `fork_inherit`, caso (w5); **M6**, cópia morta barrando a retomada, caso (w6);
 **M10**, `max` virando `min`, caso (bg6); **M11**, aviso de fundo sem conferir o `kind`, caso (bg5b).
+
+## Re-revisão isolada
+
+A re-revisão isolada em `e5fcb74` **aprovou a cura do achado 1 e reprovou a do 2**: o `fork-of` seguia simétrico entre
+pai e filha. O último uuid herdado pela cópia reaparece em toda descendente dela, então `fork-of ed9f72cc ← 022965f2`
+dava rc 0, e o `--resume-check` do pai seguia e arquivava o bilhete da filha (cadeia O→A→B na bancada do revisor).
+
+**Cura:** a cópia descende da origem quando um uuid **herdado** pela cópia está na parte **própria** da origem, ou seja,
+no que a origem escreveu depois do próprio fork (todo o transcript, se a origem não é cópia). O uuid que aparece na filha
+ou na irmã mais nova é herança dela (timestamp anterior ao `ts` do fork dela) e não conta. A relação fica assimétrica, e
+a cadeia vale do jeito certo: a neta casa com a avó pelo que a avó escreveu antes do fork da mãe. Somei a trava do
+`ts`: só vale bilhete gravado **antes** do fork da cópia. Medido no vivo: `535955f0 ← 022965f2` dá 0;
+`022965f2 ← ed9f72cc` dá 0; `ed9f72cc ← 022965f2` dá 1; `022965f2 ← 535955f0` dá 1.
+
+Casos novos, cada um com mutante, sendo o da regra do fork-of «sem filtrar a parte própria»:
+- (w9) irmã mais velha × mais nova, nos dois sentidos;
+- (w10) pai × filha: retomar a filha com o pai vivo abre, e retomar o pai com a filha viva recusa (resolve o C);
+- restart (t4) O→A→B com só o bilhete da filha: o `--resume-check` do pai não o segue nem o arquiva;
+- restart (t3): bilhete gravado depois do fork, com mutante na trava do `ts`.
+
+O (w7) foi refeito com a irmã como cópia, e o mutante dele passou a ser o da parte própria.
+
+Não bloqueantes:
+- **B (o avô):** a cadeia é seguida quando a cópia ainda carrega o que o avô escreveu. A compactação apaga essa parte, e
+  aí o bilhete do avô não é seguido. Fica como limite declarado no `restart-drain.sh`, no `restart.md` e na KB. No vivo,
+  `535955f0 ← ed9f72cc` dá 1 por isso. O comentário antigo (l.157) foi reescrito.
+- **C:** resolvido junto com a cura principal, caso (w10).
+- **D:** o nome e a pasta da sessão, logo o rótulo, também saem da linha viva no pulso. Caso (bg5c), com mutante.
+- **M2:** interativa com pid morto, caso (z) na família `session_open`, com mutante no helper.
+- **M16:** a pasta vazia, caso (bg8). O cwd ausente agora fica vazio, em vez de virar o `realpath('')`, que é a pasta do
+  processo. A guarda redundante saiu, e o filtro de caminho absoluto virou a única defesa, mordida pelo mutante.
 

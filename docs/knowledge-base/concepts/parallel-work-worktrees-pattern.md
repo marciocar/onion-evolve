@@ -96,9 +96,12 @@ O que se mediu no Claude Code 2.1.331, e decide a escolha:
 
 - **A tecla `←` cria uma CÓPIA com id novo**, e o processo antigo morre. O transcript da cópia abre com
   `{"type":"history-suppression","cause":"fork_inherit"}`, **sem** o id de origem, e todo `sessionId` do histórico é
-  reescrito. O que liga as duas é o `uuid` das mensagens: o **último** `uuid` herdado (a última mensagem com
-  `timestamp` anterior ao `ts` da linha `history-suppression`) está, idêntico, no transcript da origem. O **primeiro**
-  não serve: é a fronteira da compactação e se repete em **irmãs** (duas cópias da mesma origem). Retomar o id antigo
+  reescrito. O que liga as duas é o `uuid` das mensagens: a cópia descende da origem quando um `uuid` **herdado**
+  por ela (`timestamp` anterior ao `ts` da linha `history-suppression`) está na parte **própria** da origem, isto é, no
+  que a origem escreveu depois do próprio fork (ou em tudo, se ela não é cópia). Só «estar na origem» não basta: o
+  `uuid` herdado reaparece em filhas e em irmãs mais novas, e lá ele é herança. Assim a relação é assimétrica (a filha é
+  cópia do pai, nunca o contrário), e irmãs não casam entre si. A cadeia (neta e avó) só casa enquanto a neta ainda
+  carrega o que a avó escreveu: a compactação apaga essa parte. Retomar o id antigo
   abre uma **segunda** cópia da conversa que já vive. Cópia recém-criada, só com a linha `history-suppression`, ainda
   não tem o que casar: a origem fica **não medida**, as peças dizem isso e não barram por palpite.
 - **A cópia nasce de um `claude bg-spare` genérico**, sem as flags da sessão original: a sessão aberta com um canal de
