@@ -102,7 +102,7 @@ for x in d:
   fork-of)
     [ $# -eq 2 ] || _usage
     exec python3 -I -c '
-import json, os, subprocess, sys, tempfile
+import json, subprocess, sys
 copy, origin = sys.argv[1:3]
 # A cópia DESCENDE da origem quando um uuid HERDADO pela cópia está na parte PRÓPRIA da origem: o que a origem escreveu
 # depois do próprio fork (todo o transcript, se a origem não é cópia). O uuid herdado reaparece em toda descendente e
@@ -153,10 +153,11 @@ if o_copy and not o_ts:
 # só o que a origem escreveu DEPOIS do próprio fork é parte própria dela
 cand = [u for u, t in inherited if (not o_copy) or (t is not None and t >= o_ts)]
 if not cand: sys.exit(1)
-with tempfile.NamedTemporaryFile("w", suffix=".pat", delete=False) as pf:
-    pf.write("".join("\"uuid\":\"" + u + "\"\n" for u in cand)); pat = pf.name
-try: r = subprocess.run(["grep", "-a", "-q", "-F", "-f", pat, "--", origin])
-finally: os.unlink(pat)
+# os padrões vão pelo stdin (grep -f -): sem arquivo temporário, que falharia sem TMPDIR gravável e sairia «não descende»
+pats = "".join("\"uuid\":\"" + u + "\"\n" for u in cand)
+try: r = subprocess.run(["grep", "-a", "-q", "-F", "-f", "-", "--", origin], input=pats, text=True)
+except OSError as e:
+    print(f"session-liveness: grep não rodou ({e}): origem NÃO medida", file=sys.stderr); sys.exit(2)
 sys.exit(0 if r.returncode == 0 else (1 if r.returncode == 1 else 2))
 ' "$@"
     ;;
