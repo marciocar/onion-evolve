@@ -1727,14 +1727,15 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: onion-messaging
     impact: 3
     confidence: 0.85
-    verified_at: "2026-11-08"
-    verified_against: "queue/onion_queue/daemon.py na main ead81baea506 via API, 2026-11-08: _clean_attr confere só str, não vazio, até 256 e isprintable; espaço passa; diffs dos PRs #8, #9 e #10: 0 menções a URI-reference ou urisplit"
+    verified_at: "2026-11-24"
+    verified_against: "2026-11-24, medido pelo core: o bloco _U … URI_REFERENCE_RE é byte a byte igual em queue/onion_queue/daemon.py (origin/main feb977e do repo da fila) e em .claude/utils/federation-transport/a2a-metrics.py (core, alinhado pelo PR #1676); a bancada da fila tem source_not_uri_reference_refused e source_uri_reference_accepted (queue/test/bench.py:200-206) e o mutante source_shape_ignored (queue/test/mutants.sh:90); fila recusa desde o PR #15 de lá (C_SOURCE_IS_URI_REFERENCE confirmed em 17/11, relatado pela sessão dona)"
     label: "A fila do onion-messaging recusa o source de CloudEvent que não é URI-reference? Hoje confere presença, não forma."
     narrative: "Remedido em 2026-11-08: `_clean_attr` aceita qualquer texto imprimível até 256 caracteres, inclusive com espaço, e `parse_cloudevent` usa o resultado como `source`. Os PRs abertos #8, #9 e #10 não mudam isso. O `parse_cloudevent` de .claude/utils/federation-transport/a2a-metrics.py, no core, tem a mesma régua (medido na mesma data), então a correção olha os dois lados. A dedupe com remetente segue divergência por decisão, fora deste item. Pronto quando: `parse_cloudevent` recusa `source` que não é URI-reference (caso negativo com espaço na bancada queue/test), e a régua do par em a2a-metrics.py fica igual ou a diferença fica declarada. Prazo a calibrar: a data 15/11 proposta pelo core foi provisória, sem essa base, e aguarda a calibração por story points e pelo histórico planejado contra executado no Linear (estimativa ligada no time em 2026-11-08; a base vem de uma amostra cega por categoria). Por isso o nó não tem x_due, e o sufixo do id não é prazo. O dono fica como está. Linear: SAC-361. Nenhuma mudança aplicada por este nó: é mapa e backlog."
+    x_closed_by: "core (batuta), 2026-11-24, a pedido da sessão dona da fila; os dois critérios de pronto do narrative medidos"
     trace: "docs/evolution/research/outside-in-primaries-2026-11/SYNTHESIS.md, seção Itens ATRÁS remedidos"
   - id: Q_CORE_ACTIONS_SHA_PIN_1116
     node_type: question
