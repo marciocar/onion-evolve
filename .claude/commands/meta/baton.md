@@ -95,7 +95,8 @@ decide), a mesma que o abridor de sessões usa:
 
 Por que: a tecla `←` manda a sessão ao fundo como cópia de id novo, nascida de um `claude bg-spare` genérico **sem** a
 flag do canal da campainha, e o daemon de fundo é transitório (sai sem clientes; aposenta sessão ociosa). Sessão de
-serviço longo fica no tmux; o fundo nativo é para tarefa curta e para trocar de terminal.
+serviço longo fica no tmux; o fundo nativo é para tarefa curta e para trocar de terminal. Não medido no 2.1.331: que
+a retomada depois do `claude stop` mantém o mesmo id e que `stop`, `attach` e `rm` aceitam o id curto que o harness lista.
 
 Pastas de config declaradas: a sessão que roda com `CLAUDE_CONFIG_DIR` próprio (o hub, por exemplo) não aparece na
 lista de peers padrão nem em `~/.claude/projects`. Declare a pasta em `~/.local/state/onion/baton/config-dirs.tsv` (um

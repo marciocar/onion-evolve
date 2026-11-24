@@ -154,8 +154,10 @@ if opt['mode'] == 'resume':
     # O BILHETE SEGUE A CÓPIA (2026-11-24): a sessão mandada ao fundo nativo (tecla ←) volta com id NOVO, e o bilhete
     # ficou no id antigo. Sem bilhete do próprio id, vale o de um ancestral: o bilhete pendente cujo transcript é a
     # origem desta cópia (fork_inherit + o 1º uuid da cópia presente na origem, pelo session-liveness.sh fork-of).
+    # O 1º uuid da cópia é herdado: a cópia de uma cópia casa também com o avô. Com dois bilhetes de ancestrais, vale o
+    # gravado POR ÚLTIMO (a drenagem que precedeu esta cópia), e os outros são ditos, nunca arquivados em silêncio.
     if not opt['all'] and SID and not os.path.exists(os.path.join(RDIR, f'{SID}.tsv')):
-        me = transcript_of(SID)
+        me = transcript_of(SID); hits = []
         for p in (sorted(glob.glob(os.path.join(glob.escape(RDIR), '*.tsv'))) if me else []):
             b = os.path.basename(p)[:-4]
             if '.resumed.' in os.path.basename(p) or b == SID: continue
@@ -165,8 +167,13 @@ if opt['mode'] == 'resume':
             except (OSError, subprocess.TimeoutExpired): fr = 2
             if fr == 2: print(f'⚠️ não medi se esta sessão é cópia de {b} (fork-of falhou): o bilhete dele NÃO foi seguido')
             if fr == 0:
-                print(f'esta sessão ({SID}) é cópia de {b} (fork_inherit: mandada ao fundo, ganhou id novo): sigo o bilhete do ancestral')
-                sids = [b]; break
+                h = next((r for r in (read_tsv(p) or []) if r and r[0] == 'session'), ['session', b, '?', ''])
+                hits.append((h[3] if len(h) > 3 else '', b))
+        if hits:
+            hits.sort(); b = hits[-1][1]
+            print(f'esta sessão ({SID}) é cópia de {b} (fork_inherit: mandada ao fundo, ganhou id novo): sigo o bilhete do ancestral')
+            for _, o in hits[:-1]: print(f'  ⚠️ {o} também é ancestral com bilhete pendente (mais antigo): não o sigo; confira-o com --resume-check --session {o}')
+            sids = [b]
     found = 0; ngaps = 0; now = int(time.time())
     for s in sids:
         tp = os.path.join(RDIR, f'{s}.tsv'); rows = read_tsv(tp)
