@@ -63679,17 +63679,19 @@ BP_DT
   # ── 2026-11-24 (fix/session-lifecycle-native-bg): «viva» é a regra única do session-liveness.sh, e o fundo nativo
   #    ganha duas classes de higiene. Pid vivo = o desta bancada ($$); morto = 999999999.
   local livs="${REPO_ROOT}/.claude/utils/orchestration/session-liveness.sh"
-  python3 - "${sb}" "$$" "${NOW}" > "${sb}/peers-bg.json" <<'BP_BG'
+  python3 - "${sb}" "$$" "${NOW}" "${r}" > "${sb}/peers-bg.json" <<'BP_BG'
 import json, sys
 sb, pid, now = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 P = [
   # o incidente: registro de fundo blocked SEM pid, de dois dias antes (STALE); e um de 2 h (morto, mas recente)
-  {'kind': 'background', 'id': 'bgstale1', 'sessionId': 'sid-bgstale', 'name': 'velho (6)', 'state': 'blocked', 'cwd': f'{sb}/gamma', 'startedAt': (now - 48 * 3600) * 1000},
-  {'kind': 'background', 'id': 'bgfresh1', 'sessionId': 'sid-bgfresh', 'name': 'recente', 'state': 'blocked', 'cwd': f'{sb}/gamma', 'startedAt': (now - 2 * 3600) * 1000},
+  {'kind': 'background', 'id': 'bgstale1', 'sessionId': 'sid-bgstale', 'name': 'velho (6)', 'state': 'blocked', 'cwd': f'{sb}/dead', 'startedAt': (now - 48 * 3600) * 1000},
+  {'kind': 'background', 'id': 'bgfresh1', 'sessionId': 'sid-bgfresh', 'name': 'recente', 'state': 'blocked', 'cwd': f'{sb}/dead', 'startedAt': (now - 2 * 3600) * 1000},
   # fundo «working» SEM pid: a regra antiga do pulso o dava como vivo; a única o dá como morto
-  {'kind': 'background', 'id': 'bgnopid1', 'sessionId': 'sid-bgnopid', 'name': 'sem-pid', 'state': 'working', 'cwd': f'{sb}/gamma', 'startedAt': (now - 600) * 1000},
+  {'kind': 'background', 'id': 'bgnopid1', 'sessionId': 'sid-bgnopid', 'name': 'sem-pid', 'state': 'working', 'cwd': f'{sb}/dead', 'startedAt': (now - 600) * 1000},
   # fundo VIVO com dever longo: alpha tem batuta-de-projeto no grants.tsv (casa pela pasta); o nome leva o sufixo « (2)»
   {'kind': 'background', 'id': 'bgduty01', 'sessionId': 'sid-bgduty', 'name': 'alpha (2)', 'state': 'working', 'status': 'busy', 'pid': pid, 'cwd': f'{sb}/alpha'},
+  # fundo VIVO no checkout da fonte: a sessão do core (segura a batuta), sem concessão nem registro
+  {'kind': 'background', 'id': 'bgcore01', 'sessionId': 'sid-bgcore', 'name': 'core-bg (5)', 'state': 'working', 'status': 'busy', 'pid': pid, 'cwd': sys.argv[4]},
   # fundo VIVO sem dever: beta não tem concessão, rótulo declarado nem peça
   {'kind': 'background', 'id': 'bgfree01', 'sessionId': 'sid-bgfree', 'name': 'beta-bg', 'state': 'working', 'status': 'busy', 'pid': pid, 'cwd': f'{sb}/beta'},
 ]
@@ -63726,6 +63728,11 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     "            if not duty: continue" "            if True: continue" _bp_bg2
   _bpcase "(bg2b) fundo nativo vivo SEM dever longo não sai aviso" \
     "            if not duty: continue" "            if False: continue" _bp_bg2
+  # (bg2c) a sessão do core (checkout da fonte) no fundo nativo também tem dever longo: é o incidente de 2026-11-24
+  _bp_bg2c() { local a; a="$(_bpbg "$1")"; BP_WHY="$(grep '^hygiene' <<< "${a}" | cut -f2,3,8 | tr '\t\n' ' |' | head -c 600)"
+    grep -q "^hygiene${T}sid-bgcore${T}SESSION_NATIVE_BG_LONG_DUTY${T}.*a sessão do core (segura a batuta).*claude stop bgcore01 && bash ops/session-open.sh core-bg --resume sid-bgcore" <<< "${a}"; }
+  _bpcase "(bg2c) a sessão do core no fundo nativo sai SESSION_NATIVE_BG_LONG_DUTY" \
+    "            if 'core' in (s.get('labels') or []) and role == 'source': duty.append" "            if False: duty.append" _bp_bg2c
   # (bg3) SESSION_STALE_BG_RECORD: o registro morto há 48 h sai com `claude rm` como oferta; o morto de 2 h não
   _bp_bg3() { local a; a="$(_bpbg "$1")"; BP_WHY="$(grep '^hygiene' <<< "${a}" | cut -f2,3,8 | tr '\t\n' ' |' | head -c 600)"
     grep -q "^hygiene${T}sid-bgstale${T}SESSION_STALE_BG_RECORD${T}.*sem sinal de vida há 48 h · cura: claude rm bgstale1  (ato do maestro" <<< "${a}" \
@@ -64165,6 +64172,20 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
       && grep -qF 'claude stop livebg01 && bash ops/session-open.sh myrepo --resume livebg01-bbbb-cccc' <<< "${r}" && ! grep -qF 'dê /exit' <<< "${r}"; }
   _so_case "(x) a janela claude attach é reconhecida: receita do fundo, nunca «dê /exit»" _so_x \
     '        for ap in ${o2}; do at="$(attach_target "${ap}")" && break; done' '        :'
+  # (x2) a janela attach SOBROU (a sessão dela não está viva na lista, ex.: depois de um claude stop): a recusa manda
+  #      fechar a janela, nunca repete a receita do fundo (que viraria laço stop → abridor → a mesma recusa)
+  _so_x2() { local r; r="$(SO_TSESS="" SO_PROC="${sb}/proc-attach" SO_AGENTS="${sb}/agents-deadbg.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não dá essa sessão como viva: feche a janela' <<< "${r}" && ! grep -qF 'claude stop' <<< "${r}"; }
+  _so_case "(x2) janela attach de sessão que não está viva: fechar a janela, nunca a receita em laço" _so_x2 \
+    '[ -n "${arow}" ] && [ "${alv}" = live ] || die' 'true || die'
+  # (w4) a cópia do id resolvido PELO NOME (sem --resume) também barra: repoB resolve pelo título e a cópia vive noutra pasta
+  printf '{"type":"user","uuid":"u-b-0001"}\n' >> "${PJ}/$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/repoB")/66666666-b.jsonl"
+  printf '{"type":"history-suppression","sessionId":"copyb000-4444","cause":"fork_inherit"}\n{"type":"system","uuid":"u-b-0001"}\n' > "${PJ}/-copia/copyb000-4444.jsonl"
+  printf '[{"kind":"background","id":"copyb000","sessionId":"copyb000-4444","name":"repoB (2)","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-copyb.json"
+  _so_w4() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-copyb.json" _so_run "$1" repoB --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'a conversa 66666666-b já vive como copyb000-4444' <<< "${r}"; }
+  _so_case "(w4) a cópia do id resolvido pelo nome (sem --resume) também barra" _so_w4 \
+    '  if rt="$(transcript_of "${RID}")"; then' '  if false; then'
   # (t) as superfícies que ensinam a reiniciar a sessão (o aviso do hook de versão, o censo de atualidade e a REGRA 65)
   #     ensinam a retomada pelo id exato, nunca `/exit → claude --continue` (D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120).
   #     Mutante: devolver a forma antiga a cada uma e exigir que o caso reprove.
@@ -64273,6 +64294,7 @@ RS_PY
     env -u CLAUDE_CODE_SESSION_ID LC_ALL=C ONION_RESTART_DIR="${RS_DIR:-${sb}/rdir}" RESTART_PROJECTS_DIR="${sb}/proj" \
       RESTART_PULSE="${RS_PULSE:-${pulse}}" RESTART_PROBE="${probe}" RESTART_SESSION_OPEN="${RS_SO:-${sb}/session-open.sh}" \
       RESTART_CLAUDE="${RS_CLAUDE:-${sb}/claude}" RS_AGENTS="${RS_AGENTS:-${sb}/agents-tmux.json}" RESTART_PROC="${sb}/proc-rd" \
+      RESTART_LIVENESS="${REPO_ROOT}/.claude/utils/orchestration/session-liveness.sh" \
       BATON_STATE_DIR="${sb}/state/baton" BATON_PROC="${sb}/proc-empty" ONION_PRIVATE_OWNERS_FILE="${sb}/sem-lista.tsv" \
       bash "${s}" --repo "${r}" "$@" 2>&1
   }
@@ -64375,7 +64397,7 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
   _rs_n() { local o; o="$(_rsr "$1" --session "${SID2}" --now)"; RS_WHY="$(grep '▶' <<< "${o}")"
     grep -q "^▶ retomar: claude --resume ${SID2} (título «sessao y (3)» fora do padrão" <<< "${o}"; }
   _rscase "(n) título com espaço não monta comando quebrado: retomada direta pelo id" \
-    "if os.path.isfile(SO) and NAME and NAME_RE.fullmatch(NAME):" "if os.path.isfile(SO) and NAME:" _rs_n
+    "if os.path.isfile(SO) and OPEN_NAME and NAME_RE.fullmatch(OPEN_NAME):" "if os.path.isfile(SO) and OPEN_NAME:" _rs_n
   # (o) agente NÃO MEDIDO (transcript ilegível) segura a espera até o teto: nunca «zerou» por não ter medido
   _rs_o() { local o rc=0; o="$(_rsr "$1" --session "${SID3}" --timeout-s 1 --poll-s 1)" || rc=$?; RS_WHY="rc=${rc} · $(tail -n 3 <<< "${o}" | head -c 300)"
     [ "${rc}" = 3 ] && grep -q 'resultado: teto de 1s vencido com 1 agente(s) e 0 tarefa(s)' "${RS_DIR}/${SID3}.md" \
@@ -64414,6 +64436,18 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
       && [ ! -e "${RS_DIR}/${SIDA}.draining" ] && [ ! -e "${RS_DIR}/${SIDA}.tsv" ]; }
   _rscase "(t) --resume-check da cópia segue o bilhete do ancestral (fork_inherit)" \
     "            if fr == 0:" "            if False:" _rs_t
+  # (t2) dois ancestrais com bilhete (a cópia de uma cópia herda o 1º uuid do avô): vale o gravado por último, o outro é dito
+  local SIDO="rsid-0000-4000-8000-aaa0"
+  printf '{"type":"custom-title","customTitle":"avo"}\n{"type":"user","uuid":"u-anc-0001"}\n' > "${sb}/proj/p/${SIDO}.jsonl"
+  _rs_t2() { local o rc=0; mkdir -p "${RS_DIR}"
+    printf 'session\t%s\tanc\t2026-11-24T00:00:00Z\tzerou\tx\ttmux\nagent\taanc1\tAGENT_RUNNING\tdesc\t~/wt\tfeat/x\t3\tBash\n' "${SIDA}" > "${RS_DIR}/${SIDA}.tsv"
+    printf 'session\t%s\tavo\t2026-11-01T00:00:00Z\tzerou\tx\ttmux\nagent\taavo1\tAGENT_RUNNING\tdesc\t~/wt\tfeat/y\t3\tBash\n' "${SIDO}" > "${RS_DIR}/${SIDO}.tsv"
+    o="$(_rsr "$1" --resume-check --session "${SIDC}")" || rc=$?
+    RS_WHY="rc=${rc} · $(head -c 400 <<< "${o}")"
+    [ "${rc}" = 0 ] && grep -q "é cópia de ${SIDA}" <<< "${o}" && grep -q "${SIDO} também é ancestral" <<< "${o}" \
+      && [ -e "${RS_DIR}/${SIDO}.tsv" ] && ! grep -q 'SendMessage to=aavo1' <<< "${o}"; }
+  _rscase "(t2) dois ancestrais com bilhete: segue o mais recente, diz o outro e não o arquiva" \
+    "            hits.sort(); b = hits[-1][1]" "            b = hits[0][1]" _rs_t2
   # (i) a batida lê o marcador e o bilhete: o baton-pulse.sh avisa «SEM DESPACHO NOVO» e manda o --resume-check
   mkdir -p "${sb}/rd-pulse"; printf '2026-11-21T00:00:00Z\tsessao-x\tdrain\n' > "${sb}/rd-pulse/${SID}.draining"
   printf 'session\t%s\tsessao-x\t2026-11-21T00:00:00Z\tzerou\tx\nagent\tarun\tAGENT_RUNNING\n' "${SID}" > "${sb}/rd-pulse/${SID}.tsv"
@@ -64427,7 +64461,7 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     "    RS.append(('draining', k)); warns.append(" "    RS.append(('draining', k)); (lambda *x: None)(" _rs_i pulse
 
   kill "${pbg}" 2>/dev/null || true; wait "${pbg}" 2>/dev/null || true
-  unset -f _rsr _rscase _rs_a _rs_b _rs_c _rs_d _rs_e _rs_f _rs_g _rs_h _rs_i _rs_j _rs_k _rs_l _rs_m _rs_n _rs_o _rs_p _rs_q _rs_r _rs_s _rs_t
+  unset -f _rsr _rscase _rs_a _rs_b _rs_c _rs_d _rs_e _rs_f _rs_g _rs_h _rs_i _rs_j _rs_k _rs_l _rs_m _rs_n _rs_o _rs_p _rs_q _rs_r _rs_s _rs_t _rs_t2
   rm -rf "${sb}"
 }
 _family run_restart_drain_selftests

@@ -86,6 +86,9 @@ agente não terminado sem escrita há mais que isso é resto de vida anterior e 
      | não medido | lista ou ambiente ilegíveis | a receita do tmux, com a lacuna dita |
 
      O modo vai ao bilhete (`- modo da sessão:` no `.md`, 7ª coluna da linha `session` no `.tsv`).
+     **Não medido no 2.1.331** (nenhuma peça roda `stop` nem `attach` para medir): que a retomada interativa depois do
+     `claude stop` mantém o mesmo id, que `stop` e `attach` aceitam o id curto que o harness lista, e que a janela
+     `claude attach` fecha sozinha depois do stop. Se ela sobrar, o abridor manda fechá-la em vez de repetir a receita.
 3. **Enquanto o marcador existir, não despache agente novo nem lance tarefa de fundo.** A batida (`/meta:baton`) avisa
    o marcador como «SEM DESPACHO NOVO» para esta sessão. Se um agente perguntar algo, responda; não dê tarefa nova.
 4. **Leia o resultado.** `rc 0`: zerou (ou `--now`), bilhete gravado. `rc 3`: o teto venceu com trabalho em curso; o

@@ -113,7 +113,9 @@ Como as peças do Onion convivem com o nativo: **leem-no e não brigam com ele**
 volta ao tmux (`claude stop <id>`, depois reabrir pelo id no tmux); o pulso avisa a sessão de dever longo que está no
 fundo (`SESSION_NATIVE_BG_LONG_DUTY`) e oferece a limpeza do registro morto há mais de 24 h
 (`SESSION_STALE_BG_RECORD`, com `claude rm <id>`, que é ato do humano); o `/meta:restart` imprime a receita pelo modo
-da sessão e faz o bilhete de retomada seguir a cópia. Nenhuma delas roda `stop`, `attach` ou `rm`.
+da sessão e faz o bilhete de retomada seguir a cópia. Nenhuma delas roda `stop`, `attach` ou `rm`. Ficou sem medir,
+porque nada aqui roda esses comandos: que a retomada depois do `stop` mantém o mesmo id, e que a janela `attach` fecha
+sozinha depois dele.
 
 ## 4. Invariantes (da convenção — repetidos porque mordem)
 

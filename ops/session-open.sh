@@ -188,19 +188,6 @@ resolve_id() {
   # nunca duas sessões no mesmo checkout: peer VIVO (qualquer nome) com o cwd nesta pasta. A sessão de fundo não aparece
   # no /proc como `claude` (o processo leva o nome da versão), então o /proc sozinho não a vê.
   local s k st p nm cw lv sh wy rt ct frc
-  # a CÓPIA do id pedido (fork_inherit): mandar a sessão ao fundo nativo dá a ela um id NOVO, e o id antigo some da
-  # lista. Retomar o antigo abriria uma 2ª cópia da conversa que já vive. Medido em 2026-11-24 (2.1.331): a 1ª linha
-  # do transcript da cópia é history-suppression/fork_inherit e o 1º uuid dela está no transcript da origem.
-  if [ -n "${RESUME}" ] && rt="$(transcript_of "${RESUME}")"; then
-    while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
-      [ -n "${s}" ] && [ "${s}" != "${RESUME}" ] && peer_live "${lv}" || continue
-      ct="$(transcript_of "${s}")" || continue
-      bash "${LIVENESS}" fork-of "${ct}" "${rt}" 2>/dev/null; frc=$?
-      [ "${frc}" -eq 2 ] && { say "session-open: ⚠️ não medi se a sessão viva ${s} é cópia de ${RESUME} (transcript ilegível)." >&2; continue; }
-      [ "${frc}" -eq 0 ] || continue
-      say "session-open: a conversa ${RESUME} já vive como ${s} («${nm}», ${k}${st:+/${st}}, cwd ${cw}): é cópia dela (fork_inherit; a sessão mandada ao fundo ganha id novo). Não abro outra cópia. $(if [ "${k}" = background ]; then bg_recipe "${sh}" "${s}" "${n}"; else printf 'Entre nela.'; fi)" >&2; return 3
-    done <<< "${PEERS}"
-  fi
   while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
     [ -n "${s}" ] && [ "${cw}" != "-" ] || continue
     [ "$(realpath -m -- "${cw}")" = "${dir}" ] || continue
@@ -242,6 +229,20 @@ resolve_id() {
     while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
       peer_live "${lv}" && { say "session-open: o id ${RID} já está vivo (nome «${nm}», ${k}${st:+/${st}}, cwd ${cw}): não abro outra cópia do mesmo histórico.$(if [ "${k}" = background ]; then printf ' '; bg_recipe "${sh}" "${s}" "${n}"; fi)" >&2; return 3; }
     done <<< "${hits}"
+  fi
+  # a CÓPIA do id escolhido (por --resume ou pelo nome) está viva (fork_inherit): mandar a sessão ao fundo nativo dá a
+  # ela um id NOVO, e o id antigo some da lista. Retomar o antigo abriria uma 2ª cópia da conversa que já vive. Medido em
+  # 2026-11-24 (2.1.331): a 1ª linha do transcript da cópia é history-suppression/fork_inherit e o 1º uuid dela está no
+  # transcript da origem.
+  if rt="$(transcript_of "${RID}")"; then
+    while IFS=$'\t' read -r s k st p nm cw lv sh wy; do
+      [ -n "${s}" ] && [ "${s}" != "${RID}" ] && peer_live "${lv}" || continue
+      ct="$(transcript_of "${s}")" || continue
+      bash "${LIVENESS}" fork-of "${ct}" "${rt}" 2>/dev/null; frc=$?
+      [ "${frc}" -eq 2 ] && { say "session-open: ⚠️ não medi se a sessão viva ${s} é cópia de ${RID} (transcript ilegível)." >&2; continue; }
+      [ "${frc}" -eq 0 ] || continue
+      say "session-open: a conversa ${RID} já vive como ${s} («${nm}», ${k}${st:+/${st}}, cwd ${cw}): é cópia dela (fork_inherit; a sessão mandada ao fundo ganha id novo). Não abro outra cópia. $(if [ "${k}" = background ]; then bg_recipe "${sh}" "${s}" "${n}"; else printf 'Entre nela.'; fi)" >&2; return 3
+    done <<< "${PEERS}"
   fi
   return 0
 }
@@ -312,7 +313,11 @@ open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a 
         local ap at; at=""
         for ap in ${o2}; do at="$(attach_target "${ap}")" && break; done
         if [ -n "${at}" ]; then
-          local afull; afull="$(peers_tsv | awk -F'\t' -v x="${at}" '$8 == x || $1 == x { print $1; exit }')"
+          local arow afull alv; arow="$(peers_tsv | awk -F'\t' -v x="${at}" '$8 == x || $1 == x { print $1 "\t" $7; exit }')"
+          afull="${arow%%$'\t'*}"; alv="${arow#*$'\t'}"
+          # a janela pode sobrar depois de um `claude stop`: se a lista não dá a sessão como VIVA, a receita do fundo
+          # viraria laço (stop → abridor → a mesma recusa). Aí o que sobra é fechar a janela.
+          [ -n "${arow}" ] && [ "${alv}" = live ] || die "o claude em ${dir} fora do tmux (pid ${ap}) é a janela «claude attach ${at}», mas a lista de peers não dá essa sessão como viva: feche a janela (Ctrl+C ou /exit nela) e rode este comando de novo." 3
           die "o claude vivo em ${dir} fora do tmux (pid ${ap}) é a janela «claude attach ${at}» de uma sessão de fundo nativo: a sessão vive no fundo, não ali. $(bg_recipe "${at}" "${afull:-<id completo de ${at} no claude agents>}" "${n}")" 3
         fi
         die "já há um claude vivo em ${dir} FORA do tmux (pid ${o2}). Abrir outro duplica a sessão no checkout. Vá à janela dele, dê /exit, e rode este comando de novo." 3

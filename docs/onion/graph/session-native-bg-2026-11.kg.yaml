@@ -7,8 +7,8 @@ meta:
   baseline: "2026-11-24"
   review_after: "2026-12-24"
   purpose: "Guardar o que se mediu quando a sessão do core foi ao fundo nativo e não reabriu, e as cinco curas que o maestro aprovou."
-  note: "TETO, declarado: 4 nós. Nasceu à parte para não disputar âncora com o arquivo de selos."
-  # ═══ TETO: 4 NÓS ═══
+  note: "TETO, declarado: 3 nós. Nasceu à parte para não disputar âncora com o arquivo de selos."
+  # ═══ TETO: 3 NÓS ═══
 external_edges:
   - from: D_SNB_FIVE_CURES_1124
     to: "docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml#D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120"
@@ -59,7 +59,7 @@ nodes:
     verified_at: "2026-11-24"
     verified_against: "leitura dos artefatos e dos casos das três famílias"
     label: "O que não se mediu: se claude stop e attach aceitam o sessionId completo (usa-se o id curto do harness); se a janela attach sai sozinha depois do stop; e se a retomada interativa de uma sessão parada por stop mantém o mesmo id no 2.1.331."
-    narrative: "A cópia de uma cópia é reconhecida pelo uuid herdado, então conta como cópia do avô também. O modo «tmux» do restart lê só a chave TMUX do ambiente do processo, não a árvore. Os dois avisos novos do pulso são texto: nada barra."
+    narrative: "A cópia de uma cópia é reconhecida pelo uuid herdado, então conta como cópia do avô também; com dois bilhetes de ancestrais o --resume-check segue o gravado por último e diz o outro. Em namespace de pid isolado (sandbox, contêiner) o kill -0 dá toda interativa listada como morta: a regra assume o mesmo namespace do harness. O modo «tmux» do restart lê só a chave TMUX do ambiente do processo, não a árvore. Os dois avisos novos do pulso são texto: nada barra."
     provenance:
       source: "leitura do próprio artefato"
       locator: ".claude/utils/orchestration/session-liveness.sh; .claude/utils/orchestration/restart-drain.sh"
