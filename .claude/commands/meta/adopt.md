@@ -410,43 +410,32 @@ PIN="<source_commit aplicado>"   # commit curto da fonte (o pin NOVO)
 PREV="<pin anterior | vazio na 1ª adoção>"
 BR="<branch do commit: onion/adopt (adoção) | \$UPDATE_BR = chore/onion-update-<pin> (update — o merge de onion/vendor cai nela)>"
 
-INBOUND="$DEST/docs/evolution/inbound"
-bash "$SOURCE_ROOT/.claude/utils/adopt/assert-dest.sh" "$DEST" || exit 1; mkdir -p "$INBOUND/_processed"   # placeholder: o mkdir criaria o lixo
-REPORT="$INBOUND/$(date +%F)-${OP}-${PIN}.md"
-# O orquestrador PREENCHE os campos reais (arquivos aplicados pelo applied-delta.sh, novidades do CHANGELOG do core, etc.).
-cat > "$REPORT" <<EOF
----
-title: 'Relatório de ${OP} Onion — pin ${PIN}'
-date: $(date +%F)
-from: core (sessão-fonte, source-driven)
-to: $(basename "${TARGET:-$DEST}") (consumidor)
-type: flow-a-report
-source_commit: ${PIN}
-previous_commit: ${PREV:-—}
-flow: downstream (core→consumidor / distribuição)
----
+INTEGRATION_BRANCH="<a integração do alvo: main | develop | …>"
+GUARD_LINE="<a linha \`adopter-guard: …\` do passo (0.6), inteira>"
+VENDOR_LINE="<no --update, a linha \"onion/vendor remota …\" do vendor-branch.sh, inteira; vazio na adoção>"
+SETTINGS_BEFORE="<no --update, \$CORE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json (a foto de antes do merge); vazio na adoção>"
 
-# Relatório de ${OP} — pin ${PIN}
-
-## Arquivos aplicados
-<colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/applied-delta.sh" "$DEST" "$INTEGRATION_BRANCH" — medido NO ALVO, depois de `git -C "$DEST" fetch -q origin "$INTEGRATION_BRANCH"` (mede pelo merge-base mais novo entre a ref local, o upstream e origin/<nome>); rc=3 = NÃO MEDIDO, nunca o delta da fonte. No --update, abaixo, a linha "onion/vendor remota …" do vendor-branch.sh, inteira (de onde para onde a remota foi, conferida por ls-remote), ou a que diz por que não foi empurrada>
-
-## Contrato KG-SSOT do corpus
-<colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$DEST" 2>&1 — medido NO ALVO, com o vendor DELE; rc 1 = dívida MUST · rc 4 = não se aplica · rc 3 = NÃO MEDIDO; nunca "lint VERDE" no lugar disto. Uma linha `AVISO kg-index:` no topo diz que o vendor do alvo é anterior à kg-ssot 4.25.1 e o índice de leitura fica sem regerador: vai inteira, e a saída é adotar a kg-ssot junto. Logo abaixo, a migração PLANEJADA: a saída inteira de bash "$SOURCE_ROOT/.claude/utils/adopt/plan-contract-migration.sh" "$DEST" 2>&1 (rc 0 = o plano e a planilha · 2 = falta o perfil, a orientação · 3 = NÃO MEDIDO · 4 = não roda · 5 = o alvo mudou, PARE); o apply é do dono do corpus, nunca do update>
-
-## Gate do alvo
-<no --update, a ÚLTIMA linha de bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$DEST": "bloqueio PROVADO (regra, rc)" ou "bloqueio NÃO PROVADO: <motivo>" — nunca omitida; na adoção, o veredito do verify-adopter-gate.sh do passo (6). E, abaixo, a linha `adopter-guard: …` do passo (0.6) da configuração (REGRA 118), inteira; rc 3 = PARE>
-
-## Novidades / capacidades novas
-<resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
-
-## Próximos passos (NO ALVO)
-1. Revisar o commit da instalação (já feito automaticamente na branch \`${BR}\` pelo 🔒 Procedimento de
-   Commit Durável — a instalação já é objeto git, não se perde num descarte de working-tree).
-2. Push / abrir PR dessa branch para a integração e mergear com **merge commit** (\`pr-merge-verified.sh --merge-commit --assert-ancestor onion/vendor\` onde houver, senão "Create a merge commit" no forge; nunca rebase/squash): linearizar tira a \`onion/vendor\` da ancestralidade e o próximo update conflita em falso.
-3. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream).
-EOF
+# O helper MEDE e escreve; ninguém preenche seção à mão (2026-11-22 e 2026-11-24: o heredoc com placeholders
+# que vivia aqui não foi preenchido em dois --update seguidos, e o adotante escreveu o relatório).
+bash "$SOURCE_ROOT/.claude/utils/adopt/emit-inbound-report.sh" "$SOURCE_ROOT" "$DEST" "$OP" "$PIN" \
+  ${PREV:+--prev "$PREV"} --branch "$BR" --integration "$INTEGRATION_BRANCH" \
+  --adopter-guard-line "$GUARD_LINE" ${VENDOR_LINE:+--vendor-line "$VENDOR_LINE"} \
+  ${SETTINGS_BEFORE:+--settings-before "$SETTINGS_BEFORE"}
+# rc 0 escrito · rc 2 uso (DEST recusado pelo assert-dest: nada escrito) · rc 3 escrito COM lacuna: a medição
+# que não rodou vai «NÃO MEDIDO» no arquivo e no stderr; leia antes de seguir (rc 4 do prove-gate e rc 5 do plan = PARE)
 ```
+
+O que o helper põe em cada seção (o desenho e os rc no cabeçalho dele): **Arquivos aplicados** = o
+`applied-delta.sh` medido NO ALVO (faz o `fetch` da integração antes; rc 3 = NÃO MEDIDO, nunca o delta da
+fonte) e a linha da `onion/vendor`; **Contrato KG-SSOT do corpus** = as saídas inteiras de
+`remeasure-contract.sh` e `plan-contract-migration.sh`, cada uma com o rc e o significado (o apply é do dono
+do corpus, nunca do update); **Gate do alvo** = a última linha do `prove-gate-blocks.sh` (nas duas
+operações) e a linha do adopter-guard (REGRA 118 (Veto de repo alheio do adotante registrado e com lista));
+**Novidades** = `git log --oneline <prev>..<pin>` da fonte, com teto declarado (`ONION_INBOUND_LOG_MAX`,
+60); no `--update`, **Configuração e HARD** = o diff de hooks (`merge-onion-hooks.sh --diff`), a linha do
+`deny-monotonic.sh` (rc 1 = PARE), o aviso do `sandbox-deny-advice.sh` e o `remeasure-hard.sh`, todos no alvo;
+**Próximos passos** fixos. Idempotente: a mesma operação e o mesmo pin reescrevem o arquivo que já
+existe, e o que o alvo já moveu para `_processed/` não volta.
 
 > **Lido/não-lido git-visível:** ao tratar o relatório, a sessão do alvo faz `git mv` dele para `inbound/_processed/` (mesma doutrina do `inbox/`). O hook deixa de contá-lo.
 
@@ -778,7 +767,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
 - **Provar que o gate do alvo BARRA, num sandbox descartável** (2026-10-20: em 11 updates seguidos o verificador do passo (6) só provou que o hook EXECUTA; com o lint limpo o bloqueio nunca é exercido). `bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$WORK"` clona o alvo para `mktemp -d` (pendente e hooks do disco inclusos), planta uma linha a mais em `docs/onion/inventory.md` (REGRA 8 (Inventário canônico sincronizado com o filesystem), que todo papel tem), commita pelo pre-commit do alvo e exige rc≠0 com a regra citada; apaga o sandbox e confere que HEAD, branch, status e config do alvo não mudaram (**nunca planta no checkout real**; desenho e rc no cabeçalho do helper).
   A última linha (`bloqueio PROVADO (REGRA 8 (…), rc N)` ou `bloqueio NÃO PROVADO: <motivo>`) vai inteira na seção "Gate do alvo" do relatório, e rc 1 (fail-open, barra tudo) também ao corpo do PR. Não é gate do update, mas nunca é calada; rc 4 (o checkout real mudou) = PARE.
 - **Auto-emitir o relatório NO ALVO — ANTES do commit durável, que o leva na branch dedicada** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
-  (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). **Os arquivos aplicados são medidos
+  (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`, `SETTINGS_BEFORE=` a foto acima). O emissor do procedimento RODA cada medição desta lista e a escreve no relatório; os comandos ficam aqui para quem precisa de uma à parte (o `deny-monotonic.sh` também roda ANTES, para o PARE). **Os arquivos aplicados são medidos
   NO ALVO**, nunca pelo delta da fonte acima: `git -C "$WORK" fetch -q origin "$INTEGRATION_BRANCH" 2>/dev/null; bash "$SOURCE_ROOT/.claude/utils/adopt/applied-delta.sh" "$WORK" "$INTEGRATION_BRANCH"` (merge-base..HEAD + o pendente; rc=3 = NÃO MEDIDO). O helper mede pelo merge-base mais novo entre `$INTEGRATION_BRANCH`, o upstream dela e `origin/$INTEGRATION_BRANCH` (2026-11-05: a ref local 2 commits atrás pôs 31 arquivos de produto no delta, 1.403 → 1.434), e a linha dele diz qual ref mediu. **O diff de hooks é a saída de** `bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" --diff "$CORE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" "$WORK/.claude/settings.json"` (entrada inteira; rc≠0 = NÃO MEDIDO). **O deny do adotante nunca encolhe:** a linha `deny: N no alvo (<ref>) → M no head` do relatório é a saída de `bash "$SOURCE_ROOT/.claude/utils/adopt/deny-monotonic.sh" "$WORK" "$INTEGRATION_BRANCH"`, que compara regra a regra o `permissions.deny` da ponta mais nova da integração com o da branch do update; **rc 1 = o update perdeu regra de deny: PARE**, não commite nem abra PR (2026-11-06: o head do update da curadoria tinha 0 das 67 regras da origin/main, por base velha); rc 3 = NÃO MEDIDO. A regra listada em `deny-retired.tsv` sai como retirada declarada, nomeada, e não reprova. **Sandbox no alvo:** cole no relatório a saída de `bash "$SOURCE_ROOT/.claude/utils/adopt/sandbox-deny-advice.sh" "$WORK"`, que diz quais regras `Read` do home viram bloqueio do sistema e qual `allowRead` falta, olhando o credential helper e o tipo de remote. Só avisa: o bloco `sandbox` é do adotante, e o `--update` não escreve nele. **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
   `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO). **O contrato do corpus também é MEDIDO, e o lint não o vê** (o `vendor/kg-ssot` novo julga os grafos do alvo; sinal de 2026-10-19: 1.024 nós reprovando com 0 HARD): `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$WORK"` vai inteiro na seção "Contrato KG-SSOT do corpus". Medir não é gate: rc 1 (dívida MUST) não para o update, só dá o número e o caminho. **E com dívida a migração é PLANEJADA** (fase 2 de D_U1_CAMADA_SDAAL_NO_UPDATE): `bash "$SOURCE_ROOT/.claude/utils/adopt/plan-contract-migration.sh" "$WORK"` roda o `kg_migrate.py plan` do vendor DO ALVO com o perfil DELE (`.kg-ssot/migrate-profile.yaml` ou `kg-migrate.profile.yaml`), planilha fora do alvo, confere o plano nó a nó contra a dívida medida, e vai inteiro na mesma seção. Sem perfil ele orienta pelo exemplo do vendor e não inventa um; **nunca roda o `apply`** (a provenance é decisão do dono do grafo); rc 5 (o alvo mudou) = PARE. Desenho e rc no cabeçalho do helper.
 - **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima, já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o `.onion-version` re-carimbado. Aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
