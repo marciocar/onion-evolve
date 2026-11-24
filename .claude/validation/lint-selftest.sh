@@ -64267,6 +64267,19 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
     [ "${r%%$'\t'*}" = 0 ] && ! grep -q 'já vive como' <<< "${r}" && [ "${r2%%$'\t'*}" = 3 ] && grep -qF 'a conversa pai00000-cccc já vive como filha000-dddd' <<< "${r2}"; }
   _so_case_liv "(w10) pai × filha: a relação é assimétrica (a filha é cópia do pai, nunca o contrário)" _so_w10 \
     'cand = [u for u, t in inherited if (not o_copy) or (t is not None and t >= o_ts)]' 'cand = [u for u, t in inherited]'
+  # (w11) a falha de ambiente no fork-of é «não medido» (rc 2), nunca «não descende» (rc 1). Os padrões vão pelo stdin
+  #       (grep -f -): sem arquivo temporário, então TMPDIR inexistente não muda nada (1ª metade). Medido: o tempfile do
+  #       Python cai para /tmp quando o TMPDIR não serve, então TMPDIR sozinho não derruba o caminho antigo; a classe que
+  #       se prova com mutante é a do grep que não roda (PATH só com o python3): sai rc 2 dito, e o mutante que não pega o
+  #       erro estoura com traceback e rc 1 (2ª metade).
+  mkdir -p "${sb}/so-path-py"; ln -sfn "$(command -v python3)" "${sb}/so-path-py/python3"
+  _so_w11() { local r rc=0 r2 rc2=0
+    r="$(TMPDIR="${sb}/nao-existe-tmp" bash "${SO_LIV:-${liv}}" fork-of "${PJ}/-copia/copy0000-2222.jsonl" "${PJ}/-orig/orig0000-1111.jsonl" 2>&1)" || rc=$?
+    r2="$(PATH="${sb}/so-path-py" "$(command -v bash)" "${SO_LIV:-${liv}}" fork-of "${PJ}/-copia/copy0000-2222.jsonl" "${PJ}/-orig/orig0000-1111.jsonl" 2>&1)" || rc2=$?
+    SO_WHY="tmpdir rc=${rc} $(head -c 150 <<< "${r}") · sem grep rc=${rc2} $(head -c 200 <<< "${r2}")"
+    [ "${rc}" = 0 ] && [ "${rc2}" = 2 ] && grep -q 'grep não rodou' <<< "${r2}"; }
+  _so_case_liv "(w11) falha de ambiente no fork-of é «não medido» (rc 2), nunca «não descende»" _so_w11 \
+    '    print(f"session-liveness: grep não rodou ({e}): origem NÃO medida", file=sys.stderr); sys.exit(2)' '    raise'
   # (z) interativa listada com pid MORTO no checkout (lista velha) não barra (M2)
   printf '[{"kind":"interactive","sessionId":"intdead0-eeee","name":"x","pid":999999999,"cwd":"%s/myrepo"}]' "${HM}" > "${sb}/agents-intdead.json"
   _so_z() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-intdead.json" _so_run "$1" myrepo --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"

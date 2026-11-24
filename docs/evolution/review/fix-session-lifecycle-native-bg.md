@@ -2,14 +2,13 @@
 branch: fix/session-lifecycle-native-bg
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: 9cb0e78c607eefb0589b2ee2a9c594d93598b2cef9c5e8359a62da4cecd00eb6
-reviewed_code_sha256: 2dd804713afcb9fcf4eee683f86f9d02ac031a301f0c50375a50ef86b61ead8e
-findings_total: 16
-findings_real: 16
+reviewed_diff_sha256: pendente
+findings_total: 17
+findings_real: 17
 findings_blocking: 3
 tokens: 154748
 duration_min: 6
-findings_fixed: 15
+findings_fixed: 16
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
@@ -136,4 +135,19 @@ Não bloqueantes:
 - **M2:** interativa com pid morto, caso (z) na família `session_open`, com mutante no helper.
 - **M16:** a pasta vazia, caso (bg8). O cwd ausente agora fica vazio, em vez de virar o `realpath('')`, que é a pasta do
   processo. A guarda redundante saiu, e o filtro de caminho absoluto virou a única defesa, mordida pelo mutante.
+
+## 3ª rodada isolada
+
+A 3ª rodada isolada **aprovou**: o achado A está curado e não há bloqueio. Nos transcripts reais, o `fork-of` só dá
+relação de origem para cópia, inclusive com as irmãs reais. Ficou uma cura pequena:
+
+- **F:** o arquivo temporário dos padrões do grep era criado fora de qualquer `try`. Uma falha ali estourava o Python
+  com rc 1 («não descende») em vez de rc 2 («não medido»). **Curado:** os padrões vão pelo stdin (`grep -f -`), sem
+  arquivo temporário, e o grep que não roda sai com rc 2 dito. Caso (w11), com duas metades:
+  - TMPDIR inexistente: o `fork-of` continua medindo (rc 0);
+  - grep ausente do PATH: sai rc 2 com «grep não rodou». O mutante que não pega o erro estoura com traceback e rc 1,
+    e o caso o mata.
+
+  Medido: o `tempfile` do Python cai para `/tmp` quando o `TMPDIR` não serve. Por isso o TMPDIR sozinho não derrubaria
+  o caminho antigo, e o mutante prova a classe pelo grep ausente.
 
