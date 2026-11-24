@@ -102,7 +102,12 @@ adapter: toda capacidade `required` que não está `implemented` viola.
    chave do credstore dela; o agente nunca vê a chave. Num Brain de empresa, roda na conta da empresa.
 2. **Identidade só pelo id do provedor.** Nome exibido e texto nunca dão privilégio (eliminatório do Delphi).
 3. **Audiência antes de responder.** A resposta lista quem vê a conversa antes de sair, e a guarda de vazamento
-   corre sobre tudo o que sai.
+   corre sobre tudo o que sai. «Dado de quem não está na audiência» é qualquer identificador de pessoa que o mapa de
+   identidade conhece e que não está na audiência listada desta conversa: nome, apelido, pseudônimo, número ou
+   e-mail. Quem pediu está na audiência e não conta. O casamento é por palavra inteira, com tamanho mínimo
+   declarado, para a palavra comum que coincide com um apelido curto não barrar à toa. Pessoa fora do mapa não é
+   reconhecível: a guarda declara isso como limite, nunca finge cobertura (definição de 2026-11-24, pedida pela
+   peça de mensageria ao fechar a `rule.leak_guard`).
 4. **Pelo menos uma vez, processado uma vez.** O provedor reentrega; o adapter deduplica pelo `provider_message_id`
    antes de entregar ao agente, e o `message.ack` encerra a reentrega.
 5. **Imediatismo medido.** Recepção por evento (webhook ou socket), não por sondagem; a latência sai em todo evento
