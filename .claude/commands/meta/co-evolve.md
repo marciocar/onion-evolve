@@ -129,7 +129,7 @@ O rascunho nasce **no repo desta sessão** (ou como entrega-sem-commit) — I3 i
 - **Um escritor por repo.** Esta sessão escreve só neste repo; nunca pusha em repo alheio (cobertura de
   ponta adormecida = commit isolado no repo coberto + log de quem fez).
 - **`git fetch` antes de evoluir** (outra instância pode ter mexido — ver lição stale-branch).
-- **Conferir antes de citar o par:** ref, nó ou selo do par só se cita depois de `bash .claude/validation/peer-ref-check.sh <par> <caminho>[#<ID>]|<sha>` (rc 0 existe na origin/main dele · 1 não existe · 2 não mediu).
+- **Conferir antes de citar o par:** ref, nó ou selo do par só se cita depois de `bash .claude/validation/peer-ref-check.sh <par> <caminho>[#<ID>]|<sha>` (rc 0 existe na origin/main dele · 1 não existe · 2 não mediu; a linha diz o `status` do nó, e com `--want-open` um nó que não está `open` sai rc 3: existir não é estar aberto).
 - **Você (humano) é o maestro** que roteia mensagens entre repos e decide ordem de merge.
 
 ## Passo 5 — Gerenciar (opcional, sob confirmação)

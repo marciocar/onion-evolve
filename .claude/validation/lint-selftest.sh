@@ -43645,6 +43645,8 @@ import sys
 p = sys.argv[1]
 add = "  - id: C_NOVO\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: y\n"
 add += "  - id: C_FEITO\n    node_type: claim\n    plane: DEV\n    status: done\n    impact: 1\n    confidence: 0.5\n    label: z\n"
+add += "  - id: C_CONF\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 1\n    confidence: 0.5\n    label: c\n"
+add += "  - id: C_SEMST\n    node_type: claim\n    plane: DEV\n    impact: 1\n    confidence: 0.5\n    label: s\n"
 s = open(p, encoding="utf-8").read().replace("edges: []\n", add + "edges: []\n")
 open(p, "w", encoding="utf-8").write(s)
 PY
@@ -43706,18 +43708,28 @@ PY
   if [ -z "${lixo}" ]; then record_pass "peer-ref: (g) argumento malformado (id vazio, sem caminho, # fora de grafo, '-x', espaço, '..', absoluto, 1 arg) → 2"
   else record_fail "peer-ref: (g)" "não saiu 2:${lixo}"; fi
 
-  # (i) EXISTIR não é estar ABERTO (2026-11-24): a linha diz o status; --want-open sai 3 em nó fechado
+  # (j) EXISTIR não é estar ABERTO (2026-11-24): a linha diz o status; --want-open sai 3 em nó fechado
   local r12=0 r13=0 r14=0 o12 o13
   env "${KQ}" bash "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_FEITO' >"${sb}/h1.out" 2>&1 || r12=$?
   env "${KQ}" bash "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_FEITO' --want-open >"${sb}/h2.out" 2>&1 || r13=$?
   env "${KQ}" bash "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_NOVO' --want-open >/dev/null 2>&1 || r14=$?
   o12="$(cat "${sb}/h1.out")"; o13="$(cat "${sb}/h2.out")"
   if [ "${r12}" = 0 ] && grep -q 'status: done' <<< "${o12}" && [ "${r13}" = 3 ] && grep -q '^peer-ref-check: FECHADO' <<< "${o13}" && [ "${r14}" = 0 ]; then
-    record_pass "peer-ref: (i) a linha diz o status (done) · --want-open: nó done → 3 FECHADO, nó open → 0"
-  else record_fail "peer-ref: (i)" "rc sem flag/done/open = ${r12}/${r13}/${r14}; saídas: ${o12:0:160} | ${o13:0:160}"; fi
+    record_pass "peer-ref: (j) a linha diz o status (done) · --want-open: nó done → 3 FECHADO, nó open → 0"
+  else record_fail "peer-ref: (j)" "rc sem flag/done/open = ${r12}/${r13}/${r14}; saídas: ${o12:0:160} | ${o13:0:160}"; fi
   local r15=0; env "${KQ}" bash "${sut}" "${sb}/par" 'README.md' --want-open >/dev/null 2>&1 || r15=$?
-  if [ "${r15}" = 2 ]; then record_pass "peer-ref: (i2) --want-open sem #ID → 2 (status é de nó)"
-  else record_fail "peer-ref: (i2)" "rc=${r15}; esperado 2"; fi
+  if [ "${r15}" = 2 ]; then record_pass "peer-ref: (j2) --want-open sem #ID → 2 (status é de nó)"
+  else record_fail "peer-ref: (j2)" "rc=${r15}; esperado 2"; fi
+  # (j3) confirmed não é open (o status mais comum do core) · nó sem status → 2 · sha com --want-open → 2 ·
+  #      e o fallback PyYAML dá o mesmo status que o produto (done → 3)
+  local r16=0 r17=0 r18=0 r19=0
+  env "${KQ}" bash "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_CONF' --want-open >/dev/null 2>&1 || r16=$?
+  env "${KQ}" bash "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_SEMST' --want-open >/dev/null 2>&1 || r17=$?
+  env "${KQ}" bash "${sut}" "${sb}/par" "${sha_main}" --want-open >/dev/null 2>&1 || r18=$?
+  env "ONION_KG_QUERY=${sb}/nao-ha/kg_query.py" bash "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_FEITO' --want-open >"${sb}/j3.out" 2>&1 || r19=$?
+  if [ "${r16}" = 3 ] && [ "${r17}" = 2 ] && [ "${r18}" = 2 ] && [ "${r19}" = 3 ] && grep -q 'PyYAML' "${sb}/j3.out"; then
+    record_pass "peer-ref: (j3) confirmed → 3 · sem status → 2 · sha com --want-open → 2 · PyYAML: done → 3"
+  else record_fail "peer-ref: (j3)" "rc confirmed/semstatus/sha/pyyaml = ${r16}/${r17}/${r18}/${r19}; esperado 3/2/2/3"; fi
 
   # (MUT-a) grep por PREFIXO no lugar do parser → o caso (b) TEM de reprovar (C_X casaria C_X_2)
   local mut="${sb}/mut-grep.sh"
