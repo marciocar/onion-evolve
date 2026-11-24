@@ -2,18 +2,17 @@
 branch: feat/adopt-inbound-report-emitter
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: 8e1df5e92e045ed7e46f2545a9516997a4339cc0a36866620d0bbde36725fc07
-reviewed_code_sha256: e8e1d1965c0040d02ac1359e2e379933440e492b3f5d927c3e4ef089a27a5c49
-findings_total: 12
-findings_real: 11
+reviewed_diff_sha256: pendente
+findings_total: 14
+findings_real: 13
 findings_blocking: 2
 tokens: 0
 duration_min: 0
-findings_fixed: 11
+findings_fixed: 13
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-reviewer: "1ª passada do condutor (4 achados, 3 reais) + revisão ISOLADA da sessão principal, que REPROVOU com 2 bloqueantes e 6 reais (8 mutantes sobreviventes); todos curados pelo condutor e 15 mutantes mortos na re-revisão"
+reviewer: "1ª passada do condutor (4 achados, 3 reais) + revisão ISOLADA da sessão principal, que REPROVOU com 2 bloqueantes e 6 reais (8 mutantes sobreviventes); todos curados pelo condutor e 15 mutantes mortos na re-revisão; re-revisão isolada APROVOU (10 mutantes do revisor mortos) com 2 reais não bloqueantes, curados"
 nota: "tokens e duração não medidos (0); a re-revisão pós-cura é do condutor, não isolada"
 ---
 
@@ -69,6 +68,20 @@ Reais, não bloqueantes, curados:
    escapado (d3). Achado do próprio conserto: no bash 5.2 o `&` cru na troca `${v//…/…}` repete o texto casado
    (`&lt;` saía `<!--lt;`); a troca vai entre aspas.
 8. `usage()` cita `--settings-before`.
+
+## Re-revisão isolada (sessão principal, 2026-11-24): APROVADA, 2 reais curados
+
+9. **O `_flat` ainda deixava forjar cabeçalho** com até 3 espaços na frente (`'   ## Próximos passos'` virava seção
+   duplicada), e `<?php` e `<![CDATA[` passavam (só o `<!--` era trocado). **Cura:** os espaços do início saem antes
+   de escapar o `#`, e TODO `<` vira `&lt;`. O (d3) agora manda essa linha e exige um único cabeçalho de Próximos
+   passos, sem `<?php` nem `<![CDATA[`.
+10. **No `adopt.md`, o rc 4 era PARE só em comentário**: nada capturava o rc, e o commit durável rodava igual, a
+    classe original (prosa que não segura). **Cura:** logo depois da chamada ao emissor, no bloco único que a Fase 6
+    e o `--update` usam, `rc=$?; [ "$rc" -eq 4 ] && { echo "PARE (emissor rc 4)" >&2; exit 4; }`. O caso (e)
+    exige o trecho nas 5 linhas depois da chamada.
+
+Mutantes desta rodada, todos mortos: espaços do início mantidos → (d3); `<` sem troca → (d3); a captura do rc 4
+apagada do `adopt.md` → (e).
 
 ## Mutantes
 
