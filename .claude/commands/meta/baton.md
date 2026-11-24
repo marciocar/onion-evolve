@@ -10,8 +10,8 @@ tags:
   - orchestration
   - sessions
   - baton
-version: "1.1.0"
-updated: "2026-11-21"
+version: "1.2.0"
+updated: "2026-11-24"
 related_commands:
   - /meta:decide
   - /meta:backlog
@@ -83,6 +83,19 @@ padrão 10, a decisão vigente `D_SESSION_CAP_10_PLUS_5_AGENTS_1119`, que supero
 `D_SESSION_CAP_8_AND_TMUX_MIGRATION_1116`). O número mora num lugar só, `SESSION_CAP_DEFAULT` no medidor;
 `bash .claude/validation/baton-pulse.sh --check-cap` confere a decisão no grafo, o medidor e esta página, e a bancada
 o roda. Cada aviso traz a cura como texto; reporte-a à sessão dona ou ao maestro, nunca a execute por eles.
+
+Fundo nativo (2026-11-24, Claude Code 2.1.331), lido da lista de peers pela regra única de «viva»
+(`.claude/utils/orchestration/session-liveness.sh`: interativa listada, ou de fundo **com** pid vivo; o `state` não
+decide), a mesma que o abridor de sessões usa:
+
+| Aviso | Quando (medido) | Cura (texto; ninguém a roda por você) |
+|---|---|---|
+| `SESSION_NATIVE_BG_LONG_DUTY` | sessão de fundo nativo **viva** que é dona de peça ou de batuta: `owner_session` do registro de posse (`members.yaml` e lista privada, pelo nome sem o sufixo « (N)» ou pela pasta), dona de peça, rótulo no `owners.tsv`, concessão no `grants.tsv`, ou a sessão do core | `claude stop <id> && bash ops/session-open.sh <nome> --resume <id>` (core-only): volta ao tmux e recupera o canal da campainha |
+| `SESSION_STALE_BG_RECORD` | registro de fundo **morto** (sem pid) sem sinal de vida (startedAt ou mtime do transcript) há mais de 24 h | `claude rm <id>`: **ato do maestro**; o pulso só oferece, nunca roda |
+
+Por que: a tecla `←` manda a sessão ao fundo como cópia de id novo, nascida de um `claude bg-spare` genérico **sem** a
+flag do canal da campainha, e o daemon de fundo é transitório (sai sem clientes; aposenta sessão ociosa). Sessão de
+serviço longo fica no tmux; o fundo nativo é para tarefa curta e para trocar de terminal.
 
 Pastas de config declaradas: a sessão que roda com `CLAUDE_CONFIG_DIR` próprio (o hub, por exemplo) não aparece na
 lista de peers padrão nem em `~/.claude/projects`. Declare a pasta em `~/.local/state/onion/baton/config-dirs.tsv` (um
