@@ -21320,6 +21320,107 @@ run_eol_gitattributes_selftests() {
 }
 _family run_eol_gitattributes_selftests
 
+# O relatório downstream do /meta:adopt é GERADO, não colado (recorrência de 2026-11-22 e 2026-11-24: em dois
+# `--update` seguidos o heredoc com placeholders não foi preenchido e o adotante escreveu o relatório). O helper
+# emit-inbound-report.sh roda cada medição do procedimento e escreve o arquivo; esta família prova que ele escreve
+# todas as seções sem placeholder, que é idempotente, que recusa DEST com placeholder e que medição que não roda
+# vira «NÃO MEDIDO» com rc 3, nunca número inventado. Fonte = o próprio checkout; alvo = repo git temporário.
+run_inbound_report_selftests() {
+  local h="${REPO_ROOT}/.claude/utils/adopt/emit-inbound-report.sh"
+  [ -f "${h}" ] || { record_fail "inbound-report: helper" "emit-inbound-report.sh ausente"; return; }
+  local d t rc out f n pin prev
+  d="$(mktemp -d)"; mkdir -p "${d}/tmp"
+  pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD 2>/dev/null)" || pin=""
+  [ -n "${pin}" ] || { record_skip "inbound-report: o checkout da bancada não é repo git (sem pin)"; rm -rf "${d}"; return; }
+  prev="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD~1 2>/dev/null)" || prev="${pin}"
+  _ir_mk() {  # alvo: integração main + branch do update com 1 commit, e um pre-commit que barra o inventário citando a REGRA 8
+    local r="$1"; mkdir -p "${r}/docs/onion" "${r}/.githooks"; git -C "${r}" init -q -b main >/dev/null 2>&1
+    printf '# inv\n' > "${r}/docs/onion/inventory.md"
+    printf '%s\n' '#!/usr/bin/env bash' \
+      'case "$(git diff --cached --name-only)" in *docs/onion/inventory.md*)' \
+      '  echo "VIOLATION: docs/onion/inventory.md: REGRA 8 (Inventário canônico sincronizado com o filesystem): drift"' \
+      '  echo "  Violações HARD : 1"; exit 1 ;; esac' 'exit 0' > "${r}/.githooks/pre-commit"
+    chmod +x "${r}/.githooks/pre-commit"; git -C "${r}" config core.hooksPath .githooks
+    #   um lint mínimo que honra o ONION_LINT_HARD_FILE, para o remeasure-hard do --update medir 0 HARD
+    mkdir -p "${r}/.claude/validation"
+    printf '%s\n' '#!/usr/bin/env bash' ': > "${ONION_LINT_HARD_FILE:-/dev/null}"' 'exit 0' > "${r}/.claude/validation/lint-artifacts.sh"
+    git -C "${r}" add -A >/dev/null 2>&1
+    git -C "${r}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -qm base --no-verify >/dev/null 2>&1
+    git -C "${r}" checkout -qb chore/onion-update-x >/dev/null 2>&1; printf 'a\n' > "${r}/a.txt"; git -C "${r}" add a.txt >/dev/null 2>&1
+    git -C "${r}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -qm aplicado --no-verify >/dev/null 2>&1
+  }
+  _ir_run() { rc=0; out="$(cd "${d}" && TMPDIR="${d}/tmp" bash "${h}" "${REPO_ROOT}" "$@" 2>&1)" || rc=$?; }
+
+  # (a) caminho feliz: rc 0, arquivo no inbound/ com as cinco seções, sem `<colar`, com o veredito do gate e o log da fonte
+  t="${d}/a"; _ir_mk "${t}"
+  _ir_run "${t}" update "${pin}" --prev "${prev}" --branch chore/onion-update-x --integration main --adopter-guard-line "adopter-guard: em dia: core /x"
+  f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
+  if [ "${rc}" -eq 0 ] && [ -f "${f}" ] && [ -d "${t}/docs/evolution/inbound/_processed" ] \
+     && grep -qxF '## Arquivos aplicados' "${f}" && grep -qxF '## Contrato KG-SSOT do corpus' "${f}" \
+     && grep -qxF '## Gate do alvo' "${f}" && grep -qxF '## Novidades / capacidades novas' "${f}" \
+     && grep -qxF '## Próximos passos (NO ALVO)' "${f}" && ! grep -q '<colar' "${f}" \
+     && grep -q '^Arquivos aplicados (medido no alvo' "${f}" && grep -q '^remeasure-contract rc 4: ' "${f}" \
+     && grep -q '^plan-contract-migration rc 4: ' "${f}" \
+     && grep -qxF 'bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1)' "${f}" \
+     && grep -qxF 'adopter-guard: em dia: core /x' "${f}" && grep -qxF "source_commit: ${pin}" "${f}" \
+     && grep -qxF '## Configuração e HARD' "${f}" && grep -qxF 'HARD medido: 0' "${f}" && grep -q '^- deny: ' "${f}" \
+     && grep -qE 'commit\(s\)|^Nenhum commit' "${f}" && grep -q 'chore/onion-update-x' "${f}"; then
+    record_pass "inbound-report: (a) caminho feliz do --update → rc 0, seis seções medidas, sem <colar, gate PROVADO, HARD e deny medidos, log da fonte"
+  else record_fail "inbound-report: (a)" "rc=${rc} arquivo=$([ -f "${f}" ] && echo sim || echo não) saída: ${out:0:200}"; fi
+
+  # (b) idempotência: o relatório da mesma op+pin com data antiga é REESCRITO no lugar, nunca duplicado num dia novo
+  if [ -f "${f}" ]; then mv "${f}" "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md"; fi
+  _ir_run "${t}" update "${pin}" --prev "${prev}" --integration main
+  _ir_run "${t}" update "${pin}" --prev "${prev}" --integration main
+  n="$(find "${t}/docs/evolution/inbound" -maxdepth 1 -type f | wc -l | tr -d ' ')"
+  if [ "${rc}" -eq 0 ] && [ "${n}" = 1 ] && [ -f "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md" ] \
+     && grep -qxF 'date: 2026-01-01' "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md"; then
+    record_pass "inbound-report: (b) duas rodadas a mais → 1 arquivo só, reescrito no caminho que já existia"
+  else record_fail "inbound-report: (b)" "rc=${rc} arquivos=${n}: $(ls "${t}/docs/evolution/inbound" | tr '\n' ' ')"; fi
+
+  # (b2) já processado pelo alvo (_processed/) → não re-emite
+  mv "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md" "${t}/docs/evolution/inbound/_processed/" 2>/dev/null
+  _ir_run "${t}" update "${pin}" --prev "${prev}" --integration main
+  n="$(find "${t}/docs/evolution/inbound" -maxdepth 1 -type f | wc -l | tr -d ' ')"
+  if [ "${rc}" -eq 0 ] && [ "${n}" = 0 ] && grep -q 'já processado' <<< "${out}"; then
+    record_pass "inbound-report: (b2) relatório já em _processed/ → não re-emitido (rc 0, diz onde está)"
+  else record_fail "inbound-report: (b2)" "rc=${rc} arquivos no inbound=${n} saída: ${out:0:160}"; fi
+
+  # (c) DEST com placeholder → rc 2, nada escrito, e nenhum diretório-lixo com o nome literal
+  _ir_run "<WORK (--update)>" update "${pin}" --integration main
+  if [ "${rc}" -eq 2 ] && [ -z "$(find "${d}" -maxdepth 1 -name '<*')" ] && grep -q 'placeholder' <<< "${out}"; then
+    record_pass "inbound-report: (c) DEST com placeholder → recusado (rc 2) antes de qualquer mkdir"
+  else record_fail "inbound-report: (c)" "rc=${rc} saída: ${out:0:160}"; fi
+
+  # (d) medição que não roda (integração inexistente no alvo) → relatório ESCRITO com «NÃO MEDIDO» e rc 3
+  t="${d}/d"; _ir_mk "${t}"
+  _ir_run "${t}" adopt "${pin}" --integration nao-existe
+  f="${t}/docs/evolution/inbound/$(date +%F)-adopt-${pin}.md"
+  if [ "${rc}" -eq 3 ] && [ -f "${f}" ] && grep -q '^NÃO MEDIDO (applied-delta rc 3)' "${f}" \
+     && ! grep -q '^Arquivos aplicados (medido no alvo' "${f}" && grep -q 'Medição que não rodou' "${f}" \
+     && grep -q 'NÃO MEDIDO: arquivos aplicados' <<< "${out}"; then
+    record_pass "inbound-report: (d) applied-delta rc 3 → «NÃO MEDIDO» declarado no relatório e rc 3, nunca um número"
+  else record_fail "inbound-report: (d)" "rc=${rc} arquivo=$([ -f "${f}" ] && echo sim || echo não) saída: ${out:0:200}"; fi
+
+  # (d2) o bloco copiado SEM preencher: linha do adopter-guard e integração com placeholder `<…>` → nada de `<…>` no
+  #      relatório; a linha vira lacuna (rc 3) e a integração cai no padrão declarado
+  t="${d}/d2"; _ir_mk "${t}"
+  _ir_run "${t}" adopt "${pin}" --integration "<a integração do alvo>" --adopter-guard-line "<a linha adopter-guard: …>"
+  f="${t}/docs/evolution/inbound/$(date +%F)-adopt-${pin}.md"
+  if [ "${rc}" -eq 3 ] && [ -f "${f}" ] && ! grep -q '<a ' "${f}" && grep -q 'placeholder não preenchido' "${f}" \
+     && grep -q '^Arquivos aplicados (medido no alvo' "${f}"; then
+    record_pass "inbound-report: (d2) placeholder nas linhas → não vai ao relatório: lacuna declarada (rc 3) e integração no padrão"
+  else record_fail "inbound-report: (d2)" "rc=${rc} arquivo=$([ -f "${f}" ] && echo sim || echo não) saída: ${out:0:200}"; fi
+
+  # (e) registro: o procedimento do adopt.md CHAMA o helper e não guarda mais o heredoc de placeholders
+  if grep -q 'emit-inbound-report.sh" "\$SOURCE_ROOT" "\$DEST"' "${REPO_ROOT}/.claude/commands/meta/adopt.md" \
+     && ! grep -q '<colar a saída' "${REPO_ROOT}/.claude/commands/meta/adopt.md"; then
+    record_pass "inbound-report: (e) o adopt.md chama o emissor e não tem mais placeholder <colar …>"
+  else record_fail "inbound-report: (e)" "o adopt.md não chama o emissor ou ainda tem <colar …>"; fi
+  rm -rf "${d}"
+}
+_family run_inbound_report_selftests
+
 run_scope_gitignore_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/scope-claude-gitignore.sh"
   if [ ! -f "${helper}" ]; then record_fail "scope-gitignore" "helper ausente: ${helper}"; return; fi
