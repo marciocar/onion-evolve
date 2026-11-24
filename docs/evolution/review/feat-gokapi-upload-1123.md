@@ -2,7 +2,8 @@
 branch: feat/gokapi-upload-1123
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9ad295f95d13484f87891c8f2d01d6208555e1f3833cbad067b7870f20a4384b
+reviewed_code_sha256: 9e491d19f0c8c46727ed2aa33730e0ce6e5b559ed76591c2603ff3ab99c5cef2
 findings_total: 15
 findings_real: 12
 findings_blocking: 3
