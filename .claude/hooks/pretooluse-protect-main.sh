@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 # PreToolUse(Bash) — o 1º uso REAL da capacidade que compra o acoplamento (Onda 7, 2026-09-01).
 # Nega force-push para o ramo de PRODUÇÃO (main, ou o resolvido do repo): a ação irreversível mais barata de barrar. exit 2 = veto ANTES de executar.
-# Escopo estreito por desenho: force-push de BRANCH DE TRABALHO segue livre (o fluxo de stack depende dele).
+# Escopo: na produção, todo force (com lease inclusive). Fora dela, desde 2026-11-24, a força DURA (`-f`, `--force`,
+# `+ref`, `--mirror`) também cai, como no deny; o `--force-with-lease` de branch de trabalho segue livre (o fluxo
+# de stack e o rebase dependem dele).
 # ── git clean que apaga IGNORADO (desde 2026-11-20, fix/deny-force-refspec-1120) ─────────────────────────
 # Também nega `git clean` com -x/-X (apaga o ignorado: o .env some) SEM simulação (-n/--dry-run). Mora aqui
 # porque o deny nativo não sabe dizer "exceto -n": o glob não tem negação, e as regras `git clean* -x*`
 # barravam `git clean -n -x`, que só lista (falso positivo medido no motor real, 2.1.329). O deny ficou só
 # com o grupo destrutivo como 1º argumento (`git clean -fdx*`); a ordem livre (`-f -d -x`, `-e keep -fdx`)
 # é julgada aqui, por token. Vale em qualquer pasta (`git -C /outra clean -fdx` também cai), como o deny.
-# TETO: o -n DEPOIS do grupo (`git clean -fdx -n`, `-x --dry-run`) ou grudado no fim dele (`-xn`, `-fdxn`) segue
-# barrado pelo deny; `eval "git clean -fdx"` não é visto aqui (a lib só marca inanalisável o que cita push ou merge).
+# Desde 2026-11-24 (fix/deny-field-notes-1124) o deny guarda só o grupo EXATO (`git clean -fdx`, sem nada depois): o
+# `-n` depois do grupo (`git clean -fdx -n`, `-x --dry-run`) e grudado no fim dele (`-xn`, `-fdxn`) passa, e todo o
+# resto (grupo seguido de caminho ou de outra flag, ordem livre) é julgado aqui.
+# TETO: `eval "git clean -fdx"` não é visto aqui (a lib só marca inanalisável o que cita push ou merge).
 input=$(cat)
 # `cwd` do JSON é o diretório ONDE o comando roda — numa worktree de agente é a worktree, não a raiz
 # (`CLAUDE_PROJECT_DIR`). Julgar pela raiz vetava `git push -u origin HEAD` de agente e deixava passar
@@ -104,6 +108,16 @@ if printf '%s\n' "$inv" | grep -E '^__ONION_UNANALYZABLE__ merge=[01] main=1 ::'
 fi
 push_lines=$(printf '%s\n' "$inv" | grep -E '^git[[:space:]]+push([[:space:]]|$)' || true)
 [ -z "$push_lines" ] && exit 0
+# FORÇA DURA EM QUALQUER BRANCH (desde 2026-11-24, fix/deny-field-notes-1124). A linha canônica diz `--force` para
+# `-f`, `--force`, `+ref` e `--mirror`, depois de tirar `FOO=1`, `env`, `command`, `nice` e afins. O `+` só chega
+# aqui quando abre um refspec do próprio push: o `+` do título de um PR no mesmo comando é de outra linha, e
+# o `v1+build` não abre o argumento. Por isso a cobertura do refspec com `+` saiu do deny (o glob `git push* +*`
+# casava o `+` de qualquer ponto do comando quando o motor o julgava inteiro, com `$(…)` ou pipe) e mora aqui.
+# O `--force-with-lease` segue a regra antiga, só na produção: o git o recusa se o remoto andou.
+if grep -qE '^git[[:space:]]+push[[:space:]]+--force([[:space:]]|$)' <<< "$push_lines"; then
+  echo "GUARDA-PRETOOLUSE: force-push negado (-f, --force, refspec com + ou --mirror reescrevem a história do remoto em qualquer branch). Para atualizar a sua branch depois de um rebase, use --force-with-lease; se o force for deliberado, o maestro roda fora da sessão." >&2
+  exit 2
+fi
 grep -qE '(--force([^-]|$)|--force-with-lease|[[:space:]]-[a-eg-z]*f[a-z]*([[:space:]]|$))' <<< "$push_lines" || exit 0
 main_target=0
 # `main` na linha canônica é o NOME do ramo protegido: a lib já converte nele o ramo de produção
