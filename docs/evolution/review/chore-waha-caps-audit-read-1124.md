@@ -2,7 +2,8 @@
 branch: chore/waha-caps-audit-read-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d48a15bc462f99b5dd951edb4ab3efdf2ac179dd8862dc7e5c7fc9c7bb2b223d
+reviewed_code_sha256: 9c690e13217355ba2c1f28854dda7722a0af9af629b80c4af5af27ab62ce8431
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
