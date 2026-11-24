@@ -8,11 +8,11 @@
 capability	requirement	status	api_version	source	note
 message.receive	required	partial	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/channels.py;piece:messaging/watcher/onion_watcher/events.py	o vigia confere o HMAC do webhook do WAHA e põe na fila durável um CloudEvent 1.0 com o corpo BRUTO do WAHA; falta a mensagem normalizada com os 5 campos
 message.send	required	implemented	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	notify-partner: texto fixo, texto livre ou anexo a um apelido da lista fechada, com --on-behalf-of em cada envio
-message.reply_thread	required	implemented	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/reply.py	watcher reply: /api/sendText com reply_to da mensagem citada; o fio vem do vínculo gravado na recepção, nunca do evento que o agente passa (medido na origin/main 517d498 da peça, 2026-11-24)
+message.reply_thread	required	implemented	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/reply.py	watcher reply: /api/sendText com reply_to da mensagem citada; o fio vem do vínculo gravado na recepção, nunca do evento que o agente passa (medido na origin/main ⟨commit⟩ da peça, 2026-11-24)
 message.ack	required	implemented	WAHA (versão não pinada)	piece:messaging/queue/onion_queue/daemon.py	op_ack da fila: sem ack o evento volta até o teto e depois vai à dead-letter
 audience.list	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	--groups lista os grupos com a contagem de participantes e os 4 últimos dígitos; não é verbo por conversa antes de responder, nem resolve pessoa
 identity.resolve	required	not_implemented	WAHA (versão não pinada)	-	falta o mapa id do provedor para pessoa e papel (internal, partner, external) e os pseudônimos: hoje o corpo bruto leva o id cru <número>@c.us
-served.ask	required	implemented	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/reply.py	o texto sai com «Serviu?» no fim; pular exige --no-served com motivo, que vai à auditoria (517d498)
+served.ask	required	implemented	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/reply.py	o texto sai com «Serviu?» no fim; pular exige --no-served com motivo, que vai à auditoria (mesma medição)
 conversation.list	optional	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	só grupos (--groups); conversas diretas não
 media.send	optional	implemented	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	PDF, XLSX ou CSV até 10 MB, conferido pelo conteúdo; /api/sendFile pode ser só da edição paga do WAHA
 media.download	optional	not_implemented	WAHA (versão não pinada)	-
@@ -24,7 +24,7 @@ rule.rate_cap_pending	required	partial	WAHA (versão não pinada)	piece:messagin
 rule.media_cap	required	implemented	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py	10 MB e três tipos, conferidos pelo conteúdo
 rule.retention	required	partial	WAHA (versão não pinada)	piece:messaging/queue/onion_queue/daemon.py	prune do dono poda dedupe e dead-letter (30 dias por padrão); sem prazo de corpos e mídias como dado de terceiros, nem cifra
 rule.audit_log	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py; piece:messaging/watcher/onion_watcher/reply.py	o envio (notify-partner) e a resposta (watcher reply, chat-audit.jsonl 600, linha pending antes do envio) gravam sem número nem texto; a recepção ainda não registra quem pediu
-rule.latency_field	required	implemented	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/reply.py	requested_at e seen_at vêm do vínculo da recepção; replied_at é a hora depois do envio, nunca antes de seen_at (517d498)
+rule.latency_field	required	implemented	WAHA (versão não pinada)	piece:messaging/watcher/onion_watcher/reply.py	requested_at e seen_at vêm do vínculo da recepção; replied_at é a hora depois do envio, nunca antes de seen_at (mesma medição)
 rule.secret_never_out	required	partial	WAHA (versão não pinada)	piece:messaging/tools/notify/remind.py;piece:messaging/watcher/onion_watcher/server.py	medido só no envio: saída JSON e log sem número, chave nem texto; o vigia registra o texto da exceção no log, e ninguém mediu se ele pode levar dado
 rule.read_marker	required	not_implemented	WAHA (versão não pinada)	-
 rule.channel_loss_keeps_queue	required	unverified	WAHA (versão não pinada)	-	a fila é independente do WAHA, mas ninguém mediu a perda do número
