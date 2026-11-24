@@ -157,7 +157,7 @@ escada (sem `x_dissect_level`: a ideia não sustenta o veredito de uso, nem prec
   `candidata-fora-do-repo`.
 
 **Quem cobra:** o item 9 do `dissect-object-check.sh` (§6), com os códigos `sem-registro-de-ideias`,
-`peca-sem-ideias`, `ideias-tipo-descoberto`, `ideia-sem-comparativo`, `ideia-sem-fonte`, `ideia-sem-destino`,
+`peca-sem-ideias`, `ideias-tipo-descoberto`, `ideia-sem-label`, `ideia-sem-comparativo`, `ideia-sem-fonte`, `ideia-sem-destino`,
 `ideia-candidata-sem-valor`, `ideia-tipo-invalido`, `ideia-mal-formada` e `ideia-sem-peca`, e o
 item 10 com `gatilho-orfao`, `candidata-inexistente` e `candidata-mal-formada`. Ele
 julga **forma e cobertura**. Se a ideia é boa e se o valor está bem estimado, quem julga é o
