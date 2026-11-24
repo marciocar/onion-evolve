@@ -2,7 +2,8 @@
 branch: feat/adopt-inbound-report-emitter
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 04ba27a8c1b2ea61e04d2eb410756ca0986fe07e1b506b6da2d49ddbcabff738
+reviewed_code_sha256: 2fd3a33ef9ca4e37dec8cc4547b828e1b25419da9c6e3481ae5b712c39994fd7
 findings_total: 14
 findings_real: 13
 findings_blocking: 2
