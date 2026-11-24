@@ -2,14 +2,13 @@
 branch: fix/deny-field-notes-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: dc9422b8e5c44036fc5b5c37a95ed85d56c6d372122cf7ae8171a8474c2966ac
-reviewed_code_sha256: 738ed5afa790daf117969ca3533166d88c2d3ae7539007cf6cd48d7c4b626c29
-findings_total: 9
-findings_real: 9
+reviewed_diff_sha256: pendente
+findings_total: 13
+findings_real: 13
 findings_blocking: 4
 tokens: 0
 duration_min: 0
-findings_fixed: 7
+findings_fixed: 11
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: false
@@ -125,4 +124,16 @@ Como o diff mudou, o resíduo volta a `pendente`.
 9. **Limite, declarado.** `git push --force --no-force` é vetado: a lib não lê o `--no-force`. É falso positivo antigo
    e está no cabeçalho do hook.
 
-A revisão isolada sobre este novo head fica com a sessão principal.
+A re-revisão isolada aprovou: 0 bloqueios, os 2 furos curados, e o mutante e13 da família `adopter_guard` também
+falha na main (medido nos dois checkouts). Ela pediu quatro curas pequenas, todas feitas com caso e mutante na família
+`pretooluse_veto`. O diff mudou, e o resíduo volta a `pendente`.
+
+10. **Curado.** O alias por `-c` casa sem caixa (`Alias.c`, `ALIAS.C`): (or5).
+11. **Curado.** A expansão de alias é recursiva, com teto de 8 (`-c alias.d=c -c alias.c=clean d -fdx`): (or6). O
+    alias em laço (`alias.a=a`) termina e passa.
+12. **Curado.** O valor do alias se parte por `shlex.split` (`alias.c='clean "-fdx"'`): (or7).
+13. **Curado.** A flag do clean por chaves (`{-x,}`, `{-fdx,}`) conta como destrutiva, igual ao `$F`: (or8). A
+    simulação com `-n` ao lado passa. Custo: `git clean -fd {a,b}` é vetado; a saída é `--` antes dos caminhos.
+
+Ficam declarados, sem cura: o alias vindo de `--config-env` ou de `GIT_CONFIG_*`, e o falso positivo de alias com
+nome de comando embutido (`-c alias.status=…`). O git ignora esse alias, e a lib o expande.

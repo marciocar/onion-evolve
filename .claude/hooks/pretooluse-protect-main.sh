@@ -60,6 +60,8 @@ clean_destroys_ignored() {
       # flag que vem de expansão (`$F`, `${F:--fdx}`) ou de substituição (`$(…)`, crase) não se lê aqui: conta como
       # destrutiva (fix/deny-field-notes-1124, revisão isolada). O -n literal ao lado ainda simula.
       if (t ~ /\$|__ONION_SUBST__|`/) { x = 1; continue }
+      # expansão por chaves (`{-x,}`, `{-fdx,}`) também não se lê aqui: conta como destrutiva, igual ao `$F`
+      if (t ~ /\{.*,.*\}/) { x = 1; continue }
       if (t ~ /^--/) {
         nm = t; sub(/=.*/, "", nm)
         if (length(nm) >= 3 && index("--dry-run", nm) == 1) n = 1
