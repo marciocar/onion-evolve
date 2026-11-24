@@ -2,8 +2,7 @@
 branch: feat/adopt-inbound-report-emitter
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: 4e332dfdc80c2a64fa404ed142499c8e9b8c06f1e7759e7b2145d9b9959b1ccb
-reviewed_code_sha256: dd26035cd06e76208d586c9b093ac3b68720b63caeec8daffe98342c4bc9321b
+reviewed_diff_sha256: pendente
 findings_total: 14
 findings_real: 13
 findings_blocking: 2
@@ -112,3 +111,10 @@ Primeira passada:
 - O tempo da família no runner do CI não foi medido; localmente, ~6 s de parede.
 - O M13 só reprova pelo caminho devolvido: um DEST relativo não quebrava nenhum irmão medido (o gate real PROVOU sem a
   normalização); a cura fica pelo contrato de devolver caminho absoluto.
+
+## Pós-CI (condutor)
+
+O CI reprovou o caso (h) da família `adopter_guard_core`: ele exigia no `adopt.md` a frase «a linha `adopter-guard: …`
+do passo (0.6)» como prova de que o relatório pede a linha do helper. A frase segue no placeholder `GUARD_LINE`, e agora
+o caso exige também a passagem `--adopter-guard-line "$GUARD_LINE"` ao emissor, que é a ligação real desde o PR. Família
+`adopter_guard_core` verde localmente.
