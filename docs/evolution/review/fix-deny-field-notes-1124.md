@@ -2,7 +2,8 @@
 branch: fix/deny-field-notes-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: dc9422b8e5c44036fc5b5c37a95ed85d56c6d372122cf7ae8171a8474c2966ac
+reviewed_code_sha256: 738ed5afa790daf117969ca3533166d88c2d3ae7539007cf6cd48d7c4b626c29
 findings_total: 9
 findings_real: 9
 findings_blocking: 4
