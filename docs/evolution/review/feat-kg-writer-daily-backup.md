@@ -2,8 +2,7 @@
 branch: feat/kg-writer-daily-backup
 pr: pendente
 date: 2026-11-17
-reviewed_diff_sha256: 7fc26e42de41b9ce1b351ac542fd95b80362cf3f925f9c6a8a0755bdffccb7e4
-reviewed_code_sha256: 30214e03c49d17648d4c9058543c94b86f7ba618bef863ed86f12854c5335dde
+reviewed_diff_sha256: pendente
 findings_total: 13
 findings_real: 11
 findings_blocking: 0
@@ -166,3 +165,7 @@ bloqueante; três observações, que são os achados 11, 12 e 13 acima.
 - **`lint-artifacts.sh`:** a primeira passada inteira acusou 2 HARD, ambas deste diff: REGRA 80 (Números do harness
   saem de SSOT gerada, nunca de comentário) e REGRA 117 (Ato de deploy tem assinatura no veto). Depois das duas
   curas, a segunda passada inteira deu 0 HARD e 31 SOFT; as 31 já estavam na primeira passada e não são deste diff.
+
+## Re-revisão pós-rebase (2026-11-24)
+
+Rebase sobre a main (que trouxe a tabela de tempos do #1748, causa da faixa 5 vermelha) sem conflito de fonte; só projeções geradas, que ficaram com a versão da main e se regeneram no fechamento. Família `kg_writer_backup`: 36 casos, 0 falhas.
