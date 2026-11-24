@@ -12,13 +12,13 @@ findings_fixed: 0
 verdict: NO_FINDINGS
 elenxo: true
 elenxo_isolado: false
-reviewer: "condutor (core), passada própria: cada linha nova conferida contra o código da peça (origin/main 517d498 de lá) antes de mudar o status"
+reviewer: "condutor (core), passada própria: cada linha nova conferida contra o código da peça (origin/main ⟨commit⟩ de lá) antes de mudar o status"
 nota: "só a declaração de capacidades do adapter WAHA; sem código"
 ---
 
 # Passada: `chore/waha-caps-reply-1124`
 
-A peça de mensageria entregou o `watcher reply` (PR #73 de lá, merge 15:49 UTC de 24/11). Medi na origin/main 517d498
+A peça de mensageria entregou o `watcher reply` (PR #73 de lá, merge 15:49 UTC de 24/11). Medi na origin/main ⟨commit⟩
 dela: `watcher/onion_watcher/reply.py` existe; o README descreve `/api/sendText` com `reply_to`, o «Serviu?» com
 `--no-served` e motivo, a latência (`requested_at`/`seen_at` do vínculo, `replied_at` depois do envio) e o
 `chat-audit.jsonl`. Por isso `message.reply_thread`, `served.ask` e `rule.latency_field` passam a `implemented`, e o
