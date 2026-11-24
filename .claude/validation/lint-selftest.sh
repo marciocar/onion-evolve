@@ -21328,21 +21328,25 @@ _family run_eol_gitattributes_selftests
 run_inbound_report_selftests() {
   local h="${REPO_ROOT}/.claude/utils/adopt/emit-inbound-report.sh"
   [ -f "${h}" ] || { record_fail "inbound-report: helper" "emit-inbound-report.sh ausente"; return; }
-  local d t rc out f n pin prev
+  local d t rc out f n pin prev pin7 pin40 sb
   d="$(mktemp -d)"; mkdir -p "${d}/tmp"
   pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD 2>/dev/null)" || pin=""
   [ -n "${pin}" ] || { record_skip "inbound-report: o checkout da bancada não é repo git (sem pin)"; rm -rf "${d}"; return; }
-  prev="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD~1 2>/dev/null)" || prev="${pin}"
-  _ir_mk() {  # alvo: integração main + branch do update com 1 commit, e um pre-commit que barra o inventário citando a REGRA 8
-    local r="$1"; mkdir -p "${r}/docs/onion" "${r}/.githooks"; git -C "${r}" init -q -b main >/dev/null 2>&1
+  prev="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD~2 2>/dev/null)" || prev=""
+  pin7="$(git -C "${REPO_ROOT}" rev-parse --short=7 HEAD)"; pin40="$(git -C "${REPO_ROOT}" rev-parse HEAD)"
+  sb="${d}/settings-before.json"
+  printf '%s\n' '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"a.sh"}]}]}}' > "${sb}"
+  _ir_mk() {  # alvo: integração main + branch do update com 1 commit, settings.json com 2 hooks, lint mínimo e um
+              # pre-commit que barra o inventário citando a REGRA 8
+    local r="$1"; mkdir -p "${r}/docs/onion" "${r}/.githooks" "${r}/.claude/validation"; git -C "${r}" init -q -b main >/dev/null 2>&1
     printf '# inv\n' > "${r}/docs/onion/inventory.md"
+    printf '%s\n' '{"permissions":{"deny":["Bash(rm -rf /)"]},"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"a.sh"},{"type":"command","command":"b.sh"}]}]}}' > "${r}/.claude/settings.json"
     printf '%s\n' '#!/usr/bin/env bash' \
       'case "$(git diff --cached --name-only)" in *docs/onion/inventory.md*)' \
       '  echo "VIOLATION: docs/onion/inventory.md: REGRA 8 (Inventário canônico sincronizado com o filesystem): drift"' \
       '  echo "  Violações HARD : 1"; exit 1 ;; esac' 'exit 0' > "${r}/.githooks/pre-commit"
     chmod +x "${r}/.githooks/pre-commit"; git -C "${r}" config core.hooksPath .githooks
     #   um lint mínimo que honra o ONION_LINT_HARD_FILE, para o remeasure-hard do --update medir 0 HARD
-    mkdir -p "${r}/.claude/validation"
     printf '%s\n' '#!/usr/bin/env bash' ': > "${ONION_LINT_HARD_FILE:-/dev/null}"' 'exit 0' > "${r}/.claude/validation/lint-artifacts.sh"
     git -C "${r}" add -A >/dev/null 2>&1
     git -C "${r}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -qm base --no-verify >/dev/null 2>&1
@@ -21350,41 +21354,79 @@ run_inbound_report_selftests() {
     git -C "${r}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -qm aplicado --no-verify >/dev/null 2>&1
   }
   _ir_run() { rc=0; out="$(cd "${d}" && TMPDIR="${d}/tmp" bash "${h}" "${REPO_ROOT}" "$@" 2>&1)" || rc=$?; }
+  # STUBS: cópia do helper (o do disco, mutado ou não) ao lado de irmãos falsos cujo rc vem do ambiente
+  # (STUB_RC_<nome>). É o único jeito de exercitar os rc raros (PARE, NÃO MEDIDO) sem montar o estado que os causa.
+  _ir_stubs() {
+    local s="${d}/stub"; mkdir -p "${s}"; cp "${h}" "${REPO_ROOT}/.claude/utils/adopt/assert-dest.sh" "${s}/"
+    _st() { printf '%s\n' '#!/usr/bin/env bash' "printf '%s\\n' \"$2\"" "exit \"\${STUB_RC_$1:-0}\"" > "${s}/$3"; }
+    _st AD 'Arquivos aplicados (medido no alvo, stub): 1 commitados + 0 pendentes' applied-delta.sh
+    _st RC 'CONTRATO medido: stub' remeasure-contract.sh
+    _st PL 'MIGRAÇÃO não roda: stub' plan-contract-migration.sh
+    _st PG 'bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1)' prove-gate-blocks.sh
+    _st HK '── hooks: stub' merge-onion-hooks.sh
+    _st DN 'deny: 1 no alvo (main) → 1 no head' deny-monotonic.sh
+    _st SB 'sandbox: desligado no alvo; nada a avisar' sandbox-deny-advice.sh
+    _st HD 'HARD medido: 0' remeasure-hard.sh
+  }
+  _ir_srun() { rc=0; out="$(cd "${d}" && TMPDIR="${d}/tmp" env "${STUB_ENV[@]+"${STUB_ENV[@]}"}" bash "${d}/stub/emit-inbound-report.sh" "${REPO_ROOT}" "$@" 2>&1)" || rc=$?; }
+  local -a FULL=(--prev "${prev:-${pin}}" --branch chore/onion-update-x --integration main --settings-before "${sb}" \
+                 --vendor-line "onion/vendor remota: a → b" --adopter-guard-line "adopter-guard: em dia: core /x")
+  local -a STUB_ENV=()
+  _ir_stubs
 
-  # (a) caminho feliz: rc 0, arquivo no inbound/ com as cinco seções, sem `<colar`, com o veredito do gate e o log da fonte
-  t="${d}/a"; _ir_mk "${t}"
-  _ir_run "${t}" update "${pin}" --prev "${prev}" --branch chore/onion-update-x --integration main --adopter-guard-line "adopter-guard: em dia: core /x"
+  # (a) caminho feliz do --update, com TUDO informado: rc 0, as seções medidas pelos helpers reais, o diff de
+  #     hooks do --settings-before (merge-onion-hooks --diff exercitado), sem `<colar`
+  t="${d}/a"; _ir_mk "${t}"; _ir_run "${t}" update "${pin}" "${FULL[@]}"
   f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
   if [ "${rc}" -eq 0 ] && [ -f "${f}" ] && [ -d "${t}/docs/evolution/inbound/_processed" ] \
      && grep -qxF '## Arquivos aplicados' "${f}" && grep -qxF '## Contrato KG-SSOT do corpus' "${f}" \
      && grep -qxF '## Gate do alvo' "${f}" && grep -qxF '## Novidades / capacidades novas' "${f}" \
-     && grep -qxF '## Próximos passos (NO ALVO)' "${f}" && ! grep -q '<colar' "${f}" \
+     && grep -qxF '## Próximos passos (NO ALVO)' "${f}" && ! grep -q '<colar' "${f}" && ! grep -q 'NÃO MEDIDO' "${f}" \
      && grep -q '^Arquivos aplicados (medido no alvo' "${f}" && grep -q '^remeasure-contract rc 4: ' "${f}" \
      && grep -q '^plan-contract-migration rc 4: ' "${f}" \
      && grep -qxF 'bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1)' "${f}" \
-     && grep -qxF 'adopter-guard: em dia: core /x' "${f}" && grep -qxF "source_commit: ${pin}" "${f}" \
-     && grep -qxF '## Configuração e HARD' "${f}" && grep -qxF 'HARD medido: 0' "${f}" && grep -q '^- deny: ' "${f}" \
+     && grep -qxF 'adopter-guard: em dia: core /x' "${f}" && grep -qxF 'onion/vendor remota: a → b' "${f}" \
+     && grep -qxF "source_commit: ${pin}" "${f}" \
+     && grep -qxF '## Configuração e HARD' "${f}" && grep -qxF 'HARD medido: 0' "${f}" && grep -q '^- deny: 1 no alvo' "${f}" \
+     && grep -qxF '+ PreToolUse [Bash] b.sh' "${f}" && grep -q '── hooks: 1 → 2 · 1 adicionado' "${f}" \
      && grep -qE 'commit\(s\)|^Nenhum commit' "${f}" && grep -q 'chore/onion-update-x' "${f}"; then
-    record_pass "inbound-report: (a) caminho feliz do --update → rc 0, seis seções medidas, sem <colar, gate PROVADO, HARD e deny medidos, log da fonte"
+    record_pass "inbound-report: (a) --update com tudo informado → rc 0, seções medidas, diff de hooks do --settings-before, sem <colar"
   else record_fail "inbound-report: (a)" "rc=${rc} arquivo=$([ -f "${f}" ] && echo sim || echo não) saída: ${out:0:200}"; fi
 
+  # (a2) --update SEM --settings-before, --vendor-line, --adopter-guard-line e --prev → escrito, rc 3, e cada ausência
+  #      é LACUNA nomeada (antes saía rc 0 com «não medido aqui»: passada isolada de 2026-11-24, bloqueante 1)
+  t="${d}/a2"; _ir_mk "${t}"; _ir_srun "${t}" update "${pin}" --integration main
+  f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
+  if [ "${rc}" -eq 3 ] && [ -f "${f}" ] && grep -q '^>  - diff de hooks (sem --settings-before)' "${f}" \
+     && grep -q '^>  - linha da onion/vendor' "${f}" && grep -q '^>  - linha do adopter-guard' "${f}" \
+     && grep -q '^>  - novidades (pin anterior não informado)' "${f}" && ! grep -q '1ª adoção' "${f}"; then
+    record_pass "inbound-report: (a2) --update sem hooks/vendor/guard/prev → rc 3, as quatro ausências viram lacuna"
+  else record_fail "inbound-report: (a2)" "rc=${rc} lacunas: $(grep '^>  - ' "${f}" 2>/dev/null | tr '\n' '|')"; fi
+
   # (b) idempotência: o relatório da mesma op+pin com data antiga é REESCRITO no lugar, nunca duplicado num dia novo
-  if [ -f "${f}" ]; then mv "${f}" "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md"; fi
-  _ir_run "${t}" update "${pin}" --prev "${prev}" --integration main
-  _ir_run "${t}" update "${pin}" --prev "${prev}" --integration main
+  t="${d}/a"; f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
+  [ -f "${f}" ] && mv "${f}" "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md"
+  _ir_srun "${t}" update "${pin}" "${FULL[@]}"; _ir_srun "${t}" update "${pin}" "${FULL[@]}"
   n="$(find "${t}/docs/evolution/inbound" -maxdepth 1 -type f | wc -l | tr -d ' ')"
-  if [ "${rc}" -eq 0 ] && [ "${n}" = 1 ] && [ -f "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md" ] \
-     && grep -qxF 'date: 2026-01-01' "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md"; then
+  if [ "${rc}" -eq 0 ] && [ "${n}" = 1 ] && grep -qxF 'date: 2026-01-01' "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md"; then
     record_pass "inbound-report: (b) duas rodadas a mais → 1 arquivo só, reescrito no caminho que já existia"
   else record_fail "inbound-report: (b)" "rc=${rc} arquivos=${n}: $(ls "${t}/docs/evolution/inbound" | tr '\n' ' ')"; fi
 
   # (b2) já processado pelo alvo (_processed/) → não re-emite
   mv "${t}/docs/evolution/inbound/2026-01-01-update-${pin}.md" "${t}/docs/evolution/inbound/_processed/" 2>/dev/null
-  _ir_run "${t}" update "${pin}" --prev "${prev}" --integration main
+  _ir_srun "${t}" update "${pin}" "${FULL[@]}"
   n="$(find "${t}/docs/evolution/inbound" -maxdepth 1 -type f | wc -l | tr -d ' ')"
   if [ "${rc}" -eq 0 ] && [ "${n}" = 0 ] && grep -q 'já processado' <<< "${out}"; then
     record_pass "inbound-report: (b2) relatório já em _processed/ → não re-emitido (rc 0, diz onde está)"
   else record_fail "inbound-report: (b2)" "rc=${rc} arquivos no inbound=${n} saída: ${out:0:160}"; fi
+
+  # (b3) o MESMO commit com 7 e com 40 caracteres → o arquivo do pin de 12, um só
+  t="${d}/b3"; _ir_mk "${t}"
+  _ir_srun "${t}" update "${pin7}" "${FULL[@]}"; _ir_srun "${t}" update "${pin40}" "${FULL[@]}"
+  n="$(find "${t}/docs/evolution/inbound" -maxdepth 1 -type f | wc -l | tr -d ' ')"
+  if [ "${n}" = 1 ] && [ -f "${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md" ]; then
+    record_pass "inbound-report: (b3) pin de 7 e de 40 caracteres do mesmo commit → um arquivo só, nomeado pelo pin de 12"
+  else record_fail "inbound-report: (b3)" "arquivos=${n}: $(ls "${t}/docs/evolution/inbound" | tr '\n' ' ')"; fi
 
   # (c) DEST com placeholder → rc 2, nada escrito, e nenhum diretório-lixo com o nome literal
   _ir_run "<WORK (--update)>" update "${pin}" --integration main
@@ -21392,9 +21434,18 @@ run_inbound_report_selftests() {
     record_pass "inbound-report: (c) DEST com placeholder → recusado (rc 2) antes de qualquer mkdir"
   else record_fail "inbound-report: (c)" "rc=${rc} saída: ${out:0:160}"; fi
 
+  # (c2) DEST RELATIVO (ao cwd do chamador) → normalizado; o relatório cai no alvo e o gate real mede
+  t="${d}/rel"; _ir_mk "${t}"; _ir_run rel adopt "${pin}" --integration main --adopter-guard-line "adopter-guard: x"
+  f="${t}/docs/evolution/inbound/$(date +%F)-adopt-${pin}.md"
+  #     (o caminho devolvido ao chamador é ABSOLUTO: quem o lê em outro cwd não pode cair noutro lugar)
+  if [ "${rc}" -eq 0 ] && [ -f "${f}" ] && grep -qxF 'bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1)' "${f}" \
+     && grep -qxF "relatório escrito: $(cd "${t}" && pwd -P)/docs/evolution/inbound/$(date +%F)-adopt-${pin}.md" <<< "${out}"; then
+    record_pass "inbound-report: (c2) DEST relativo → normalizado (caminho devolvido absoluto), relatório no alvo, gate PROVADO (rc 0)"
+  else record_fail "inbound-report: (c2)" "rc=${rc} arquivo=$([ -f "${f}" ] && echo sim || echo não) saída: ${out:0:200}"; fi
+
   # (d) medição que não roda (integração inexistente no alvo) → relatório ESCRITO com «NÃO MEDIDO» e rc 3
   t="${d}/d"; _ir_mk "${t}"
-  _ir_run "${t}" adopt "${pin}" --integration nao-existe
+  _ir_run "${t}" adopt "${pin}" --integration nao-existe --adopter-guard-line "adopter-guard: x"
   f="${t}/docs/evolution/inbound/$(date +%F)-adopt-${pin}.md"
   if [ "${rc}" -eq 3 ] && [ -f "${f}" ] && grep -q '^NÃO MEDIDO (applied-delta rc 3)' "${f}" \
      && ! grep -q '^Arquivos aplicados (medido no alvo' "${f}" && grep -q 'Medição que não rodou' "${f}" \
@@ -21402,15 +21453,51 @@ run_inbound_report_selftests() {
     record_pass "inbound-report: (d) applied-delta rc 3 → «NÃO MEDIDO» declarado no relatório e rc 3, nunca um número"
   else record_fail "inbound-report: (d)" "rc=${rc} arquivo=$([ -f "${f}" ] && echo sim || echo não) saída: ${out:0:200}"; fi
 
-  # (d2) o bloco copiado SEM preencher: linha do adopter-guard e integração com placeholder `<…>` → nada de `<…>` no
-  #      relatório; a linha vira lacuna (rc 3) e a integração cai no padrão declarado
+  # (d2) placeholder nas linhas do chamador (guard, vendor, integração) → nada de `<…>` no relatório: lacunas e rc 3
   t="${d}/d2"; _ir_mk "${t}"
-  _ir_run "${t}" adopt "${pin}" --integration "<a integração do alvo>" --adopter-guard-line "<a linha adopter-guard: …>"
-  f="${t}/docs/evolution/inbound/$(date +%F)-adopt-${pin}.md"
-  if [ "${rc}" -eq 3 ] && [ -f "${f}" ] && ! grep -q '<a ' "${f}" && grep -q 'placeholder não preenchido' "${f}" \
-     && grep -q '^Arquivos aplicados (medido no alvo' "${f}"; then
-    record_pass "inbound-report: (d2) placeholder nas linhas → não vai ao relatório: lacuna declarada (rc 3) e integração no padrão"
-  else record_fail "inbound-report: (d2)" "rc=${rc} arquivo=$([ -f "${f}" ] && echo sim || echo não) saída: ${out:0:200}"; fi
+  _ir_srun "${t}" update "${pin}" --prev "${prev:-${pin}}" --settings-before "${sb}" --integration "<a integração do alvo>" \
+    --adopter-guard-line "<a linha adopter-guard: …>" --vendor-line "<a linha onion/vendor remota>"
+  f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
+  if [ "${rc}" -eq 3 ] && [ -f "${f}" ] && ! grep -q '<a ' "${f}" \
+     && grep -q '^>  - linha do adopter-guard (placeholder' "${f}" && grep -q '^>  - linha da onion/vendor (placeholder' "${f}"; then
+    record_pass "inbound-report: (d2) placeholder no guard e na vendor → fora do relatório, as duas viram lacuna (rc 3)"
+  else record_fail "inbound-report: (d2)" "rc=${rc} lacunas: $(grep '^>  - ' "${f}" 2>/dev/null | tr '\n' '|')"; fi
+
+  # (d3) linha do chamador que tenta FORJAR seção (quebra + `## …`, `<!--`, crase, `#` inicial) → achatada
+  t="${d}/d3"; _ir_mk "${t}"
+  _ir_srun "${t}" update "${pin}" "${FULL[@]}" --vendor-line $'onion/vendor ok\n## Forjada\n<!-- oculto --> `x`' \
+    --adopter-guard-line '# adopter-guard: cabeçalho'
+  f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
+  if [ "${rc}" -eq 0 ] && [ -f "${f}" ] && ! grep -q '^## Forjada' "${f}" && ! grep -qF '<!--' "${f}" \
+     && grep -qF 'onion/vendor ok ## Forjada &lt;!-- oculto --> '"'"'x'"'" "${f}" && ! grep -q '^# adopter-guard' "${f}"; then
+    record_pass "inbound-report: (d3) linha do chamador com quebra, <!--, crase e # → achatada, sem seção forjada"
+  else record_fail "inbound-report: (d3)" "rc=${rc} linhas: $(grep -n 'Forjada\|adopter-guard' "${f}" 2>/dev/null | tr '\n' '|')"; fi
+
+  # (f) os rc raros dos irmãos, por stub: NÃO MEDIDO vira lacuna (rc 3); PARE vira PARE (rc 4, vence o 3)
+  local spec nm want key msg
+  for spec in "HD|3|3|HARD (remeasure-hard rc 3)" "RC|3|3|contrato KG-SSOT (remeasure-contract rc 3)" \
+              "DN|1|4|deny: o update PERDEU regra de deny" "PG|4|4|gate do alvo: o checkout real mudou" \
+              "PL|5|4|migração planejada: o alvo mudou"; do
+    IFS='|' read -r key nm want msg <<< "${spec}"
+    t="${d}/f-${key}"; _ir_mk "${t}"; STUB_ENV=("STUB_RC_${key}=${nm}")
+    _ir_srun "${t}" update "${pin}" "${FULL[@]}"; STUB_ENV=()
+    f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
+    if [ "${rc}" -eq "${want}" ] && [ -f "${f}" ] && grep -qF ">  - ${msg}" "${f}" \
+       && { [ "${want}" -ne 4 ] || grep -q '⛔ \*\*PARE\*\*' "${f}"; }; then
+      record_pass "inbound-report: (f) stub ${key} rc ${nm} → relatório escrito, rc ${want}, «${msg}» declarado"
+    else record_fail "inbound-report: (f) stub ${key} rc ${nm}" "rc=${rc} (queria ${want}) declarados: $(grep '^>  - ' "${f}" 2>/dev/null | tr '\n' '|')"; fi
+  done
+
+  # (g) teto das Novidades: ONION_INBOUND_LOG_MAX=1 com 2 commits no intervalo → 1 linha só, e o teto declarado
+  if [ -n "${prev}" ]; then
+    t="${d}/g"; _ir_mk "${t}"; STUB_ENV=(ONION_INBOUND_LOG_MAX=1)
+    _ir_srun "${t}" update "${pin}" "${FULL[@]}"; STUB_ENV=()
+    f="${t}/docs/evolution/inbound/$(date +%F)-update-${pin}.md"
+    n="$(sed -n '/^## Novidades/,/^## Próximos/p' "${f}" 2>/dev/null | grep -cE '^[0-9a-f]{7,} ')" || n=0
+    if [ "${rc}" -eq 0 ] && [ "${n}" = 1 ] && grep -q 'mostrando os 1 mais novos (teto ONION_INBOUND_LOG_MAX)' "${f}"; then
+      record_pass "inbound-report: (g) ONION_INBOUND_LOG_MAX=1 com 2 commits → 1 linha e o teto declarado"
+    else record_fail "inbound-report: (g)" "rc=${rc} linhas de log=${n}"; fi
+  else record_skip "inbound-report: (g) o checkout da bancada não tem HEAD~2 (clone raso)"; fi
 
   # (e) registro: o procedimento do adopt.md CHAMA o helper e não guarda mais o heredoc de placeholders
   if grep -q 'emit-inbound-report.sh" "\$SOURCE_ROOT" "\$DEST"' "${REPO_ROOT}/.claude/commands/meta/adopt.md" \
