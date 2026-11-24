@@ -2,7 +2,8 @@
 branch: fix/dissect-idea-label-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0cde807730646a9c8870ab0456644b9f8ba768329f6b83f32fd252bafa29454c
+reviewed_code_sha256: 41651049004245d1e41dd5522c03a0fd82119ec0216fcc05332c60620fbcd2ca
 findings_total: 2
 findings_real: 1
 findings_blocking: 0
