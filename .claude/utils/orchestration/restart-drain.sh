@@ -153,8 +153,8 @@ if opt['mode'] == 'resume':
     else: die('sem id de sessão: passe --session <sid> ou --all (CLAUDE_CODE_SESSION_ID vazio)')
     # O BILHETE SEGUE A CÓPIA (2026-11-24): a sessão mandada ao fundo nativo (tecla ←) volta com id NOVO, e o bilhete
     # ficou no id antigo. Sem bilhete do próprio id, vale o de um ancestral: o bilhete pendente cujo transcript é a
-    # origem desta cópia (fork_inherit + o 1º uuid da cópia presente na origem, pelo session-liveness.sh fork-of).
-    # O 1º uuid da cópia é herdado: a cópia de uma cópia casa também com o avô. Com dois bilhetes de ancestrais, vale o
+    # origem desta cópia (fork_inherit + o ÚLTIMO uuid herdado presente na origem, pelo session-liveness.sh fork-of;
+    # o 1º se repete em IRMÃS e seguiria o bilhete de uma delas). O ancestral que guarda a herança inteira também casa. Com dois bilhetes de ancestrais, vale o
     # gravado POR ÚLTIMO (a drenagem que precedeu esta cópia), e os outros são ditos, nunca arquivados em silêncio.
     if not opt['all'] and SID and not os.path.exists(os.path.join(RDIR, f'{SID}.tsv')):
         me = transcript_of(SID); hits = []
@@ -388,7 +388,10 @@ def session_mode():
         if c.returncode != 0: raise RuntimeError(f'regra de «viva» rc {c.returncode}')
     except (OSError, subprocess.TimeoutExpired, RuntimeError) as e:
         return 'unknown', '', f'modo da sessão NÃO medido ({type(e).__name__}: {e})'
-    row = next((f for f in (l.split('\t') for l in c.stdout.splitlines()) if f[0] == SID and len(f) >= 9), None)
+    # o mesmo sessionId pode vir em DUAS linhas (o registro de fundo morto e a interativa viva que o retomou no tmux):
+    # vale a linha VIVA, e o kind sai da mesma linha do veredito
+    rows = [f for f in (l.split('\t') for l in c.stdout.splitlines()) if f[0] == SID and len(f) >= 9]
+    row = next((f for f in rows if f[6] == 'live'), rows[0] if rows else None)
     if not row: return 'unknown', '', 'a sessão não está na lista de peers do harness: modo NÃO medido'
     kind, pid, short = row[1], row[3], row[7]
     if kind == 'background': return 'bg', short, ''

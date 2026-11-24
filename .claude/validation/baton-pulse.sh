@@ -722,10 +722,16 @@ if PROCS:
             if len(f) < 9: continue
             prev = LIVE.get(f[0])
             if prev and prev[0]: continue   # o mesmo sid em dois processos: basta um vivo
-            LIVE[f[0]] = (f[6] == 'live', f[8], f[7])
+            LIVE[f[0]] = (f[6] == 'live', f[8], f[7], f[1], None if f[3] == '-' else f[3])
     except Exception as e:
         print(f'baton-pulse: a regra de «viva» não se leu ({liv_tool}: {type(e).__name__}: {e}): não classifico sessão às cegas', file=sys.stderr)
         sys.exit(2)
+# o mesmo sessionId em DUAS linhas (o registro de fundo morto e a interativa viva que o retomou no tmux): os campos da
+# sessão saem da linha do VEREDITO (a viva, quando há), nunca da última lida, senão a viva herdava o kind do morto.
+for _sid, _v in LIVE.items():
+    if _sid in S and _v[0]:
+        S[_sid]['kind'] = _v[3]
+        S[_sid]['pid'] = int(_v[4]) if str(_v[4] or '').isdigit() else _v[4]
 def peer_dead(s): return in_peers(s) and s['sid'] in LIVE and not LIVE[s['sid']][0]
 
 claimed_owner = set(); claimed_pr = set()
@@ -907,7 +913,7 @@ if _members:
             f = ln.split('\t')
             if len(f) >= 4 and f[0]:
                 own_map[f[0]] = (f[1], 'lista privada' if f[3] == 'privada' else f[3])
-                if f[1] not in ('', '-'): own_dirs.add(real(f[2]) if f[2].startswith('/') else '')
+                if f[1] not in ('', '-') and f[2].startswith('/'): own_dirs.add(real(f[2]))
     except Exception as e:
         own_err = f'{type(e).__name__}: {e}'
         gaps.append(f'leitor de posse NÃO lido ({own_reader}: {own_err}): o dono pela owner_session fica NÃO MEDIDO')
@@ -1068,7 +1074,7 @@ if peers_ok:
     _piece_owners = {pc['owner'] for pc in PIECES if pc.get('owner') not in (None, '', '?')}
     for s in sorted(S.values(), key=lambda x: x['sid']):
         if not in_peers(s) or s['kind'] != 'background' or s['sid'] not in LIVE: continue
-        _live, _why, _short = LIVE[s['sid']]
+        _live, _why, _short = LIVE[s['sid']][:3]
         _base = re.sub(r' \(\d+\)$', '', s['name'] or '')
         p = {'pid': int(s['pid']) if str(s['pid'] or '').isdigit() else 0, 'sid': s['sid'], 'name': s['name'], 'cwd': s['cwd']}
         tag = f'{s["name"] or s["sid"][:8]} ({_short})'

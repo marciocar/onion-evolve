@@ -18,8 +18,9 @@
 # ── A CÓPIA (fork_inherit) ───────────────────────────────────────────────────────────────────────
 # Mandar a sessão ao fundo nativo (a tecla ←) cria uma CÓPIA com id novo. Formato medido no transcript da cópia
 # (~/.claude/projects/<pasta>/<id-novo>.jsonl): a 1ª linha é {"type":"history-suppression","cause":"fork_inherit",…}
-# SEM o id de origem, e todo `sessionId` do histórico copiado é reescrito para o id novo. O que liga as duas é o
-# `uuid` das mensagens: o 1º `uuid` da cópia está, idêntico, no transcript da origem. (O daemon grava a origem em
+# SEM o id de origem (com o `ts` do fork), e todo `sessionId` do histórico copiado é reescrito para o id novo. O que
+# liga as duas é o `uuid` das mensagens. Vale o ÚLTIMO uuid herdado (a última mensagem com `timestamp` anterior ao `ts`
+# do fork), não o primeiro: o primeiro é a fronteira da compactação e se repete em IRMÃS (duas cópias da mesma origem). (O daemon grava a origem em
 # ~/.claude/daemon/roster.json, `dispatch.launch.sessionId` com `fork: true`, mas só enquanto o worker vive: não é
 # fonte durável, e é estado interno do harness.)
 #
@@ -30,10 +31,12 @@
 #                                                      (campo vazio vira «-»; live = live|dead; short = o `id` curto do
 #                                                      harness, ou os 8 primeiros caracteres do sessionId)
 #   session-liveness.sh fork-of <copia.jsonl> <origem.jsonl>
-#                                                      rc 0 a cópia descende da origem (fork_inherit + 1º uuid presente
-#                                                      na origem) · 1 não descende · 2 não medido (arquivo ilegível)
+#                                                      rc 0 a cópia descende da origem (fork_inherit + o ÚLTIMO uuid
+#                                                      herdado presente na origem) · 1 não descende (ou não é cópia)
+#                                                      · 2 não medido (arquivo ilegível, cópia sem ts, ou cópia
+#                                                      recém-criada sem mensagem herdada)
 # Saída: 0/1 como acima · 2 uso ou entrada ilegível (classify: JSON que não é lista).
-# Só lê. Do transcript lê a 1ª linha e o 1º uuid da cópia; na origem procura só aquele uuid (grep -F), nunca a conversa.
+# Só lê. Da cópia lê a herança até a 1ª mensagem nova (uuid e timestamp); na origem procura só aquele uuid (grep -F).
 # Bancada: run_session_open_selftests, run_baton_pulse_selftests e run_restart_drain_selftests (lint-selftest.sh).
 # ===========================================================================
 set -uo pipefail
@@ -99,25 +102,39 @@ for x in d:
     exec python3 -I -c '
 import json, subprocess, sys
 copy, origin = sys.argv[1:3]
+# A ORIGEM é a sessão que contém o ÚLTIMO uuid herdado (a última mensagem com timestamp anterior ao ts da linha
+# history-suppression), não o primeiro: o primeiro é a fronteira da compactação e é o mesmo em IRMÃS (duas cópias da
+# mesma origem), medido em 2026-11-24 (022965f2 e ed9f72cc).
 try:
     with open(copy, encoding="utf-8", errors="replace") as f:
-        first = None; uid = None
-        for i, line in enumerate(f):
-            if i >= 400: break
+        first = None; fork_ts = None; last = None
+        for line in f:
             line = line.strip()
             if not line: continue
             try: o = json.loads(line)
             except ValueError: continue
             if not isinstance(o, dict): continue
-            if first is None: first = o
-            if isinstance(o.get("uuid"), str) and o["uuid"]: uid = o["uuid"]; break
+            if first is None:
+                first = o
+                if o.get("type") != "history-suppression" or o.get("cause") != "fork_inherit": sys.exit(1)   # não é cópia
+                fork_ts = o.get("ts") if isinstance(o.get("ts"), str) else None
+                if not fork_ts:
+                    print("session-liveness: cópia sem o ts do fork: origem NÃO medida", file=sys.stderr); sys.exit(2)
+                continue
+            u = o.get("uuid"); t = o.get("timestamp")
+            if not (isinstance(u, str) and u): continue
+            if isinstance(t, str) and t >= fork_ts: break   # 1ª mensagem nova da cópia: a herança acabou
+            last = u
 except OSError as e:
     print(f"session-liveness: cópia ilegível ({e})", file=sys.stderr); sys.exit(2)
-if not first or first.get("type") != "history-suppression" or first.get("cause") != "fork_inherit" or not uid: sys.exit(1)
+if first is None: sys.exit(1)
+if last is None:
+    # cópia recém-criada, só com a linha history-suppression: ainda não há o que casar
+    print("session-liveness: cópia sem mensagem herdada ainda: origem NÃO medida", file=sys.stderr); sys.exit(2)
 try: open(origin, "rb").close()
 except OSError as e:
     print(f"session-liveness: origem ilegível ({e})", file=sys.stderr); sys.exit(2)
-needle = "\"uuid\":\"" + uid + "\""
+needle = "\"uuid\":\"" + last + "\""
 r = subprocess.run(["grep", "-a", "-q", "-F", "--", needle, origin])
 sys.exit(0 if r.returncode == 0 else (1 if r.returncode == 1 else 2))
 ' "$@"

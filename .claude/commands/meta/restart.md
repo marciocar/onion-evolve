@@ -106,7 +106,8 @@ agente não terminado sem escrita há mais que isso é resto de vida anterior e 
    como `<sessão>.<epoch>.resumed.md`. **O bilhete segue a cópia:** mandar a sessão ao fundo nativo (a tecla `←`) cria
    uma cópia com id novo, e o bilhete ficou no id antigo. Chamado da cópia sem bilhete do próprio id, o `--resume-check`
    segue o do **ancestral**: o bilhete pendente cujo transcript é a origem dela (1ª linha `history-suppression` com
-   `cause: fork_inherit`, e o 1º `uuid` da cópia presente no transcript da origem). Ele diz que seguiu. Para cada agente listado, mande `SendMessage` com `to` = o id e o texto
+   `cause: fork_inherit`, e o **último** `uuid` herdado da cópia presente no transcript da origem; o primeiro se repete em irmãs e seguiria o
+   bilhete de uma delas). Ele diz que seguiu. Para cada agente listado, mande `SendMessage` com `to` = o id e o texto
    «Reinício da sessão: retome de onde parou. Último passo: <o do bilhete>. Confira o estado (git status, PR, CI)
    antes de repetir qualquer passo.» As tarefas de fundo morreram com o processo: relance à mão só as que ainda
    forem necessárias. Sem bilhete, ele sai `rc 4` e diz isso. Bilhete com lacuna sai `rc 5` e repete o que não foi

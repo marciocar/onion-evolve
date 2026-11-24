@@ -2,19 +2,18 @@
 branch: fix/session-lifecycle-native-bg
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: 71299c74a240c1822686f68a2504e0abc261db27a2b5b7b9b313007f662978e3
-reviewed_code_sha256: 54e08b2f382eb762586182d8cadb812cd2524bb7b81d82c690387e45b4c3f8cb
-findings_total: 6
-findings_real: 6
-findings_blocking: 0
+reviewed_diff_sha256: pendente
+findings_total: 11
+findings_real: 11
+findings_blocking: 2
 tokens: 154748
 duration_min: 6
-findings_fixed: 5
-verdict: FIXED
+findings_fixed: 10
+verdict: REJECTED_AND_FIXED
 elenxo: true
-elenxo_isolado: false
-reviewer: "subagente general-purpose (opus), mandato de refutar o diff, só leitura"
-nota: "Revisor lançado pelo próprio agente de execução, com o diff e os fatos medidos, sem a conclusão: não é isolado (elenxo_isolado: false). O achado 2 (namespace de pid) ficou como limite declarado, sem cura."
+elenxo_isolado: true
+reviewer: "1ª passada: subagente general-purpose (opus) lançado pelo agente de execução; 2ª: revisão isolada pela sessão do core"
+nota: "A 1ª passada (6 achados, tokens 154748) foi do refutador lançado pelo próprio agente. A revisão isolada da sessão do core REPROVOU com 2 bloqueios e mais 3 pontos e 5 mutantes sobreviventes, todos curados nesta re-revisão; os tokens dela não chegaram a este agente (não medidos). Fica sem cura o namespace de pid isolado (limite declarado)."
 ---
 
 # Passada adversarial: `fix/session-lifecycle-native-bg`
@@ -78,3 +77,31 @@ Um ou mais por cura, todos mordem (bancada `LC_ALL=C`):
   sozinha depois do `stop`.
 - O modo «tmux» do restart lê só a chave `TMUX` do ambiente do processo, não a árvore.
 - Os ramos de owner_session, pasta, peça e owners.tsv do `SESSION_NATIVE_BG_LONG_DUTY` não têm caso próprio.
+
+## Revisão isolada
+
+A sessão do core revisou o diff isolada e **reprovou com 2 bloqueios**. Esta re-revisão os curou na mesma worktree:
+
+1. **Bloqueio: a sessão interativa viva recebia a receita `claude stop`** quando o mesmo `sessionId` vinha duas vezes
+   na lista (o registro de fundo morto e a interativa viva), que é o caminho do incidente. **Curado nas duas peças:**
+   no `restart-drain.sh`, o `session_mode()` escolhe a linha VIVA; no `baton-pulse.sh`, o `kind` e o pid da sessão
+   saem da mesma linha do veredito. Casos: restart (u); pulso (bg5), com mutante no `kind`, e (bg5b) no filtro de `kind`
+   do aviso de fundo, que era o M11.
+2. **Bloqueio: o `--resume-check` seguia o bilhete de uma IRMÃ**, porque o 1º `uuid` se repete em duas cópias da mesma
+   origem. **Escolha: exigir o ÚLTIMO uuid herdado** (a última mensagem com `timestamp` anterior ao `ts` da linha
+   `history-suppression`) no transcript da origem. Não escolhi o filtro pelo `ts` do bilhete porque ele não exclui a
+   irmã: o bilhete de uma irmã gravado antes do fork também passaria. O último uuid herdado é a ponta da conversa no
+   instante do fork; a irmã divergiu antes dela e não a tem. Medido no vivo: `535955f0` casa com `022965f2` (rc 0) e
+   não com `ed9f72cc` (rc 1). E `022965f2` casa com `ed9f72cc`: pela herança, ela é a origem de `022965f2`, não irmã.
+   Casos: session-open (w7), com mutante «o 1º uuid»; restart (t2), em que a irmã com o bilhete mais novo não é seguida
+   nem citada.
+3. **Cópia recém-criada sem uuid herdado:** agora o `fork-of` dá rc 2 (não medido), e o abridor diz «não medi» e
+   abre, sem barrar por palpite. Fica declarado na KB §3.5. Caso (w8).
+4. **Recusa falsa entre irmãs:** resolvida junto com o 2, em (w7).
+5. **Pasta vazia no conjunto de pastas de donas** (`baton-pulse.sh`): corrigido, só entra a pasta absoluta. Sem caso
+   próprio (limite).
+
+Mutantes que sobreviviam e agora morrem: **M1**, EPERM tratado como morto, caso (y), que pula declarado quando roda
+como root; **M3**, `fork-of` sem exigir `fork_inherit`, caso (w5); **M6**, cópia morta barrando a retomada, caso (w6);
+**M10**, `max` virando `min`, caso (bg6); **M11**, aviso de fundo sem conferir o `kind`, caso (bg5b).
+

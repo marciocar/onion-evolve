@@ -63690,6 +63690,11 @@ P = [
   {'kind': 'background', 'id': 'bgnopid1', 'sessionId': 'sid-bgnopid', 'name': 'sem-pid', 'state': 'working', 'cwd': f'{sb}/dead', 'startedAt': (now - 600) * 1000},
   # fundo VIVO com dever longo: alpha tem batuta-de-projeto no grants.tsv (casa pela pasta); o nome leva o sufixo « (2)»
   {'kind': 'background', 'id': 'bgduty01', 'sessionId': 'sid-bgduty', 'name': 'alpha (2)', 'state': 'working', 'status': 'busy', 'pid': pid, 'cwd': f'{sb}/alpha'},
+  # o MESMO sessionId em duas linhas: a interativa VIVA (retomada no tmux, com batuta em alpha) e o registro de fundo
+  # morto de 48 h, lido por último; e um registro de fundo morto de 48 h com o transcript escrito há 10 min
+  {'kind': 'interactive', 'sessionId': 'sid-dup2', 'name': 'alpha', 'status': 'idle', 'pid': pid, 'cwd': f'{sb}/alpha'},
+  {'kind': 'background', 'id': 'dup20000', 'sessionId': 'sid-dup2', 'name': 'alpha (3)', 'state': 'blocked', 'cwd': f'{sb}/alpha', 'startedAt': (now - 48 * 3600) * 1000},
+  {'kind': 'background', 'id': 'bgact001', 'sessionId': 'sid-bgact', 'name': 'ativa', 'state': 'blocked', 'cwd': f'{sb}/dead', 'startedAt': (now - 48 * 3600) * 1000},
   # fundo VIVO no checkout da fonte: a sessão do core (segura a batuta), sem concessão nem registro
   {'kind': 'background', 'id': 'bgcore01', 'sessionId': 'sid-bgcore', 'name': 'core-bg (5)', 'state': 'working', 'status': 'busy', 'pid': pid, 'cwd': sys.argv[4]},
   # fundo VIVO sem dever: beta não tem concessão, rótulo declarado nem peça
@@ -63697,6 +63702,7 @@ P = [
 ]
 print(json.dumps(P))
 BP_BG
+  : > "${sb}/proj/p/sid-bgact.jsonl"; touch -d "@$((NOW - 600))" "${sb}/proj/p/sid-bgact.jsonl"
   _bpbg() { _bpr "$1" --tsv --peers "${sb}/peers-bg.json"; }
   _bpcase_liv() {  # <nome> <OLD> <NEW> <função>: o mutante é o da REGRA de «viva» (o pulso intacto a lê por BATON_LIVENESS)
     local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1 k="${sb}/kl$(date +%N)/.claude/validation"
@@ -63733,6 +63739,19 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     grep -q "^hygiene${T}sid-bgcore${T}SESSION_NATIVE_BG_LONG_DUTY${T}.*a sessão do core (segura a batuta).*claude stop bgcore01 && bash ops/session-open.sh core-bg --resume sid-bgcore" <<< "${a}"; }
   _bpcase "(bg2c) a sessão do core no fundo nativo sai SESSION_NATIVE_BG_LONG_DUTY" \
     "            if 'core' in (s.get('labels') or []) and role == 'source': duty.append" "            if False: duty.append" _bp_bg2c
+  # (bg5) o mesmo sessionId em duas linhas (fundo morto + interativa viva): vale a viva, com o kind DELA; nenhum aviso de
+  #       fundo para a interativa (nem LONG_DUTY, nem STALE), e ela não sai UNREACHABLE
+  _bp_bg5() { local a; a="$(_bpbg "$1")"; BP_WHY="$(grep 'sid-dup2' <<< "${a}" | cut -f1-3,8 | tr '\t\n' ' |' | head -c 600)"
+    ! grep -q "^hygiene${T}sid-dup2${T}" <<< "${a}" && grep -q "^session${T}sid-dup2${T}" <<< "${a}" && ! grep -q "^session${T}sid-dup2${T}UNREACHABLE" <<< "${a}"; }
+  _bpcase "(bg5) sid repetido: os campos saem da linha viva (o kind da interativa)" \
+    "        S[_sid]['kind'] = _v[3]" "        pass" _bp_bg5
+  _bpcase "(bg5b) o aviso de fundo confere o kind (interativa com batuta não recebe claude stop)" \
+    "        if not in_peers(s) or s['kind'] != 'background' or s['sid'] not in LIVE: continue" "        if not in_peers(s) or s['sid'] not in LIVE: continue" _bp_bg5
+  # (bg6) registro de fundo morto há 48 h mas com o transcript escrito há 10 min: não é velho, sem claude rm (M10)
+  _bp_bg6() { local a; a="$(_bpbg "$1")"; BP_WHY="$(grep 'sid-bgact' <<< "${a}" | cut -f1-3,8 | tr '\t\n' ' |' | head -c 400)"
+    grep -q "^session${T}sid-bgact${T}" <<< "${a}" && ! grep -q "^hygiene${T}sid-bgact${T}" <<< "${a}"; }
+  _bpcase "(bg6) a prova de vida mais NOVA vale: transcript recente impede o claude rm" \
+    "            _last = max([t for t in (s.get('started'), s.get('act')) if t is not None], default=None)" "            _last = min([t for t in (s.get('started'), s.get('act')) if t is not None], default=None)" _bp_bg6
   # (bg3) SESSION_STALE_BG_RECORD: o registro morto há 48 h sai com `claude rm` como oferta; o morto de 2 h não
   _bp_bg3() { local a; a="$(_bpbg "$1")"; BP_WHY="$(grep '^hygiene' <<< "${a}" | cut -f2,3,8 | tr '\t\n' ' |' | head -c 600)"
     grep -q "^hygiene${T}sid-bgstale${T}SESSION_STALE_BG_RECORD${T}.*sem sinal de vida há 48 h · cura: claude rm bgstale1  (ato do maestro" <<< "${a}" \
@@ -64146,9 +64165,9 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
     'já está viva neste checkout (${dir}): nunca duas sessões no mesmo checkout. $(if [ "${k}" = background ]; then' 'já está viva neste checkout (${dir}): nunca duas sessões no mesmo checkout. $(if false; then'
   # (w) a CÓPIA (fork_inherit) do id pedido está viva noutra pasta: recusa rc 3 «a conversa já vive como <id>»
   mkdir -p "${PJ}/-orig" "${PJ}/-copia" "${PJ}/-outra"
-  printf '{"type":"custom-title","customTitle":"orig","sessionId":"orig0000-1111"}\n{"type":"user","uuid":"u-0001-shared","sessionId":"orig0000-1111"}\n' > "${PJ}/-orig/orig0000-1111.jsonl"
-  printf '{"type":"history-suppression","sessionId":"copy0000-2222","cause":"fork_inherit"}\n{"type":"custom-title","customTitle":"orig (2)"}\n{"type":"system","uuid":"u-0001-shared","sessionId":"copy0000-2222"}\n' > "${PJ}/-copia/copy0000-2222.jsonl"
-  printf '{"type":"history-suppression","sessionId":"other000-3333","cause":"fork_inherit"}\n{"type":"system","uuid":"u-9999-alheio","sessionId":"other000-3333"}\n' > "${PJ}/-outra/other000-3333.jsonl"
+  printf '{"type":"custom-title","customTitle":"orig","sessionId":"orig0000-1111"}\n{"type":"user","uuid":"u-0001-shared","sessionId":"orig0000-1111","timestamp":"2026-11-24T09:00:00Z"}\n' > "${PJ}/-orig/orig0000-1111.jsonl"
+  printf '{"type":"history-suppression","sessionId":"copy0000-2222","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n{"type":"custom-title","customTitle":"orig (2)"}\n{"type":"system","uuid":"u-0001-shared","sessionId":"copy0000-2222","timestamp":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-copy-novo","sessionId":"copy0000-2222","timestamp":"2026-11-24T10:05:00Z"}\n' > "${PJ}/-copia/copy0000-2222.jsonl"
+  printf '{"type":"history-suppression","sessionId":"other000-3333","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n{"type":"system","uuid":"u-9999-alheio","sessionId":"other000-3333","timestamp":"2026-11-24T09:00:00Z"}\n' > "${PJ}/-outra/other000-3333.jsonl"
   printf '[{"kind":"background","id":"copy0000","sessionId":"copy0000-2222","name":"orig (2)","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-copy.json"
   printf '[{"kind":"background","id":"other000","sessionId":"other000-3333","name":"outra","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-other.json"
   _so_w() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-copy.json" _so_run "$1" myrepo --resume orig0000-1111 --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
@@ -64157,7 +64176,7 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   _so_case "(w) a cópia viva do id pedido (fork_inherit): recusa, a conversa já vive como <id>" _so_w \
     '      [ "${frc}" -eq 0 ] || continue' '      continue'
   _so_case_liv "(w2) a cópia se reconhece pela 1ª linha fork_inherit" _so_w \
-    'first.get("cause") != "fork_inherit"' 'first.get("cause") == "fork_inherit"'
+    'o.get("cause") != "fork_inherit"' 'o.get("cause") == "fork_inherit"'
   # (w3) sessão viva com fork_inherit mas de OUTRA origem (o 1º uuid não está no transcript pedido): não é cópia, abre
   _so_w3() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-other.json" _so_run "$1" myrepo --resume orig0000-1111 --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 0 ] && grep -qF -- "--resume orig0000-1111'" <<< "${r}" && ! grep -q 'já vive como' <<< "${r}"; }
@@ -64179,13 +64198,47 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   _so_case "(x2) janela attach de sessão que não está viva: fechar a janela, nunca a receita em laço" _so_x2 \
     '[ -n "${arow}" ] && [ "${alv}" = live ] || die' 'true || die'
   # (w4) a cópia do id resolvido PELO NOME (sem --resume) também barra: repoB resolve pelo título e a cópia vive noutra pasta
-  printf '{"type":"user","uuid":"u-b-0001"}\n' >> "${PJ}/$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/repoB")/66666666-b.jsonl"
-  printf '{"type":"history-suppression","sessionId":"copyb000-4444","cause":"fork_inherit"}\n{"type":"system","uuid":"u-b-0001"}\n' > "${PJ}/-copia/copyb000-4444.jsonl"
+  printf '{"type":"user","uuid":"u-b-0001","timestamp":"2026-11-24T09:00:00Z"}\n' >> "${PJ}/$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/repoB")/66666666-b.jsonl"
+  printf '{"type":"history-suppression","sessionId":"copyb000-4444","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n{"type":"system","uuid":"u-b-0001","timestamp":"2026-11-24T09:00:00Z"}\n' > "${PJ}/-copia/copyb000-4444.jsonl"
   printf '[{"kind":"background","id":"copyb000","sessionId":"copyb000-4444","name":"repoB (2)","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-copyb.json"
   _so_w4() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-copyb.json" _so_run "$1" repoB --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'a conversa 66666666-b já vive como copyb000-4444' <<< "${r}"; }
   _so_case "(w4) a cópia do id resolvido pelo nome (sem --resume) também barra" _so_w4 \
     '  if rt="$(transcript_of "${RID}")"; then' '  if false; then'
+  # ── revisão isolada (2026-11-24): os mutantes que sobreviveram viram caso
+  # (w5) sessão viva SEM a linha fork_inherit que compartilha o uuid (não é cópia): abre, sem «não medi» (M3)
+  printf '{"type":"user","uuid":"u-0001-shared","timestamp":"2026-11-24T09:00:00Z"}\n' > "${PJ}/-outra/same0000-5555.jsonl"
+  printf '[{"kind":"background","id":"same0000","sessionId":"same0000-5555","name":"x","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-same.json"
+  _so_w5() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-same.json" _so_run "$1" myrepo --resume orig0000-1111 --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && ! grep -q 'já vive como' <<< "${r}" && ! grep -q 'não medi' <<< "${r}"; }
+  _so_case_liv "(w5) sem a linha fork_inherit não é cópia, nem «não medido»" _so_w5 \
+    'if o.get("type") != "history-suppression" or o.get("cause") != "fork_inherit": sys.exit(1)   # não é cópia' 'pass'
+  # (w6) a cópia MORTA (registro de fundo sem pid) não barra a retomada do id (M6)
+  printf '[{"kind":"background","id":"copy0000","sessionId":"copy0000-2222","name":"orig (2)","state":"blocked","cwd":"/x/outra-pasta"}]' > "${sb}/agents-copy-dead.json"
+  _so_w6() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-copy-dead.json" _so_run "$1" myrepo --resume orig0000-1111 --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && ! grep -q 'já vive como' <<< "${r}"; }
+  _so_case "(w6) cópia morta não barra a retomada" _so_w6 \
+    '      [ -n "${s}" ] && [ "${s}" != "${RID}" ] && peer_live "${lv}" || continue' '      [ -n "${s}" ] && [ "${s}" != "${RID}" ] || continue'
+  # (w7) IRMÃ: a cópia viva herdou o 1º uuid da origem comum, mas o ÚLTIMO herdado não está na irmã pedida: não barra
+  printf '{"type":"user","uuid":"u-f1","timestamp":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-irma-x","timestamp":"2026-11-24T08:40:00Z"}\n' > "${PJ}/-outra/irma0000-6666.jsonl"
+  printf '{"type":"history-suppression","sessionId":"copyc000-7777","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n{"type":"system","uuid":"u-f1","timestamp":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-l1","timestamp":"2026-11-24T09:30:00Z"}\n{"type":"user","uuid":"u-nova","timestamp":"2026-11-24T10:05:00Z"}\n' > "${PJ}/-copia/copyc000-7777.jsonl"
+  printf '[{"kind":"background","id":"copyc000","sessionId":"copyc000-7777","name":"c","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-copyc.json"
+  _so_w7() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-copyc.json" _so_run "$1" myrepo --resume irma0000-6666 --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && ! grep -q 'já vive como' <<< "${r}"; }
+  _so_case_liv "(w7) irmã (mesmo 1º uuid) não é origem: vale o ÚLTIMO uuid herdado" _so_w7 \
+    '            last = u' '            last = last or u'
+  # (w8) cópia recém-criada, só com a linha history-suppression: origem NÃO medida, dito, e abre (não barra às cegas)
+  printf '{"type":"history-suppression","sessionId":"fresh000-8888","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n' > "${PJ}/-copia/fresh000-8888.jsonl"
+  printf '[{"kind":"background","id":"fresh000","sessionId":"fresh000-8888","name":"f","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-fresh.json"
+  _so_w8() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-fresh.json" _so_run "$1" myrepo --resume orig0000-1111 --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'não medi se a sessão viva fresh000-8888 é cópia' <<< "${r}"; }
+  _so_case_liv "(w8) cópia sem mensagem herdada: não medido e dito, nunca «não é cópia» calado" _so_w8 \
+    'print("session-liveness: cópia sem mensagem herdada ainda: origem NÃO medida", file=sys.stderr); sys.exit(2)' 'sys.exit(1)'
+  # (y) pid VIVO de outro dono (kill -0 dá EPERM; o pid 1 é do root) conta como vivo (M1). Como root não há EPERM: pula.
+  _so_y() { local w; w="$(bash "${SO_LIV:-${liv}}" live background working 1 2>&1)"; local rc=$?; SO_WHY="rc=${rc} ${w}"; [ "${rc}" = 0 ]; }
+  if [ "$(id -u)" = 0 ]; then record_skip "session-open: (y) EPERM conta como vivo (rodando como root: kill -0 1 não dá EPERM)"
+  else _so_case_liv "(y) pid vivo de outro dono (EPERM) conta como vivo" _so_y \
+    '    except PermissionError: return True       # existe, de outro dono' '    except PermissionError: return False'; fi
   # (t) as superfícies que ensinam a reiniciar a sessão (o aviso do hook de versão, o censo de atualidade e a REGRA 65)
   #     ensinam a retomada pelo id exato, nunca `/exit → claude --continue` (D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120).
   #     Mutante: devolver a forma antiga a cada uma e exigir que o caso reprove.
@@ -64284,8 +64337,8 @@ RS_PY
   # sessão 4: título com o sufixo « (5)» que o harness põe no nome repetido
   printf '{"type":"custom-title","customTitle":"sessao-w (5)"}\n' > "${sb}/proj/p/${SID4}.jsonl"
   # o ancestral e a cópia (fork_inherit): a 1ª linha da cópia e o 1º uuid dela presente na origem
-  printf '{"type":"custom-title","customTitle":"anc"}\n{"type":"user","uuid":"u-anc-0001"}\n' > "${sb}/proj/p/${SIDA}.jsonl"
-  printf '{"type":"history-suppression","sessionId":"%s","cause":"fork_inherit"}\n{"type":"system","uuid":"u-anc-0001"}\n' "${SIDC}" > "${sb}/proj/p/${SIDC}.jsonl"
+  printf '{"type":"custom-title","customTitle":"anc"}\n{"type":"user","uuid":"u-anc-0001","timestamp":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-anc-0002","timestamp":"2026-11-24T09:30:00Z"}\n' > "${sb}/proj/p/${SIDA}.jsonl"
+  printf '{"type":"history-suppression","sessionId":"%s","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n{"type":"system","uuid":"u-anc-0001","timestamp":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-anc-0002","timestamp":"2026-11-24T09:30:00Z"}\n{"type":"user","uuid":"u-cop-0003","timestamp":"2026-11-24T10:05:00Z"}\n' "${SIDC}" > "${sb}/proj/p/${SIDC}.jsonl"
   printf '#!/bin/sh\necho falhou >&2\nexit 1\n' > "${sb}/pulse-broken.sh"
   # medidor que mede na 1ª chamada e falha da 2ª em diante (a falha DURANTE a espera); o contador vem do ambiente
   printf '#!/bin/sh\nn=$(cat "$RS_FLAKY_CNT" 2>/dev/null || echo 0); echo $((n+1)) > "$RS_FLAKY_CNT"\n[ "$n" -eq 0 ] && exec bash "%s" "$@"\necho falhou na espera >&2; exit 1\n' "${pulse}" > "${sb}/pulse-flaky.sh"
@@ -64438,16 +64491,28 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     "            if fr == 0:" "            if False:" _rs_t
   # (t2) dois ancestrais com bilhete (a cópia de uma cópia herda o 1º uuid do avô): vale o gravado por último, o outro é dito
   local SIDO="rsid-0000-4000-8000-aaa0"
-  printf '{"type":"custom-title","customTitle":"avo"}\n{"type":"user","uuid":"u-anc-0001"}\n' > "${sb}/proj/p/${SIDO}.jsonl"
+  # SIDO: ancestral mais antigo que também tem a herança inteira (o último uuid herdado); SIDS: IRMÃ, só com o 1º uuid
+  local SIDS="rsid-0000-4000-8000-sib0"
+  printf '{"type":"custom-title","customTitle":"avo"}\n{"type":"user","uuid":"u-anc-0001","timestamp":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-anc-0002","timestamp":"2026-11-24T09:30:00Z"}\n' > "${sb}/proj/p/${SIDO}.jsonl"
+  printf '{"type":"history-suppression","sessionId":"%s","cause":"fork_inherit","ts":"2026-11-24T09:10:00Z"}\n{"type":"system","uuid":"u-anc-0001","timestamp":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-sib-0009","timestamp":"2026-11-24T09:20:00Z"}\n' "${SIDS}" > "${sb}/proj/p/${SIDS}.jsonl"
   _rs_t2() { local o rc=0; mkdir -p "${RS_DIR}"
     printf 'session\t%s\tanc\t2026-11-24T00:00:00Z\tzerou\tx\ttmux\nagent\taanc1\tAGENT_RUNNING\tdesc\t~/wt\tfeat/x\t3\tBash\n' "${SIDA}" > "${RS_DIR}/${SIDA}.tsv"
     printf 'session\t%s\tavo\t2026-11-01T00:00:00Z\tzerou\tx\ttmux\nagent\taavo1\tAGENT_RUNNING\tdesc\t~/wt\tfeat/y\t3\tBash\n' "${SIDO}" > "${RS_DIR}/${SIDO}.tsv"
+    printf 'session\t%s\tirma\t2026-11-24T12:00:00Z\tzerou\tx\ttmux\nagent\tasib1\tAGENT_RUNNING\tdesc\t~/wt\tfeat/z\t3\tBash\n' "${SIDS}" > "${RS_DIR}/${SIDS}.tsv"
     o="$(_rsr "$1" --resume-check --session "${SIDC}")" || rc=$?
     RS_WHY="rc=${rc} · $(head -c 400 <<< "${o}")"
     [ "${rc}" = 0 ] && grep -q "é cópia de ${SIDA}" <<< "${o}" && grep -q "${SIDO} também é ancestral" <<< "${o}" \
-      && [ -e "${RS_DIR}/${SIDO}.tsv" ] && ! grep -q 'SendMessage to=aavo1' <<< "${o}"; }
+      && [ -e "${RS_DIR}/${SIDO}.tsv" ] && ! grep -q 'SendMessage to=aavo1' <<< "${o}" \
+      && [ -e "${RS_DIR}/${SIDS}.tsv" ] && ! grep -q "asib1\|${SIDS}" <<< "${o}"; }
   _rscase "(t2) dois ancestrais com bilhete: segue o mais recente, diz o outro e não o arquiva" \
     "            hits.sort(); b = hits[-1][1]" "            b = hits[0][1]" _rs_t2
+  # (u) o mesmo sessionId em duas linhas (o registro de fundo morto, lido primeiro, e a interativa viva no tmux): vale a
+  #     linha viva, e a receita é a do tmux, nunca claude stop numa sessão que não está no fundo
+  printf '[{"kind":"background","id":"rsiddead","sessionId":"%s","state":"blocked"},{"kind":"interactive","sessionId":"%s","pid":%s}]' "${SID}" "${SID}" "$$" > "${sb}/agents-dup.json"
+  _rs_u() { local o; o="$(RS_AGENTS="${sb}/agents-dup.json" _rsr "$1" --session "${SID}" --now)"; RS_WHY="$(grep '▶' <<< "${o}")"
+    grep -q "^▶ retomar: bash ops/session-open.sh sessao-x --resume ${SID}\$" <<< "${o}" && grep -q '^- modo da sessão: tmux$' "${RS_DIR}/${SID}.md"; }
+  _rscase "(u) sid repetido (fundo morto + interativa viva): vale a viva, receita do tmux sem claude stop" \
+    "    row = next((f for f in rows if f[6] == 'live'), rows[0] if rows else None)" "    row = rows[0] if rows else None" _rs_u
   # (i) a batida lê o marcador e o bilhete: o baton-pulse.sh avisa «SEM DESPACHO NOVO» e manda o --resume-check
   mkdir -p "${sb}/rd-pulse"; printf '2026-11-21T00:00:00Z\tsessao-x\tdrain\n' > "${sb}/rd-pulse/${SID}.draining"
   printf 'session\t%s\tsessao-x\t2026-11-21T00:00:00Z\tzerou\tx\nagent\tarun\tAGENT_RUNNING\n' "${SID}" > "${sb}/rd-pulse/${SID}.tsv"
@@ -64461,7 +64526,7 @@ if o in s: open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 
     "    RS.append(('draining', k)); warns.append(" "    RS.append(('draining', k)); (lambda *x: None)(" _rs_i pulse
 
   kill "${pbg}" 2>/dev/null || true; wait "${pbg}" 2>/dev/null || true
-  unset -f _rsr _rscase _rs_a _rs_b _rs_c _rs_d _rs_e _rs_f _rs_g _rs_h _rs_i _rs_j _rs_k _rs_l _rs_m _rs_n _rs_o _rs_p _rs_q _rs_r _rs_s _rs_t _rs_t2
+  unset -f _rsr _rscase _rs_a _rs_b _rs_c _rs_d _rs_e _rs_f _rs_g _rs_h _rs_i _rs_j _rs_k _rs_l _rs_m _rs_n _rs_o _rs_p _rs_q _rs_r _rs_s _rs_t _rs_t2 _rs_u
   rm -rf "${sb}"
 }
 _family run_restart_drain_selftests

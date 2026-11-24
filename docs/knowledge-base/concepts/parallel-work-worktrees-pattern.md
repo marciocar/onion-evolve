@@ -96,8 +96,11 @@ O que se mediu no Claude Code 2.1.331, e decide a escolha:
 
 - **A tecla `←` cria uma CÓPIA com id novo**, e o processo antigo morre. O transcript da cópia abre com
   `{"type":"history-suppression","cause":"fork_inherit"}`, **sem** o id de origem, e todo `sessionId` do histórico é
-  reescrito. O que liga as duas é o `uuid` das mensagens: o 1º `uuid` da cópia está, idêntico, no transcript da
-  origem. Retomar o id antigo abre uma **segunda** cópia da conversa que já vive.
+  reescrito. O que liga as duas é o `uuid` das mensagens: o **último** `uuid` herdado (a última mensagem com
+  `timestamp` anterior ao `ts` da linha `history-suppression`) está, idêntico, no transcript da origem. O **primeiro**
+  não serve: é a fronteira da compactação e se repete em **irmãs** (duas cópias da mesma origem). Retomar o id antigo
+  abre uma **segunda** cópia da conversa que já vive. Cópia recém-criada, só com a linha `history-suppression`, ainda
+  não tem o que casar: a origem fica **não medida**, as peças dizem isso e não barram por palpite.
 - **A cópia nasce de um `claude bg-spare` genérico**, sem as flags da sessão original: a sessão aberta com um canal de
   desenvolvimento (a campainha de mensagens) volta **muda**. `claude --bg --resume <id>` continua a sessão no fundo
   com o **mesmo** id, mas flag a mais na retomada abre cópia.
