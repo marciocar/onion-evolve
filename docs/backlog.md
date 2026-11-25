@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1221 itens abertos** em 182 grafo(s) com aberto (de 241 no escopo) · 172 grupo(s), agrupados por `owner:` (81 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1225 itens abertos** em 183 grafo(s) com aberto (de 242 no escopo) · 173 grupo(s), agrupados por `owner:` (81 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1525,6 +1525,15 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 12.0 | `Q_DIFF_SEM_NOME_PRIVADO` | private-names-2026-11 | no core, o diff que acrescenta nome de repo ou de clone de adotante não federado reprova no lint, sem lista à mão e sem imprimi |
+
+## radar-E3-2026-11-25-r28 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 11.2 | `Q_DENY_RESISTE_A_COMANDO_LONGO_E_A_CRASE_EM_HEREDOC_1125` | radar-E3-2026-11-25-r28 | fechar os dois furos do deny no modo da casa: comando acima do limite do parser e crase em heredoc sem aspas, com casos novos na b |
+| 11.2 | `Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125` | radar-E3-2026-11-25-r28 | o SDK do bridge sobe para 0.3.332 (o PR onion-bridge #112, ainda aberto, mira 0.3.330 e precisa de novo alvo) e o pin do revisor d |
+| 10.5 | `Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125` | radar-E3-2026-11-25-r28 | ligar os guardas de Bash da casa também ao PreSkillShellCommand, para que a diretiva de comando ou skill de fora passe pelo mesmo |
+| 2.8 | `Q_CAMINHO_DE_IMAGEM_PARA_AS_SESSOES_DA_VPS_1125` | radar-E3-2026-11-25-r28 | declarar e documentar o caminho de imagem do maestro para as sessões da VPS (Remote Control pelo app, ou arquivo enviado e citado |
 
 ## dissect-forge-2026-10 — 2 item(ns)
 
