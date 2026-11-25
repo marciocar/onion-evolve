@@ -9,6 +9,7 @@ flowchart TD
   metagamify["metagamify<br/>standalone · legacy"]:::standalone
   pulse_mais["pulse-mais<br/>standalone · greenfield"]:::standalone
   granaai["granaai<br/>standalone · regulated"]:::standalone
+  ticket_ai["ticket-ai<br/>consumer · legacy"]:::consumer
   gustavo_pulga["gustavo-pulga<br/>standalone · greenfield"]:::standalone
   onion_mini["onion-mini<br/>mini · distilled"]:::mini
   onion_standalone["onion-standalone<br/>standalone · greenfield"]:::standalone
@@ -50,6 +51,7 @@ flowchart TD
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
   granaai -.->|can-correct| onion_evolve
+  ticket_ai -->|adopts| brain_granaai
   gustavo_pulga -->|adopts| onion_evolve
   onion_mini -->|adopts| onion_evolve
   onion_standalone -->|adopts| onion_evolve
@@ -101,6 +103,7 @@ flowchart TD
 | metagamify | standalone | legacy | gamification, nx-monorepo, asana-integration, metagamification | `21213cc6c3d6` |
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
+| ticket-ai | consumer | legacy | saas-multitenant, help-center, lovable-origin | `79452017f23d` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `7fd9392cd43b` |
 | onion-mini | mini | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `eb598aa5bcdd` |
 | onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `eb598aa5bcdd` |

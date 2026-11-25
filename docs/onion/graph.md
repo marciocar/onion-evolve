@@ -975,6 +975,14 @@ test-engineer	related	test-planner
 test-planner	related	/engineer/pre-pr	
 test-planner	related	branch-test-planner	
 test-planner	related	test-engineer	
+ticket-ai	adopts	brain-granaai	
+ticket-ai	mode	legacy	
+ticket-ai	pin	79452017f23d	
+ticket-ai	specialization	help-center	
+ticket-ai	specialization	lovable-origin	
+ticket-ai	specialization	saas-multitenant	
+ticket-ai	tier	consumer	
+ticket-ai	trust-advises	onion-evolve	
 vendas-pdi-enterprise	adopts	onion-evolve	
 vendas-pdi-enterprise	mode	greenfield	
 vendas-pdi-enterprise	pin	4299290b73d4	
