@@ -77,7 +77,7 @@ nodes:
     verified_against: "123.258 comandos Bash únicos dos transcripts da máquina (sessões e subagentes); 4.040 com rm recursivo, filter-*, gh repo/release delete|edit, --visibility ou eval, reexecutados contra o hook novo e, os que citam eval ou push, contra o protect-main e o merge-gate de origin/main e da branch"
     label: "o eval literal na lib não mudou nenhum veredito do protect-main nem do merge-gate no corpus; a 1ª forma do espelho vetou 8 comandos, 6 deles falsos positivos (rm -rf do .git de uma cópia de trabalho num rascunho, filter-branch --help), curados limitando o .git ao do projeto e liberando --help; seguem vetados 2: um gh repo edit --visibility (o moat-gate também veta) e um git filter-branch --msg-filter numa branch de trabalho, que o deny também barra"
     provenance:
-      source: "~/.claude/projects/*/*.jsonl"
+      source: "⟨transcripts das sessões Claude Code desta máquina⟩"
       locator: "replay.py no rascunho da forja"
       method: "measurement: reexecução do corpus contra os hooks antigo e novo"
       locality: "repo"
