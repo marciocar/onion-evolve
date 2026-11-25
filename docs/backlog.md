@@ -1817,8 +1817,8 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 5.4 | `T_EVAL_E_SCRIPT_OPACOS_1125` | deny-mirror-2026-11 | teto: eval com o texto inteiro opaco (eval \"$X\"), script em arquivo, outra linguagem (python, perl), comando montado por substit |
-| 3.6 | `T_ALVO_DINAMICO_DO_RM_PASSA_1125` | deny-mirror-2026-11 | teto: rm recursivo com alvo dinâmico (rm -rf \"$D\", inclusive por eval) passa, porque vetá-lo travaria a limpeza honesta de pas |
+| 5.4 | `T_EVAL_E_SCRIPT_OPACOS_1125` | deny-mirror-2026-11 | teto: eval opaco, script em arquivo, outra linguagem, substituição, glob no alvo, conteúdo de dentro do .git, binário git-filt |
+| 3.6 | `T_ALVO_DINAMICO_DO_RM_PASSA_1125` | deny-mirror-2026-11 | teto: rm recursivo com alvo dinâmico passa; o .git só cai quando é o do projeto, e depois de um cd não seguido cai salvo se a  |
 | 3.4 | `T_LEASE_E_RESET_FORA_DE_PROPOSITO_1125` | deny-mirror-2026-11 | teto: --force-with-lease de branch de trabalho, reset --hard (inclusive na main) e apagar branch remota de trabalho não são veta |
 
 ## elenxo-mecanismos-lint-2026-08-13 — 1 item(ns)
