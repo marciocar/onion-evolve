@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1239 itens abertos** em 185 grafo(s) com aberto (de 246 no escopo) · 174 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1238 itens abertos** em 185 grafo(s) com aberto (de 246 no escopo) · 174 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -463,12 +463,11 @@
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
 
-## second-brain-company-brain-2026-11 — 13 item(ns)
+## second-brain-company-brain-2026-11 — 12 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 57.5 | `Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11` | second-brain-company-brain-2026-11 | Second Brain pessoal × Company Brain interconectáveis como vertical do Onion: o que o mercado faz em nov/2026, que mercados isso |
-| 47.5 | `D_SECOND_BRAIN_VERTICAL_2026_11` | second-brain-company-brain-2026-11 | DECISÃO ABERTA: Second Brain × Company Brain como vertical do Onion. Opções: A retomar ADR-003 · B vertical irmã federada · |
 | 20.4 | `C_OPCAO_B_SISTER_VERTICAL_FEDERATED` | second-brain-company-brain-2026-11 | OPÇÃO B) Second Brain como vertical irmã do Company Brain, com interconexão federada (A2A, kg-ssot) entre os dois. |
 | 18.0 | `C_OPCAO_C_DECISION_CENTER_FIRST` | second-brain-company-brain-2026-11 | OPÇÃO C) Começar pela central de decisão do company-brain (PR #29 / SAC-554), com o indivíduo como usuário dentro do Company |
 | 13.2 | `C_OPCAO_A_RESUME_ADR003_ONDEVICE` | second-brain-company-brain-2026-11 | OPÇÃO A) Retomar o ADR-003 do Onion Pessoal: KG cifrado no celular, só contexto de-identificado à nuvem. |

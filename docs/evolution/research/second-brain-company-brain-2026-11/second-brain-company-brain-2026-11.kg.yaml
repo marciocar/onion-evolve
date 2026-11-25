@@ -21,9 +21,11 @@ meta:
   # como doutrina, mas as objeções que BLOQUEIAM o item (2) são de mercado e foram cortadas/não lidas.
   # Gatilhos antecipados: a rodada complementar D; o encerramento do Mem (15/01/2027); a ANPD TS-04-2026.
   note: "Grafo de DECISÃO. 37 objeções sobreviventes do Elenxo, TODAS modeladas como E_OBJECAO_ (0 não modeladas). 19 claims confirmadas viram E_F01..19. 6 superações viram C_SUPERACAO_20261125_*."
-  # ═══ TETO: 70 NÓS ═══
+  # ═══ TETO: 72 NÓS ═══
+  #   (era 70 no run; +2 justificados em 2026-11-25: o selo da ORDEM do Delphi second-brain-order-1125
+  #   D_SECOND_BRAIN_ORDER_1125 e a medida do MVP 0 E_MVP0_MEDIDA_1125, ambos nascidos depois do run)
   #   1 question + 1 decision (OPEN) + 4 opções + 19 achados confirmados + 37 E_OBJECAO
-  #   + 1 E_MERCADO + 1 E_LACUNAS + 6 C_SUPERACAO = 70.
+  #   + 1 E_MERCADO + 1 E_LACUNAS + 6 C_SUPERACAO = 70, mais 2 pós-run = 72.
 external_edges:
   - from: D_SECOND_BRAIN_VERTICAL_2026_11
     to: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml#D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION"
@@ -69,11 +71,15 @@ nodes:
   - id: D_SECOND_BRAIN_VERTICAL_2026_11
     node_type: decision
     layer: audit
-    plane: DEV
-    status: open
     impact: 5
     confidence: 0.5
     label: "DECISÃO ABERTA: Second Brain × Company Brain como vertical do Onion. Opções: A retomar ADR-003 · B vertical irmã federada · C começar pela central de decisão do company-brain · D rodada complementar. Elenxo recomenda C com limites (A só reescrita, B parqueada)."
+    trace: "run /onion-research modo decision de 2026-11-25; pergunta Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11; segue D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION e D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR (compartilhamento-individuo-organizacao-2026-09)"
+    status: done
+    plane: DEV
+    x_destination: design
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro em 2026-11-25, por pergunta com opções (/meta:decide): escolhida «C (central de decisão do company-brain) primeiro, depois B (vertical irmã federada) usando o aprendizado de A (ADR-003)»"
     narrative: |-
       Opções: C_OPCAO_A_RESUME_ADR003_ONDEVICE, C_OPCAO_B_SISTER_VERTICAL_FEDERATED,
       C_OPCAO_C_DECISION_CENTER_FIRST, C_OPCAO_D_COMPLEMENTARY_ROUND.
@@ -111,7 +117,13 @@ nodes:
       externa. (c) O último commit do app pessoal é de 2026-10-08 (o Elenxo disse 2026-10-09).
 
       Este escritor NÃO sela: o maestro sela pelo /meta:decide.
-    trace: "run /onion-research modo decision de 2026-11-25; pergunta Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11; segue D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION e D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR (compartilhamento-individuo-organizacao-2026-09)"
+
+      Selado por /meta:decide em 2026-11-25: escolhida «C (central de decisão do company-brain) primeiro, depois B (vertical irmã federada) usando o aprendizado de A (ADR-003)»; descartadas: «A como caminho principal agora» · «D antes de decidir». Destino: desenho (fica como texto, sem guarda a cobrar).
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-25: «Opção C e depois B com o aprendizado do que aconteceu em A; fazer um Delphi com os envolvidos e trazer em decide para avançar; validar e certificar as jornadas fim a fim de forma ordenada e progressiva»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-25"
+      locality: "pessoa"
   - id: C_OPCAO_A_RESUME_ADR003_ONDEVICE
     node_type: claim
     layer: audit
@@ -1233,7 +1245,44 @@ nodes:
     label: "Memória pessoal e da empresa podem dividir o substrato de armazenamento e recuperação, mas o company brain precisa de governança que um namespace user_id/org_id não entrega: autorização no store, herança da permissão da fonte e auditoria."
     narrative: "O QUE SUPERA: a fronteira entre a pessoa e a organização é de governança, não de escopo; a camada tem três partes: autorização imposta no store (row-level security, deny por padrão), herança da permissão de cada fonte e auditoria do que o agente viu. MEDIDA: WebFetch em 25/11/2026: a própria Vectorize diz 'A company brain has many users with different access levels'; a doc da Oracle Agent Memory 26.4 diz 'The integrating application is responsible for end-user authentication, authorization, and correct memory scoping'. Oracle Developers e DevRev voltaram 403 e 429 (só resumo de busca). CRITÉRIO: V5_MARKETING (CTA 'Request a demo of Hindsight', tier 3) com complemento da segunda versão. ALVO REPROVADO: claim refutada (f), em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz; não fecha o vazamento por agregação (E_OBJECAO_14)."
     trace: "WebFetch https://vectorize.io/articles/second-brain-vs-company-brain + grep -F 'Request a demo of Hindsight'; WebFetch https://docs.oracle.com/en/database/oracle/agent-memory/26.4/agmea/about.html + grep -F 'responsible for end-user authentication, authorization, and correct memory scoping'"
+  - id: D_SECOND_BRAIN_ORDER_1125
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro em 2026-11-25, por pergunta com opções (/meta:decide): escolhida «Selar e começar (MVP 0 primeiro)»"
+    label: "Ordem Lean do Second Brain: MVP 0 (selo de 1-3 decisões reais pelo /meta:decide, linha de base) → MVP 1 (5 dias, N=1, fila única: bloco pessoal do hub + batuta/decide + 3-5 capturas do celular, resumo manual) → incremento 1 só se uso ≥3/5 e ação ≥50% → incremento 2 → B"
+    narrative: "Selado por /meta:decide em 2026-11-25: escolhida «Selar e começar (MVP 0 primeiro)»; descartadas: «Selar sem o MVP 0» · «Ajustar antes». Destino: desenho (fica como texto, sem guarda a cobrar). Delphi second-brain-order-1125 em 3 rodadas (posições independentes, crítica cruzada sem autor, convergência), participantes company-brain, onion-slm, onion-curation e brain-granaai; rodada 3 com 4 aceites e nenhuma objeção; confiança 0,75 / 0,75 / 0,75 / 0,8. Síntese integral em data/delphi-second-brain-order-1125.md. LIMITES DECLARADOS (não pré-requisitos): N=1 e autor do produto (viés); só dado do maestro; celular em Termux, não app nativo; resumo de-identificado à mão; transporte por scp; uma semana não prova retenção; métricas de ação autodeclaradas. SEGUNDA RESPOSTA DO MAESTRO (25/11): o ambiente de teste do Slack FICA, e o aviso sem conteúdo do MVP 1 sai também pelo WhatsApp via WAHA."
+    trace: "docs/evolution/research/second-brain-company-brain-2026-11/data/delphi-second-brain-order-1125.md"
+    x_destination: design
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-25: «Selo a ordem do Delphi second-brain-order-1125?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-25"
+      locality: "pessoa"
+  - id: E_MVP0_MEDIDA_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-25"
+    verified_against: "MVP 0 rodado em 2026-11-25 pelo /meta:decide, com a fila da rodada 28 (relato da sessão que o executou)"
+    label: "MVP 0 medido: 3 de 3 decisões reais da fila seladas pelo /meta:decide, laço fechado, ≈ 2 min 39 s de resposta do maestro e ≈ 4 min até o último selo, 2 recusas do selador por flag nova."
+    narrative: "Medida do MVP 0 (zero construção), linha de base da ordem D_SECOND_BRAIN_ORDER_1125. Três decisões reais da rodada 28 seladas pelo /meta:decide: Q_DENY_SEGURA_EM_BYPASS_1125, Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125 e Q_CAMINHO_DE_IMAGEM_PARA_AS_SESSOES_DA_VPS_1125. O laço fechou (3 de 3 seladas, radar 0). Tempo da pergunta ao selo: ≈ 2 min 39 s de resposta do maestro (20:49:09Z a 20:51:48Z) e ≈ 4 min até o último selo. Atrito: 2 recusas do selador por flag nova (primeiro --destination, depois --guard para o destino mecanismo) e 0 passos do maestro fora do trilho. As 3 escolhas foram a recomendada. Cards filhos do SAC-562: SAC-563 (MVP 0), SAC-564 (MVP 1), SAC-565 e SAC-566. Limite: N=1, autor do produto, 3 itens."
+    provenance:
+      source: "relato da sessão do core que rodou o MVP 0, 2026-11-25"
+      locator: "ordem do core a esta sessão, com os ids das 3 perguntas e os horários"
+      method: "measurement: tempos e contagens declarados pela sessão que executou; não reconferidos por mim"
+      locality: "pessoa"
 edges:
+  - from: E_MVP0_MEDIDA_1125
+    to: D_SECOND_BRAIN_ORDER_1125
+    edge_type: SUPPORTS
   - from: D_SECOND_BRAIN_VERTICAL_2026_11
     to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
     edge_type: TRACES_TO
@@ -1500,4 +1549,7 @@ edges:
     edge_type: TRACES_TO
   - from: C_SUPERACAO_20261125_GOVERNANCE_NOT_NAMESPACE_SCOPE
     to: E_LACUNAS_SECOND_BRAIN_2026_11
+    edge_type: TRACES_TO
+  - from: D_SECOND_BRAIN_ORDER_1125
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
     edge_type: TRACES_TO

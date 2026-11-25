@@ -25,7 +25,7 @@ Grafo de decisão `second-brain-company-brain-2026-11` (70 nós, decisão `D_SEC
 
 ## Achados
 
-Confrontado com os `confirmed` de maior impacto do grafo (`E_OBJECAO_37_OPTION_A_PREMISE_CONTRADICTS_CODE`, `E_OBJECAO_36_SNYK_TOXICSKILLS_UNREAD`, `E_OBJECAO_23_GPT_STORE_COUNTEREXAMPLE_CUT`): este PR só versiona o grafo do run, não propõe nada que os contrarie; os três já constam como limites na SYNTHESIS (opção A não confere com o app; o item 2 de mercado sem prova). Nenhum bloqueante. A decisão fica aberta para o maestro (`/meta:decide`).
+Selos de 25/11 gravados pelo selador (`kg-decide-seal.sh`, rc 0): `D_SECOND_BRAIN_VERTICAL_2026_11` e `D_SECOND_BRAIN_ORDER_1125`, mais a evidência `E_MVP0_MEDIDA_1125` (relato da sessão que rodou o MVP 0, não reconferido). Confrontado com os `confirmed` de maior impacto do grafo (`E_OBJECAO_37_OPTION_A_PREMISE_CONTRADICTS_CODE`, `E_OBJECAO_36_SNYK_TOXICSKILLS_UNREAD`, `E_OBJECAO_23_GPT_STORE_COUNTEREXAMPLE_CUT`): este PR só versiona o grafo do run, não propõe nada que os contrarie; os três já constam como limites na SYNTHESIS (opção A não confere com o app; o item 2 de mercado sem prova). Nenhum bloqueante. A decisão fica aberta para o maestro (`/meta:decide`).
 
 ## Mutantes
 
