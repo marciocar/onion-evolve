@@ -55,7 +55,7 @@
     {
       "alvo": "E_HOST_NA_2_1_332_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_330_1125",
       "veredito": "SUSTENTA",
-      "nota": "Reproduz. claude --version → 2.1.332; link exe do processo pai do juiz → versions/2.1.331; contagem pelo link exe de cada processo no procfs → 6 em 2.1.330, 8 em 2.1.331, 3 em 2.1.332 (igual ao nó); grep -n claude-code-action@ .github/workflows/onion-review.yml → l.343 e l.522 com acfe7992 (a l.40 só cita @v1 em comentário); currency-census.sh . --table → action 1.0.286 contra 1.0.290, e o pin acfe7992 instala o CLI 2.1.330; agent-sdk:bridge 0.3.323 contra 0.3.332. Bridge 8 versões atrás (censo) e revisor 2 atrás (331 e 332) conferem."
+      "nota": "Reproduz. claude --version → 2.1.332; link exe do processo pai do juiz → versions/2.1.331; contagem pelo link exe de cada processo no procfs → 6 em 2.1.330, 8 em 2.1.331, 3 em 2.1.332 (igual ao nó); grep -n claude-code-action@ .github/workflows/onion-review.yml → l.343 e l.522 com anthropics/claude-code-action@acfe7992 (a l.40 só cita @v1 em comentário); currency-census.sh . --table → action 1.0.286 contra 1.0.290, e o pin anthropics/claude-code-action@acfe7992 instala o CLI 2.1.330; agent-sdk:bridge 0.3.323 contra 0.3.332. Bridge 8 versões atrás (censo) e revisor 2 atrás (331 e 332) conferem."
     },
     {
       "alvo": "Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125",
