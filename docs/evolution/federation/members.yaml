@@ -198,20 +198,25 @@ members:
       exposes_downstream: []
 
   - id: ticket-ai
-    name: ticket-ai (TicketAi — SaaS de tickets e Central de Ajuda da Grana.ai; feito no Lovable)
-    role: adopted
+    name: ticket-ai
+    role: consumer                 # T2 sob o hub da Grana.ai
     kind: adopter
-    parent: brain-granaai          # adotante sob o hub da Grana.ai; o core orquestra (SAC-561, maestro 2026-11-25)
-    remote: github.com/marcio-granaai/ticket-ai   # PRIVADO; canônico vai para marciocar/ticket-ai com espelho na GranaAi (decisão 2026-11-25)
+    parent: brain-granaai
+    remote: github.com/marcio-granaai/ticket-ai   # PRIVADO; o canônico vai para marciocar/ticket-ai com espelho na GranaAi (decisão do maestro 2026-11-25) — atualizar aqui na transferência
     local_path: "/home/marcio/ticket-ai"
+    owner_session: ticket-ai       # sessão dona (tmux ticket-ai, aberta 2026-11-25)
     onion_version: 79452017f23d    # adoção legacy, PR ticket-ai#1 (merge commit, 2026-11-25)
     adopted_at: 2026-11-25
     mode: legacy
     integration_branch: main       # o Lovable sincroniza a main: nada direto nela, só PR com merge commit
+    personality_summary: "SaaS de tickets e Central de Ajuda da Grana.ai, nascido no Lovable; adotado para sair do Lovable Cloud rumo à VPS e depois à AWS da Grana.ai, com login pelo Logto."
+    specializations: [saas-multitenant, help-center, lovable-origin]
+    personality_last_sync: 2026-11-25
     trust:
       can_receive_from: [onion-evolve]
       can_advise_to: [onion-evolve]
-      diary_readable_by: []
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
       diary_classifications_shared: []
       exposes_downstream: []
 
