@@ -96,6 +96,12 @@ segredos. Ela é a 1ª camada e o hook é a 2ª: nenhuma substitui a outra, e ne
 - **O que fica fora de propósito:** o que a casa faz todo dia (`reset --hard`, `branch -D`, `worktree remove
   --force`, `--force-with-lease`, `rm -rf` de pasta de trabalho) e o que já tem veto por hook com caminho verificado
   (merge e push na main: num repo sem o script verificado o hook avisa em vez de vetar, e o deny tiraria essa saída).
+- **O deny não segura toda forma em `bypassPermissions` (medido em 2.1.330–2.1.332, SAC-551):** por isso todo ato
+  irreversível do deny tem também veto por hook, e o hook não depende do deny. O `pretooluse-deny-mirror.sh` veta
+  `filter-branch`/`filter-repo`, `rm` recursivo da raiz, da home e do `.git` do projeto, `gh repo delete`,
+  `gh release delete` e `--visibility`. O `protect-main` veta a força dura e o `clean -x`. Os dois veem também o
+  `eval` literal. Regra nova no deny pede o veto irmão no hook, no mesmo PR. Grafo:
+  `docs/evolution/research/guard-deny-mirror-2026-11/deny-mirror-2026-11.kg.yaml`.
 - **Medido em 2.1.319:** a regra `Read` alcança comando conhecido no Bash **quando o arquivo é nomeado** (`cat`,
   `grep`, `rg`, `sed`, `base64`), e também inspeção (`ls` e `stat` do arquivo: use `test -f`). Vale em
   `bypassPermissions`. Script chamado pela linha **não** é visto, e é assim que o merge verificado e a publicação de

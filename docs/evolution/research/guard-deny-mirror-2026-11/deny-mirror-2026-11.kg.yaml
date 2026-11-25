@@ -1,0 +1,132 @@
+# kg-backlog-guard: on
+# ═══ TETO: 8 NÓS ═══ (7 em uso)
+meta:
+  id: deny-mirror-2026-11
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-11-25"
+  review_after: "2026-12-26"
+  # Forja (/meta:forge-guard) do espelho do deny: SAC-551, Q_DENY_SEGURA_EM_BYPASS_1125 (radar E3, rodada 28).
+  # Os casos do incidente real ficam no registro privado do core; aqui só formas genéricas.
+external_edges:
+  - from: E_CORPUS_DE_TRANSCRIPTS_SEM_FALSO_POSITIVO_1125
+    to: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    edge_type: SUPPORTS
+  - from: E_HOOKS_DEIXAVAM_ABERTO_O_QUE_SO_O_DENY_COBRIA_1125
+    to: "docs/evolution/research/radar-E3-2026-11-25-r28/radar-E3-2026-11-25-r28.kg.yaml#E_DENY_NAO_SEGURA_EM_BYPASS_1125"
+    edge_type: TRACES_TO
+  - from: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    to: "docs/evolution/research/radar-E3-2026-11-25-r28/radar-E3-2026-11-25-r28.kg.yaml#Q_DENY_SEGURA_EM_BYPASS_1125"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_HOOKS_DEIXAVAM_ABERTO_O_QUE_SO_O_DENY_COBRIA_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: "2026-11-25"
+    verified_against: "payload JSON contra TODOS os hooks PreToolUse de Bash do settings.json de origin/main (14c1bbdb8), cwd numa worktree em branch de tópico: rc 0 em todos para git filter-branch, git filter-repo (direto, bash -c, eval), rm -rf de /, ~, $HOME e .git (direto, bash -c, crase, eval), gh repo delete (direto e eval), eval \"git push --force origin feat/x\", eval \"git push origin +feat/x\" e eval \"git clean -fdx\". Barrados já: força dura direta e por crase em heredoc sem aspas (protect-main), gh release delete e --visibility (moat-gate, só no core), apagar a main remota (merge-gate)"
+    label: "o defeito, datado: com o deny fora (bypassPermissions, E_DENY_NAO_SEGURA_EM_BYPASS_1125), nenhum hook barrava reescrever a história (filter-branch/filter-repo), apagar raiz, home ou .git com rm recursivo, apagar o repo, nem o force-push e o clean -fdx chegados por eval literal"
+    narrative: "A forma do incidente (crase em heredoc sem aspas com force-push) já caía no protect-main de origin/main desde 2026-11-24 (força dura em qualquer branch); o que segue aberto e só o deny cobria são as formas acima. O eval escapava porque a lib só marcava inanalisável o eval que citava push ou merge, e o protect-main só fechava o inanalisável com alvo main."
+    provenance:
+      source: ".claude/settings.json; .claude/hooks/pretooluse-*.sh"
+      locator: "sonda probeall.py no rascunho da forja (todos os hooks Bash do settings.json, JSON com cwd)"
+      method: "measurement: execução dos hooks com payload sintético"
+      locality: "repo"
+  - id: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "guard-census.sh (classe nova no léxico; molde de hook com lib: protect-main); tempo medido do protect-main ≈ 180 ms por chamada; lib/invocation-lines.sh já seguia heredoc, crase, $( ), bash -c e env"
+    label: "três curas, cada uma no seu dono: (1) hook novo pretooluse-deny-mirror.sh para os atos que nenhum hook tinha dono; (2) a lib analisa o eval LITERAL como sh -c, uma vez para todos os vetos; (3) o protect-main fecha o inanalisável com força dura em qualquer alvo"
+    narrative: "Estender o protect-main com rm, filter e gh deixaria um hook de nome «protect-main» dono de atos que não tocam a main; o merge-gate e o moat-gate já têm dono (merge e alvo servido). O custo do hook novo é uma passada a mais da lib por comando Bash (≈ 180 ms medido no protect-main). A lib ganhou a variável ONION_DENY_MIRROR, que só acrescenta as linhas rm: as outras guardas veem a mesma saída sem ela. Força dura e clean -x seguem com o protect-main (um dono por ato). Fora de propósito, pela guard-doctrine «A camada nativa»: reset --hard, --force-with-lease de branch de trabalho, rm -rf de pasta de trabalho, apagar branch remota de trabalho (o merge verificado manda fazê-lo)."
+    provenance:
+      source: ".claude/commands/common/prompts/guard-doctrine.md"
+      locator: "seção «A camada nativa: o permissions.deny portátil» (o que fica fora de propósito)"
+      method: "measurement: censo de guardas e tempo do hook medidos na forja"
+      locality: "repo"
+  - id: E_BANCADA_DO_ESPELHO_COM_MUTANTES_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "LC_ALL=C lint-selftest.sh --families deny_mirror: as duas polaridades e 7 mutantes (eval literal na lib, inanalisável com força no protect-main, emissão do rm na lib, .git no juiz, relevant_mirror no eval dinâmico, gh repo delete, subcomando do git)"
+    label: "a bancada deny_mirror acusa as formas genéricas (direto, bash -c, crase em heredoc sem aspas, $( ), eval literal e com variável) e cala no texto honesto (heredoc com aspas, mensagem de commit e comentário que citam o ato, rm de pasta de trabalho, alvo dinâmico); cada cura tem mutante que morde"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_deny_mirror_selftests"
+      method: "measurement: bancada rodada na forja"
+      locality: "repo"
+  - id: E_CORPUS_DE_TRANSCRIPTS_SEM_FALSO_POSITIVO_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "123.258 comandos Bash únicos dos transcripts da máquina (sessões e subagentes); 4.040 com rm recursivo, filter-*, gh repo/release delete|edit, --visibility ou eval, reexecutados contra o hook novo e, os que citam eval ou push, contra o protect-main e o merge-gate de origin/main e da branch"
+    label: "o eval literal na lib não mudou nenhum veredito do protect-main nem do merge-gate no corpus; a 1ª forma do espelho vetou 8 comandos, 6 deles falsos positivos (rm -rf do .git de uma cópia de trabalho num rascunho, filter-branch --help), curados limitando o .git ao do projeto e liberando --help; seguem vetados 2: um gh repo edit --visibility (o moat-gate também veta) e um git filter-branch --msg-filter numa branch de trabalho, que o deny também barra"
+    provenance:
+      source: "~/.claude/projects/*/*.jsonl"
+      locator: "replay.py no rascunho da forja"
+      method: "measurement: reexecução do corpus contra os hooks antigo e novo"
+      locality: "repo"
+  - id: T_EVAL_E_SCRIPT_OPACOS_1125
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "sonda: eval \"$X\" e bash x.sh saem rc 0 em todos os hooks"
+    label: "teto: eval com o texto inteiro opaco (eval \"$X\"), script em arquivo e outra linguagem (python, perl) não são vistos; análise estática não fecha indireção arbitrária. O hook é camada de conformidade, não fronteira de segurança"
+  - id: T_ALVO_DINAMICO_DO_RM_PASSA_1125
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "bancada: rm -rf \"$tmp\" → rc 0 (caso honesto); rm -rf \"$HOME\" → rc 2 (nome literal)"
+    label: "teto: rm recursivo com alvo dinâmico (rm -rf \"$D\", inclusive por eval) passa, porque vetá-lo travaria a limpeza honesta de pasta temporária; só o nome literal da raiz e da home cai, e o .git só quando é o do projeto (cwd do hook, CLAUDE_PROJECT_DIR ou o topo git): depois de um cd que a lib não segue (variável, pasta criada na própria string) o rm -rf .git passa"
+  - id: T_LEASE_E_RESET_FORA_DE_PROPOSITO_1125
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "guard-doctrine «A camada nativa» (o que a casa faz todo dia); ops/sync-main-worktree.sh e ops/pr-merge-verified.sh orientam reset --hard origin/main e git push origin --delete <branch> como cura"
+    label: "teto: --force-with-lease de branch de trabalho, reset --hard (inclusive na main) e apagar branch remota de trabalho não são vetados: o deny também não os lista, e a casa os usa como cura documentada. Apagar a MAIN remota é vetado pelo merge-gate"
+edges:
+  - from: E_CORPUS_DE_TRANSCRIPTS_SEM_FALSO_POSITIVO_1125
+    to: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    edge_type: SUPPORTS
+  - from: E_HOOKS_DEIXAVAM_ABERTO_O_QUE_SO_O_DENY_COBRIA_1125
+    to: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    edge_type: SUPPORTS
+  - from: E_BANCADA_DO_ESPELHO_COM_MUTANTES_1125
+    to: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    edge_type: SUPPORTS
+  - from: T_EVAL_E_SCRIPT_OPACOS_1125
+    to: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    edge_type: TRACES_TO
+  - from: T_ALVO_DINAMICO_DO_RM_PASSA_1125
+    to: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    edge_type: TRACES_TO
+  - from: T_LEASE_E_RESET_FORA_DE_PROPOSITO_1125
+    to: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
+    edge_type: TRACES_TO

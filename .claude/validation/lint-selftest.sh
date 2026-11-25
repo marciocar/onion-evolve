@@ -10802,6 +10802,98 @@ run_hookspath_reminder_selftests() {
   rm -rf "${d}"
 }
 
+# ESPELHO DO DENY (SAC-551, Q_DENY_SEGURA_EM_BYPASS_1125): o permissions.deny não segura toda forma em bypassPermissions
+# (medido 2026-11-25, 2.1.330–2.1.332). As formas destrutivas do deny têm veto por hook, independente dele: o
+# pretooluse-deny-mirror.sh (filter-branch/repo, rm -r da raiz/home/.git, gh repo/release delete, visibilidade) e o
+# protect-main (força dura, clean -x), com o `eval` literal analisado pela lib. Casos GENÉRICOS (o incidente real fica
+# no registro privado do core). As duas polaridades e um mutante por cura.
+run_deny_mirror_selftests() {
+  local hd="${REPO_ROOT}/.claude/hooks"
+  local dm="${hd}/pretooluse-deny-mirror.sh" pm="${hd}/pretooluse-protect-main.sh" mg="${hd}/pretooluse-merge-gate.sh"
+  if [ ! -f "${dm}" ] || [ ! -f "${pm}" ]; then record_fail "deny-mirror" "hook ausente: ${dm} / ${pm}"; return; fi
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "deny-mirror: python3 ausente → pulado"; return; fi
+  local d; d="$(mktemp -d)"
+  git -C "${d}" init -q; git -C "${d}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base
+  git -C "${d}" branch -M main; git -C "${d}" checkout -q -b feat; mkdir -p "${d}/ops"; : > "${d}/ops/pr-merge-verified.sh"
+  _dm_pv() {  # <hook> <comando> → rc
+    local rc=0
+    printf '%s' "$2" | python3 -c 'import json,sys;print(json.dumps({"tool_input":{"command":sys.stdin.read()}}))' \
+      | (cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash "$1" >/dev/null 2>&1) || rc=$?
+    printf '%s' "${rc}"
+  }
+  _dm_case() {  # <nome> <esperado> <hook> <comando>
+    local got; got="$(_dm_pv "$3" "$4")"
+    if [ "${got}" = "$2" ]; then record_pass "deny-mirror: $1 (rc=$2)"
+    else record_fail "deny-mirror: $1" "esperava rc=$2, veio rc=${got} — cmd: $4"; fi
+  }
+  _dm_mut() {  # <nome> <esperado> <hook> <comando> <arquivo-mutado> <OLD> <NEW>
+    local got gotm rc_i=1 rc_m=1 mh; mh="$(mktemp -d)"
+    cp -r "${hd}/." "${mh}/"
+    OLD="$6" NEW="$7" python3 - "${mh}/$5" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    got="$(_dm_pv "${hd}/$3" "$4")"
+    if [ "${got}" = "$2" ]; then record_pass "deny-mirror: $1 (rc=$2)"; rc_i=0
+    else record_fail "deny-mirror: $1" "esperava rc=$2, veio rc=${got} — cmd: $4"; fi
+    gotm="$(_dm_pv "${mh}/$3" "$4")"; [ "${gotm}" = "$2" ] && rc_m=0
+    _prove_mutation "deny-mirror: $1 (MUT)" "${hd}/$5" "${mh}/$5" "${rc_i}" "${rc_m}"
+    rm -rf "${mh}"
+  }
+  local _IL=lib/invocation-lines.sh _DM=pretooluse-deny-mirror.sh _PM=pretooluse-protect-main.sh
+  # ── acusa (com mutante: cada cura é load-bearing) ──
+  _dm_mut "(e1) protect-main: eval literal com force-push fora da main → VETO" 2 "${_PM}" \
+    'eval "git push --force origin feat/x"' "${_IL}" '        if txt and not DYNAMIC.search(txt):' '        if False:'
+  _dm_mut "(e2) protect-main: eval com variável e -f fora da main → VETO" 2 "${_PM}" \
+    'eval "git push -f origin $B"' "${_PM}" "sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p' | grep -E '\\bpush\\b' \\" "sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p' | grep -E '\\bNOPUSH\\b' \\"
+  _dm_mut "(r1) rm -rf ~ → VETO" 2 "${_DM}" 'rm -rf ~' "${_IL}" '    elif base == "rm" and MIRROR:' '    elif False:'
+  _dm_mut "(r2) crase em heredoc sem aspas com rm -rf .git → VETO" 2 "${_DM}" $'cat <<EOF\n`rm -rf .git`\nEOF' \
+    "${_DM}" '        if n == ".git" or n.endswith("/.git"):' '        if False:'
+  _dm_mut "(f1) eval com variável e git filter-repo → VETO" 2 "${_DM}" 'eval "git filter-repo $X"' \
+    "${_IL}" ' or relevant_mirror(words):' ':'
+  _dm_mut "(g1) gh repo delete → VETO" 2 "${_DM}" 'gh repo delete o/r --yes' \
+    "${_DM}" 'return r[:2] in (["repo", "delete"], ["release", "delete"])' 'return r[:2] in (["release", "delete"],)'
+  # ── cala (o mutante é a versão ingênua que vetava o texto honesto) ──
+  _dm_mut "(c1) git commit cuja mensagem CITA filter-repo → passa" 0 "${_DM}" 'git commit -m "nunca rode git filter-repo"' \
+    "${_DM}" 'return k < len(w) and w[k] in ("filter-branch", "filter-repo")' 'return any(x in ("filter-branch", "filter-repo") for x in w[1:])'
+  _dm_mut "(c2) rm -rf de um .git de cópia de trabalho (repo/.git) → passa" 0 "${_DM}" 'rm -rf repo/.git' \
+    "${_DM}" '            if os.path.realpath(os.path.dirname(os.path.normpath(full))) in ROOTS:' '            if True:'
+  _dm_mut "(c3) git filter-branch --help → passa" 0 "${_DM}" 'git filter-branch --help' \
+    "${_DM}" ' and not any(x in ("--help", "-h") for x in w[k + 1:])' ''
+  # ── acusa (sem mutante próprio: mesma linha de cura dos de cima, outra forma de chegar) ──
+  _dm_case "protect-main: crase em heredoc sem aspas com force-push fora da main → VETO" 2 "${pm}" $'cat <<EOF\n`git push --force origin feat/x`\nEOF'
+  _dm_case "protect-main: \$( ) em heredoc sem aspas com -f → VETO" 2 "${pm}" $'gh pr comment 1 --body-file - <<EOF\n$(git push -f origin feat/x)\nEOF'
+  _dm_case "protect-main: eval literal com +refspec → VETO" 2 "${pm}" 'eval "git push origin +feat/x"'
+  _dm_case "protect-main: eval literal com git clean -fdx → VETO" 2 "${pm}" 'eval "git clean -fdx"'
+  _dm_case "git filter-branch → VETO" 2 "${dm}" 'git filter-branch --tree-filter x HEAD'
+  _dm_case "bash -c com git -C x filter-repo → VETO" 2 "${dm}" 'bash -c "git -C /tmp/x filter-repo --path y"'
+  _dm_case "command rm -Rf / → VETO" 2 "${dm}" 'command rm -Rf /'
+  _dm_case "rm -r -f \$HOME → VETO" 2 "${dm}" 'rm -r -f "$HOME"'
+  _dm_case "rm -rf ~/* → VETO" 2 "${dm}" 'rm -rf ~/*'
+  _dm_case "rm --recursive ./.git/ → VETO" 2 "${dm}" 'rm --recursive --force ./.git/'
+  _dm_case "eval literal com rm -rf .git → VETO" 2 "${dm}" 'eval "rm -rf .git"'
+  _dm_case "\$( ) com gh release delete → VETO" 2 "${dm}" 'x=$(gh release delete v1 --yes)'
+  _dm_case "gh repo edit --visibility → VETO" 2 "${dm}" 'gh repo edit o/r --visibility public --accept-visibility-change-consequences'
+  # ── cala ──
+  _dm_case "heredoc COM aspas citando rm -rf ~ e filter-repo → passa" 0 "${dm}" $'cat <<\'EOF\'\nrm -rf ~\ngit filter-repo\nEOF'
+  _dm_case "gh pr comment citando gh repo delete → passa" 0 "${dm}" 'gh pr comment 1 --body "gh repo delete é proibido"'
+  _dm_case "rm -rf de pasta de trabalho → passa" 0 "${dm}" 'rm -rf build dist'
+  _dm_case "rm -rf \"\$tmp\" (alvo dinâmico) → passa" 0 "${dm}" 'rm -rf "$tmp"'
+  _dm_case "rm -f .git/index.lock (não recursivo) → passa" 0 "${dm}" 'rm -f .git/index.lock'
+  _dm_case "rm -rf de pasta que só começa com .git → passa" 0 "${dm}" 'rm -rf .github-cache'
+  _dm_case "cd para pasta criada na string e rm -rf .git (fixture) → passa" 0 "${dm}" 'mkdir -p w && cd w && rm -rf .git && git init -q'
+  _dm_case "rm -rf do .git do projeto por caminho absoluto → VETO" 2 "${dm}" "rm -rf ${d}/.git"
+  _dm_case "gh release view → passa" 0 "${dm}" 'gh release view v1'
+  _dm_case "protect-main: eval literal push sem força → passa" 0 "${pm}" 'eval "git push origin feat/x"'
+  _dm_case "protect-main: eval com variável e --force-with-lease → passa" 0 "${pm}" 'eval "git push --force-with-lease origin $B"'
+  _dm_case "protect-main: apagar branch remota de trabalho → passa" 0 "${pm}" 'git push origin --delete feat/x'
+  [ -f "${mg}" ] && _dm_case "merge-gate: eval literal push sem força fora da main → passa" 0 "${mg}" 'eval "git push origin feat/x"'
+  [ -f "${mg}" ] && _dm_case "merge-gate: eval literal gh pr merge → VETO" 2 "${mg}" 'eval "gh pr merge 5"'
+  rm -rf "${d}"
+}
+
 run_pretooluse_veto_selftests() {
   local pm="${REPO_ROOT}/.claude/hooks/pretooluse-protect-main.sh"
   local mg="${REPO_ROOT}/.claude/hooks/pretooluse-merge-gate.sh"
@@ -46729,6 +46821,7 @@ _family run_kg_status_factor_selftests
 _family run_radar_composable_modes_selftests
 _family run_radar_json_format_selftests
 _family run_pretooluse_veto_selftests
+_family run_deny_mirror_selftests
 _family run_moat_gate_selftests
 _family run_a2a_invite_live_selftests
 _family run_a2a_queue_live_selftests
