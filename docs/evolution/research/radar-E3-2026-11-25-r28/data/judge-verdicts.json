@@ -1,0 +1,213 @@
+{
+  "criteria": [
+    {
+      "id": "CU1_CITACAO_DIVERGE",
+      "when": "data/2.1.331.txt ou data/2.1.332.txt não batem byte a byte com a seção do CHANGELOG oficial, ou um nó cita texto ou linha (l.N) que não está lá",
+      "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk '$0==\"## 2.1.332\"{f=1;print;next} /^## /{f=0} f') data/2.1.332.txt (idem 2.1.331); grep -n -F de cada trecho citado"
+    },
+    {
+      "id": "CU2_MEDICAO_NAO_REPRODUZ",
+      "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+      "check": "re-executar: claude --version; cc-delta-census.sh . --markdown; currency-census.sh . --table; data/probe-long-command.py com as versões 2.1.331 e 2.1.332 (binários em versions/ do instalador); data/probe-preskill-shell.py none|block|allow nas duas versões; hooks PreToolUse com comando de 100 mil caracteres; xclip/wl-paste; gh pr view 112 no onion-bridge"
+    },
+    {
+      "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+      "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+      "check": "ler label e verified_against e conferir no core por grep -n ou leitura do hook, do comando, do script e do settings"
+    },
+    {
+      "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+      "when": "a rodada supera nó da r27 que não existe ou cujo estado ainda vale, ou deixa de superar nó cujo estado a medição de hoje derrubou",
+      "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-11-21-r27/radar-E3-2026-11-21-r27.kg.yaml e comparar o estado afirmado com a medição de hoje"
+    },
+    {
+      "id": "CU5_OMISSAO_DO_DELTA",
+      "when": "um item do delta toca superfície real do core e a rodada não o mediu nem o declarou em NÃO-VERIFICADOS",
+      "check": "ler data/2.1.331.txt e data/2.1.332.txt e, para cada candidato ausente, medir a superfície no core (hooks em .claude/settings.json, comandos, agentes, skills, ops/, .github/workflows)"
+    },
+    {
+      "id": "CU6_VAZAMENTO_EM_REPO_PUBLICO",
+      "when": "o grafo, a SYNTHESIS ou as sondas trazem nome de cliente ou de pessoa, caminho de máquina, IP, hostname ou e-mail",
+      "check": "grep -rnE '/home/|/tmp/|~/|@[a-z0-9.-]+\\.[a-z]' na pasta da rodada fora de data/2.1.33*.txt; kg-contract-check.sh"
+    },
+    {
+      "id": "CU7_EFEITO_AFIRMADO_SEM_MEDIR_O_MODO",
+      "when": "o nó afirma efeito num modo (sessão interativa, Code Mode, subagente, Remote Control) que a medição não exercitou",
+      "check": "conferir que o label ou o narrative declara o modo não medido; onde for barato, repetir a medição no modo afirmado"
+    },
+    {
+      "id": "CU8_SONDA_DO_AGENT_ID",
+      "when": "a guarda pretooluse-subagent-background-wait.sh deixa de vetar Bash em fundo num subagente de verdade (não colega de time) na versão do processo do juiz",
+      "check": "um subagente SEM nome (in-process, não colega de time em painel), lançado pela rodada, chama Bash com run_in_background true e um comando inofensivo; esperado: recusa «GUARDA-PRETOOLUSE (fundo em subagente)». O juiz confere o relato e o transcript do subagente"
+    }
+  ],
+  "verdicts": [
+    {
+      "alvo": "E_DELTA_DA_RODADA",
+      "veredito": "SUSTENTA",
+      "nota": "CU1: as duas seções extraídas hoje do CHANGELOG oficial (curl + awk do critério) batem byte a byte com data/2.1.331.txt e data/2.1.332.txt (diff vazio, cmp sem saída). Contagens conferidas: 2.1.331 com 138 linhas e 135 itens (l.3 a l.137), 2.1.332 com 153 linhas e 150 itens (l.3 a l.152). Toda l.N citada nos nós foi conferida com cat -n: 2.1.332 l.3, l.4, l.15, l.16, l.17, l.24, l.42, l.92, l.106, l.107, l.110; 2.1.331 l.12, l.21, l.34, l.57, l.58. Todas dizem o que o nó diz. cc-delta-census.sh . --markdown re-rodado: baseline 2.1.330, disco 2.1.332, processo 2.1.331, SDK bridge 2.1.323 (0.3.323)."
+    },
+    {
+      "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+      "veredito": "SUSTENTA",
+      "nota": "Pergunta do esqueleto, aberta. Só fecha depois de aplicar os vereditos e as omissões deste juiz, em especial a perda do deny em bypassPermissions (omissões 1 e 2), que muda a resposta para o item l.15 da 2.1.332."
+    },
+    {
+      "alvo": "E_HOST_NA_2_1_332_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_330_1125",
+      "veredito": "SUSTENTA",
+      "nota": "Reproduz. claude --version → 2.1.332; link exe do processo pai do juiz → versions/2.1.331; contagem pelo link exe de cada processo no procfs → 6 em 2.1.330, 8 em 2.1.331, 3 em 2.1.332 (igual ao nó); grep -n claude-code-action@ .github/workflows/onion-review.yml → l.343 e l.522 com acfe7992 (a l.40 só cita @v1 em comentário); currency-census.sh . --table → action 1.0.286 contra 1.0.290, e o pin acfe7992 instala o CLI 2.1.330; agent-sdk:bridge 0.3.323 contra 0.3.332. Bridge 8 versões atrás (censo) e revisor 2 atrás (331 e 332) conferem."
+    },
+    {
+      "alvo": "Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125",
+      "veredito": "EXAGERA",
+      "nota": "Os alvos reproduzem: currency-census → bridge 0.3.323 contra 0.3.332, action 1.0.286 contra 1.0.290 (que instala o CLI 2.1.332); gh pr view 112 -R <dono>/onion-bridge → OPEN, «chore(deps): o Agent SDK sobe de 0.3.323 para 0.3.330», mergedAt null, updatedAt 2026-11-21T01:28:22Z. O que cai é a narrativa: «SAC-432 ... comentada nesta rodada com os alvos novos». tm.sh item.read SAC-432 (leitura completa, com comentários) devolve 3 comentários, o último de 2026-11-21T14:56:10 (r27); nenhum de 2026-11-25, nenhum citando 0.3.332 ou 1.0.290. O título da issue segue «para 0.3.327 e ... v1.0.282». Cura: comentar a SAC-432 com os alvos novos (e corrigir o título) ANTES de selar, ou reescrever a narrativa para «a comentar no passo 8».",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "bash .claude/utils/task-manager/tm.sh item.read SAC-432 | grep -n -E '0\\.3\\.332|1\\.0\\.290|createdAt\": \"2026-11-25'"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "a leitura completa da SAC-432 pelo tm.sh (sem --lean), que traz os comentários com data e mostra o que a issue de fato diz hoje",
+        "medida": "tm.sh item.read SAC-432 rc 0: comments[0] 2026-11-20 (r26), comments[1] 2026-11-21T01:28 (PRs abertos), comments[2] 2026-11-21T14:56 (r27); título ainda com 0.3.327/v1.0.282"
+      }
+    },
+    {
+      "alvo": "E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125",
+      "veredito": "EXAGERA",
+      "nota": "A metade do tempo reproduz: data/probe-long-command.py com o deny da casa, modo default → 2.1.331: 150.017 caracteres em 36,3 s e 50.017 em 5,4 s; 2.1.332: 150.017 em 1,4 s e 50.017 em 1,3 s; os dois com «Parser aborted (timeout, resource limit, or over-length)». O deny tem 75 regras, 52 com dois ou mais curingas, nenhuma com quatro (máximo 3); 0 hooks com if. O que cai é «o veredito não muda, a recusa segue fechada»: medido só em default, e a casa roda em bypassPermissions (o settings do usuário tem defaultMode bypassPermissions e skipDangerousModePermissionPrompt true). Em bypassPermissions, o comando que o parser aborta RODA, e o deny se perde: na 2.1.330, 2.1.331 e 2.1.332, «echo » + «push x -- » x1500 + «; git push --force origin main:refs/heads/feat/s7» (15.054 caracteres) executou e criou feat/s7 no bare do fixture; a mesma linha curta (74 caracteres) foi negada. Limite medido na 2.1.332: 9.056 caracteres negado, 10.057 executado. O enchimento pode ser qualquer texto («echo ab ab ...» com 12.054 também executou) desde que o trecho negado não venha no começo (com o push na frente, a regra casa pelo prefixo e nega mesmo com 15 mil). Em default e acceptEdits a mesma linha volta «Parser aborted» e não roda. Cura: reescrever o label para «em default a recusa segue fechada; em bypassPermissions, o modo da casa, o comando acima de ~10 mil caracteres roda e o deny se perde, nas três versões» e abrir nó próprio (ver omissão 1).",
+      "criterio": {
+        "id": "CU7_EFEITO_AFIRMADO_SEM_MEDIR_O_MODO",
+        "comando": "PATH=<pasta com o link claude da versão>:$PATH python3 -I <sonda do juiz long_shapes2.py> ops/testing/permissions-deny-bench.py .claude/settings.json <pasta de trabalho> bypassPermissions  # caso pad_echo_then_push: echo + 'push x -- '*1500 + '; git push --force origin main:refs/heads/feat/s7'"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "a mesma sonda do motor real rodada no modo da casa (bypassPermissions), com o trecho negado depois do enchimento, que mede se a recusa segue fechada onde a casa de fato roda",
+        "medida": "bypassPermissions, deny da casa: 2.1.330, 2.1.331 e 2.1.332 → is_error false, branch feat/s7 criada no bare do fixture; default e acceptEdits (2.1.332) → Parser aborted, nada criado; limiar 9.056 negado / 10.057 executado"
+      }
+    },
+    {
+      "alvo": "E_HOOKS_DA_CASA_IMPRIMEM_POUCO_1125",
+      "veredito": "EXAGERA",
+      "nota": "O label se sustenta: re-rodei, numa cópia da worktree no scratch (para não sujar a rodada), os 10 PreToolUse de Bash com três comandos de 100 mil caracteres e os SessionStart, UserPromptSubmit, PreCompact, InstructionsLoaded e os dois Stop; maior saída 1.327 bytes (session-currency-check); env-guard bloqueia com 338 bytes e merge-gate com 280; nenhum ecoa o comando. Os dois Stop, que o nó declarou não medidos, rodaram contra os dois maiores transcripts reais do projeto (179 MB e 40 MB): 0 bytes, 0,2 s. O PostToolUse bash-empty-result-guard, com comando e saída de 100 mil caracteres, bloqueia com 462 bytes. O que cai é a frase de verified_against «os 35 hooks têm timeout declarado ou são PreToolUse de saída fixa»: o censo e o settings mostram 4 hooks fora de PreToolUse sem timeout (UserPromptSubmit session-degraded-notice, PostToolUse bash-empty-result-guard, InstructionsLoaded instructions-loaded-log, Stop rule-title-in-prose), que caem no teto padrão do harness. É justamente a classe que a l.16 cura (hook que imprime sem fim). Cura: reescrever a frase com a lista dos 4 e a medida de saída deles (todos pequenos hoje).",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "python3 -c \"import json; s=json.load(open('.claude/settings.json')); [print(e, h['command'][-50:]) for e,a in s['hooks'].items() for g in a for h in g['hooks'] if e!='PreToolUse' and 'timeout' not in h]\""
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "o inventário de timeouts do cc-delta-census.sh --markdown (linha timeout=— por hook) cruzado com a saída medida dos 4 hooks sem timeout",
+        "medida": "censo: session-degraded-notice, bash-empty-result-guard, instructions-loaded-log e rule-title-in-prose com timeout=—; saídas medidas 0, 462, 0 e 0 bytes"
+      }
+    },
+    {
+      "alvo": "E_PRESKILLSHELLCOMMAND_RECUSA_A_DIRETIVA_NA_2_1_332_1125",
+      "veredito": "EXAGERA",
+      "nota": "O label reproduz por inteiro: data/probe-preskill-shell.py na 2.1.332 → none: diretiva rodou, hook não chamado; block: diretiva NÃO rodou, hook chamado; allow: rodou, hook chamado. Entrada do hook: hook_event_name PreSkillShellCommand, tool_name Bash, tool_input.command com a diretiva, command_name probe, command_source projectSettings, invoked_by user, tool_use_id com :inner:preamble-0, permission_mode bypassPermissions. O que não reproduz é a contagem da narrativa: «28 linhas com diretiva de injeção em 17 comandos, skills e fragmentos». As 28 linhas reproduzem (29 diretivas, porque a l.21 do onion-research/SKILL.md tem duas), mas estão em 14 arquivos (12 comandos de meta/ e 2 skills, onion e onion-research), e nenhum fragmento de common/prompts tem diretiva viva: os 4 arquivos a mais do grep -F (guard-doctrine, publish-doctrine, onion-publish/SKILL.md e agent-skills-specialist) só CITAM o ! em prosa. Cura: «28 linhas em 14 arquivos (12 comandos, 2 skills)».",
+      "criterio": {
+        "id": "CU2_MEDICAO_NAO_REPRODUZ",
+        "comando": "grep -rn -E '^\\s*!`|[^`]!`[^`]' .claude/commands .claude/skills | cut -d: -f1 | sort -u | wc -l"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "o próprio cited-directive-check.sh (motor do binário) ou o grep por regex de diretiva viva, que separa a diretiva da citação em prosa",
+        "medida": "grep por regex: 28 linhas, 14 arquivos; grep -F '!`' dá 18 arquivos, 4 deles só com citação em prosa"
+      }
+    },
+    {
+      "alvo": "E_PRETOOLUSE_NAO_VE_A_DIRETIVA_E_O_DENY_VE_1125",
+      "veredito": "EXAGERA",
+      "nota": "A metade do PreToolUse reproduz: sonda do juiz com hook PreToolUse de matcher Bash que sai 2 e grava a entrada → na 2.1.331 e na 2.1.332 a diretiva rodou e o hook não foi chamado. A metade do deny só vale para diretiva curta: com o deny da casa em bypassPermissions, a diretiva «git push --force origin main:refs/heads/feat/dir && touch ...» é recusada nas duas versões («Shell command permission check failed for pattern ...»), mas a MESMA diretiva precedida de «echo » + «push x -- » x1500 + «; » rodou nas duas e criou feat/dir no bare do fixture. Logo «diretiva passa pelo permissions.deny» é falso acima de ~10 mil caracteres no modo da casa, e o PreSkillShellCommand (ou o PreToolUse, que vê o comando inteiro) é a única barreira que não depende do tamanho. Isso fortalece a Q_GUARDA_DE_DIRETIVA, mas o label precisa dizer o limite. Cura: «o deny vê a diretiva curta; acima de ~10 mil caracteres, em bypassPermissions, nem o deny a vê».",
+      "criterio": {
+        "id": "CU7_EFEITO_AFIRMADO_SEM_MEDIR_O_MODO",
+        "comando": "sonda do juiz preskill4.py (comando de projeto com diretiva enchida até 15 mil caracteres antes do git push --force) em bypassPermissions com o deny da casa, nas duas versões"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "a variante da sonda com a diretiva enchida até passar do limite do parser, no modo da casa, que mede se o deny vê a diretiva em toda a faixa de tamanho",
+        "medida": "2.1.331 e 2.1.332, bypassPermissions: directive_ran true, bare_branch feat/dir; a diretiva curta foi recusada nas duas"
+      }
+    },
+    {
+      "alvo": "E_PRESKILLSHELLCOMMAND_NA_2_1_331_E_IGNORADO_EM_SILENCIO_NO_P_1125",
+      "veredito": "SUSTENTA",
+      "nota": "Reproduz: 2.1.331, modo block → claude -p rc 0, stderr vazio, hook não chamado, diretiva rodou. O nó declarou a sessão interativa não medida; o juiz mediu (tmux, HOME do fixture, chave falsa aprovada): a 2.1.331 abre um diálogo «Settings Warning ... hooks.PreSkillShellCommand: Unknown hook event \"PreSkillShellCommand\" was ignored ... The values listed above were skipped; the rest of the file is in effect» com 1. Continue / 2. Fix with Claude / 3. Exit and fix manually, que prende o início até alguém responder; a 2.1.332 abre direto no prompt. Depois do Continue, a guarda segue muda (o evento é ignorado). A rodada pode trocar o «não medido» pela medida."
+    },
+    {
+      "alvo": "Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125",
+      "veredito": "SUSTENTA",
+      "nota": "Bem fundada: a entrada do evento traz tool_input.command no formato do PreToolUse (medido), exit 2 recusa antes de rodar (medido), e a 2.1.331 trava o início interativo com diálogo (medido pelo juiz). A medida do juiz aumenta o peso: em bypassPermissions o deny não vê diretiva acima de ~10 mil caracteres (ver E_PRETOOLUSE_NAO_VE_A_DIRETIVA_E_O_DENY_VE_1125), então o hook é a única barreira independente de tamanho. A bancada da futura guarda deve incluir a diretiva enchida."
+    },
+    {
+      "alvo": "E_CTRL_V_DE_IMAGEM_NAO_ALCANCA_A_VPS_HEADLESS_1125",
+      "veredito": "SUSTENTA",
+      "nota": "Reproduz: command -v → xclip e wl-paste; dpkg-query → xclip 0.13-3, wl-clipboard 2.2.1-1build1; DISPLAY e WAYLAND_DISPLAY vazios, SSH_CONNECTION presente; xclip -o → «Can't open display: (null)» rc 1; wl-paste --list-types → «Failed to connect to a Wayland server» rc 1. Conferi também o ambiente dos processos claude vivos (environ no procfs): nenhum tem DISPLAY nem WAYLAND_DISPLAY. A frase sobre o OSC 52 é do protocolo e não foi medida pela rodada; não a derrubo."
+    },
+    {
+      "alvo": "Q_CAMINHO_DE_IMAGEM_PARA_AS_SESSOES_DA_VPS_1125",
+      "veredito": "SUSTENTA",
+      "nota": "Pergunta aberta coerente com a evidência; a própria narrativa manda medir cada caminho de ponta a ponta antes de escrever a doutrina."
+    },
+    {
+      "alvo": "E_TIME_EM_PAINEL_E_SESSAO_PROPRIA_COM_O_BINARIO_DO_LIDER_1125",
+      "veredito": "EXAGERA",
+      "nota": "O núcleo reproduz. ps e argv no procfs: o processo da rodada (cc-update-r28) roda versions/2.1.331 com --agent-name cc-update-r28 e --team-name session-535955f0; nasceu às 01:38:07, depois de a 2.1.332 chegar ao disco (01:34:51), e a sessão líder 535955f0 roda 2.1.331: isso sustenta «nasce com o binário do líder». O transcript da rodada está no topo da pasta de projetos; os subagentes dela (o sem nome que a rodada lançou e este juiz) estão em <sessão>/subagents/. No transcript da rodada, o Bash em fundo «echo sonda-agent-id-r28» foi aceito e a notificação de fim (task-notification, status completed) chegou no meio do turno. Dois pontos caem. (1) «não leva agent_id»: o processo do colega de time NASCE com --agent-id cc-update-r28@session-535955f0 no argv; o que falta é o campo agent_id no JSON do PreToolUse (deduzido de a guarda, que só olha d.get(\"agent_id\"), não ter vetado). Para quem desenhar guarda nova, a diferença importa. (2) «os outros dois colegas de time também rodam 2.1.331» não prova a tese: nasceram às 01:34:31 e 01:34:47, antes da 2.1.332 chegar ao disco. Cura: «o JSON do hook do colega de time não traz agent_id (o argv traz --agent-id)», e citar só o cc-update-r28 como prova do binário do líder.",
+      "criterio": {
+        "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+        "comando": "for p in $(pgrep -f -- '--agent-name'); do tr '\\0' ' ' < /proc/$p/cmdline | grep -o -E -- '--agent-id [^ ]+'; ps -o lstart= -p $p; done; stat -c %y <pasta versions>/2.1.332"
+      },
+      "superacao": {
+        "classe": "entrega",
+        "achada": true,
+        "o_que": "o argv do processo do colega de time e a hora de nascimento de cada um contra a hora da 2.1.332 no disco, que separam o campo do hook do flag do processo e dizem qual colega prova a tese do binário",
+        "medida": "argv: --agent-id cc-update-r28@session-535955f0; nascimento: 01:34:31 e 01:34:47 (antes) e 01:38:07 (depois) contra o disco 01:34:51; os três em 2.1.331"
+      }
+    },
+    {
+      "alvo": "E_REENVIO_DO_CLAUDE_MD_EM_WORKTREE_PEGA_POUCO_1125",
+      "veredito": "SUSTENTA",
+      "nota": "Reproduz no essencial: git worktree list → 57 linhas hoje (uma worktree a menos desde a rodada), 5 em .claude/worktrees; CLAUDE.md 26.298 bytes no checkout e na worktree; 7 arquivos em .claude/rules; grep de EnterWorktree em comandos, skills, agentes e ops → nada (só isolation worktree citado em orchestrate.md e ops/verify-adopter-gate.sh). O impacto 1 é proporcional."
+    },
+    {
+      "alvo": "E_ITENS_QUE_A_CASA_NAO_USA_1125",
+      "veredito": "SUSTENTA",
+      "nota": "Reproduz: grep -rlF em .claude/hooks, .claude/settings.json, .claude/commands, .claude/skills, ops e .github → 0 arquivos para oat01, isSynthetic, PushNotification, OTEL_, apiKeyHelper, PermissionDenied, extraKnownMarketplaces e computer-use; deny e allow sem regra de Agent, Skill ou Task (as 87 regras começam com nome de ferramenta, o que também tira a casa da l.88 da 2.1.332); eventos do settings conferem, sem SubagentStop nem PermissionDenied. O isSynthetic está corretamente declarado como não medido para o bridge (o handshake do ops/chat-runner.sh usa --input-format stream-json, l.657)."
+    },
+    {
+      "alvo": "AUFHEBUNG (external_edges SUPERSEDES sobre a r27)",
+      "veredito": "SUSTENTA",
+      "nota": "Os dois SUPERSEDES estão certos: o E_HOST_NA_2_1_330_..._1121 da r27 afirmava host 2.1.330 e revisor 2.1.322 (v1.0.272), hoje host 2.1.332 em disco e revisor 2.1.330 (v1.0.286); o Q_SUBIR_SDK_..._0_3_330_..._V1_0_286_1121 mirava a v1.0.286, que já está no pin (l.343 e l.522), e o 0.3.330, ultrapassado pelo 0.3.332. Falta um: E_BANCADA_DO_DENY_VERDE_NA_2_1_330_1121 («o permissions.deny da casa segue valendo na 2.1.330 em default e em bypass») cai pela medida de hoje NA PRÓPRIA 2.1.330: em bypassPermissions, comando acima de ~10 mil caracteres com o trecho negado depois do enchimento roda, e a substituição de comando por crase dentro de heredoc sem aspas também. Ver omissões 1 e 2."
+    }
+  ],
+  "omissoes": [
+    {
+      "item": "1. O deny da casa se perde em bypassPermissions para comando acima de ~10 mil caracteres (liga com 2.1.332 l.15, o item que a rodada mediu só em default)",
+      "superficie": ".claude/settings.json permissions.deny (75 regras); settings do usuário com defaultMode bypassPermissions; ops/testing/permissions-deny-bench.py (a bancada do deny não tem caso de comando longo)",
+      "medida": "sonda do juiz no motor real com o deny da casa, bypassPermissions: «echo » + «push x -- » x1500 + «; git push --force origin main:refs/heads/feat/s7» (15.054 caracteres) → executou e criou feat/s7 no bare do fixture na 2.1.330, 2.1.331 e 2.1.332; a mesma linha com 74 caracteres → negada. Limiar na 2.1.332: 9.056 negado, 10.057 executado. Qualquer enchimento serve («echo ab ...», 12.054 → executou). Com o trecho negado no começo, a regra casa pelo prefixo e nega até com 15 mil. Em default e acceptEdits volta «Parser aborted» e não roda. Hooks da casa contra a linha enchida: merge-gate segue barrando push para main e gh pr merge (o hook vê o comando inteiro), mas nenhum hook barra force-push para branch que não é main, que hoje só o deny cobre. Derruba E_BANCADA_DO_DENY_VERDE_NA_2_1_330_1121 da r27. Impacto alto: pede nó novo, caso na bancada do deny e ação (por exemplo hook PreToolUse que recuse Bash acima do limite do parser em bypass, ou que aplique as regras do deny ele mesmo)."
+    },
+    {
+      "item": "2. Substituição de comando por crase dentro de heredoc sem aspas passa pelo deny (fora do delta, mas é o mesmo deny que os nós da rodada dão por fechado)",
+      "superficie": ".claude/settings.json permissions.deny; nenhum hook PreToolUse da casa cobre force-push para branch que não é main",
+      "medida": "sonda do juiz em bypassPermissions com o deny da casa, 2.1.331 e 2.1.332: «git push --force origin main:refs/heads/feat/h0» → negado; «cat <<EOF / x = `git push --force origin main:refs/heads/feat/h1` / EOF» → executou e criou feat/h1 no bare do fixture; a forma $(...) no mesmo heredoc → negada; heredoc com aspas → não executa o push (correto). Medido também ao vivo, por acidente do juiz: um python3 - <<EOF sem aspas, na sessão do juiz (processo 2.1.331, bypass), levou a diretiva entre crases de um script de sonda para o shell, e um git push --force de main para um branch novo feat/dir no origin real do core passou sem recusa do deny nem de hook. O branch aponta para o mesmo sha da origin/main (5260e3233), sem conteúdo novo, e segue lá: apagar é ato do dono da sessão."
+    },
+    {
+      "item": "3. As duas guardas de deriva de binário que o censo manda rodar nesta rodada («RODE-AS nesta rodada») não têm nó",
+      "superficie": ".claude/validation/lint-selftest.sh --families cited_directive e --families channel_session; .claude/validation/cited-directive-check.sh (molde copiado da 2.1.295)",
+      "medida": "LC_ALL=C lint-selftest.sh --families cited_directive → rc 1, «(f) DERIVA — ... o COMPORTAMENTO do motor mudou no binario 2.1.332»; --families channel_session → rc 0, verde. Extração do binário 2.1.332: function SFn(e){let n=e.matchAll(Lxr),o=e.includes(\"!`\")?Bit(e).matchAll(Nxr):[],g=[]...} com Lxr=/```!\\s*\\n?([\\s\\S]*?)\\n?```/g e Nxr=/(?<=^|\\s)!`([^`]+)`/gm, as mesmas regex da 2.1.330 (cbr/mbr): só os nomes mudaram. A mensagem «o comportamento mudou» segue falsa, como na r27, e a guarda segue vermelha desde a 2.1.329. A l.4 da 2.1.332 mexe no caminho da diretiva (PreSkillShellCommand), mas o parser não mudou. Os nós da r27 E_DERIVA_DO_CITED_DIRECTIVE_SEGUE_IGUAL_NA_2_1_330_1121 e E_CHANNEL_SESSION_VERDE_NA_2_1_330_1121 seguem valendo na 2.1.332 e precisam do carimbo desta rodada."
+    },
+    {
+      "item": "4. 2.1.332 l.5: «Always deliver» no prompt de mensagens retidas de outras sessões",
+      "superficie": ".claude/commands/meta/baton.md l.99 (uma SendMessage por sessão viva) e l.19 (allowed-tools com SendMessage)",
+      "medida": "grep -n SendMessage .claude/commands/meta/baton.md → l.19, l.99, l.131, l.183. O baton pergunta a cada sessão viva por mensagem entre sessões, que é o que a l.5 mexe. Não medi se as mensagens do baton chegam retidas (exige duas sessões interativas); fica como NÃO-VERIFICADO de impacto baixo, não como nó."
+    },
+    {
+      "item": "5. Medido e sem toque (para a SYNTHESIS não reabrir): 2.1.332 l.44 (motivo de ask de PreToolUse), l.88 (/permissions recusa regra sem nome de ferramenta), l.28 (família no --fallback-model) e 2.1.331 l.31 (shells de fundo de agente de Workflow), l.10 (optionalDependencies)",
+      "superficie": ".claude/hooks, .claude/settings.json, .claude/workflows, ops/door-templates",
+      "medida": "nenhum hook emite ask (o único \"ask\" é comentário em userprompt-one-touch-approval.sh l.11 dizendo que não usa); as 87 regras de allow e deny começam com nome de ferramenta; fallbackModel usa ids completos (claude-opus-5-5, claude-opus-5, claude-sonnet-5-5) e não há availableModels; os 3 workflows (decide-triage, meta-evolve-fanout, onion-research) não citam fundo, e a guarda de fundo em subagente já veta; nenhum manifesto de plugin nas templates das portas declara dependências."
+    }
+  ]
+}

@@ -13,14 +13,14 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-11-21
-    cc_version: "2.1.330"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "juiz independente (opus não-fork, effort high): 11 sustentados e 1 exagerado (o claude -p da bancada do deny contado como não usado e a razão errada da volta do retry de max_tokens), aplicado com 1 superação e 2 omissões medidas (sonda do agent_id e nomes de modelo); Aufhebung: SUPERSEDES de dois nós da r26"
-                            # rodada 27 (2.1.329->2.1.330, uma versão, 142 itens). Bridge no SDK 0.3.323 com a subida para
-                            # 0.3.330 no PR onion-bridge #112 (merge e deploy do maestro); revisor do CI na v1.0.272; cited_directive
-                            # reprova pelo mesmo motivo da 2.1.329; o censo contava README como agente. Ações: SAC-432 e SAC-433
-                            # comentadas; Q_CENSO só como nó (Linear recusou por limite de uso). Histórico da r26 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-11-21-r27/radar-E3-2026-11-21-r27.kg.yaml
+    last_run: 2026-11-25
+    cc_version: "2.1.332"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "juiz independente (opus não-fork, effort high, sem nome: colega de time não lança colega): 9 sustentados e 6 exagerados (deny lento medido só em default, deny da diretiva só curta, 4 hooks sem timeout, contagem de diretivas, campo agent_id do colega de time, SAC-432 não comentada), aplicados com 6 superações e 3 omissões medidas (deny perdido em bypass acima de ~10 mil caracteres, crase em heredoc, deriva do cited-directive); Aufhebung: SUPERSEDES de três nós da r27"
+                            # rodada 28 (2.1.330->2.1.332, duas versões, 285 itens). Disco na 2.1.332, processo na 2.1.331;
+                            # medição pelo motor real das duas versões lado a lado. Bridge no SDK 0.3.323 (8 atrás; PR
+                            # onion-bridge #112 mira 0.3.330), revisor na v1.0.286 (CLI 2.1.330). Ações: SAC-551 (deny em
+                            # bypass), SAC-552 (PreSkillShellCommand), SAC-553 (imagem na VPS), SAC-432 comentada.
+    kg: docs/evolution/research/radar-E3-2026-11-25-r28/radar-E3-2026-11-25-r28.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
