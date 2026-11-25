@@ -2,7 +2,7 @@
 branch: feat/deny-bypass-guard
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 100ef0f2f76fccde04967fe016a02057193aa41e75734385016ff37979434706
+reviewed_diff_sha256: d316b329928380706c7abb3c52f32e01a814017a9ade80e6958d8361e7b226f3
 reviewed_code_sha256: d7cc6dac9a6712338a3c11869c5bfab452ab26dfa56eb87b06cc214ff72a2f0d
 findings_total: 17
 findings_real: 17
