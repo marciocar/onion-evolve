@@ -2,8 +2,7 @@
 branch: feat/onion-attach
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 2a8f093a04c716e4a1a685ff1dc4c5e6508ba74b49120e1f0fee27ec97907bcd
-reviewed_code_sha256: b05ce452b8e7ec8f37d88ae3731ef34e34aa2de0a4e3c445c2416dd0f517c06b
+reviewed_diff_sha256: pendente
 findings_total: 39
 findings_real: 39
 findings_blocking: 0
@@ -293,3 +292,5 @@ na rodada do revisor).
 Commits da branch sobre a `origin/main`. A sessão do core falou em 3 (a feature e 2 de projeções); medi 5 antes
 deste registro: 2 de código (`c164cecd6`, a feature; `432d99bd5`, a cura do delta) e 3 de projeções geradas pelo
 `pr-finalize`. Este registro acrescenta um commit de resíduo, e o fechamento pode acrescentar outro de projeções.
+
+Rebase sobre a main depois do merge do #1763 (core, 25/11 ~12:37Z): único conflito real na linha SELFTEST_CORE_ONLY_FAMILIES (main +image_bridge, branch +onion_attach), resolvido pela união; projeções puladas e regeneradas. reviewer: rebase-resolution-reviewer (sonnet, isolado): APPROVE (range-diff: código do PR igual fora dessa linha; lista sem perda nem duplicata; resíduo idêntico ao do tip pré-rebase).
