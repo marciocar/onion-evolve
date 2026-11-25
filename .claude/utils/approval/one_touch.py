@@ -76,7 +76,7 @@ _WORD_PR_RE = re.compile(r"(?:%s)(?: (?:do|da|o|no))?(?: pr)? (%s(?:%s(?:pr )?%s
                          % ("|".join(re.escape(v) for v in WORD_VERBS), _NUM, _SEP, _NUM))
 _WORD_LOOSE_RE = re.compile(r"\b(?:%s)\b.*#?[0-9]" % "|".join(re.escape(v) for v in WORD_VERBS))
 HEAD_MIN_AGE_S = 120         # o head mais novo que isto o maestro não viu: «o PR acabou de mudar; repita a frase»
-# os arquivos que SÃO a catraca (a mesma lista do _catraca_hits do executor): PR que toca um deles não sai por palavra
+# os arquivos que SÃO a catraca (a mesma lista do _ratchet_hits do executor): PR que toca um deles não sai por palavra
 # com número, porque ela amarra um head que o maestro não viu; ali segue o pedido com o sha na tela (revisão de 25/11, A)
 RATCHET_RE = re.compile(r"docs/evolution/federation/members\.yaml|ops/pr-merge-verified\.sh|ops/moat-targets\.tsv|\.claude/hooks/pretooluse-moat-gate\.sh|\.claude/hooks/lib/moat-judge\.py|\.claude/hooks/lib/invocation-lines\.sh|\.claude/settings(\.local)?\.json")  # (core-only)
 ENGINE_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))

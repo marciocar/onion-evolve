@@ -2,8 +2,7 @@
 branch: feat/merge-word-with-pr-number
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 6f95ebb7991643e869b94845314dd8adf8f116abd094ca1ed33bc09e7c3829a7
-reviewed_code_sha256: 348514b1c02f3d2f6aac8b5f9cd2a9e6c7077efe48ac906ad59efa1c83cd376a
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 0
@@ -54,7 +53,7 @@ Rodada 1, revisor isolado `merge-word-reviewer` (opus), encomendado pelo core: *
 
 | id | achado | cura | caso / mutante |
 |---|---|---|---|
-| A (important) | a palavra com número amarra o head lido na hora do hook, que o maestro nunca viu; com o `OT_LIVE` voltando antes do bloqueio da catraca, valia até para o PR que muda a própria catraca | (a1) o hook não registra em PR que toca a catraca e diz «peço o pedido com o sha na tela»; o executor também recusa (o `verify` devolve 4 para a palavra com número; lista única `_catraca_hits`); (a2) o hook recusa head com menos de 120 s (data do commit do head no forge) | otn9, otn9-MUT, otn9b, otn9b-MUT; otn10, otn10-MUT |
+| A (important) | a palavra com número amarra o head lido na hora do hook, que o maestro nunca viu; com o `OT_LIVE` voltando antes do bloqueio da catraca, valia até para o PR que muda a própria catraca | (a1) o hook não registra em PR que toca a catraca e diz «peço o pedido com o sha na tela»; o executor também recusa (o `verify` devolve 4 para a palavra com número; lista única `_ratchet_hits`); (a2) o hook recusa head com menos de 120 s (data do commit do head no forge) | otn9, otn9-MUT, otn9b, otn9b-MUT; otn10, otn10-MUT |
 | B | `1,763` virava #1 e #763 | vírgula só com espaço depois | otn16, otn16-MUT |
 | C | palavra com número vencida ou gasta sombreava o pedido vivo do mesmo PR | o `load_live` ignora a vencida/gasta e usa o pedido; sem pedido, mensagem «a palavra com número para o PR #n venceu/já foi usada: diga de novo» | otn17, otn17-MUT; otn5b |
 | D | casos faltantes | moldura pelo hook, TTL de 10 min e folga de 60 s no caminho numerado, timeout do gh, zero à esquerda, `1,763` | otn11, otn12, otn13/13b, otn14, otn15, otn16 (todos com mutante) |
