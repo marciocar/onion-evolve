@@ -850,7 +850,7 @@ nodes:
     confidence: 0.5
     verified_at: "2026-11-25"
     verified_against: "claim (i) 'cortada por orçamento'; /meta:dissect Portable Memory não executado"
-    label: "Corte (i): o adaptador de ingestão de MEMORY.md do Portable Memory toca o substrato do Onion e a conformidade L2 por propagação de exclusão é o que falta ao Solid; ficou sem dissecação."
+    label: "Corte (i): o adaptador de ingestão de MEMORY.md do Portable Memory toca o substrato do Onion e a conformidade de nível 2 por propagação de exclusão é o que falta ao Solid; ficou sem dissecação."
     narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
     provenance:
       source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
@@ -963,7 +963,7 @@ nodes:
     verified_at: "2026-11-25"
     verified_against: "medição no repo privado do app pessoal (exceção declarada e temporária: a mídia vai crua ao cérebro; detalhe fica no repo privado)"
     label: "Corte (q): o Microsoft Recall é a evidência de mercado do risco da captura multimodal, e o app pessoal manda mídia (imagem, áudio, arquivo) CRUA ao cérebro-nuvem por exceção 'consciente e temporária'."
-    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não. A superação (de-id local de mídia por SLM on-device, F3) é condição de saída futura declarada no próprio arquivo, não entregue."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não. A superação (de-id local de mídia por SLM on-device, fase 3) é condição de saída futura declarada no próprio arquivo, não entregue."
     provenance:
       source: "private-cite:zZ3GMMSLxn0_3w7JV1XCXA"
       locator: "private-cite:zZ3GMMSLxn0_3w7JV1XCXA"
@@ -1107,7 +1107,7 @@ nodes:
     verified_at: "2026-11-25"
     verified_against: "medição no repo privado do app pessoal; git log do repo privado (último commit 2026-10-08)"
     label: "A premissa da opção A ('só contexto de-identificado à nuvem') não confere com o código: o app manda mídia CRUA por exceção ao ADR-003 e o de-id de texto é frágil por desenho; o repo está parado desde 2026-10-08."
-    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E1_EVIDENCIA_CONTRARIA, superação achada: não. CENÁRIO do Elenxo: o maestro retoma o ADR-003 confiando na INVARIANTE 0; um áudio ou foto com terceiros identificáveis vai cru ao LLM-nuvem e a promessa de privacidade, que é o diferencial, não se cumpre. Superação no alcance: desligar a flag de mídia (perde a captura multimodal) ou STT/SLM on-device (F3, condição futura). O de-id de texto teve a over-redação afrouxada em 20/07 (números curtos saem em claro). O Elenxo disse 'parado desde 2026-10-09'; o escritor mediu o último commit em 2026-10-08."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E1_EVIDENCIA_CONTRARIA, superação achada: não. CENÁRIO do Elenxo: o maestro retoma o ADR-003 confiando na INVARIANTE 0; um áudio ou foto com terceiros identificáveis vai cru ao LLM-nuvem e a promessa de privacidade, que é o diferencial, não se cumpre. Superação no alcance: desligar a flag de mídia (perde a captura multimodal) ou STT/SLM on-device (fase 3, condição futura). O de-id de texto teve a over-redação afrouxada em 20/07 (números curtos saem em claro). O Elenxo disse 'parado desde 2026-10-09'; o escritor mediu o último commit em 2026-10-08."
     provenance:
       source: "private-cite:zZ3GMMSLxn0_3w7JV1XCXA"
       locator: "private-cite:zZ3GMMSLxn0_3w7JV1XCXA"
@@ -1231,7 +1231,7 @@ nodes:
     impact: 3
     confidence: 0.5
     label: "Memória pessoal e da empresa podem dividir o substrato de armazenamento e recuperação, mas o company brain precisa de governança que um namespace user_id/org_id não entrega: autorização no store, herança da permissão da fonte e auditoria."
-    narrative: "O QUE SUPERA: a fronteira entre a pessoa e a organização é de governança, não de escopo; a camada tem três partes: autorização imposta no store (row-level security, deny por padrão), herança da permissão de cada fonte e auditoria do que o agente viu. MEDIDA: WebFetch em 25/11/2026: a própria Vectorize diz 'A company brain has many users with different access levels'; a doc da Oracle Agent Memory 26.4 diz 'The integrating application is responsible for end-user authentication, authorization, and correct memory scoping'. Oracle Developers e DevRev voltaram 403 e 429 (só resumo de busca). CRITÉRIO: V5_MARKETING (CTA 'Request a demo of Hindsight', tier 3) com complemento V2. ALVO REPROVADO: claim refutada (f), em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz; não fecha o vazamento por agregação (E_OBJECAO_14)."
+    narrative: "O QUE SUPERA: a fronteira entre a pessoa e a organização é de governança, não de escopo; a camada tem três partes: autorização imposta no store (row-level security, deny por padrão), herança da permissão de cada fonte e auditoria do que o agente viu. MEDIDA: WebFetch em 25/11/2026: a própria Vectorize diz 'A company brain has many users with different access levels'; a doc da Oracle Agent Memory 26.4 diz 'The integrating application is responsible for end-user authentication, authorization, and correct memory scoping'. Oracle Developers e DevRev voltaram 403 e 429 (só resumo de busca). CRITÉRIO: V5_MARKETING (CTA 'Request a demo of Hindsight', tier 3) com complemento da segunda versão. ALVO REPROVADO: claim refutada (f), em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz; não fecha o vazamento por agregação (E_OBJECAO_14)."
     trace: "WebFetch https://vectorize.io/articles/second-brain-vs-company-brain + grep -F 'Request a demo of Hindsight'; WebFetch https://docs.oracle.com/en/database/oracle/agent-memory/26.4/agmea/about.html + grep -F 'responsible for end-user authentication, authorization, and correct memory scoping'"
 edges:
   - from: D_SECOND_BRAIN_VERTICAL_2026_11

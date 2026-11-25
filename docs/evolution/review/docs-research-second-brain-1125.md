@@ -2,8 +2,7 @@
 branch: docs/research-second-brain-1125
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 87f85936e4e99c684fc849cd634fff68695cb0a501bbad89c6464a475f842b70
-reviewed_code_sha256: 85a9a56654201e315aa249a275cbadf8c9d90b1384f91075072905c2b6de0296
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
