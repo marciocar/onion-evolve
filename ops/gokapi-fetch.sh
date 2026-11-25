@@ -26,7 +26,8 @@
 # Ambiente: GOKAPI_URL (padrão https://transfer.onionevolve.com) · GOKAPI_FETCH_PASS_ENTRY (padrão
 #   onion/vps-gokapi/api-upload, a MESMA chave do gokapi-upload.sh, que tem todas as permissões) · ONION_IMAGE_INBOX (padrão ~/.local/share/onion/inbox-images) ·
 #   ONION_IMAGE_MAX_BYTES (padrão 20971520 = 20 MiB) · ONION_IMAGE_KEEP_DAYS (padrão 7, a limpeza automática).
-# Saída: rc 0 ok · 2 uso, configuração ou chave ausente · 3 HTTP, rede ou arquivo cifrado · 4 não é imagem ou grande demais.
+# Saída: rc 0 ok · 2 uso, configuração ou chave ausente · 3 HTTP, rede ou arquivo cifrado · 4 não é imagem ou grande demais
+#        · 5 (só --check) sonda inconclusiva: a resposta não é o erro de «arquivo não encontrado» do Gokapi.
 set -uo pipefail
 { set +x; } 2>/dev/null   # rastreio herdado (bash -x, SHELLOPTS) mostraria a chave
 umask 077
@@ -61,15 +62,29 @@ inbox_guard() {
   case "${INBOX}/" in */./*|*/../*|*//*) die 2 "ONION_IMAGE_INBOX com «.», «..» ou «//», recuso: ${INBOX}" ;; esac
   [ -L "${INBOX}" ] && die 2 "a pasta de imagens é um link simbólico, recuso: ${INBOX}"
   local home_real real; home_real="$(cd "${HOME}" 2>/dev/null && pwd -P)" || die 2 "HOME ilegível: ${HOME}"
-  real="$(cd "${INBOX}" 2>/dev/null && pwd -P)" || real="${INBOX}"
   # dentro do HOME e abaixo dele (nunca o HOME, a raiz ou outra pasta do sistema)
-  case "${real}" in "${home_real}"/?*) ;; *) die 2 "a pasta de imagens tem de ficar dentro do HOME (${home_real}): ${real}" ;; esac
+  case "$(expected_real "${INBOX}" "${home_real}")" in "${home_real}"/?*) ;; *) die 2 "a pasta de imagens tem de ficar dentro do HOME (${home_real}): ${INBOX}" ;; esac
+  # nenhum link simbólico no MEIO do caminho: o ancestral mais fundo que existe resolve para onde o texto diz
+  # (HOME/lnk/inbox com lnk → fora do HOME fazia o mkdir criar a pasta lá fora; revisão isolada, 2026-11-25)
+  local anc="${INBOX}"; while [ ! -e "${anc}" ] && [ "${anc}" != "/" ]; do anc="$(dirname -- "${anc}")"; done
+  real="$(cd "${anc}" 2>/dev/null && pwd -P)" || die 2 "não li a pasta ${anc}"
+  [ "${real}" = "$(expected_real "${anc}" "${home_real}")" ] \
+    || die 2 "há um link simbólico no caminho da pasta de imagens (${anc} → ${real}), recuso: ${INBOX}"
+}
+
+# o caminho real esperado: o texto, com o prefixo do HOME trocado pelo HOME resolvido (o HOME pode ser um link legítimo)
+expected_real() {  # $1=caminho absoluto, $2=HOME resolvido
+  case "$1" in "${HOME%/}"/*) printf '%s/%s' "$2" "${1#"${HOME%/}"/}" ;; "${HOME%/}") printf '%s' "$2" ;; *) printf '%s' "$1" ;; esac
 }
 
 inbox_make() {
   inbox_guard
   mkdir -p -- "${INBOX}" || die 2 "não criei a pasta de imagens: ${INBOX}"
   [ -L "${INBOX}" ] && die 2 "a pasta de imagens é um link simbólico, recuso: ${INBOX}"
+  # refaz a contenção DEPOIS do mkdir, pelo caminho resolvido (corrida entre a conferência e a criação)
+  local hr; hr="$(cd "${HOME}" 2>/dev/null && pwd -P)" || die 2 "HOME ilegível: ${HOME}"
+  [ "$(cd "${INBOX}" 2>/dev/null && pwd -P)" = "$(expected_real "${INBOX}" "${hr}")" ] \
+    || die 2 "a pasta de imagens resolveu para fora do caminho esperado, recuso: ${INBOX}"
   [ -O "${INBOX}" ] || die 2 "a pasta de imagens não é desta conta: ${INBOX}"
   chmod 700 -- "${INBOX}" || die 2 "não consegui fechar a pasta em 0700: ${INBOX}"
 }
@@ -99,7 +114,7 @@ extract_id() {
   else
     id="${in}"
   fi
-  [[ "${id}" =~ ^[A-Za-z0-9_-]{4,64}$ ]] || die 2 "id inválido (só letras, dígitos, _ e -, de 4 a 64): ${id}"
+  [[ "${id}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{3,63}$ ]] || die 2 "id inválido (letras, dígitos, _ e -, de 4 a 64, sem começar por -): ${id}"
   printf '%s' "${id}"
 }
 
@@ -136,7 +151,7 @@ while [ $# -gt 0 ]; do
     --days) [ $# -ge 2 ] || die 2 "--days pede um valor"; DAYS="$2"; shift ;;
     --dry-run) DRY=1 ;;
     --offline) OFFLINE=1 ;;
-    -h|--help) sed -n '2,27p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,30p' "$0"; exit 0 ;;
     --) shift; [ -z "${ARG}" ] && [ $# -eq 1 ] || die 2 "um id ou link por vez"; ARG="$1"; shift; break ;;
     -*) die 2 "opção desconhecida: $1 (id começando com '-'? use --)" ;;
     *) [ -z "${ARG}" ] || die 2 "um id ou link por vez"; ARG="$1" ;;
@@ -162,19 +177,28 @@ case "${MODE}" in
     [ "${key_state}" = "presente" ] || exit 2
     [ "${bad}" -eq 0 ] || exit 2
     [ "${OFFLINE}" -eq 1 ] && { printf 'download: não medido (--offline)\n'; exit 0; }
-    # UMA chamada só-leitura: download de um id de sonda que não existe. A permissão é conferida antes do arquivo:
-    # 404 = a chave passou e tem DOWNLOAD; 401/403 = falta a permissão. Nada do corpo é impresso.
+    # UMA chamada só-leitura: download de um id de sonda que não existe. INFERÊNCIA até a 1ª medida contra o servidor
+    # real: o Gokapi confere a permissão antes de procurar o arquivo. Então 404 COM o erro JSON de arquivo não encontrado
+    # = a chave passou e tem DOWNLOAD; 401/403 = falta a permissão; qualquer outra resposta (404 de proxy, página HTML)
+    # = inconclusiva, rc 5. Do corpo nada é impresso: só se lê se ele é aquele erro.
     key="$(pass show "${PASS_ENTRY}" 2>/dev/null)" || { key_missing_msg >&2; exit 2; }
     key="${key%%$'\n'*}"; key="${key%$'\r'}"
     [ -n "${key}" ] || { key_missing_msg >&2; exit 2; }
-    pcode="$(curl -q -sS --max-time 30 --proto '=https,http' --max-redirs 0 -o /dev/null -w '%{http_code}' \
+    pbody="$(mktemp)" || die 2 "não criei o arquivo temporário da sonda"
+    pcode="$(curl -q -sS --max-time 30 --proto '=https,http' --max-redirs 0 --max-filesize 65536 -o "${pbody}" -w '%{http_code}' \
                -H @<(printf 'apikey: %s\n' "${key}") "${BASE}/api/files/download/onionprobe000" 2>/dev/null)"; pcrc=$?
     unset key
+    pjson="$(head -c 2000 -- "${pbody}" | tr -d '\000-\037')"; rm -f -- "${pbody}"
+    gokapi_404=0
+    [[ "${pjson}" =~ ^[[:space:]]*\{.*\"(ErrorMessage|Result)\"[[:space:]]*:.*[Nn]ot[[:space:]]+[Ff]ound ]] && gokapi_404=1
     [ "${pcrc}" -eq 0 ] || { printf 'download: não medido (curl rc %s: rede, DNS, TLS ou tempo)\n' "${pcrc}"; exit 3; }
     case "${pcode}" in
-      404) printf 'download: presente (HTTP 404 na sonda: a chave passou e o id de sonda não existe)\n'; exit 0 ;;
+      404) if [ "${gokapi_404}" -eq 1 ]; then
+             printf 'download: presente (HTTP 404 com o erro de arquivo não encontrado do Gokapi: inferência, a chave passou)\n'; exit 0
+           fi
+           printf 'download: inconclusivo (HTTP 404 sem o erro JSON do Gokapi: proxy ou outro servidor?)\n'; exit 5 ;;
       401|403) printf 'download: AUSENTE (HTTP %s: a chave não tem permissão de download ou foi revogada)\n' "${pcode}"; exit 3 ;;
-      *) printf 'download: inconclusivo (HTTP %s na sonda)\n' "${pcode}"; exit 3 ;;
+      *) printf 'download: inconclusivo (HTTP %s na sonda)\n' "${pcode}"; exit 5 ;;
     esac ;;
 esac
 

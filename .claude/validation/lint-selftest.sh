@@ -18611,7 +18611,7 @@ http.server.HTTPServer(("127.0.0.1",int(sys.argv[1])),H).serve_forever()' "${p40
   spid=$!
   local _w; for _w in 1 2 3 4 5 6 7 8 9 10; do (exec 3<>"/dev/tcp/127.0.0.1/${p404}") 2>/dev/null && break; sleep 0.3; done
   _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:${p404}/a2a/hub-x"
-  kill "${spid}" 2>/dev/null || true; wait "${spid}" 2>/dev/null || true
+  kill "${spid}" 2>/dev/null; wait "${spid}" 2>/dev/null
   _fa_state "(F3.d7) rota certa num bridge sem o receptor múltiplo (POST → 404)" 1 g falha "respondeu 404"
   _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:9/a2a/hub-x?x=1"
   _fa_state "(F3.d4) receptor hub com a rota dele (query ignorada) chega ao alcance" 1 g falha "inalcançável"
@@ -65106,11 +65106,16 @@ run_image_bridge_selftests() {
   mkdir -p "${sb}/bin" "${sb}/home" "${sb}/store/onion/vps-gokapi"
   printf 'chave-da-bancada\n' > "${sb}/key"
   # pass de mentira: `pass show <entrada>` devolve o arquivo IB_KEYFILE; IB_PASSRC força a saída
-  printf '#!/usr/bin/env bash\n[ "$1" = show ] || exit 1\n[ -n "${IB_PASSRC:-}" ] && exit "${IB_PASSRC}"\ncat "${IB_KEYFILE}"\n' > "${sb}/bin/pass"
-  chmod +x "${sb}/bin/pass"
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "${IB_PASSLOG}"\n[ "$1" = show ] || exit 1\n[ -n "${IB_PASSRC:-}" ] && exit "${IB_PASSRC}"\ncat "${IB_KEYFILE}"\n' > "${sb}/bin/pass"
+  # curl-dublê: repassa ao curl real, mas REPROVA (rc 99, registrado) se a chave aparecer em qualquer argumento
+  local real_curl; real_curl="$(command -v curl)"
+  printf '#!/usr/bin/env bash\nfor a in "$@"; do case "$a" in *chave-da-bancada*|*chave-errada*) printf "argv\\n" >> "${IB_ARGVLOG}"; exit 99 ;; esac; done\nexec "%s" "$@"\n' "${real_curl}" > "${sb}/bin/curl"
+  chmod +x "${sb}/bin/pass" "${sb}/bin/curl"
   cat > "${sb}/srv.py" <<'IB_SRV'
 import http.server, sys, json
 PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
+FMT = {"fmtpng1": ("image/png", PNG), "fmtjpg1": ("image/jpeg", b"\xff\xd8\xff\xe0" + b"\x00" * 60),
+       "fmtgif1": ("image/gif", b"GIF89a" + b"\x00" * 58), "fmtwebp": ("image/webp", b"RIFF\x40\x00\x00\x00WEBPVP8 " + b"\x00" * 52)}
 class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a): pass
     def send(self, code, ctype, body):
@@ -65124,6 +65129,8 @@ class H(http.server.BaseHTTPRequestHandler):
         if not p.startswith("/api/files/download/"): return self.send(404, "text/plain", b"no")
         fid = p.rsplit("/", 1)[1]
         if fid == "png0001": return self.send(200, "image/png", PNG)
+        if fid in FMT: return self.send(200, FMT[fid][0], FMT[fid][1])
+        if fid == "onionprobe000" and __import__("os").path.exists(sys.argv[3]): return self.send(404, "text/html", b"<html>404 Not Found</html>")
         if fid == "redir01":
             self.send_response(302); self.send_header("Location", "/steal"); self.send_header("Content-Length", "0"); self.end_headers(); return
         if fid == "oct0001": return self.send(200, "application/octet-stream", PNG)
@@ -65136,16 +65143,16 @@ open(sys.argv[1], "w").write(str(s.server_address[1]))
 s.serve_forever()
 IB_SRV
   : > "${sb}/reqlog"
-  python3 -I "${sb}/srv.py" "${sb}/port" "${sb}/reqlog" >/dev/null 2>&1 &
+  python3 -I "${sb}/srv.py" "${sb}/port" "${sb}/reqlog" "${sb}/probe-html" >/dev/null 2>&1 &
   local spid=$! i=0
   while [ ! -s "${sb}/port" ] && [ "${i}" -lt 50 ]; do sleep 0.1; i=$((i + 1)); done
   [ -s "${sb}/port" ] || { kill "${spid}" 2>/dev/null; rm -rf "${sb}"; record_skip "image-bridge: o servidor falso não subiu"; return; }
   local BASE; BASE="http://127.0.0.1:$(cat "${sb}/port")"
   local IN="${sb}/home/.local/share/onion/inbox-images"
   _ib_run() {  # $1=SUT, resto=args → "rc<TAB>stdout-numa-linha<TAB>stderr-numa-linha"; IB_* do ambiente de chamada
-    local w="$1" o rc; shift; : > "${sb}/err"
+    local w="$1" o rc; shift; : > "${sb}/err"; : > "${sb}/passlog"
     if o="$(env -i PATH="${sb}/bin:/usr/bin:/bin" HOME="${sb}/home" LC_ALL=C.UTF-8 GOKAPI_URL="${IB_BASE:-${BASE}}" \
-            PASSWORD_STORE_DIR="${sb}/store" IB_KEYFILE="${IB_KEYFILE:-${sb}/key}" IB_PASSRC="${IB_PASSRC:-}" \
+            PASSWORD_STORE_DIR="${sb}/store" IB_PASSLOG="${sb}/passlog" IB_ARGVLOG="${sb}/argvlog" IB_KEYFILE="${IB_KEYFILE:-${sb}/key}" IB_PASSRC="${IB_PASSRC:-}" \
             ${IB_INBOX:+ONION_IMAGE_INBOX="${IB_INBOX}"} ${IB_MAX:+ONION_IMAGE_MAX_BYTES="${IB_MAX}"} ${IB_KEEP:+ONION_IMAGE_KEEP_DAYS="${IB_KEEP}"} bash "${w}" "$@" 2>"${sb}/err")"; then rc=0; else rc=$?; fi
     printf '%s\t%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")" "$(tr '\n' '|' < "${sb}/err")"
   }
@@ -65248,8 +65255,7 @@ inbox_make'
     [ "$(_ib_rc "${r}")" = 2 ] && [ "$(_ib_rc "${r2}")" = 2 ] && [ "$(_ib_rc "${r3}")" = 2 ] && [ "$(_ib_rc "${r4}")" = 2 ] \
       && [ -e "${IN}/20260101-000000-velha.png" ] && [ -e "${sb}/fora/20260101-000000-fora.png" ]; }
   _ib_case "(g3) --prune em link (até com barra no fim), no HOME ou fora dele: rc 2" _ib_g3 \
-    '  [ -L "${INBOX}" ] && die 2 "a pasta de imagens é um link simbólico, recuso: ${INBOX}"
-  local home_real' '  local home_real'
+    '  case "$(expected_real "${INBOX}" "${home_real}")" in "${home_real}"/?*) ;; *)' '  case x in x) ;; *)'
   # (h) --check: sem a entrada no store → rc 2 nomeando a variável e SEM rede; --offline → rc 0 sem rede
   _ib_h() { local r r2; : > "${sb}/reqlog"; rm -f "${sb}/store/onion/vps-gokapi/api-upload.gpg"; r="$(_ib_run "$1" --check)"
     : > "${sb}/store/onion/vps-gokapi/api-upload.gpg"; r2="$(_ib_run "$1" --check --offline)"; IB_WHY="$(tr '\t' ' ' <<< "${r} || ${r2}")"
@@ -65263,8 +65269,55 @@ inbox_make'
     r2="$(IB_KEYFILE="${sb}/key-errada" _ib_run "$1" --check)"; IB_WHY="$(tr '\t' ' ' <<< "${r} || ${r2}") req=$(wc -l < "${sb}/reqlog")"
     [ "$(_ib_rc "${r}")" = 0 ] && grep -qF 'download: presente (HTTP 404' <<< "${r}" && [ "$(_ib_rc "${r2}")" = 3 ] && grep -qF 'download: AUSENTE (HTTP 401' <<< "${r2}" \
       && [ "$(wc -l < "${sb}/reqlog")" -eq 2 ] && ! grep -qF 'chave-' <<< "${r}${r2}"; }
-  _ib_case "(h2) --check com sonda: 404 presente rc 0, 401 AUSENTE rc 3" _ib_h2 \
-    "      404) printf 'download: presente" "      499) printf 'download: presente"
+  _ib_case "(h2) --check com sonda: 404 do Gokapi presente rc 0, 401 AUSENTE rc 3" _ib_h2 \
+    '      404) if [ "${gokapi_404}" -eq 1 ]; then' '      499) if [ "${gokapi_404}" -eq 1 ]; then'
+  # (h3) 404 que NÃO é o erro JSON do Gokapi (página de proxy): inconclusivo, rc 5, nunca «presente»
+  _ib_h3() { local r; : > "${sb}/store/onion/vps-gokapi/api-upload.gpg"; : > "${sb}/probe-html"; r="$(_ib_run "$1" --check)"; rm -f "${sb}/probe-html"
+    IB_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "$(_ib_rc "${r}")" = 5 ] && grep -qF 'download: inconclusivo (HTTP 404' <<< "${r}" && ! grep -qF 'download: presente' <<< "${r}"; }
+  _ib_case "(h3) 404 sem o erro JSON do Gokapi: inconclusivo rc 5" _ib_h3 \
+    '&& gokapi_404=1' '|| gokapi_404=1'
+  # (m) ID MALICIOSO (../, %2F, começando por -): rc 2 antes de tudo — sem rede e sem chamar o pass
+  _ib_m() { local r1 r2 r3 r4 ok=0; : > "${sb}/reqlog"; : > "${sb}/allpass"
+    r1="$(_ib_run "$1" '../../etc')"; cat "${sb}/passlog" >> "${sb}/allpass"; r2="$(_ib_run "$1" 'abc%2Fdef')"; cat "${sb}/passlog" >> "${sb}/allpass"
+    r3="$(_ib_run "$1" -- '--abcd')"; cat "${sb}/passlog" >> "${sb}/allpass"; r4="$(_ib_run "$1" "${BASE}/d?id=..%2F..%2Fx")"; cat "${sb}/passlog" >> "${sb}/allpass"
+    IB_WHY="$(tr '\t' ' ' <<< "${r1} || ${r2} || ${r3} || ${r4}") pass=$(tr '\n' '|' < "${sb}/allpass") req=$(wc -l < "${sb}/reqlog")"
+    for r in "${r1}" "${r2}" "${r3}" "${r4}"; do [ "$(_ib_rc "${r}")" = 2 ] || ok=1; done
+    [ "${ok}" = 0 ] && [ ! -s "${sb}/allpass" ] && [ ! -s "${sb}/reqlog" ]; }
+  _ib_case "(m) id malicioso (../, %2F, -- ): rc 2, sem rede e sem pass" _ib_m \
+    '[[ "${id}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{3,63}$ ]]' '[[ "${id}" =~ .* ]]'
+  # (n) um fixture por formato: a extensão sai dos bytes (png, jpg, gif, webp), cada um com o seu mutante
+  _ib_n_mk() {  # $1=id $2=ext
+    eval "_ib_n_$2() { local r; rm -rf \"\${sb}/home/.local\"; r=\"\$(_ib_run \"\$1\" $1)\"; IB_WHY=\"\$(tr '\\t' ' ' <<< \"\${r}\")\"
+      [ \"\$(_ib_rc \"\${r}\")\" = 0 ] && [[ \"\$(_ib_out \"\${r}\")\" == *-$1.$2\"|\" ]]; }"
+  }
+  _ib_n_mk fmtpng1 png; _ib_n_mk fmtjpg1 jpg; _ib_n_mk fmtgif1 gif; _ib_n_mk fmtwebp webp
+  _ib_case "(n1) png pelos bytes" _ib_n_png '    89504e470d0a1a0a*) echo png ;;' '    89504e470d0a1a0a*) echo jpg ;;'
+  _ib_case "(n2) jpeg pelos bytes" _ib_n_jpg '    ffd8ff*) echo jpg ;;' '    ffd8ff*) echo png ;;'
+  _ib_case "(n3) gif pelos bytes" _ib_n_gif '    474946383761*|474946383961*) echo gif ;;' '    474946383761*) echo gif ;;'
+  _ib_case "(n4) webp pelos bytes" _ib_n_webp '    52494646????????57454250) echo webp ;;' '    52494646????????57454251) echo webp ;;'
+  # (o) a chave NUNCA vai em argv do curl: o curl-dublê reprova (rc 99) se ela aparecer em qualquer argumento
+  _ib_o() { local r; rm -rf "${sb}/home/.local"; : > "${sb}/argvlog"; r="$(_ib_run "$1" png0001)"; IB_WHY="$(tr '\t' ' ' <<< "${r}") argv=$(cat "${sb}/argvlog")"
+    [ "$(_ib_rc "${r}")" = 0 ] && [ ! -s "${sb}/argvlog" ]; }
+  _ib_case "(o) a chave não aparece em argv do curl" _ib_o \
+    $'-w \'%{http_code}\\t%{content_type}\' -H @<(printf \'apikey: %s\\n\' "${key}")' $'-w \'%{http_code}\\t%{content_type}\' -H "apikey: ${key}"'
+  # (g4) link simbólico NO MEIO do caminho (HOME/lnk → fora do HOME): rc 2 e nada criado lá fora
+  _ib_g4() { local r; rm -rf "${sb}/fora2" "${sb}/home/lnk"; mkdir -p "${sb}/fora2"; ln -s "${sb}/fora2" "${sb}/home/lnk"; : > "${sb}/reqlog"
+    r="$(IB_INBOX="${sb}/home/lnk/inbox" _ib_run "$1" png0001)"; IB_WHY="$(tr '\t' ' ' <<< "${r}") fora2=$(ls -A "${sb}/fora2" | tr '\n' ' ')"
+    rm -f "${sb}/home/lnk"
+    [ "$(_ib_rc "${r}")" = 2 ] && [ -z "$(ls -A "${sb}/fora2")" ] && [ ! -s "${sb}/reqlog" ]; }
+  _ib_case "(g4) link simbólico no meio do caminho: rc 2, nada criado fora do HOME" _ib_g4 \
+    '  [ "${real}" = "$(expected_real "${anc}" "${home_real}")" ] \' '  true \'
+  # (g5) a re-contenção DEPOIS do mkdir é a última linha de defesa: sem a pré-conferência, ela ainda barra a gravação
+  _ib_g5() { local r; rm -rf "${sb}/fora2" "${sb}/home/lnk"; mkdir -p "${sb}/fora2"; ln -s "${sb}/fora2" "${sb}/home/lnk"
+    r="$(IB_INBOX="${sb}/home/lnk/inbox" _ib_run "$1" png0001)"; IB_WHY="$(tr '\t' ' ' <<< "${r}")"; rm -f "${sb}/home/lnk"
+    [ "$(_ib_rc "${r}")" = 2 ] && [ -z "$(find "${sb}/fora2" -type f)" ]; }
+  _ib_g5_sut() { _ib_mutate "${sut}" "${sb}/g5base.sh" '  [ "${real}" = "$(expected_real "${anc}" "${home_real}")" ] \' '  true \'; }
+  if _ib_g5_sut && _ib_g5 "${sb}/g5base.sh"; then record_pass "image-bridge: (g5) sem a pré-conferência, a re-contenção pós-mkdir barra a gravação"
+  else record_fail "image-bridge: (g5) re-contenção pós-mkdir" "${IB_WHY:-}"; fi
+  if _ib_mutate "${sb}/g5base.sh" "${sb}/g5mut.sh" '  [ "$(cd "${INBOX}" 2>/dev/null && pwd -P)" = "$(expected_real "${INBOX}" "${hr}")" ] \' '  true \' && ! _ib_g5 "${sb}/g5mut.sh"
+  then record_pass "image-bridge: (g5) re-contenção pós-mkdir (MUT): sem ela a imagem vai para fora do HOME"
+  else record_fail "image-bridge: (g5) (MUT)" "o mutante não derrubou o caso"; fi
   # (j) ~/.curlrc com `location` e o servidor responde 302: a chave NÃO segue o redirect (curl -q, --max-redirs 0); rc 3
   _ib_j() { local r; : > "${sb}/reqlog"; printf 'location\n' > "${sb}/home/.curlrc"; r="$(_ib_run "$1" redir01)"; rm -f "${sb}/home/.curlrc"
     IB_WHY="$(tr '\t' ' ' <<< "${r}") log=$(tr '\n' '|' < "${sb}/reqlog")"
@@ -65296,6 +65349,15 @@ inbox_make'
   if [ -f "${ps1}" ]; then tail -c +4 "${ps1}" > "${sb}/nobom.ps1"
     if ! cmp -s "${ps1}" "${sb}/nobom.ps1" && ! _ib_bom "${sb}/nobom.ps1"; then record_pass "image-bridge: .ps1 com BOM (MUT): sem o BOM o caso reprova"
     else record_fail "image-bridge: .ps1 com BOM (MUT)" "o mutante não derrubou o caso"; fi
+  fi
+  # a config do .ps1 mora em %APPDATA%\Onion (nunca ao lado do script) e o .gitignore da pasta recusa *.config.psd1
+  _ib_cfg() { grep -qF "\$ConfigDir  = Join-Path \$env:APPDATA 'Onion'" "$1" && ! grep -q 'ConfigPath = Join-Path \$PSScriptRoot' "$1" \
+      && grep -qxF '*.config.psd1' "${REPO_ROOT}/ops/windows/.gitignore"; }
+  if [ -f "${ps1}" ] && _ib_cfg "${ps1}"; then record_pass "image-bridge: .ps1 guarda a config em %APPDATA%\\Onion e o .gitignore recusa *.config.psd1"
+  else record_fail "image-bridge: config do .ps1" "fora de %APPDATA%\\Onion ou .gitignore sem *.config.psd1"; fi
+  if [ -f "${ps1}" ]; then sed "s/^\\\$ConfigDir  = Join-Path \\\$env:APPDATA 'Onion'/\$ConfigDir  = \$PSScriptRoot/" "${ps1}" > "${sb}/cfgmut.ps1"
+    if ! cmp -s "${ps1}" "${sb}/cfgmut.ps1" && ! _ib_cfg "${sb}/cfgmut.ps1"; then record_pass "image-bridge: config do .ps1 (MUT): ao lado do script o caso reprova"
+    else record_fail "image-bridge: config do .ps1 (MUT)" "o mutante não derrubou o caso"; fi
   fi
   if [ ! -f "${ps1}" ]; then record_fail "image-bridge: .ps1 ausente" "${ps1}"
   elif command -v pwsh >/dev/null 2>&1; then

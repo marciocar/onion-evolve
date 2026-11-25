@@ -13,7 +13,8 @@
   O Claude Code aceita imagem pelo caminho do arquivo no disco onde ele roda (doc oficial, «Work with images»).
 
   Por que sftp e não o Gokapi: veja ops/windows/README.md. Nenhum IP, usuário ou senha mora aqui: o destino é um
-  apelido do ~/.ssh/config (o mesmo do mosh), guardado em onion-paste-image.config.psd1 ao lado deste arquivo.
+  apelido do ~/.ssh/config (o mesmo do mosh), guardado em %APPDATA%\Onion\onion-paste-image.config.psd1 (fora da
+  pasta do script: uma cópia do repo nunca carrega a config de ninguém).
 
 .PARAMETER SshHost
   Apelido do ~/.ssh/config (ou usuario@host) da VPS. Gravado na config no 1º uso.
@@ -47,7 +48,8 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 
-$ConfigPath = Join-Path $PSScriptRoot 'onion-paste-image.config.psd1'
+$ConfigDir  = Join-Path $env:APPDATA 'Onion'
+$ConfigPath = Join-Path $ConfigDir 'onion-paste-image.config.psd1'
 $RemoteRel  = '.local/share/onion/inbox-images'
 $MaxBytes   = 20MB
 
@@ -80,6 +82,7 @@ function Read-Config {
 
 function Write-Config([string]$HostAlias, [string]$RemoteDir) {
   $body = "@{`r`n  SshHost   = '$($HostAlias -replace "'", "''")'`r`n  RemoteDir = '$($RemoteDir -replace "'", "''")'`r`n}`r`n"
+  if (-not (Test-Path -LiteralPath $ConfigDir)) { New-Item -ItemType Directory -Path $ConfigDir -Force | Out-Null }
   Set-Content -LiteralPath $ConfigPath -Value $body -Encoding UTF8
 }
 
@@ -150,11 +153,13 @@ try {
     $fs = [System.IO.File]::OpenRead($src)
     try { $hd = New-Object byte[] 12; [void]$fs.Read($hd, 0, 12) } finally { $fs.Dispose() }
     $hex = -join ($hd | ForEach-Object { $_.ToString('x2') })
-    $isImg = $hex.StartsWith('89504e470d0a1a0a') -or $hex.StartsWith('ffd8ff') -or $hex.StartsWith('474946383') -or
-             ($hex.StartsWith('52494646') -and $hex.Substring(16, 8) -eq '57454250')
-    if (-not $isImg) { Fail "o arquivo copiado não é imagem png, jpg, gif ou webp pelos bytes: $src" }
-    $ext = [System.IO.Path]::GetExtension($src).ToLowerInvariant()
-    if ($ext -eq '.jpeg') { $ext = '.jpg' }
+    # a extensão sai dos BYTES, como no gokapi-fetch.sh da VPS: um .png que é jpeg chega como .jpg
+    $ext = $null
+    if ($hex.StartsWith('89504e470d0a1a0a')) { $ext = '.png' }
+    elseif ($hex.StartsWith('ffd8ff')) { $ext = '.jpg' }
+    elseif ($hex.StartsWith('474946383761') -or $hex.StartsWith('474946383961')) { $ext = '.gif' }
+    elseif ($hex.StartsWith('52494646') -and $hex.Substring(16, 8) -eq '57454250') { $ext = '.webp' }
+    if (-not $ext) { Fail "o arquivo copiado não é imagem png, jpg, gif ou webp pelos bytes: $src" }
     $name = "$stamp-win-$rand$ext"
     $tmp = Join-Path ([System.IO.Path]::GetTempPath()) $name
     Copy-Item -LiteralPath $src -Destination $tmp

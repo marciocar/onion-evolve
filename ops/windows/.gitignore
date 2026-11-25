@@ -1,0 +1,2 @@
+# config local da ponte de imagem (mora em %APPDATA%\Onion; nunca versionar)
+*.config.psd1

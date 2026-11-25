@@ -33,7 +33,7 @@ nodes:
     impact: 3
     confidence: 0.8
     verified_at: "2026-11-25"
-    verified_against: "bancada image_bridge do lint-selftest (28 casos com mutante, servidor HTTP falso em loopback) na branch feat/image-bridge; o .ps1 não roda nesta VPS (sem pwsh)"
+    verified_against: "bancada image_bridge do lint-selftest (29 casos, cada um com o seu mutante: 58 verificações; servidor HTTP falso em loopback) na branch feat/image-bridge; o .ps1 não roda nesta VPS (sem pwsh)"
     label: "Dois fluxos: o atalho do Windows (print, tecla, Ctrl+V) envia por sftp e deixa o caminho no clipboard; o Gokapi pelo navegador ou celular, com ops/gokapi-fetch.sh na VPS, é o segundo."
     narrative: "O sftp pela chave SSH que o maestro já usa é o padrão de mercado para copiar arquivo a um servidor, não precisa de segredo novo no Windows nem de serviço novo na VPS, e dá o menor número de passos. O Gokapi fica para o celular ou outra máquina sem a chave SSH. Os dois gravam na mesma pasta privada (0700, arquivo 0600), com o mesmo formato de nome, e a limpeza apaga só esses arquivos, só no primeiro nível da pasta. Um modo -Via gokapi no .ps1 foi descartado: pediria uma chave de upload guardada no Windows sem ganho sobre o sftp."
     provenance:
@@ -50,7 +50,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "Faltam a primeira medida do fluxo 2 contra o Gokapi real e a primeira execução do atalho no Windows do maestro."
-    narrative: "Pronto quando: (1) ops/gokapi-fetch.sh --check, com a entrada padrão onion/vps-gokapi/api-upload (a chave tem todas as permissões, segundo o maestro em 2026-11-25), sai rc 0 com «download: presente» contra o servidor real; (2) o maestro rodou o .ps1 com -Setup e -InstallShortcut no Windows, apertou o atalho e a sessão leu a imagem pelo caminho colado. Até lá o fluxo 1 está escrito e não medido no Windows, e o fluxo 2 só foi medido contra servidor falso."
+    narrative: "Pronto quando: (1) ops/gokapi-fetch.sh --check, com a entrada padrão onion/vps-gokapi/api-upload (a chave tem todas as permissões, segundo o maestro em 2026-11-25), sai rc 0 com «download: presente» contra o servidor real (até lá, ler 404 com o erro JSON de arquivo não encontrado como «a chave tem download» é INFERÊNCIA: supõe que o Gokapi confere a permissão antes de procurar o arquivo; outra resposta sai inconclusiva, rc 5); (2) o maestro rodou o .ps1 com -Setup e -InstallShortcut no Windows, apertou o atalho e a sessão leu a imagem pelo caminho colado. Até lá o fluxo 1 está escrito e não medido no Windows, e o fluxo 2 só foi medido contra servidor falso."
 edges:
   - from: D_IB_TWO_FLOWS_SFTP_FIRST_1125
     to: E_IB_IMAGE_BY_PATH_ONLY_1125

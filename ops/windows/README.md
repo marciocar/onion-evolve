@@ -24,8 +24,9 @@ Pré-requisito: você já entra na VPS por `ssh` ou `mosh` com chave, usando um 
 
 Pronto. Uso: **Win+Shift+S** → **Ctrl+Alt+I** → **Ctrl+V** na sessão.
 
-A config fica em `onion-paste-image.config.psd1`, ao lado do script, com o apelido SSH e a pasta remota. Não há IP,
-usuário nem senha no script.
+A config fica em `%APPDATA%\Onion\onion-paste-image.config.psd1`, com o apelido SSH e a pasta remota. Ela fica fora da
+pasta do script de propósito: a pasta pode ser uma cópia do repo, e o `.gitignore` daqui ainda recusa `*.config.psd1`
+por garantia. Não há IP, usuário nem senha no script.
 
 ## Atalho mais rápido (opcional): AutoHotkey
 
@@ -39,6 +40,17 @@ arquivo `onion.ahk` responde na hora:
 Ponha o `onion.ahk` em `shell:startup` para ele abrir com o Windows. Se usar o AutoHotkey, apague o atalho
 «Onion - colar imagem na VPS» do Menu Iniciar, para a tecla não rodar duas vezes.
 
+## Dois cuidados do Windows
+
+- **Histórico do clipboard (Win+V) e sincronização entre dispositivos.** Se estiverem ligados, o print e depois o
+  caminho ficam guardados no histórico, e a sincronização os manda à nuvem da Microsoft. Para print com dado sensível,
+  desligue em Configurações > Sistema > Área de transferência, ou apague o item no Win+V depois de usar.
+- **`-ExecutionPolicy Bypass` e a marca da web.** O atalho roda o script com `Bypass`, que ignora a política de
+  execução, inclusive a marca «baixado da internet» (Mark-of-the-Web) que o `RemoteSigned` usaria para barrar o arquivo.
+  Então quem consegue editar o `.ps1` consegue rodar código no seu login. Guarde a pasta no seu perfil, leia o script
+  antes de usar, e se ele veio por navegador ou anexo, rode `Unblock-File .\onion-paste-image.ps1` só depois de ler.
+  Se preferir não usar `Bypass`, troque no atalho por `-ExecutionPolicy RemoteSigned` depois do `Unblock-File`.
+
 ## Por que sftp, e não o Gokapi
 
 - **É o padrão de mercado** para copiar um arquivo a um servidor Linux, e já vem no Windows (OpenSSH).
@@ -50,7 +62,8 @@ Ponha o `onion.ahk` em `shell:startup` para ele abrir com o Windows. Se usar o A
 
 ## O que o script garante
 
-- Imagem do clipboard (print) ou o primeiro arquivo de imagem copiado no Explorer (png, jpg, gif, webp).
+- Imagem do clipboard (print) ou o primeiro arquivo de imagem copiado no Explorer (png, jpg, gif, webp), com a
+  extensão tirada dos bytes, não do nome.
 - Teto de 20 MiB, conferido antes de enviar.
 - Nome `AAAAMMDD-HHMMSS-win-XXXX.png`, o mesmo formato que a limpeza da VPS (`ops/gokapi-fetch.sh --prune`) reconhece.
 - Na VPS: pasta `~/.local/share/onion/inbox-images` em 0700 e arquivo em 0600.
