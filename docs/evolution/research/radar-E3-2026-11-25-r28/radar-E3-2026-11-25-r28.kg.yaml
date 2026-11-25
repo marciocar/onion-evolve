@@ -1,0 +1,454 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.331 a 2.1.332 contra a baseline 2.1.330.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-11-25-r28
+  schema_version: "1"
+  baseline: "2026-11-25"
+  review_after: "2026-12-25"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-11-25); 13 da rodada; 24 após o juiz (3 omissões medidas em 2 nós, 1 pergunta, 6 superações).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+#   DECIDIDO (2026-11-25): (a). Caem dois nós da r27 pela medição de hoje: as versões de quem serve (o host
+#   subiu para 2.1.332 e o pin do revisor andou para a v1.0.286) e a pergunta da subida (alvo 0.3.330/v1.0.286
+#   ultrapassado; o pin do revisor já está na v1.0.286). Pelo juiz, cai também a bancada do deny verde da r27:
+#   o deny da casa não segura em bypass sob certas formas de comando Bash, medido na própria 2.1.330
+#   (detalhes fora do repositório público).
+external_edges:
+  - from: E_HOST_NA_2_1_332_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_330_1125
+    to: "docs/evolution/research/radar-E3-2026-11-21-r27/radar-E3-2026-11-21-r27.kg.yaml#E_HOST_NA_2_1_330_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_322_1121"
+    edge_type: SUPERSEDES
+  - from: Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125
+    to: "docs/evolution/research/radar-E3-2026-11-21-r27/radar-E3-2026-11-21-r27.kg.yaml#Q_SUBIR_SDK_DO_BRIDGE_0_3_330_E_PIN_DO_REVISOR_V1_0_286_1121"
+    edge_type: SUPERSEDES
+  - from: E_DENY_NAO_SEGURA_EM_BYPASS_1125
+    to: "docs/evolution/research/radar-E3-2026-11-21-r27/radar-E3-2026-11-21-r27.kg.yaml#E_BANCADA_DO_DENY_VERDE_NA_2_1_330_1121"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    trace: "docs/evolution/research/radar-E3-2026-11-25-r28/SYNTHESIS.md"
+    verified_against: "CHANGELOG oficial: seções 2.1.331 (138 linhas, 135 itens), 2.1.332 (153 linhas, 150 itens); baseline 2.1.330, disco 2.1.332, processo 2.1.331, SDK bridge 2.1.323"
+    label: "o delta desde a baseline 2.1.330 são 2 versão(ões), de 2.1.331 a 2.1.332, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.331 a ## 2.1.332 (cópias em docs/evolution/research/radar-E3-2026-11-25-r28/data/)"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fechada em 2026-11-25 pela rodada 28 do radar do Claude Code: 285 itens; os candidatos foram medidos no vivo no motor das duas versões, o juiz refutou em data/judge-verdicts.json (9 SUSTENTA, 6 EXAGERA, 0 REPROVA, 6 superações), as três omissões que ele mediu viraram nós (o deny que não segura em bypass sob certas formas de comando, reunido num nó só, e a deriva do cited-directive), e o Code Mode e o resto estão em NÃO-VERIFICADOS na SYNTHESIS"
+    label: "quais itens de 2.1.331 a 2.1.332 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_HOST_NA_2_1_332_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_330_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "claude --version → 2.1.332; cc-delta-census.sh . --markdown → processo 2.1.331, SDK bridge binário 2.1.323 (SDK 0.3.323), 8 versões publicadas atrás do host; grep -n 'claude-code-action@' .github/workflows/onion-review.yml → l.343 e l.522 com o pin anthropics/claude-code-action@acfe7992 (v1.0.286); currency-census.sh → o pin acfe7992 instala o CLI 2.1.330; contagem dos binários dos processos claude do host pelo link exe de cada processo no procfs → 6 em 2.1.330, 8 em 2.1.331, 3 em 2.1.332 (a 2.1.332 chegou ao disco às 01:34 UTC de hoje)"
+    label: "quem serve o Onion em 2026-11-25: o host na 2.1.332 em disco, a maior parte das sessões vivas ainda na 2.1.330 e na 2.1.331, o bridge na 2.1.323 (SDK 0.3.323) e o revisor do CI na 2.1.330 (action v1.0.286)"
+    narrative: "Régua do CHANGELOG (versões com seção, a mesma do cc-delta-census): o bridge foi de 6 para 8 versões atrás do host; o revisor saiu de 7 para 2 atrás, porque o pin subiu para a v1.0.286 depois da rodada 27. Das 17 sessões e colegas de time vivos no host, só 3 rodam a 2.1.332: o resto só pega o delta desta rodada depois de reiniciar."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "cc-delta-census.sh --markdown; currency-census.sh; .github/workflows/onion-review.yml; ⟨link exe dos processos claude no procfs⟩"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-11-25"
+    verified_against: "currency-census.sh em 2026-11-25: agent-sdk:bridge 0.3.323 contra 0.3.332 publicada (o hook de atualidade da mesma hora leu 0.3.331: o registro oscila); action 1.0.286 contra 1.0.290 (o hook leu 1.0.289); gh pr view 112 no repo onion-bridge → OPEN, «chore(deps): o Agent SDK sobe de 0.3.323 para 0.3.330», mergedAt null; tm.sh item.read SAC-432 --lean → startedAt 2026-11-21, updatedAt 2026-11-21T14:56"
+    label: "o SDK do bridge sobe para 0.3.332 (o PR onion-bridge #112, ainda aberto, mira 0.3.330 e precisa de novo alvo) e o pin do revisor do CI sobe para a action v1.0.290, que instala o CLI 2.1.332"
+    narrative: "Issue no Linear: SAC-432, já em andamento; o juiz achou que ela ainda não tinha sido comentada (o último comentário era da rodada 27, e o título falava em 0.3.327), e a rodada a comentou com os alvos novos no passo 8 e corrigiu o título para 0.3.332 e v1.0.290. O merge e o deploy do bridge são do maestro. Até lá, o que a 2.1.324 a 2.1.332 corrigiram (entre eles o congelamento do deny em comando longo, E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125) não chega a quem conversa pelo bridge."
+  - id: E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "sonda do tempo do deny no motor real (Messages API falsa da bancada do deny, modo default; a sonda fica no registro privado do core, 25/11, fora do repositório público) com o permissions.deny da casa (75 regras, 52 com dois ou mais curingas, nenhuma com quatro ou mais) e um comando Bash longo: 2.1.331 → 50 mil caracteres em 4,8 s e 10,7 s (duas rodadas); 150 mil em 33,5 s. 2.1.332 → 50 mil em 1,3 s e 1,7 s; 150 mil em 1,6 s. Sem deny, 50 mil caracteres levam 1,3 s na 2.1.331 e 1,6 s na 2.1.332. Em default as duas recusam. Hooks com condição if: 0 dos 35"
+    label: "o congelamento que a 2.1.332 corrige pega a casa: com o deny da casa, julgar um comando de 150 mil caracteres leva 33,5 s na 2.1.331 e 1,6 s na 2.1.332; a recusa foi medida em default"
+    narrative: "Item: data/2.1.332.txt l.15. A casa não tem hook com condição if; o custo vem das regras do deny. O crescimento é mais que linear na 2.1.331 (50 mil caracteres: 5 a 11 s; 150 mil: 33,5 s). Comando tão longo é raro na sessão, mas acontece quando um agente cola um payload inteiro num argumento. Não medido: o efeito na sessão interativa (a sonda é claude -p). O juiz repetiu o tempo (36,3 s contra 1,4 s) e pediu que o label declarasse o modo de permissão medido (C_SUPERACAO_20261125_DENY_MEDIDO_NO_MODO_DA_CASA)."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.332.txt l.15; registro privado do core, 25/11; ops/testing/permissions-deny-bench.py; .claude/settings.json"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_HOOKS_DA_CASA_IMPRIMEM_POUCO_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "os 10 hooks PreToolUse de Bash rodados com comandos de 100 mil caracteres → bloqueiam merge-gate (274 bytes), env-guard (333) e direct-provider-api (436); nenhum hook passou de 2.000 bytes, e nenhum ecoa o comando; SessionStart e UserPromptSubmit rodados no checkout principal → co-evolution-inbox-check 645 bytes com 32 itens no inbox, session-currency-check 1.461, session-version-drift 523, task-manager-provider-hook 219, os demais 0; 31 dos 35 hooks têm timeout declarado; os 4 sem timeout fora do PreToolUse (session-degraded-notice, bash-empty-result-guard, instructions-loaded-log, rule-title-in-prose) imprimem 0, 462, 0 e 0 bytes (medido pelo juiz); os dois hooks de Stop contra os dois maiores transcripts reais (179 MB e 40 MB) → 0 bytes em 0,2 s"
+    label: "as correções da 2.1.332 para hook que imprime sem fim e para bloqueio com log enorme (corte em cerca de 50 mil caracteres) não pegam a casa hoje: a maior saída medida de hook foi 1.461 bytes, e os bloqueios não ecoam o comando"
+    narrative: "Itens: data/2.1.332.txt l.16 e l.17. O co-evolution-inbox-check cresce com o inbox (645 bytes com 32 itens), longe dos 50 mil. Os 4 hooks sem timeout são a classe que a l.16 cura (hook que imprime sem fim) e hoje imprimem pouco. Os hooks de Stop foram medidos pelo juiz."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.332.txt l.16, l.17; .claude/hooks; .claude/settings.json"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_PRESKILLSHELLCOMMAND_RECUSA_A_DIRETIVA_NA_2_1_332_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "data/probe-preskill-shell.py (claude -p /probe em bypassPermissions, comando de projeto com uma diretiva que grava um marcador, Messages API falsa): 2.1.332 sem hook → diretiva rodou; com hook PreSkillShellCommand que sai 2 → diretiva não rodou, hook chamado; com hook que sai 0 → rodou. Entrada do hook: hook_event_name PreSkillShellCommand, tool_name Bash, tool_input.command com a linha da diretiva, command_name probe, command_source projectSettings, invoked_by user, tool_use_id com sufixo :inner:preamble-0"
+    label: "o evento PreSkillShellCommand da 2.1.332 funciona no motor real: exit 2 recusa a diretiva do comando antes de ela rodar, e a entrada traz o comando, o nome e a origem do comando, no mesmo formato de tool_input do PreToolUse"
+    narrative: "Item: data/2.1.332.txt l.4. A casa tem 28 linhas com diretiva viva em 14 arquivos (12 comandos de meta/ e 2 skills, onion e onion-research), todas escritas pela própria casa; outros 4 arquivos só citam a forma em prosa (contagem corrigida pelo juiz). Não medido: o texto que o modelo recebe no lugar da diretiva recusada, e skills vindas de servidor MCP (l.3)."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.332.txt l.4; data/probe-preskill-shell.py"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_PRETOOLUSE_NAO_VE_A_DIRETIVA_E_O_DENY_VE_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "sonda com hook PreToolUse de matcher Bash que sai 2 e grava a entrada: na 2.1.331 e na 2.1.332 a diretiva rodou e o hook não foi chamado; sonda com o permissions.deny da casa e a diretiva git push --force origin feat/x, em bypassPermissions: nas duas versões, «Permission to use Bash with command git push --force origin feat/x has been denied»; .claude/settings.json → os guardas de Bash da casa que não têm regra deny equivalente são hooks PreToolUse (env-guard, protect-main, merge-gate, moat-gate, direct-provider-api, subagent-background-wait, plugin-write-guard, kg-read-leg, memory-write-guard, adopter-guard)"
+    label: "diretiva de injeção de comando ou skill não passa pelos hooks PreToolUse da casa, na 2.1.331 e na 2.1.332; o permissions.deny recusou a diretiva testada, mas não segura toda forma dela em bypass (SAC-551); o PreSkillShellCommand é o primeiro hook que a vê"
+    narrative: "Hoje as 28 diretivas da casa são escritas pela casa, então o buraco não tem atacante dentro do core. Ele importa para o que vem de fora: comando ou skill de adotante, de plugin e de servidor MCP (data/2.1.332.txt l.3). O ops/chat-runner.sh já desliga diretiva e hook juntos (disableSkillShellExecution e disableAllHooks), então o canal de conversa não depende disso."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.332.txt l.4; data/probe-preskill-shell.py; .claude/settings.json; ops/chat-runner.sh l.656"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_PRESKILLSHELLCOMMAND_NA_2_1_331_E_IGNORADO_EM_SILENCIO_NO_P_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "data/probe-preskill-shell.py na 2.1.331, modo block (settings do projeto com hook PreSkillShellCommand que sai 2): claude -p rc 0, sem diálogo, sem aviso no stderr, o hook não foi chamado e a diretiva rodou"
+    label: "na 2.1.331, um settings que nomeia o PreSkillShellCommand não abre diálogo no claude -p: o evento é ignorado em silêncio e a diretiva roda; o diálogo de início que o CHANGELOG anuncia é da sessão interativa, que não foi medida"
+    narrative: "Item: data/2.1.332.txt l.4 («on 2.1.331 and older, a settings file naming it opens a dialog at start»). Consequência para quem viaja: uma guarda por PreSkillShellCommand no settings da casa fica muda, sem aviso, em adotante headless numa versão antiga, e incomoda o adotante interativo com um diálogo no início. Precisa de versão mínima declarada antes de entrar no settings que viaja."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.332.txt l.4; data/probe-preskill-shell.py"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-25"
+    verified_against: "aberta em 2026-11-25 a partir de E_PRETOOLUSE_NAO_VE_A_DIRETIVA_E_O_DENY_VE_1125, E_PRESKILLSHELLCOMMAND_RECUSA_A_DIRETIVA_NA_2_1_332_1125 e E_PRESKILLSHELLCOMMAND_NA_2_1_331_E_IGNORADO_EM_SILENCIO_NO_P_1125"
+    label: "ligar os guardas de Bash da casa também ao PreSkillShellCommand, para que a diretiva de comando ou skill de fora passe pelo mesmo juiz, com versão mínima 2.1.332 declarada e o adotante antigo tratado antes do settings viajar"
+    narrative: "Issue no Linear: SAC-552 (projeto Onion — core: próximas levas). Desenho pelo /meta:forge-guard: a entrada traz tool_input.command no mesmo formato do PreToolUse, então os scripts atuais podem servir aos dois eventos; a bancada precisa provar a recusa no motor real nas duas versões. A decisão de quando o settings que viaja passa a nomear o evento é do maestro."
+  - id: E_CTRL_V_DE_IMAGEM_NAO_ALCANCA_A_VPS_HEADLESS_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "command -v → xclip e wl-paste instalados (apt policy: xclip 0.13-3, wl-clipboard 2.2.1-1build1); ambiente da sessão: DISPLAY e WAYLAND_DISPLAY vazios, SSH_CONNECTION presente; xclip -o -selection clipboard -t TARGETS → «Can't open display: (null)», rc 1; wl-paste --list-types → «Failed to connect to a Wayland server», rc 1"
+    label: "a melhoria da 2.1.332 no Ctrl+V de imagem não resolve a colagem de imagem nas sessões da VPS: os dois pacotes já estão instalados, mas a VPS não tem display, e a área de transferência que eles leem não é a do computador do maestro"
+    narrative: "Item: data/2.1.332.txt l.92 (só a mensagem de erro mudou: agora ela nomeia o pacote). O OSC 52 do tmux e do mosh leva texto do servidor para o terminal local, não imagem do local para o servidor. A imagem precisa de outro caminho: o app claude.ai pelo Remote Control, ou o arquivo enviado à VPS e citado por @caminho."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.332.txt l.92"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_CAMINHO_DE_IMAGEM_PARA_AS_SESSOES_DA_VPS_1125
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-11-25"
+    verified_against: "aberta em 2026-11-25 a partir de E_CTRL_V_DE_IMAGEM_NAO_ALCANCA_A_VPS_HEADLESS_1125"
+    label: "declarar e documentar o caminho de imagem do maestro para as sessões da VPS (Remote Control pelo app, ou arquivo enviado e citado por @caminho), já que o Ctrl+V do terminal não alcança a VPS headless"
+    narrative: "Issue no Linear: SAC-553 (projeto Onion — core: próximas levas). Medir cada caminho de ponta a ponta antes de escrever a doutrina; o pedido do maestro de 2026-11-25 é copiar e colar, inclusive imagens, nas sessões do tmux."
+  - id: E_TIME_EM_PAINEL_E_SESSAO_PROPRIA_COM_O_BINARIO_DO_LIDER_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-11-25"
+    verified_against: "esta rodada roda como colega de time em painel: processo próprio com --agent-name cc-update-r28 e --team-name, transcript próprio no topo da pasta de projetos (não em subagents/), binário versions/2.1.331, nascido às 01:38:07, depois de a 2.1.332 chegar ao disco às 01:34:51 (os outros dois colegas de time vivos nasceram antes disso e não provam a tese); o argv traz --agent-id, mas o JSON do hook não traz o campo agent_id, deduzido de a guarda, que só lê esse campo, não ter vetado; um Bash com run_in_background true desta sessão não foi recusado pela guarda pretooluse-subagent-background-wait.sh, e o aviso de fim da tarefa de fundo chegou no meio do turno; um subagente sem nome (in-process, haiku) lançado por esta sessão chamou Bash com run_in_background true e foi recusado por «GUARDA-PRETOOLUSE (fundo em subagente)»"
+    label: "o colega de time em painel é sessão própria: nasce com o binário da sessão líder (2.1.331 hoje, com a 2.1.332 no disco), e o JSON do hook dele não traz agent_id (o argv traz --agent-id); a guarda de espera em fundo não o veta, o que está certo, porque o aviso de fim chega a ele"
+    narrative: "Consequência prática: para que os colegas de time peguem a 2.1.332, é a sessão líder que reinicia. A sonda do agent_id pedida pelo cabeçalho da guarda (l.29-30) foi refeita nas duas metades no processo 2.1.331: subagente recusado, sessão própria liberada. Um colega de time também não pode lançar outro colega com nome (o harness recusa: «the team roster is flat»), então o juiz desta rodada é subagente sem nome. A guarda não tem defeito: ela mira o subagente, a quem o aviso de fim não chega."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.332.txt; .claude/hooks/pretooluse-subagent-background-wait.sh l.13-30"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_REENVIO_DO_CLAUDE_MD_EM_WORKTREE_PEGA_POUCO_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.6
+    verified_at: "2026-11-25"
+    verified_against: "git worktree list → 58 linhas (o checkout e 57 worktrees), 5 delas em .claude/worktrees (as de agente com isolation worktree); wc -c CLAUDE.md → 26.298 bytes; .claude/rules → 7 arquivos; as worktrees de trabalho da casa ficam fora de .claude/worktrees"
+    label: "a correção da 2.1.332 para o CLAUDE.md e as rules reenviados ao modelo depois de entrar numa worktree de .claude/worktrees pega pouco a casa: só 5 das 57 worktrees ficam lá, e a casa não usa o EnterWorktree à mão"
+    narrative: "Item: data/2.1.332.txt l.24. O item cita o EnterWorktree e a retomada dentro da worktree; não foi medido se o isolation worktree do Agent passa pelo mesmo caminho. Quando passa, cada envio a mais custa os 26 KB do CLAUDE.md."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.332.txt l.24"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_ITENS_QUE_A_CASA_NAO_USA_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "grep -rlF em .claude/hooks, .claude/settings.json, .claude/commands, .claude/skills, ops e .github → nada para oat01, isSynthetic, PushNotification, OTEL_, apiKeyHelper, PermissionDenied, extraKnownMarketplaces e computer-use; permissions.deny sem regra de Agent, Skill ou Task; eventos de hook no settings: InstructionsLoaded, PostModelSwitch, PostToolUse, PreCompact, PreModelSwitch, PreToolUse, SessionEnd, SessionStart, Stop, UserPromptSubmit (sem SubagentStop nem PermissionDenied)"
+    label: "parte do delta mexe no que a casa não usa: prefixo oat02 do token do runner, isSynthetic do SDK, PushNotification, OpenTelemetry, apiKeyHelper, hook PermissionDenied, auto-update de marketplace gerenciado, nome computer-use, regra de permissão no Agent ou no Skill e SubagentStop"
+    narrative: "Itens: data/2.1.332.txt l.110, l.106, l.107, l.42 e os de OpenTelemetry; data/2.1.331.txt l.12, l.57, l.58, l.34, l.21 (o Stop que lia o transcript sem a última resposta era só no Claude Desktop; os dois hooks de Stop da casa rodam no terminal). O isSynthetic (l.106) pode importar ao bridge quando o SDK subir: o bridge repassa texto pelo SDK, e isso não foi medido aqui."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/2.1.331.txt; data/2.1.332.txt; .claude/settings.json"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_DENY_NAO_SEGURA_EM_BYPASS_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "registro privado do core, 25/11 (fora do repositório público): sonda do motor real com o permissions.deny da casa, medida pela rodada e, de forma independente, pelo juiz, na 2.1.330, na 2.1.331 e na 2.1.332; em default e acceptEdits a recusa segue. Settings do usuário do host: defaultMode bypassPermissions e skipDangerousModePermissionPrompt true (só as chaves lidas)"
+    label: "o deny da casa não segura em bypassPermissions sob certas formas de comando Bash, medido em 2.1.330–2.1.332; os hooks PreToolUse seguem barrando merge e push para a main (detalhes fora do repositório público; ação SAC-551)"
+    narrative: "Omissões 1 e 2 do juiz, confirmadas de forma independente pela rodada e reunidas num nó só na versão pública. Os hooks PreToolUse (merge-gate, protect-main) seguem barrando merge e push para a main; o que fica aberto é parte do que só o deny cobre. Um push acidental de sonda criou um branch sem conteúdo novo, já apagado. Detalhes e reprodução ficam no registro privado do core até a coordenação com o fornecedor. Derruba E_BANCADA_DO_DENY_VERDE_NA_2_1_330_1121 da rodada 27, que dava o deny por valendo em bypass."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "registro privado do core, 25/11; data/judge-verdicts.json (omissoes, itens 1 e 2); ops/testing/permissions-deny-bench.py; .claude/settings.json"
+      method: "measurement: medição no vivo pela sessão do core e pelo juiz da rodada"
+      locality: "repo"
+  - id: Q_DENY_SEGURA_EM_BYPASS_1125
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    verified_at: "2026-11-25"
+    verified_against: "aberta em 2026-11-25 a partir de E_DENY_NAO_SEGURA_EM_BYPASS_1125"
+    label: "fazer o deny da casa segurar no modo da casa (bypassPermissions), com casos novos na bancada do deny e uma guarda PreToolUse independente do deny"
+    narrative: "Issue no Linear: SAC-551 (projeto Onion — core: próximas levas). Desenho pelo /meta:forge-guard. A bancada precisa reprovar contra mutante e rodar nas versões vivas; os casos dela nascem do registro privado do core e só entram no repositório público depois da coordenação com o fornecedor. O reporte ao fornecedor é do maestro."
+  - id: E_DERIVA_DO_CITED_DIRECTIVE_SEGUE_IGUAL_NA_2_1_332_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "medido pelo juiz: LC_ALL=C lint-selftest.sh --families cited_directive → rc 1, «(f) DERIVA … o COMPORTAMENTO do motor mudou no binario 2.1.332»; --families channel_session → rc 0; extração do binário 2.1.332 → as duas regex da diretiva (a forma em bloco e a forma inline) são idênticas às da 2.1.330, só os nomes de função mudaram"
+    label: "a guarda de deriva do cited-directive segue vermelha na 2.1.332 pelo mesmo motivo da 2.1.329 e da 2.1.330: só os nomes de função mudaram, o parser da diretiva é o mesmo; a channel_session segue verde"
+    narrative: "Omissão 3 do juiz: o censo manda rodar as duas guardas a cada rodada, e esta não as tinha registrado. A tarefa do curinga das locais no molde (SAC-433) segue valendo. A l.4 da 2.1.332 mexe no caminho da diretiva (PreSkillShellCommand), não no parser."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "data/judge-verdicts.json (omissoes, item 3); .claude/validation/lint-selftest.sh"
+      method: "measurement: medição no vivo pelo juiz da rodada"
+      locality: "repo"
+  - id: C_SUPERACAO_20261125_DENY_MEDIDO_NO_MODO_DA_CASA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "judge-verdict-check.sh rc 0 imprimiu SUPERACAO para E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125; medida: o label não declarava o modo de permissão medido (default); a medida no modo da casa fica no registro privado do core, 25/11 (fora do repositório público)"
+    label: "superação do juiz: declarar no label o modo de permissão em que a recusa foi medida e medir também o modo em que a casa roda"
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-11-25-r28/data/judge-verdicts.json"
+      locator: "data/judge-verdicts.json (verdicts, alvo E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125)"
+      method: "judges: juiz subagente opus da rodada, critério pré-registrado"
+      locality: "repo"
+  - id: C_SUPERACAO_20261125_INVENTARIO_DE_TIMEOUT_DOS_HOOKS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "judge-verdict-check.sh rc 0 imprimiu SUPERACAO para E_HOOKS_DA_CASA_IMPRIMEM_POUCO_1125; medida: 4 hooks com timeout=— no censo; saídas 0, 462, 0 e 0 bytes"
+    label: "superação do juiz: cruzar o inventário de timeouts do cc-delta-census com a saída medida dos hooks sem timeout"
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-11-25-r28/data/judge-verdicts.json"
+      locator: "data/judge-verdicts.json (verdicts, alvo E_HOOKS_DA_CASA_IMPRIMEM_POUCO_1125)"
+      method: "judges: juiz subagente opus da rodada, critério pré-registrado"
+      locality: "repo"
+  - id: C_SUPERACAO_20261125_DIRETIVA_VIVA_POR_REGEX
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "judge-verdict-check.sh rc 0 imprimiu SUPERACAO para E_PRESKILLSHELLCOMMAND_RECUSA_A_DIRETIVA_NA_2_1_332_1125; medida: regex: 28 linhas em 14 arquivos; o grep -F dava 18 arquivos, 4 só com citação"
+    label: "superação do juiz: contar diretiva viva pela regex do motor, que separa a diretiva da citação em prosa"
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-11-25-r28/data/judge-verdicts.json"
+      locator: "data/judge-verdicts.json (verdicts, alvo E_PRESKILLSHELLCOMMAND_RECUSA_A_DIRETIVA_NA_2_1_332_1125)"
+      method: "judges: juiz subagente opus da rodada, critério pré-registrado"
+      locality: "repo"
+  - id: C_SUPERACAO_20261125_DIRETIVA_NO_MODO_DA_CASA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "judge-verdict-check.sh rc 0 imprimiu SUPERACAO para E_PRETOOLUSE_NAO_VE_A_DIRETIVA_E_O_DENY_VE_1125; medida: 2.1.331 e 2.1.332 em bypass: a diretiva testada foi recusada, e o deny não segura toda forma dela; detalhes no registro privado do core, 25/11 (fora do repositório público)"
+    label: "superação do juiz: medir o deny sobre a diretiva no modo em que a casa roda, além da forma testada"
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-11-25-r28/data/judge-verdicts.json"
+      locator: "data/judge-verdicts.json (verdicts, alvo E_PRETOOLUSE_NAO_VE_A_DIRETIVA_E_O_DENY_VE_1125)"
+      method: "judges: juiz subagente opus da rodada, critério pré-registrado"
+      locality: "repo"
+  - id: C_SUPERACAO_20261125_ARGV_E_HORA_DO_COLEGA_DE_TIME
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "judge-verdict-check.sh rc 0 imprimiu SUPERACAO para E_TIME_EM_PAINEL_E_SESSAO_PROPRIA_COM_O_BINARIO_DO_LIDER_1125; medida: argv com --agent-id; nascimentos 01:34:31 e 01:34:47 (antes) e 01:38:07 (depois) contra o disco às 01:34:51"
+    label: "superação do juiz: ler o argv e a hora de nascimento de cada colega de time contra a hora da 2.1.332 no disco"
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-11-25-r28/data/judge-verdicts.json"
+      locator: "data/judge-verdicts.json (verdicts, alvo E_TIME_EM_PAINEL_E_SESSAO_PROPRIA_COM_O_BINARIO_DO_LIDER_1125)"
+      method: "judges: juiz subagente opus da rodada, critério pré-registrado"
+      locality: "repo"
+  - id: C_SUPERACAO_20261125_LEITURA_COMPLETA_DA_ISSUE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "judge-verdict-check.sh rc 0 imprimiu SUPERACAO para Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125; medida: tm.sh item.read SAC-432: último comentário de 2026-11-21, título ainda em 0.3.327"
+    label: "superação do juiz: ler a issue inteira pelo tm.sh, com os comentários datados, antes de afirmar que ela foi comentada"
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-11-25-r28/data/judge-verdicts.json"
+      locator: "data/judge-verdicts.json (verdicts, alvo Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125)"
+      method: "judges: juiz subagente opus da rodada, critério pré-registrado"
+      locality: "repo"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_HOST_NA_2_1_332_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_330_1125
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_332_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_330_1125
+    to: Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125
+    edge_type: SUPPORTS
+  - from: E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125
+    to: Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_HOOKS_DA_CASA_IMPRIMEM_POUCO_1125
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_PRESKILLSHELLCOMMAND_RECUSA_A_DIRETIVA_NA_2_1_332_1125
+    edge_type: SUPPORTS
+  - from: E_PRESKILLSHELLCOMMAND_RECUSA_A_DIRETIVA_NA_2_1_332_1125
+    to: Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125
+    edge_type: SUPPORTS
+  - from: E_PRETOOLUSE_NAO_VE_A_DIRETIVA_E_O_DENY_VE_1125
+    to: Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125
+    edge_type: SUPPORTS
+  - from: E_PRESKILLSHELLCOMMAND_NA_2_1_331_E_IGNORADO_EM_SILENCIO_NO_P_1125
+    to: Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125
+    edge_type: CONSTRAINS
+  - from: E_DELTA_DA_RODADA
+    to: E_CTRL_V_DE_IMAGEM_NAO_ALCANCA_A_VPS_HEADLESS_1125
+    edge_type: SUPPORTS
+  - from: E_CTRL_V_DE_IMAGEM_NAO_ALCANCA_A_VPS_HEADLESS_1125
+    to: Q_CAMINHO_DE_IMAGEM_PARA_AS_SESSOES_DA_VPS_1125
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_332_BRIDGE_NA_2_1_323_REVISOR_NA_2_1_330_1125
+    to: E_TIME_EM_PAINEL_E_SESSAO_PROPRIA_COM_O_BINARIO_DO_LIDER_1125
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_REENVIO_DO_CLAUDE_MD_EM_WORKTREE_PEGA_POUCO_1125
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_ITENS_QUE_A_CASA_NAO_USA_1125
+    edge_type: SUPPORTS
+  - from: E_DENY_NAO_SEGURA_EM_BYPASS_1125
+    to: Q_DENY_SEGURA_EM_BYPASS_1125
+    edge_type: SUPPORTS
+  - from: E_DENY_NAO_SEGURA_EM_BYPASS_1125
+    to: Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: E_DERIVA_DO_CITED_DIRECTIVE_SEGUE_IGUAL_NA_2_1_332_1125
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261125_DENY_MEDIDO_NO_MODO_DA_CASA
+    to: E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_INVENTARIO_DE_TIMEOUT_DOS_HOOKS
+    to: E_HOOKS_DA_CASA_IMPRIMEM_POUCO_1125
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_DIRETIVA_VIVA_POR_REGEX
+    to: E_PRESKILLSHELLCOMMAND_RECUSA_A_DIRETIVA_NA_2_1_332_1125
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_DIRETIVA_NO_MODO_DA_CASA
+    to: E_PRETOOLUSE_NAO_VE_A_DIRETIVA_E_O_DENY_VE_1125
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_ARGV_E_HORA_DO_COLEGA_DE_TIME
+    to: E_TIME_EM_PAINEL_E_SESSAO_PROPRIA_COM_O_BINARIO_DO_LIDER_1125
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_LEITURA_COMPLETA_DA_ISSUE
+    to: Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125
+    edge_type: TRACES_TO
