@@ -2,8 +2,8 @@
 branch: feat/image-bridge
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 7774893b9f4d0d68fb6f2d6f90e430eb9865856addeb3a2d9b05be317fa42781
-reviewed_code_sha256: fe284ab3d868732a9e67e6ae39c5b0b47b23e0f8cfb009295fcdd831652c576a
+reviewed_diff_sha256: pendente
+reviewed_code_sha256: pendente
 findings_total: 17
 findings_real: 17
 findings_blocking: 1
@@ -86,3 +86,5 @@ reviewer: ps1-case-reviewer (opus, isolado), sobre dcc23147c..33dc10b8e: FIXES_N
 2ª rodada: reviewer: ps1-case-reviewer (opus, isolado), sobre 33dc10b8e..d53c50fa6: APPROVE. Mediu real 60 ✓, quebrado 59 ✓ 1 ✗ sem aborto, caminho com espaço/$/; lido certo, e IB_PS1 ausente falha fechado. Não rodou a bancada inteira «sem pwsh» por carga ≥ 15 (o ramo ⊘ não mudou no delta; na 1ª rodada deu 58 ✓ 1 ⊘).
 
 Pós-revisão (core, 25/11 ~06:30Z): a guarda shell_pipefail_robustness do pré-voo barrou `printf … | grep -qF` no mutante (classe EPIPE sob pipefail); trocado por here-string `grep -qF … <<< "$var"`, sem outra mudança. Delta conferido por revisão isolada à parte (ver abaixo).
+
+reviewer: pipefail-delta-reviewer (sonnet, isolado), sobre 0b552c374..948e5a871: APPROVE (diff só a linha do here-string e a nota; equivalência medida; emissor pipe-verdict-check rc 0 sem sítio novo; a família inteira não rodou por carga ≥ 15 e fica com o pré-voo e o CI).
