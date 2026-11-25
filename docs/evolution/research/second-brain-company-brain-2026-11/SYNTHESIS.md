@@ -14,8 +14,8 @@ review_after: 2027-02-23
 
 # Second Brain pessoal × Company Brain — decisão aberta
 
-> **Projeção** do grafo `second-brain-company-brain-2026-11.kg.yaml` (70 nós; radar `--integrity --schema` exit 0; contrato exit 0).
-> Se esta prosa divergir do grafo, vale o grafo. Nó de decisão: **`D_SECOND_BRAIN_VERTICAL_2026_11`**, `open`. **O maestro sela** pelo `/meta:decide`; esta rodada não selou nada.
+> **Projeção** do grafo `second-brain-company-brain-2026-11.kg.yaml` (72 nós; radar `--integrity --schema` exit 0; contrato exit 0).
+> Se esta prosa divergir do grafo, vale o grafo. Nó de decisão: **`D_SECOND_BRAIN_VERTICAL_2026_11`**, **selada pelo maestro em 2026-11-25** (ver «Selos de 25/11» abaixo). O run em si não selou nada: nasceu `open`.
 > Retorno íntegro do run em `data/wf_4dcf9417-edc-return.json`.
 
 ## Custo declarado
@@ -28,11 +28,17 @@ review_after: 2027-02-23
 | Orçamento | `maxFetch` 15 · `maxVerify` 25 |
 | Elenxo | sim (modo decisão): 37 objeções sobreviventes, todas modeladas como `E_OBJECAO_` |
 
+## Selos de 25/11 (depois do run, pelo `/meta:decide`, destino desenho)
+
+- **`D_SECOND_BRAIN_VERTICAL_2026_11`:** escolhida **C (central de decisão do company-brain) primeiro, depois B (vertical irmã federada) usando o aprendizado de A (ADR-003)**. Descartadas: A como caminho principal agora; D antes de decidir. Pedido junto: Delphi com os envolvidos, trazido ao `/meta:decide`, e jornadas certificadas fim a fim de forma ordenada e progressiva.
+- **`D_SECOND_BRAIN_ORDER_1125`** (Delphi `second-brain-order-1125`, 3 rodadas, 4 participantes, 0 objeções; síntese em `data/delphi-second-brain-order-1125.md`): **Selar e começar (MVP 0 primeiro)**. Ordem Lean: MVP 0, MVP 1 (5 dias, N=1, fila única), incremento 1 só se uso ≥ 3 de 5 dias e ação ≥ 50% em 24 h, incremento 2, depois B. O ambiente de teste do Slack fica, e o aviso do MVP 1 sai também pelo WhatsApp via WAHA.
+- **`E_MVP0_MEDIDA_1125`:** o MVP 0 já rodou: 3 de 3 decisões reais seladas, laço fechado, ≈ 2 min 39 s de resposta e ≈ 4 min até o último selo, 2 recusas do selador por flag nova (relato da sessão que o executou).
+
 ## Resumo
 
 Em novembro de 2026 o segundo cérebro pessoal com IA vive mais como camada de memória para desenvolvedores do que como app de consumo. A Mem0 captou US$ 24M e chegou a 186M de chamadas por trimestre em 2025, enquanto apps de consumo morrem: o Mem encerra em 15/01/2027 depois de cerca de US$ 29M investidos, e a Ollie fechou em 06/11/2026. A ponte pessoal-empresa está em construção. O Solid tem grupo de trabalho no W3C, e a Inrupt pede consentimento revogável com auditoria. O Stanford trata a memória como portátil e governada pelo usuário, mas a fronteira é jurídica e de trilha, não criptográfica: revogar não apaga a cópia. A lei sobre quem é dono do gêmeo digital do empregado segue em aberto. Recomendo a vertical Second Brain como irmã do Company Brain. O cérebro pessoal fica do lado do indivíduo, no modelo do ADR-003 (o KG cifrado no celular). A interconexão com a empresa passa pelo kg-ssot e pelo A2A, com fluxo assimétrico por finalidade (a opção C já selada em D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION). A porta de entrada é o app da central de decisão. Não recomendo abrir agora o mercado de vender ou alugar habilidades e contatos: a pesquisa não confirmou nenhum caso que funcione.
 
-## A decisão e as opções
+## A decisão e as opções (antes do selo)
 
 | Opção | O quê |
 |---|---|
@@ -96,4 +102,4 @@ O que a pesquisa NÃO cobre: (a) Item (2) quase vazio. Nenhuma claim confirmada 
 
 ## valeu-a-pena
 
-7.762.046 tokens ÷ 70 nós ≈ **110.886 por nó**. Só 19 dos 70 nós são achados confirmados (≈ 408 mil por achado); os outros 51 são a pergunta, a decisão, as 4 opções, as 37 objeções do Elenxo, o mercado, as lacunas e 6 superações. O que se comprou: o Elenxo derrubou a premissa da opção A («só de-identificado à nuvem» não confere com o que o app pessoal faz hoje) e separou o que a evidência sustenta do que só a ausência de evidência sugere. O mercado de (2) segue sem prova nos dois sentidos.
+7.762.046 tokens ÷ 70 nós do run ≈ **110.886 por nó**. Só 19 dos 70 nós são achados confirmados (≈ 408 mil por achado); os outros 51 são a pergunta, a decisão, as 4 opções, as 37 objeções do Elenxo, o mercado, as lacunas e 6 superações. O que se comprou: o Elenxo derrubou a premissa da opção A («só de-identificado à nuvem» não confere com o que o app pessoal faz hoje) e separou o que a evidência sustenta do que só a ausência de evidência sugere. O mercado de (2) segue sem prova nos dois sentidos.
