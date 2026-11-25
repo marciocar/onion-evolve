@@ -1,0 +1,1503 @@
+# Pesquisa em MODO DECISÃO (2026-11-25): Second Brain pessoal × Company Brain interconectáveis,
+# como vertical do Onion — mercado e comunidade em nov/2026, mercados que isso abre (b2b a c2c) e a
+# escolha entre retomar o ADR-003 do Onion Pessoal, vertical irmã federada, central de decisão primeiro
+# ou rodada complementar.
+#
+# ⚠️ Proveniência (R15.2): label e narrative das evidências web carregam texto extraído de páginas da
+#    web. É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+# ⚠️ Repo privado: o app do Onion Pessoal é citado por marcador private-cite (contrato v4.22); a
+#    resolução mora na tabela privada do dono.
+#
+# Este escritor NÃO sela nada. O nó decision D_ nasce OPEN — o maestro sela pelo /meta:decide.
+# As 4 opções nascem OPEN; nenhuma foi morta por evidência (nenhuma REFUTES; 41 CONSTRAINS).
+# kg-backlog-guard: on
+meta:
+  id: second-brain-company-brain-2026-11
+  schema_version: "1"
+  baseline: "2026-11-25"
+  review_after: "2027-02-23"
+  # review_after = 90d: o tipo DOMINANTE é MERCADO (mortalidade de apps de segundo cérebro, capital de
+  # memória, marketplaces de skills/agentes). A metade jurídica (Lei 9.609, CLT 483, ANPD) pediria 12m
+  # como doutrina, mas as objeções que BLOQUEIAM o item (2) são de mercado e foram cortadas/não lidas.
+  # Gatilhos antecipados: a rodada complementar D; o encerramento do Mem (15/01/2027); a ANPD TS-04-2026.
+  note: "Grafo de DECISÃO. 37 objeções sobreviventes do Elenxo, TODAS modeladas como E_OBJECAO_ (0 não modeladas). 19 claims confirmadas viram E_F01..19. 6 superações viram C_SUPERACAO_20261125_*."
+  # ═══ TETO: 70 NÓS ═══
+  #   1 question + 1 decision (OPEN) + 4 opções + 19 achados confirmados + 37 E_OBJECAO
+  #   + 1 E_MERCADO + 1 E_LACUNAS + 6 C_SUPERACAO = 70.
+external_edges:
+  - from: D_SECOND_BRAIN_VERTICAL_2026_11
+    to: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml#D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION"
+    edge_type: TRACES_TO
+  - from: D_SECOND_BRAIN_VERTICAL_2026_11
+    to: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml#D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR"
+    edge_type: TRACES_TO
+  - from: D_SECOND_BRAIN_VERTICAL_2026_11
+    to: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml#E_R2_EDPB_MAIORIA_NAO_PODE_SER_CONSENTIMENTO"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_14_ACL_NOT_ENOUGH_AGGREGATION_LEAK
+    to: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml#E_REFUTACAO_DA_PROPOSTA_DE_RAIO"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_10_MEM0_VOLUME_VS_MEMGHOST
+    to: "docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml#E_MEMGHOST_CLAUDE_CODE_SDK_71"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_16_AUTO_MEMORY_IS_INDEX_AND_POISONABLE
+    to: "docs/evolution/research/guard-memory-write-2026-11/memory-write-2026-11.kg.yaml#E_DEFEITO_MEMGHOST_NO_CLAUDE_CODE_SDK"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_09_MEM0_CAPITAL_STALE_AND_B2B
+    to: "docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml#E_MEMORIA_BITEMPORAL_VENCE_MEM0"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_05_FORMER_EMPLOYEE_CLONE_CASE_UNREAD
+    to: "docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml#E_TWIN2K_RETEST_CEILING"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_06_ANPD_TWIN_POSITION_UNREAD
+    to: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml#E_R2_ANPD_EXEMPLO7_RASTREIO_PRODUTIVIDADE_REPROVADO"
+    edge_type: TRACES_TO
+  - from: E_MERCADO_SECOND_BRAIN_2026_11
+    to: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml#E_MERCADO_NO_CAPITAL_SIGNAL_EMPLOYEE_DATA"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "Second Brain pessoal × Company Brain interconectáveis como vertical do Onion: o que o mercado faz em nov/2026, que mercados isso abre (b2b a c2c) e qual opção o Onion toma (ADR-003, vertical irmã federada, central de decisão ou rodada complementar)?"
+    narrative: "Pergunta do run em modo decisão (2026-11-25), em três partes: (1) estado de mercado e comunidade em segundo cérebro pessoal com IA, memória pessoal de agente, PKM com grafo e a ponte com o company brain (valor mútuo, consentimento, fronteira indivíduo×organização); (2) mercados de vender, alugar ou bilhetar habilidade, conhecimento, estratégia, agentes e contatos (b2b, b2c, b2b2c, c2c, c2b, agente-para-consumidor), quem tenta, capital e onde falha; (3) opções do Onion com recomendação e riscos (privacidade, vigilância do empregador, propriedade do conhecimento do colaborador). A decisão é do maestro (D_SECOND_BRAIN_VERTICAL_2026_11, OPEN)."
+    trace: "run /onion-research modo decision de 2026-11-25; pergunta computada pelo workflow; corpus prévio: compartilhamento-individuo-organizacao-2026-09, company-brain-market-2026-07, bridge-produto-2026-08, ADR-003 do Onion Pessoal · projeção: docs/evolution/research/second-brain-company-brain-2026-11/SYNTHESIS.md"
+  - id: D_SECOND_BRAIN_VERTICAL_2026_11
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "DECISÃO ABERTA: Second Brain × Company Brain como vertical do Onion. Opções: A retomar ADR-003 · B vertical irmã federada · C começar pela central de decisão do company-brain · D rodada complementar. Elenxo recomenda C com limites (A só reescrita, B parqueada)."
+    narrative: |-
+      Opções: C_OPCAO_A_RESUME_ADR003_ONDEVICE, C_OPCAO_B_SISTER_VERTICAL_FEDERATED,
+      C_OPCAO_C_DECISION_CENTER_FIRST, C_OPCAO_D_COMPLEMENTARY_ROUND.
+
+      RECOMENDAÇÃO DO ELENXO (afirmação de UM agente, sem votação; íntegra, sem corte):
+      Recomendo a opção C, e só com estes limites. Começar pela central de decisão que já existe no
+      company-brain (PR #29, SAC-554), com o colaborador como USUÁRIO que puxa (pull) do company brain o que
+      lhe cabe, sem nenhum fluxo do pessoal para a empresa, salvo publicação autoral explícita (semântica da
+      opção B de set/2026 dentro da opção C selada em D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION com as 4
+      emendas). Na dúvida, não sai (D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR). Condições que seguram a decisão:
+      (1) NÃO retomar a opção A com a promessa de 'só de-identificado à nuvem'. O código do app pessoal manda
+      mídia crua por exceção declarada, e o de-id de texto é frágil por desenho. Para retomar, é preciso reescrever a INVARIANTE 0
+      com a exceção dita na cara, ou desligar a flag de mídia.
+      (2) A opção B, a interconexão federada, fica PARQUEADA até existir mecanismo contra vazamento por
+      agregação. ACL na recuperação não basta (times de 3 a 5 reconstroem o indivíduo por diferença), e o
+      ledger com épsilon não foi desenhado.
+      (3) Nenhum desenho pode se apoiar nos escopos do Claude Code (CLAUDE.local.md, auto-memória) como
+      fronteira. A managed policy da TI tem precedência e é o vetor de vigilância numa máquina gerida.
+      (4) A titularidade do conhecimento do colaborador segue a lei BR, não o 'work product' do common law.
+      Lei 9.609 art. 4º §2º: o que foi criado fora do contrato e sem recurso do empregador é do empregado. O
+      consentimento do empregado não serve de salvaguarda (EDPB/ANPD no corpus).
+      (5) O item (2), mercados de bilhetar skills, agentes e contatos, NÃO tem evidência confirmada de falha
+      nem de sucesso para c2b/c2c. Todas as claims contrárias foram cortadas ou não lidas (GPT Store,
+      Bloomberg, snyk ToxicSkills). Nenhuma promessa de mercado sai desta rodada sem a opção D.
+      (6) Os sinais de mercado do item (1) são de mortalidade (Mem encerra em 15/01/2027, Ollie encerrou),
+      com causa não declarada. Eles não sustentam nem 'privacidade vende' nem 'não vende'.
+      Risco residual declarado: memória escrita pelo agente é envenenável (MemGhost, 71,4% no Claude Code
+      SDK), e isso vale para qualquer das três opções.
+
+      NOTA DO ESCRITOR (medida nesta escrita, 2026-11-25): (a) o §2º do art. 4º da Lei 9.609 foi conferido
+      verbatim por WebFetch no planalto.gov.br; a lei cobre PROGRAMA DE COMPUTADOR, e notas/conhecimento
+      caem na Lei 9.610 e invenção na Lei 9.279 art. 88, que ninguém leu na rodada. (b) O nó
+      E_AGREGADO_COM_OPTIN_VAZA_POR_DIFERENCA, citado pelo Elenxo, NÃO existe como id no corpus: é citado
+      dentro do label de E_REFUTACAO_DA_PROPOSTA_DE_RAIO (mesmo grafo de set/2026), para onde aponta a aresta
+      externa. (c) O último commit do app pessoal é de 2026-10-08 (o Elenxo disse 2026-10-09).
+
+      Este escritor NÃO sela: o maestro sela pelo /meta:decide.
+    trace: "run /onion-research modo decision de 2026-11-25; pergunta Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11; segue D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION e D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR (compartilhamento-individuo-organizacao-2026-09)"
+  - id: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.3
+    label: "OPÇÃO A) Retomar o ADR-003 do Onion Pessoal: KG cifrado no celular, só contexto de-identificado à nuvem."
+    narrative: "Reprovada pelo Elenxo como está: o app manda mídia CRUA ao cérebro-nuvem por exceção declarada e o de-id de texto é frágil por desenho. Retomar exige reescrever a INVARIANTE 0 com a exceção declarada ou desligar a flag de mídia. Limites: E_OBJECAO_01, 08, 12, 16, 21, 25, 28, 31, 37."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-11-25"
+  - id: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.3
+    label: "OPÇÃO B) Second Brain como vertical irmã do Company Brain, com interconexão federada (A2A, kg-ssot) entre os dois."
+    narrative: "Parqueada pelo Elenxo: ACL na recuperação não fecha o vazamento por agregação (times de 3 a 5 reconstroem o indivíduo por diferença) e o ledger com épsilon não foi desenhado; formato de memória portátil sem adoção; Solid sem métrica de adoção. Limites: E_OBJECAO_02, 03, 10, 11, 14, 15, 17, 19, 20, 25, 26, 27, 31, 32, 33."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-11-25"
+  - id: C_OPCAO_C_DECISION_CENTER_FIRST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "OPÇÃO C) Começar pela central de decisão do company-brain (PR #29 / SAC-554), com o indivíduo como usuário dentro do Company Brain."
+    narrative: "A recomendada pelo Elenxo, com limites: o colaborador PUXA do company brain, nada flui do pessoal para a empresa salvo publicação autoral explícita; nenhum desenho se apoia nos escopos do Claude Code como fronteira (a managed policy da TI vence); titularidade pela lei BR; acordo coletivo na UE. Limites: E_OBJECAO_04, 05, 07, 15, 22, 29, 34."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-11-25"
+  - id: C_OPCAO_D_COMPLEMENTARY_ROUND
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "OPÇÃO D) Rodada complementar antes de decidir: mercados/falhas (GPT Store, Bloomberg, snyk ToxicSkills, Zep wallet fallacy) e eixo BR (ANPD TS-04-2026, Lei 9.609 art. 4º, CLT 483)."
+    narrative: "O Elenxo a põe como condição do item (2): nenhuma promessa de mercado sai desta rodada sem ela. As objeções que a pedem limitam a DECISÃO (não esta opção): E_OBJECAO_06, 09, 13, 18, 23, 24, 30, 35, 36. A Lei 9.609 art. 4º §2º já foi conferida verbatim pelo escritor nesta escrita."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-11-25"
+  - id: E_F01_CC_AUTO_MEMORY_LOCAL_TO_MACHINE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    source_tier: 9
+    source_kind: "primary"
+    verified_at: "2026-11-25"
+    verified_against: "https://code.claude.com/docs/en/memory ; votação 3-0 do run"
+    label: "A memória automática do Claude Code é local à máquina: fica em .claude/projects/<projeto>/memory/ na home do usuário, é compartilhada entre worktrees do mesmo repo git e não entre máquinas nem ambientes de nuvem."
+    provenance:
+      source: "https://code.claude.com/docs/en/memory"
+      locator: "seção da memória automática (onde mora e o que é compartilhado)"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://code.claude.com/docs/en/memory"
+  - id: E_F02_STANFORD_DEL_PORTABLE_PERSONAL_MEMORY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    source_tier: 8
+    source_kind: "paper"
+    valid_from: "2026-03-16"
+    verified_at: "2026-11-25"
+    verified_against: "https://digitaleconomy.stanford.edu/publication/the-future-of-personal-ai-portable-and-persistent-personal-memory-through-a-unified-human-context-protocol/ ; votação 3-0 do run"
+    label: "O Stanford Digital Economy Lab (16/03/2026) define memória pessoal portátil como camada de contexto governada pelo usuário, que persiste entre interações e se move entre ferramentas."
+    provenance:
+      source: "https://digitaleconomy.stanford.edu/publication/the-future-of-personal-ai-portable-and-persistent-personal-memory-through-a-unified-human-context-protocol/"
+      locator: "resumo da publicação (Unified Human Context Protocol)"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://digitaleconomy.stanford.edu/publication/the-future-of-personal-ai-portable-and-persistent-personal-memory-through-a-unified-human-context-protocol/"
+  - id: E_F03_SOLID_W3C_LWS_GENAI_INTEREST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.65
+    source_tier: 7
+    source_kind: "primary"
+    valid_from: "2026-07"
+    verified_at: "2026-11-25"
+    verified_against: "https://edmcouncil.org/wp-content/uploads/2026/08/EDMWebinar_Solid-and-ODI_Q-and-A_20260714.pdf ; votação 3-0 do run"
+    label: "Em jul/2026 o Solid tem um W3C Working Group (Linked Web Storage) para virar recomendação, e o interesse cresceu com GenAI, que o encaixa como camada de armazenamento da IA agêntica pessoal."
+    provenance:
+      source: "https://edmcouncil.org/wp-content/uploads/2026/08/EDMWebinar_Solid-and-ODI_Q-and-A_20260714.pdf"
+      locator: "Q&A do webinar EDM Council com ODI/Inrupt de 14/07/2026"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://edmcouncil.org/wp-content/uploads/2026/08/EDMWebinar_Solid-and-ODI_Q-and-A_20260714.pdf"
+  - id: E_F04_SOLID_NO_COPY_PREVENTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    source_tier: 7
+    source_kind: "primary"
+    valid_from: "2026-07-14"
+    verified_at: "2026-11-25"
+    verified_against: "https://edmcouncil.org/wp-content/uploads/2026/08/EDMWebinar_Solid-and-ODI_Q-and-A_20260714.pdf ; votação 3-0 do run"
+    label: "O Solid não impede tecnicamente a cópia de dados compartilhados: a fronteira é jurídica e de trilha de evidência (ODRL, auditoria), não criptográfica; revogação não garante deleção do outro lado."
+    provenance:
+      source: "https://edmcouncil.org/wp-content/uploads/2026/08/EDMWebinar_Solid-and-ODI_Q-and-A_20260714.pdf"
+      locator: "Q&A do webinar EDM Council com ODI/Inrupt de 14/07/2026"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://edmcouncil.org/wp-content/uploads/2026/08/EDMWebinar_Solid-and-ODI_Q-and-A_20260714.pdf"
+  - id: E_F05_MACPAW_PORTABLE_MEMORY_PREPRINT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    source_tier: 6
+    source_kind: "paper"
+    valid_from: "2026-07"
+    verified_at: "2026-11-25"
+    verified_against: "https://research.macpaw.com/publications/portable-memory/portable-memory.pdf ; votação 3-0 do run"
+    label: "A MacPaw propõe o Portable Memory: memória de IA como bundle .mem (JSONL + manifest + checksums), assinatura Ed25519 opcional e tombstones de exclusão; preprint de jul/2026, um autor-organização, uma integração (Mnemos), sem adoção."
+    provenance:
+      source: "https://research.macpaw.com/publications/portable-memory/portable-memory.pdf"
+      locator: "preprint Portable Memory (formato .mem, seções de formato e de adoção)"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://research.macpaw.com/publications/portable-memory/portable-memory.pdf"
+  - id: E_F06_GOWLING_EMPLOYER_OWNS_WORK_PRODUCT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    source_tier: 6
+    source_kind: "analyst"
+    valid_from: "2026-06-30"
+    verified_at: "2026-11-25"
+    verified_against: "https://gowlingwlg.com/en/insights-resources/articles/2026/emerging-employment-law-issues-for-employers ; votação 3-0 do run"
+    label: "Artigo da Gowling WLG (30/06/2026) afirma que empregadores em geral são donos do produto de trabalho criado por empregados no curso do emprego."
+    provenance:
+      source: "https://gowlingwlg.com/en/insights-resources/articles/2026/emerging-employment-law-issues-for-employers"
+      locator: "artigo 'emerging employment law issues for employers'"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://gowlingwlg.com/en/insights-resources/articles/2026/emerging-employment-law-issues-for-employers"
+  - id: E_F07_GOWLING_TWIN_PERSONA_DISPUTE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    source_tier: 6
+    source_kind: "analyst"
+    valid_from: "2026-06-30"
+    verified_at: "2026-11-25"
+    verified_against: "https://gowlingwlg.com/en/insights-resources/articles/2026/emerging-employment-law-issues-for-employers ; votação 3-0 do run"
+    label: "Digital twins de funcionários podem capturar estilo, julgamento, expertise e identidade profissional, abrindo disputa sobre a persona de ex-funcionários além do produto de trabalho."
+    provenance:
+      source: "https://gowlingwlg.com/en/insights-resources/articles/2026/emerging-employment-law-issues-for-employers"
+      locator: "artigo 'emerging employment law issues for employers', trecho sobre digital twins"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://gowlingwlg.com/en/insights-resources/articles/2026/emerging-employment-law-issues-for-employers"
+  - id: E_F08_MONDAQ_TWIN_OWNERSHIP_OPEN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    source_tier: 5
+    source_kind: "analyst"
+    valid_from: "2026-06-02"
+    verified_at: "2026-11-25"
+    verified_against: "https://www.mondaq.com/uk/contracts-and-commercial-law/1795628/ai-digital-twins-in-the-workplace-the-legal-and-ethical-risks ; votação 3-0 do run"
+    label: "Em 2026 há digital twins de funcionários treinados no estilo e no julgamento do empregado, e a propriedade e o controle desse ativo é questão jurídica em aberto (dados pessoais, habilidades, PI)."
+    provenance:
+      source: "https://www.mondaq.com/uk/contracts-and-commercial-law/1795628/ai-digital-twins-in-the-workplace-the-legal-and-ethical-risks"
+      locator: "artigo Mondaq UK sobre AI digital twins no trabalho"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://www.mondaq.com/uk/contracts-and-commercial-law/1795628/ai-digital-twins-in-the-workplace-the-legal-and-ethical-risks"
+  - id: E_F09_MONDAQ_CONTRACTS_SILENT_ON_TWINS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    source_tier: 5
+    source_kind: "analyst"
+    valid_from: "2026-06-02"
+    verified_at: "2026-11-25"
+    verified_against: "https://www.mondaq.com/uk/contracts-and-commercial-law/1795628/ai-digital-twins-in-the-workplace-the-legal-and-ethical-risks ; votação 3-0 do run"
+    label: "Contratos de trabalho raramente tratam de IA treinada no comportamento do empregado; forçar a participação sem base legal pode gerar reclamações e alegações de constructive dismissal (UK)."
+    provenance:
+      source: "https://www.mondaq.com/uk/contracts-and-commercial-law/1795628/ai-digital-twins-in-the-workplace-the-legal-and-ethical-risks"
+      locator: "artigo Mondaq UK, trecho sobre contratos e constructive dismissal"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://www.mondaq.com/uk/contracts-and-commercial-law/1795628/ai-digital-twins-in-the-workplace-the-legal-and-ethical-risks"
+  - id: E_F10_OLLIE_FAMILY_ASSISTANT_SHUTDOWN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    source_tier: 5
+    source_kind: "aggregator"
+    valid_from: "2026-11-06"
+    verified_at: "2026-11-25"
+    verified_against: "https://techcrunch.com/2026/11/14/the-ai-graveyard-a-running-list-of-projects-and-startups-that-didnt-make-it/ ; votação 3-0 do run"
+    label: "A Ollie, assistente de IA para famílias que destacava SOC 2 como diferencial de privacidade, encerrou em 06/11/2026 por não crescer nem captar capital suficiente."
+    provenance:
+      source: "https://techcrunch.com/2026/11/14/the-ai-graveyard-a-running-list-of-projects-and-startups-that-didnt-make-it/"
+      locator: "lista 'AI graveyard' do TechCrunch de 14/11/2026, entrada Ollie"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://techcrunch.com/2026/11/14/the-ai-graveyard-a-running-list-of-projects-and-startups-that-didnt-make-it/"
+  - id: E_F11_MEM0_RAISED_24M
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    source_tier: 5
+    source_kind: "analyst"
+    valid_from: "2025-10-28"
+    verified_at: "2026-11-25"
+    verified_against: "https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps ; votação 3-0 do run"
+    label: "A Mem0 captou US$ 24M no total (US$ 3,9M seed + US$ 20M Série A liderada pela Basis Set Ventures, com Peak XV, Y Combinator, GitHub Fund e Kindred Ventures)."
+    provenance:
+      source: "https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps"
+      locator: "matéria TechCrunch de 28/10/2025"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps"
+  - id: E_F12_MEM0_API_GROWTH_2025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    source_tier: 5
+    source_kind: "analyst"
+    valid_from: "2025-10"
+    verified_at: "2026-11-25"
+    verified_against: "https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps ; votação 3-0 do run"
+    label: "As chamadas de API da Mem0 foram de 35M (1º tri 2025) a 186M (3º tri 2025), com 80 mil+ desenvolvedores no cloud, 41 mil+ estrelas no GitHub e 13M de downloads Python."
+    provenance:
+      source: "https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps"
+      locator: "matéria TechCrunch de 28/10/2025, números de adoção"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps"
+  - id: E_F13_INRUPT_ESS3_ACCESS_GRANT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    source_tier: 5
+    source_kind: "primary"
+    valid_from: "2026-05-27"
+    verified_at: "2026-11-25"
+    verified_against: "https://www.inrupt.com/blog/ess-version-3-0-making-consumer-data-ready-for-ai-assistants ; votação 3-0 do run"
+    label: "O ESS 3.0 da Inrupt (post de 27/05/2026) exige que agentes de terceiros peçam Access Grant ao consumidor para acessar o repositório pessoal, com revogação e registro de auditoria."
+    provenance:
+      source: "https://www.inrupt.com/blog/ess-version-3-0-making-consumer-data-ready-for-ai-assistants"
+      locator: "post 'ESS version 3.0: making consumer data ready for AI assistants'"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://www.inrupt.com/blog/ess-version-3-0-making-consumer-data-ready-for-ai-assistants"
+  - id: E_F14_SWARMVAULT_LOCAL_FIRST_KG
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    source_tier: 4
+    source_kind: "engineer"
+    verified_at: "2026-11-25"
+    verified_against: "https://github.com/swarmclawai/swarmvault ; votação 3-0 do run"
+    label: "SwarmVault é projeto MIT local-first de LLM Wiki / construtor de knowledge graph / base RAG para agentes, posicionado como memória durável para Claude Code, Codex e OpenClaw e alternativa ao Obsidian."
+    provenance:
+      source: "https://github.com/swarmclawai/swarmvault"
+      locator: "README do repositório"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://github.com/swarmclawai/swarmvault"
+  - id: E_F15_MEM_SHUTDOWN_JAN_2027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    source_tier: 4
+    source_kind: "aggregator"
+    valid_from: "2026-11-16"
+    verified_at: "2026-11-25"
+    verified_against: "https://zeli.app/story/50526537 ; votação 3-0 do run"
+    label: "O Mem (app de notas com IA) encerra em 15/01/2027, com as notas só para leitura a partir de 18/12/2026, segundo anúncio de 16-17/11/2026 (confirmado em help.mem.ai)."
+    narrative: "A claim do run dizia anúncio de 17/11/2026; o Elenxo reconfirmou as datas fora do agregador (help.mem.ai, drweb.de) e registrou o anúncio como 16/11/2026. valid_from fica em 16/11."
+    provenance:
+      source: "https://zeli.app/story/50526537"
+      locator: "nota do agregador; datas reconfirmadas pelo Elenxo em help.mem.ai e drweb.de"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://zeli.app/story/50526537"
+  - id: E_F16_MEM_29M_VC_NOT_SUSTAINED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    source_tier: 4
+    source_kind: "aggregator"
+    valid_from: "2026-11"
+    verified_at: "2026-11-25"
+    verified_against: "https://zeli.app/story/50526537 ; votação 3-0 do run"
+    label: "Cerca de US$ 29M de capital de risco foram investidos no Mem, e o app de segundo cérebro com IA não sustentou o negócio."
+    provenance:
+      source: "https://zeli.app/story/50526537"
+      locator: "nota do agregador sobre o encerramento do Mem"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://zeli.app/story/50526537"
+  - id: E_F17_ACL_AT_RETRIEVAL_DIVIDER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    source_tier: 3
+    source_kind: "vendor-on-competitor"
+    valid_from: "2026-06"
+    verified_at: "2026-11-25"
+    verified_against: "https://vectorize.io/articles/second-brain-vs-company-brain ; votação 3-0 do run"
+    label: "Fornecedor afirma que o company brain exige controle de acesso por usuário e por recurso aplicado na recuperação, e que o modelo de permissões é o divisor arquitetural entre second brain e company brain."
+    narrative: "Tier 3 de fornecedor sobre concorrente: confiança limitada a 0,4. O corpus da casa já mediu que ACL na recuperação NÃO basta (vazamento por agregação, E_OBJECAO_14)."
+    provenance:
+      source: "https://vectorize.io/articles/second-brain-vs-company-brain"
+      locator: "artigo 'second brain vs company brain' (CTA do produto Hindsight no mesmo domínio)"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://vectorize.io/articles/second-brain-vs-company-brain"
+  - id: E_F18_CC_INSTRUCTION_SCOPES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    source_tier: 9
+    source_kind: "primary"
+    verified_at: "2026-11-25"
+    verified_against: "https://code.claude.com/docs/en/memory ; votação 3-0 do run"
+    label: "Os escopos de instrução do Claude Code são managed policy (organização, via TI), CLAUDE.md de projeto, CLAUDE.md de usuário e CLAUDE.local.md (só o próprio usuário, no projeto atual, no .gitignore)."
+    provenance:
+      source: "https://code.claude.com/docs/en/memory"
+      locator: "tabela de escopos de CLAUDE.md"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://code.claude.com/docs/en/memory"
+  - id: E_F19_CC_AUTO_MEMORY_MARKDOWN_25KB
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    source_tier: 9
+    source_kind: "primary"
+    verified_at: "2026-11-25"
+    verified_against: "https://code.claude.com/docs/en/memory ; votação 3-0 do run"
+    label: "A memória automática é markdown simples que o usuário lê, edita ou apaga, escrita pelo próprio Claude a partir de correções e preferências; o MEMORY.md carrega até as primeiras 200 linhas ou 25KB por sessão."
+    provenance:
+      source: "https://code.claude.com/docs/en/memory"
+      locator: "seção da memória automática (formato e limite de carga)"
+      method: "judges: votação 3-0 do run sobre a leitura WebFetch da fonte"
+      locality: "web"
+    trace: "https://code.claude.com/docs/en/memory"
+  - id: E_OBJECAO_01_CC_MEMORY_IS_DEV_LAYER_NOT_APP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "medição no repo privado do app pessoal (o app chama a Anthropic direto, ADR-003 C-direct; detalhe fica no repo privado); kg-corpus-grep 'CLAUDE.local.md' = 0 nós"
+    label: "Achado 1 prova menos: descreve a auto-memória do Claude Code (ferramenta de dev), não a memória do app pessoal no celular, que é Expo/RN e chama a Anthropic direto (ADR-003 C-direct)."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 1 (E_F01_CC_AUTO_MEMORY_LOCAL_TO_MACHINE). Nenhuma claim do run descreve a memória do substrato do app entre dispositivos; o corpus não liga as duas camadas."
+    provenance:
+      source: "private-cite:uzk55LIFaoa04u2kjRrlQA"
+      locator: "private-cite:uzk55LIFaoa04u2kjRrlQA"
+      method: "measurement: leitura de um arquivo do app no último commit do repo privado (2026-10-08), refeita pelo escritor"
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'CLAUDE.local.md'"
+  - id: E_OBJECAO_02_HCP_IS_DEFINITION_NOT_ADOPTION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "descarte (a) do run e leitura da página Stanford DEL; nenhum implementador do HCP no run"
+    label: "Achado 2 prova menos: o HCP de Stanford é definição e proposta de protocolo, sem implementador medido, e a página não trata do cérebro de empresa; não sustenta a ponte com o company brain."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 2 (E_F02_STANFORD_DEL_PORTABLE_PERSONAL_MEMORY)."
+    provenance:
+      source: "https://digitaleconomy.stanford.edu/publication/the-future-of-personal-ai-portable-and-persistent-personal-memory-through-a-unified-human-context-protocol/"
+      locator: "publicação de 16/03/2026; descarte (a) do run"
+      method: "judges: triagem do Elenxo (E2_PROVA_MENOS) sobre a fonte lida no run"
+      locality: "web"
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'human context protocol'"
+  - id: E_OBJECAO_03_SOLID_INTEREST_IS_VENDOR_CLAIM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fonte EDM Council/ODI/Inrupt tier 7 auto-declarado; kg-corpus-grep inrupt = 0 nós"
+    label: "Achado 3 prova menos: 'o interesse cresceu' vem de Q&A com ODI/Inrupt (parte interessada), sem métrica; a falha de adoção do Solid foi cortada por orçamento, não refutada; corpus tem 0 nós Inrupt."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 3 (E_F03_SOLID_W3C_LWS_GENAI_INTEREST)."
+    provenance:
+      source: "https://edmcouncil.org/wp-content/uploads/2026/08/EDMWebinar_Solid-and-ODI_Q-and-A_20260714.pdf"
+      locator: "Q&A do webinar de 14/07/2026; kg-corpus-grep inrupt"
+      method: "judges: triagem do Elenxo (E2_PROVA_MENOS) sobre fonte lida no run e grep do corpus"
+      locality: "web"
+    trace: "bash .claude/validation/kg-corpus-grep.sh inrupt"
+  - id: E_OBJECAO_04_BR_LAW_9609_EMPLOYEE_OWNS_OUTSIDE_CONTRACT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-25"
+    verified_against: "planalto.gov.br/ccivil_03/leis/l9609.htm, art. 4º caput e §2º ('Pertencerão, com exclusividade, ao empregado'), conferido verbatim por WebFetch do escritor em 2026-11-25"
+    label: "Achado 6 é jurisdição errada para a casa: na Lei 9.609/98 art. 4º §2º, o programa criado sem relação com o contrato e sem recurso do empregador é do empregado; 'work product' do common law não vale aqui."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E1_EVIDENCIA_CONTRARIA, superação achada: não. Alvo: achado 6 (E_F06_GOWLING_EMPLOYER_OWNS_WORK_PRODUCT). CENÁRIO do Elenxo: a fronteira adota 'o empregador é dono de tudo' e um adotante BR leva notas e skills do cérebro pessoal, feitas fora do contrato e sem recurso do empregador, ao company brain como ativo da empresa; erra contra o colaborador. LIMITE da objeção: a Lei 9.609 cobre programa de computador; notas/conhecimento caem na Lei 9.610 e invenção na Lei 9.279 art. 88, não lidas na rodada. 'Produto de trabalho' também não é conhecimento tácito/habilidade, o objeto do item (2)."
+    provenance:
+      source: "https://www.planalto.gov.br/ccivil_03/leis/l9609.htm"
+      locator: "Art. 4º, caput e §2º"
+      method: "reading: WebFetch do escritor em 2026-11-25 devolveu o §2º verbatim; objeção do Elenxo (E1_EVIDENCIA_CONTRARIA)"
+      locality: "web"
+    trace: "WebFetch https://www.planalto.gov.br/ccivil_03/leis/l9609.htm → Art. 4º §2º"
+  - id: E_OBJECAO_05_FORMER_EMPLOYEE_CLONE_CASE_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fonte não lida no run: completeaitraining.com/news/chinese-gaming-firm-builds-ai-clone-of-former-employee"
+    label: "Achado 7 é opinião de escritório sem caso citado; o caso concreto do clone de ex-funcionário (completeaitraining.com) ficou como fonte citada, não lida."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E4_LACUNA_ABERTA, superação achada: não. Alvo: achado 7 (E_F07_GOWLING_TWIN_PERSONA_DISPUTE). O corpus tem a fidelidade de twin (E_TWIN2K_RETEST_CEILING, maestro-persona-2026-11), não a disputa jurídica."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "eixo 'Fronteira empregador x empregado', lista 'fonte não lida'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'former employee'"
+  - id: E_OBJECAO_06_ANPD_TWIN_POSITION_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fonte não lida: gov.br/anpd TS-04-2026 (minuta da agenda regulatória); corpus E_R2_ANPD_EXEMPLO7_RASTREIO_PRODUTIVIDADE_REPROVADO trata de monitoramento"
+    label: "Achado 8 vale só no UK (tier 5); a posição BR sobre twin de empregado depende da ANPD TS-04-2026 (primário citado, não lido); os nós ANPD do corpus tratam de rastreio de produtividade."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E4_LACUNA_ABERTA, superação achada: não. Alvo: achado 8 (E_F08_MONDAQ_TWIN_OWNERSHIP_OPEN)."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "lista 'fonte não lida' do run; nós ANPD de 2026-09-13 no corpus"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "https://www.gov.br/anpd/pt-br/acesso-a-informacao/participacao-social/outras-acoes/ts-04-2026-minuta_agenda-regulatoria_tomada_de_subsidios.pdf"
+  - id: E_OBJECAO_07_CLT_483_NOT_MEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "kg-corpus-grep 'constructive dismissal' = 1 nó fora de tema (engenharia-de-corpus-de-regras)"
+    label: "Achado 9: 'constructive dismissal' é figura do common law; o análogo BR é a rescisão indireta (CLT art. 483), que nenhuma claim do run examina (primário citado, não lido)."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 9 (E_F09_MONDAQ_CONTRACTS_SILENT_ON_TWINS)."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "achado 9 e grep do corpus por 'constructive dismissal'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'rescisao indireta'"
+  - id: E_OBJECAO_08_OLLIE_N1_CAUSE_NOT_PRIVACY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "achado 10: causa = 'por não crescer nem captar capital suficiente'"
+    label: "Achado 10 é n=1 de lista agregada; a causa declarada é 'não crescer nem captar', sem nexo com o SOC 2: serve só como sinal de mortalidade de app pessoal, não como 'privacidade não vende'."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 10 (E_F10_OLLIE_FAMILY_ASSISTANT_SHUTDOWN)."
+    provenance:
+      source: "https://techcrunch.com/2026/11/14/the-ai-graveyard-a-running-list-of-projects-and-startups-that-didnt-make-it/"
+      locator: "entrada Ollie"
+      method: "judges: triagem do Elenxo (E2_PROVA_MENOS) sobre a fonte lida no run"
+      locality: "web"
+    trace: "reler o achado 10: causa sem nexo com SOC 2"
+  - id: E_OBJECAO_09_MEM0_CAPITAL_STALE_AND_B2B
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "kg-corpus-grep Mem0 = 6 nós; E_MEMORIA_BITEMPORAL_VENCE_MEM0 (bridge-produto-2026-08, US$ 23,9M)"
+    label: "Achado 11 tem 13 meses de idade (out/2025) e a Mem0 é infra B2B de dev, não segundo cérebro pessoal; o sinal de capital de 2026 ('memory passport' na AWS) foi cortado por orçamento."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 11 (E_F11_MEM0_RAISED_24M)."
+    provenance:
+      source: "docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml@14c1bbdb8"
+      locator: "nó E_MEMORIA_BITEMPORAL_VENCE_MEM0"
+      method: "judges: triagem do Elenxo (E2_PROVA_MENOS) com grep do corpus"
+      locality: "repo"
+    trace: "bash .claude/validation/kg-corpus-grep.sh Mem0"
+  - id: E_OBJECAO_10_MEM0_VOLUME_VS_MEMGHOST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "E_MEMGHOST_CLAUDE_CODE_SDK_71 (maestro-persona-2026-11)"
+    label: "Achado 12 é métrica de fornecedor sobre adoção por dev; o corpus mede o contrapeso: MemGhost transfere payloads para backends Mem0 (71,4% end-to-end no Claude Code SDK). Volume não diz se a camada é segura."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E1_EVIDENCIA_CONTRARIA, superação achada: não. Alvo: achado 12 (E_F12_MEM0_API_GROWTH_2025)."
+    provenance:
+      source: "docs/evolution/research/maestro-persona-2026-11/maestro-persona-2026-11.kg.yaml@14c1bbdb8"
+      locator: "nó E_MEMGHOST_CLAUDE_CODE_SDK_71"
+      method: "judges: triagem do Elenxo (E1_EVIDENCIA_CONTRARIA) com grep do corpus"
+      locality: "repo"
+    trace: "bash .claude/validation/kg-corpus-grep.sh MEMGHOST"
+  - id: E_OBJECAO_11_ACCESS_GRANT_IS_TRAIL_NOT_ENFORCEMENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "achado 4 do run (revogação não garante deleção); kg-corpus-grep inrupt = 0 nós"
+    label: "Achado 13 é post de fornecedor sobre capacidade, não adoção; pelo achado 4, revogar não garante deleção: o Access Grant é trilha de evidência, não enforcement; corpus tem 0 nós Inrupt."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 13 (E_F13_INRUPT_ESS3_ACCESS_GRANT)."
+    provenance:
+      source: "https://www.inrupt.com/blog/ess-version-3-0-making-consumer-data-ready-for-ai-assistants"
+      locator: "post de 27/05/2026 cruzado com o achado 4"
+      method: "judges: triagem do Elenxo (E2_PROVA_MENOS)"
+      locality: "web"
+    trace: "bash .claude/validation/kg-corpus-grep.sh inrupt"
+  - id: E_OBJECAO_12_SWARMVAULT_NOT_DISSECTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "gh api repos/swarmclawai/swarmvault não rodado no run; nenhuma claim de tração"
+    label: "Achado 14: SwarmVault existe, mas sem medida de tração (estrelas, contribuidores, idade); pela doutrina 'testar o que o mundo tem antes de construir', é candidato a absorver que ficou sem dissecação."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 14 (E_F14_SWARMVAULT_LOCAL_FIRST_KG)."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "achado 14; sem medida de tração"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "gh api repos/swarmclawai/swarmvault --jq '.stargazers_count,.created_at,.pushed_at'"
+  - id: E_OBJECAO_13_MEM_SHUTDOWN_CAUSE_UNDECLARED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "WebSearch 'Mem AI notes app shutting down January 2027': nenhuma razão declarada pelo Mem"
+    label: "Achado 16 vem de agregador (tier 4) e o Mem não declarou a causa do encerramento; generalizar um caso para 'segundo cérebro com IA não se sustenta' não tem base."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E2_PROVA_MENOS, superação achada: não. Alvo: achado 16 (E_F16_MEM_29M_VC_NOT_SUSTAINED)."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "achado 16; busca do Elenxo sem causa declarada"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "WebSearch 'Mem AI notes app shutting down January 2027'"
+  - id: E_OBJECAO_14_ACL_NOT_ENOUGH_AGGREGATION_LEAK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-25"
+    verified_against: "E_REFUTACAO_DA_PROPOSTA_DE_RAIO (compartilhamento-individuo-organizacao-2026-09): 'karma_total - soma(visiveis) denuncia quem manteve o raio estreito'"
+    label: "Achado 17 (marketing tier 3) é contradito pelo corpus: agregado com opt-in parcial vaza o indivíduo POR DIFERENCA em times de 3 a 5; num time de 4 com 3 opt-ins a ACL passa e o quarto vaza."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E1_EVIDENCIA_CONTRARIA, superação achada: não. Alvo: achado 17 (E_F17_ACL_AT_RETRIEVAL_DIVIDER). O mecanismo contra vazamento por agregação (ledger com épsilon / PO_BUDGET) é condição futura: D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR diz que exige ruído parametrizado que ninguém desenhou. Medido pelo escritor: o id E_AGREGADO_COM_OPTIN_VAZA_POR_DIFERENCA NÃO existe como nó; é citado dentro do label de E_REFUTACAO_DA_PROPOSTA_DE_RAIO."
+    provenance:
+      source: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml@14c1bbdb8"
+      locator: "nó E_REFUTACAO_DA_PROPOSTA_DE_RAIO (cita E_AGREGADO_COM_OPTIN_VAZA_POR_DIFERENCA) e D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR"
+      method: "judges: triagem do Elenxo (E1_EVIDENCIA_CONTRARIA) com leitura do grafo de set/2026"
+      locality: "repo"
+    trace: "grep -n 'karma_total - soma' docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml"
+  - id: E_OBJECAO_15_CC_SCOPES_ARE_SURVEILLANCE_VECTOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-25"
+    verified_against: "CLAUDE.md do core, l.18: 'camada de conformidade, não fronteira de segurança'; doc oficial de memória (precedência da managed policy)"
+    label: "Achado 18: escopos do Claude Code são de INSTRUÇÃO e precedência, não de confidencialidade; a managed policy da TI vence as camadas do usuário e vira vetor de vigilância numa máquina gerida."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E1_EVIDENCIA_CONTRARIA, superação achada: não. Alvo: achado 18 (E_F18_CC_INSTRUCTION_SCOPES). CENÁRIO do Elenxo: colaborador com cérebro pessoal numa máquina gerida; a TI põe na managed policy uma instrução para ler a auto-memória e o CLAUDE.local.md e resumir num canal corporativo. O 'escopo só do usuário' vira o vetor de vigilância. Não há fronteira técnica medida em máquina gerida; a única candidata é o celular pessoal (ADR-003), com a exceção de mídia crua."
+    provenance:
+      source: "CLAUDE.md@14c1bbdb8"
+      locator: "linha 18: 'de conformidade, não fronteira de segurança'"
+      method: "judges: triagem do Elenxo (E1_EVIDENCIA_CONTRARIA) com grep do CLAUDE.md, conferido pelo escritor"
+      locality: "repo"
+    trace: "grep -n 'não fronteira de segurança' CLAUDE.md"
+  - id: E_OBJECAO_16_AUTO_MEMORY_IS_INDEX_AND_POISONABLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "E_DEFEITO_MEMGHOST_NO_CLAUDE_CODE_SDK (memory-write-2026-11)"
+    label: "Achado 19: o teto de 25KB por sessão mostra que a auto-memória é índice, não substrato de cérebro pessoal; e ser escrita pelo próprio Claude é a superfície do envenenamento (MemGhost por um único e-mail)."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E1_EVIDENCIA_CONTRARIA, superação achada: não. Alvo: achado 19 (E_F19_CC_AUTO_MEMORY_MARKDOWN_25KB)."
+    provenance:
+      source: "docs/evolution/research/guard-memory-write-2026-11/memory-write-2026-11.kg.yaml@14c1bbdb8"
+      locator: "nó E_DEFEITO_MEMGHOST_NO_CLAUDE_CODE_SDK"
+      method: "judges: triagem do Elenxo (E1_EVIDENCIA_CONTRARIA) com grep do corpus"
+      locality: "repo"
+    trace: "bash .claude/validation/kg-corpus-grep.sh MEMGHOST"
+  - id: E_OBJECAO_17_MEMORY_FORMAT_LOCKIN_UNSEPARATED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim cortada 'Engines como mem0, Letta, Zep e OpenMemory não têm formatos intercambiáveis'; fonte não lida dev.to/stantyan"
+    label: "Descarte (b) por comodismo: a refutação atingiu o 'imóvel' (há import/export), mas 'sem formato comum' tem apoio na claim cortada (mem0, Letta, Zep, OpenMemory não intercambiáveis); faltou separar as três falhas."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "descarte (b) e claim cortada por orçamento sobre formatos"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "comparar a claim refutada (b) com a cortada sobre formatos e a fonte não lida dev.to/stantyan"
+  - id: E_OBJECAO_18_C2B_MONETIZATION_ZERO_CONFIRMED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-25"
+    verified_against: "contagem nos achados confirmados do run de claims sobre monetização de criador em marketplace: 0; GPT Store e apps no ChatGPT 'cortada por orçamento'"
+    label: "Descarte (e) por comodismo: com (d) e (e) refutadas e (l)/(m) cortadas, o item (2) 'onde falham' fica com ZERO claim confirmada sobre monetização de criador; bilhetar skills c2b sairia sem contraevidência."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "descarte (e); cortes (l) e (m)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "contar nos achados confirmados as claims sobre monetização de criador: 0"
+  - id: E_OBJECAO_19_PORTABLE_MEMORY_LEAST_PRIVILEGE_OPEN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim cortada (g); o próprio paper declara o menor privilégio como questão aberta"
+    label: "Corte (g): a única claim que diz que o Portable Memory NÃO resolve consentimento nem menor privilégio entre agentes foi cortada por orçamento; sem ela o achado 5 parece mais útil à fronteira do que é."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E4_LACUNA_ABERTA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (g), lacuna do Scope 'mecanismos de fronteira e consentimento'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "lacuna do Scope 'mecanismos técnicos e jurídicos de fronteira e consentimento': nenhum achado a fecha"
+  - id: E_OBJECAO_20_MEMORY_STANDARDS_CONVERGENCE_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim (h) marcada 'cortada por orçamento', sem votos de refutação"
+    label: "Corte (h): PAM, IETF draft-vu-aimem-bundle-00 e W3C CG (mai/2026) são on-axis para o formato de interconexão (kg-ssot × padrões emergentes) e foram cortados sem refutação (primário citado, não lido)."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (h)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "ler draft-vu-aimem-bundle-00 e o charter do W3C CG"
+  - id: E_OBJECAO_21_MEMORY_MD_ADAPTER_NOT_DISSECTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim (i) 'cortada por orçamento'; /meta:dissect Portable Memory não executado"
+    label: "Corte (i): o adaptador de ingestão de MEMORY.md do Portable Memory toca o substrato do Onion e a conformidade L2 por propagação de exclusão é o que falta ao Solid; ficou sem dissecação."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (i)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "/meta:dissect Portable Memory"
+  - id: E_OBJECAO_22_TWIN_RETENTION_ON_EXIT_UNCOVERED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim (j) UK GDPR cortada; kg-corpus-grep 'retencao' sem nó de retenção de twin"
+    label: "Corte (j): a retenção do twin quando o funcionário sai é o risco central de propriedade do conhecimento do colaborador; nenhum achado confirmado o cobre e o corpus BR não trata dela."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E4_LACUNA_ABERTA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (j)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'retencao'"
+  - id: E_OBJECAO_23_GPT_STORE_COUNTEREXAMPLE_CUT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-25"
+    verified_against: "claim (l) 'cortada por orçamento'; nenhum achado confirmado sobre GPT Store"
+    label: "Corte (l): a GPT Store (repasse virou piloto a convidados; GPTs aposentados em 11/12/2026) é o contraexemplo principal de monetização c2b de criador; primário da OpenAI citado, não lido."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não. CENÁRIO do Elenxo: sem este caso, a análise de vender/alugar/bilhetar habilidade e agentes sai sem nenhum caso de falha confirmado, e a opção de marketplace pessoal-para-empresa ganha peso que a evidência não dá."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (l)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "ler a primária da OpenAI sobre o programa de receita de GPTs"
+  - id: E_OBJECAO_24_CHATGPT_APPS_BURIED_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim (m) 'cortada por orçamento'"
+    label: "Corte (m): apps no ChatGPT enterrados e rasos de propósito (Bloomberg, mar/2026) mostram o mecanismo da falha b2b2c (o parceiro não cede a relação com o cliente); fonte citada, não lida."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (m)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "ler a matéria da Bloomberg de mar/2026"
+  - id: E_OBJECAO_25_INRUPT_CHARLIE_COMPETITOR_UNDISSECTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim (n) 'cortada por orçamento'; kg-corpus-grep inrupt = 0"
+    label: "Corte (n): o Charlie da Inrupt (IA pessoal agêntica sobre Solid) é o concorrente mais direto das opções A e B, e o corpus tem 0 nós Inrupt."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (n)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "bash .claude/validation/kg-corpus-grep.sh inrupt"
+  - id: E_OBJECAO_26_SOLID_MUTUAL_VALUE_UNMEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim (o) 'cortada por orçamento'"
+    label: "Corte (o): compartilhamento seletivo e valor para empresas no Solid trata do 'valor mútuo' de (1), mas é visão de fornecedor sem caso medido; cortado sem refutação."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (o)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "procurar caso b2b2c medido sobre Solid"
+  - id: E_OBJECAO_27_SOLID_FAILURES_ASYMMETRIC_CUT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "comparação: achados 3 e 13 confirmados × claim de falha do Solid 'cortada por orçamento'"
+    label: "Corte (p): as falhas de adoção e robustez do Solid (o contrário que o Scope pediu) foram cortadas enquanto os achados 3 e 13 (pró-Solid) ficaram: corte assimétrico."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (p)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "comparar achados 3 e 13 com a claim de falha cortada"
+  - id: E_OBJECAO_28_RECALL_RISK_VS_RAW_MEDIA_POLICY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "medição no repo privado do app pessoal (exceção declarada e temporária: a mídia vai crua ao cérebro; detalhe fica no repo privado)"
+    label: "Corte (q): o Microsoft Recall é a evidência de mercado do risco da captura multimodal, e o app pessoal manda mídia (imagem, áudio, arquivo) CRUA ao cérebro-nuvem por exceção 'consciente e temporária'."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não. A superação (de-id local de mídia por SLM on-device, F3) é condição de saída futura declarada no próprio arquivo, não entregue."
+    provenance:
+      source: "private-cite:zZ3GMMSLxn0_3w7JV1XCXA"
+      locator: "private-cite:zZ3GMMSLxn0_3w7JV1XCXA"
+      method: "measurement: leitura de um arquivo do app no último commit do repo privado (2026-10-08), refeita pelo escritor"
+    trace: "leitura no repo privado do app pessoal (private-cite)"
+  - id: E_OBJECAO_29_MANAGED_POLICY_PRECEDENCE_CUT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "claim (t) 'cortada por orçamento'; a doc oficial já tinha sido lida para o achado 18"
+    label: "Corte (t): os caminhos da política gerenciada e a precedência da camada empresa sobre a pessoal são a metade que faltava ao achado 18; o corte o deixou parecendo fronteira protetora quando é o vetor."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (t)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "comparar a claim (t) cortada com o achado 18"
+  - id: E_OBJECAO_30_MEM0_MEMORY_PASSPORT_AWS_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "nenhum achado confirmado de capital com data de 2026 em memória pessoal"
+    label: "Corte (u): o 'memory passport' da Mem0 e o papel de fornecedor exclusivo do Agent SDK da AWS é o único sinal de capital e canal de 2026 para memória portátil; primário da AWS citado, não lido."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E4_LACUNA_ABERTA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "corte (u)"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "ler a primária da AWS sobre o Agent SDK e a Mem0"
+  - id: E_OBJECAO_31_ZEP_WALLET_FALLACY_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fonte listada em 'fonte não lida': blog.getzep.com/the-ai-memory-wallet-fallacy"
+    label: "Fonte citada, não lida: 'The AI memory wallet fallacy' (Zep) é o contrário mais direto à tese de carteira de memória pessoal portátil, de um ator que o corpus mediu acima da Mem0."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "lista 'fonte não lida'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "WebFetch https://blog.getzep.com/the-ai-memory-wallet-fallacy"
+  - id: E_OBJECAO_32_SEVEN_MEMORY_PRODUCTS_LOCKIN_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fonte listada em 'fonte não lida': dev.to/stantyan"
+    label: "Fonte citada, não lida: teste empírico de portabilidade em 7 produtos de memória de IA (dev.to), 'todos com lock-in', que sustentaria o descarte (b)."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "lista 'fonte não lida'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "ler o post dev.to 'I tested 7 AI memory products for portability'"
+  - id: E_OBJECAO_33_MCP_MEMORY_KG_SERVER_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fonte listada em 'fonte não lida': dev.to grove_chatforest (MCP memory server knowledge graph)"
+    label: "Fonte citada, não lida: avaliação do servidor de memória em KG do MCP (dev.to), que toca a escolha kg-ssot × MCP memory para a interconexão."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "lista 'fonte não lida'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "ler o post dev.to sobre o MCP memory server knowledge graph"
+  - id: E_OBJECAO_34_EU_WORKS_COUNCIL_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fontes listadas em 'fonte não lida'; kg-corpus-grep 'works council' casa só substring genérica"
+    label: "Fontes citadas, não lidas (Covington, CMS): na UE, IA sobre dados de empregado exige acordo coletivo e a falta dele já é violação GDPR; é condição de venda B2B do company brain com operação na UE."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E4_LACUNA_ABERTA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "lista 'fonte não lida'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "bash .claude/validation/kg-corpus-grep.sh --phrase 'works council'"
+  - id: E_OBJECAO_35_ANPD_TS04_2026_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-25"
+    verified_against: "fonte listada em 'fonte não lida': gov.br/anpd TS-04-2026"
+    label: "Primário citado, não lido: a ANPD TS-04-2026 (agenda regulatória) é a fonte do regulador da jurisdição da casa, de 2026; o corpus BR para em set/2026."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=limite, critério E4_LACUNA_ABERTA, superação achada: não."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "lista 'fonte não lida'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "https://www.gov.br/anpd/pt-br/acesso-a-informacao/participacao-social/outras-acoes/ts-04-2026-minuta_agenda-regulatoria_tomada_de_subsidios.pdf"
+  - id: E_OBJECAO_36_SNYK_TOXICSKILLS_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-25"
+    verified_against: "fonte listada em 'fonte não lida'; kg-corpus-grep ToxicSkills sem nó"
+    label: "Fonte citada, não lida: snyk ToxicSkills mede skills maliciosas no ClawHub, o modo de falha de segurança do marketplace c2c de skills do item (2); bilhetar skills sem essa medida abre o company brain."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E3_DESCARTE_SEM_MEDIDA, superação achada: não. CENÁRIO do Elenxo: o Onion propõe bilhetar ou alugar skills entre pessoas e empresas sem a medida de quantas skills de marketplace aberto são maliciosas; a superfície de ataque entra no company brain pela ponte com o cérebro pessoal, somada ao MemGhost já medido no corpus."
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "lista 'fonte não lida'"
+      method: "judges: triagem do Elenxo no run (objeção sobrevivente; fonte não lida ou cortada nesta rodada)"
+    trace: "bash .claude/validation/kg-corpus-grep.sh ToxicSkills"
+  - id: E_OBJECAO_37_OPTION_A_PREMISE_CONTRADICTS_CODE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-25"
+    verified_against: "medição no repo privado do app pessoal; git log do repo privado (último commit 2026-10-08)"
+    label: "A premissa da opção A ('só contexto de-identificado à nuvem') não confere com o código: o app manda mídia CRUA por exceção ao ADR-003 e o de-id de texto é frágil por desenho; o repo está parado desde 2026-10-08."
+    narrative: "Objeção do Elenxo (afirmação de UM agente, sem votação; confidence ≤ 0,6). triage=bloqueia, critério E1_EVIDENCIA_CONTRARIA, superação achada: não. CENÁRIO do Elenxo: o maestro retoma o ADR-003 confiando na INVARIANTE 0; um áudio ou foto com terceiros identificáveis vai cru ao LLM-nuvem e a promessa de privacidade, que é o diferencial, não se cumpre. Superação no alcance: desligar a flag de mídia (perde a captura multimodal) ou STT/SLM on-device (F3, condição futura). O de-id de texto teve a over-redação afrouxada em 20/07 (números curtos saem em claro). O Elenxo disse 'parado desde 2026-10-09'; o escritor mediu o último commit em 2026-10-08."
+    provenance:
+      source: "private-cite:zZ3GMMSLxn0_3w7JV1XCXA"
+      locator: "private-cite:zZ3GMMSLxn0_3w7JV1XCXA"
+      method: "measurement: leitura de dois arquivos do app (private-cite:jXKXAL01QPr41bN4gXqdJw) no último commit do repo privado, refeita pelo escritor em 2026-11-25"
+    trace: "leitura no repo privado do app pessoal (private-cite)"
+  - id: E_MERCADO_SECOND_BRAIN_2026_11
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    source_tier: 5
+    source_kind: "analyst"
+    valid_from: "2025-10"
+    verified_at: "2026-11-25"
+    verified_against: "síntese de mercado do run: TechCrunch 28/10/2025 (Mem0 US$ 24M), zeli.app (Mem ~US$ 29M, encerra 15/01/2027), TechCrunch 14/11/2026 (Ollie); votos 3-0 por claim"
+    label: "Capital vai para infra de memória de dev (Mem0, US$ 24M, out/2025) enquanto apps de consumo de segundo cérebro morrem (Mem ~US$ 29M encerra 15/01/2027; Ollie fechou 06/11/2026). Sem sinal confirmado de capital em marketplaces c2c/c2b de skills e contatos."
+    narrative: "Eixo mercado/capital. (1) Infra de memória para dev atrai capital: Mem0 seed US$ 3,9M + Série A US$ 20M (Basis Set; Peak XV, YC, GitHub Fund, Kindred), chamadas de API de 35M a 186M por trimestre em 2025. (2) App de consumo perde dinheiro: Mem (~US$ 29M) e Ollie. (3) Padrões e infra: Solid com W3C WG (LWS, jul/2026), Inrupt ESS 3.0 com Access Grant (27/05/2026), MacPaw Portable Memory (preprint sem adoção). (4) Analistas jurídicos (Gowling, Mondaq) apontam a propriedade do twin do empregado como questão aberta. SEM SINAL CONFIRMADO para: rodadas ou M&A de marketplaces de habilidade, conhecimento, agentes ou contatos (c2c, c2b, b2b2c), receita de criador individual, cooperativas de dados com tração, capital de company brain em nov/2026. Claude Marketplace e AgentExchange foram refutados na forma original (ver superações). O corpus de set/2026 já registrava E_MERCADO_NO_CAPITAL_SIGNAL_EMPLOYEE_DATA. Limite (Elenxo): o dado de capital é de 2025; o sinal de 2026 (Mem0 'memory passport' na AWS) foi cortado."
+    provenance:
+      source: "https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps ; https://zeli.app/story/50526537 ; https://techcrunch.com/2026/11/14/the-ai-graveyard-a-running-list-of-projects-and-startups-that-didnt-make-it/"
+      locator: "seção Mercado do sintetizador do run de 2026-11-25"
+      method: "derived: síntese do eixo mercado/capital a partir das claims confirmadas do run"
+      locality: "web"
+    trace: "síntese de mercado do run /onion-research modo decision de 2026-11-25"
+  - id: E_LACUNAS_SECOND_BRAIN_2026_11
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Contabilidade: 37 objeções sobreviventes do Elenxo, 37 modeladas (0 não modeladas), 0 recusadas pelo motor; 6 claims refutadas, todas com superação; 0 não verificadas; 39 fontes e 33 claims cortadas por orçamento."
+    narrative: |-
+      SOBREVIVENTES do Elenxo: 37 de 48 objeções julgadas. MODELADAS: 37 (E_OBJECAO_01..37). NÃO MODELADAS: 0.
+      Distribuição: 16 sobre achados confirmados (achados 1-3, 6-14, 16-19), 2 sobre descartes por comodismo
+      (b, e), 12 sobre cortes por orçamento (g, h, i, j, l, m, n, o, p, q, t, u), 6 sobre fontes não lidas
+      (Zep, dev.to 7 produtos, MCP memory KG, Covington/CMS, ANPD TS-04-2026, snyk ToxicSkills) e 1 sobre a
+      opção A. Delas, 7 BLOQUEIAM (E_OBJECAO_04, 14, 15, 18, 23, 36, 37) e 30 LIMITAM.
+      NÃO sobreviveram (11): achados 4, 5, 15; descartes a, c, d, f; cortes k, r, s; fontes memmy-agent/agensi.
+
+      RECUSADAS pelo motor (naoJulgada, sem critério pré-registrado ou sem superação): 0.
+
+      REFUTADAS no Verify (6 claims, não viram nó de evidência): (a) Stanford DEL 'compartilhável por papel,
+      consentimento e finalidade, página não trata de empresas' (tier 8); (b) memória de agente é lock-in,
+      imóvel e sem formato comum (MacPaw, tier 6); (c) plataformas absorveram startups, Relay ago/2026 e Notion
+      Mail 'previsto' 22/09/2026 (TechCrunch, tier 5); (d) Claude Marketplace abriu em 23/09/2026 sem repasse
+      (llms.blog, tier 4); (e) marketplaces que funcionam são canais de compra B2B (AgentExchange) e c2b falha
+      (llms.blog, tier 4); (f) second e company brain na mesma arquitetura com escopos user_id/org_id
+      (vectorize, tier 3). As 6 tiveram SUPERAÇÃO achada por juiz (formulação corrigida) e viram
+      C_SUPERACAO_20261125_* com TRACES_TO para este nó.
+
+      NÃO VERIFICADAS: 0.
+
+      CORTADAS POR ORÇAMENTO: 39 fontes, 33 claims. As cortadas que sobreviveram como objeção estão nomeadas
+      nos E_OBJECAO_17..36 (formatos de memória, GPT Store, Bloomberg, Inrupt Charlie, falhas do Solid,
+      Microsoft Recall, managed policy, Mem0/AWS, PAM/IETF/W3C CG, retenção de twin UK GDPR).
+
+      NOTA DO ESCRITOR: o id E_AGREGADO_COM_OPTIN_VAZA_POR_DIFERENCA citado pelo Elenxo não existe como nó
+      no corpus (é texto dentro de E_REFUTACAO_DA_PROPOSTA_DE_RAIO); a aresta externa aponta o nó real.
+    provenance:
+      source: "run /onion-research modo decision de 2026-11-25 (triagem do Elenxo)"
+      locator: "contabilidade de objeções, refutadas, não verificadas, superações e cortes do run"
+      method: "derived: contagem das objeções e descartes do run, conferida pelo gerador do grafo"
+    trace: "run /onion-research modo decision de 2026-11-25; contabilidade de objeções, refutadas, não verificadas e cortes"
+  - id: C_SUPERACAO_20261125_STANFORD_HCP_USER_GOVERNED_NOT_EMPLOYER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Stanford DEL (03/2026): contexto pessoal é camada governada pelo usuário, compartilhável por papel, consentimento e finalidade; trata a empresa só como plataforma de IA que concentra contexto, não como empregador."
+    narrative: "O QUE SUPERA: a fonte diz que o contexto pessoal deve ser camada governada pelo usuário, compartilhável seletivamente por papel, consentimento e finalidade; trata a empresa só como plataforma ou serviço de IA que concentra contexto pessoal em sistema proprietário (risco à portabilidade e à agência do usuário); não trata do empregador nem do cérebro organizacional. MEDIDA: duas buscas WebFetch na URL em 2026-11-25; aparecem 'can be shared selectively by role, consent, and purpose', 'a user-governed layer of context', 'may consolidate durable personal context within proprietary', 'user agency'; 'employers', 'enterprises' e 'workplace' ausentes. CRITÉRIO: V1_QUOTE_NAO_SUSTENTA. ALVO REPROVADO: claim refutada (a), registrada em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz."
+    trace: "WebFetch https://digitaleconomy.stanford.edu/publication/the-future-of-personal-ai-portable-and-persistent-personal-memory-through-a-unified-human-context-protocol/ e grep -F 'proprietary' / 'employer' / 'workplace' no texto devolvido"
+  - id: C_SUPERACAO_20261125_MEMORY_LOCKIN_LOSSY_BRIDGES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Memória de agente é lock-in: desde mar/2026 só migra por pontes pontuais e com perda (Claude importa de ChatGPT, Gemini, Copilot), sem esquema comum nem apagamento verificável; Portable Memory e o draft IETF não têm adoção."
+    narrative: "O QUE SUPERA: a memória de agente funciona como lock-in; desde mar/2026 só migra entre fornecedores por pontes pontuais, mediadas por prompt e com perda; o Claude importa de ChatGPT, Gemini e Copilot; não há esquema comum, garantia de integridade nem apagamento verificável; lançamentos ChatGPT fev/2024, Gemini fev/2025, Claude set/2025; Portable Memory (MacPaw, jul/2026) e IETF draft-vu-aimem-bundle-00 são propostas não adotadas. MEDIDA: pdftotext do PDF com grep das três falhas, das datas e da seção 5 verbatim; WebFetch da MacRumors de 2026-03-02 confirma a importação. CRITÉRIO: V2_CONTRADITA. ALVO REPROVADO: claim refutada (b), em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz."
+    trace: "WebFetch https://research.macpaw.com/publications/portable-memory/portable-memory.pdf + pdftotext -layout + grep -n 'First-party memory transfer is beginning'; WebFetch https://macrumors.com/2026/03/02/anthropic-memory-import-tool/"
+  - id: C_SUPERACAO_20261125_RELAY_SHUTDOWN_NOTION_MAIL_AGENTS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O Relay.app encerrou (free 15/08/2026, pagas 14/09/2026; equipe foi ao Chrome do Google). O Notion Mail não foi absorção: a Notion fechou a caixa de entrada em 22/09/2026 porque agentes passaram a operar o e-mail."
+    narrative: "O QUE SUPERA: Relay.app encerrou (contas free em 15/08/2026, pagas em 14/09/2026), equipe para o time do Chrome do Google sem aquisição do produto; o TechCrunch atribui o fim a plataformas maiores (OpenAI, Google) com automação embutida. O Notion Mail não é absorção de startup: a própria plataforma descontinuou a caixa de entrada em 22/09/2026 porque agentes passaram a operar o e-mail. Sinal útil ao app pessoal: a interface de caixa de entrada perde valor para o agente. MEDIDA: WebFetch do TechCrunch de 14/11/2026, da relay.app ('shut down in September 2026') e do 9to5mac de 25/06/2026; WebSearch das datas. CRITÉRIO: V2_CONTRADITA. ALVO REPROVADO: claim refutada (c), em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz."
+    trace: "WebFetch https://9to5mac.com/2026/06/25/notion-shutting-down-its-ai-powered-email-client-including-mac-and-ios-apps/ ; WebFetch https://relay.app/?via=nadia"
+  - id: C_SUPERACAO_20261125_CLAUDE_MARKETPLACE_PREVIEW_MARCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O Claude Marketplace abriu em prévia limitada em mar/2026 (seis parceiros, compra pelo gasto comprometido, sem comissão) e virou hub de 2.000+ conectores em 23/09/2026; nenhuma fonte descreve repasse a desenvolvedor independente."
+    narrative: "O QUE SUPERA: prévia limitada em março de 2026, com seis parceiros (Snowflake, GitLab, Harvey AI, Replit, Rogo, Lovable) e compra pelo gasto comprometido com a Anthropic, sem comissão; em 23/09/2026 virou hub com mais de 2.000 conectores e plugins, além de agentes e serviços; nenhuma fonte descreve repasse de receita ou venda self-serve para desenvolvedores independentes. MEDIDA: WebFetch de claude.com/blog/claude-marketplace ('more than 2,000 available today', 'Use a portion of your committed Anthropic spend') e do digitalcommerce360 de 16/03/2026 ('debuted in limited preview', 'does not currently plan to take a commission'). CRITÉRIO: V2_CONTRADITA. ALVO REPROVADO: claim refutada (d), em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz."
+    trace: "WebFetch https://www.digitalcommerce360.com/2026/03/16/anthropic-launches-claude-b2b-marketplace-enterprise-ai-applications/"
+  - id: C_SUPERACAO_20261125_C2B_PAYS_PER_USE_OR_OFF_PLATFORM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Marketplaces corporativos de IA funcionam como canal de compra (AgentExchange, 04/03/2025, 200+ parceiros); lojas de chatbot não pagaram criadores; o c2b paga por uso em loja de dev (Apify, US$ 4M+) ou em contrato B2B fora da loja; c2c não medido."
+    narrative: "O QUE SUPERA: (a) o AgentExchange foi lançado em 04/03/2025 com mais de 200 parceiros (press release da Salesforce) e os marketplaces de IA corporativos que funcionam são canais de compra; (b) as lojas de apps de chatbot (GPT Store, ChatGPT apps) não pagaram criadores (llms.blog, 23/11/2026); (c) o c2b de agentes e ferramentas paga quando o criador cobra por uso numa loja de desenvolvedores (Apify: mais de US$ 4M pagos a desenvolvedores independentes e US$ 563 mil só em set/2025) ou fecha contrato B2B fora da plataforma; (d) c2c: as fontes lidas não tratam e o juiz não fez busca própria (texto da superação chegou cortado neste ponto). MEDIDA: WebSearch e WebFetch do press release da Salesforce, do llms.blog e do release da Apify de 03/11/2025. CRITÉRIO: V2_CONTRADITA. ALVO REPROVADO: claim refutada (e), em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz."
+    trace: "WebFetch https://natlawreview.com/press-releases/apify-bets-1m-independent-developers-building-ais-missing-tools ; WebFetch https://www.llms.blog/posts/nobody-got-paid-what-the-gpt-store-chatgpt-apps-and-claude-marketplace-actually-built"
+  - id: C_SUPERACAO_20261125_GOVERNANCE_NOT_NAMESPACE_SCOPE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Memória pessoal e da empresa podem dividir o substrato de armazenamento e recuperação, mas o company brain precisa de governança que um namespace user_id/org_id não entrega: autorização no store, herança da permissão da fonte e auditoria."
+    narrative: "O QUE SUPERA: a fronteira entre a pessoa e a organização é de governança, não de escopo; a camada tem três partes: autorização imposta no store (row-level security, deny por padrão), herança da permissão de cada fonte e auditoria do que o agente viu. MEDIDA: WebFetch em 25/11/2026: a própria Vectorize diz 'A company brain has many users with different access levels'; a doc da Oracle Agent Memory 26.4 diz 'The integrating application is responsible for end-user authentication, authorization, and correct memory scoping'. Oracle Developers e DevRev voltaram 403 e 429 (só resumo de busca). CRITÉRIO: V5_MARKETING (CTA 'Request a demo of Hindsight', tier 3) com complemento V2. ALVO REPROVADO: claim refutada (f), em E_LACUNAS_SECOND_BRAIN_2026_11. Afirmação de UM juiz; não fecha o vazamento por agregação (E_OBJECAO_14)."
+    trace: "WebFetch https://vectorize.io/articles/second-brain-vs-company-brain + grep -F 'Request a demo of Hindsight'; WebFetch https://docs.oracle.com/en/database/oracle/agent-memory/26.4/agmea/about.html + grep -F 'responsible for end-user authentication, authorization, and correct memory scoping'"
+edges:
+  - from: D_SECOND_BRAIN_VERTICAL_2026_11
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_C_DECISION_CENTER_FIRST
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_D_COMPLEMENTARY_ROUND
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: TRACES_TO
+  - from: E_F01_CC_AUTO_MEMORY_LOCAL_TO_MACHINE
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F02_STANFORD_DEL_PORTABLE_PERSONAL_MEMORY
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F03_SOLID_W3C_LWS_GENAI_INTEREST
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F04_SOLID_NO_COPY_PREVENTION
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F05_MACPAW_PORTABLE_MEMORY_PREPRINT
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F06_GOWLING_EMPLOYER_OWNS_WORK_PRODUCT
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F07_GOWLING_TWIN_PERSONA_DISPUTE
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F08_MONDAQ_TWIN_OWNERSHIP_OPEN
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F09_MONDAQ_CONTRACTS_SILENT_ON_TWINS
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F10_OLLIE_FAMILY_ASSISTANT_SHUTDOWN
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F11_MEM0_RAISED_24M
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F12_MEM0_API_GROWTH_2025
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F13_INRUPT_ESS3_ACCESS_GRANT
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F14_SWARMVAULT_LOCAL_FIRST_KG
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F15_MEM_SHUTDOWN_JAN_2027
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F16_MEM_29M_VC_NOT_SUSTAINED
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F17_ACL_AT_RETRIEVAL_DIVIDER
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F18_CC_INSTRUCTION_SCOPES
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_F19_CC_AUTO_MEMORY_MARKDOWN_25KB
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_01_CC_MEMORY_IS_DEV_LAYER_NOT_APP
+    to: E_F01_CC_AUTO_MEMORY_LOCAL_TO_MACHINE
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_01_CC_MEMORY_IS_DEV_LAYER_NOT_APP
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_HCP_IS_DEFINITION_NOT_ADOPTION
+    to: E_F02_STANFORD_DEL_PORTABLE_PERSONAL_MEMORY
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_02_HCP_IS_DEFINITION_NOT_ADOPTION
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_03_SOLID_INTEREST_IS_VENDOR_CLAIM
+    to: E_F03_SOLID_W3C_LWS_GENAI_INTEREST
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_03_SOLID_INTEREST_IS_VENDOR_CLAIM
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_BR_LAW_9609_EMPLOYEE_OWNS_OUTSIDE_CONTRACT
+    to: E_F06_GOWLING_EMPLOYER_OWNS_WORK_PRODUCT
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_04_BR_LAW_9609_EMPLOYEE_OWNS_OUTSIDE_CONTRACT
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_BR_LAW_9609_EMPLOYEE_OWNS_OUTSIDE_CONTRACT
+    to: C_OPCAO_C_DECISION_CENTER_FIRST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_05_FORMER_EMPLOYEE_CLONE_CASE_UNREAD
+    to: E_F07_GOWLING_TWIN_PERSONA_DISPUTE
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_05_FORMER_EMPLOYEE_CLONE_CASE_UNREAD
+    to: C_OPCAO_C_DECISION_CENTER_FIRST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_ANPD_TWIN_POSITION_UNREAD
+    to: E_F08_MONDAQ_TWIN_OWNERSHIP_OPEN
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_06_ANPD_TWIN_POSITION_UNREAD
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_CLT_483_NOT_MEASURED
+    to: E_F09_MONDAQ_CONTRACTS_SILENT_ON_TWINS
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_07_CLT_483_NOT_MEASURED
+    to: C_OPCAO_C_DECISION_CENTER_FIRST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_08_OLLIE_N1_CAUSE_NOT_PRIVACY
+    to: E_F10_OLLIE_FAMILY_ASSISTANT_SHUTDOWN
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_08_OLLIE_N1_CAUSE_NOT_PRIVACY
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_09_MEM0_CAPITAL_STALE_AND_B2B
+    to: E_F11_MEM0_RAISED_24M
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_09_MEM0_CAPITAL_STALE_AND_B2B
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_10_MEM0_VOLUME_VS_MEMGHOST
+    to: E_F12_MEM0_API_GROWTH_2025
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_10_MEM0_VOLUME_VS_MEMGHOST
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_ACCESS_GRANT_IS_TRAIL_NOT_ENFORCEMENT
+    to: E_F13_INRUPT_ESS3_ACCESS_GRANT
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_11_ACCESS_GRANT_IS_TRAIL_NOT_ENFORCEMENT
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_SWARMVAULT_NOT_DISSECTED
+    to: E_F14_SWARMVAULT_LOCAL_FIRST_KG
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_12_SWARMVAULT_NOT_DISSECTED
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_13_MEM_SHUTDOWN_CAUSE_UNDECLARED
+    to: E_F16_MEM_29M_VC_NOT_SUSTAINED
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_13_MEM_SHUTDOWN_CAUSE_UNDECLARED
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_14_ACL_NOT_ENOUGH_AGGREGATION_LEAK
+    to: E_F17_ACL_AT_RETRIEVAL_DIVIDER
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_14_ACL_NOT_ENOUGH_AGGREGATION_LEAK
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_15_CC_SCOPES_ARE_SURVEILLANCE_VECTOR
+    to: E_F18_CC_INSTRUCTION_SCOPES
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_15_CC_SCOPES_ARE_SURVEILLANCE_VECTOR
+    to: C_OPCAO_C_DECISION_CENTER_FIRST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_15_CC_SCOPES_ARE_SURVEILLANCE_VECTOR
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_AUTO_MEMORY_IS_INDEX_AND_POISONABLE
+    to: E_F19_CC_AUTO_MEMORY_MARKDOWN_25KB
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_16_AUTO_MEMORY_IS_INDEX_AND_POISONABLE
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_17_MEMORY_FORMAT_LOCKIN_UNSEPARATED
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_18_C2B_MONETIZATION_ZERO_CONFIRMED
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_19_PORTABLE_MEMORY_LEAST_PRIVILEGE_OPEN
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_20_MEMORY_STANDARDS_CONVERGENCE_UNREAD
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_21_MEMORY_MD_ADAPTER_NOT_DISSECTED
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_22_TWIN_RETENTION_ON_EXIT_UNCOVERED
+    to: C_OPCAO_C_DECISION_CENTER_FIRST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_23_GPT_STORE_COUNTEREXAMPLE_CUT
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_24_CHATGPT_APPS_BURIED_UNREAD
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_25_INRUPT_CHARLIE_COMPETITOR_UNDISSECTED
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_25_INRUPT_CHARLIE_COMPETITOR_UNDISSECTED
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_26_SOLID_MUTUAL_VALUE_UNMEASURED
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_27_SOLID_FAILURES_ASYMMETRIC_CUT
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_28_RECALL_RISK_VS_RAW_MEDIA_POLICY
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_29_MANAGED_POLICY_PRECEDENCE_CUT
+    to: C_OPCAO_C_DECISION_CENTER_FIRST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_30_MEM0_MEMORY_PASSPORT_AWS_UNREAD
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_31_ZEP_WALLET_FALLACY_UNREAD
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_31_ZEP_WALLET_FALLACY_UNREAD
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_32_SEVEN_MEMORY_PRODUCTS_LOCKIN_UNREAD
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_33_MCP_MEMORY_KG_SERVER_UNREAD
+    to: C_OPCAO_B_SISTER_VERTICAL_FEDERATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_34_EU_WORKS_COUNCIL_UNREAD
+    to: C_OPCAO_C_DECISION_CENTER_FIRST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_35_ANPD_TS04_2026_UNREAD
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_36_SNYK_TOXICSKILLS_UNREAD
+    to: D_SECOND_BRAIN_VERTICAL_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_37_OPTION_A_PREMISE_CONTRADICTS_CODE
+    to: C_OPCAO_A_RESUME_ADR003_ONDEVICE
+    edge_type: CONSTRAINS
+  - from: E_MERCADO_SECOND_BRAIN_2026_11
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_SECOND_BRAIN_2026_11
+    to: Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_STANFORD_HCP_USER_GOVERNED_NOT_EMPLOYER
+    to: E_LACUNAS_SECOND_BRAIN_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_MEMORY_LOCKIN_LOSSY_BRIDGES
+    to: E_LACUNAS_SECOND_BRAIN_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_RELAY_SHUTDOWN_NOTION_MAIL_AGENTS
+    to: E_LACUNAS_SECOND_BRAIN_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_CLAUDE_MARKETPLACE_PREVIEW_MARCH
+    to: E_LACUNAS_SECOND_BRAIN_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_C2B_PAYS_PER_USE_OR_OFF_PLATFORM
+    to: E_LACUNAS_SECOND_BRAIN_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261125_GOVERNANCE_NOT_NAMESPACE_SCOPE
+    to: E_LACUNAS_SECOND_BRAIN_2026_11
+    edge_type: TRACES_TO

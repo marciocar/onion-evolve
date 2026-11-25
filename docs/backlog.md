@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1223 itens abertos** em 184 grafo(s) com aberto (de 246 no escopo) · 173 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1239 itens abertos** em 185 grafo(s) com aberto (de 246 no escopo) · 174 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -462,6 +462,24 @@
 | 4.5 | `C_OPCAO_E_NOT_NOW` | maestro-persona-2026-11 | E. Não fazer agora |
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
+
+## second-brain-company-brain-2026-11 — 13 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 57.5 | `Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11` | second-brain-company-brain-2026-11 | Second Brain pessoal × Company Brain interconectáveis como vertical do Onion: o que o mercado faz em nov/2026, que mercados isso |
+| 47.5 | `D_SECOND_BRAIN_VERTICAL_2026_11` | second-brain-company-brain-2026-11 | DECISÃO ABERTA: Second Brain × Company Brain como vertical do Onion. Opções: A retomar ADR-003 · B vertical irmã federada · |
+| 20.4 | `C_OPCAO_B_SISTER_VERTICAL_FEDERATED` | second-brain-company-brain-2026-11 | OPÇÃO B) Second Brain como vertical irmã do Company Brain, com interconexão federada (A2A, kg-ssot) entre os dois. |
+| 18.0 | `C_OPCAO_C_DECISION_CENTER_FIRST` | second-brain-company-brain-2026-11 | OPÇÃO C) Começar pela central de decisão do company-brain (PR #29 / SAC-554), com o indivíduo como usuário dentro do Company |
+| 13.2 | `C_OPCAO_A_RESUME_ADR003_ONDEVICE` | second-brain-company-brain-2026-11 | OPÇÃO A) Retomar o ADR-003 do Onion Pessoal: KG cifrado no celular, só contexto de-identificado à nuvem. |
+| 12.8 | `E_LACUNAS_SECOND_BRAIN_2026_11` | second-brain-company-brain-2026-11 | Contabilidade: 37 objeções sobreviventes do Elenxo, 37 modeladas (0 não modeladas), 0 recusadas pelo motor; 6 claims refutadas, |
+| 3.2 | `C_OPCAO_D_COMPLEMENTARY_ROUND` | second-brain-company-brain-2026-11 | OPÇÃO D) Rodada complementar antes de decidir: mercados/falhas (GPT Store, Bloomberg, snyk ToxicSkills, Zep wallet fallacy) e ei |
+| 3.0 | `C_SUPERACAO_20261125_C2B_PAYS_PER_USE_OR_OFF_PLATFORM` | second-brain-company-brain-2026-11 | Marketplaces corporativos de IA funcionam como canal de compra (AgentExchange, 04/03/2025, 200+ parceiros); lojas de chatbot não  |
+| 3.0 | `C_SUPERACAO_20261125_CLAUDE_MARKETPLACE_PREVIEW_MARCH` | second-brain-company-brain-2026-11 | O Claude Marketplace abriu em prévia limitada em mar/2026 (seis parceiros, compra pelo gasto comprometido, sem comissão) e virou |
+| 3.0 | `C_SUPERACAO_20261125_GOVERNANCE_NOT_NAMESPACE_SCOPE` | second-brain-company-brain-2026-11 | Memória pessoal e da empresa podem dividir o substrato de armazenamento e recuperação, mas o company brain precisa de governan |
+| 3.0 | `C_SUPERACAO_20261125_MEMORY_LOCKIN_LOSSY_BRIDGES` | second-brain-company-brain-2026-11 | Memória de agente é lock-in: desde mar/2026 só migra por pontes pontuais e com perda (Claude importa de ChatGPT, Gemini, Copilo |
+| 3.0 | `C_SUPERACAO_20261125_RELAY_SHUTDOWN_NOTION_MAIL_AGENTS` | second-brain-company-brain-2026-11 | O Relay.app encerrou (free 15/08/2026, pagas 14/09/2026; equipe foi ao Chrome do Google). O Notion Mail não foi absorção: a Not |
+| 3.0 | `C_SUPERACAO_20261125_STANFORD_HCP_USER_GOVERNED_NOT_EMPLOYER` | second-brain-company-brain-2026-11 | Stanford DEL (03/2026): contexto pessoal é camada governada pelo usuário, compartilhável por papel, consentimento e finalidade; |
 
 ## a2a-backbone-product-2026-11 — 45 item(ns)
 
@@ -1527,6 +1545,15 @@
 |--:|---|---|---|
 | 12.0 | `Q_DIFF_SEM_NOME_PRIVADO` | private-names-2026-11 | no core, o diff que acrescenta nome de repo ou de clone de adotante não federado reprova no lint, sem lista à mão e sem imprimi |
 
+## radar-E3-2026-11-25-r28 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 11.2 | `Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125` | radar-E3-2026-11-25-r28 | o SDK do bridge sobe para 0.3.332 (o PR onion-bridge #112, ainda aberto, mira 0.3.330 e precisa de novo alvo) e o pin do revisor d |
+| 10.5 | `Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125` | radar-E3-2026-11-25-r28 | ligar os guardas de Bash da casa também ao PreSkillShellCommand, para que a diretiva de comando ou skill de fora passe pelo mesmo |
+| 7.5 | `Q_DENY_SEGURA_EM_BYPASS_1125` | radar-E3-2026-11-25-r28 | fazer o deny da casa segurar no modo da casa (bypassPermissions), com casos novos na bancada do deny e uma guarda PreToolUse indep |
+| 2.8 | `Q_CAMINHO_DE_IMAGEM_PARA_AS_SESSOES_DA_VPS_1125` | radar-E3-2026-11-25-r28 | declarar e documentar o caminho de imagem do maestro para as sessões da VPS (Remote Control pelo app, ou arquivo enviado e citado |
+
 ## dissect-forge-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1562,12 +1589,6 @@
 | 10.8 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | QUESTAO DE DESENHO (gated): a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adot |
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
-
-## radar-E3-2026-11-25-r28 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 10.5 | `Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125` | radar-E3-2026-11-25-r28 | ligar os guardas de Bash da casa também ao PreSkillShellCommand, para que a diretiva de comando ou skill de fora passe pelo mesmo |
 
 ## forge-decide-2026-10 — 2 item(ns)
 
