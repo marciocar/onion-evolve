@@ -2,7 +2,8 @@
 branch: feat/onion-attach
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fcae4b5b27c5414e38d8dee8cc9758dd417eab3498bd73120c68de3d992b5ebb
+reviewed_code_sha256: b406efa274e446a9402410f4492ec9f087a996567a2d426e1f50240b503aaff2
 findings_total: 39
 findings_real: 39
 findings_blocking: 0
