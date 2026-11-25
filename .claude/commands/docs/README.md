@@ -25,5 +25,5 @@ Comandos da **documentação estruturada** do Onion: geram, validam e mantêm os
 ## 🔗 Referências
 - Agentes de documentação: `@system-documentation-orchestrator`, `@docs-reverse-engineer`, `@c4-architecture-specialist`, `@c4-documentation-specialist`, `@mermaid-specialist`, `@document-consolidator`
 - Comandos irmãos: [`/meta:create-knowledge-base`](../meta/create-knowledge-base.md) (KBs em `docs/knowledge-base/`), [`/product:consolidate-meetings`](../product/consolidate-meetings.md)
-- Saídas em `docs/`: [`../../../docs/business-context/`](../../../docs/business-context/), [`../../../docs/technical-context/`](../../../docs/technical-context/), [`../../../docs/compliance-context/`](../../../docs/compliance-context/), [`../../../docs/knowledge-base/`](../../../docs/knowledge-base/)
+- Saídas em `docs/`: `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`, `docs/knowledge-base/`
 - Meta-specs (L0): [`../../../docs/meta-specs/`](../../../docs/meta-specs/)
