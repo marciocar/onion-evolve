@@ -5,6 +5,8 @@
 # VPS, e não por anexo ou página. O core opera o upload; a chave de API foi criada uma vez pelo maestro (login de
 # administrador) e guardada no pass em onion/vps-gokapi/api-upload.
 #
+# curl -q (ignora o ~/.curlrc) e --max-redirs 0: um `location` no .curlrc levaria o cabeçalho apikey a outro host no
+# redirect (achado do refutador da ponte de imagem, 2026-11-25; o curl só tira Authorization e Cookie ao trocar de host).
 # Segredo: a chave é lida só por dentro, por `pass show`, e vai ao curl por um descritor (`-H @<(...)`, printf
 # embutido do bash), nunca em argv, em variável exportada ou na saída. Do retorno só sai o link ou o campo de erro.
 # O arquivo vai pelo stdin com nome próprio entre aspas: `;` e `,` no caminho não viram diretiva do `-F` do curl.
@@ -45,7 +47,7 @@ key="${key%%$'\n'*}"; key="${key%$'\r'}"
 # nome enviado: o basename, sem aspas, barra invertida nem quebra de linha (vão entre aspas no -F)
 name="$(basename -- "$FILE")"; name="${name//[\"\\$'\n'$'\r']/_}"
 
-resp="$(curl -sS --max-time 120 --fail-with-body -H @<(printf 'apikey: %s\n' "$key") \
+resp="$(curl -q -sS --max-time 120 --max-redirs 0 --fail-with-body -H @<(printf 'apikey: %s\n' "$key") \
           -F "file=@-;filename=\"${name}\"" -F "allowedDownloads=${DOWNLOADS}" -F "expiryDays=${DAYS}" \
           "${BASE}/api/files/add" < "$FILE")"; crc=$?
 unset key

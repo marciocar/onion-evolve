@@ -79,6 +79,7 @@ docs/knowledge-base/
 - [Parallel Work Worktrees](concepts/parallel-work-worktrees-pattern.md) — trabalho paralelo em worktrees independentes
 - [Public Door vs Private Core](concepts/public-door-vs-private-core.md) — porta pública ≠ core privado: a fronteira entre onde a família se adota e onde ela evolui
 - [Secret Handling (Agent)](concepts/secret-handling-agent.md) — regra dura: agente nunca pede/aceita segredo em texto claro; receituário capability-split → terminal real → efêmero → fora-de-banda → container (crédito: adotante de campo, dogfood real)
+- [Mandar imagem para a sessão](concepts/send-image-to-session.md) — ponte de imagem do Windows à sessão na VPS: atalho por sftp (principal) e Gokapi pelo navegador (segundo); a imagem chega pelo caminho do arquivo
 - [Session Memory Lifecycle](concepts/session-memory-lifecycle.md) — memória persistente do harness como 4º contexto auditável, irmã de domain-context-lifecycle
 - [Fonte ≠ Derivação](concepts/source-vs-derivation.md) — fronteira física entre conhecimento-fonte e nossa leitura dele; família do "declarado ≠ verificado"
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)

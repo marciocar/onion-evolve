@@ -1,0 +1,60 @@
+meta:
+  schema_version: "1"
+  id: image-bridge-2026-11
+  slug: image-bridge-2026-11
+  title: "Ponte de imagem: do Windows do maestro para a sessão do Claude Code na VPS"
+  date: "2026-11-25"
+  baseline: "2026-11-25"
+  review_after: "2026-12-25"
+  purpose: "Guardar por que a imagem chega à sessão pelo CAMINHO do arquivo na VPS, os dois fluxos escolhidos (atalho do Windows por sftp como principal, Gokapi pelo navegador como segundo) e o que ficou pendente."
+  # ═══ TETO: 4 NÓS ═══
+nodes:
+  - id: E_IB_IMAGE_BY_PATH_ONLY_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-25"
+    verified_against: "pesquisa da sessão do core em 2026-11-25 (Claude Code 2.1.332): doc oficial code.claude.com common-workflows «Work with images» (HTTP 200), CHANGELOG 2.1.311 e 2.1.332, issue anthropics/claude-code#42712 por gh (CLOSED, not planned), openapi do Gokapi v2.2.4 e stat do diretório de dados (750, uid 65532)"
+    label: "A sessão na VPS só recebe imagem pelo caminho de um arquivo no disco da VPS: o Ctrl+V do terminal lê o clipboard da VPS, o OSC 52 não leva imagem, e o disco do Gokapi não é legível pela conta."
+    narrative: "O Claude Code anexa a imagem quando o caminho dela vai na mensagem (doc oficial). Ctrl+V e Alt+V leem o clipboard da máquina onde o claude roda; numa VPS sem display não há imagem. O pedido de colar imagem por OSC 52 foi fechado como not planned. A API do Gokapi entrega o arquivo por GET /files/download/{id} com chave de permissão DOWNLOAD, exceto arquivo cifrado de ponta a ponta."
+    provenance:
+      source: "pesquisa de 2026-11-25 da sessão do core (fleet-research-1125, seção B)"
+      locator: "seção B: «O que o Claude Code aceita» e «O que o Gokapi já tem»"
+      method: "reading: fontes primárias com HTTP conferido, relatadas pela sessão do core"
+      locality: "repo"
+  - id: D_IB_TWO_FLOWS_SFTP_FIRST_1125
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "bancada image_bridge do lint-selftest (28 casos com mutante, servidor HTTP falso em loopback) na branch feat/image-bridge; o .ps1 não roda nesta VPS (sem pwsh)"
+    label: "Dois fluxos: o atalho do Windows (print, tecla, Ctrl+V) envia por sftp e deixa o caminho no clipboard; o Gokapi pelo navegador ou celular, com ops/gokapi-fetch.sh na VPS, é o segundo."
+    narrative: "O sftp pela chave SSH que o maestro já usa é o padrão de mercado para copiar arquivo a um servidor, não precisa de segredo novo no Windows nem de serviço novo na VPS, e dá o menor número de passos. O Gokapi fica para o celular ou outra máquina sem a chave SSH. Os dois gravam na mesma pasta privada (0700, arquivo 0600), com o mesmo formato de nome, e a limpeza apaga só esses arquivos, só no primeiro nível da pasta. Um modo -Via gokapi no .ps1 foi descartado: pediria uma chave de upload guardada no Windows sem ganho sobre o sftp."
+    provenance:
+      source: "ops/gokapi-fetch.sh, ops/windows/onion-paste-image.ps1, ops/windows/README.md"
+      locator: "cabeçalhos dos scripts e seção «Por que sftp» do README"
+      method: "reading: os artefatos da branch feat/image-bridge"
+      locality: "repo"
+  - id: Q_IB_DOWNLOAD_KEY_AND_WINDOWS_RUN_1125
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.6
+    label: "Faltam a primeira medida do fluxo 2 contra o Gokapi real e a primeira execução do atalho no Windows do maestro."
+    narrative: "Pronto quando: (1) ops/gokapi-fetch.sh --check, com a entrada padrão onion/vps-gokapi/api-upload (a chave tem todas as permissões, segundo o maestro em 2026-11-25), sai rc 0 com «download: presente» contra o servidor real; (2) o maestro rodou o .ps1 com -Setup e -InstallShortcut no Windows, apertou o atalho e a sessão leu a imagem pelo caminho colado. Até lá o fluxo 1 está escrito e não medido no Windows, e o fluxo 2 só foi medido contra servidor falso."
+edges:
+  - from: D_IB_TWO_FLOWS_SFTP_FIRST_1125
+    to: E_IB_IMAGE_BY_PATH_ONLY_1125
+    edge_type: TRACES_TO
+  - from: Q_IB_DOWNLOAD_KEY_AND_WINDOWS_RUN_1125
+    to: D_IB_TWO_FLOWS_SFTP_FIRST_1125
+    edge_type: TRACES_TO
