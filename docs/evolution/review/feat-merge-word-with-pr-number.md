@@ -2,18 +2,18 @@
 branch: feat/merge-word-with-pr-number
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 5fd6eba161002fb5a625f81df5d44432a3a2e2a94beba869c3040c3a271409ab
-reviewed_code_sha256: e607f75b1daeff884ee012250c1f9e5a3d13f3e73ebab87299b818212b397ac9
-findings_total: 0
-findings_real: 0
+reviewed_diff_sha256: pendente
+findings_total: 5
+findings_real: 5
+findings_blocking: 0
 tokens: 0
 duration_min: 0
-findings_fixed: 0
-verdict: NO_FINDINGS
-elenxo: false
+findings_fixed: 5
+verdict: FIXED
+elenxo: true
 elenxo_isolado: false
-reviewer: "Ainda sem revisão isolada: o core a encomenda depois da abertura do PR (brief do agente de execução, 2026-11-25). Este resíduo é da autoria; nenhuma passada adversarial rodou."
-nota: "Números zerados = não medidos: não houve passada. PR de GUARDA que toca a própria catraca (ops/pr-merge-verified.sh): o merge segue do maestro."
+reviewer: "Revisor isolado merge-word-reviewer (opus), encomendado pelo core em 2026-11-25: FIXES_NEEDED sem bloqueio. Confirmou que o atalho OT_LIVE no _guard_pr_gate existe (o ajuste declarado é verdadeiro) e pediu A (important: a palavra com número amarra um head que o maestro não viu e valia até no PR da catraca), B (1,763 virava #1 e #763), C (palavra vencida ou gasta sombreando o pedido vivo), D (casos faltantes) e a doc do fallback de guarda. Os cinco curados neste commit, cada um com caso e mutante. elenxo_isolado fica false até o core pedir ao revisor a passada do delta."
+nota: "tokens e duration_min = 0: não medidos aqui (a rodada do revisor é do core). PR de GUARDA que toca a própria catraca (ops/pr-merge-verified.sh): o merge segue do maestro."
 ---
 
 # Passada adversarial: `feat/merge-word-with-pr-number`
@@ -49,7 +49,17 @@ certeza do que eu estou falando, execute se ok». O «pode rodar» exigia o pedi
 
 ## Achados
 
-Nenhuma passada adversarial rodou ainda; a revisão isolada é do core.
+Rodada 1, revisor isolado `merge-word-reviewer` (opus), encomendado pelo core: **FIXES_NEEDED**, sem bloqueio.
+
+| id | achado | cura | caso / mutante |
+|---|---|---|---|
+| A (important) | a palavra com número amarra o head lido na hora do hook, que o maestro nunca viu; com o `OT_LIVE` voltando antes do bloqueio da catraca, valia até para o PR que muda a própria catraca | (a1) o hook não registra em PR que toca a catraca e diz «peço o pedido com o sha na tela»; o executor também recusa (o `verify` devolve 4 para a palavra com número; lista única `_catraca_hits`); (a2) o hook recusa head com menos de 120 s (data do commit do head no forge) | otn9, otn9-MUT, otn9b, otn9b-MUT; otn10, otn10-MUT |
+| B | `1,763` virava #1 e #763 | vírgula só com espaço depois | otn16, otn16-MUT |
+| C | palavra com número vencida ou gasta sombreava o pedido vivo do mesmo PR | o `load_live` ignora a vencida/gasta e usa o pedido; sem pedido, mensagem «a palavra com número para o PR #n venceu/já foi usada: diga de novo» | otn17, otn17-MUT; otn5b |
+| D | casos faltantes | moldura pelo hook, TTL de 10 min e folga de 60 s no caminho numerado, timeout do gh, zero à esquerda, `1,763` | otn11, otn12, otn13/13b, otn14, otn15, otn16 (todos com mutante) |
+| doc | README, grafo e resíduo diziam que a palavra substitui o `--maestro` sem ressalva | ressalva escrita: PR da catraca não sai por palavra com número, e com o revisor do CI em fallback (ou PR que muda a maquinaria do revisor) o resíduo isolado segue exigido pelo gate de fallback de guarda | — |
+
+**Este PR é um desses**: muda a catraca e a maquinaria de guarda, então o merge exige o resíduo isolado; `elenxo_isolado: true` só depois da passada do delta.
 
 ## Mutantes
 
@@ -64,7 +74,7 @@ origem, mergearia); repo errado recusa (mutante: sem conferir o repo, mergearia)
 
 ## Limites declarados
 
-- Bancada: família `pr_merge_verified`, 363 ✓ e 0 ✗ (`LC_ALL=C`, `--families pr_merge_verified`). Cinco
+- Bancada: família `pr_merge_verified`, 384 ✓ e 0 ✗ (rodada 1 curada; antes 363) (`LC_ALL=C`, `--families pr_merge_verified`). Cinco
   mutantes antigos (ot12, ot19, ot20, ot23, ot26) tiveram a âncora atualizada porque as linhas do motor mudaram; o
   sentido de cada um ficou o mesmo.
 - Sem refutador neste PR: o brief pediu sem subagentes (cota alta); a revisão isolada é do core.
