@@ -2,8 +2,7 @@
 branch: docs/research-second-brain-1125
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 44f575b9ef0512b408f3e1e1d813eb41fb60ca198806adb7cff835f98f8c3818
-reviewed_code_sha256: 39c2498b5b224677d46ca69bb89195159fb79f7315f43a37a93d743af91c2657
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
@@ -34,3 +33,7 @@ Não se aplica (só dados e prosa gerada).
 ## Limites declarados
 
 - O retorno em `data/` foi versionado com os trechos que citavam arquivos do repo privado do app pessoal redigidos (marcador no lugar); o original fica no output do run. O resto é o retorno íntegro.
+
+## Re-revisão
+
+Os selos do maestro de 25/11 (decisão, ordem e evidência do MVP 0) mudaram o grafo e a SYNTHESIS depois da 1ª passada. Reconferido: selador rc 0, radar rc 0, contrato rc 0, `ops/kg-gate-ci.sh` rc 0, guarda de citação privada limpa; a evidência `E_MVP0_MEDIDA_1125` vem de relato da sessão que rodou o MVP 0 e não foi reconferida aqui (dito no nó).
