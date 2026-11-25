@@ -11,7 +11,7 @@ tokens: 269110
 duration_min: 8
 findings_fixed: 30
 verdict: FIXED
-elenxo: false
+elenxo: true
 elenxo_isolado: true
 reviewer: "attach-reviewer (opus, isolado)"
 nota: "Duas passadas do refutador do agente de execução (subagente opus, só leitura: 9 achados com 5 curados, e 12 com 8 curados) e duas rodadas da revisão isolada attach-reviewer (opus), ambas FIXES_NEEDED sem bloqueio: a 1ª com 8 itens (6 curados, 1 limite, 1 informativo), a 2ª com 6 itens, todos curados; a 3ª rodada deu APPROVE, com 3 notas baratas, curadas. elenxo_isolado: true carimbado com a autorização da sessão do core, depois da 3ª rodada. Toca .github/workflows/: toque de guarda, merge pelo one-touch do maestro. tokens e duração somam só as passadas do refutador; os da revisão isolada não foram medidos aqui."
