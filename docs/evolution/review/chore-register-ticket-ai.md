@@ -2,7 +2,8 @@
 branch: chore/register-ticket-ai
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 739e98b310eb5c89eeacc3ca96308d0903b4b52d7a1e8a76283f3c848640c2c5
+reviewed_code_sha256: 349ba9fd55efd4ee74f29a8013be45b4119cbedbf30b582678f6b45fca0bae4a
 findings_total: 5
 findings_real: 3
 findings_blocking: 2
