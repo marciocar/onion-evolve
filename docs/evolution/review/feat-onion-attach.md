@@ -2,8 +2,7 @@
 branch: feat/onion-attach
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 2a8f093a04c716e4a1a685ff1dc4c5e6508ba74b49120e1f0fee27ec97907bcd
-reviewed_code_sha256: b05ce452b8e7ec8f37d88ae3731ef34e34aa2de0a4e3c445c2416dd0f517c06b
+reviewed_diff_sha256: pendente
 findings_total: 39
 findings_real: 39
 findings_blocking: 0
@@ -282,3 +281,14 @@ reviewer: attach-delta-reviewer (opus, isolado)
    como morta, mas avisa no stderr; caso (lw) com mutante.
 
 Bancada depois das curas do delta: `--families onion_attach,session_open,baton_pulse`, 408 ✓, 0 ✗, 0 ⊘ (76 + 136 + 196).
+
+## Revisão isolada do delta, 2ª rodada: APPROVE
+
+reviewer: attach-delta-reviewer (opus, isolado), 2ª rodada sobre 6ba8f1d9e..9b7ac2194: APPROVE
+
+A reprodução agora fecha com rc 5. As fixtures (w)–(w10) não enfraqueceram o #1761, e o (lw) está correto (212 ✓
+na rodada do revisor).
+
+Commits da branch sobre a `origin/main`. A sessão do core falou em 3 (a feature e 2 de projeções); medi 5 antes
+deste registro: 2 de código (`c164cecd6`, a feature; `432d99bd5`, a cura do delta) e 3 de projeções geradas pelo
+`pr-finalize`. Este registro acrescenta um commit de resíduo, e o fechamento pode acrescentar outro de projeções.
