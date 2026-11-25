@@ -3,7 +3,6 @@ branch: feat/image-bridge
 pr: pendente
 date: 2026-11-25
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 17
 findings_real: 17
 findings_blocking: 1
