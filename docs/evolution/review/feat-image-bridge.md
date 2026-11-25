@@ -14,7 +14,7 @@ verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
 reviewer: "image-reviewer (opus, isolado), 2ª rodada sobre o delta 1cbea22c1..c32ff158c: APPROVE, 58 ✓ 0 ✗ 1 ⊘ pwsh. 1ª rodada dele: revisão encomendada pela sessão do core, separada do condutor, deu FIXES_NEEDED com 5 itens e 2 notas (a chave não vaza); todos curados, cada cura do script com caso e mutante. Antes dela, 1ª rodada: refutador (subagente general-purpose, só leitura, encomendado pelo condutor) REPROVOU com 1 bloqueio e 9 limites/nits, 9 curados (o 7 em parte)."
-nota: "TOCA GUARDA: .claude/validation/lint-selftest.sh é «fecho script» em ops/moat-targets.tsv, então o merge é pelo one-touch do maestro. tokens e duração são os do refutador da 1ª rodada; os do image-reviewer não chegaram ao condutor (0 = não medido nessa parte). O delta da 2ª rodada volta ao image-reviewer pela sessão do core. O .ps1 não roda nesta VPS (sem pwsh): a bancada confere o BOM e a config, a sintaxe fica como lacuna declarada."
+nota: "TOCA GUARDA: .claude/validation/lint-selftest.sh é «fecho script» em ops/moat-targets.tsv, então o merge é pelo one-touch do maestro. tokens e duração são os do refutador da 1ª rodada; os do image-reviewer não chegaram ao condutor (0 = não medido nessa parte). O delta da 2ª rodada volta ao image-reviewer pela sessão do core. O CI (que tem pwsh) reprovou o caso do parser em 25/11: o defeito era do CASO, não do .ps1 (pwsh -Command não entrega argumentos em $args, então o caminho chegava nulo). Curado pela sessão do core: o caminho entra como parâmetro de bloco, a falha mostra linha e mensagem, e um mutante (chave sem fechar) prova que o caso reprova. Medido com o pwsh oficial em contêiner descartável (sem rede), autorizado pelo maestro: 60 ✓ 0 ✗ 0 ⊘. A EXECUÇÃO do .ps1 num Windows segue sem medida: o 1º uso é a medida."
 ---
 
 # Passada adversarial: `feat/image-bridge`
@@ -74,3 +74,7 @@ o SIGTERM no meio do download não tem caso na bancada (a cura do trap foi confe
 - (a) o casamento do «presente» no `--check` é heurístico, e o formato do erro do Gokapi usado na fixture
   (`{"Result":"error","ErrorMessage":"File not found"}`) não tem fonte primária: confirmar na 1ª medida real.
 - (c) a sintaxe do `.ps1` segue sem conferência nesta VPS: o 1º uso no Windows é a medida.
+
+## Correção do caso do parser (sessão do core, 25/11)
+
+O CI reprovou «.ps1 com erro de sintaxe». O pwsh oficial em contêiner (`mcr.microsoft.com/powershell`, `--network none`) achou 0 erros no .ps1; o caso passava o caminho por `$args[0]`, que `pwsh -Command` não preenche. Cura: `& { param($p) … }`, saída do parser no motivo da falha e o mutante «chave sem fechar». Família image_bridge: 60 ✓ 0 ✗ 0 ⊘ com pwsh.

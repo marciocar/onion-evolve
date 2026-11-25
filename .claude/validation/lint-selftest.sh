@@ -65361,8 +65361,16 @@ inbox_make'
   fi
   if [ ! -f "${ps1}" ]; then record_fail "image-bridge: .ps1 ausente" "${ps1}"
   elif command -v pwsh >/dev/null 2>&1; then
-    if pwsh -NoProfile -NonInteractive -Command '$e=$null; [void][System.Management.Automation.Language.Parser]::ParseFile($args[0],[ref]$null,[ref]$e); if ($e.Count) { $e | % { $_.Message }; exit 1 }' "${ps1}" >/dev/null 2>&1
-    then record_pass "image-bridge: .ps1 passa no parser do PowerShell"; else record_fail "image-bridge: .ps1 com erro de sintaxe" "pwsh ParseFile"; fi
+    # -Command NÃO entrega argumentos em $args: eles são colados ao texto do comando. Por isso o caminho entra
+    # como parâmetro de um bloco (& { param($p) … }). Medido em 25/11: a forma com $args[0] lia caminho nulo e
+    # reprovava um .ps1 sem erro algum. A saída do parser vai para o motivo da falha (linha: mensagem).
+    _ib_parse() { pwsh -NoProfile -NonInteractive -Command '& { param($p) $e=$null; [void][System.Management.Automation.Language.Parser]::ParseFile($p,[ref]$null,[ref]$e); if ($e.Count) { $e | % { "{0}: {1}" -f $_.Extent.StartLineNumber,$_.Message }; exit 1 } }' "$1" 2>&1; }
+    _ib_perr="$(_ib_parse "${ps1}")"
+    if [ $? -eq 0 ]; then record_pass "image-bridge: .ps1 passa no parser do PowerShell"
+    else record_fail "image-bridge: .ps1 com erro de sintaxe" "pwsh ParseFile: $(printf '%s' "${_ib_perr}" | head -3 | tr '\n' ' ')"; fi
+    printf '%s\n' 'function Quebrada {' >> "${sb}/parsemut.ps1"; cat "${ps1}" >> "${sb}/parsemut.ps1"
+    if ! _ib_parse "${sb}/parsemut.ps1" >/dev/null; then record_pass "image-bridge: parser do .ps1 (MUT): chave sem fechar reprova"
+    else record_fail "image-bridge: parser do .ps1 (MUT)" "o mutante não derrubou o caso"; fi
   else record_skip "image-bridge: pwsh ausente — sintaxe do .ps1 NÃO conferida aqui (lacuna declarada)"; fi
   rm -rf "${sb}"
 }
