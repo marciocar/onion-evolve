@@ -13,7 +13,7 @@ findings_fixed: 16
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
-reviewer: "image-reviewer (opus, isolado): revisão encomendada pela sessão do core, separada do condutor, deu FIXES_NEEDED com 5 itens e 2 notas (a chave não vaza); todos curados, cada cura do script com caso e mutante. Antes dela, 1ª rodada: refutador (subagente general-purpose, só leitura, encomendado pelo condutor) REPROVOU com 1 bloqueio e 9 limites/nits, 9 curados (o 7 em parte)."
+reviewer: "image-reviewer (opus, isolado), 2ª rodada sobre o delta 1cbea22c1..c32ff158c: APPROVE, 58 ✓ 0 ✗ 1 ⊘ pwsh. 1ª rodada dele: revisão encomendada pela sessão do core, separada do condutor, deu FIXES_NEEDED com 5 itens e 2 notas (a chave não vaza); todos curados, cada cura do script com caso e mutante. Antes dela, 1ª rodada: refutador (subagente general-purpose, só leitura, encomendado pelo condutor) REPROVOU com 1 bloqueio e 9 limites/nits, 9 curados (o 7 em parte)."
 nota: "TOCA GUARDA: .claude/validation/lint-selftest.sh é «fecho script» em ops/moat-targets.tsv, então o merge é pelo one-touch do maestro. tokens e duração são os do refutador da 1ª rodada; os do image-reviewer não chegaram ao condutor (0 = não medido nessa parte). O delta da 2ª rodada volta ao image-reviewer pela sessão do core. O .ps1 não roda nesta VPS (sem pwsh): a bancada confere o BOM e a config, a sintaxe fica como lacuna declarada."
 ---
 
@@ -66,3 +66,11 @@ o SIGTERM no meio do download não tem caso na bancada (a cura do trap foi confe
    curl-dublê que reprova se a chave aparecer em argv (o).
 6. **Nota:** o `.ps1` escolhe a extensão pelos bytes, como o `.sh`.
 7. **Nota:** contagens corrigidas: a família tem 29 casos, cada um com o seu mutante (58 verificações), e 1 ⊘ (sem pwsh).
+
+## 3ª passada: image-reviewer (opus, isolado), 2ª rodada sobre o delta `1cbea22c1..c32ff158c` — APPROVE
+
+58 ✓ 0 ✗ 1 ⊘ (pwsh): cada mutante reprova o seu caso. Notas que ficam abertas:
+
+- (a) o casamento do «presente» no `--check` é heurístico, e o formato do erro do Gokapi usado na fixture
+  (`{"Result":"error","ErrorMessage":"File not found"}`) não tem fonte primária: confirmar na 1ª medida real.
+- (c) a sintaxe do `.ps1` segue sem conferência nesta VPS: o 1º uso no Windows é a medida.
