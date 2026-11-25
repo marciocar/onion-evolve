@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1226 itens abertos** em 184 grafo(s) com aberto (de 245 no escopo) · 173 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1223 itens abertos** em 184 grafo(s) com aberto (de 245 no escopo) · 173 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1527,15 +1527,6 @@
 |--:|---|---|---|
 | 12.0 | `Q_DIFF_SEM_NOME_PRIVADO` | private-names-2026-11 | no core, o diff que acrescenta nome de repo ou de clone de adotante não federado reprova no lint, sem lista à mão e sem imprimi |
 
-## radar-E3-2026-11-25-r28 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 11.2 | `Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125` | radar-E3-2026-11-25-r28 | o SDK do bridge sobe para 0.3.332 (o PR onion-bridge #112, ainda aberto, mira 0.3.330 e precisa de novo alvo) e o pin do revisor d |
-| 10.5 | `Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125` | radar-E3-2026-11-25-r28 | ligar os guardas de Bash da casa também ao PreSkillShellCommand, para que a diretiva de comando ou skill de fora passe pelo mesmo |
-| 7.5 | `Q_DENY_SEGURA_EM_BYPASS_1125` | radar-E3-2026-11-25-r28 | fazer o deny da casa segurar no modo da casa (bypassPermissions), com casos novos na bancada do deny e uma guarda PreToolUse indep |
-| 2.8 | `Q_CAMINHO_DE_IMAGEM_PARA_AS_SESSOES_DA_VPS_1125` | radar-E3-2026-11-25-r28 | declarar e documentar o caminho de imagem do maestro para as sessões da VPS (Remote Control pelo app, ou arquivo enviado e citado |
-
 ## dissect-forge-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1571,6 +1562,12 @@
 | 10.8 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | QUESTAO DE DESENHO (gated): a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adot |
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
+
+## radar-E3-2026-11-25-r28 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.5 | `Q_GUARDA_DE_DIRETIVA_POR_PRESKILLSHELLCOMMAND_1125` | radar-E3-2026-11-25-r28 | ligar os guardas de Bash da casa também ao PreSkillShellCommand, para que a diretiva de comando ou skill de fora passe pelo mesmo |
 
 ## forge-decide-2026-10 — 2 item(ns)
 
