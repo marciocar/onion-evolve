@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1225 itens abertos** em 183 grafo(s) com aberto (de 244 no escopo) · 173 grupo(s), agrupados por `owner:` (81 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1226 itens abertos** em 184 grafo(s) com aberto (de 246 no escopo) · 173 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -978,7 +978,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 24 item(ns)
+## maestro — 25 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -998,6 +998,7 @@
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 | 4.0 | `Q_COMPOSICAO_PERNA_CODEX_LACUNA_1122` | sinais-de-campo-2026-09 | LACUNA NOMEADA: a ponta Codex da composição segue sem medida, porque o Codex CLI não está instalado. O maestro autoriza instal |
 | 3.6 | `C_JQ_SYSTEM_LAG_1122` | a2a-outbound-2026-11 | O jq da VPS está defasado: o pacote 1.7.1 do Ubuntu 24.04 (que se declara jq-1.7) contra o jq 1.8.2 upstream (2026-06-20), que tr |
+| 3.6 | `Q_IB_DOWNLOAD_KEY_AND_WINDOWS_RUN_1125` | image-bridge-2026-11 | Faltam a primeira medida do fluxo 2 contra o Gokapi real e a primeira execução do atalho no Windows do maestro. |
 | 3.2 | `Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO` | coordenacao-sessoes-2026-10 | O índice do diário (.claude/diary/index.md) carrega um nome de host da VPS desde julho; o maestro decide se limpa. |
 | 3.0 | `D_A2A_OUTBOUND_IROH_PHASE2_1110` | a2a-outbound-2026-11 | Caminho do transporte VPS↔notebook: Fase 2 com iroh, caminho próprio ou parquear; aguarda validação das estimativas (próprio |
 | 3.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe. |
