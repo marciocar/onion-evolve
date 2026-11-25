@@ -2,8 +2,7 @@
 branch: fix/deny-field-notes-1124
 pr: pendente
 date: 2026-11-24
-reviewed_diff_sha256: b0e147a864d0e67f786ec7d279e4b216d11219047096196de620f0ad23e0586c
-reviewed_code_sha256: 2b8e2eb61d879f9ff560c9a9b062c8915040973dcee9f7209aabbf06ae6977e0
+reviewed_diff_sha256: pendente
 findings_total: 13
 findings_real: 13
 findings_blocking: 4
@@ -12,8 +11,8 @@ duration_min: 0
 findings_fixed: 11
 verdict: REJECTED_AND_FIXED
 elenxo: true
-elenxo_isolado: false
-reviewer: "Passada do próprio agente de execução, com medição no motor real do Claude Code 2.1.331 (ops/testing/permissions-deny-bench.py), no git real e no hook. A revisão isolada da sessão principal REPROVOU com 2 bloqueios e 3 limites, curados nesta re-revisão (seção Revisão isolada)."
+elenxo_isolado: true
+reviewer: "Passada do agente de execução (motor real 2.1.331, git real, hook) + REFUTADOR INDEPENDENTE lançado pela sessão principal, com brief sem a conclusão do condutor, em 2 rodadas: a 1ª (head d45d17edc) REPROVOU com 2 bloqueios (força e clean em outro repo) e 3 limites; a 2ª (head 084fa718379e) APROVOU sem bloqueio, com 4 limites, curados ou declarados na seção Revisão isolada"
 nota: "tokens e duração não medidos (0): a passada é do condutor, misturada à construção. Os achados 4 e 9 são limites declarados, e o achado 8 foi curado em parte (resto declarado)."
 ---
 
@@ -138,3 +137,11 @@ falha na main (medido nos dois checkouts). Ela pediu quatro curas pequenas, toda
 
 Ficam declarados, sem cura: o alias vindo de `--config-env` ou de `GIT_CONFIG_*`, e o falso positivo de alias com
 nome de comando embutido (`-c alias.status=…`). O git ignora esse alias, e a lib o expande.
+
+## 2ª rodada isolada (refutador independente, head 084fa718379e)
+
+APROVOU, sem bloqueio: os 2 furos curados (força e `clean` em outro repo dão rc 2 com `CLAUDE_PROJECT_DIR` setado, contra
+origin estranho), a lease de outro projeto com `+`/`-f` vira força dura, os motivos do `deny-retired.tsv` corretos, e o
+e13 da família `adopter_guard` confirmado como falha da própria main (279bcff2e). Restaram 4 limites, tratados no head
+seguinte: alias por `-c` sem caixa, alias encadeado e aspas no valor (or5–or7, curados) e flags do `clean` por chaves
+(or8, curado); `--config-env`, alias por `GIT_CONFIG_*` e o falso positivo de `alias.status` ficaram declarados.
