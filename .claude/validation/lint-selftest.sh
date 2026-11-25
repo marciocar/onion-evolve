@@ -65372,7 +65372,7 @@ inbox_make'
     # motivo). O caso só conta se o parser disser exatamente «Missing closing '}'», nunca por falha do pwsh.
     { cat "${ps1}"; printf '\n%s\n' 'function Quebrada {'; } > "${sb}/parsemut.ps1"
     if _ib_mout="$(_ib_parse "${sb}/parsemut.ps1")"; then record_fail "image-bridge: parser do .ps1 (MUT)" "o mutante não derrubou o caso"
-    elif printf '%s' "${_ib_mout}" | grep -qF "Missing closing '}'"; then record_pass "image-bridge: parser do .ps1 (MUT): chave sem fechar no fim reprova com «Missing closing '}'»"
+    elif grep -qF "Missing closing '}'" <<< "${_ib_mout}"; then record_pass "image-bridge: parser do .ps1 (MUT): chave sem fechar no fim reprova com «Missing closing '}'»"
     else record_fail "image-bridge: parser do .ps1 (MUT)" "reprovou por outro motivo: $(printf '%s' "${_ib_mout}" | head -2 | tr '\n' ' ')"; fi
   else record_skip "image-bridge: pwsh ausente — sintaxe do .ps1 NÃO conferida aqui (lacuna declarada)"; fi
   rm -rf "${sb}"
