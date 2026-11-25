@@ -191,6 +191,9 @@ GH_SETDEFAULT = [False]          # `gh repo set-default` na string: o repositór
 DEFAULT_RE = re.compile(r"symbolic-ref|origin/HEAD|defaultBranchRef|default_branch|init\.defaultBranch")
 CWD = [None]                     # pilha do diretório julgado; None = a raiz do projeto
 MOAT = False                     # juiz do MOAT por alvo (moat-judge.py), ligado só pelo pretooluse-moat-gate.sh
+# ESPELHO DO DENY (SAC-551, 2026-11-25): o pretooluse-deny-mirror.sh liga ONION_DENY_MIRROR=1 e a lib passa a emitir também
+# as linhas `rm` (as outras guardas não as pedem, e a saída delas segue idêntica sem a variável)
+MIRROR = os.environ.get("ONION_DENY_MIRROR") == "1"
 # FUNÇÃO DEFINIDA NA PRÓPRIA STRING (SAC-148, 2026-10-15): `run(){ bash -c "$1"; }; run "<comando>"` passava os
 # vetos com rc 0 — o corpo era julgado na DEFINIÇÃO, com `$1` dinâmico, e a CHAMADA era um comando desconhecido
 # com texto inerte como argumento. Agora o corpo é guardado e, a cada chamada, re-julgado com os parâmetros
@@ -1153,6 +1156,17 @@ def relevant(words):
     return bool(re.search(r"mergePullRequest|enablePullRequestAutoMerge|\bgh\b[^;&|\n]*\b(merge|api)\b|\bgit\b[^;&|\n]*\bpush\b", t))
 
 
+def relevant_mirror(text):
+    """Forma do que só o deny cobria (espelho, SAC-551): reescrever a história, apagar a raiz/home/.git, apagar repo ou
+    release, mudar a visibilidade. Só conta com ONION_DENY_MIRROR=1; sem ela as outras guardas veem o mesmo de sempre."""
+    if not MIRROR:
+        return False
+    t = " ".join(text) if isinstance(text, (list, tuple)) else str(text)
+    return bool(re.search(r"\bgit\b[^;&|\n]*\bfilter-(branch|repo)\b"
+                          r"|\brm\b[^;&|\n]*\s-(-recursive\b|[A-Za-z]*[rR])"
+                          r"|\bgh\b[^;&|\n]*\b(repo\s+delete|release\s+delete|repo\s+edit\b[^;&|\n]*--visibility)", t))
+
+
 def relevant_loose(words):
     """Nome dinâmico/IFS: relevante se um argumento É o verbo (token inteiro), ou se a forma gh/git
     aparece COLADA por separador de IFS (`gh${IFS}pr${IFS}merge`). Substring solta vetava
@@ -1558,7 +1572,14 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
             return
         return                                          # `bash x.sh`: script em ARQUIVO, fronteira
     if base == "eval":
-        if relevant_tokens(words) or relevant([" ".join(words)]):
+        # `eval "<texto>"` executa o texto como código. LITERAL (sem `$`, crase nem substituição) ele se analisa como
+        # `sh -c`: a 1ª forma só marcava inanalisável o que citava push ou merge, e `eval "git push --force origin x"`
+        # (alvo fora da main) e `eval "git clean -fdx"` passavam todos os vetos com rc 0 (SAC-551, medido 2026-11-25)
+        txt = " ".join(words[1:])
+        if txt and not DYNAMIC.search(txt):
+            scoped(txt, depth + 1)
+            return
+        if relevant_tokens(words) or relevant([" ".join(words)]) or relevant_mirror(words):
             emit_unanalyzable(words, CWD[-1])
         return
     if base == "xargs":
@@ -1617,6 +1638,10 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
             return
         if line:
             OUT.append(line)
+    elif base == "rm" and MIRROR:
+        # o juiz do espelho decide (recursivo + alvo da raiz/home/.git); leva o diretório julgado, porque `cd <fixture> &&
+        # rm -rf .git` apaga o .git de uma cópia de trabalho, não o do projeto (falso positivo medido no corpus de transcripts)
+        OUT.append("rm " + shlex.join(words[1:]) + " #ONION_DIR=" + shlex.quote(CWD[-1] or JCWD or ""))
     elif base == "gh":
         if ("repo" in words and "set-default" in words) or \
                 any(not slug_is_foreign(x) for x in gh_explicit_slugs(words, env)):
@@ -1646,7 +1671,7 @@ except Exception as e:
     # QUALQUER exceção — inclusive bug deste analisador — passa pelo MESMO critério de forma
     OUT[:] = [l for l in OUT if not l.startswith("__ONION_UNANALYZABLE__")] + \
              [l for l in OUT if l.startswith("__ONION_UNANALYZABLE__")]
-    if relevant([raw]):
+    if relevant([raw]) or relevant_mirror(raw):
         emit_unanalyzable(raw)
     if MOAT:
         moat_unanalyzable(raw, "comando que o analisador não conseguiu ler")

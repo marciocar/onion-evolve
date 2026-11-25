@@ -115,6 +115,13 @@ if printf '%s\n' "$inv" | grep -E '^__ONION_UNANALYZABLE__ merge=[01] main=1 ::'
   echo "GUARDA-PRETOOLUSE: comando que cita push e NÃO pode ser analisado com certeza — reescreva sem eval, nome de comando em variável, xargs ou brace expansion (force-push na main é irreversível)." >&2
   exit 2
 fi
+# INANALISÁVEL com FORÇA DURA em qualquer alvo → FECHADO (SAC-551, 2026-11-25): `eval "git push -f origin $B"` saía
+# `main=0` e passava com rc 0, embora a força dura caia em qualquer branch desde 2026-11-24. O lease segue livre.
+if printf '%s\n' "$inv" | sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p' | grep -E '\bpush\b' \
+   | grep -qE '(^|[[:space:]])(--force([[:space:]]|$)|--mirror([[:space:]]|$)|-[a-eg-z]*f[a-z]*([[:space:]]|$)|\+[^[:space:]])'; then
+  echo "GUARDA-PRETOOLUSE: comando com forma de force-push (-f, --force, refspec com + ou --mirror) que NÃO pode ser analisado com certeza — reescreva sem eval, nome de comando em variável ou xargs. Force-push reescreve a história do remoto em qualquer branch; se for deliberado, o maestro roda fora da sessão." >&2
+  exit 2
+fi
 push_lines=$(printf '%s\n' "$inv" | grep -E '^git[[:space:]]+push([[:space:]]|$)' || true)
 [ -z "$push_lines" ] && exit 0
 # FORÇA DURA EM QUALQUER BRANCH (desde 2026-11-24, fix/deny-field-notes-1124). A linha canônica diz `--force` para
