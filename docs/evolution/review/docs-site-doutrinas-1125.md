@@ -2,7 +2,8 @@
 branch: docs/site-doutrinas-1125
 pr: 1769
 date: 2026-11-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ea08acd801529422ec2f73d56b135602046a633023ea1081da18e65625cfe7e4
+reviewed_code_sha256: c9492e24b21dedb486d88b26a7550f97e432aa8359355e39e3f52c59defea22d
 findings_total: 9
 findings_real: 9
 findings_blocking: 2
