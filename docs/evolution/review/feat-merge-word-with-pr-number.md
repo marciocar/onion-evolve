@@ -2,8 +2,7 @@
 branch: feat/merge-word-with-pr-number
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: ddd7649602257af9648a011bd36cb002e245dbbf01c3462e45f39326365315ad
-reviewed_code_sha256: 512b3e4ff4d789921759a2e4ccdecdb17436da14d571bdb2b6786ee78fe8d767
+reviewed_diff_sha256: pendente
 findings_total: 8
 findings_real: 8
 findings_blocking: 0
@@ -12,8 +11,8 @@ duration_min: 0
 findings_fixed: 8
 verdict: FIXED
 elenxo: true
-elenxo_isolado: false
-reviewer: "Revisor isolado merge-word-reviewer (opus), encomendado pelo core em 2026-11-25: FIXES_NEEDED sem bloqueio. Confirmou que o atalho OT_LIVE no _guard_pr_gate existe (o ajuste declarado é verdadeiro) e pediu A (important: a palavra com número amarra um head que o maestro não viu e valia até no PR da catraca), B (1,763 virava #1 e #763), C (palavra vencida ou gasta sombreando o pedido vivo), D (casos faltantes) e a doc do fallback de guarda. Os cinco curados neste commit, cada um com caso e mutante. elenxo_isolado fica false até o core pedir ao revisor a passada do delta. Rodada 2 (mesmo revisor, sobre 46bfb6126): APPROVE com três nits (previous_filename/paginação no hook, regex da catraca em dois lugares, idade do head pela committer.date forjável), curados no lote seguinte com a decisão do core (carimbo do servidor pelo check-suite)."
+elenxo_isolado: true
+reviewer: "merge-word-reviewer (opus, isolado), 3ª rodada sobre 46bfb6126..2819d9c42: APPROVE. Rodada 1: FIXES_NEEDED sem bloqueio (A, B, C, D e doc, curados). Rodada 2 sobre 46bfb6126: APPROVE com três nits (previous_filename e paginação no hook, regex da catraca em dois lugares, idade do head pela committer.date forjável), curados com a decisão do core (carimbo do servidor pelo check-suite). Rodada 3: APPROVE, 394 ✓, nits curados com mutante; dois tetos declarados."
 nota: "tokens e duration_min = 0: não medidos aqui (a rodada do revisor é do core). PR de GUARDA que toca a própria catraca (ops/pr-merge-verified.sh): o merge segue do maestro."
 ---
 
@@ -68,6 +67,13 @@ lote seguinte junto com a decisão de desenho do core:
 | nit 1 | o hook lia só o nome novo da renomeação, e o core pediu também a paginação | `previous_filename` e `--paginate` com `per_page=100`, o mesmo jq do executor | otn20 e otn20-MUT; otn21 e otn21-MUT |
 | nit 2 | a regex da catraca mora em dois lugares (motor e executor) | a bancada compara as duas byte a byte | otn22 e otn22-MUT |
 | nit 3 / decisão do core | a idade do head vinha da `committer.date`, que quem commita escreve | carimbo do servidor: `created_at` mais antigo dos check-suites do sha; sem check-suite, recusa | otn18 e otn18-MUT (data forjada); otn19 e otn19-MUT |
+
+Rodada 3, mesmo revisor, sobre `46bfb6126..2819d9c42`: **APPROVE** (394 ✓, os três nits curados com mutante), com dois
+tetos a declarar, escritos aqui e no README:
+
+1. o check-suite é por **sha**, não por push: reempurrar um sha antigo herda o carimbo antigo. Risco baixo: o executor
+   exige CI verde no head e o PR da catraca já não sai por palavra com número;
+2. repo **sem CI** nunca registra palavra com número (falha fechada): ali segue o pedido e o «pode rodar» solto.
 
 **Este PR é um desses**: muda a catraca e a maquinaria de guarda, então o merge exige o resíduo isolado; `elenxo_isolado: true` só depois da passada do delta.
 
