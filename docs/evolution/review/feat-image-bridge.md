@@ -2,7 +2,8 @@
 branch: feat/image-bridge
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4efd51c25b68bf2175e0e91ccb605af93da12546c0ac0a3c3bd6a22051d26853
+reviewed_code_sha256: 4c13e35ec2d09999261608bb6c7a136de9842a91c5344d527079003367ecbb90
 findings_total: 10
 findings_real: 10
 findings_blocking: 1
