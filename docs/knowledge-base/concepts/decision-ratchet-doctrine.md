@@ -62,7 +62,7 @@ número diria coisas opostas no mesmo script. Por isso a catraca usa **letra** p
 | classe | quem decide | o que entra (quando a régua ligar) |
 |---|---|---|
 | **A** | o automático, com aviso e registro | **só ato que não muda estado**, na lista do selo: ler no privilégio de quem pede, responder no fio do pedido, medir, re-carimbar um nó do grafo. Responder e re-carimbar escrevem algo, mas o selo os conta como «não muda estado»: não mexem em código, serviço nem permissão |
-| **B** | o maestro, digitando **«pode rodar»** | ato que muda estado, se desfaz e não está na lista fixa de C. A frase vale **sozinha**: é o prompt inteiro, digitado por ele |
+| **B** | o maestro, digitando **«pode rodar»** | ato que muda estado, se desfaz e não está na lista fixa de C. A frase vale **sozinha**: é o prompt inteiro, digitado por ele. Com o número do PR (`pode rodar 1763`, `merge #1763`, desde 25/11/2026) dispensa o pedido prévio da sessão; o executor confere os gates na hora (`D_OT_WORD_WITH_PR_NUMBER_1125`) |
 | **C** | **só o maestro**, pelo caminho próprio do ato | a lista fixa (§3) e todo ato que a régua não conhece |
 
 **Por que A é tão estreita agora.** Medido em 20/11/2026: as sessões rodam com o privilégio pleno do
@@ -140,6 +140,8 @@ Descer de classe é a única direção que precisa de prova. A ordem é fixa:
 1. **Curar a fricção do «pode rodar».** Medido: de 15 tentativas de aprovação, **10 foram recusadas**
    (6 por moldura de outra sessão, 2 porque a frase não era o prompt inteiro, 2 por pedido vencido). Um
    PR precisou de 4 aprovações porque o commit mudou. Classe B com essa fricção vira C na prática.
+   Primeira cura (25/11/2026): a frase com o número do PR (`pode rodar 1763`) dispensa o pedido prévio, e o
+   maestro deixa de esperar «o momento certo» para digitar (`D_OT_WORD_WITH_PR_NUMBER_1125`).
 2. **Modo observar por 30 dias.** A catraca classifica e registra, **não decide**. Mede quantos B o
    maestro dá por dia e quantas reversões houve, inclusive fora do git, pelo carimbo do **resultado** de
    cada ato.

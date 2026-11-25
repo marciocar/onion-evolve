@@ -27425,6 +27425,10 @@ if [ -n "${STUB_GH_NEEDS_REPO:-}" ] && [ -z "${GH_REPO:-}" ] && [[ " $args " != 
   echo "failed to run git: fatal: not a git repository (or any of the parent directories): .git" >&2; exit 1
 fi
 case "$args" in
+  # «pode rodar 1763» (2026-11-25): o hook lê o PR no forge (estado, merged, head) na hora da palavra
+  *"api repos/"*"/pulls/"*"head.sha"*)
+      [ "${GH_PRAPI_RC:-0}" -ne 0 ] && { echo "gh: Not Found (HTTP 404)" >&2; exit "${GH_PRAPI_RC}"; }
+      printf '%s\t%s\t%s\t%s\n' "${GH_PRAPI_STATE:-open}" "${GH_PRAPI_MERGED:-false}" "${STUB_HEAD_SHA:-deadbeefdeadbeefdeadbeefdeadbeefdeadbeef}" "${GH_HEAD_REF:-feat/alguma-coisa}"; exit 0 ;;
   # o aviso de serialização (repo alheio): os PRs abertos, e os arquivos de cada um por arquivo em STUB_PRFILES_DIR/<n>
   *"pr list"*) [ -n "${GH_OPEN_PRS:-}" ] && printf '%s\n' ${GH_OPEN_PRS}; exit 0 ;;
   *"pr view"*"--json files"*)
@@ -28020,11 +28024,11 @@ STUB
   _otrun() { # $1=cwd $2=script ; resto = args → _oto, _otrc (o merge fica em ${d}/merge-args)
     local cwd="$1" scr="$2"; shift 2
     echo 0 > "${d}/n"; : > "${d}/merge-args"
-    _oto="$(cd "${cwd}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="OPEN|null" \
+    _oto="$(cd "${cwd}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/merge-args" GH_STATE_BEFORE="${OT_STATE_BEFORE:-OPEN|null}" \
       GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged GH_HEAD_REF=feat/x GH_WF_COUNT=5 \
       GH_PR_FILES="${OT_FILES-${_otm1}}" GH_RESIDUE="" GH_BEHIND_BY="${OT_BEHIND:-0}" STUB_HEAD_SHA="${OT_SHA:-}" ONION_MERGE_POLL_SECS=0 \
       XDG_STATE_HOME="${_otst}" CLAUDE_CONFIG_DIR="${_otcc}" CLAUDE_CODE_SESSION_ID="${_otsid}" \
-      env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${scr}' 999 $*; exit \$?" 2>&1)"; _otrc=$?
+      env -u ONION_PR_MERGE_VERIFIED_TEST "${fcl}" -c "bash '${scr}' ${OT_PR:-999} $*; exit \$?" 2>&1)"; _otrc=$?
   }
   _othook() { # $1=prompt $2=prompt_id → a saída do hook, invocado como o runner (payload JSON no stdin)
     python3 -I -c 'import json,sys;print(json.dumps({"session_id":sys.argv[1],"transcript_path":sys.argv[2],"prompt_id":sys.argv[3],"prompt":sys.argv[4],"hook_event_name":"UserPromptSubmit","cwd":"/x","permission_mode":"bypassPermissions"}))' \
@@ -28131,7 +28135,7 @@ print(json.dumps(e))' "$@" >> "${_ottp}"
   _otn=$((_otn+1)); _otpid="pid-${_otn}"
   _otrun "${fc}" "${_pi}" --one-touch-request; _othook "pode rodar" "${_otpid}" >/dev/null
   _ottr "${_otpid}" - - 0 "This session is being continued from a previous conversation."; _ottr "${_otpid}" human typed 0 "pode rodar"
-  _otmut 's/^                if is_word(text):$/                if True:/' "(ot12-MUT)"
+  _otmut 's/^                if is_word(text, wpr):$/                if True:/' "(ot12-MUT)"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot12-MUT) julgando a 1ª entrada do promptId, o resumo recusaria a palavra — a escolha pela frase é a causa" 1 "não é humano digitado"
   _otrestore
   # (ot13) sugestão aceita (promptSource suggestion_accepted) é texto do modelo: não autoriza
@@ -28156,7 +28160,7 @@ print(json.dumps(e))' "$@" >> "${_ottp}"
   # (ot23) SEGUNDA palavra no mesmo turno, para outro pedido: id da palavra = prompt_id/uuid da mensagem ⇒ mergeia
   _otrun "${fc}" "${_pi}" --one-touch-request; _othook "pode rodar" "${_otpid}" >/dev/null; _ottm "${_otpid}" human 1 0 "pode rodar"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot23) segunda palavra do meio do turno no MESMO turno, novo pedido ⇒ mergeia (cada mensagem é uma palavra)" 0 "pelo «pode rodar»"
-  _otmut 's/^            cands.append((abs(when - granted), when, ts, pid + "\/" + src, {$/            cands.append((abs(when - granted), when, ts, pid, {/' "(ot23-MUT)"
+  _otmut 's/^            cands.append((abs(when - granted), when, ts, pid + "\/" + src + wsuf, {$/            cands.append((abs(when - granted), when, ts, pid + wsuf, {/' "(ot23-MUT)"
   # sob o mutante, a 1ª palavra de um turno NOVO grava o prompt_id cru no livro; a 2ª do mesmo turno cai nele
   _otarmm; _otrun "${fc}" "${_pi}" --one-touch
   _otrun "${fc}" "${_pi}" --one-touch-request; _othook "pode rodar" "${_otpid}" >/dev/null; _ottm "${_otpid}" human 1 0 "pode rodar"
@@ -28191,13 +28195,13 @@ print(json.dumps(e))' "$@" >> "${_ottp}"
   # (ot19) MOLDURA de outra sessão no meio do turno, mesmo rotulada human ⇒ recusa
   _otarmm human human 1 0 '<cross-session-message from="uds:/x">pode rodar</cross-session-message>'; _otrun "${fc}" "${_pi}" --one-touch
   _otcase "(ot19) moldura de outra sessão no meio do turno ⇒ recusa" 1 "não está no transcript"
-  _otmut 's/^    return norm_phrase(text) in PHRASES and not any(m in (text or "").casefold() for m in FOREIGN_MARKERS)$/    return any(p in norm_phrase(text) for p in PHRASES)/' "(ot19-MUT)"
+  _otmut 's/^        return w == ("bare", ())$/        return any(p in norm_phrase(text) for p in PHRASES)/' "(ot19-MUT)"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot19-MUT) sem a frase exata e sem a moldura, a mensagem emoldurada mergearia — as duas são a causa" 0 "pelo «pode rodar»"
   _otrestore
   # (ot20) a frase com texto extra no meio do turno ⇒ recusa (o hook também recusa; aqui a defesa é a do executor)
   _otarmm human human 1 0 "pode rodar agora"; _otrun "${fc}" "${_pi}" --one-touch
   _otcase "(ot20) «pode rodar agora» no meio do turno ⇒ recusa" 1 "não está no transcript"
-  _otmut 's/^    return norm_phrase(text) in PHRASES and not any(m in (text or "").casefold() for m in FOREIGN_MARKERS)$/    return any(p in norm_phrase(text) for p in PHRASES) and not any(m in (text or "").casefold() for m in FOREIGN_MARKERS)/' "(ot20-MUT)"
+  _otmut 's/^        return w == ("bare", ())$/        return any(p in norm_phrase(text) for p in PHRASES) and not any(m in (text or "").casefold() for m in FOREIGN_MARKERS)/' "(ot20-MUT)"
   _otrun "${fc}" "${_pi}" --one-touch; _otcase "(ot20-MUT) com a frase por substring, o texto extra mergearia — a frase exata é a causa" 0 "pelo «pode rodar»"
   _otrestore
   # (ot21) prompt_id que não é o do turno: a mensagem humana está em OUTRO turno ⇒ recusa
@@ -28232,7 +28236,7 @@ L.append(m);open(sys.argv[1],"w").write("\n".join(L)+"\n")' "${_ottp}" "${_otpid
 print(o.ledger_hit(["HASH_A\tP/*\tx\n"],{"hash":"HASH_B"},"P/S"), o.ledger_hit(["HASH_A\tP/*\tx\n"],{"hash":"HASH_B"},"P"), o.ledger_hit(["HASH_A\tP/*\tx\n"],{"hash":"HASH_B"},"Q/S"))' "$(dirname "${_ote}")")"
   if [ "${o}" = "True True False" ]; then record_pass "pr-merge-verified: (ot26) marca «P/*» do consume sem transcript gasta P e P/uuid, e só o turno P"
   else record_fail "pr-merge-verified: (ot26)" "out=${o}"; fi
-  _otmut 's/^    fam = wid.split("\/", 1)\[0\] + "\/\*"$/    fam = "\\0"/' "(ot26-MUT)"
+  _otmut 's/^    fam = re.split(r"\[\/#\]", wid, 1)\[0\] + "\/\*"$/    fam = "\\0"/' "(ot26-MUT)"
   o="$(python3 -I -c 'import sys;sys.path.insert(0,sys.argv[1]);import one_touch as o
 print(o.ledger_hit(["HASH_A\tP/*\tx\n"],{"hash":"HASH_B"},"P/S"))' "$(dirname "${_ote}")")"
   if [ "${o}" = "False" ]; then record_pass "pr-merge-verified: (ot26-MUT) sem a marca de família, a palavra P/uuid ficaria livre — a marca é a causa"
@@ -28330,6 +28334,115 @@ p=sys.argv[2];a=json.load(open(p));r=a["request"];r["created_at"]=o.utc(o.time.t
   done
   if [ -n "${o}" ] && grep -qE $'^[0-9TZ:-]+\tgrant\tmerge\t1\t[0-9]+\t' "${_otst}/onion/approvals/usage.tsv"; then record_pass "pr-merge-verified: (ot11) o log da autorização segue o formato dos atos («── ato …» e «✓ RESULTADO … level=1 wait_s=N») e o usage.tsv mede a espera"
   else record_fail "pr-merge-verified: (ot11)" "logs=$(ls "${_otst}/onion/approvals/acts/" 2>/dev/null | tr '\n' ' ')"; fi
+  # ── «PODE RODAR 1763» (2026-11-25): a PALAVRA COM NÚMERO. Sem pedido prévio, a frase que nomeia o PR (a mensagem
+  # inteira) grava uma aprovação por número com o head lido no forge na hora; o executor roda os gates de sempre e
+  # confere o head, o repo, a frase humana no transcript e o uso único POR PR. O hook roda com o gh falso no PATH e o
+  # cwd num clone cujo origin é o core de sandbox; o executor é a cópia cujo sha256 o hook amarrou (ops/ do fc).
+  local _otx_core="${d}/othook-core" _otx_outro="${d}/othook-outro" _otsx="${fc}/ops/pr-merge-verified.sh"
+  local _otapn="${_otst}/onion/approvals/approvals/${_otsid}.pr-999.json" _otapn8="${_otst}/onion/approvals/approvals/${_otsid}.pr-998.json"
+  git init -q "${_otx_core}"; git -C "${_otx_core}" remote add origin https://github.com/onion-bancada/core.git
+  git init -q "${_otx_outro}"; git -C "${_otx_outro}" remote add origin https://github.com/onion-bancada/outro.git
+  _othookn() { # $1=prompt $2=prompt_id [$3=cwd] → a saída do hook (gh falso no PATH; GH_PRAPI_* do caso vêm de fora)
+    python3 -I -c 'import json,sys;print(json.dumps({"session_id":sys.argv[1],"transcript_path":sys.argv[2],"prompt_id":sys.argv[3],"prompt":sys.argv[4],"hook_event_name":"UserPromptSubmit","cwd":sys.argv[5],"permission_mode":"bypassPermissions"}))' \
+      "${_otsid}" "${_ottp}" "$2" "$1" "${3:-${_otx_core}}" | PATH="${d}:${PATH}" GH_HEAD_REF=feat/x XDG_STATE_HOME="${_otst}" CLAUDE_CONFIG_DIR="${_otcc}" bash "${_oth}" 2>&1 \
+      | python3 -I -c 'import json,sys
+t=sys.stdin.read()
+try: print(json.loads(t)["hookSpecificOutput"]["additionalContext"])
+except Exception: print(t)'
+  }
+  _otclean() { rm -f "${_otappr}" "${_otapn}" "${_otapn8}" "${_otst}/onion/approvals/requests/${_otsid}.json"; }
+  _otword() { # $1=prompt [$2=cwd] → sem pedido prévio, a palavra pelo hook e a mesma frase digitada no transcript; deixa _otpid e o
+    _otclean; _otn=$((_otn+1)); _otpid="pid-${_otn}"
+    o="$(_othookn "$1" "${_otpid}" "${2:-}")"
+    _ottr "${_otpid}" human "${OT_SRC:-typed}" 0 "${OT_TEXT:-$1}"
+  }
+  # (otn1) «pode rodar 999», sem pedido prévio ⇒ o hook registra e o executor mergeia o PR que toca a catraca
+  _otword "pode rodar 999"
+  if grep -qF "palavra registrada" <<< "${o}" && grep -qF -- "999 --one-touch" <<< "${o}" && [ -f "${_otapn}" ]; then
+    record_pass "pr-merge-verified: (otn1) «pode rodar 999» sem pedido prévio ⇒ o hook registra a palavra daquele PR e diz o comando"
+  else record_fail "pr-merge-verified: (otn1)" "out=${o}"; fi
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn1b) o executor com a palavra com número ⇒ mergeia" 0 "pelo «pode rodar» (nível 1)"
+  _otmut 's/^    if word and word\[0\] == "pr":$/    if False:/' "(otn1-MUT)"
+  _otword "pode rodar 999"
+  if [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn1-MUT) sem o ramo da palavra com número, nada se registra — o ramo é a causa"
+  else record_fail "pr-merge-verified: (otn1-MUT)" "o mutante também registrou"; fi
+  _otrestore
+  # (otn2) dois números na mesma mensagem ⇒ duas palavras, cada uma de uso único: os dois PRs mergeiam
+  _otword "Merge #999 e #998."
+  if [ -f "${_otapn}" ] && [ -f "${_otapn8}" ]; then record_pass "pr-merge-verified: (otn2) «merge #999 e #998» ⇒ registra as duas palavras"
+  else record_fail "pr-merge-verified: (otn2)" "out=${o}"; fi
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn2b) o 1º PR da frase dupla ⇒ mergeia" 0 "pelo «pode rodar»"
+  OT_PR=998 _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn2c) o 2º PR da mesma frase ⇒ mergeia (o uso é por PR)" 0 "pelo «pode rodar»"
+  _otmut 's/^    wsuf = ("#%d" % int(wpr)) if wpr is not None else ""   # .*$/    wsuf = ""/' "(otn2-MUT)"
+  _otword "merge #999 e #998"
+  _otrun "${fc}" "${_otsx}" --one-touch
+  OT_PR=998 _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn2-MUT) com o id da palavra sem o número, o 2º PR seria dado como usado — o número no id é a causa" 1 "já foi usada"
+  _otrestore
+  # (otn3) a frase com número e texto a mais ⇒ não registra, e diz por quê
+  _otword "pode rodar 999 agora"
+  if grep -qF "a mensagem inteira" <<< "${o}" && [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn3) «pode rodar 999 agora» ⇒ o hook não registra"
+  else record_fail "pr-merge-verified: (otn3)" "out=${o}"; fi
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn3b) sem a palavra registrada, o executor recusa" 1 "não há autorização viva"
+  _otmut 's/^    m = _WORD_PR_RE.fullmatch(t)$/    m = _WORD_PR_RE.match(t)/' "(otn3-MUT)"
+  _otword "pode rodar 999 agora"
+  if [ -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn3-MUT) com a frase pelo começo, o texto a mais registraria — a frase inteira é a causa"
+  else record_fail "pr-merge-verified: (otn3-MUT)" "o mutante também não registrou"; fi
+  _otrestore
+  _otword "merge 999?"
+  if [ ! -f "${_otapn}" ] && grep -qF "não registrei" <<< "${o}"; then record_pass "pr-merge-verified: (otn3c) «merge 999?» (pergunta) ⇒ não registra"
+  else record_fail "pr-merge-verified: (otn3c)" "out=${o}"; fi
+  # (otn4) PR inexistente ou fechado no forge ⇒ o hook não registra e o executor recusa
+  GH_PRAPI_RC=1 _otword "pode rodar 999"
+  if grep -qF "inexistente" <<< "${o}" && [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn4) PR inexistente ⇒ o hook não registra"
+  else record_fail "pr-merge-verified: (otn4)" "out=${o}"; fi
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn4b) PR inexistente ⇒ o executor recusa" 1 "não há autorização viva"
+  GH_PRAPI_STATE=closed _otword "pode rodar 999"
+  if grep -qF "fechado" <<< "${o}" && [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn4c) PR fechado ⇒ o hook não registra"
+  else record_fail "pr-merge-verified: (otn4c)" "out=${o}"; fi
+  _otmut 's/^            if state != "open" or merged == "true":$/            if False:/' "(otn4c-MUT)"
+  GH_PRAPI_STATE=closed _otword "pode rodar 999"
+  if [ -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn4c-MUT) sem ler o estado, o PR fechado registraria — a leitura é a causa"
+  else record_fail "pr-merge-verified: (otn4c-MUT)" "o mutante também não registrou"; fi
+  _otrestore
+  _otword "pode rodar 999"
+  OT_STATE_BEFORE="CLOSED|null" _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn4d) palavra registrada e o PR fechado antes do executor ⇒ recusa antes de qualquer efeito" 1 "está FECHADO"
+  cp "${_otsx}" "${d}/pmv-otn-intacto.sh"
+  sed -i 's/^  CLOSED\\|\*) die /  CLOSED\\|*-MUT) die /' "${_otsx}"
+  cmp -s "${_otsx}" "${d}/pmv-otn-intacto.sh" && record_fail "pr-merge-verified: (otn4d-MUT)" "a âncora do mutante sumiu"
+  _otword "pode rodar 999"
+  OT_STATE_BEFORE="CLOSED|null" _otrun "${fc}" "${_otsx}" --one-touch
+  if grep -qF "está FECHADO" <<< "${_oto}"; then record_fail "pr-merge-verified: (otn4d-MUT)" "o mutante também recusou pelo estado"
+  else record_pass "pr-merge-verified: (otn4d-MUT) sem a recusa do estado CLOSED, o executor seguiria adiante — a recusa é a causa"; fi
+  cp "${d}/pmv-otn-intacto.sh" "${_otsx}"
+  # (otn5) o head mudou depois da palavra ⇒ recusa (e gasta a palavra)
+  _otword "pode rodar 999"
+  OT_SHA="${_otc40}" _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn5) head mudado depois da palavra com número ⇒ recusa" 1 "o sha mudou"
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn5b) de volta ao head antigo, a palavra já foi gasta" 1 "já foi usada"
+  _otmut 's/^        if t.get("sha") != a.get("sha") or t.get("ref") != a.get("ref"):$/        if False:/' "(otn5-MUT)"
+  _otword "pode rodar 999"
+  OT_SHA="${_otc40}" _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn5-MUT) sem conferir o head, o head novo mergearia — a conferência é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (otn6) a frase com número por sugestão aceita ⇒ recusa
+  OT_SRC=suggestion_accepted _otword "pode rodar 999"
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn6) «pode rodar 999» por sugestão aceita ⇒ recusa" 1 "sugestão aceita nunca autoriza"
+  _otmut "${_otorig}" "(otn6-MUT)"
+  OT_SRC=suggestion_accepted _otword "pode rodar 999"
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn6-MUT) sem conferir a origem, a sugestão aceita mergearia — a conferência é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (otn7) o repo do cwd é outro: a palavra é de onion-bancada/outro#999, o executor (core) recusa
+  _otword "pode rodar 999" "${_otx_outro}"
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn7) palavra registrada noutro repo ⇒ o executor do core recusa" 1 "é de outro ato"
+  _otmut 's/^        if req.get("act") != a.get("act") or t.get("repo") != a.get("repo", "").lower() \\$/        if req.get("act") != a.get("act") \\/' "(otn7-MUT)"
+  _otword "pode rodar 999" "${_otx_outro}"
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn7-MUT) sem conferir o repo, a palavra de outro repo mergearia — a conferência é a causa" 0 "pelo «pode rodar»"
+  _otrestore
+  # (otn8) o transcript diz outro número (a aprovação é do 999 e a frase digitada nomeia o 998) ⇒ recusa
+  OT_TEXT="pode rodar 998" _otword "pode rodar 999"
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn8) a frase digitada nomeia outro PR ⇒ recusa" 1 "não está no transcript"
+  _otmut 's/^    return bool(w) and w\[0\] == "pr" and int(pr) in w\[1\]$/    return bool(w) and w[0] == "pr"/' "(otn8-MUT)"
+  OT_TEXT="pode rodar 998" _otword "pode rodar 999"
+  _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn8-MUT) sem casar o número, a frase de outro PR mergearia — casar o número é a causa" 0 "pelo «pode rodar»"
+  _otrestore; _otclean
   # ── REPOS DE SERVIÇO COM SESSÃO DONA (D_SERVICE_REPOS_OWNER_VPS_OPS_1120, 2026-11-20) ──────────────────────────────
   # (b) MESMA DONA REGISTRADA: a sessão da peça "dona" mergeia o repo de serviço "svc" (owner_session: dona), pela regra (3)
   #     estendida; dona diferente, alvo sem owner_session e sessão sem membro seguem recusados, cada um com mutante.

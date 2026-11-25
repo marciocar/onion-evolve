@@ -18,6 +18,30 @@ que poder rodar as coisas e me identificar se o nível de segurança exigir». P
 
 A recusa sempre cabe em uma linha e diz o que fazer.
 
+## A palavra com número (25/11/2026): sem o pedido prévio
+
+Pedido do maestro: «quando eu digo "pode rodar 1763" ou "merge 1763" ou similar que você tenha certeza do que eu
+estou falando, execute se ok». A frase que **nomeia o PR** pula o passo 1:
+
+- **Frases aceitas** (a mensagem inteira, sem diferença de caixa, um ponto ou exclamação final tolerado): um verbo da
+  lista fechada (`pode rodar`, `pode mergear`, `pode fazer o merge`, `pode fazer merge`, `merge`, `mergeia`,
+  `mergear`), um conectivo opcional (`do`, `o`, `pr`) e de 1 a 5 números, com ou sem `#`, separados por espaço,
+  vírgula ou `e`. Ex.: `pode rodar 1763`, `merge #1763`, `merge do PR #1763`, `pode rodar 1763 e 1765`.
+- **Não registram**: texto a mais (`pode rodar 1763 agora`), pergunta (`merge 1763?`: pergunta não é ordem), mais de 5
+  números, número com zero à esquerda, moldura de outra sessão. O hook diz em uma linha por que não registrou.
+- **O que o hook grava**: para cada número, lê o PR no forge pelo repo do `origin` do cwd (estado e head) e grava
+  `approvals/<session>.pr-<n>.json`, com o head daquele instante, nível 1, 10 minutos e uso único. PR inexistente,
+  fechado ou mergeado não registra. Só registra o checkout que tem o executor do merge verificado (o hash do pedido
+  cobre o conteúdo dele). A saída diz o comando, um por PR: o executor com `<n> --one-touch`.
+- **O que o executor confere**: o mesmo de sempre (todos os gates, CI verde no head, ponta da base, catraca) e, da
+  aprovação daquele PR, o repo, o head (andou depois da palavra: recusa e gasta), a frase humana no transcript que
+  **nomeia aquele número** e o livro. O id da palavra no livro leva o número (`prompt_id#1763`), então dois números
+  na mesma mensagem são dois usos.
+- **Mesmo poder da palavra com pedido**: no PR de guarda ela substitui o `--maestro`, como a palavra solta já
+  substituía. Não se exige resíduo isolado por cima: é a palavra do maestro, e o `--maestro` no terminal dele também
+  não o exige.
+- **«pode rodar» solto** segue igual: vale para o pedido vivo da sessão.
+
 ## Quem autoriza: medido, não suposto (18/11/2026)
 
 | sinal | prompt digitado pelo humano | mensagem de outra sessão (peer) |

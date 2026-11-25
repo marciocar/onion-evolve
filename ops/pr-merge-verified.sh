@@ -117,6 +117,10 @@
 #                RECALCULADO na hora (o hash bate), estar no TTL, sem uso no livro do executor e com o prompt humano no
 #                transcript (origin.kind=human, promptSource typed|queued). Ela substitui só a exigência do --maestro
 #                no PR de guarda (o _guard_pr_gate); não dispensa check, não declara CI inoperante, não abre repo alheio.
+#           PALAVRA COM NÚMERO (2026-11-25, pedido do maestro): «pode rodar 1763», «merge #1763», «pode rodar 1763 e
+#           1765», a mensagem inteira, dispensam o passo 1: o hook lê o PR no forge (repo do cwd) e grava uma aprovação por
+#           número com o head daquele instante; a sessão roda direto o passo 3 (`<n> --one-touch`), e o executor acha a
+#           aprovação daquele PR (o consume recebe --pr). Gates, head amarrado, transcript humano e uso único: os mesmos.
 #           Com autorização viva NÃO há auto-rebase: precisar de rebase, ou o sha ter mudado, GASTA a autorização e
 #           recusa em uma linha. Repo de OUTRO DONO (cliente) segue recusado SEMPRE pela catraca, autorizado ou não.
 #           Sem as flags, nada muda. Deploy, firewall, segredo e publicação externa ficam fora da v1.
@@ -556,6 +560,9 @@ state_before="$(pr_state)"
 [ -z "$state_before" ] && die "não consegui LER o estado do PR #${PR} antes do merge (gh falhou/sem auth?) — não prossigo: sem a âncora, qualquer falha adiante viraria falso positivo"
 case "$state_before" in
   MERGED\|*) die "PR #${PR} JÁ ESTAVA MERGED antes desta execução (mergedAt=${state_before#*|}) — não declaro merge que não foi meu" ;;
+  # (2026-11-25, palavra com número) PR fechado sem merge recusa AQUI, antes do auto-rebase e do comentário: antes, só
+  # o forge recusava, depois de o script já ter empurrado a branch e comentado no PR
+  CLOSED\|*) die "PR #${PR} está FECHADO (sem merge): não há o que mergear. Nada foi feito." ;;
 esac
 # ── RASCUNHO É RECUSADO ANTES DE QUALQUER EFEITO (2026-10-25, observação do par na bancada do #1355) ──
 # O auto-rebase reescreve a branch, empurra e comenta ANTES do merge: num rascunho, isso é mexer no
@@ -781,7 +788,7 @@ _one_touch_gate() {
   local _o _rc; _o="$(_ot_engine verify $(_ot_target_args))"; _rc=$?
   case "${_rc}" in
     0) say "${_o}"; OT_LIVE=1 ;;
-    3) _ot_engine consume --session "${_OT_SID}" --outcome "refused: sha changed" >/dev/null; die "${_o#✗ } Nada foi mergeado." ;;
+    3) _ot_engine consume --session "${_OT_SID}" --pr "${PR}" --outcome "refused: sha changed" >/dev/null; die "${_o#✗ } Nada foi mergeado." ;;
     *) die "«pode rodar» recusado: ${_o#✗ } Nada foi mergeado." ;;
   esac
 }
@@ -1245,7 +1252,7 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
   # «pode rodar»: sem auto-rebase. O pedido só nasce na ponta; a autorização viva se GASTA e recusa (o sha mudaria)
   [ "${OT_REQUEST}" -eq 1 ] && die "o PR precisa de rebase antes do pedido: rode ops/pr-finalize.sh --rebase --push, espere o verde e peça de novo. Nada foi feito."
   if [ "${OT_LIVE}" -eq 1 ]; then
-    _ot_engine consume --session "${_OT_SID}" --outcome "refused: rebase needed" >/dev/null
+    _ot_engine consume --session "${_OT_SID}" --pr "${PR}" --outcome "refused: rebase needed" >/dev/null
     die "o PR precisa de rebase e o sha vai mudar: a autorização foi gasta; rebaseie, espere o verde e peça de novo. Nada foi mergeado."
   fi
   # merge alheio delegado: SEM CONFLITO é condição do selo, e o caminho delegado não reescreve a branch alheia
@@ -2001,10 +2008,10 @@ fi
 if [ "${OT_LIVE}" -eq 1 ]; then
   _o="$(_ot_engine verify $(_ot_target_args))"; _rc=$?
   if [ "${_rc}" -ne 0 ]; then
-    _ot_engine consume --session "${_OT_SID}" --outcome "refused: changed before merge" >/dev/null
+    _ot_engine consume --session "${_OT_SID}" --pr "${PR}" --outcome "refused: changed before merge" >/dev/null
     die "${_o#✗ } Nada foi mergeado."
   fi
-  _o="$(_ot_engine consume --session "${_OT_SID}" --outcome used)" || die "«pode rodar»: ${_o#✗ } Nada foi mergeado."
+  _o="$(_ot_engine consume --session "${_OT_SID}" --pr "${PR}" --outcome used)" || die "«pode rodar»: ${_o#✗ } Nada foi mergeado."
   say "${_o}"
 fi
 MERGE_EXTRA=(--match-head-commit "${JUDGED_HEAD}")

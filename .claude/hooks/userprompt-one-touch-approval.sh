@@ -8,6 +8,10 @@
 # O que faz: quando o prompt é EXATAMENTE a frase (aparadas as bordas) e a sessão tem um pedido pendente, grava a
 # aprovação (hash do pedido, TTL de 10 min, uso único conferido pelo executor). Mensagem com moldura de outra sessão
 # ou de sistema, ou a frase dentro de texto maior, NÃO autoriza, e o hook diz isso em uma linha. Sem a frase: silêncio.
+# PALAVRA COM NÚMERO (2026-11-25, pedido do maestro): «pode rodar 1763», «pode rodar #1763», «merge 1763», «pode mergear
+# 1763», «pode rodar 1763 e 1765», como mensagem inteira, gravam SEM pedido prévio uma aprovação por PR (repo do cwd, head
+# lido no forge agora, nível 1, 10 min, uso único); a saída diz o comando que a sessão roda, um por PR (o executor do
+# merge verificado com `<n> --one-touch`), e ele confere todos os gates na hora. Frase com número e texto a mais: recusa.
 # NUNCA bloqueia o prompt (exit 0 sempre) e NÃO usa "ask" (relatado como auto-aprovado em bypassPermissions).
 # Falha FECHADA: sem python3, sem payload legível ou com qualquer erro, não autoriza.
 #

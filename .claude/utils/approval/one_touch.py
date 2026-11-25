@@ -20,6 +20,15 @@
 #      digitada NO MEIO do turno (medido 20/11) chega ao hook com o prompt_id do turno em curso e vira attachment
 #      queued_command sem promptId: o executor a acha dentro desse turno (transcript_word) e julga a origem dela.
 #
+# ── A PALAVRA COM NÚMERO (2026-11-25) ────────────────────────────────────────────────────────────────────────────
+# Pedido do maestro: «quando eu digo "pode rodar 1763" ou "merge 1763" ou similar que você tenha certeza do que eu estou
+# falando, execute se ok, não fique me travando pedindo para fazer somente se eu escrever a mão "pode rodar" no momento
+# certo». A frase que NOMEIA o PR dispensa o pedido prévio: o hook lê o PR no forge (repo do cwd) e grava UMA aprovação
+# por número, com o head daquele instante, em approvals/<sessão>.pr-<n>.json. O resto é o fluxo de sempre: o executor
+# roda TODOS os gates (CI verde no head, ponta da base, catraca), recusa se o head andou depois da palavra, confere no
+# transcript que a frase digitada por humano nomeia aquele PR e grava o uso no livro (um uso por número). A frase tem de
+# ser a mensagem inteira (parse_word: lista FECHADA de verbos, só números de PR, «?» final não vale: pergunta não é ordem).
+#
 # ── HONESTIDADE (o teto, escrito no topo de propósito) ───────────────────────────────────────────────────────────
 # Isto é camada de CONFORMIDADE, NÃO fronteira de segurança. No mesmo usuário Unix o agente pode escrever o arquivo de
 # aprovação, o livro e até o transcript. O que a camada impede é a sessão se AUTOAUTORIZAR POR ENGANO (ou por mensagem
@@ -34,7 +43,7 @@
 #   one_touch.py hook            < payload UserPromptSubmit (stdout: JSON additionalContext; exit 0 sempre)
 #   one_touch.py verify  --act merge --repo R --ref REF --sha SHA [--pr N] --session SID
 #        exit 0 viva · 3 viva mas o alvo mudou (o executor consome e recusa) · 1 não há/recusada
-#   one_touch.py consume --session SID --outcome TEXTO   (grava o hash no livro do executor; exit 1 se já usada)
+#   one_touch.py consume --session SID [--pr N] --outcome TEXTO   (grava o hash no livro do executor; exit 1 se já usada)
 #   one_touch.py canon < json    (imprime o hash canônico; para a bancada e para quem adotar o esquema)
 # Estado: ${XDG_STATE_HOME:-~/.local/state}/onion/approvals (modo 700). Transcripts: ${CLAUDE_CONFIG_DIR:-~/.claude}.
 # Logs no formato dos atos da vps-ops: <estado>/acts/approval-<evento>-<UTC>.log, última linha «✓ RESULTADO» ou
@@ -55,6 +64,17 @@ REQUEST_MAX_AGE_S = 1800      # pedido sem palavra em 30 min caduca
 HUMAN_PROMPT_SOURCES = {"typed", "queued"}
 MIDTURN_SKEW_S = 30           # a mensagem do meio do turno nasce a até 30 s da gravação da aprovação (medido: < 1 s)
 FOREIGN_MARKERS = ("<cross-session-message", "<system-reminder", "<task-notification", "<teammate-message")
+# A PALAVRA COM NÚMERO: verbos de lista fechada, conectivo opcional («do», «o», «pr»), 1 a WORD_MAX_PRS números
+WORD_VERBS = ("pode rodar", "pode mergear", "pode fazer o merge", "pode fazer merge", "merge", "mergeia", "mergear")
+WORD_MAX_PRS = 5
+WORD_SKEW_S = 60              # a palavra com número cria o pedido no hook: a entrada do transcript nasce perto dele
+HOOK_BUDGET_S = 8             # o hook tem 10 s no settings; cada PR custa uma leitura no forge (medido: ~0,5 s)
+_NUM = r"#?[1-9][0-9]{0,6}"
+_SEP = r"(?: ?, ?| e | and | \+ | ?& ?| )"
+_WORD_PR_RE = re.compile(r"(?:%s)(?: (?:do|da|o|no))?(?: pr)? (%s(?:%s(?:pr )?%s)*)"
+                         % ("|".join(re.escape(v) for v in WORD_VERBS), _NUM, _SEP, _NUM))
+_WORD_LOOSE_RE = re.compile(r"\b(?:%s)\b.*#?[0-9]" % "|".join(re.escape(v) for v in WORD_VERBS))
+ENGINE_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 # O que a v1 implementa. Ponto de extensão: o canal novo entra aqui com a sua verificação, nunca por fora.
 #   nível 2 → "slack-signed": a ponte de mensageria da família entrega a DM assinada; o portão por identidade da ponte
 #             verifica e grava a aprovação; o executor confere a assinatura (não implementado).
@@ -110,6 +130,38 @@ def script_sha(path):
 def norm_phrase(s):
     # aparadas as bordas, espaço interno colapsado, sem diferença de caixa, e um ponto ou exclamação final tolerado
     return re.sub(r"\s+", " ", unicodedata.normalize("NFC", s or "")).strip().casefold().rstrip(".!").strip()
+
+
+def parse_word(text):
+    """("bare", ()) para «pode rodar» sozinho; ("pr", (n, …)) para a frase com número(s) sozinha; None no resto
+    (moldura de outra sessão ou do sistema, texto a mais, pergunta, mais de WORD_MAX_PRS números)."""
+    if any(m in (text or "").casefold() for m in FOREIGN_MARKERS):
+        return None
+    t = norm_phrase(text)
+    if t in PHRASES:
+        return ("bare", ())
+    m = _WORD_PR_RE.fullmatch(t)
+    if not m:
+        return None
+    nums = []
+    for x in re.findall(r"[0-9]+", m.group(1)):
+        if int(x) not in nums:
+            nums.append(int(x))
+    if not nums or len(nums) > WORD_MAX_PRS:
+        return None
+    return ("pr", tuple(nums))
+
+
+def slug_norm(url):
+    """O mesmo _slug_norm do executor: minúsculas antes, prefixo de host fora, .git e barra final fora."""
+    s = (url or "").strip().lower()
+    s = re.sub(r"^(git@[^:]+:|ssh://git@[^/]+/|https?://([^@/]+@)?[^/]+/|github\.com/)", "", s)
+    s = re.sub(r"\.git$", "", s).rstrip("/")
+    return s if re.fullmatch(r"[a-z0-9._-]+/[a-z0-9._-]+", s) else ""
+
+
+def approval_path(sid, pr=None):
+    return os.path.join(state_dir(), "approvals", ("%s.pr-%d.json" % (sid, int(pr))) if pr else sid + ".json")
 
 
 def ensure_dirs():
@@ -252,6 +304,105 @@ def hook_say(msg):
     print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": msg}}, ensure_ascii=True))
 
 
+def repo_of(cwd):
+    import subprocess
+    try:
+        r = subprocess.run(["git", "-C", cwd or ".", "remote", "get-url", "origin"], capture_output=True, text=True, timeout=3)
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return slug_norm(r.stdout) if r.returncode == 0 else ""
+
+
+def pr_live(slug, n, budget):
+    """O PR lido no forge AGORA: (state, merged, head_sha, head_ref) ou levanta LookupError com o porquê."""
+    import subprocess
+    try:
+        r = subprocess.run(["gh", "api", "repos/%s/pulls/%d" % (slug, n), "--jq", "[.state,(.merged|tostring),.head.sha,.head.ref]|@tsv"],
+                           capture_output=True, text=True, timeout=max(1.0, min(5.0, budget)))
+    except subprocess.TimeoutExpired:
+        raise LookupError("o forge não respondeu a tempo")
+    except OSError:
+        raise LookupError("sem o gh não leio o PR")
+    if r.returncode != 0:
+        raise LookupError("não li o PR no forge (inexistente ou sem acesso)")
+    cols = r.stdout.strip().split("\t")
+    if len(cols) != 4:
+        raise LookupError("resposta do forge ilegível")
+    return cols
+
+
+def hook_numbered(payload, sid, prs, prompt):
+    """A PALAVRA COM NÚMERO: sem pedido prévio, uma aprovação por PR, com o head lido no forge na hora da palavra."""
+    t0 = time.time()
+    pid, tp = str(payload.get("prompt_id", "")), str(payload.get("transcript_path", ""))
+    if not pid or not tp:
+        hook_say("✗ não registrei (falha fechada): o payload não trouxe prompt_id e transcript_path.")
+        return 0
+    executor = os.path.join(ENGINE_ROOT, "ops", "pr-merge-verified.sh")   # (core-only) sem ele, nada se registra
+    ssha = script_sha(executor)
+    if not ssha:
+        hook_say("✗ não registrei: este checkout não tem o executor do merge verificado; a palavra com número vale só onde ele existe.")
+        return 0
+    slug = repo_of(str(payload.get("cwd") or ""))
+    if not slug:
+        hook_say("✗ não registrei: não li o repo do cwd (o origin). Nada foi autorizado.")
+        act_log("grant", ["palavra com número sem repo legível no cwd"], False, "recusado · repo do cwd ilegível")
+        return 0
+    pol = ACT_POLICY["merge"]
+    ensure_dirs()
+    done, refused = [], []
+    for n in prs:
+        left = HOOK_BUDGET_S - (time.time() - t0)
+        if left < 1:
+            refused.append("#%d: acabou o tempo do hook; diga de novo só este número" % n)
+            continue
+        try:
+            state, merged, sha, ref = pr_live(slug, n, left)
+            if state != "open" or merged == "true":
+                raise LookupError("o PR está %s" % ("mergeado" if merged == "true" else "fechado"))
+            if not re.fullmatch(r"[0-9a-f]{40}", sha) or not re.fullmatch(r"[A-Za-z0-9._/-]+", ref):
+                raise LookupError("head ilegível no forge")
+        except LookupError as e:
+            refused.append("#%d: %s" % (n, e))
+            act_log("grant", ["palavra com número", "alvo %s#%d" % (slug, n), "recusa: %s" % e], False, "recusado · %s#%d" % (slug, n))
+            continue
+        run = "bash %s %d --one-touch" % (executor, n)
+        req = {
+            "schema": "onion.act-request/1", "act": "merge",
+            "target": {"repo": slug, "ref": "refs/heads/" + ref, "sha": sha, "pr": n},
+            "level": 1, "effect": pol["effect"], "approvals_required": pol["approvals_required"],
+            "requested_by": {"kind": "claude-session", "id": sid},
+            "created_at": utc(t0), "nonce": secrets.token_hex(16), "requires_tty": False,
+            "executor": {"name": "merge-verified", "run": run, "script_sha256": ssha,
+                         "args": ["merge", slug, "refs/heads/" + ref, sha, str(n)]},
+        }
+        req["hash"] = digest(req)
+        appr = {
+            "schema": "onion.act-approval/1", "request_hash": req["hash"], "request": req,
+            "approvals": [{"role": "maestro", "approver_id": "prompt:" + sid, "channel": "prompt", "level": 1, "at": utc(t0)}],
+            "evidence": {"prompt_id": pid, "transcript_path": tp, "phrase": norm_phrase(prompt), "pr": n},
+            "expires_at": utc(t0 + APPROVAL_TTL_S), "nonce": secrets.token_hex(16),
+        }
+        appr["hash"] = digest(appr)
+        try:
+            write_atomic(approval_path(sid, n), appr)
+        except OSError as e:
+            refused.append("#%d: não gravei (%s)" % (n, e))
+            continue
+        done.append((n, sha, run))
+        act_log("grant", ["aprovação %s (palavra com número, sem pedido prévio)" % appr["hash"], "canal prompt · prompt_id %s" % pid],
+                True, "autorizado · act=merge level=1 wait_s=0 target=%s" % short_target(req))
+        usage("grant", "merge", 1, 0, short_target(req), "granted-word-pr")
+    parts = []
+    if done:
+        parts.append("✓ palavra registrada (nível 1, 10 min, uso único por PR, sem pedido prévio) em %s: %s. Vale se o maestro DIGITOU a frase (sugestão aceita não autoriza); o executor roda todos os gates e recusa se o head andou. Rode agora, um por vez: %s"
+                     % (slug, ", ".join("#%d @%s" % (n, sha[:7]) for n, sha, _ in done), " ; ".join(r for _, _, r in done)))
+    if refused:
+        parts.append("✗ não registrei: %s." % "; ".join(refused))
+    hook_say(" ".join(parts))
+    return 0
+
+
 def cmd_hook(_argv):
     try:
         payload = json.loads(sys.stdin.read() or "{}")
@@ -261,13 +412,25 @@ def cmd_hook(_argv):
     if not isinstance(prompt, str):
         return 0
     low = prompt.casefold()
-    mentions = any(p in norm_phrase(prompt) for p in PHRASES)
+    word = parse_word(prompt)
+    numbered = len(norm_phrase(prompt)) <= 80 and bool(_WORD_LOOSE_RE.search(norm_phrase(prompt)))
+    mentions = any(p in norm_phrase(prompt) for p in PHRASES) or numbered
     if not mentions:
         return 0                                   # silêncio: custo zero no turno honesto
     sid = payload.get("session_id", "")
     try:
         sid = safe_sid(sid)
     except ValueError:
+        return 0
+    if word and word[0] == "pr":
+        return hook_numbered(payload, sid, word[1], prompt)
+    if word is None and numbered:
+        if any(m in low for m in FOREIGN_MARKERS):
+            hook_say("✗ não registrei: mensagem com moldura de outra sessão ou do sistema nunca autoriza. Só a frase digitada pelo maestro, sozinha.")
+            act_log("grant", ["prompt com número e moldura estrangeira"], False, "recusado · moldura de outra sessão/sistema")
+        else:
+            hook_say("✗ não registrei: a frase com número tem de ser a mensagem inteira, sem mais texto e sem «?» (ex.: «pode rodar 1763», «merge #1763», «pode rodar 1763 e 1765»).")
+            act_log("grant", ["frase com número dentro de texto maior"], False, "recusado · a frase com número não é o prompt inteiro")
         return 0
     root = state_dir()
     req_path = os.path.join(root, "requests", sid + ".json")
@@ -322,9 +485,11 @@ def cmd_hook(_argv):
 
 
 # ── verify / consume (o EXECUTOR) ───────────────────────────────────────────────────────────────────────────────
-def load_live(sid):
-    root = state_dir()
-    path = os.path.join(root, "approvals", sid + ".json")
+def load_live(sid, pr=None):
+    """A aprovação viva: a da palavra com número deste PR, se houver; senão a do pedido da sessão."""
+    path = approval_path(sid)
+    if pr and re.fullmatch(r"[1-9][0-9]{0,6}", str(pr)) and os.path.isfile(approval_path(sid, pr)):
+        path = approval_path(sid, pr)
     if not os.path.isfile(path):
         raise LookupError("não há autorização viva desta sessão: prepare o ato e peça «pode rodar» ao maestro")
     appr = read_json(path)
@@ -333,6 +498,9 @@ def load_live(sid):
     req = appr.get("request") or {}
     if req.get("hash") != digest(req) or appr.get("request_hash") != req.get("hash"):
         raise LookupError("o hash do pedido não bate com o da aprovação")
+    wpr = (appr.get("evidence") or {}).get("pr")
+    if wpr is not None and wpr != (req.get("target") or {}).get("pr"):
+        raise LookupError("a palavra nomeia o PR #%s e o pedido é de outro" % wpr)
     return appr, req
 
 
@@ -346,7 +514,7 @@ def ledger_hit(lines, appr, word_id):
     livro."""
     wid = word_id or "\0"
     # «P/*» é a marca do consume que não leu o transcript: gasta toda palavra do turno P (topo e meio)
-    fam = wid.split("/", 1)[0] + "/*"
+    fam = re.split(r"[/#]", wid, 1)[0] + "/*"
     for line in lines:
         cols = line.rstrip("\n").split("\t")
         if cols[0] == appr["hash"] or (len(cols) > 1 and cols[1] in (wid, fam)):
@@ -362,9 +530,12 @@ def ledger_has(appr, word_id):
         return False
 
 
-def is_word(text):
-    """A frase sozinha, sem moldura de outra sessão ou de sistema."""
-    return norm_phrase(text) in PHRASES and not any(m in (text or "").casefold() for m in FOREIGN_MARKERS)
+def is_word(text, pr=None):
+    """A frase sozinha, sem moldura de outra sessão ou de sistema. Com pr: a frase com número que nomeia ESTE PR."""
+    w = parse_word(text)
+    if pr is None:
+        return w == ("bare", ())
+    return bool(w) and w[0] == "pr" and int(pr) in w[1]
 
 
 def entry_ts(e):
@@ -392,6 +563,8 @@ def transcript_word(appr, req):
     """
     ev = appr.get("evidence") or {}
     pid = str(ev.get("prompt_id") or "")
+    wpr = ev.get("pr")
+    wsuf = ("#%d" % int(wpr)) if wpr is not None else ""   # um uso POR PR: «pode rodar 1763 e 1765» são duas palavras
     if not pid:
         raise LookupError("a aprovação não traz o prompt_id da palavra")
     try:
@@ -423,9 +596,9 @@ def transcript_word(appr, req):
                 # o MESMO promptId pode ter mais de uma entrada (medido em 18/11: a auto-compactação disparada no envio
                 # grava o resumo com o promptId do prompt, ANTES dele). Candidata é a que traz a frase.
                 text = c if isinstance(c, str) else "".join(x.get("text", "") for x in (c or []) if isinstance(x, dict) and x.get("type") == "text")
-                if is_word(text):
+                if is_word(text, wpr):
                     when, ts = entry_ts(e)
-                    cands.append((abs(when - granted), when, ts, pid, {"origin": e.get("origin"), "promptSource": e.get("promptSource"),
+                    cands.append((abs(when - granted), when, ts, pid + wsuf, {"origin": e.get("origin"), "promptSource": e.get("promptSource"),
                                                                         "isMeta": e.get("isMeta"), "form": "topo"}))
                 continue
             if e.get("type") != "attachment" or cur != pid:
@@ -433,7 +606,7 @@ def transcript_word(appr, req):
             a = e.get("attachment")
             if not isinstance(a, dict) or a.get("type") != "queued_command" or not isinstance(a.get("prompt"), str):
                 continue
-            if not is_word(a["prompt"]):
+            if not is_word(a["prompt"], wpr):
                 continue
             when, ts = entry_ts(e)
             if abs(when - granted) > MIDTURN_SKEW_S:
@@ -443,7 +616,7 @@ def transcript_word(appr, req):
                 continue
             ps = a.get("promptSource", e.get("promptSource"))
             human_turn = a.get("humanTurn") is True and a.get("commandMode") == "prompt"
-            cands.append((abs(when - granted), when, ts, pid + "/" + src, {
+            cands.append((abs(when - granted), when, ts, pid + "/" + src + wsuf, {
                 # sem humanTurn=true e commandMode=prompt não há promptSource humano; com eles, o ausente vale queued
                 # (a forma medida) e o presente se julga como está (suggestion_accepted recusa)
                 "origin": a.get("origin"), "promptSource": (("queued" if ps is None else ps) if human_turn else None),
@@ -468,7 +641,8 @@ def transcript_human(appr, req):
         raise LookupError("o prompt da palavra (%s) não é humano digitado (origin.kind=%s, promptSource=%s, isMeta=%s): mensagem de outra sessão ou sugestão aceita nunca autoriza"
                           % (found.get("form"), origin.get("kind") if isinstance(origin, dict) else "?", found.get("promptSource"), bool(found.get("isMeta"))))
     created = parse_utc(req["created_at"])
-    if when + 1 < created:
+    # a palavra com número CRIA o pedido no hook (o transcript a grava depois, com o horário do envio): folga de WORD_SKEW_S
+    if when + (WORD_SKEW_S if ev.get("pr") is not None else 1) < created:
         raise LookupError("o prompt da palavra é anterior ao pedido")
     # o TTL conta da PALAVRA no transcript, não da gravação da aprovação (regravar a aprovação não renova o prazo)
     if time.time() > when + APPROVAL_TTL_S:
@@ -480,7 +654,7 @@ def cmd_verify(argv):
     a = get_args(argv, {"act", "repo", "ref", "sha", "pr", "session", "script"})
     try:
         sid = safe_sid(a.get("session", ""))
-        appr, req = load_live(sid)
+        appr, req = load_live(sid, a.get("pr"))
         if req.get("requested_by", {}).get("id") != sid:
             raise LookupError("a aprovação é de outra sessão")
         if time.time() > parse_utc(appr["expires_at"]):
@@ -520,10 +694,10 @@ def cmd_verify(argv):
 
 
 def cmd_consume(argv):
-    a = get_args(argv, {"session", "outcome"})
+    a = get_args(argv, {"session", "outcome", "pr"})
     try:
         sid = safe_sid(a.get("session", ""))
-        appr, req = load_live(sid)
+        appr, req = load_live(sid, a.get("pr"))
     except (LookupError, ValueError, OSError) as e:
         print("✗ não consumi: %s." % e)
         return 1

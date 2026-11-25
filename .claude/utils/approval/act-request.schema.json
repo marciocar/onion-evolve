@@ -319,6 +319,11 @@
             },
             "phrase": {
               "type": "string"
+            },
+            "pr": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "A PALAVRA COM NÚMERO (2026-11-25): «pode rodar 1763», «merge #1763». O hook registra, sem pedido prévio, uma aprovação por número, com o head do PR lido no forge na hora da palavra; o executor confere que a frase no transcript nomeia este PR."
             }
           }
         },
