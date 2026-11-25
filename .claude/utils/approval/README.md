@@ -48,6 +48,10 @@ estou falando, execute se ok». A frase que **nomeia o PR** pula o passo 1:
   olhando um PR que acabou de mudar. A idade vem de um carimbo do **servidor**, o `created_at` mais antigo dos
   check-suites do sha (o GitHub o grava quando o push chega), nunca da `committer.date`, que quem commita escreve
   (`GIT_COMMITTER_DATE`). Head sem check-suite recusa («o CI ainda não viu este head»).
+  **Tetos declarados** (3ª rodada da revisão isolada): (1) o check-suite é por **sha**, não por push: reempurrar um sha
+  antigo herda o carimbo antigo (risco baixo: o executor exige CI verde no head, e o PR da catraca já não sai por
+  palavra com número); (2) repo **sem CI** nunca registra palavra com número (falha fechada): ali segue o pedido e o
+  «pode rodar» solto.
 - **Lista de arquivos**: todas as páginas (`--paginate`) e o nome antigo da renomeação (`previous_filename`), como o
   executor: renomear um arquivo da catraca para fora não escapa. A regex da catraca do motor é a mesma do executor
   (a bancada compara as duas byte a byte).
