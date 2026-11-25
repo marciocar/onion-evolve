@@ -3,12 +3,12 @@ branch: feat/onion-attach
 pr: pendente
 date: 2026-11-25
 reviewed_diff_sha256: pendente
-findings_total: 37
-findings_real: 37
+findings_total: 39
+findings_real: 39
 findings_blocking: 0
 tokens: 269110
 duration_min: 8
-findings_fixed: 28
+findings_fixed: 30
 verdict: FIXED
 elenxo: false
 elenxo_isolado: true
@@ -260,3 +260,24 @@ ficou em `backup/onion-attach-pre-rebase`, local). O que mudou além de juntar a
   real sempre grava `cwd`, e a sessão de serviços segue curada. Caso novo (rd6) com mutante.
 
 Bancada depois do rebase: `--families onion_attach,session_open,baton_pulse`, 402 ✓, 0 ✗, 0 ⊘ (74 + 132 + 196).
+
+## Revisão isolada do delta do rebase: attach-delta-reviewer (opus, isolado) — FIXES_NEEDED, com reprodução
+
+reviewer: attach-delta-reviewer (opus, isolado)
+
+1. **O fallback do transcript sem `cwd` abria na pasta ERRADA com rc 0.** Com o registro ambíguo, o `locate` caía na
+   conversa mais recente com o TÍTULO (não a do id); com o nome fora do registro, no palpite `~/<nome>`; e o aviso
+   «uso a do registro de posse» mentia nos dois. CURADO: o abridor lê o caminho do transcript (campo 4 do `by-id`) e
+   só aceita a pasta que o nome dá se a codificação dela (`[^A-Za-z0-9-]` → `-`) for IGUAL à pasta do transcript,
+   que é onde o `claude --resume` procura a conversa; senão rc 5 pedindo `--dir`. O aviso diz a pasta usada e que ela
+   foi conferida pela codificação. Casos (rd7) registro ambíguo com a conversa mais recente do título noutra pasta →
+   rc 5, e (rd8) nome fora do registro → rc 5, os dois com o mutante que tira a conferência; (rd6) segue: a pasta do
+   registro bate com a do transcript e abre.
+   Consequência nas fixtures do #1761: os casos de cópia (w)–(w10) guardavam os transcripts retomados em pastas de
+   nome livre (`-orig`, `-outra`), forma que o Claude Code não grava. Os transcripts que eles RETOMAM foram movidos
+   para a pasta codificada do checkout da fixture; as cópias seguem onde estavam (o `fork-of` as acha em qualquer
+   pasta). Nenhuma asserção dos casos mudou.
+2. **Nota:** o rc 2 do `session-liveness.sh` (não medido) virava «morta» sem aviso no `onion-attach`. CURADO: conta
+   como morta, mas avisa no stderr; caso (lw) com mutante.
+
+Bancada depois das curas do delta: `--families onion_attach,session_open,baton_pulse`, 408 ✓, 0 ✗, 0 ⊘ (76 + 136 + 196).

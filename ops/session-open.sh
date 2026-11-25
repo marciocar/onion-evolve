@@ -323,12 +323,16 @@ locate_resume() {
     5) die "o id ${RESUME} tem transcript em mais de uma pasta: ambíguo, não escolho; passe a pasta com --dir" 5 ;;
     *) die "o leitor de transcript falhou (rc ${rc}) para o id ${RESUME}: passe a pasta com --dir" ;;
   esac
-  IFS=$'\t' read -r m _id d _p last _t <<< "${row}"
-  # transcript sem `cwd` compatível com a pasta dele: a pasta vem do registro de posse (o caminho de antes), DITO; se
-  # o registro também não responde, recusa e pede --dir
+  IFS=$'\t' read -r m _id d tpath last _t <<< "${row}"
+  # transcript sem `cwd` compatível com a pasta dele: tenta a pasta que o nome dá (registro de posse, conversa com o
+  # título, ou o palpite ~/<nome>), mas SÓ a aceita se a codificação dela for a pasta do transcript (o lugar onde o
+  # `claude --resume` procura a conversa). Senão, recusa e pede --dir: nunca abre noutra pasta com rc 0.
   if [ "${d}" = "-" ]; then
-    local loc; loc="$(locate "${n}")" || die "o transcript do id ${RESUME} não grava a pasta onde a sessão nasceu, e o registro de posse não a dá: passe a pasta com --dir" 5
-    say "session-open: o transcript do id ${RESUME} não grava a pasta onde a sessão nasceu; uso a do registro de posse: $(cut -f2 <<< "${loc}")." >&2
+    local loc ld tf; tf="$(basename "$(dirname "${tpath}")")"
+    loc="$(locate "${n}" 2>/dev/null)" || die "o transcript do id ${RESUME} não grava a pasta onde a sessão nasceu, e o nome «${n}» não dá uma pasta: passe a pasta com --dir" 5
+    ld="$(realpath -m -- "$(cut -f2 <<< "${loc}")")"
+    [ "$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${ld}")" = "${tf}" ] || die "o transcript do id ${RESUME} não grava a pasta onde a sessão nasceu, e a pasta que o nome «${n}» dá (${ld}) não é a do transcript (${tf}): passe a pasta com --dir" 5
+    say "session-open: o transcript do id ${RESUME} não grava a pasta onde a sessão nasceu; uso ${ld}, conferida: a codificação dela é a pasta do transcript (${tf})." >&2
     printf '%s\n' "${loc}"; return 0
   fi
   say "session-open: a pasta da retomada vem do transcript do id ${RESUME}: ${d}$([ "${last}" = "${d}" ] || [ "${last}" = "-" ] || printf ' (o último cwd foi %s; a conversa se acha pela pasta onde nasceu)' "${last}")." >&2

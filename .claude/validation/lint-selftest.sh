@@ -64177,8 +64177,11 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   _so_case "(v) sessão de fundo viva no checkout: recusa com a receita do fundo nativo" _so_v \
     'já está viva neste checkout (${dir}): nunca duas sessões no mesmo checkout. $(if [ "${k}" = background ]; then' 'já está viva neste checkout (${dir}): nunca duas sessões no mesmo checkout. $(if false; then'
   # (w) a CÓPIA (fork_inherit) do id pedido está viva noutra pasta: recusa rc 3 «a conversa já vive como <id>»
-  mkdir -p "${PJ}/-orig" "${PJ}/-copia" "${PJ}/-outra"
-  printf '{"type":"custom-title","customTitle":"orig","sessionId":"orig0000-1111"}\n{"type":"user","uuid":"u-0001-shared","sessionId":"orig0000-1111","timestamp":"2026-11-24T09:00:00Z"}\n' > "${PJ}/-orig/orig0000-1111.jsonl"
+  # a origem mora na pasta CODIFICADA do checkout (como o Claude Code grava): o abridor só aceita retomar um id cujo
+  # transcript está na pasta de onde a sessão se abre (#1765, a conferência da codificação)
+  local so_enc_my; so_enc_my="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/myrepo")"
+  mkdir -p "${PJ}/${so_enc_my}" "${PJ}/-copia" "${PJ}/-outra"
+  printf '{"type":"custom-title","customTitle":"orig","sessionId":"orig0000-1111"}\n{"type":"user","uuid":"u-0001-shared","sessionId":"orig0000-1111","timestamp":"2026-11-24T09:00:00Z"}\n' > "${PJ}/${so_enc_my}/orig0000-1111.jsonl"
   printf '{"type":"history-suppression","sessionId":"copy0000-2222","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n{"type":"custom-title","customTitle":"orig (2)"}\n{"type":"system","uuid":"u-0001-shared","sessionId":"copy0000-2222","timestamp":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-copy-novo","sessionId":"copy0000-2222","timestamp":"2026-11-24T10:05:00Z"}\n' > "${PJ}/-copia/copy0000-2222.jsonl"
   printf '{"type":"history-suppression","sessionId":"other000-3333","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n{"type":"system","uuid":"u-9999-alheio","sessionId":"other000-3333","timestamp":"2026-11-24T09:00:00Z"}\n' > "${PJ}/-outra/other000-3333.jsonl"
   printf '[{"kind":"background","id":"copy0000","sessionId":"copy0000-2222","name":"orig (2)","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-copy.json"
@@ -64233,7 +64236,7 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   _so_case "(w6) cópia morta não barra a retomada" _so_w6 \
     '      [ -n "${s}" ] && [ "${s}" != "${RID}" ] && peer_live "${lv}" || continue' '      [ -n "${s}" ] && [ "${s}" != "${RID}" ] || continue'
   # (w7) IRMÃ: a cópia viva herdou o 1º uuid da origem comum, mas o ÚLTIMO herdado não está na irmã pedida: não barra
-  printf '{"type":"history-suppression","sessionId":"irma0000-6666","cause":"fork_inherit","ts":"2026-11-24T08:30:00Z"}\n{"type":"user","uuid":"u-f1","timestamp":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-irma-x","timestamp":"2026-11-24T08:40:00Z"}\n' > "${PJ}/-outra/irma0000-6666.jsonl"
+  printf '{"type":"history-suppression","sessionId":"irma0000-6666","cause":"fork_inherit","ts":"2026-11-24T08:30:00Z"}\n{"type":"user","uuid":"u-f1","timestamp":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-irma-x","timestamp":"2026-11-24T08:40:00Z"}\n' > "${PJ}/${so_enc_my}/irma0000-6666.jsonl"
   printf '{"type":"history-suppression","sessionId":"copyc000-7777","cause":"fork_inherit","ts":"2026-11-24T10:00:00Z"}\n{"type":"system","uuid":"u-f1","timestamp":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-l1","timestamp":"2026-11-24T09:30:00Z"}\n{"type":"user","uuid":"u-nova","timestamp":"2026-11-24T10:05:00Z"}\n' > "${PJ}/-copia/copyc000-7777.jsonl"
   printf '[{"kind":"background","id":"copyc000","sessionId":"copyc000-7777","name":"c","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-copyc.json"
   _so_w7() { local r; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-copyc.json" _so_run "$1" myrepo --resume irma0000-6666 --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
@@ -64248,8 +64251,8 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   _so_case_liv "(w8) cópia sem mensagem herdada: não medido e dito, nunca «não é cópia» calado" _so_w8 \
     'print("session-liveness: cópia sem mensagem herdada ainda: origem NÃO medida", file=sys.stderr); sys.exit(2)' 'sys.exit(1)'
   # (w9) irmã mais VELHA × mais NOVA (cópias da mesma origem): nenhuma é origem da outra, nos dois sentidos
-  printf '{"type":"history-suppression","sessionId":"velha000-aaaa","cause":"fork_inherit","ts":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-o1","timestamp":"2026-11-24T07:00:00Z"}\n{"type":"user","uuid":"u-velha","timestamp":"2026-11-24T08:10:00Z"}\n' > "${PJ}/-outra/velha000-aaaa.jsonl"
-  printf '{"type":"history-suppression","sessionId":"nova0000-bbbb","cause":"fork_inherit","ts":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-o1","timestamp":"2026-11-24T07:00:00Z"}\n{"type":"user","uuid":"u-o2","timestamp":"2026-11-24T08:30:00Z"}\n{"type":"user","uuid":"u-nova","timestamp":"2026-11-24T09:10:00Z"}\n' > "${PJ}/-outra/nova0000-bbbb.jsonl"
+  printf '{"type":"history-suppression","sessionId":"velha000-aaaa","cause":"fork_inherit","ts":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-o1","timestamp":"2026-11-24T07:00:00Z"}\n{"type":"user","uuid":"u-velha","timestamp":"2026-11-24T08:10:00Z"}\n' > "${PJ}/${so_enc_my}/velha000-aaaa.jsonl"
+  printf '{"type":"history-suppression","sessionId":"nova0000-bbbb","cause":"fork_inherit","ts":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-o1","timestamp":"2026-11-24T07:00:00Z"}\n{"type":"user","uuid":"u-o2","timestamp":"2026-11-24T08:30:00Z"}\n{"type":"user","uuid":"u-nova","timestamp":"2026-11-24T09:10:00Z"}\n' > "${PJ}/${so_enc_my}/nova0000-bbbb.jsonl"
   printf '[{"kind":"background","id":"velha000","sessionId":"velha000-aaaa","name":"v","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-velha.json"
   printf '[{"kind":"background","id":"nova0000","sessionId":"nova0000-bbbb","name":"n","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-nova.json"
   _so_w9() { local r r2; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-nova.json" _so_run "$1" myrepo --resume velha000-aaaa --dry-run)"
@@ -64259,8 +64262,8 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
     'cand = [u for u, t in inherited if (not o_copy) or (t is not None and t >= o_ts)]' 'cand = [u for u, t in inherited]'
   # (w10) pai × filha: retomar a FILHA com o PAI vivo abre (o pai não é cópia da filha); retomar o pai com a filha viva
   #       recusa (a filha é cópia dele)
-  printf '{"type":"history-suppression","sessionId":"pai00000-cccc","cause":"fork_inherit","ts":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-p1","timestamp":"2026-11-24T07:00:00Z"}\n{"type":"user","uuid":"u-p2","timestamp":"2026-11-24T08:30:00Z"}\n' > "${PJ}/-outra/pai00000-cccc.jsonl"
-  printf '{"type":"history-suppression","sessionId":"filha000-dddd","cause":"fork_inherit","ts":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-p1","timestamp":"2026-11-24T07:00:00Z"}\n{"type":"user","uuid":"u-p2","timestamp":"2026-11-24T08:30:00Z"}\n{"type":"user","uuid":"u-f3","timestamp":"2026-11-24T09:30:00Z"}\n' > "${PJ}/-outra/filha000-dddd.jsonl"
+  printf '{"type":"history-suppression","sessionId":"pai00000-cccc","cause":"fork_inherit","ts":"2026-11-24T08:00:00Z"}\n{"type":"user","uuid":"u-p1","timestamp":"2026-11-24T07:00:00Z"}\n{"type":"user","uuid":"u-p2","timestamp":"2026-11-24T08:30:00Z"}\n' > "${PJ}/${so_enc_my}/pai00000-cccc.jsonl"
+  printf '{"type":"history-suppression","sessionId":"filha000-dddd","cause":"fork_inherit","ts":"2026-11-24T09:00:00Z"}\n{"type":"user","uuid":"u-p1","timestamp":"2026-11-24T07:00:00Z"}\n{"type":"user","uuid":"u-p2","timestamp":"2026-11-24T08:30:00Z"}\n{"type":"user","uuid":"u-f3","timestamp":"2026-11-24T09:30:00Z"}\n' > "${PJ}/${so_enc_my}/filha000-dddd.jsonl"
   printf '[{"kind":"background","id":"pai00000","sessionId":"pai00000-cccc","name":"p","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-pai.json"
   printf '[{"kind":"background","id":"filha000","sessionId":"filha000-dddd","name":"f","state":"working","pid":%s,"cwd":"/x/outra-pasta"}]' "$$" > "${sb}/agents-filha.json"
   _so_w10() { local r r2; r="$(SO_TSESS="" SO_AGENTS="${sb}/agents-pai.json" _so_run "$1" myrepo --resume filha000-dddd --dry-run)"
@@ -64275,8 +64278,8 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   #       erro estoura com traceback e rc 1 (2ª metade).
   mkdir -p "${sb}/so-path-py"; ln -sfn "$(command -v python3)" "${sb}/so-path-py/python3"
   _so_w11() { local r rc=0 r2 rc2=0
-    r="$(TMPDIR="${sb}/nao-existe-tmp" bash "${SO_LIV:-${liv}}" fork-of "${PJ}/-copia/copy0000-2222.jsonl" "${PJ}/-orig/orig0000-1111.jsonl" 2>&1)" || rc=$?
-    r2="$(PATH="${sb}/so-path-py" "$(command -v bash)" "${SO_LIV:-${liv}}" fork-of "${PJ}/-copia/copy0000-2222.jsonl" "${PJ}/-orig/orig0000-1111.jsonl" 2>&1)" || rc2=$?
+    r="$(TMPDIR="${sb}/nao-existe-tmp" bash "${SO_LIV:-${liv}}" fork-of "${PJ}/-copia/copy0000-2222.jsonl" "${PJ}/${so_enc_my}/orig0000-1111.jsonl" 2>&1)" || rc=$?
+    r2="$(PATH="${sb}/so-path-py" "$(command -v bash)" "${SO_LIV:-${liv}}" fork-of "${PJ}/-copia/copy0000-2222.jsonl" "${PJ}/${so_enc_my}/orig0000-1111.jsonl" 2>&1)" || rc2=$?
     SO_WHY="tmpdir rc=${rc} $(head -c 150 <<< "${r}") · sem grep rc=${rc2} $(head -c 200 <<< "${r2}")"
     [ "${rc}" = 0 ] && [ "${rc2}" = 2 ] && grep -q 'grep não rodou' <<< "${r2}"; }
   _so_case_liv "(w11) falha de ambiente no fork-of é «não medido» (rc 2), nunca «não descende»" _so_w11 \
@@ -64329,12 +64332,29 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   local encM; encM="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/myrepo")"; mkdir -p "${PJ}/${encM}"
   printf '{"type":"custom-title","customTitle":"myrepo","sessionId":"99990000-nocwd"}\n' > "${PJ}/${encM}/99990000-nocwd.jsonl"
   _so_rd6() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run --resume 99990000-nocwd)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
-    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'uso a do registro de posse' <<< "${r}" && grep -qF "new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --resume 99990000-nocwd'" <<< "${r}"; }
-  _so_case "(rd6) --resume de transcript sem cwd: a pasta vem do registro, dita" _so_rd6 \
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'conferida: a codificação dela é a pasta do transcript' <<< "${r}" && grep -qF "new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --resume 99990000-nocwd'" <<< "${r}"; }
+  _so_case "(rd6) --resume de transcript sem cwd: a pasta que o nome dá, conferida pela codificação, e dita" _so_rd6 \
     '  if [ "${d}" = "-" ]; then
-    local loc;' '  if false; then
-    local loc;'
+    local loc ld tf;' '  if false; then
+    local loc ld tf;'
   rm -f "${PJ}/${encM}/99990000-nocwd.jsonl"
+  # (rd7) --resume, transcript sem cwd, registro AMBÍGUO e a conversa mais recente com o título noutra pasta: a pasta
+  #       que o nome dá (multiB) não é a do transcript (multiA) → rc 5, nunca abre na pasta errada
+  local encA7; encA7="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/multiA")"; mkdir -p "${PJ}/${encA7}"
+  printf '{"type":"custom-title","customTitle":"velho","sessionId":"99990001-amb"}\n' > "${PJ}/${encA7}/99990001-amb.jsonl"
+  _so_rd7() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-multi.yaml" _so_run "$1" multi --dry-run --resume 99990001-amb)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF 'não é a do transcript' <<< "${r}" && ! grep -q 'ensaio:' <<< "${r}"; }
+  _so_case "(rd7) transcript sem cwd e o nome aponta outra pasta: rc 5, nunca a pasta errada" _so_rd7 \
+    '    [ "$(sed '\''s#[^A-Za-z0-9-]#-#g'\'' <<< "${ld}")" = "${tf}" ] || die' '    true || die'
+  rm -f "${PJ}/${encA7}/99990001-amb.jsonl"
+  # (rd8) --resume, transcript sem cwd, nome FORA do registro (o palpite ~/<nome>) noutra pasta: rc 5
+  local encX8; encX8="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/myrepo")"; mkdir -p "${PJ}/${encX8}"
+  printf '{"type":"custom-title","customTitle":"x","sessionId":"99990002-fora"}\n' > "${PJ}/${encX8}/99990002-fora.jsonl"
+  _so_rd8() { local r; r="$(SO_TSESS="" _so_run "$1" foraregistro --dry-run --resume 99990002-fora)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF 'não é a do transcript' <<< "${r}" && ! grep -q 'ensaio:' <<< "${r}"; }
+  _so_case "(rd8) transcript sem cwd e nome fora do registro: rc 5" _so_rd8 \
+    '    [ "$(sed '\''s#[^A-Za-z0-9-]#-#g'\'' <<< "${ld}")" = "${tf}" ] || die' '    true || die'
+  rm -f "${PJ}/${encX8}/99990002-fora.jsonl"
   # (rd5) sem --resume, registro ambíguo e conversas com o título em PASTAS diferentes: não escolhe a pasta (rc 2)
   local encA2; encA2="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/multiA")"
   printf '{"type":"user","cwd":"%s/multiA","sessionId":"88888888-mta"}\n{"type":"custom-title","customTitle":"multi","sessionId":"88888888-mta"}\n' "${HM}" > "${PJ}/${encA2}/88888888-mta.jsonl"
@@ -64527,7 +64547,15 @@ OA_TMUX
   _oa_h() { local r; r="$(OA_LIVE="${sb}/liveness-dead" _oa_run "$1" beta)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|clog=$(tr '\n' '|' < "${sb}/clog")"
     [ "${r%%$'\t'*}" = 5 ] && ! grep -q '^attach' "${sb}/clog"; }
   _oa_case "(h) helper de vida presente: ele decide (morta → não anexa)" _oa_h \
-    'if [ -f "${LIVENESS}" ]; then bash' 'if false; then bash'
+    '  if [ -f "${LIVENESS}" ]; then
+    local lr=0;' '  if false; then
+    local lr=0;'
+  # (lw) o helper de vida devolve rc 2 (não medido): conta como morta, mas avisa no stderr, nunca calado
+  printf '#!/usr/bin/env bash\nexit 2\n' > "${sb}/liveness-unmeasured"; chmod +x "${sb}/liveness-unmeasured"
+  _oa_lw() { local r; r="$(OA_LIVE="${sb}/liveness-unmeasured" _oa_run "$1" beta)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|clog=$(tr '\n' '|' < "${sb}/clog")"
+    grep -qF 'não medi se a sessão' <<< "${r}" && ! grep -q '^attach' "${sb}/clog"; }
+  _oa_case "(lw) helper de vida rc 2: morta, com aviso no stderr" _oa_lw \
+    '[ "${lr}" -le 1 ] || say' 'true || say'
   # (i) interativa VIVA fora de um tmux achado: não anexa, rc 3, diz onde ela roda
   _oa_i() { local r; r="$(_oa_run "$1" inter)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
     [ "${r%%$'\t'*}" = 3 ] && grep -qF 'interativa fora de um tmux' <<< "${r}" && [ ! -s "${sb}/solog" ]; }
