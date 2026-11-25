@@ -72,14 +72,24 @@ nodes:
   - id: Q_SUBIR_SDK_DO_BRIDGE_0_3_332_E_PIN_DO_REVISOR_V1_0_290_1125
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.75
-    verified_at: "2026-11-25"
-    verified_against: "currency-census.sh em 2026-11-25: agent-sdk:bridge 0.3.323 contra 0.3.332 publicada (o hook de atualidade da mesma hora leu 0.3.331: o registro oscila); action 1.0.286 contra 1.0.290 (o hook leu 1.0.289); gh pr view 112 no repo onion-bridge → OPEN, «chore(deps): o Agent SDK sobe de 0.3.323 para 0.3.330», mergedAt null; tm.sh item.read SAC-432 --lean → startedAt 2026-11-21, updatedAt 2026-11-21T14:56"
     label: "o SDK do bridge sobe para 0.3.332 (o PR onion-bridge #112, ainda aberto, mira 0.3.330 e precisa de novo alvo) e o pin do revisor do CI sobe para a action v1.0.290, que instala o CLI 2.1.332"
-    narrative: "Issue no Linear: SAC-432, já em andamento; o juiz achou que ela ainda não tinha sido comentada (o último comentário era da rodada 27, e o título falava em 0.3.327), e a rodada a comentou com os alvos novos no passo 8 e corrigiu o título para 0.3.332 e v1.0.290. O merge e o deploy do bridge são do maestro. Até lá, o que a 2.1.324 a 2.1.332 corrigiram (entre eles o congelamento do deny em comando longo, E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125) não chega a quem conversa pelo bridge."
+    status: done
+    plane: DEV
+    x_destination: design
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro em 2026-11-25, por pergunta com opções (/meta:decide): escolhida «Retarget do #112 para 0.3.332 pela sessão dona do bridge, pin do revisor v1.0.290 no core, merge e deploy do bridge em card do maestro»"
+    narrative: |-
+      Issue no Linear: SAC-432, já em andamento; o juiz achou que ela ainda não tinha sido comentada (o último comentário era da rodada 27, e o título falava em 0.3.327), e a rodada a comentou com os alvos novos no passo 8 e corrigiu o título para 0.3.332 e v1.0.290. O merge e o deploy do bridge são do maestro. Até lá, o que a 2.1.324 a 2.1.332 corrigiram (entre eles o congelamento do deny em comando longo, E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125) não chega a quem conversa pelo bridge.
+
+      verified_against anterior: «currency-census.sh em 2026-11-25: agent-sdk:bridge 0.3.323 contra 0.3.332 publicada (o hook de atualidade da mesma hora leu 0.3.331: o registro oscila); action 1.0.286 contra 1.0.290 (o hook leu 1.0.289); gh pr view 112 no repo onion-bridge → OPEN, «chore(deps): o Agent SDK sobe de 0.3.323 para 0.3.330», mergedAt null; tm.sh item.read SAC-432 --lean → startedAt 2026-11-21, updatedAt 2026-11-21T14:56»
+      Selado por /meta:decide em 2026-11-25: escolhida «Retarget do #112 para 0.3.332 pela sessão dona do bridge, pin do revisor v1.0.290 no core, merge e deploy do bridge em card do maestro»; descartadas: «Só o pin do CI» · «Depois». Destino: desenho (fica como texto, sem guarda a cobrar).
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-25: «SDK do bridge para 0.3.332 e revisor para v1.0.290 (SAC-432)?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-25"
+      locality: "pessoa"
   - id: E_DENY_LENTO_EM_COMANDO_LONGO_NA_2_1_331_CURADO_NA_2_1_332_1125
     node_type: evidence
     layer: audit
@@ -190,14 +200,24 @@ nodes:
   - id: Q_CAMINHO_DE_IMAGEM_PARA_AS_SESSOES_DA_VPS_1125
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 2
     confidence: 0.7
-    verified_at: "2026-11-25"
-    verified_against: "aberta em 2026-11-25 a partir de E_CTRL_V_DE_IMAGEM_NAO_ALCANCA_A_VPS_HEADLESS_1125"
     label: "declarar e documentar o caminho de imagem do maestro para as sessões da VPS (Remote Control pelo app, ou arquivo enviado e citado por @caminho), já que o Ctrl+V do terminal não alcança a VPS headless"
-    narrative: "Issue no Linear: SAC-553 (projeto Onion — core: próximas levas). Medir cada caminho de ponta a ponta antes de escrever a doutrina; o pedido do maestro de 2026-11-25 é copiar e colar, inclusive imagens, nas sessões do tmux."
+    status: done
+    plane: DEV
+    x_destination: design
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro em 2026-11-25, por pergunta com opções (/meta:decide): escolhida «Gokapi como padrão (link colado, o core baixa para um caminho); scp com .ps1 de reserva»"
+    narrative: |-
+      Issue no Linear: SAC-553 (projeto Onion — core: próximas levas). Medir cada caminho de ponta a ponta antes de escrever a doutrina; o pedido do maestro de 2026-11-25 é copiar e colar, inclusive imagens, nas sessões do tmux.
+
+      verified_against anterior: «aberta em 2026-11-25 a partir de E_CTRL_V_DE_IMAGEM_NAO_ALCANCA_A_VPS_HEADLESS_1125»
+      Selado por /meta:decide em 2026-11-25: escolhida «Gokapi como padrão (link colado, o core baixa para um caminho); scp com .ps1 de reserva»; descartadas: «Remote Control pelo app» · «Os dois, medidos». Destino: desenho (fica como texto, sem guarda a cobrar).
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-25: «Caminho de imagem do maestro para as sessões da VPS (SAC-553)?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-25"
+      locality: "pessoa"
   - id: E_TIME_EM_PAINEL_E_SESSAO_PROPRIA_COM_O_BINARIO_DO_LIDER_1125
     node_type: evidence
     layer: audit
@@ -265,14 +285,25 @@ nodes:
   - id: Q_DENY_SEGURA_EM_BYPASS_1125
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 5
     confidence: 0.75
-    verified_at: "2026-11-25"
-    verified_against: "aberta em 2026-11-25 a partir de E_DENY_NAO_SEGURA_EM_BYPASS_1125"
     label: "fazer o deny da casa segurar no modo da casa (bypassPermissions), com casos novos na bancada do deny e uma guarda PreToolUse independente do deny"
-    narrative: "Issue no Linear: SAC-551 (projeto Onion — core: próximas levas). Desenho pelo /meta:forge-guard. A bancada precisa reprovar contra mutante e rodar nas versões vivas; os casos dela nascem do registro privado do core e só entram no repositório público depois da coordenação com o fornecedor. O reporte ao fornecedor é do maestro."
+    status: done
+    plane: DEV
+    x_destination: mechanism
+    x_guard: "SAC-551"
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro em 2026-11-25, por pergunta com opções (/meta:decide): escolhida «Forjar a guarda já: PreToolUse independente do deny, com bancada e mutante, pelo /meta:forge-guard»"
+    narrative: |-
+      Issue no Linear: SAC-551 (projeto Onion — core: próximas levas). Desenho pelo /meta:forge-guard. A bancada precisa reprovar contra mutante e rodar nas versões vivas; os casos dela nascem do registro privado do core e só entram no repositório público depois da coordenação com o fornecedor. O reporte ao fornecedor é do maestro.
+
+      verified_against anterior: «aberta em 2026-11-25 a partir de E_DENY_NAO_SEGURA_EM_BYPASS_1125»
+      Selado por /meta:decide em 2026-11-25: escolhida «Forjar a guarda já: PreToolUse independente do deny, com bancada e mutante, pelo /meta:forge-guard»; descartadas: «Sair do bypass» · «Depois». Destino: mecanismo (vira guarda; a guarda a construir está no campo x_guard).
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-25: «O deny da casa não segura no bypassPermissions (SAC-551). Fazemos a guarda?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-25"
+      locality: "pessoa"
   - id: E_DERIVA_DO_CITED_DIRECTIVE_SEGUE_IGUAL_NA_2_1_332_1125
     node_type: evidence
     layer: audit
