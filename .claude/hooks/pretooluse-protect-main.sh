@@ -120,9 +120,10 @@ fi
 # A força se procura só nos tokens DEPOIS do PRIMEIRO `push`, no mesmo segmento: `eval "git push origin $1; tail -f x"`
 # era vetado pelo `-f` do tail (refutador isolado, B2), e o corte guloso no ÚLTIMO `push` escondia a força em
 # `eval "git push -f origin feat/push-$N"` e em `--push-option` (2º refutador isolado).
-if printf '%s\n' "$inv" | sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p' | tr ';&|' '\n\n\n' \
-   | sed -n 's/\bpush\b/\x01/;s/^[^\x01]*\x01//p' \
-   | grep -qE '(^|[[:space:]])(--force([[:space:]]|$)|--mirror([[:space:]]|$)|-[a-eg-z]*f[a-z]*([[:space:]]|$)|\+[^[:space:]])'; then
+# (o juiz lê por here-string: `| grep -q` no fim do pipe fecha cedo e o pipefail reprova com o padrão presente)
+after_push=$(printf '%s\n' "$inv" | sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p' | tr ';&|' '\n\n\n' \
+   | sed -n 's/\bpush\b/\x01/;s/^[^\x01]*\x01//p')
+if grep -qE '(^|[[:space:]])(--force([[:space:]]|$)|--mirror([[:space:]]|$)|-[a-eg-z]*f[a-z]*([[:space:]]|$)|\+[^[:space:]])' <<< "$after_push"; then
   echo "GUARDA-PRETOOLUSE: comando com forma de force-push (-f, --force, refspec com + ou --mirror) que NÃO pode ser analisado com certeza — reescreva sem eval, nome de comando em variável ou xargs. Force-push reescreve a história do remoto em qualquer branch; se for deliberado, o maestro roda fora da sessão." >&2
   exit 2
 fi
