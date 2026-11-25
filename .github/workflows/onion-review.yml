@@ -309,6 +309,12 @@ jobs:
         # SUBIDO para v1.0.269 (61a9c274; a tag anotada é 402b5b79) em 2026-11-06, pelo aviso do session-currency-check: 4 commits,
         # um por release (1.0.266 a 1.0.269), todos "bump Claude Code to 2.1.31x and Agent SDK to 0.3.31x", nos mesmos 6 arquivos;
         # as notas das 4 releases só trazem o link do changelog. O action.yml da raiz não muda: nenhum input nem output usado aqui muda.
+        # SUBIDO para v1.0.290 (4411a9e9; a tag anotada é 7558e61c) em 2026-11-25 (SAC-432), pelo aviso do session-currency-check:
+        # 6 commits (v1.0.287..v1.0.290), CLI 2.1.330 -> 2.1.332, SDK 0.3.332. Medido no compare acfe7992...4411a9e9: a seção
+        # `outputs:` do action.yml não muda e nenhum input usado aqui muda. O allow_fork_prs passa a ter default "false" (#2114),
+        # e o job já exige head.repo.fork == false. O passo "Post buffered inline comments" sai do action.yml e vira parte do
+        # passo run (#2122); este job não posta comentário inline. O run passa a parar a sessão e revogar o token quando o run
+        # é cancelado (#2112). A prova de execução é o PR SEGUINTE: o PR que edita o workflow faz a action se auto-pular. Antes:
         # SUBIDO para v1.0.286 (acfe7992; a tag anotada é cb5e7061) em 2026-11-20 (SAC-432), pelo aviso do session-currency-check:
         # 32 commits (v1.0.273..v1.0.286), CLI 2.1.322 -> 2.1.330. Pela 1ª vez desde a v1.0.252 a subida MUDA COMPORTAMENTO, porque
         # a v1.0.273 (#2004) abre a sessão em AUTO MODE por padrão: uma revisão de segurança decide o que nenhuma regra de
@@ -340,7 +346,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@acfe7992852970efb4fee683d63d628e3e52df67
+        uses: anthropics/claude-code-action@4411a9e9b0283becf4b924f7bce360fd7756c78c
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -488,6 +494,12 @@ jobs:
         # SUBIDO para v1.0.269 (61a9c274; a tag anotada é 402b5b79) em 2026-11-06, pelo aviso do session-currency-check: 4 commits,
         # um por release (1.0.266 a 1.0.269), todos "bump Claude Code to 2.1.31x and Agent SDK to 0.3.31x", nos mesmos 6 arquivos;
         # as notas das 4 releases só trazem o link do changelog. O action.yml da raiz não muda: nenhum input nem output usado aqui muda.
+        # SUBIDO para v1.0.290 (4411a9e9; a tag anotada é 7558e61c) em 2026-11-25 (SAC-432), pelo aviso do session-currency-check:
+        # 6 commits (v1.0.287..v1.0.290), CLI 2.1.330 -> 2.1.332, SDK 0.3.332. Medido no compare acfe7992...4411a9e9: a seção
+        # `outputs:` do action.yml não muda e nenhum input usado aqui muda. O allow_fork_prs passa a ter default "false" (#2114),
+        # e o job já exige head.repo.fork == false. O passo "Post buffered inline comments" sai do action.yml e vira parte do
+        # passo run (#2122); este job não posta comentário inline. O run passa a parar a sessão e revogar o token quando o run
+        # é cancelado (#2112). A prova de execução é o PR SEGUINTE: o PR que edita o workflow faz a action se auto-pular. Antes:
         # SUBIDO para v1.0.286 (acfe7992; a tag anotada é cb5e7061) em 2026-11-20 (SAC-432), pelo aviso do session-currency-check:
         # 32 commits (v1.0.273..v1.0.286), CLI 2.1.322 -> 2.1.330. Pela 1ª vez desde a v1.0.252 a subida MUDA COMPORTAMENTO, porque
         # a v1.0.273 (#2004) abre a sessão em AUTO MODE por padrão: uma revisão de segurança decide o que nenhuma regra de
@@ -519,7 +531,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@acfe7992852970efb4fee683d63d628e3e52df67
+        uses: anthropics/claude-code-action@4411a9e9b0283becf4b924f7bce360fd7756c78c
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
