@@ -137,7 +137,12 @@ fi
 
 # «viva?» — a regra única do helper do #1761 quando ele existe; senão, a mesma regra aqui
 is_live() {  # kind state pid → rc 0 viva · 1 morta
-  if [ -f "${LIVENESS}" ]; then bash "${LIVENESS}" live "$1" "$2" "$3" >/dev/null 2>&1; return $?; fi
+  if [ -f "${LIVENESS}" ]; then
+    local lr=0; bash "${LIVENESS}" live "$1" "$2" "$3" >/dev/null 2>&1 || lr=$?
+    # rc 2 = não medido (uso ou entrada ilegível): conta como morta, mas DITO, nunca calado
+    [ "${lr}" -le 1 ] || say "onion-attach: ⚠️ não medi se a sessão (kind $1, pid $3) está viva (session-liveness rc ${lr}): trato como morta." >&2
+    [ "${lr}" -eq 0 ]; return $?
+  fi
   local k="$1" p="$3"
   if [ -n "${p}" ] && [ "${p}" != "-" ]; then
     [[ "${p}" =~ ^[1-9][0-9]*$ ]] || { [ "${k}" = interactive ]; return $?; }   # pid 0 ou torto: só a interativa conta
