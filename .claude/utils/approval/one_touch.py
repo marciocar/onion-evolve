@@ -355,12 +355,18 @@ def gh_lines(args, budget, what):
 
 
 def head_age_s(slug, sha, budget):
-    """Segundos desde o commit do head (committer.date, que o rebase e o amend renovam)."""
-    out = gh_lines(["api", "repos/%s/commits/%s" % (slug, sha), "--jq", ".commit.committer.date"], budget, "a data do head")
+    """Segundos desde o carimbo do SERVIDOR para o head: o created_at mais antigo dos check-suites do sha, que o GitHub
+    grava quando o push chega. A committer.date NÃO serve: quem commita a escreve (GIT_COMMITTER_DATE), e um head
+    recém-empurrado com data antiga forjada passaria (decisão do core, 2026-11-25). Sem check-suite = o CI ainda não viu
+    o head: recusa, coerente com o gate do executor que exige CI verde no head."""
+    out = gh_lines(["api", "repos/%s/commits/%s/check-suites" % (slug, sha), "--paginate", "--jq", "[.check_suites[].created_at]|min"], budget, "os check-suites do head")
+    stamps = [x.strip() for x in out if x.strip() and x.strip() != "null"]
+    if not stamps:
+        raise LookupError("o CI ainda não viu este head (@%s); repita quando o CI começar" % sha[:7])
     try:
-        return time.time() - parse_utc(out[0].strip()[:19] + "Z")
-    except (ValueError, IndexError):
-        raise LookupError("data do head ilegível no forge")
+        return time.time() - min(parse_utc(x[:19] + "Z") for x in stamps)
+    except ValueError:
+        raise LookupError("data do check-suite do head ilegível no forge")
 
 
 def hook_numbered(payload, sid, prs, prompt):
@@ -394,7 +400,9 @@ def hook_numbered(payload, sid, prs, prompt):
                 raise LookupError("o PR está %s" % ("mergeado" if merged == "true" else "fechado"))
             if not re.fullmatch(r"[0-9a-f]{40}", sha) or not re.fullmatch(r"[A-Za-z0-9._/-]+", ref):
                 raise LookupError("head ilegível no forge")
-            files = gh_lines(["api", "repos/%s/pulls/%d/files" % (slug, n), "--paginate", "--jq", ".[].filename"],
+            # o nome antigo da renomeação conta (renomear um arquivo da catraca para fora não escapa) e todas as páginas
+            # contam (PR com mais de 100 arquivos não esconde um da catraca na 2ª): o mesmo jq do executor
+            files = gh_lines(["api", "repos/%s/pulls/%d/files?per_page=100" % (slug, n), "--paginate", "--jq", ".[] | .filename, (.previous_filename // empty)"],
                              HOOK_BUDGET_S - (time.time() - t0), "os arquivos do PR")
             hit = [f for f in files if RATCHET_RE.fullmatch(f.strip())]
             if hit:

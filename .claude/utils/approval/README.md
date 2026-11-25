@@ -44,8 +44,13 @@ estou falando, execute se ok». A frase que **nomeia o PR** pula o passo 1:
   ali segue o pedido com o sha na tela e o «pode rodar» solto; (2) com o revisor do CI em fallback, ou em PR que muda a
   maquinaria do revisor, o resíduo isolado (`elenxo_isolado: true`) segue exigido pelo gate de fallback de guarda,
   com palavra ou sem ela.
-- **Head recém-empurrado**: o hook recusa se o head do PR tem menos de 120 s (data do commit do head no forge) e pede a
-  frase de novo: o maestro digitou olhando um PR que acabou de mudar.
+- **Head recém-empurrado**: o hook recusa se o head do PR tem menos de 120 s e pede a frase de novo: o maestro digitou
+  olhando um PR que acabou de mudar. A idade vem de um carimbo do **servidor**, o `created_at` mais antigo dos
+  check-suites do sha (o GitHub o grava quando o push chega), nunca da `committer.date`, que quem commita escreve
+  (`GIT_COMMITTER_DATE`). Head sem check-suite recusa («o CI ainda não viu este head»).
+- **Lista de arquivos**: todas as páginas (`--paginate`) e o nome antigo da renomeação (`previous_filename`), como o
+  executor: renomear um arquivo da catraca para fora não escapa. A regex da catraca do motor é a mesma do executor
+  (a bancada compara as duas byte a byte).
 - **Vírgula**: só com espaço depois (`1763, 1765`); `1,763` não vira `#1` e `#763`.
 - **Palavra vencida ou gasta** não sombreia o pedido vivo do mesmo PR: o executor a ignora e usa o pedido; sem pedido,
   diz «a palavra com número para o PR #n venceu/já foi usada: diga de novo».

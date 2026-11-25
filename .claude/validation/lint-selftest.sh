@@ -27427,6 +27427,8 @@ fi
 case "$args" in
   # «pode rodar 1763» (2026-11-25): o hook lê o PR no forge (estado, merged, head) na hora da palavra
   *"api repos/"*"/commits/"*"committer.date"*) echo "${GH_HEAD_DATE:-2020-01-01T00:00:00Z}"; exit 0 ;;
+  # o carimbo do SERVIDOR para o head (created_at do check-suite mais antigo); GH_SUITES_NONE = o CI ainda não viu o head
+  *"api repos/"*"/check-suites"*) if [ -n "${GH_SUITES_NONE:-}" ]; then echo null; else echo "${GH_SUITE_DATE:-2020-01-01T00:00:00Z}"; fi; exit 0 ;;
   *"api repos/"*"/pulls/"*"head.sha"*)
       [ -n "${GH_PRAPI_SLEEP:-}" ] && sleep "${GH_PRAPI_SLEEP}"
       [ "${GH_PRAPI_RC:-0}" -ne 0 ] && { echo "gh: Not Found (HTTP 404)" >&2; exit "${GH_PRAPI_RC}"; }
@@ -27545,7 +27547,10 @@ case "$args" in
         printf '%s' "${GH_PR_FILES_JSON}" | jq -r "$q"; exit 0
       fi
       # os arquivos do PR, um por linha (SAC-80: só PR que toca .kg.yaml faz a guarda ler git)
-      [ -n "${GH_PR_FILES:-}" ] && printf '%s\n' ${GH_PR_FILES}; exit 0 ;;
+      [ -n "${GH_PR_FILES:-}" ] && printf '%s\n' ${GH_PR_FILES}
+      # a 2ª página só chega a quem pede --paginate (como o gh real: sem ele, só a 1ª)
+      [ -n "${GH_PR_FILES_PAGE2:-}" ] && [[ " $args " == *" --paginate "* ]] && printf '%s\n' ${GH_PR_FILES_PAGE2}
+      exit 0 ;;
   *"pr merge"*)
       # TOCTOU: um push alheio cai ENTRE o julgamento do CI e o merge. O forge de verdade (expectedHeadOid)
       # recusa quando --match-head-commit não bate com o head atual; sem a flag, mergeia o head novo.
@@ -28464,11 +28469,11 @@ except Exception: print(t)'
   OT_FILES="${_otm1}" _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn9b-MUT) sem a recusa no executor, a palavra com número mergearia o PR da catraca — a recusa é a causa" 0 "pelo «pode rodar»"
   cp "${d}/pmv-otn-intacto.sh" "${_otsx}"; _otrestore
   # (otn10) head que acabou de mudar (menos de 120 s) ⇒ o hook não registra
-  GH_HEAD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" _otword "pode rodar 999"
+  GH_SUITE_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" _otword "pode rodar 999"
   if grep -qF "acabou de mudar" <<< "${o}" && [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn10) head com menos de 120 s ⇒ o hook não registra e pede a frase de novo"
   else record_fail "pr-merge-verified: (otn10)" "out=${o}"; fi
   _otmut 's/^    return HEAD_MIN_AGE_S$/    return 0/' "(otn10-MUT)"
-  GH_HEAD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" _otword "pode rodar 999"
+  GH_SUITE_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" _otword "pode rodar 999"
   if [ -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn10-MUT) sem a idade mínima do head, o head recém-empurrado registraria — a idade é a causa"
   else record_fail "pr-merge-verified: (otn10-MUT)" "o mutante também não registrou"; fi
   _otrestore
@@ -28540,6 +28545,58 @@ p=sys.argv[2];a=json.load(open(p));r=a["request"];r["created_at"]=o.utc(o.time.t
   _otword "pode rodar 999"; OT_SHA="${_otc40}" _otrun "${fc}" "${_otsx}" --one-touch
   OT_SCRIPT="${_otsx}" _otarm
   _otrun "${fc}" "${_otsx}" --one-touch; _otcase "(otn17-MUT) com a palavra gasta escolhida, o pedido vivo seria sombreado — ignorar a gasta é a causa" 1 "já foi usada"
+  # ── 2ª rodada (core e merge-word-reviewer, 2026-11-25): carimbo do servidor, renomeação, paginação, regex única ────
+  # (otn18) committer.date antiga FORJADA e check-suite recente: a idade é a do servidor ⇒ recusa
+  GH_HEAD_DATE="2020-01-01T00:00:00Z" GH_SUITE_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" _otword "pode rodar 999"
+  if grep -qF "acabou de mudar" <<< "${o}" && [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn18) committer.date antiga forjada + check-suite recente ⇒ recusa (a idade é do servidor)"
+  else record_fail "pr-merge-verified: (otn18)" "out=${o}"; fi
+  _otmut 's/^    out = gh_lines(\["api", "repos\/%s\/commits\/%s\/check-suites" % (slug, sha), "--paginate", "--jq", "\[.check_suites\[\].created_at\]|min"\], budget, "os check-suites do head")$/    out = gh_lines(["api", "repos\/%s\/commits\/%s" % (slug, sha), "--jq", ".commit.committer.date"], budget, "a data do head")/' "(otn18-MUT)"
+  GH_HEAD_DATE="2020-01-01T00:00:00Z" GH_SUITE_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" _otword "pode rodar 999"
+  if [ -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn18-MUT) lendo a committer.date, a data forjada registraria — o carimbo do servidor é a causa"
+  else record_fail "pr-merge-verified: (otn18-MUT)" "o mutante também não registrou: ${o}"; fi
+  _otrestore
+  # (otn19) head sem check-suite (o CI ainda não o viu) ⇒ recusa
+  GH_SUITES_NONE=1 _otword "pode rodar 999"
+  if grep -qF "o CI ainda não viu este head" <<< "${o}" && [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn19) head sem check-suite ⇒ recusa («o CI ainda não viu este head»)"
+  else record_fail "pr-merge-verified: (otn19)" "out=${o}"; fi
+  _otmut 's/^    stamps = \[x.strip() for x in out if x.strip() and x.strip() != "null"\]$/    stamps = ["2020-01-01T00:00:00Z"]/' "(otn19-MUT)"
+  GH_SUITES_NONE=1 _otword "pode rodar 999"
+  if [ -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn19-MUT) tomando o head sem check-suite como velho, ele registraria — a recusa é a causa"
+  else record_fail "pr-merge-verified: (otn19-MUT)" "o mutante também não registrou: ${o}"; fi
+  _otrestore
+  # (otn20) renomeação de um arquivo da catraca para fora: o previous_filename conta ⇒ recusa
+  GH_PR_FILES_JSON='[{"filename":"docs/x.md"},{"filename":"docs/fora.json","previous_filename":".claude/settings.json"}]' _otword "pode rodar 999"
+  if grep -qF "muda a catraca" <<< "${o}" && [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn20) renomear arquivo da catraca para fora ⇒ o hook não registra (previous_filename)"
+  else record_fail "pr-merge-verified: (otn20)" "out=${o}"; fi
+  _otmut 's/"--jq", ".\[\] | .filename, (.previous_filename \/\/ empty)"\],$/"--jq", ".[].filename"],/' "(otn20-MUT)"
+  GH_PR_FILES_JSON='[{"filename":"docs/x.md"},{"filename":"docs/fora.json","previous_filename":".claude/settings.json"}]' _otword "pode rodar 999"
+  if [ -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn20-MUT) só pelo nome novo, a renomeação para fora da catraca registraria — o previous_filename é a causa"
+  else record_fail "pr-merge-verified: (otn20-MUT)" "o mutante também não registrou: ${o}"; fi
+  _otrestore
+  # (otn21) arquivo da catraca na 2ª página da lista ⇒ recusa (o hook pede --paginate)
+  GH_PR_FILES_PAGE2=".claude/settings.json" _otword "pode rodar 999"
+  if grep -qF "muda a catraca" <<< "${o}" && [ ! -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn21) arquivo da catraca na 2ª página ⇒ o hook não registra"
+  else record_fail "pr-merge-verified: (otn21)" "out=${o}"; fi
+  _otmut 's/"repos\/%s\/pulls\/%d\/files?per_page=100" % (slug, n), "--paginate", /"repos\/%s\/pulls\/%d\/files?per_page=100" % (slug, n), /' "(otn21-MUT)"
+  GH_PR_FILES_PAGE2=".claude/settings.json" _otword "pode rodar 999"
+  if [ -f "${_otapn}" ]; then record_pass "pr-merge-verified: (otn21-MUT) sem --paginate, a catraca da 2ª página escaparia — a paginação é a causa"
+  else record_fail "pr-merge-verified: (otn21-MUT)" "o mutante também não registrou: ${o}"; fi
+  _otrestore
+  # (otn22) a lista da catraca é UMA: o RATCHET_RE do motor é byte a byte a regex do _ratchet_hits do executor
+  _otratchet() { # $1=motor $2=executor → "igual" ou "diferente"
+    local _py _sh
+    _py="$(sed -n 's/^RATCHET_RE = re.compile(r"\(.*\)")  # (core-only)$/\1/p' "$1")"
+    _sh="$(sed -n "s/^_ratchet_hits() { grep -xE '\(.*\)'; }\$/\1/p" "$2")"
+    if [ -n "${_py}" ] && [ "${_py}" = "${_sh}" ]; then echo igual; else echo "diferente [${_py}] [${_sh}]"; fi
+  }
+  o="$(_otratchet "${REPO_ROOT}/.claude/utils/approval/one_touch.py" "${REPO_ROOT}/ops/pr-merge-verified.sh")"
+  if [ "${o}" = igual ]; then record_pass "pr-merge-verified: (otn22) RATCHET_RE do motor = regex do _ratchet_hits do executor (lista única provada)"
+  else record_fail "pr-merge-verified: (otn22)" "${o}"; fi
+  sed 's/|\\\.claude\/settings(\\\.local)?\\\.json")  # (core-only)$/")  # (core-only)/' "${REPO_ROOT}/.claude/utils/approval/one_touch.py" > "${d}/ot-ratchet-mut.py"
+  cmp -s "${d}/ot-ratchet-mut.py" "${REPO_ROOT}/.claude/utils/approval/one_touch.py" && record_fail "pr-merge-verified: (otn22-MUT)" "a âncora do mutante sumiu"
+  o="$(_otratchet "${d}/ot-ratchet-mut.py" "${REPO_ROOT}/ops/pr-merge-verified.sh")"
+  if [ "${o}" != igual ]; then record_pass "pr-merge-verified: (otn22-MUT) o motor sem o settings diverge do executor — a comparação acusa"
+  else record_fail "pr-merge-verified: (otn22-MUT)" "o mutante passou como igual"; fi
   _otrestore; _otclean; unset OT_FILES
   # ── REPOS DE SERVIÇO COM SESSÃO DONA (D_SERVICE_REPOS_OWNER_VPS_OPS_1120, 2026-11-20) ──────────────────────────────
   # (b) MESMA DONA REGISTRADA: a sessão da peça "dona" mergeia o repo de serviço "svc" (owner_session: dona), pela regra (3)
