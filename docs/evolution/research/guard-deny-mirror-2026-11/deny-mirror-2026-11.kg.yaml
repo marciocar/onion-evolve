@@ -9,9 +9,6 @@ meta:
   # Forja (/meta:forge-guard) do espelho do deny: SAC-551, Q_DENY_SEGURA_EM_BYPASS_1125 (radar E3, rodada 28).
   # Os casos do incidente real ficam no registro privado do core; aqui só formas genéricas.
 external_edges:
-  - from: E_CORPUS_DE_TRANSCRIPTS_SEM_FALSO_POSITIVO_1125
-    to: D_ESPELHO_DO_DENY_POR_HOOK_E_EVAL_NA_LIB_1125
-    edge_type: SUPPORTS
   - from: E_HOOKS_DEIXAVAM_ABERTO_O_QUE_SO_O_DENY_COBRIA_1125
     to: "docs/evolution/research/radar-E3-2026-11-25-r28/radar-E3-2026-11-25-r28.kg.yaml#E_DENY_NAO_SEGURA_EM_BYPASS_1125"
     edge_type: TRACES_TO
@@ -60,7 +57,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-25"
     verified_against: "LC_ALL=C lint-selftest.sh --families deny_mirror: as duas polaridades e 15 mutantes (força depois do 1º push, criação antes do rm, eval literal na lib, inanalisável com força no protect-main e só no segmento do push, emissão do rm na lib, .git no juiz, .git do projeto, cd não seguido sem a string criar a pasta, xargs com stdin literal, normalização da home, relevant_mirror no eval dinâmico, gh repo delete, subcomando do git, --help)"
-    label: "a bancada deny_mirror acusa as formas genéricas (direto, bash -c, crase em heredoc sem aspas, $( ), eval literal e com variável) e cala no texto honesto (heredoc com aspas, mensagem de commit e comentário que citam o ato, rm de pasta de trabalho, alvo dinâmico); cada cura tem mutante que morde"
+    label: "a bancada deny_mirror acusa as formas genéricas e cala no texto honesto; cada cura tem mutante que morde"
+    narrative: "a bancada deny_mirror acusa as formas genéricas (direto, bash -c, crase em heredoc sem aspas, $( ), eval literal e com variável) e cala no texto honesto (heredoc com aspas, mensagem de commit e comentário que citam o ato, rm de pasta de trabalho, alvo dinâmico); cada cura tem mutante que morde"
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_deny_mirror_selftests"
@@ -75,7 +73,8 @@ nodes:
     confidence: 0.85
     verified_at: "2026-11-25"
     verified_against: "123.258 comandos Bash únicos dos transcripts da máquina (sessões e subagentes); 4.040 com rm recursivo, filter-*, gh repo/release delete|edit, --visibility ou eval, reexecutados contra o hook novo e, os que citam eval ou push, contra o protect-main e o merge-gate de origin/main e da branch"
-    label: "o eval literal na lib não mudou nenhum veredito do protect-main nem do merge-gate no corpus; a 1ª forma do espelho vetou 8 comandos, 6 deles falsos positivos (rm -rf do .git de uma cópia de trabalho num rascunho, filter-branch --help), curados limitando o .git ao do projeto e liberando --help; seguem vetados 2: um gh repo edit --visibility (o moat-gate também veta) e um git filter-branch --msg-filter numa branch de trabalho, que o deny também barra"
+    label: "no corpus de transcripts, o eval literal não mudou veredito do protect-main nem do merge-gate; o espelho só veta 2 comandos, os dois também barrados pelo deny ou pelo moat-gate"
+    narrative: "o eval literal na lib não mudou nenhum veredito do protect-main nem do merge-gate no corpus; a 1ª forma do espelho vetou 8 comandos, 6 deles falsos positivos (rm -rf do .git de uma cópia de trabalho num rascunho, filter-branch --help), curados limitando o .git ao do projeto e liberando --help; seguem vetados 2: um gh repo edit --visibility (o moat-gate também veta) e um git filter-branch --msg-filter numa branch de trabalho, que o deny também barra"
     provenance:
       source: "⟨transcripts das sessões Claude Code desta máquina⟩"
       locator: "replay.py no rascunho da forja"
@@ -90,7 +89,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-25"
     verified_against: "sonda: eval \"$X\" e bash x.sh saem rc 0 em todos os hooks"
-    label: "teto: eval com o texto inteiro opaco (eval \"$X\"), script em arquivo, outra linguagem (python, perl), comando montado por substituição ($(echo rm -rf /)), glob e chaves no alvo (/?*, .gi[t]), o conteúdo de dentro do .git (.git/*, .git/objects), o binário direto (git-filter-branch, git-filter-repo, python3 -m git_filter_repo), alias com ! e gh api -X DELETE repos/o/r não são vistos; o deny também não cobre a maioria. Análise estática não fecha indireção arbitrária: o hook é camada de conformidade, não fronteira de segurança"
+    label: "teto: eval opaco, script em arquivo, outra linguagem, substituição, glob no alvo, conteúdo de dentro do .git, binário git-filter-* direto, alias com ! e gh api DELETE não são vistos"
+    narrative: "teto: eval com o texto inteiro opaco (eval \"$X\"), script em arquivo, outra linguagem (python, perl), comando montado por substituição ($(echo rm -rf /)), glob e chaves no alvo (/?*, .gi[t]), o conteúdo de dentro do .git (.git/*, .git/objects), o binário direto (git-filter-branch, git-filter-repo, python3 -m git_filter_repo), alias com ! e gh api -X DELETE repos/o/r não são vistos; o deny também não cobre a maioria. Análise estática não fecha indireção arbitrária: o hook é camada de conformidade, não fronteira de segurança"
   - id: T_ALVO_DINAMICO_DO_RM_PASSA_1125
     node_type: claim
     layer: audit
@@ -100,7 +100,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-25"
     verified_against: "bancada: rm -rf \"$tmp\" → rc 0 (caso honesto); rm -rf \"$HOME\" → rc 2 (nome literal)"
-    label: "teto: rm recursivo com alvo dinâmico (rm -rf \"$D\", inclusive por eval) passa, porque vetá-lo travaria a limpeza honesta de pasta temporária; só o nome literal da raiz e da home cai, e o .git só quando é o do projeto (cwd do hook, CLAUDE_PROJECT_DIR ou o topo git): depois de um cd que a lib não segue (variável, pasta que ainda não existe) o rm -rf .git é VETADO, como no deny, salvo quando a string cria a pasta antes do rm (mkdir, git init/clone/worktree add, cp -r, tar -x, unzip, rsync); cd \"$wt\" && rm -rf .git é vetado (o deny também veta)"
+    label: "teto: rm recursivo com alvo dinâmico passa; o .git só cai quando é o do projeto, e depois de um cd não seguido cai salvo se a string cria a pasta antes do rm"
+    narrative: "teto: rm recursivo com alvo dinâmico (rm -rf \"$D\", inclusive por eval) passa, porque vetá-lo travaria a limpeza honesta de pasta temporária; só o nome literal da raiz e da home cai, e o .git só quando é o do projeto (cwd do hook, CLAUDE_PROJECT_DIR ou o topo git): depois de um cd que a lib não segue (variável, pasta que ainda não existe) o rm -rf .git é VETADO, como no deny, salvo quando a string cria a pasta antes do rm (mkdir, git init/clone/worktree add, cp -r, tar -x, unzip, rsync); cd \"$wt\" && rm -rf .git é vetado (o deny também veta)"
   - id: T_LEASE_E_RESET_FORA_DE_PROPOSITO_1125
     node_type: claim
     layer: audit
