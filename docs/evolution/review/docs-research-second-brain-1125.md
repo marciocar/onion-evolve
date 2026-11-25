@@ -2,8 +2,7 @@
 branch: docs/research-second-brain-1125
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 1bbb99f4755b20e690e94f433b477e774f557b489691b5612284b5fb3832862f
-reviewed_code_sha256: f5263ac3ca8d7257b5a2094abfee6c167a53fca5aba5838823f7bceb5d428f61
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
@@ -25,7 +24,7 @@ Grafo de decisão `second-brain-company-brain-2026-11` (70 nós, decisão `D_SEC
 
 ## Achados
 
-Nenhum bloqueante. A decisão fica aberta para o maestro (`/meta:decide`).
+Confrontado com os `confirmed` de maior impacto do grafo (`E_OBJECAO_37_OPTION_A_PREMISE_CONTRADICTS_CODE`, `E_OBJECAO_36_SNYK_TOXICSKILLS_UNREAD`, `E_OBJECAO_23_GPT_STORE_COUNTEREXAMPLE_CUT`): este PR só versiona o grafo do run, não propõe nada que os contrarie; os três já constam como limites na SYNTHESIS (opção A não confere com o app; o item 2 de mercado sem prova). Nenhum bloqueante. A decisão fica aberta para o maestro (`/meta:decide`).
 
 ## Mutantes
 

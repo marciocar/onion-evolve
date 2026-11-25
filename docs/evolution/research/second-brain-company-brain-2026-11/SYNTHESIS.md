@@ -23,7 +23,7 @@ review_after: 2027-02-23
 | Item | Valor |
 |---|---|
 | Tokens | 7.762.046 |
-| Agentes | 106 · 15 fontes · 58 claims · 25 verificadas (19 confirmadas, 6 refutadas) |
+| Workers do run | 106 · 15 fontes · 58 claims · 25 verificadas (19 confirmadas, 6 refutadas) |
 | Parede | ≈ 23,9 min (1.432.945 ms) |
 | Orçamento | `maxFetch` 15 · `maxVerify` 25 |
 | Elenxo | sim (modo decisão): 37 objeções sobreviventes, todas modeladas como `E_OBJECAO_` |
