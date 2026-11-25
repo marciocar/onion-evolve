@@ -1,0 +1,74 @@
+meta:
+  schema_version: "1"
+  id: one-touch-word-pr-2026-11
+  slug: one-touch-word-pr-2026-11
+  title: "A palavra com número: «pode rodar 1763» e «merge 1763» valem sem o pedido prévio"
+  date: "2026-11-25"
+  baseline: "2026-11-25"
+  review_after: "2026-12-25"
+  purpose: "Guardar o pedido do maestro que tirou o passo do pedido prévio do «pode rodar» quando a frase nomeia o PR, o desenho que saiu dele e os limites declarados."
+  note: "TETO, declarado: 3 nós. Nasceu à parte para não disputar âncora com o arquivo de selos, onde mora a decisão de origem do «pode rodar»."
+  # ═══ TETO: 3 NÓS ═══
+external_edges:
+  - from: D_OT_WORD_WITH_PR_NUMBER_1125
+    to: "docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml#D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118"
+    edge_type: TRACES_TO
+  - from: D_OT_WORD_WITH_PR_NUMBER_1125
+    to: "docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml#D_RATCHET_CLASS_B_VALID_NOW_1120"
+    edge_type: TRACES_TO
+nodes:
+  - id: D_OT_WORD_WITH_PR_NUMBER_1125
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "pedido do maestro, verbatim, repassado pela sessão do core no brief do agente de execução de 2026-11-25 (o brief o data de 26/11; o relógio da máquina mediu 2026-11-25)"
+    label: "Frase com número de PR, sozinha na mensagem e digitada pelo maestro, registra a palavra daquele PR sem pedido prévio; o executor confere todos os gates na hora e recusa se o head andou."
+    narrative: "Pedido verbatim: «quando eu digo \"pode rodar 1763\" ou \"merge 1763\" ou similar que voce tenha certeza do que eu estou falando, execute se ok, não fique me travando pedindo para fazer somente se eu escrever a mão \"pode rodar\" no momento certo». Desenho: lista fechada de verbos (pode rodar, pode mergear, pode fazer o merge, merge, mergeia, mergear), conectivo opcional (do, o, pr), 1 a 5 números, «?» final recusa; o hook lê o PR no forge pelo repo do cwd e grava uma aprovação por número com o head daquele instante; o executor acha a aprovação daquele PR. Ajuste declarado: a palavra com número substitui o --maestro no PR de guarda como o «pode rodar» com pedido já substituía (é a mesma palavra do maestro); não se exige resíduo com elenxo_isolado por cima, porque o --maestro no terminal dele também não exige."
+    provenance:
+      source: "maestro, pela sessão do core"
+      locator: "brief do agente de execução feat/merge-word-with-pr-number, 2026-11-25, «Pedido do maestro, 26/11 (verbatim)»"
+      method: "testimony: pedido do maestro repassado"
+      locality: "pessoa"
+  - id: E_OT_WORD_PR_BENCH_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "família pr_merge_verified da bancada, casos otn1 a otn8, cada recusa com mutante plantado que a desfaz"
+    label: "A bancada prova: frase com número registra e mergeia; dois números registram dois usos; texto a mais, pergunta, PR inexistente ou fechado não registram; head mudado, sugestão aceita, repo errado e frase de outro número recusam no executor."
+    narrative: "O hook roda como o runner o invoca, com o gh falso no PATH (o endpoint repos/<r>/pulls/<n> devolve estado, merged, head e ref) e o cwd num clone cujo origin é o core de sandbox; o executor é a cópia cujo sha256 o hook amarrou. Cada recusa tem um mutante que a remove e faz o caso mergear ou registrar."
+    provenance:
+      source: "bancada do core"
+      locator: ".claude/validation/lint-selftest.sh, run_pr_merge_verified_selftests, bloco «PODE RODAR 1763»"
+      method: "measurement: bancada com mutantes"
+      locality: "repo"
+  - id: E_OT_WORD_PR_LIMITS_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "leitura do motor .claude/utils/approval/one_touch.py e do registro do hook no settings (timeout 10 s)"
+    label: "Limites declarados: camada de conformidade e não fronteira (como o «pode rodar» de sempre); o hook gasta uma leitura no forge por número dentro de 8 s; só o checkout que tem o executor do merge verificado registra; o repo é o do origin do cwd."
+    narrative: "Sem pedido prévio, a palavra nasce no hook: a folga entre o horário do prompt no transcript e a criação do pedido sobe de 1 s para 60 s só nesse caso. O id da palavra no livro leva o número (prompt_id#n), para que «pode rodar 1763 e 1765» sejam dois usos. O consume sem transcript legível grava prompt_id/*, que gasta as palavras de todos os números do turno: gastar mais, nunca menos."
+    provenance:
+      source: "motor e settings do core"
+      locator: ".claude/utils/approval/one_touch.py (parse_word, hook_numbered, transcript_word); .claude/settings.json (UserPromptSubmit, timeout 10)"
+      method: "measurement: leitura do código"
+      locality: "repo"
+edges:
+  - from: E_OT_WORD_PR_BENCH_1125
+    to: D_OT_WORD_WITH_PR_NUMBER_1125
+    edge_type: SUPPORTS
+  - from: E_OT_WORD_PR_LIMITS_1125
+    to: D_OT_WORD_WITH_PR_NUMBER_1125
+    edge_type: CONSTRAINS
