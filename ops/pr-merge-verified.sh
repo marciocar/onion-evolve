@@ -764,16 +764,16 @@ _isolated_residue_ok() {
   _IR_REL="${_rel}"; _IR_V="${_v}"; _IR_H="${_h}"
 }
 # os arquivos que SÃO a catraca (M1 e 2ª revisão de 2026-11-18): lista única para o gate de guarda e a palavra com número
-_catraca_hits() { grep -xE 'docs/evolution/federation/members\.yaml|ops/pr-merge-verified\.sh|ops/moat-targets\.tsv|\.claude/hooks/pretooluse-moat-gate\.sh|\.claude/hooks/lib/moat-judge\.py|\.claude/hooks/lib/invocation-lines\.sh|\.claude/settings(\.local)?\.json'; }
+_ratchet_hits() { grep -xE 'docs/evolution/federation/members\.yaml|ops/pr-merge-verified\.sh|ops/moat-targets\.tsv|\.claude/hooks/pretooluse-moat-gate\.sh|\.claude/hooks/lib/moat-judge\.py|\.claude/hooks/lib/invocation-lines\.sh|\.claude/settings(\.local)?\.json'; }
 _guard_pr_gate() {
   [ "${_CORE_SESSION}" = 1 ] && [ "${MAESTRO}" -eq 0 ] || return 0
   # «pode rodar»: o pedido nasce aqui (o que ele destrava é este gate), e a autorização viva o substitui
   [ "${OT_REQUEST}" -eq 1 ] && return 0
   # (revisão isolada de 2026-11-25, A) a palavra com número amarra o head lido no hook, que o maestro não viu: no PR que
   # muda a própria catraca ela NÃO basta; ali segue o pedido com o sha na tela e o «pode rodar» solto
-  if [ "${OT_LIVE}" -eq 1 ] && [ "${OT_WORD_PR}" -eq 1 ] && [ -n "$(_catraca_hits <<< "${_PR_FILES}")" ]; then
+  if [ "${OT_LIVE}" -eq 1 ] && [ "${OT_WORD_PR}" -eq 1 ] && [ -n "$(_ratchet_hits <<< "${_PR_FILES}")" ]; then
     _ot_engine consume --session "${_OT_SID}" --pr "${PR}" --outcome "refused: word with number on ratchet PR" >/dev/null
-    die "o PR #${PR} muda a própria catraca ($(_catraca_hits <<< "${_PR_FILES}" | head -3 | tr '\n' ' ')): a palavra com número não basta. Peça com --one-touch-request (o sha aparece na tela) e o maestro responde «pode rodar». A palavra foi gasta. Nada foi mergeado."
+    die "o PR #${PR} muda a própria catraca ($(_ratchet_hits <<< "${_PR_FILES}" | head -3 | tr '\n' ' ')): a palavra com número não basta. Peça com --one-touch-request (o sha aparece na tela) e o maestro responde «pode rodar». A palavra foi gasta. Nada foi mergeado."
   fi
   [ "${OT_LIVE}" -eq 1 ] && { say "✓ PR de guarda pelo «pode rodar» (nível 1): a autorização viva substitui o --maestro"; return 0; }
   if [ "${#REPO_ARG[@]}" -ge 2 ] && [ "$(_slug_norm "${REPO_ARG[1]}")" != "${_PMV_CORE_SLUG}" ]; then return 0; fi
@@ -784,7 +784,7 @@ _guard_pr_gate() {
   # (2ª revisão, 2026-11-18) e o que a catraca PRESSUPÕE: o veto do hook do core ao --maestro e à variável de bancada
   # (A1/A2 se apoiam nele). O hook, o juiz e o tokenizador que ele carrega, e o settings que o registra (o local também:
   # pode desligar hooks). Sem eles na lista, um PR de guarda tirava o veto e o seguinte atravessava a catraca.
-  local _cat; _cat="$(_catraca_hits <<< "${_PR_FILES}" | head -3 | tr '\n' ' ')"
+  local _cat; _cat="$(_ratchet_hits <<< "${_PR_FILES}" | head -3 | tr '\n' ' ')"
   [ -z "${_cat}" ] || die "o PR #${PR} toca GUARDA e a própria catraca (${_cat% }): esse merge segue do maestro mesmo com resíduo isolado (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118). Peça: ! bash ops/pr-merge-verified.sh ${PR} --maestro. Nada foi feito."
   _isolated_residue_ok "${_PMV_CORE_SLUG}" "o PR #${PR} toca GUARDA (${_g% }): a sessão o mergeia só com o resíduo da branch declarando refutador independente (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118); sem ele, o merge é do maestro (! bash ops/pr-merge-verified.sh ${PR} --maestro)"
   say "✓ PR de GUARDA pela sessão: resíduo ${_IR_REL} com refutador independente (elenxo_isolado: true), verdict ${_IR_V}, diff ${_IR_H:0:12} (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)"
