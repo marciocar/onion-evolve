@@ -59,7 +59,7 @@ nodes:
     impact: 4
     confidence: 0.9
     verified_at: "2026-11-25"
-    verified_against: "LC_ALL=C lint-selftest.sh --families deny_mirror: as duas polaridades e 7 mutantes (eval literal na lib, inanalisável com força no protect-main, emissão do rm na lib, .git no juiz, relevant_mirror no eval dinâmico, gh repo delete, subcomando do git)"
+    verified_against: "LC_ALL=C lint-selftest.sh --families deny_mirror: as duas polaridades e 13 mutantes (eval literal na lib, inanalisável com força no protect-main e só no segmento do push, emissão do rm na lib, .git no juiz, .git do projeto, cd não seguido sem a string criar a pasta, xargs com stdin literal, normalização da home, relevant_mirror no eval dinâmico, gh repo delete, subcomando do git, --help)"
     label: "a bancada deny_mirror acusa as formas genéricas (direto, bash -c, crase em heredoc sem aspas, $( ), eval literal e com variável) e cala no texto honesto (heredoc com aspas, mensagem de commit e comentário que citam o ato, rm de pasta de trabalho, alvo dinâmico); cada cura tem mutante que morde"
     provenance:
       source: ".claude/validation/lint-selftest.sh"
@@ -90,7 +90,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-25"
     verified_against: "sonda: eval \"$X\" e bash x.sh saem rc 0 em todos os hooks"
-    label: "teto: eval com o texto inteiro opaco (eval \"$X\"), script em arquivo e outra linguagem (python, perl) não são vistos; análise estática não fecha indireção arbitrária. O hook é camada de conformidade, não fronteira de segurança"
+    label: "teto: eval com o texto inteiro opaco (eval \"$X\"), script em arquivo, outra linguagem (python, perl), comando montado por substituição ($(echo rm -rf /)), glob e chaves no alvo (/?*, .gi[t]), o conteúdo de dentro do .git (.git/*, .git/objects), o binário direto (git-filter-branch, git-filter-repo, python3 -m git_filter_repo), alias com ! e gh api -X DELETE repos/o/r não são vistos; o deny também não cobre a maioria. Análise estática não fecha indireção arbitrária: o hook é camada de conformidade, não fronteira de segurança"
   - id: T_ALVO_DINAMICO_DO_RM_PASSA_1125
     node_type: claim
     layer: audit

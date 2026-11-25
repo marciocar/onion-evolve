@@ -1601,7 +1601,7 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
                 rep_str = w[2:]
         def opaque(x):
             return x is None or (rep_str is not None and rep_str in x)
-        if known is not None and tb in ("git", "gh"):
+        if known is not None and (tb in ("git", "gh") or (MIRROR and tb == "rm")):
             # stdin CONHECIDO (`echo main | xargs git push origin`): monta o comando concreto e julga
             if rep_str is not None:
                 for item in known or [""]:
