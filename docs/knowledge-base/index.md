@@ -1,6 +1,6 @@
 # 📚 Índice - Knowledge Bases
 
-> **Última atualização**: 2026-11-21 | **Gerado por**: `/docs:build-index` · contagens conferidas contra o disco pela REGRA 110 (`.claude/validation/kb-index-check.sh`)
+> **Última atualização**: 2026-11-25 | **Gerado por**: `/docs:build-index` · contagens conferidas contra o disco pela REGRA 110 (`.claude/validation/kb-index-check.sh`)
 
 Índice das **Knowledge Bases** do Sistema Onion — conhecimento estruturado para consumo por IA e referência técnica.
 
@@ -86,6 +86,7 @@ docs/knowledge-base/
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
 - [Specification-Driven AI Abstraction Layer (SDAAL)](concepts/specification-driven-ai-abstraction-layer.md) — padrão-pai das camadas de abstração
 - [Task Manager Abstraction](concepts/task-manager-abstraction.md) — instância canônica do SDAAL (API-first; MCP opcional)
+- [Operar as sessões no tmux](concepts/tmux-operation-guide.md) — guia em linguagem simples: servidor, sessão, janela e painel; atalhos (`Ctrl-b d`, `s`, `[`, `o`, `z`, `x`); copiar e colar por OSC 52 com Shift+arrastar de reserva; a config da casa (`onion-attach --install-tmux`); entrar pelo nome com `onion-attach`; o que fazer quando a sessão some; limites medidos
 - [Transfer Heuristic (Aristóteles)](concepts/transfer-heuristic-aristotle.md) — **CANDIDATO** — régua de transferência *igual → transfere / diferente → desenha* (lente de Aristóteles); invocada por `/meta:adopt`
 - [Transformer Architecture](concepts/transformer-architecture.md) — Transformer: a arquitetura por trás do reasoner do Onion
 - [Verify-External-for-Current](concepts/verify-external-for-current.md) — forcing function: claim sobre atual/emergente/popular (versão·device·player·framework·tendência) ⇒ verify externo (web) obrigatório; WebFetch é budget separado do WebSearch; sem verificar → declarar "não verificado". O `verify(vivo)` do SSOT-as-runtime aplicado ao mundo externo
