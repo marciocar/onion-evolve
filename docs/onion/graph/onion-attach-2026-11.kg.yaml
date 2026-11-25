@@ -1,0 +1,197 @@
+meta:
+  schema_version: "1"
+  id: onion-attach-2026-11
+  slug: onion-attach-2026-11
+  title: "Entrar numa sessão pelo nome: o atalho onion-attach e a pasta da retomada pelo transcript"
+  date: "2026-11-25"
+  baseline: "2026-11-25"
+  review_after: "2026-12-25"
+  purpose: "Mapa do pedido do maestro de 25/11 (um atalho que acha o servidor tmux, o fundo nativo ou a conversa fechada pelo nome), do defeito medido no abridor para a sessão dona de várias peças e do que o atalho não cobre."
+  note: "TETO, declarado: 9 nós (subiu de 5 em 25/11: o copiar e colar e a config versionada do tmux, e as três decisões do maestro da madrugada de 25/11, todos pedidos por ele). Nasceu à parte para não disputar o grafo de coordenação; a decisão de origem é a D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120, citada por aresta externa."
+  # ═══ TETO: 9 NÓS ═══
+nodes:
+  - id: E_OAT_TWO_TMUX_KINDS_AND_NATIVE_BG_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "tmux -L <s> ls em cada socket do diretório de sockets do tmux do usuário e claude agents --json, no Claude Code 2.1.331"
+    label: "As sessões vivem em três lugares: um servidor tmux próprio por sessão (-L <nome>), o servidor default das antigas e o fundo nativo do Claude Code (claude attach <id>)."
+    narrative: "Medido em 25/11: duas sessões em servidor próprio, três no default e a sessão do core no fundo nativo. Cinco sockets sem servidor vivo ficaram no diretório. Quem entra precisa saber o servidor: sem -L o tmux vai ao default e não acha a sessão. Em 25/11 o maestro voltou o padrão ao servidor único (a queda de 22/11 foi falta de memória); as sessões em servidor próprio migram no próximo reinício, num PR separado do abridor."
+    provenance:
+      source: "estado real da máquina, só leitura"
+      locator: "⟨sockets do tmux do usuário⟩ e claude agents --json"
+      method: "measurement: tmux ls e lista de peers"
+      locality: "host"
+  - id: E_OAT_RESUME_REFUSED_FOR_MULTI_OWNER_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-11-25"
+    verified_against: "bash ops/session-open.sh <sessão de serviços> --dry-run --resume <id da conversa da sessão de serviços> na origin/main 5260e3233: rc 2"
+    label: "O abridor recusava a sessão dona de várias peças mesmo com --resume <id>: a pasta vinha do registro de posse, e o registro responde «casa 6 membros, ambíguo»."
+    narrative: "A pasta certa de uma retomada é a do transcript: o claude --resume acha a conversa pela pasta codificada onde ela nasceu (⟨pasta de projetos do Claude Code⟩/<pasta codificada>/<id>.jsonl). A conversa da sessão de serviços nasceu no checkout principal do repo e o último cwd dela é uma worktree; retomar da worktree procuraria noutra pasta codificada."
+    provenance:
+      source: "execução do abridor e leitura do transcript"
+      locator: "ops/session-open.sh (locate) e .claude/utils/orchestration/ownership.sh who"
+      method: "measurement: ensaio do abridor"
+      locality: "repo"
+  - id: D_ONION_ATTACH_ONE_ENTRY_1125
+    node_type: decision
+    layer: audit
+    impact: 3
+    confidence: 0.85
+    label: "onion-attach <nome> acha a sessão: servidor tmux certo (switch-client dentro do mesmo servidor, sair com Ctrl-b d de outro), fundo nativo vivo por claude attach, e a fechada pela conversa mais recente com o título, reaberta pelo abridor único com --resume <id> --dir <pasta>."
+    status: done
+    plane: DEV
+    x_destination: design
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro em 2026-11-25, por pergunta com opções (/meta:decide): escolhida «onion-attach: uma entrada única por nome para qualquer sessão (tmux, fundo nativo ou fechada)»"
+    narrative: |-
+      Aceito pelo maestro em 25/11; o selo é da sessão do core, depois da revisão isolada. Decisão do agente, declarada: ambíguo é quando as duas conversas mais recentes com o título mudaram com menos de 120 s de diferença, ou nasceram em pastas diferentes; conversas mais antigas na mesma pasta são o histórico de reinícios e só são ditas. A leitura literal («mais de uma conversa = ambíguo») deixaria a sessão de serviços, que tem 3 conversas com o título, sempre ambígua, e divergiria da regra do próprio abridor. A cura do abridor: com --resume a pasta vem do transcript daquele id ou de --dir; sem --resume, o registro segue mandando e, quando não responde, a pasta vem da conversa mais recente com o título, dita.
+
+      verified_against anterior: «família onion_attach e casos (u) a (u4) da session_open, cada um com mutante; ensaio contra o estado real»
+      proveniência anterior: source «pedido do maestro de 25/11, repassado pela sessão do core» · locator «ops/onion-attach.sh, ops/session-transcript.sh, ops/session-open.sh» · method «testimony: pedido do maestro de 25/11, construído com bancada» · locality «repo»
+      Selado por /meta:decide em 2026-11-25: escolhida «onion-attach: uma entrada única por nome para qualquer sessão (tmux, fundo nativo ou fechada)»; descartadas: «abrir cada sessão com o comando tmux -L à mão». Destino: desenho (fica como texto, sem guarda a cobrar).
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-25: «aceito a proposta do onion-attach; gostei, mapeie o onion-attach e coloque na documentação»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-25"
+      locality: "pessoa"
+  - id: E_OAT_LIMITS_DECLARED_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "leitura do artefato e ensaio contra o estado real"
+    label: "O que não cobre: a interativa fora de tmux não se anexa (só se diz o pid e a pasta); a regra de «viva» é cópia local até o helper session-liveness.sh do PR #1761 entrar; a busca pelo título lê os transcripts (cerca de 3 s nesta máquina)."
+    narrative: "Nenhum attach real foi rodado: tmux attach, switch-client e claude attach só foram exercidos com dublês. A retomada de verdade pelo abridor (claude --resume dentro do tmux) segue medida só pelo ensaio. A conversa sem cwd compatível com a pasta codificada recusa e pede --dir. Achados do refutador (25/11) deixados como limite: o título com sufixo « (N)», que o Claude Code acrescenta na colisão de nomes, não casa a busca exata pelo nome; a sessão de fundo viva sem pid na lista do harness contaria como morta (as vivas medidas têm pid); no abridor, o rc 2 do registro também cobre «ilegível», e esse caso agora segue pela conversa com o título, dito."
+    provenance:
+      source: "leitura do próprio artefato"
+      locator: "ops/onion-attach.sh"
+      method: "reading: o artefato inteiro"
+      locality: "repo"
+  - id: E_OAT_COPY_PASTE_OSC52_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-11-25"
+    verified_against: "a config que o maestro aplicou em 25/11, lida linha a linha; a cópia pelo mouse não foi exercida pela sessão (ela não tem terminal local)"
+    label: "Copiar e colar no tmux da casa: arrastar com o mouse copia ao computador local por OSC 52 (set-clipboard external e copy-pipe-and-cancel ao soltar), Shift+arrastar é o caminho que sempre funciona, Ctrl+Shift+V cola; imagem vai pelo claude.ai por enquanto."
+    narrative: "Pedido do maestro em 25/11: «precisamos copiar e colar, inclusive imagens». O OSC 52 depende do terminal local aceitar a sequência (o Windows Terminal aceita e o mosh 1.4 a repassa). A revisão isolada de 25/11 trocou set-clipboard on por external (o app do painel não escreve sozinho na área de transferência local) e tirou o allow-passthrough (imagem não passa pelo terminal, e ele deixaria sequências DCS de conteúdo não confiável chegarem ao terminal)."
+    provenance:
+      source: "config aplicada pelo maestro e relato dele"
+      locator: "ops/tmux/onion.tmux.conf (a mesma config, versionada)"
+      method: "reading: a config aplicada, linha a linha"
+      locality: "repo"
+  - id: E_OAT_TMUX_CONF_VERSIONED_1125
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "família onion_attach, casos (t1) a (t10) com mutante (o t8 carrega a config num tmux 3.4 real, em servidor descartável), num HOME de bancada; ensaio --install-tmux --dry-run contra os servidores reais"
+    label: "A config do tmux da casa é versionada (ops/tmux/onion.tmux.conf) e se liga por onion-attach --install-tmux: cópia fora do repo e UMA linha source-file -q na config do usuário, idempotente, sem sobrescrever; --check só mede; recarrega nos servidores vivos."
+    narrative: "Config que só mora no HOME de uma conta evapora e não chega a outra máquina. Versionada, ela pode viajar: hoje mora no core, e chega aos adotantes quando o SAC-546 levar essa maquinaria. Pela revisão isolada de 25/11, o tmux nunca lê do checkout (trocar de branch mudaria a config viva, e config de tmux pode rodar comando): a config é copiada para um caminho estável fora do repo, com backup da cópia anterior e conferência de conteúdo, e a linha source-file -q aponta para essa cópia. Recusa link na config do usuário ou na cópia."
+    provenance:
+      source: "o artefato e a bancada"
+      locator: "ops/onion-attach.sh --install-tmux e ops/tmux/onion.tmux.conf"
+      method: "measurement: bancada com mutantes e ensaio"
+      locality: "repo"
+  - id: D_TMUX_SINGLE_SERVER_DEFAULT_1125
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro na madrugada de 25/11 (~02:05 UTC), repassada pela sessão do core"
+    label: "O tmux volta ao servidor único por padrão; as sessões em servidor próprio migram no próximo reinício de cada uma; a mudança do abridor de sessões vai num PR separado."
+    narrative: "A causa da queda de 22/11 foi medida no registro do sistema, das 21:44 às 21:48: falta de memória (OOM). Servidor tmux separado por sessão não protege os processos do Claude Code disso, então o isolamento não paga a complexidade de saber o -L. O onion-attach cobre as duas topologias enquanto convivem."
+    provenance:
+      source: "maestro, repassado pela sessão do core"
+      locator: "mensagem da sessão do core ao agente de execução, 25/11 ~02:05 UTC"
+      method: "testimony: decisão do maestro, 25/11"
+      locality: "pessoa"
+  - id: D_DELEGATED_AGENT_ALWAYS_NAMED_1125
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro na madrugada de 25/11 (~02:05 UTC), repassada pela sessão do core"
+    label: "Agente delegado sempre com nome; abrir o agente num painel do tmux (teammateMode) é opcional, não ordem."
+    narrative: "O nome é o que permite falar com o agente, retomá-lo e saber quem fez o quê. O painel é conveniência de quem acompanha, e por isso fica a critério de quem opera."
+    provenance:
+      source: "maestro, repassado pela sessão do core"
+      locator: "mensagem da sessão do core ao agente de execução, 25/11 ~02:05 UTC"
+      method: "testimony: decisão do maestro, 25/11"
+      locality: "pessoa"
+  - id: D_NATIVE_BG_SHORT_TASKS_ONLY_1125
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-25"
+    verified_against: "decisão do maestro na madrugada de 25/11 (~02:05 UTC), repassada pela sessão do core"
+    label: "Fundo nativo do Claude Code só para tarefa curta; sessão com campainha nunca vai ao fundo; para sair sem fechar, Ctrl-b d."
+    narrative: "Medido: retomar no fundo com a flag do canal abre uma cópia com outro id, e a sessão perde a campainha. Relatado ao Claude Code na issue anthropics/claude-code#90160 (aberta). Até a correção, a sessão longa fica no tmux."
+    provenance:
+      source: "maestro, repassado pela sessão do core"
+      locator: "mensagem da sessão do core ao agente de execução, 25/11 ~02:05 UTC"
+      method: "testimony: decisão do maestro, 25/11"
+      locality: "pessoa"
+edges:
+  - from: D_ONION_ATTACH_ONE_ENTRY_1125
+    to: E_OAT_TWO_TMUX_KINDS_AND_NATIVE_BG_1125
+    edge_type: TRACES_TO
+  - from: D_ONION_ATTACH_ONE_ENTRY_1125
+    to: E_OAT_RESUME_REFUSED_FOR_MULTI_OWNER_1125
+    edge_type: TRACES_TO
+  - from: E_OAT_LIMITS_DECLARED_1125
+    to: D_ONION_ATTACH_ONE_ENTRY_1125
+    edge_type: TRACES_TO
+  - from: E_OAT_COPY_PASTE_OSC52_1125
+    to: D_ONION_ATTACH_ONE_ENTRY_1125
+    edge_type: SUPPORTS
+  - from: E_OAT_TMUX_CONF_VERSIONED_1125
+    to: D_ONION_ATTACH_ONE_ENTRY_1125
+    edge_type: SUPPORTS
+  - from: E_OAT_TMUX_CONF_VERSIONED_1125
+    to: E_OAT_COPY_PASTE_OSC52_1125
+    edge_type: TRACES_TO
+  - from: D_TMUX_SINGLE_SERVER_DEFAULT_1125
+    to: E_OAT_TWO_TMUX_KINDS_AND_NATIVE_BG_1125
+    edge_type: TRACES_TO
+  - from: D_ONION_ATTACH_ONE_ENTRY_1125
+    to: D_TMUX_SINGLE_SERVER_DEFAULT_1125
+    edge_type: TRACES_TO
+  - from: D_DELEGATED_AGENT_ALWAYS_NAMED_1125
+    to: D_ONION_ATTACH_ONE_ENTRY_1125
+    edge_type: TRACES_TO
+  - from: D_NATIVE_BG_SHORT_TASKS_ONLY_1125
+    to: E_OAT_TWO_TMUX_KINDS_AND_NATIVE_BG_1125
+    edge_type: TRACES_TO
+external_edges:
+  - from: D_ONION_ATTACH_ONE_ENTRY_1125
+    to: "docs/onion/graph/coordenacao-selos-arquivo-2026-11.kg.yaml#D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120"
+    edge_type: TRACES_TO

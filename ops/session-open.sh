@@ -3,7 +3,7 @@
 # session-open.sh — o ABRIDOR ÚNICO das sessões longas do Claude Code nesta máquina (core-only).
 #
 # Uso:
-#   bash ops/session-open.sh <nome> [--dry-run] [--no-attach] [--resume <id> | --new] [--mode <permission-mode>]
+#   bash ops/session-open.sh <nome> [--dry-run] [--no-attach] [--resume <id> [--dir <pasta>] | --new] [--mode <permission-mode>]
 #   bash ops/session-open.sh --all  [--dry-run]   reabre, sem anexar, toda sessão dona do registro de posse
 #   bash ops/session-open.sh --list               o que existe: sessão tmux, processo claude e pasta de cada sessão dona
 #
@@ -30,6 +30,11 @@
 #     noutro lugar (a cópia escreveria no mesmo histórico: incidente de 2026-11-16). Nunca mata processo.
 #   · PREFLIGHT na abertura: «este repo merja sozinho? sim|não, e por quê», pela parte estática da catraca do
 #     ops/pr-merge-verified.sh, lida pelo ownership.sh (sem reimplementar aqui).
+#   · COM --resume <id>, A PASTA VEM DO TRANSCRIPT daquele id (ou de --dir), nunca do registro de posse (2026-11-25):
+#     o `claude --resume` acha a conversa pela pasta codificada do transcript, e o registro é ambíguo para a sessão dona
+#     de várias peças (a sessão de serviços casa 6 membros, e o abridor recusava). Sem --resume, o registro segue mandando;
+#     quando ele não responde (rc 2: ambíguo ou ilegível), a pasta vem da conversa mais recente com o título, DITA.
+#     O leitor do transcript é o ops/session-transcript.sh (o mesmo que o ops/onion-attach.sh usa).
 #   · O tmux NÃO sobrevive a reboot: depois de um, `--all` reabre as sessões donas do registro, cada uma pelo seu id
 #     (no boot, pelo systemd do usuário: ops/session-boot.sh install). Cada sessão vive no PRÓPRIO servidor tmux
 #     (`tmux -L <nome>`): a queda de um servidor leva só aquela sessão (2026-11-22: o servidor único levou cinco).
@@ -63,6 +68,7 @@ PROJECTS_DIR="${SESSION_OPEN_PROJECTS:-${HOME_DIR}/.claude/projects}"
 OWNERSHIP="${SESSION_OPEN_OWNERSHIP:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.claude/utils/orchestration/ownership.sh}"
 # a regra ÚNICA de «sessão viva» e a detecção da cópia (fork_inherit): a mesma que o baton-pulse.sh lê (2026-11-24)
 LIVENESS="${SESSION_OPEN_LIVENESS:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.claude/utils/orchestration/session-liveness.sh}"
+TRANSCRIPT="${SESSION_OPEN_TRANSCRIPT:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/session-transcript.sh}"
 OWN_ARGS=()
 [ -n "${SESSION_OPEN_MEMBERS:-}" ] && OWN_ARGS+=(--members "${SESSION_OPEN_MEMBERS}")   # bancada: registro de fixture
 OWN_ARGS+=(--home "${HOME_DIR}")
@@ -76,7 +82,7 @@ AMBIG_SECS="${SESSION_OPEN_AMBIG_SECS:-120}"
 say() { printf '%s\n' "$*"; }
 die() { printf 'session-open: %s\n' "$1" >&2; exit "${2:-2}"; }
 
-NAME="" DRY=0 ATTACH=1 RESUME="" MODE="" ALL=0 LIST=0 NEW=0
+NAME="" DRY=0 ATTACH=1 RESUME="" MODE="" ALL=0 LIST=0 NEW=0 DIR_ARG=
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run) DRY=1 ;;
@@ -85,6 +91,7 @@ while [ $# -gt 0 ]; do
     --list) LIST=1 ;;
     --new) NEW=1 ;;
     --resume) shift; RESUME="${1:-}"; [ -n "${RESUME}" ] || die "--resume pede o id da sessão" ;;
+    --dir) shift; DIR_ARG="${1:-}"; [ -n "${DIR_ARG}" ] || die "--dir pede a pasta" ;;
     --mode) shift; MODE="${1:-}"; [ -n "${MODE}" ] || die "--mode pede o modo de permissão" ;;
     --continue|-c) die "--continue não existe aqui: a retomada é sempre por id exato (D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120). Sem --resume, o id se resolve pelo nome." ;;
     -*) die "opção desconhecida: $1" ;;
@@ -93,6 +100,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 [ -z "${RESUME}" ] || [ "${NEW}" -eq 0 ] || die "--resume e --new se excluem"
+[ -z "${DIR_ARG}" ] || [ -n "${RESUME}" ] || die "--dir só vale com --resume <id> (sem id, a pasta vem do registro de posse)"
 ID_RE='^[A-Za-z0-9][A-Za-z0-9-]{7,63}$'
 [ -z "${RESUME}" ] || [[ "${RESUME}" =~ ${ID_RE} ]] || die "id de sessão inválido: «${RESUME}»"
 case "${MODE}" in ''|default|acceptEdits|plan|auto|dontAsk|bypassPermissions) ;; *) die "--mode fora da lista (default, acceptEdits, plan, auto, dontAsk, bypassPermissions): «${MODE}»" ;; esac
@@ -264,21 +272,75 @@ locate() {
   local n="$1" row rc
   if [ -f "${OWNERSHIP}" ]; then
     row="$(bash "${OWNERSHIP}" who "${n}" "${OWN_ARGS[@]}" 2>/dev/null)"; rc=$?
-    [ "${rc}" -eq 2 ] && die "o registro de posse não respondeu por «${n}» (ilegível ou ambíguo): rode bash ${OWNERSHIP} who ${n}"
     if [ "${rc}" -eq 0 ]; then
       IFS=$'\t' read -r _id _k _o sn lp _v _r <<< "${row}"
       [ "${lp}" != "-" ] || die "«${n}» está no registro de posse, mas sem pasta conhecida (local_path ausente, ou a 4ª coluna da lista privada vazia): não adivinho"
       printf '%s\t%s\t%s\n' "${sn}" "${lp}" "${n}"; return 0
     fi
+    # rc 2 (ambíguo ou ilegível): a pasta vem da conversa mais recente com o título, dita; sem conversa, recusa
+    [ "${rc}" -eq 2 ] && { locate_by_title "${n}" && return 0
+      die "o registro de posse não respondeu por «${n}» (ilegível ou ambíguo) e não há conversa com esse título que diga a pasta: rode bash ${OWNERSHIP} who ${n}, ou retome com --resume <id> [--dir <pasta>]"; }
   fi
   [ "${n}" = core ] && n="onion-evolve"
   printf '%s\t%s\t%s\n' "${n}" "${HOME_DIR}/${n}" "${n}"
 }
 
+# rc 2 do registro → a pasta da conversa MAIS RECENTE cujo último título é o nome (a que tem pasta de lançamento), dita
+locate_by_title() {
+  local n="$1" rows m id d _p last _t
+  [ -f "${TRANSCRIPT}" ] || return 1
+  rows="$(bash "${TRANSCRIPT}" by-title "${n}" --projects "${PROJECTS_DIR}" 2>/dev/null)" || return 1
+  # conversas com o título nascidas em PASTAS diferentes: o mesmo nome em dois repos, não escolho (a mesma regra do
+  # ops/onion-attach.sh); a regra de tempo fica com o resolve_id, que a aplica dentro da pasta escolhida
+  if [ "$(awk -F'\t' '$3 != "-" { print $3 }' <<< "${rows}" | sort -u | wc -l)" -gt 1 ]; then
+    say "session-open: há conversas com o título «${n}» em pastas diferentes: ambíguo, não escolho a pasta. Retome com --resume <id> (o onion-attach ${n} lista as opções)." >&2
+    return 1
+  fi
+  while IFS=$'\t' read -r m id d _p last _t; do
+    [ -n "${id}" ] && [ "${d}" != "-" ] || continue
+    say "session-open: o registro de posse não respondeu por «${n}» (ambíguo ou ilegível); a pasta vem da conversa mais recente com esse título: ${d} (id ${id}, $(date -u -d "@${m}" +%Y-%m-%dT%H:%MZ 2>/dev/null || echo "${m}"))." >&2
+    printf '%s\t%s\t%s\n' "${n}" "${d}" "${n}"; return 0
+  done <<< "${rows}"
+  return 1
+}
+
+# --resume <id>: a pasta vem de --dir ou do transcript DAQUELE id, nunca do registro (ambíguo para dona de várias peças).
+# O nome da sessão vem do registro quando ele responde por um membro só; senão, é o nome dado.
+locate_resume() {
+  local n="$1" sn="$1" row rc d m _id _p last _t
+  if [ -f "${OWNERSHIP}" ]; then
+    row="$(bash "${OWNERSHIP}" who "${n}" "${OWN_ARGS[@]}" 2>/dev/null)" && IFS=$'\t' read -r _id _k _o sn _lp _v _r <<< "${row}"
+  fi
+  if [ -n "${DIR_ARG}" ]; then
+    say "session-open: a pasta da retomada vem de --dir: ${DIR_ARG}." >&2
+    printf '%s\t%s\t%s\n' "${sn}" "${DIR_ARG}" "${n}"; return 0
+  fi
+  [ -f "${TRANSCRIPT}" ] || die "leitor de transcript ausente (${TRANSCRIPT}): passe a pasta com --dir"
+  row="$(bash "${TRANSCRIPT}" by-id "${RESUME}" --projects "${PROJECTS_DIR}" 2>/dev/null)"; rc=$?
+  case "${rc}" in
+    0) ;;
+    1) die "não achei o transcript do id ${RESUME} em ${PROJECTS_DIR}: confira o id, ou passe a pasta com --dir" 5 ;;
+    5) die "o id ${RESUME} tem transcript em mais de uma pasta: ambíguo, não escolho; passe a pasta com --dir" 5 ;;
+    *) die "o leitor de transcript falhou (rc ${rc}) para o id ${RESUME}: passe a pasta com --dir" ;;
+  esac
+  IFS=$'\t' read -r m _id d _p last _t <<< "${row}"
+  # transcript sem `cwd` compatível com a pasta dele: a pasta vem do registro de posse (o caminho de antes), DITO; se
+  # o registro também não responde, recusa e pede --dir
+  if [ "${d}" = "-" ]; then
+    local loc; loc="$(locate "${n}")" || die "o transcript do id ${RESUME} não grava a pasta onde a sessão nasceu, e o registro de posse não a dá: passe a pasta com --dir" 5
+    say "session-open: o transcript do id ${RESUME} não grava a pasta onde a sessão nasceu; uso a do registro de posse: $(cut -f2 <<< "${loc}")." >&2
+    printf '%s\n' "${loc}"; return 0
+  fi
+  say "session-open: a pasta da retomada vem do transcript do id ${RESUME}: ${d}$([ "${last}" = "${d}" ] || [ "${last}" = "-" ] || printf ' (o último cwd foi %s; a conversa se acha pela pasta onde nasceu)' "${last}")." >&2
+  printf '%s\t%s\t%s\n' "${sn}" "${d}" "${n}"
+}
+
 open_one() {  # $1 = nome, $2 = anexar (1|0), $3 = pasta (opcional: --all já a sabe)
   local n="$1" attach="$2" dir="${3:-}" key cmd out rc loc
   valid_name "${n}" || die "nome inválido: «${n}» (letras, dígitos, ponto, hífen e sublinhado)"
-  if [ -z "${dir}" ]; then loc="$(locate "${n}")" || exit $?; IFS=$'\t' read -r n dir key <<< "${loc}"
+  if [ -z "${dir}" ]; then
+    if [ -n "${RESUME}" ]; then loc="$(locate_resume "${n}")" || exit $?; else loc="$(locate "${n}")" || exit $?; fi
+    IFS=$'\t' read -r n dir key <<< "${loc}"
   else key="${n}"; fi
   valid_name "${n}" || die "nome de sessão inválido no registro: «${n}»"
   dir="$(realpath -m -- "${dir}")"   # o /proc dá o cwd canônico: barra final ou `..` no registro furariam a comparação
@@ -389,6 +451,7 @@ fi
 if [ "${ALL}" -eq 1 ]; then
   [ -z "${NAME}" ] || die "--all não leva nome"
   [ -z "${RESUME}" ] || die "--all não leva --resume: cada sessão se resolve pelo próprio nome"
+  [ -z "${DIR_ARG}" ] || die "--all não leva --dir"
   names="$(roster)" || exit $?
   [ -n "${names}" ] || die "nenhuma sessão dona com pasta no registro de posse" 2
   worst=0
@@ -400,5 +463,5 @@ if [ "${ALL}" -eq 1 ]; then
   exit "${worst}"
 fi
 
-[ -n "${NAME}" ] || die "uso: session-open.sh <nome> [--dry-run] [--no-attach] [--resume <id> | --new] [--mode <modo>] | --all | --list"
+[ -n "${NAME}" ] || die "uso: session-open.sh <nome> [--dry-run] [--no-attach] [--resume <id> [--dir <pasta>] | --new] [--mode <modo>] | --all | --list"
 open_one "${NAME}" "${ATTACH}"

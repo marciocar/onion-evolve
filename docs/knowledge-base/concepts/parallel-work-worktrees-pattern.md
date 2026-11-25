@@ -67,6 +67,48 @@ cd ~/worktrees/<repo>/<tipo>-<slug> && claude
   persistente) ou **VS Code/Cursor Remote-SSH** (server persiste os terminais). Detalhe operacional fica no
   runbook de acesso, não nesta KB.
 
+### 3.2.1 Voltar a uma sessão pelo nome (no core: `onion-attach`)
+
+Na máquina do core, cada sessão longa vive num destes três lugares, e quem entra precisa saber qual
+(medido em 2026-11-25):
+
+| Onde a sessão está | Como se entra à mão | O que dá errado sem saber |
+|---|---|---|
+| Servidor tmux `default` — o **padrão** (servidor único, decisão de 2026-11-25) | `tmux attach -t <nome>` | — |
+| Servidor tmux **próprio** (`tmux -L <nome>`), o modelo de 2026-11-22 a 2026-11-25; cada sessão assim passa ao servidor único no próximo reinício dela | `tmux -L <nome> attach -t <nome>` | sem `-L`, o tmux procura no servidor `default` e diz que a sessão não existe |
+| Fundo nativo do Claude Code (`claude agents` lista com `kind: background`) | `claude attach <id curto>` | o id não é o nome |
+| **Fechada** | `claude --resume <id>` na pasta onde a conversa nasceu | não se sabe o id, nem a pasta (a sessão pode ter ido a uma worktree) |
+
+O atalho **`onion-attach`** do core (ferramenta de operação da máquina do core; não viaja para adotantes nem
+portas) acha sozinho:
+
+```bash
+onion-attach                       # lista: nome, onde está, se está viva e o comando exato para entrar
+onion-attach <nome>                # entra: servidor tmux certo, fundo nativo, ou reabre a fechada
+onion-attach <nome> --dry-run      # só diz o que faria
+onion-attach <nome> --resume <id>  # escolhe a conversa depois de um «ambíguo»
+```
+
+- **Dentro de um tmux**: no mesmo servidor, troca de sessão (`switch-client`); noutro servidor, não aninha —
+  pede para sair antes com `Ctrl-b d`.
+- **Fechada**: acha a conversa mais recente cujo título é o nome e a reabre pelo abridor único, com o id e a
+  pasta **onde a conversa nasceu** (o `claude --resume` acha a conversa por essa pasta, não pela worktree em
+  que a sessão estava no fim). Conversas mais antigas com o mesmo título, na mesma pasta, são o histórico de
+  reinícios: são ditas, e `--resume <id>` escolhe uma delas.
+- **Ambíguo — lista com data e não escolhe**: a mesma sessão em dois servidores tmux; duas sessões de fundo vivas
+  com o nome; ou duas conversas com o título que mudaram quase juntas (menos de 2 min) ou nasceram em pastas
+  diferentes.
+- **Não anexa**: a sessão interativa que roda fora de um tmux (diz o pid e a pasta; entre pelo terminal dela).
+- Instalação, uma vez: `onion-attach --install` cria o link em `~/.local/bin` e avisa se essa pasta não está no
+  `PATH`. Nunca sobrescreve um arquivo que já esteja lá.
+
+O abridor de sessões passou a tirar a pasta da retomada do **transcript** do id (ou de `--dir <pasta>`), e não
+mais do registro de posse: a sessão dona de várias peças casava vários membros do registro e o abridor recusava
+reabri-la mesmo com o id certo. Mapa da decisão: `docs/onion/graph/onion-attach-2026-11.kg.yaml`.
+
+Atalhos do tmux, copiar e colar, a config da casa e o que fazer quando a sessão some:
+[tmux-operation-guide.md](tmux-operation-guide.md).
+
 ### 3.3 Trabalhar, entregar, sincronizar
 ```bash
 # ... trabalho na worktree (handoff commitado antes de trocar de ponta) ...

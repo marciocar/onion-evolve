@@ -235,7 +235,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,gokapi_oidc,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature,session_open,update_persona_hub,image_bridge"
+SELFTEST_CORE_ONLY_FAMILIES="public_machine_data,testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,slack_persona,gokapi_oidc,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3,act_signature,session_open,update_persona_hub,image_bridge,onion_attach"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -63856,6 +63856,7 @@ SO_TMUX
             SESSION_OPEN_CLAUDE="${sb}/claude" SESSION_OPEN_PROJECTS="${PJ}" SESSION_OPEN_MEMBERS="${SO_MEMBERS:-${sb}/members.yaml}" \
             SESSION_OPEN_OWNERSHIP="${SO_OWN:-${own}}" SESSION_OPEN_LIVENESS="${SO_LIV:-${liv}}" ONION_PRIVATE_OWNERS_FILE="${SO_PRIV:-${sb}/sem-lista.tsv}" \
             ONION_OWNERSHIP_CORE=onion-bancada/core SO_AGENTS="${SO_AGENTS:-${sb}/agents-empty.json}" \
+            SESSION_OPEN_TRANSCRIPT="${REPO_ROOT}/ops/session-transcript.sh" \
             SO_TLOG="${sb}/tlog" SO_TSESS="${SO_TSESS:-}" SO_TSESS_L="${SO_TSESS_L:-}" SESSION_OPEN_UID="${SO_UID:-}" \
             LC_ALL=C bash "${w}" "$@" 2>&1)"; then rc=0; else rc=$?; fi
     printf '%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")"
@@ -64291,6 +64292,57 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   if [ "$(id -u)" = 0 ]; then record_skip "session-open: (y) EPERM conta como vivo (rodando como root: kill -0 1 não dá EPERM)"
   else _so_case_liv "(y) pid vivo de outro dono (EPERM) conta como vivo" _so_y \
     '    except PermissionError: return True       # existe, de outro dono' '    except PermissionError: return False'; fi
+  # ── a pasta da RETOMADA vem do transcript, não do registro (2026-11-25, a dona de várias peças) ─────────────────
+  # registro em que o nome «multi» casa DOIS membros (o caso da sessão de serviços, dona de 6): o who responde rc 2
+  _so_repo multiA; _so_repo multiB
+  printf 'members:\n  - id: core\n    kind: source\n    remote: github.com/onion-bancada/core\n  - id: m-ma\n    kind: adopter\n    owner_session: multi\n    remote: github.com/onion-bancada/ma\n    local_path: %s/multiA\n  - id: m-mb\n    kind: adopter\n    owner_session: multi\n    remote: github.com/onion-bancada/mb\n    local_path: %s/multiB\n' "${HM}" "${HM}" > "${sb}/members-multi.yaml"
+  # a conversa 77777777-mul nasceu em multiA (título antigo, para o fallback por título NÃO achar) e foi a uma worktree
+  local encA; encA="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/multiA")"; mkdir -p "${PJ}/${encA}"
+  printf '{"type":"user","cwd":"%s/multiA","sessionId":"77777777-mul"}\n{"type":"custom-title","customTitle":"outro-titulo","sessionId":"77777777-mul"}\n{"type":"user","cwd":"%s/multiA/.claude/worktrees/w1","sessionId":"77777777-mul"}\n' "${HM}" "${HM}" > "${PJ}/${encA}/77777777-mul.jsonl"
+  # (rd1) --resume <id> com o registro AMBÍGUO: a pasta vem do transcript daquele id (multiA, onde nasceu), e abre
+  _so_rd1() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-multi.yaml" _so_run "$1" multi --dry-run --resume 77777777-mul)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF "new-session -d -s multi -c ${HM}/multiA '${sb}/claude --resume 77777777-mul'" <<< "${r}" \
+      && grep -qF 'a pasta da retomada vem do transcript do id 77777777-mul' <<< "${r}"; }
+  _so_case "(rd1) --resume com registro ambíguo: a pasta vem do transcript do id" _so_rd1 \
+    'if [ -n "${RESUME}" ]; then loc="$(locate_resume "${n}")"' 'if false; then loc="$(locate_resume "${n}")"'
+  # (rd2) --dir explícito vence o transcript
+  _so_rd2() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-multi.yaml" _so_run "$1" multi --dry-run --resume 77777777-mul --dir "${HM}/multiB")"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF "new-session -d -s multi -c ${HM}/multiB " <<< "${r}"; }
+  _so_case "(rd2) --dir explícito vence o transcript na retomada" _so_rd2 \
+    '  if [ -n "${DIR_ARG}" ]; then
+    say' '  if false; then
+    say'
+  # (rd3) --resume de id SEM transcript: recusa rc 5 e pede --dir, nunca abre numa pasta adivinhada
+  _so_rd3() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-multi.yaml" _so_run "$1" multi --dry-run --resume 99999999-none)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF 'não achei o transcript do id 99999999-none' <<< "${r}" && ! grep -q 'ensaio:' <<< "${r}"; }
+  _so_case "(rd3) --resume sem transcript: rc 5, pede --dir" _so_rd3 \
+    '    1) die "não achei o transcript do id' '    1) ;; 1x) die "não achei o transcript do id'
+  # (rd4) SEM --resume, registro ambíguo: a pasta vem da conversa mais recente com o título, dita (antes: recusa rc 2)
+  local encB; encB="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/multiB")"; mkdir -p "${PJ}/${encB}"
+  printf '{"type":"user","cwd":"%s/multiB","sessionId":"88888888-mtt"}\n{"type":"custom-title","customTitle":"multi","sessionId":"88888888-mtt"}\n' "${HM}" > "${PJ}/${encB}/88888888-mtt.jsonl"
+  _so_rd4() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-multi.yaml" _so_run "$1" multi --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'a pasta vem da conversa mais recente com esse título' <<< "${r}" \
+      && grep -qF "new-session -d -s multi -c ${HM}/multiB '${sb}/claude --resume 88888888-mtt'" <<< "${r}"; }
+  _so_case "(rd4) sem --resume e registro ambíguo: a pasta vem da conversa com o título, dita" _so_rd4 \
+    '[ "${rc}" -eq 2 ] && { locate_by_title "${n}" && return 0' '[ "${rc}" -eq 2 ] && { false && return 0'
+  # (rd6) --resume de transcript SEM cwd compatível (forma das fixtures de cópia): a pasta vem do registro, dito
+  local encM; encM="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/myrepo")"; mkdir -p "${PJ}/${encM}"
+  printf '{"type":"custom-title","customTitle":"myrepo","sessionId":"99990000-nocwd"}\n' > "${PJ}/${encM}/99990000-nocwd.jsonl"
+  _so_rd6() { local r; r="$(SO_TSESS="" _so_run "$1" myrepo --dry-run --resume 99990000-nocwd)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'uso a do registro de posse' <<< "${r}" && grep -qF "new-session -d -s myrepo -c ${HM}/myrepo '${sb}/claude --resume 99990000-nocwd'" <<< "${r}"; }
+  _so_case "(rd6) --resume de transcript sem cwd: a pasta vem do registro, dita" _so_rd6 \
+    '  if [ "${d}" = "-" ]; then
+    local loc;' '  if false; then
+    local loc;'
+  rm -f "${PJ}/${encM}/99990000-nocwd.jsonl"
+  # (rd5) sem --resume, registro ambíguo e conversas com o título em PASTAS diferentes: não escolhe a pasta (rc 2)
+  local encA2; encA2="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "${HM}/multiA")"
+  printf '{"type":"user","cwd":"%s/multiA","sessionId":"88888888-mta"}\n{"type":"custom-title","customTitle":"multi","sessionId":"88888888-mta"}\n' "${HM}" > "${PJ}/${encA2}/88888888-mta.jsonl"
+  _so_rd5() { local r; r="$(SO_TSESS="" SO_MEMBERS="${sb}/members-multi.yaml" _so_run "$1" multi --dry-run)"; SO_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 2 ] && grep -qF 'pastas diferentes' <<< "${r}" && ! grep -q 'ensaio:' <<< "${r}"; }
+  _so_case "(rd5) sem --resume, o título em pastas diferentes: não escolhe a pasta" _so_rd5 \
+    'if [ "$(awk -F'\''\t'\'' '\''$3 != "-" { print $3 }'\'' <<< "${rows}" | sort -u | wc -l)" -gt 1 ]; then' 'if false; then'
+  rm -f "${PJ}/${encA2}/88888888-mta.jsonl"
   # (t) as superfícies que ensinam a reiniciar a sessão (o aviso do hook de versão, o censo de atualidade e a REGRA 65)
   #     ensinam a retomada pelo id exato, nunca `/exit → claude --continue` (D_SESSION_ACCESS_TMUX_MOSH_RESUME_BY_ID_1120).
   #     Mutante: devolver a forma antiga a cada uma e exigir que o caso reprove.
@@ -64318,6 +64370,374 @@ print(s[a:b].replace("'"'"'\"'"'"'\"'"'"'", "'"'"'"))' "${pmv}")" || { SO_WHY="n
   rm -rf "${sb}"
 }
 _family run_session_open_selftests
+
+# ---------------------------------------------------------------------------
+# onion_attach — ops/onion-attach.sh (core-only, 2026-11-25): entra numa sessão pelo NOME, ache-se ela num servidor tmux
+# próprio (`-L <nome>`), no `default`, no fundo nativo do Claude Code ou fechada (a conversa pelo título, reaberta pelo
+# abridor único com --resume <id> --dir <pasta>); e o leitor de conversa que ele e o session-open usam
+# (ops/session-transcript.sh: a pasta é a de ONDE a sessão nasceu, nunca o último cwd).
+# Dublês: sockets unix de verdade num diretório da bancada (ONION_ATTACH_SOCKDIR), tmux de mentira que lê as sessões de
+# cada servidor de um arquivo e registra attach/switch-client, claude de mentira (agents --json de arquivo; attach só
+# registra), session-open de mentira que só registra os argumentos. NENHUM tmux, claude ou sessão real é tocado.
+run_onion_attach_selftests() {
+  echo ""
+  echo "▸ onion-attach — servidor certo, switch-client, fundo nativo, fechada reabre pela conversa, ambíguo lista, --install"
+  local sut="${REPO_ROOT}/ops/onion-attach.sh" trs="${REPO_ROOT}/ops/session-transcript.sh"
+  [ -f "${sut}" ] && [ -f "${trs}" ] || { record_fail "onion-attach: SUT ausente" "${sut} ou ${trs} (core-only)"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "onion-attach: python3 ausente (SUT não exercido)"; return; }
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)" || { record_skip "onion-attach: mktemp falhou"; return; }
+  mkdir -p "${sb}/sock" "${sb}/srv" "${sb}/projects" "${sb}/home"
+  # sockets unix reais (o SUT confere -S): srvA, srvB e default com servidor; morto só tem o socket
+  local s; for s in srvA srvB default morto "srv'q"; do
+    python3 -I -c 'import socket, sys; socket.socket(socket.AF_UNIX).bind(sys.argv[1])' "${sb}/sock/${s}" || { record_skip "onion-attach: não criei socket unix"; rm -rf "${sb}"; return; }
+  done
+  printf 'zeta\n' > "${sb}/srv/srv'q"; printf 'outra\n' > "${sb}/srv/srvA"; printf 'alpha\n' > "${sb}/srv/srvB"; printf 'velha\n' > "${sb}/srv/default"
+  cat > "${sb}/tmux" <<'OA_TMUX'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "${OA_TLOG}"
+if [ "$1" = "-S" ]; then       # o servidor atual: a sessão de quem chama, os terminais anexados, e o resto só registra
+  case "$3" in
+    display-message) [ -z "${OA_DISPFAIL:-}" ] || exit 1; printf '%s\n' "${OA_CURSESS:-outra}" ;;
+    list-clients) [ -z "${OA_LCFAIL:-}" ] || exit 1; i=0; while [ "${i}" -lt "${OA_NCLIENTS:-1}" ]; do printf '/dev/pts/%s: x\n' "${i}"; i=$((i + 1)); done ;;
+  esac
+  exit 0
+fi
+[ "$1" = "-L" ] || exit 1
+srv="$2"; f="${OA_SRV}/$2"; shift 2
+case "$1" in
+  ls) [ -f "${f}" ] || exit 1; cat "${f}" ;;
+  source-file) [ "${OA_SRCFAIL:-}" = "${srv}" ] && exit 1; exit 0 ;;
+  has-session) [ -f "${f}" ] && grep -qxF -- "${3#=}" "${f}" ;;
+  attach|switch-client) exit 0 ;;
+  *) exit 1 ;;
+esac
+OA_TMUX
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "${OA_CLOG}"\n[ "$1" = agents ] && { cat "${OA_AGENTS:-/dev/null}"; exit 0; }\nexit 0\n' > "${sb}/claude"
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "${OA_SOLOG}"\nexit 0\n' > "${sb}/session-open"
+  printf '#!/usr/bin/env bash\nexit 1\n' > "${sb}/liveness-dead"
+  chmod +x "${sb}/tmux" "${sb}/claude" "${sb}/session-open" "${sb}/liveness-dead"
+  local HM="${sb}/home" PJ="${sb}/projects" NOW; NOW="$(date +%s)"
+  printf '[]' > "${sb}/agents-empty.json"
+  # pid vivo = o desta bancada; pid morto = acima do pid_max
+  printf '[{"kind":"background","id":"bbbb1234","sessionId":"bbbb1234-full","name":"beta","state":"idle","pid":%s,"cwd":"/x"},{"kind":"background","id":"dddd9999","sessionId":"dddd9999-full","name":"gamma","state":"working","pid":999999999,"cwd":"/x"},{"kind":"interactive","sessionId":"iiii1111-full","name":"inter","pid":%s,"cwd":"/y"}]' "$$" "$$" > "${sb}/agents.json"
+  # conversas: gamma nasceu em repoG e foi a uma worktree; gamma tem um histórico mais antigo na mesma pasta; delta tem
+  # duas quase juntas; eps tem duas em pastas diferentes
+  _oa_tr() {  # $1=pasta-de-lançamento $2=id $3=título $4=epoch [$5=último cwd]
+    local e; e="$(sed 's#[^A-Za-z0-9-]#-#g' <<< "$1")"; mkdir -p "${PJ}/${e}"
+    printf '{"type":"user","cwd":"%s","sessionId":"%s"}\n{"type":"custom-title","customTitle":"%s","sessionId":"%s"}\n{"type":"user","cwd":"%s","sessionId":"%s"}\n' \
+      "$1" "$2" "$3" "$2" "${5:-$1}" "$2" > "${PJ}/${e}/$2.jsonl"
+    touch -d "@$4" "${PJ}/${e}/$2.jsonl"
+  }
+  _oa_tr "${HM}/repoG" 10000000-gnew gamma "$((NOW - 60))" "${HM}/repoG/.claude/worktrees/w1"
+  _oa_tr "${HM}/repoG" 10000000-gold gamma "$((NOW - 86400))"
+  _oa_tr "${HM}/repoD" 20000000-d1 delta "$((NOW - 60))"; _oa_tr "${HM}/repoD" 20000000-d2 delta "$((NOW - 90))"
+  _oa_tr "${HM}/repoE1" 30000000-e1 eps "$((NOW - 60))"; _oa_tr "${HM}/repoE2" 30000000-e2 eps "$((NOW - 86400))"
+  _oa_run() {  # $1=SUT, resto=args → "rc<TAB>saída-numa-linha"; OA_* do ambiente de chamada
+    local w="$1" o rc; shift; : > "${sb}/tlog"; : > "${sb}/clog"; : > "${sb}/solog"
+    if o="$(env -u TMUX ${OA_TMUX:+TMUX="${OA_TMUX}"} HOME="${HM}" PATH="${OA_PATH:-${PATH}}" ONION_ATTACH_TMUX="${sb}/tmux" ONION_ATTACH_CLAUDE="${sb}/claude" \
+            ONION_ATTACH_SOCKDIR="${sb}/sock" ONION_ATTACH_PROJECTS="${PJ}" ONION_ATTACH_SESSION_OPEN="${sb}/session-open" \
+            ONION_ATTACH_TRANSCRIPT="${OA_TRS:-${trs}}" ONION_ATTACH_LIVENESS="${OA_LIVE:-${sb}/sem-helper.sh}" \
+            ONION_ATTACH_BIN_DIR="${sb}/bin" ONION_ATTACH_TMUX_INSTALLER="${OA_INST:-${REPO_ROOT}/ops/tmux/install-tmux-conf.sh}" ONION_TMUX_CONF="${OA_HOUSE:-${sb}/house.conf}" OA_SRCFAIL="${OA_SRCFAIL:-}" OA_NCLIENTS="${OA_NCLIENTS:-1}" OA_DISPFAIL="${OA_DISPFAIL:-}" OA_LCFAIL="${OA_LCFAIL:-}" ${OA_TMUX:+TMUX_PANE=%1} OA_SRV="${sb}/srv" OA_TLOG="${sb}/tlog" OA_CLOG="${sb}/clog" OA_SOLOG="${sb}/solog" \
+            OA_AGENTS="${OA_AGENTS:-${sb}/agents.json}" LC_ALL=C bash "${w}" "$@" 2>&1)"; then rc=0; else rc=$?; fi
+    printf '%s\t%s' "${rc}" "$(tr '\n' '|' <<< "${o}")"
+  }
+  _oa_mutate() { cp "$1" "$2" && python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' "$2" "$3" "$4"; }
+  local mt="${sb}/mut.sh" mtr="${sb}/trs-mut.sh"
+  _oa_case() {  # <nome> <fn> <OLD> <NEW>: o mutante é do onion-attach.sh
+    local name="$1" fn="$2" old="$3" new="$4" ri rm_
+    if "${fn}" "${sut}"; then ri=0; else ri=1; fi
+    if [ "${ri}" = 0 ]; then record_pass "onion-attach: ${name}"; else record_fail "onion-attach: ${name}" "${OA_WHY:-caso não satisfeito}"; fi
+    if ! _oa_mutate "${sut}" "${mt}" "${old}" "${new}"; then record_fail "onion-attach: ${name} (MUT não aplicou)" "âncora ausente/não-única"; return; fi
+    if "${fn}" "${mt}"; then rm_=0; else rm_=1; fi
+    _prove_mutation "onion-attach: ${name} (MUT)" "${sut}" "${mt}" "${ri}" "${rm_}"
+  }
+  _oa_case_tr() {  # igual, mas o mutante é do leitor de conversa (o onion-attach intacto o lê por ONION_ATTACH_TRANSCRIPT)
+    local name="$1" fn="$2" old="$3" new="$4" ri rm_
+    if "${fn}" "${sut}"; then ri=0; else ri=1; fi
+    if [ "${ri}" = 0 ]; then record_pass "onion-attach: ${name}"; else record_fail "onion-attach: ${name}" "${OA_WHY:-caso não satisfeito}"; fi
+    if ! _oa_mutate "${trs}" "${mtr}" "${old}" "${new}"; then record_fail "onion-attach: ${name} (MUT não aplicou)" "âncora ausente/não-única"; return; fi
+    if OA_TRS="${mtr}" "${fn}" "${sut}"; then rm_=0; else rm_=1; fi
+    _prove_mutation "onion-attach: ${name} (MUT)" "${trs}" "${mtr}" "${ri}" "${rm_}"
+  }
+  # (a) SERVIDOR CERTO: «alpha» só existe no srvB; fora do tmux, anexa com -L srvB (nunca no default nem no srvA)
+  _oa_a() { local r; r="$(_oa_run "$1" alpha)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF -- '-L srvB attach -t =alpha' "${sb}/tlog" && ! grep -q 'switch-client' "${sb}/tlog"; }
+  _oa_case "(a) servidor certo: anexa no servidor onde a sessão está (-L srvB)" _oa_a \
+    'run "${TMUX_BIN}" -L "${srv}" attach -t "=${NAME}"' 'run "${TMUX_BIN}" attach -t "=${NAME}"'
+  # (b) dentro do MESMO servidor tmux: switch-client, nunca attach aninhado
+  _oa_b() { local r; r="$(OA_TMUX="${sb}/sock/srvB,4242,0" _oa_run "$1" alpha)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF -- '-L srvB switch-client -t =alpha' "${sb}/tlog" && ! grep -q ' attach ' "${sb}/tlog"; }
+  _oa_case "(b) dentro do mesmo servidor: switch-client" _oa_b \
+    'run "${TMUX_BIN}" -L "${srv}" switch-client -t "=${NAME}"' 'run "${TMUX_BIN}" -L "${srv}" attach -t "=${NAME}"'
+  # (b2) dentro de OUTRO servidor: não anexa (tmux aninhado), rc 3 e diz Ctrl-b d
+  _oa_b2() { local r; r="$(OA_TMUX="${sb}/sock/srvA,4242,0" _oa_run "$1" alpha)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF -- "-S ${sb}/sock/srvA detach-client -E '${sb}/tmux' -L 'srvB' attach -t '=alpha'" "${sb}/tlog" \
+      && ! grep -qE '^-L srvB (attach|switch-client)' "${sb}/tlog"; }
+  _oa_case "(b2) dentro de outro servidor: detach-client -E com o attach do alvo, sem aninhar" _oa_b2 \
+    'detach-client -E "$(sq "${TMUX_BIN}") -L $(sq "${srv}") attach -t $(sq "=${NAME}")"' 'detach-client -E "${TMUX_BIN} -L ${srv} attach -t =${NAME}"'
+  # (b3) nome de servidor com aspa (vem do diretório de sockets): a citação o mantém dado no comando do -E
+  _oa_b3() { local r; r="$(OA_TMUX="${sb}/sock/srvA,4242,0" _oa_run "$1" zeta)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF -- "-S ${sb}/sock/srvA detach-client -E '${sb}/tmux' -L 'srv'\''q' attach -t '=zeta'" "${sb}/tlog"; }
+  _oa_case "(b3) servidor com aspa no nome: citado no comando do detach-client -E" _oa_b3 \
+    'sq() { local v="$1"; printf "'\''%s'\''" "${v//\'\''/\'\''\\\'\''\'\''}"; }' 'sq() { printf "'\''%s'\''" "$1"; }'
+  # (b4) dois terminais na sessão atual (PC e celular), alvo noutro servidor: recusa rc 3, nenhum detach
+  _oa_b4() { local r; r="$(OA_NCLIENTS=2 OA_TMUX="${sb}/sock/srvA,4242,0" _oa_run "$1" alpha)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'há 2 terminais nesta sessão' <<< "${r}" && ! grep -qE 'detach-client|switch-client| attach ' "${sb}/tlog"; }
+  _oa_case "(b4) dois terminais na sessão, alvo noutro servidor: rc 3, não troca" _oa_b4 \
+    '[ "${n}" -le 1 ] || die' 'true || die'
+  # (b5) dois terminais, alvo no MESMO servidor: também recusa, nenhum switch-client
+  _oa_b5() { local r; r="$(OA_NCLIENTS=2 OA_TMUX="${sb}/sock/srvB,4242,0" _oa_run "$1" alpha)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'há 2 terminais nesta sessão' <<< "${r}" && ! grep -q 'switch-client' "${sb}/tlog"; }
+  _oa_case "(b5) dois terminais, alvo no mesmo servidor: rc 3, sem switch-client" _oa_b5 \
+    '      one_client_or_refuse "${cur}"' '      :'
+  # (b6) não se lê a sessão tmux atual (display-message falha): recusa rc 3, nunca troca às cegas
+  _oa_b6() { local r; r="$(OA_DISPFAIL=1 OA_TMUX="${sb}/sock/srvA,4242,0" _oa_run "$1" alpha)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não li a sessão tmux atual' <<< "${r}" && ! grep -qE 'detach-client|switch-client' "${sb}/tlog"; }
+  _oa_case "(b6) display-message falha: rc 3, não troca" _oa_b6 \
+    '    || die "não li a sessão tmux atual' '    || true "não li a sessão tmux atual'
+  # (b7) não se contam os terminais (list-clients falha): recusa rc 3, nunca conta «zero» e troca
+  _oa_b7() { local r; r="$(OA_LCFAIL=1 OA_TMUX="${sb}/sock/srvA,4242,0" _oa_run "$1" alpha)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não li os terminais' <<< "${r}" && ! grep -qE 'detach-client|switch-client' "${sb}/tlog"; }
+  _oa_case "(b7) list-clients falha: rc 3, não troca" _oa_b7 \
+    '    || die "não li os terminais' '    || true "não li os terminais'
+  # (a2) a mesma sessão em DOIS servidores: ambíguo, lista os dois comandos, não anexa (rc 5)
+  printf 'alpha\n' >> "${sb}/srv/default"
+  _oa_a2() { local r; r="$(_oa_run "$1" alpha)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF -- '-L srvB attach -t alpha' <<< "${r}" && grep -qF -- '-L default attach -t alpha' <<< "${r}" && ! grep -q ' attach -t =' "${sb}/tlog"; }
+  _oa_case "(a2) sessão em dois servidores: ambíguo, lista, não anexa" _oa_a2 \
+    'if [ "${#hits[@]}" -gt 1 ]; then' 'if false; then'
+  printf 'velha\n' > "${sb}/srv/default"
+  # (c) FUNDO NATIVO vivo: claude attach <id curto>
+  _oa_c() { local r; r="$(_oa_run "$1" beta)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|clog=$(tr '\n' '|' < "${sb}/clog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF 'attach bbbb1234' "${sb}/clog" && [ ! -s "${sb}/solog" ]; }
+  _oa_case "(c) fundo nativo vivo: claude attach <id>" _oa_c \
+    'run "${CLAUDE_BIN}" attach "${bg[0]}"' ':'
+  # (c2) fundo nativo com pid MORTO (lista velha): não anexa; cai na conversa fechada e reabre pelo abridor
+  _oa_c2() { local r; r="$(_oa_run "$1" gamma)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|clog=$(tr '\n' '|' < "${sb}/clog")"
+    [ "${r%%$'\t'*}" = 0 ] && ! grep -q '^attach' "${sb}/clog" && grep -q -- '--resume 10000000-gnew' "${sb}/solog"; }
+  _oa_case "(c2) fundo nativo com pid morto: não anexa, reabre pela conversa" _oa_c2 \
+    'kill -0 "${p}" 2>/dev/null || [ -d "/proc/${p}" ] || return 1' 'true'
+  # (c3) fundo nativo de DENTRO de um tmux: o `claude attach` roda no próprio painel; ninguém é desanexado do tmux
+  _oa_c3() { local r; r="$(OA_TMUX="${sb}/sock/srvA,4242,0" _oa_run "$1" beta)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")|clog=$(tr '\n' '|' < "${sb}/clog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF 'attach bbbb1234' "${sb}/clog" && ! grep -q 'detach-client' "${sb}/tlog"; }
+  _oa_case "(c3) fundo nativo de dentro do tmux: claude attach no próprio painel, sem desanexar" _oa_c3 \
+    '    run "${CLAUDE_BIN}" attach "${bg[0]}"' '    [ -z "${TMUX:-}" ] || run "${TMUX_BIN}" -S "${TMUX%%,*}" detach-client -E x
+    run "${CLAUDE_BIN}" attach "${bg[0]}"'
+  # (h) o helper único de «viva» (session-liveness.sh, #1761) VENCE a regra local quando existe: ele diz morta → não anexa
+  _oa_h() { local r; r="$(OA_LIVE="${sb}/liveness-dead" _oa_run "$1" beta)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|clog=$(tr '\n' '|' < "${sb}/clog")"
+    [ "${r%%$'\t'*}" = 5 ] && ! grep -q '^attach' "${sb}/clog"; }
+  _oa_case "(h) helper de vida presente: ele decide (morta → não anexa)" _oa_h \
+    'if [ -f "${LIVENESS}" ]; then bash' 'if false; then bash'
+  # (i) interativa VIVA fora de um tmux achado: não anexa, rc 3, diz onde ela roda
+  _oa_i() { local r; r="$(_oa_run "$1" inter)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'interativa fora de um tmux' <<< "${r}" && [ ! -s "${sb}/solog" ]; }
+  _oa_case "(i) interativa fora do tmux: rc 3, não reabre cópia" _oa_i \
+    '  if [ -n "${inter}" ]; then' '  if false; then'
+  # (d) FECHADA → reabre pelo abridor único, com o id e a pasta da conversa mais recente com o título
+  _oa_d() { local r; r="$(OA_AGENTS="${sb}/agents-empty.json" _oa_run "$1" gamma)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|solog=$(tr '\n' '|' < "${sb}/solog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF "gamma --resume 10000000-gnew --dir ${HM}/repoG" "${sb}/solog"; }
+  _oa_case "(d) fechada: reabre por session-open <nome> --resume <id> --dir <pasta>" _oa_d \
+    'args=("${NAME}" --resume "${id}" --dir "${d}")' 'args=("${NAME}")'
+  # (d2) a pasta é a de ONDE a conversa nasceu (repoG), nunca o último cwd (a worktree): mutante no leitor de conversa
+  _oa_d2() { local r; r="$(OA_AGENTS="${sb}/agents-empty.json" _oa_run "$1" gamma)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|solog=$(tr '\n' '|' < "${sb}/solog")"
+    grep -q -- "--dir ${HM}/repoG\$" "${sb}/solog"; }
+  _oa_case_tr "(d2) a pasta é a do nascimento da conversa, não o último cwd" _oa_d2 \
+    'if launch is None and enc(c) == folder: launch = c' 'launch = c'
+  # (d3) histórico de reinícios (mesma pasta, longe no tempo): a mais recente, e as antigas DITAS
+  _oa_d3() { local r; r="$(OA_AGENTS="${sb}/agents-empty.json" _oa_run "$1" gamma)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    grep -q -- '--resume 10000000-gnew' "${sb}/solog" && grep -qF 'id 10000000-gold' <<< "${r}"; }
+  _oa_case "(d3) histórico na mesma pasta: a mais recente, com as antigas ditas" _oa_d3 \
+    'row="$(head -1 <<< "${rows}")"' 'row="$(tail -1 <<< "${rows}")"'
+  # (e) AMBÍGUO no tempo: duas conversas «delta» mudadas quase juntas → lista com data e id, não reabre (rc 5)
+  _oa_e() { local r; r="$(OA_AGENTS="${sb}/agents-empty.json" _oa_run "$1" delta)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF 'id 20000000-d1' <<< "${r}" && grep -qF 'id 20000000-d2' <<< "${r}" \
+      && grep -qF 'onion-attach delta --resume 20000000-d2' <<< "${r}" && [ ! -s "${sb}/solog" ]; }
+  _oa_case "(e) duas conversas quase juntas: ambíguo, lista com data, não reabre" _oa_e \
+    'if [ $(( m1 - m2 )) -le "${AMBIG_SECS}" ] || [ -n "${other_dir}" ]; then' 'if [ -n "${other_dir}" ]; then'
+  # (e2) AMBÍGUO por pasta: «eps» em dois repos, mesmo longe no tempo → lista (o mesmo nome em dois repos)
+  _oa_e2() { local r; r="$(OA_AGENTS="${sb}/agents-empty.json" _oa_run "$1" eps)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 5 ] && grep -qF 'pastas diferentes' <<< "${r}" && [ ! -s "${sb}/solog" ]; }
+  _oa_case "(e2) o título em duas pastas: ambíguo, não reabre" _oa_e2 \
+    'if [ $(( m1 - m2 )) -le "${AMBIG_SECS}" ] || [ -n "${other_dir}" ]; then' 'if [ $(( m1 - m2 )) -le "${AMBIG_SECS}" ]; then'
+  # (e3) --resume <id> depois do ambíguo: reabre AQUELA conversa, com a pasta dela
+  _oa_e3() { local r; r="$(OA_AGENTS="${sb}/agents-empty.json" _oa_run "$1" eps --resume 30000000-e2)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|solog=$(tr '\n' '|' < "${sb}/solog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF "eps --resume 30000000-e2 --dir ${HM}/repoE2" "${sb}/solog"; }
+  _oa_case "(e3) --resume escolhe a conversa depois do ambíguo" _oa_e3 \
+    '  row="$(bash "${TRANSCRIPT}" by-id "${RESUME}"' '  row="$(bash "${TRANSCRIPT}" by-title "${NAME}"'
+  # (n1) --resume <id> cuja conversa tem OUTRO título: avisa no stderr e reabre assim mesmo (não recusa)
+  _oa_n1() { local r; r="$(OA_AGENTS="${sb}/agents-empty.json" _oa_run "$1" eps --resume 10000000-gnew)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'tem o título «gamma», não «eps»' <<< "${r}" && grep -q -- '^eps --resume 10000000-gnew' "${sb}/solog"; }
+  _oa_case "(n1) --resume de conversa com outro título: aviso, sem recusa" _oa_n1 \
+    '[ "${rt}" = "${NAME}" ] || say' 'true || say'
+  # (f) SEM argumento: a lista diz o servidor e o comando exato de cada sessão, o fundo nativo e o socket morto
+  _oa_f() { local r; r="$(_oa_run "$1")"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF "${sb}/tmux -L srvB attach -t alpha" <<< "${r}" && grep -qF "${sb}/tmux -L default attach -t velha" <<< "${r}" \
+      && grep -qF "${sb}/claude attach bbbb1234" <<< "${r}" && grep -qF 'sockets sem servidor tmux vivo: morto' <<< "${r}"; }
+  _oa_case "(f) a lista: servidor e comando exato de cada sessão" _oa_f \
+    '"tmux (servidor ${srv})" "viva" "${TMUX_BIN} -L ${srv} attach -t ${s}"' '"tmux (servidor ${srv})" "viva" "${TMUX_BIN} attach -t ${s}"'
+  # (g) --install num HOME de bancada: cria o link, avisa que o bin não está no PATH; 2ª vez diz que já existe;
+  #     arquivo alheio no lugar: rc 3, não sobrescreve
+  _oa_g() { local r r2 r3; rm -rf "${sb}/bin"
+    r="$(OA_PATH=/usr/bin:/bin _oa_run "$1" --install)"; r2="$(OA_PATH="${sb}/bin:/usr/bin:/bin" _oa_run "$1" --install)"
+    rm -f "${sb}/bin/onion-attach"; printf 'x\n' > "${sb}/bin/onion-attach"; r3="$(_oa_run "$1" --install)"
+    OA_WHY="$(tr '\t' ' ' <<< "${r} || ${r2} || ${r3}")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qF 'NÃO está no PATH' <<< "${r}" && grep -qF 'já existe' <<< "${r2}" && grep -qF 'está no PATH' <<< "${r2}" \
+      && [ "${r3%%$'\t'*}" = 3 ] && grep -qF 'não sobrescrevo' <<< "${r3}" && [ "$(cat "${sb}/bin/onion-attach")" = x ]; }
+  _oa_case "(g) --install em HOME de bancada: link, aviso de PATH, nunca sobrescreve" _oa_g \
+    '  elif [ -e "${link}" ] || [ -L "${link}" ]; then' '  elif false; then'
+  # ── 1ª passada adversarial (refutador, 2026-11-25): cada achado curado vira caso com mutante ─────────────────
+  # (j) --resume <id> com a sessão VIVA no tmux: recusa rc 3 (o abridor anexaria à conversa que já roda lá)
+  _oa_j() { local r; r="$(_oa_run "$1" alpha --resume 10000000-gnew)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não troca a conversa de uma sessão viva' <<< "${r}" && [ ! -s "${sb}/solog" ]; }
+  _oa_case "(j) --resume com a sessão viva no tmux: rc 3, não reabre" _oa_j \
+    'if [ -n "${RESUME}" ] && [ "${#hits[@]}" -gt 0 ]; then' 'if false; then'
+  # (k) pasta de projetos ilegível NÃO vira «nenhuma conversa» (que mandaria abrir uma NOVA): rc 2, sem sugerir --new
+  _oa_k() { local r; r="$(OA_AGENTS="${sb}/agents-empty.json" _oa_run_pj "$1" "${sb}/nao-existe" gamma)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 2 ] && ! grep -qF -- '--new' <<< "${r}" && [ ! -s "${sb}/solog" ]; }
+  _oa_run_pj() { local w="$1" pj="$2" PJ_SAVE; shift 2; PJ_SAVE="${PJ}"; PJ="${pj}"; _oa_run "${w}" "$@"; PJ="${PJ_SAVE}"; }
+  _oa_case_tr "(k) pasta de projetos ilegível: rc 2, nunca «abra uma nova»" _oa_k \
+    '[ -d "${PROJECTS}" ] && [ -r "${PROJECTS}" ] || { echo "session-transcript: não li a pasta de projetos ${PROJECTS}" >&2; exit 2; }' \
+    '[ -d "${PROJECTS}" ] || exit 1'
+  # ── --install-tmux (ops/tmux/install-tmux-conf.sh): a config vai COPIADA para ~/.config/onion/tmux.conf, fora do repo,
+  # e o ~/.tmux.conf ganha UMA linha `source-file -q ~/.config/onion/tmux.conf`. Os mutantes são do instalador; o
+  # onion-attach intacto o chama. A config de origem é uma cópia na pasta da bancada (OA_HOUSE).
+  local conf="${REPO_ROOT}/ops/tmux/onion.tmux.conf" inst="${REPO_ROOT}/ops/tmux/install-tmux-conf.sh" mi="${sb}/inst-mut.sh"
+  cp "${conf}" "${sb}/house.conf"
+  local LINE='source-file -q ~/.config/onion/tmux.conf' CP="${HM}/.config/onion/tmux.conf"
+  _oa_clean_home() { rm -f "${HM}/.tmux.conf" "${CP}" "${HM}"/.config/onion/tmux.conf.bak-*; }
+  _oa_case_inst() {  # <nome> <fn> <OLD> <NEW>: o mutante é do instalador
+    local name="$1" fn="$2" old="$3" new="$4" ri rm_
+    if "${fn}" "${sut}"; then ri=0; else ri=1; fi
+    if [ "${ri}" = 0 ]; then record_pass "onion-attach: ${name}"; else record_fail "onion-attach: ${name}" "${OA_WHY:-caso não satisfeito}"; fi
+    if ! _oa_mutate "${inst}" "${mi}" "${old}" "${new}"; then record_fail "onion-attach: ${name} (MUT não aplicou)" "âncora ausente/não-única"; return; fi
+    if OA_INST="${mi}" "${fn}" "${sut}"; then rm_=0; else rm_=1; fi
+    _prove_mutation "onion-attach: ${name} (MUT)" "${inst}" "${mi}" "${ri}" "${rm_}"
+  }
+  # (t1) ~/.tmux.conf com conteúdo próprio: o conteúdo fica intacto, a linha é ACRESCENTADA, e a cópia fora do repo
+  #      é igual à config de origem (a linha aponta para a cópia, nunca para o repo)
+  _oa_t1() { local r; _oa_clean_home; printf 'set -g mouse off' > "${HM}/.tmux.conf"
+    r="$(_oa_run "$1" --install-tmux)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|conf=$(tr '\n' '|' < "${HM}/.tmux.conf")"
+    [ "${r%%$'\t'*}" = 0 ] && [ "$(head -1 "${HM}/.tmux.conf")" = 'set -g mouse off' ] && grep -qxF -- "${LINE}" "${HM}/.tmux.conf" \
+      && cmp -s "${sb}/house.conf" "${CP}" && ! grep -qF "${sb}/house.conf" "${HM}/.tmux.conf"; }
+  _oa_case_inst "(t1) --install-tmux: copia para fora do repo e acrescenta a linha, o conteúdo do usuário intacto" _oa_t1 \
+    '  printf '\''\n# Onion: a config do tmux da casa' '  : printf '\''\n# Onion: a config do tmux da casa'
+  # (t3) IDEMPOTENTE: rodar duas vezes deixa uma linha só e nenhum backup
+  _oa_t3() { local r n; _oa_clean_home; r="$(_oa_run "$1" --install-tmux)"; r="$(_oa_run "$1" --install-tmux)"
+    n="$(grep -cxF -- "${LINE}" "${HM}/.tmux.conf" || true)"; OA_WHY="linhas=${n} $(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && [ "${n}" = 1 ] && grep -qF 'nada a acrescentar' <<< "${r}" && ! ls "${HM}"/.config/onion/tmux.conf.bak-* >/dev/null 2>&1; }
+  _oa_case_inst "(t3) --install-tmux duas vezes: uma linha só, nenhum backup" _oa_t3 \
+    'if has_line; then
+  say "install-tmux-conf: ${DST} já lê' 'if false; then
+  say "install-tmux-conf: ${DST} já lê'
+  # (t10) a cópia anterior que DIFERE vai para um backup datado antes de ser trocada
+  _oa_t10() { local r b; _oa_clean_home; mkdir -p "${HM}/.config/onion"; printf 'velha\n' > "${CP}"
+    r="$(_oa_run "$1" --install-tmux)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    b="$(ls "${HM}"/.config/onion/tmux.conf.bak-* 2>/dev/null | head -1)"
+    [ "${r%%$'\t'*}" = 0 ] && [ -n "${b}" ] && [ "$(cat "${b}")" = velha ] && cmp -s "${sb}/house.conf" "${CP}"; }
+  _oa_case_inst "(t10) cópia anterior diferente: backup datado e a nova conferida" _oa_t10 \
+    'cp -p -- "${COPY}" "${bak}" || die' 'true || die'
+  # (t2) recarrega a CÓPIA em cada servidor vivo (srvA, srvB, default), nunca no socket sem servidor
+  _oa_t2() { local r; _oa_clean_home; r="$(_oa_run "$1" --install-tmux)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")|tlog=$(tr '\n' '|' < "${sb}/tlog")"
+    [ "${r%%$'\t'*}" = 0 ] && grep -qxF -- "-L srvA source-file ${CP}" "${sb}/tlog" && grep -qxF -- "-L srvB source-file ${CP}" "${sb}/tlog" \
+      && grep -qxF -- "-L default source-file ${CP}" "${sb}/tlog" && ! grep -q -- '-L morto source-file' "${sb}/tlog" && grep -qF 'servidor «morto»: sem tmux vivo' <<< "${r}"; }
+  _oa_case_inst "(t2) --install-tmux: source-file da cópia em cada servidor vivo, o morto pulado e dito" _oa_t2 \
+    'if "${TMUX_BIN}" -L "${srv}" source-file "${COPY}" 2>/dev/null; then' 'if true; then'
+  # (t4) source-file que falha num servidor: rc 3 e o servidor nomeado, nunca silêncio
+  _oa_t4() { local r; _oa_clean_home; r="$(OA_SRCFAIL=srvB _oa_run "$1" --install-tmux)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'servidor «srvB»: o source-file falhou' <<< "${r}"; }
+  _oa_case_inst "(t4) source-file falho: rc 3, servidor nomeado" _oa_t4 \
+    '>&2; bad=1; fi' '>&2; fi'
+  # (t5) --dry-run não escreve nada no HOME nem recarrega
+  _oa_t5() { local r; _oa_clean_home; printf 'x\n' > "${HM}/.tmux.conf"; r="$(_oa_run "$1" --install-tmux --dry-run)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 0 ] && [ "$(cat "${HM}/.tmux.conf")" = x ] && [ ! -e "${CP}" ] && grep -qF 'ensaio: acrescentar' <<< "${r}" && ! grep -q 'source-file' "${sb}/tlog"; }
+  _oa_case_inst "(t5) --install-tmux --dry-run: nada escrito, nada recarregado" _oa_t5 \
+    'elif [ "${MODE}" = dry ]; then
+  say "ensaio: acrescentar' 'elif false; then
+  say "ensaio: acrescentar'
+  # (t7) ~/.tmux.conf que é LINK (repo de dotfiles): recusa rc 3 e o destino do link fica intacto
+  _oa_t7() { local r; _oa_clean_home; printf 'dotfiles\n' > "${sb}/dot.conf"; ln -s "${sb}/dot.conf" "${HM}/.tmux.conf"
+    r="$(_oa_run "$1" --install-tmux)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não escrevo através dele' <<< "${r}" && [ "$(cat "${sb}/dot.conf")" = dotfiles ]; }
+  _oa_case_inst "(t7) ~/.tmux.conf é link: rc 3, o destino do link intacto" _oa_t7 \
+    '[ ! -L "${f}" ] || die' 'true || die'
+  _oa_clean_home
+  # (t11) a PASTA ~/.config/onion é link: recusa rc 3 e nada é escrito no destino do link
+  _oa_t11() { local r; _oa_clean_home; rm -rf "${HM}/.config/onion"; mkdir -p "${sb}/dotdir" "${HM}/.config"; ln -s "${sb}/dotdir" "${HM}/.config/onion"
+    r="$(_oa_run "$1" --install-tmux)"; OA_WHY="$(tr '\t' ' ' <<< "${r}")"
+    local ok=1; [ "${r%%$'\t'*}" = 3 ] && grep -qF 'não escrevo através dele' <<< "${r}" && [ ! -e "${sb}/dotdir/tmux.conf" ] && ok=0
+    rm -f "${HM}/.config/onion"; return "${ok}"; }
+  _oa_case_inst "(t11) ~/.config/onion é link: rc 3, nada escrito no destino" _oa_t11 \
+    'for f in "${DST}" "${COPY_DIR}" "${COPY}"; do' 'for f in "${DST}" "${COPY}"; do'
+  _oa_clean_home
+  # (t9) --check só mede: rc 1 quando falta (a linha ou a cópia), rc 0 depois de instalar, e nunca escreve
+  _oa_t9() { local r r2; _oa_clean_home; printf 'y\n' > "${HM}/.tmux.conf"; r="$(_oa_run "$1" --install-tmux --check)"
+    [ "$(cat "${HM}/.tmux.conf")" = y ] && [ ! -e "${CP}" ] || { OA_WHY="o --check escreveu"; return 1; }
+    _oa_run "$1" --install-tmux >/dev/null; r2="$(_oa_run "$1" --install-tmux --check)"; OA_WHY="$(tr '\t' ' ' <<< "${r} || ${r2}")"
+    [ "${r%%$'\t'*}" = 1 ] && grep -qF 'FALTA' <<< "${r}" && [ "${r2%%$'\t'*}" = 0 ] && ! grep -q 'source-file' "${sb}/tlog"; }
+  _oa_case_inst "(t9) --check: rc 1 falta, rc 0 presente, nada escrito" _oa_t9 \
+    '  say "install-tmux-conf: FALTA —${miss% ;} Rode: onion-attach --install-tmux"; exit 1' \
+    '  say "install-tmux-conf: FALTA —${miss% ;} Rode: onion-attach --install-tmux"; exit 0'
+  _oa_clean_home
+  # (t8) o caminho REAL: HOME descartável, o ~/.tmux.conf gerado pelo INSTALADOR (a linha source-file -q da cópia), um
+  #      tmux real com socket na pasta da bancada (-S) lendo esse HOME: mouse on, set-clipboard external, passthrough
+  #      off, e recarregar a cópia não empilha o terminal-features. Único servidor que a bancada mata. Mutantes: opção
+  #      com erro de digitação; -as que empilha.
+  _oa_t8() {  # $1 = arquivo de config de origem
+    local h="${sb}/t8h-${RANDOM}" sk="${sb}/t8-${RANDOM}" ok=1 n
+    command -v tmux >/dev/null 2>&1 || { OA_WHY="tmux ausente"; return 2; }
+    mkdir -p "${h}"
+    if ! HOME="${h}" ONION_TMUX_CONF="$1" ONION_TMUX_SOCKDIR="${h}/sem-sockets" bash "${inst}" >/dev/null 2>&1 \
+       || ! grep -qxF 'source-file -q ~/.config/onion/tmux.conf' "${h}/.tmux.conf"; then OA_WHY="o instalador não gerou o ~/.tmux.conf"; return 1; fi
+    if HOME="${h}" tmux -S "${sk}" new-session -d -s x 'sleep 20' 2>/dev/null; then
+      # 1º: a linha instalada carrega a config SOZINHA (nenhum source-file explícito ainda)
+      local m c a; m="$(tmux -S "${sk}" show -gv mouse 2>/dev/null)"; c="$(tmux -S "${sk}" show -gv set-clipboard 2>/dev/null)"
+      a="$(tmux -S "${sk}" show -gv allow-passthrough 2>/dev/null)"
+      OA_WHY="na partida: mouse=${m} set-clipboard=${c} allow-passthrough=${a}"
+      # 2º: recarregar a cópia duas vezes não empilha o terminal-features
+      if [ "${m}" = on ] && [ "${c}" = external ] && [ "${a}" = off ] \
+         && HOME="${h}" tmux -S "${sk}" source-file "${h}/.config/onion/tmux.conf" 2>/dev/null \
+         && HOME="${h}" tmux -S "${sk}" source-file "${h}/.config/onion/tmux.conf" 2>/dev/null; then
+        n="$(tmux -S "${sk}" show -s terminal-features 2>/dev/null | grep -c '\] \*:clipboard$' || true)"
+        [ "${n}" = 1 ] && ok=0
+        OA_WHY="${OA_WHY}; entradas *:clipboard=${n}"
+      fi
+    else OA_WHY="o tmux recusou a config"; fi
+    tmux -S "${sk}" kill-server >/dev/null 2>&1 || true
+    return "${ok}"
+  }
+  local t8=0; _oa_t8 "${conf}" || t8=$?
+  if [ "${t8}" = 2 ]; then record_skip "onion-attach: (t8) tmux ausente (a config não foi carregada num tmux real)"
+  else
+    if [ "${t8}" = 0 ]; then record_pass "onion-attach: (t8) o tmux real aceita a config e recarregar não empilha"
+    else record_fail "onion-attach: (t8) config no tmux real" "${OA_WHY}"; fi
+    sed 's/^set -g history-limit 50000/set -g histroy-limit 50000/' "${conf}" > "${sb}/conf-typo"
+    if ! cmp -s "${conf}" "${sb}/conf-typo" && ! _oa_t8 "${sb}/conf-typo"; then record_pass "onion-attach: (t8) (MUT): opção com erro de digitação reprova"
+    else record_fail "onion-attach: (t8) (MUT)" "o mutante não derrubou o caso"; fi
+    sed "s/^set -s terminal-features\[9\] /set -as terminal-features /" "${conf}" > "${sb}/conf-stack"
+    if ! cmp -s "${conf}" "${sb}/conf-stack" && ! _oa_t8 "${sb}/conf-stack"; then record_pass "onion-attach: (t8) (MUT): -as empilha a cada recarga e reprova"
+    else record_fail "onion-attach: (t8) (MUT -as)" "o mutante não derrubou o caso"; fi
+  fi
+  # (t6) a config versionada: copiar pelo mouse (OSC 52 com set-clipboard EXTERNAL: o app do painel não escreve na área
+  #      de transferência local), mouse e rolagem; allow-passthrough NUNCA ligado (imagem não passa; DCS não confiável)
+  _oa_t6() {  # $1 = arquivo de config
+    local k miss=""
+    for k in 'set -g set-clipboard external' 'MouseDragEnd1Pane send -X copy-pipe-and-cancel' 'set -g mouse on' 'set -g history-limit 50000'; do
+      grep -qF -- "${k}" "$1" || miss="${miss} falta «${k}»"
+    done
+    grep -qE '^[[:space:]]*set[^#]*set-clipboard[[:space:]]+on' "$1" && miss="${miss} set-clipboard on"
+    grep -qE '^[[:space:]]*set[^#]*allow-passthrough[[:space:]]+(on|all)' "$1" && miss="${miss} allow-passthrough ligado"
+    OA_WHY="${miss}"; [ -z "${miss}" ]; }
+  if _oa_t6 "${conf}"; then record_pass "onion-attach: (t6) a config versionada: clipboard external, mouse, rolagem, sem passthrough"
+  else record_fail "onion-attach: (t6) config versionada" "${OA_WHY}"; fi
+  sed 's/^set -g set-clipboard external/set -g set-clipboard on/' "${conf}" > "${sb}/conf-mut"
+  if ! cmp -s "${conf}" "${sb}/conf-mut" && ! _oa_t6 "${sb}/conf-mut"; then record_pass "onion-attach: (t6) (MUT): set-clipboard on reprova"
+  else record_fail "onion-attach: (t6) (MUT on)" "o mutante não derrubou o caso"; fi
+  { cat "${conf}"; printf 'set -g allow-passthrough on\n'; } > "${sb}/conf-mut2"
+  if ! _oa_t6 "${sb}/conf-mut2"; then record_pass "onion-attach: (t6) (MUT): allow-passthrough on reprova"
+  else record_fail "onion-attach: (t6) (MUT passthrough)" "o mutante não derrubou o caso"; fi
+  rm -rf "${sb}"
+}
+_family run_onion_attach_selftests
 
 # ---------------------------------------------------------------------------
 # restart_drain — o reinício gracioso (restart-drain.sh, 2026-11-21): o medidor e escritor
