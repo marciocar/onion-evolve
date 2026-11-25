@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1258 itens abertos** em 186 grafo(s) com aberto (de 248 no escopo) · 175 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1226 itens abertos** em 185 grafo(s) com aberto (de 246 no escopo) · 174 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -87,34 +87,6 @@
 | 3.2 | `E_R3_TST_CIENCIA_PREVIA_AFASTA_EXPECTATIVA` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): a licitude do monitoramento e condicionada a CIENCIA PREVIA do empregado de que a caixa |
 | 2.4 | `E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DURA DE LOCATOR (tier 5, nao 9): o TST distingue e-mail PESSOAL (provedor proprio, protegido pela inviolabil |
 | 2.4 | `E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): o acordao invoca o principio da PROPORCIONALIDADE para exigir PARCIMONIA na qualificaca |
-
-## onion-evolve-persona-2026-11 — 23 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 110.0 | `Q_ONION_EVOLVE_PERSONA_2026_11` | onion-evolve-persona-2026-11 | Sessão dedicada à Persona do Onion Evolve: qual o termo de mercado/academia em nov/2026, que padrões e casos reais existem, que |
-| 77.5 | `C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | MVP que a evidência sustenta: a persona como S4 (propõe) e o maestro ou um Delphi como S5 (decide); charter no KG-SSOT, wake pel |
-| 60.0 | `Q_ONION_EVOLVE_PERSONA_R2_STOP_CRITERION_1126` | onion-evolve-persona-2026-11 | Rodada 2: qual termo tem uso medido em 2026, o que o Apêndice H do DGM mediu sobre hacking do avaliador, que critério de parada  |
-| 52.5 | `C_ELENXO_PERSONA_R2_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | Rodada 2: 'nada novo no grafo' medido pela própria Persona não vale sozinho; a catraca precisa de medidor externo sobre snapshot |
-| 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_AGENTIC_SYSTEMS_UMBRELLA` | onion-evolve-persona-2026-11 | A formulação sustentada pelo texto da Anthropic: 'agentic systems' como guarda-chuva com workflows e agents como os dois tipos,  |
-| 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_AUTONOMY_COST_WARNED` | onion-evolve-persona-2026-11 | A formulação 'adverte/afirma' com a recomendação de sandbox e guardrails, que o mesmo trecho da Anthropic sustenta (custo maio |
-| 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_WHEN_TO_USE_AGENTS` | onion-evolve-persona-2026-11 | A formulação 'indica quando usar' agentes: problemas abertos 'and where you can’t hardcode a fixed path', sustentada pelo mesm |
-| 3.0 | `C_SUPERACAO_20261126_APO_IDEMPOTENCE_ONLY_STATE` | onion-evolve-persona-2026-11 | A formulação corrigida: idempotência atribuída só ao estado por PO; o ledger é separado, com linhas próprias. |
-| 3.0 | `C_SUPERACAO_20261126_APO_NEVER_GATEKEEPER` | onion-evolve-persona-2026-11 | A formulação corrigida que o PR 287 sustenta em duas passagens: 'It is never a gatekeeper' e 'a PO note is advice and a DRI neve |
-| 3.0 | `C_SUPERACAO_20261126_ARXIV_AGENT_MANAGER_SORTED_43_OF_50` | onion-evolve-persona-2026-11 | A mesma consulta do arXiv com sortBy=submittedDate&sortOrder=descending entrega 43 de 2026 entre os 50 mais recentes de 'agent man |
-| 3.0 | `C_SUPERACAO_20261126_COSCI_ABLATION_SEARCH_AND_DEBATE` | onion-evolve-persona-2026-11 | A formulação corrigida pelo AI co-scientist (Supplementary Note 3, Fig. 4 e 5): Reflexão sem busca 6,14 contra 2,38 com busca e |
-| 3.0 | `C_SUPERACAO_20261126_DGM_APPXH_HIDDEN_CHECKERS_EDITABLE_MARKER` | onion-evolve-persona-2026-11 | A formulação do próprio Apêndice H: funções de checagem ocultas do agente, marcadores registrados no código editável do ag |
-| 3.0 | `C_SUPERACAO_20261126_DGM_ARCHIVE_STEPPING_STONES` | onion-evolve-persona-2026-11 | A formulação que o paper da DGM sustenta: Sec. 3 (trampolins) mais Sec. 4.4 ('makes subsequent improvements harder to achieve'), |
-| 3.0 | `C_SUPERACAO_20261126_GUEST_6PLUS2_ACROSS_BASE_SIZES` | onion-evolve-persona-2026-11 | A formulação corrigida de Guest et al. 2020 (Results): com run length 2 e limiar ≤5%, saturação em 6+2 entre tamanhos de bas |
-| 3.0 | `C_SUPERACAO_20261126_MJ_COCKPIT_TOOLS_READ_ONLY` | onion-evolve-persona-2026-11 | A formulação do próprio PR 6041 (linha 11): ferramentas de cliente do cockpit são read-only, e as quatro ações não são exp |
-| 3.0 | `C_SUPERACAO_20261126_MJ_OUTSTANDING_DELIMITS_LIVE_VALIDATION` | onion-evolve-persona-2026-11 | A seção Outstanding/Deliverable 3 e a tabela Verification do PR 6041, que delimitam o não validado ao vivo (provedores e postur |
-| 3.0 | `C_SUPERACAO_20261126_PRECHELT_RULE3_PQ_OR_UP` | onion-evolve-persona-2026-11 | As regras de seleção de Prechelt (Seção 2.2) verbatim: para maximizar a qualidade média, critério PQ se a rede sobreajusta m |
-| 3.0 | `C_SUPERACAO_20261126_PRECHELT_TENDS_TO_GAIN_SCOPE` | onion-evolve-persona-2026-11 | O parágrafo final de Prechelt com o escopo certo: nenhuma classe tem grande vantagem 'on average, for the mix of situations consi |
-| 3.0 | `C_SUPERACAO_20261126_TAC_LIMITATIONS_STRAIGHTFORWARD_TASKS` | onion-evolve-persona-2026-11 | O parágrafo de limitações do §8 do TheAgentCompany: os autores admitem tarefas diretas e ausência de tarefas criativas comple |
-| 3.0 | `C_SUPERACAO_20261126_TAC_TABLE4_OWNCLOUD_WORST` | onion-evolve-persona-2026-11 | A Tabela 4 do TheAgentCompany sustenta a formulação corrigida: ownCloud é o pior de forma consistente, RocketChat fica mediano  |
-| 3.0 | `C_SUPERACAO_20261126_TAC_WEB_NAVIGATION_OFTEN_OBSTACLE` | onion-evolve-persona-2026-11 | O trecho da seção 7.3 do TheAgentCompany com o achado hedgeado: navegação web é 'frequentemente' obstáculo (no ownCloud o po |
-| 3.0 | `C_SUPERACAO_20261126_VEND2_HELPFULNESS_SUSPECTED` | onion-evolve-persona-2026-11 | A formulação hedgeada do Project Vend 2: 'We suspect...' seguida da comparação com 'a friend who just wants to be nice'; liga  |
-| 3.0 | `C_SUPERACAO_20261126_VEND2_PROCEDURES_AMONG_MOST_IMPACTFUL` | onion-evolve-persona-2026-11 | A frase do Project Vend 2 ('Among the most impactful changes...') e a passagem 'bureaucracy matters': procedimentos e checklists c |
 
 ## postmerge-projection-writer-2026-10 — 7 item(ns)
 
@@ -490,23 +462,6 @@
 | 4.5 | `C_OPCAO_E_NOT_NOW` | maestro-persona-2026-11 | E. Não fazer agora |
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
-
-## second-brain-company-brain-2026-11 — 12 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 57.5 | `Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11` | second-brain-company-brain-2026-11 | Second Brain pessoal × Company Brain interconectáveis como vertical do Onion: o que o mercado faz em nov/2026, que mercados isso |
-| 20.4 | `C_OPCAO_B_SISTER_VERTICAL_FEDERATED` | second-brain-company-brain-2026-11 | OPÇÃO B) Second Brain como vertical irmã do Company Brain, com interconexão federada (A2A, kg-ssot) entre os dois. |
-| 18.0 | `C_OPCAO_C_DECISION_CENTER_FIRST` | second-brain-company-brain-2026-11 | OPÇÃO C) Começar pela central de decisão do company-brain (PR #29 / SAC-554), com o indivíduo como usuário dentro do Company |
-| 13.2 | `C_OPCAO_A_RESUME_ADR003_ONDEVICE` | second-brain-company-brain-2026-11 | OPÇÃO A) Retomar o ADR-003 do Onion Pessoal: KG cifrado no celular, só contexto de-identificado à nuvem. |
-| 12.8 | `E_LACUNAS_SECOND_BRAIN_2026_11` | second-brain-company-brain-2026-11 | Contabilidade: 37 objeções sobreviventes do Elenxo, 37 modeladas (0 não modeladas), 0 recusadas pelo motor; 6 claims refutadas, |
-| 3.2 | `C_OPCAO_D_COMPLEMENTARY_ROUND` | second-brain-company-brain-2026-11 | OPÇÃO D) Rodada complementar antes de decidir: mercados/falhas (GPT Store, Bloomberg, snyk ToxicSkills, Zep wallet fallacy) e ei |
-| 3.0 | `C_SUPERACAO_20261125_C2B_PAYS_PER_USE_OR_OFF_PLATFORM` | second-brain-company-brain-2026-11 | Marketplaces corporativos de IA funcionam como canal de compra (AgentExchange, 04/03/2025, 200+ parceiros); lojas de chatbot não  |
-| 3.0 | `C_SUPERACAO_20261125_CLAUDE_MARKETPLACE_PREVIEW_MARCH` | second-brain-company-brain-2026-11 | O Claude Marketplace abriu em prévia limitada em mar/2026 (seis parceiros, compra pelo gasto comprometido, sem comissão) e virou |
-| 3.0 | `C_SUPERACAO_20261125_GOVERNANCE_NOT_NAMESPACE_SCOPE` | second-brain-company-brain-2026-11 | Memória pessoal e da empresa podem dividir o substrato de armazenamento e recuperação, mas o company brain precisa de governan |
-| 3.0 | `C_SUPERACAO_20261125_MEMORY_LOCKIN_LOSSY_BRIDGES` | second-brain-company-brain-2026-11 | Memória de agente é lock-in: desde mar/2026 só migra por pontes pontuais e com perda (Claude importa de ChatGPT, Gemini, Copilo |
-| 3.0 | `C_SUPERACAO_20261125_RELAY_SHUTDOWN_NOTION_MAIL_AGENTS` | second-brain-company-brain-2026-11 | O Relay.app encerrou (free 15/08/2026, pagas 14/09/2026; equipe foi ao Chrome do Google). O Notion Mail não foi absorção: a Not |
-| 3.0 | `C_SUPERACAO_20261125_STANFORD_HCP_USER_GOVERNED_NOT_EMPLOYER` | second-brain-company-brain-2026-11 | Stanford DEL (03/2026): contexto pessoal é camada governada pelo usuário, compartilhável por papel, consentimento e finalidade; |
 
 ## a2a-backbone-product-2026-11 — 45 item(ns)
 
@@ -1857,6 +1812,14 @@
 |--:|---|---|---|
 | 5.4 | `C_BOLETIM_INFORM` | constellation-dialogic-layer-2026-07 | 3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto |
 | 4.0 | `D_ISOLATION_EXTENSION_GATED` | constellation-dialogic-layer-2026-07 | GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao |
+
+## deny-mirror-2026-11 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `T_EVAL_E_SCRIPT_OPACOS_1125` | deny-mirror-2026-11 | teto: eval com o texto inteiro opaco (eval \"$X\"), script em arquivo, outra linguagem (python, perl), comando montado por substit |
+| 3.6 | `T_ALVO_DINAMICO_DO_RM_PASSA_1125` | deny-mirror-2026-11 | teto: rm recursivo com alvo dinâmico (rm -rf \"$D\", inclusive por eval) passa, porque vetá-lo travaria a limpeza honesta de pas |
+| 3.4 | `T_LEASE_E_RESET_FORA_DE_PROPOSITO_1125` | deny-mirror-2026-11 | teto: --force-with-lease de branch de trabalho, reset --hard (inclusive na main) e apagar branch remota de trabalho não são veta |
 
 ## elenxo-mecanismos-lint-2026-08-13 — 1 item(ns)
 
