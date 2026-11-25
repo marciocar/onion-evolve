@@ -10844,8 +10844,9 @@ PY
   }
   local _IL=lib/invocation-lines.sh _DM=pretooluse-deny-mirror.sh _PM=pretooluse-protect-main.sh
   # ── acusa (com mutante: cada cura é load-bearing) ──
-  _dm_mut "(e1) protect-main: eval literal com force-push fora da main → VETO" 2 "${_PM}" \
-    'eval "git push --force origin feat/x"' "${_IL}" '        if txt and not DYNAMIC.search(txt):' '        if False:'
+  # (o eval literal com force-push também cai pelo inanalisável com força, (e2): o mutante que morde é o do clean)
+  _dm_mut "(e1) protect-main: eval literal com git clean -fdx → VETO" 2 "${_PM}" \
+    'eval "git clean -fdx"' "${_IL}" '        if txt and not DYNAMIC.search(txt):' '        if False:'
   _dm_mut "(e2) protect-main: eval com variável e -f fora da main → VETO" 2 "${_PM}" \
     'eval "git push -f origin $B"' "${_PM}" "   | sed -n 's/\\bpush\\b/\\x01/;s/^[^\\x01]*\\x01//p' \\" "   | sed -n 's/\\bNOPUSH\\b/\\x01/;s/^[^\\x01]*\\x01//p' \\"
   _dm_mut "(r1) rm -rf ~ → VETO" 2 "${_DM}" 'rm -rf ~' "${_IL}" '    elif base == "rm" and MIRROR:' '    elif False:'
@@ -10866,7 +10867,7 @@ PY
   _dm_mut "(b1) cd condicional que a lib não segue e rm -rf .git, sem a string criar a pasta → VETO" 2 "${_DM}" \
     'ls && cd . && rm -rf .git' "${_DM}" '                if not CREATES:' '                if False:'
   _dm_mut "(b2) protect-main: eval com variável, push sem força e -f de outro comando → passa" 0 "${_PM}" \
-    'eval "git push origin $1; tail -f /tmp/l"' "${_PM}" "   | sed -n 's/\\bpush\\b/\\x01/;s/^[^\\x01]*\\x01//p' \\" "   | grep -E '\\bpush\\b' \\"
+    'eval "git push origin $1; tail -f /tmp/l"' "${_PM}" $'| sed -n \'s/^__ONION_UNANALYZABLE__ [^:]*:: //p\' | tr \';&|\' \'\\n\\n\\n\' \\' $'| sed -n \'s/^__ONION_UNANALYZABLE__ [^:]*:: //p\' \\'
   _dm_mut "(b4) protect-main: eval com variável, -f e outro push depois (--push-option) → VETO" 2 "${_PM}" \
     'eval "git push -f origin $B --push-option=x"' "${_PM}" "   | sed -n 's/\\bpush\\b/\\x01/;s/^[^\\x01]*\\x01//p' \\" "   | sed -n 's/.*\\bpush\\b//p' \\"
   _dm_mut "(b5) criação de pasta DEPOIS do rm não reabre o veto do .git → VETO" 2 "${_DM}" \
@@ -10882,7 +10883,7 @@ PY
   _dm_case "protect-main: crase em heredoc sem aspas com force-push fora da main → VETO" 2 "${pm}" $'cat <<EOF\n`git push --force origin feat/x`\nEOF'
   _dm_case "protect-main: \$( ) em heredoc sem aspas com -f → VETO" 2 "${pm}" $'gh pr comment 1 --body-file - <<EOF\n$(git push -f origin feat/x)\nEOF'
   _dm_case "protect-main: eval literal com +refspec → VETO" 2 "${pm}" 'eval "git push origin +feat/x"'
-  _dm_case "protect-main: eval literal com git clean -fdx → VETO" 2 "${pm}" 'eval "git clean -fdx"'
+  _dm_case "protect-main: eval literal com force-push fora da main → VETO" 2 "${pm}" 'eval "git push --force origin feat/x"'
   _dm_case "git filter-branch → VETO" 2 "${dm}" 'git filter-branch --tree-filter x HEAD'
   _dm_case "bash -c com git -C x filter-repo → VETO" 2 "${dm}" 'bash -c "git -C /tmp/x filter-repo --path y"'
   _dm_case "command rm -Rf / → VETO" 2 "${dm}" 'command rm -Rf /'
