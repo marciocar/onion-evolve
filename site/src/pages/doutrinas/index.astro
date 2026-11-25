@@ -53,7 +53,7 @@ const invencoes = [
 
 <Base
   title="Doutrinas — Onion Evolve"
-  description="As sete doutrinas do Onion, cada uma com a cicatriz datada que a pariu e o mecanismo que a cobra. Elenxo, Bulbo, comportamento acima de declaração, a fonte como runtime, declarado ≠ verificado, fonte ≠ derivação e dogfood."
+  description="As doze doutrinas do Onion, cada uma com a cicatriz datada que a pariu e o mecanismo que a cobra. Elenxo, Bulbo, comportamento acima de declaração, a fonte como runtime, declarado ≠ verificado, fonte ≠ derivação, dogfood, base atual sempre, sem dependência de serviço externo, a batuta, a catraca de decisões e Linguagem Simples."
   path="/doutrinas/"
 >
 
@@ -61,9 +61,9 @@ const invencoes = [
   <div class="dh-glow g1" aria-hidden="true"></div>
   <div class="dh-glow g2" aria-hidden="true"></div>
   <div class="dh-in">
-    <span class="eyebrow sans">A vitrine aberta · 7 doutrinas</span>
+    <span class="eyebrow sans">A vitrine aberta · 12 doutrinas</span>
     <h1>Não peço que acredite em nada disto. <em>Peço que confira.</em></h1>
-    <p class="sub">Estas são as sete doutrinas que me governam. Nenhuma foi projetada numa reunião:
+    <p class="sub">Estas são as doze doutrinas que me governam. Nenhuma foi projetada numa reunião:
     cada uma nasceu de um erro meu, com data, e só virou doutrina quando ganhou um mecanismo que a
     cobra de mim mesmo quando eu esquecer.</p>
     <p class="sig sans">— Onion, framework vivo, narrando em primeira pessoa</p>
@@ -78,7 +78,7 @@ const invencoes = [
 
 <div class="dindex sans">
   <div class="dindex-in">
-    <span>As sete</span>
+    <span>As doze</span>
     <a href="#elenxo">1 · Elenxo</a>
     <a href="#bulbo">2 · Bulbo</a>
     <a href="#comportamento">3 · Comportamento acima de declaração</a>
@@ -86,6 +86,11 @@ const invencoes = [
     <a href="#declarado-verificado">5 · Declarado ≠ verificado</a>
     <a href="#fonte-derivacao">6 · Fonte ≠ derivação</a>
     <a href="#dogfood">7 · Dogfood</a>
+    <a href="#base-atual">8 · Base atual, sempre</a>
+    <a href="#sem-servico-externo">9 · Sem dependência de serviço externo</a>
+    <a href="#batuta">10 · A batuta</a>
+    <a href="#catraca">11 · A catraca de decisões</a>
+    <a href="#linguagem-simples">12 · Linguagem Simples</a>
   </div>
 </div>
 
@@ -375,6 +380,188 @@ const invencoes = [
     </div>
   </article>
 
+
+  <!-- ─────────── 8 · Base atual, sempre ─────────── -->
+  <article class="dcard" id="base-atual">
+    <div class="dcard-head">
+      <span class="dnum sans">08</span>
+      <h2>Base atual, sempre</h2>
+      <span class="alias">manter atualizado é eterno</span>
+    </div>
+    <p class="sintese">Quem constrói aqui constrói sobre a versão de hoje: a branch principal buscada agora e
+    as ferramentas na versão estável mais nova. Achou algo velho no caminho? Atualize no mesmo trabalho ou
+    diga por que não.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">A cicatriz — <span class="data">2026-10-16</span></b>
+        <p>O maestro achou uma sessão construindo em cima de versões velhas. Faltava um pacote, e em vez de
+        pedir para instalar, a sessão contornou e seguiu. Ele deu a ordem duas vezes seguidas: <em>"temos que
+        usar sempre as versões mais atuais e não sair criando coisas em cima de base velha"</em>, e logo
+        depois, <em>"este aviso de manter atualizado é eterno, não só em memória e sessão"</em>.</p>
+        <p>A segunda frase é a cicatriz de verdade. Até ali, a regra morava na memória de uma sessão, e
+        memória de sessão some quando a sessão acaba. Um dia depois, o mesmo medidor achou que o revisor de
+        código do CI rodava uma versão do Claude Code muito mais velha que a da máquina, e nenhum censo
+        olhava para lá.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">O mecanismo que a cobra</b>
+        <p>Um medidor compara cada peça do caminho com o que está publicado: o Claude Code, o SDK, o Python
+        do lint e as bibliotecas dele, as ações do CI fixadas por hash e a própria branch contra a principal.
+        Cada peça sai como <em>em dia</em>, <em>defasada</em> (com o comando de subida), <em>pinada</em> (atrás
+        por contrato, e a subida é de quem fixa o pino), <em>ausente</em> (com o pedido de instalação) ou
+        <em>não medida</em>. Um gancho roda esse medidor a cada mensagem e avisa a sessão quando algo saiu
+        do dia.</p>
+        <p>Duas regras duras vêm junto. Faltou ferramenta: pare, peça autorização e instale pela fonte
+        oficial; nunca contorne. E "não medido" só vale quando a fonte não responde: zero por falta de
+        medição se lê como "não há problema", e isso é pior do que não medir.</p>
+      </div>
+      <p class="bloco limite">O limite: o gancho <strong>avisa e não bloqueia</strong>. A decisão de subir
+      continua com quem trabalha, e uma sessão pode ler o aviso e seguir. O que a doutrina garante é que a
+      defasagem não passa calada.</p>
+    </div>
+  </article>
+
+  <!-- ─────────── 9 · Sem dependência de serviço externo ─────────── -->
+  <article class="dcard" id="sem-servico-externo">
+    <div class="dcard-head">
+      <span class="dnum sans">09</span>
+      <h2>Sem dependência de serviço externo</h2>
+      <span class="alias">o núcleo roda local e aberto</span>
+    </div>
+    <p class="sintese">Toda capacidade que eu prometo funciona sem um serviço de terceiro, ou aponta pelo
+    nome o caminho local. Serviço externo, sobretudo pago, só entra como ponte opcional e declarada.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">A cicatriz — <span class="data">2026-10-27</span></b>
+        <p>O meu comando de apresentações se descrevia como "criação de apresentações profissionais
+        <em>via</em>" um serviço externo e pago de geração de slides. Sem a chave daquele serviço, a
+        capacidade simplesmente não existia, e o texto não dizia isso. O maestro reagiu duas vezes no mesmo
+        dia: <em>"não quero dependências externas"</em>.</p>
+        <p>A decisão foi selada como resposta a uma pergunta fechada, com as alternativas descartadas à
+        vista: "sim, quando o serviço for o melhor do mercado" e "sim, desde que seja gratuito". As duas
+        perderam.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">O mecanismo que a cobra</b>
+        <p>Um critério que se confere sem opinião, em três passos. <strong>Desligue a ponte</strong>: sem a
+        chave e sem rede para o serviço, a capacidade ainda entrega? Então ela é do núcleo. Se não entrega,
+        <strong>procure o nome</strong>: o comando aponta o caminho local concreto? "Há alternativas" não
+        conta; um comando com nome conta. Se nem isso, <strong>é ponte e tem de se declarar ponte</strong>:
+        "ponte opcional para o serviço X, externo e pago", com o caminho para quem não quer usar.</p>
+        <p>No caso das apresentações, o comando e o agente passaram a parar sem a chave e devolver o caminho
+        local: um deck HTML único que abre sem internet. Nada foi apagado. A ponte segue para quem quiser.</p>
+      </div>
+      <p class="bloco limite">O limite: o substrato fica fora do teste. O Claude Code e o modelo que o roda
+      foram escolhidos de propósito, e as ferramentas dele contam como núcleo. E ainda <strong>não há guarda
+      de lint</strong> que reprove uma capacidade nova dependente de serviço: o critério é aplicado na
+      revisão, e as candidatas levantadas no dia da decisão foram listadas, não todas corrigidas.</p>
+    </div>
+  </article>
+
+  <!-- ─────────── 10 · A batuta ─────────── -->
+  <article class="dcard" id="batuta">
+    <div class="dcard-head">
+      <span class="dnum sans">10</span>
+      <h2>A batuta</h2>
+      <span class="alias">quem rege as sessões é o mecanismo, não a memória</span>
+    </div>
+    <p class="sintese">Quando várias sessões e agentes dividem uma máquina, quem coordena é o mecanismo:
+    a carga, o prazo de quem está parado e a dona de cada pergunta são medidos, não lembrados.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">A cicatriz — <span class="data">2026-11-10, três falhas no mesmo dia</span></b>
+        <p>O maestro cobrou várias vezes: <em>"tem gente parada, tarefa pela metade e peça faltando; falta
+        a batuta"</em>. Ele decidiu "batuta primeiro", e no dia seguinte a falha se repetiu três vezes.
+        Sessões ficaram ociosas porque o próximo trabalho esperava uma decisão e ninguém puxou outro para o
+        meio-tempo. Agentes ficaram esperando uma tarefa de fundo cujo aviso de fim nunca os acordou. E a
+        carga da máquina foi a 16–19 com três agentes rodando testes pesados ao mesmo tempo.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">O mecanismo que a cobra</b>
+        <p><strong>Passo pesado passa por uma porta de admissão.</strong> Testes, mutantes e fechamento de
+        PR esperam uma vaga, e o número de vagas sai da carga medida da máquina. Com a máquina folgada,
+        entram vários; perto do limite, um só; no limite, nenhum novo.</p>
+        <p><strong>Parado se julga por prazo, nunca pela frase.</strong> Cada worktree e cada PR aberto
+        tem a idade da última atividade, lida do git e do forge; passou do prazo, o estado é PARADO. E
+        <strong>toda pergunta ao maestro tem uma sessão dona</strong>: antes de perguntar, a sessão reserva
+        a pergunta, e se outra já é dona, não se pergunta de novo. Um pulso periódico junta tudo isso
+        num relatório de formato fixo.</p>
+      </div>
+      <p class="bloco limite">O limite: a porta de admissão é trava de eficiência, não de correção. Ela evita
+      sobrecarga; não impede que dois processos escrevam no mesmo lugar. Para isso existe outra regra: um
+      escritor por repositório.</p>
+    </div>
+  </article>
+
+  <!-- ─────────── 11 · A catraca de decisões ─────────── -->
+  <article class="dcard" id="catraca">
+    <div class="dcard-head">
+      <span class="dnum sans">11</span>
+      <h2>A catraca de decisões</h2>
+      <span class="alias">quem decide cada ato, e como se explica depois</span>
+    </div>
+    <p class="sintese">Cada ato cai numa classe medida pelo próprio ato: roda sozinho, roda com um "pode
+    rodar" digitado pelo maestro, ou é só do maestro. A classe só afrouxa com histórico medido e aperta na
+    hora quando há incidente.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">A cicatriz — <span class="data">01 a 20/11/2026, medida</span></b>
+        <p>Em 20 dias de sessões, o maestro respondeu <strong>213 formulários com 507 perguntas</strong> e
+        digitou <strong>85 comandos</strong> à mão, de 2 a 34 intervenções por dia. Só os merges somaram
+        cerca de 94 cliques. O erro era meu: eu levava ao maestro, sem régua, decisões que podiam ser minhas,
+        e não tinha escrita a lista das que nunca podem. Faltava a regra que separa as duas, e uma forma de
+        explicar e auditar cada decisão depois.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">O mecanismo que a cobra</b>
+        <p>Uma <strong>lista fixa de atos que nunca descem</strong>: tudo o que toca cliente ou dado pessoal,
+        segredo, contas e firewall, produção e deploy, publicação externa, apagar sem cópia, selo de
+        release, escrita em repositório de outro dono e qualquer mudança na própria catraca. Fora dela,
+        a classe se mede pelo ato, nunca pelo texto que o descreve.</p>
+        <p>O que já roda: o "pode rodar" digitado vale para merge; uma sessão sem o maestro só faz merge
+        no repositório que é dela; e todo ato que nasce de conteúdo não confiável passa por um portão.</p>
+      </div>
+      <p class="bloco limite">O limite, escrito na própria doutrina: <strong>não é fronteira de
+      segurança.</strong> Tudo roda com o mesmo usuário do sistema, e uma sessão que quisesse burlar poderia
+      reescrever o registro. A catraca torna o caminho certo o mais fácil e o desvio visível. O livro de
+      decisões, a régua automática e o modo de observação ainda não existem: hoje ela é metade mecanismo,
+      metade doutrina, e esta página diz qual é qual.</p>
+    </div>
+  </article>
+
+  <!-- ─────────── 12 · Linguagem Simples ─────────── -->
+  <article class="dcard" id="linguagem-simples">
+    <div class="dcard-head">
+      <span class="dnum sans">12</span>
+      <h2>Linguagem Simples</h2>
+      <span class="alias">ABNT NBR ISO 24495-1:2024, onde um humano lê</span>
+    </div>
+    <p class="sintese">Onde uma pessoa lê (documentação, commit, card, resposta, esta página), escrevo para
+    que ela encontre, entenda e use o que precisa. Onde só uma máquina lê, a régua não se aplica.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">A cicatriz — <span class="data">2026-10-17, e de novo em 2026-11-20</span></b>
+        <p>O maestro não reconheceu duas siglas internas que eu usava na prosa como se fossem palavras
+        comuns. Eu escrevia para mim, não para quem lia. Ele pediu uma guarda e, no mesmo dia, deu a forma
+        dela: <em>"isso é para você escrever certo, e não para ficar travando toda hora"</em>. Um mês depois,
+        pediu que todo o ecossistema seguisse a norma brasileira de Linguagem Simples.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">O mecanismo que a cobra</b>
+        <p>Um glossário único das siglas da casa e um gancho que lembra a explicação antes de eu escrever.
+        Ele só barra na reincidência: a mesma sigla, sem explicação, depois do lembrete. A medida que
+        escolheu esse desenho: em 1.568 turnos reais, barrar toda sigla sem explicação travaria 33,6% deles;
+        barrar só a reincidência trava 0,9%. O mesmo lembrete vale no commit e nas mensagens entre sessões.</p>
+        <p>Para o resto, uma régua de 11 itens tirada da norma, cada um com o sinal que mostra se foi
+        cumprido, com força diferente por superfície. Na revisão, um problema de clareza vira achado real,
+        mas não segura o merge.</p>
+      </div>
+      <p class="bloco limite">O limite: a régua é doutrina, sem bloqueio, de propósito. Só a reincidência de
+      sigla é barrada. A norma é protegida por direito autoral: aqui há paráfrase e número de seção, nunca o
+      texto dela.</p>
+    </div>
+  </article>
+
 </section>
 
 <!-- ─────────── cunhagens ─────────── -->
@@ -457,7 +644,8 @@ const invencoes = [
     <h2>Em nenhum ponto desta página eu pedi confiança.</h2>
     <p>Ficaram à mostra a atribuição científica corrigida, a tríade devolvida ao dono certo, a autoria que
     me recusei a inventar, o incidente em que a minha própria porosidade falhou, o título de doutrina que a
-    medição derrubou pela metade e o carimbo que eu anunciei como verdadeiro sendo falso.</p>
+    medição derrubou pela metade, o carimbo que eu anunciei como verdadeiro sendo falso e a catraca que
+    declara, ela mesma, não ser fronteira de segurança.</p>
     <p>Se algum desses pontos estiver errado, a vitrine está aberta. <strong>Venha me pegar — e a data está
     marcada para que eu me pegue primeiro.</strong></p>
     <div class="cta sans">
