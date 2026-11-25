@@ -1,20 +1,19 @@
 ---
 branch: docs/site-doutrinas-1125
-pr: pendente
+pr: 1769
 date: 2026-11-25
-reviewed_diff_sha256: a0d524924c6c504f0a8410811f039f7d34aa1f54aafb07b209923b60fbc11bae
-reviewed_code_sha256: e6b1e3ddbaa6a31a34d2aac3e1ebf69b83b101e3c4fc352330092986eb0cba2b
-findings_total: 3
-findings_real: 3
-findings_blocking: 1
+reviewed_diff_sha256: pendente
+findings_total: 9
+findings_real: 9
+findings_blocking: 2
 tokens: 0
-duration_min: 25
-findings_fixed: 1
+duration_min: 55
+findings_fixed: 7
 verdict: FIXED
-elenxo: false
-elenxo_isolado: false
-reviewer: autor (passada própria, sem subagente por ordem da sessão principal)
-nota: "tokens não medido. Sem refutador isolado: a sessão principal vetou subagentes nesta tarefa."
+elenxo: true
+elenxo_isolado: true
+reviewer: site-doctrines-reviewer (sonnet, isolado)
+nota: "tokens não medido. 1ª passada do autor (3 achados) + rodada isolada do site-doctrines-reviewer (FIXES_NEEDED, 6 achados, todos curados nas duas línguas)."
 ---
 
 # Passada adversarial: `docs/site-doutrinas-1125`
@@ -43,13 +42,41 @@ Medição de partida: o site no ar era igual à fonte do main (7 cards, 17 inven
    já cobertas: um escritor por repo (citado no limite da batuta), Modernização, Abstração e o catálogo de
    ferramentas da VPS (as duas primeiras já estão na tabela de invenções; a última é interna da máquina).
 
+## Rodada isolada: site-doctrines-reviewer (sonnet, isolado) — FIXES_NEEDED
+
+Revisor isolado, sem o raciocínio do autor. Seis achados reais, todos curados em pt e en:
+
+4. **(real, BLOQUEANTE, curado)** Card 12 citava «1.568 turnos / 33,6% / 0,9%» sem fonte, e os números
+   não batiam com a fonte. Curado com os números do nó `E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS`
+   (`docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml`), citado no
+   card: 1.556 turnos, 36,4% com sigla sem glosa, 2,3% barrando toda sigla de opacidade alta, 0,3% barrando
+   só a reincidência; o 0,9% aparece como a 1ª medida, derrubada pelo refutador.
+5. **(real, curado)** Card 8: «a sessão contornou e seguiu» não tinha sustentação. Reescrito fiel à KB
+   `keep-current-doctrine.md`: «construindo sobre versões velhas» e a fala «é só pedir autorização para mim
+   e instalar». As aspas da 2ª fala viraram verbatim («este aviso anterior… memoria e sessão»).
+6. **(real, curado)** Card 12: a síntese dizia que a régua não vale onde só a máquina lê. A KB
+   `plain-language-by-surface.md` (seção «Por que o tráfego de máquina fica de fora») mantém duas exceções:
+   C1 (glosa de sigla) na mensagem entre sessões e U1 (data de revisita) no grafo e no sinal. Acrescentadas.
+7. **(real, curado)** Card 11: a inferência «o erro era meu» saiu (ela vinha da cura do achado 1, que
+   passou do ponto). A cicatriz agora diz «numa colheita de 20 dias nas sessões do core» e «parte pode
+   descer de classe com segurança, parte nunca pode», como `decision-ratchet-doctrine.md`.
+8. **(real, curado)** Cards 9 e 10 (e 8 e 12, conferidos junto): aspas só em citação verbatim. Card 9:
+   «melhor opção do mercado» (era «o melhor do mercado»), a 2ª fala do maestro é a da KB
+   `no-external-service-dependency.md`, e o «via» e o molde «ponte opcional…» viraram paráfrase sem aspas.
+   Card 10: a fala verbatim de `baton-doctrine.md`. Card 12: a fala verbatim do grafo da guarda. Em en, as
+   falas são traduções declaradas («translated from Portuguese»).
+9. **(real, LIMITE, curado)** Linguagem Simples: jargão explicado ou trocado nos cards 8 a 12 (pinada →
+   fixada; gancho → gatilho automático; worktree → cópia de trabalho; forge → GitHub; mutantes → testes de
+   mutação, explicados; lint → verificação automática de regras; SDK → kit de agentes do Claude) e frases
+   longas partidas.
+
 ## Mutantes
 
-Não se aplica: mudança só de conteúdo do site, sem guarda nova. Prova: `npm ci && npm run build` rc 0,
+Não se aplica: mudança só de conteúdo do site, sem guarda nova. Prova: `npm run build` rc 0 depois das curas,
 12 `dcard` em `dist/doutrinas/` e `dist/en/doutrinas/`, nenhum aviso `nota-drift`.
 
 ## Limites declarados
 
-- Sem refutador isolado (ordem da sessão principal): `elenxo_isolado: false`.
+- O revisor isolado foi o site-doctrines-reviewer; a 1ª passada foi do autor.
 - Itens 2 e 3 acima.
 - Deploy não feito: é do maestro.
