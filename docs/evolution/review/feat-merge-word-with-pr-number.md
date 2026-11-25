@@ -2,7 +2,8 @@
 branch: feat/merge-word-with-pr-number
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ddd7649602257af9648a011bd36cb002e245dbbf01c3462e45f39326365315ad
+reviewed_code_sha256: 512b3e4ff4d789921759a2e4ccdecdb17436da14d571bdb2b6786ee78fe8d767
 findings_total: 8
 findings_real: 8
 findings_blocking: 0
