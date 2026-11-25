@@ -117,10 +117,11 @@ if printf '%s\n' "$inv" | grep -E '^__ONION_UNANALYZABLE__ merge=[01] main=1 ::'
 fi
 # INANALISÁVEL com FORÇA DURA em qualquer alvo → FECHADO (SAC-551, 2026-11-25): `eval "git push -f origin $B"` saía
 # `main=0` e passava com rc 0, embora a força dura caia em qualquer branch desde 2026-11-24. O lease segue livre.
-# A força se procura só nos tokens DEPOIS do `push`, no mesmo segmento: `eval "git push origin $1; tail -f x"` era
-# vetado pelo `-f` do tail (refutador isolado, B2).
+# A força se procura só nos tokens DEPOIS do PRIMEIRO `push`, no mesmo segmento: `eval "git push origin $1; tail -f x"`
+# era vetado pelo `-f` do tail (refutador isolado, B2), e o corte guloso no ÚLTIMO `push` escondia a força em
+# `eval "git push -f origin feat/push-$N"` e em `--push-option` (2º refutador isolado).
 if printf '%s\n' "$inv" | sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p' | tr ';&|' '\n\n\n' \
-   | sed -n 's/.*\bpush\b//p' \
+   | sed -n 's/\bpush\b/\x01/;s/^[^\x01]*\x01//p' \
    | grep -qE '(^|[[:space:]])(--force([[:space:]]|$)|--mirror([[:space:]]|$)|-[a-eg-z]*f[a-z]*([[:space:]]|$)|\+[^[:space:]])'; then
   echo "GUARDA-PRETOOLUSE: comando com forma de force-push (-f, --force, refspec com + ou --mirror) que NÃO pode ser analisado com certeza — reescreva sem eval, nome de comando em variável ou xargs. Force-push reescreve a história do remoto em qualquer branch; se for deliberado, o maestro roda fora da sessão." >&2
   exit 2

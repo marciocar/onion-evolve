@@ -10847,7 +10847,7 @@ PY
   _dm_mut "(e1) protect-main: eval literal com force-push fora da main → VETO" 2 "${_PM}" \
     'eval "git push --force origin feat/x"' "${_IL}" '        if txt and not DYNAMIC.search(txt):' '        if False:'
   _dm_mut "(e2) protect-main: eval com variável e -f fora da main → VETO" 2 "${_PM}" \
-    'eval "git push -f origin $B"' "${_PM}" "   | sed -n 's/.*\\bpush\\b//p' \\" "   | sed -n 's/.*\\bNOPUSH\\b//p' \\"
+    'eval "git push -f origin $B"' "${_PM}" "   | sed -n 's/\\bpush\\b/\\x01/;s/^[^\\x01]*\\x01//p' \\" "   | sed -n 's/\\bNOPUSH\\b/\\x01/;s/^[^\\x01]*\\x01//p' \\"
   _dm_mut "(r1) rm -rf ~ → VETO" 2 "${_DM}" 'rm -rf ~' "${_IL}" '    elif base == "rm" and MIRROR:' '    elif False:'
   _dm_mut "(r2) crase em heredoc sem aspas com rm -rf .git → VETO" 2 "${_DM}" $'cat <<EOF\n`rm -rf .git`\nEOF' \
     "${_DM}" '        if n == ".git" or n.endswith("/.git"):' '        if False:'
@@ -10866,7 +10866,11 @@ PY
   _dm_mut "(b1) cd condicional que a lib não segue e rm -rf .git, sem a string criar a pasta → VETO" 2 "${_DM}" \
     'ls && cd . && rm -rf .git' "${_DM}" '                if not CREATES:' '                if False:'
   _dm_mut "(b2) protect-main: eval com variável, push sem força e -f de outro comando → passa" 0 "${_PM}" \
-    'eval "git push origin $1; tail -f /tmp/l"' "${_PM}" "   | sed -n 's/.*\\bpush\\b//p' \\" "   | grep -E '\\bpush\\b' \\"
+    'eval "git push origin $1; tail -f /tmp/l"' "${_PM}" "   | sed -n 's/\\bpush\\b/\\x01/;s/^[^\\x01]*\\x01//p' \\" "   | grep -E '\\bpush\\b' \\"
+  _dm_mut "(b4) protect-main: eval com variável, -f e outro push depois (--push-option) → VETO" 2 "${_PM}" \
+    'eval "git push -f origin $B --push-option=x"' "${_PM}" "   | sed -n 's/\\bpush\\b/\\x01/;s/^[^\\x01]*\\x01//p' \\" "   | sed -n 's/.*\\bpush\\b//p' \\"
+  _dm_mut "(b5) criação de pasta DEPOIS do rm não reabre o veto do .git → VETO" 2 "${_DM}" \
+    'ls && cd . && rm -rf .git && mkdir -p y' "${_DM}" '_raw = _raw[:_rm.start()] if _rm else _raw' '_raw = _raw'
   _dm_mut "(b3) stdin literal no xargs rm -rf → VETO" 2 "${_DM}" 'echo / | xargs rm -rf' \
     "${_IL}" ' or (MIRROR and tb == "rm"))' ')'
   _dm_mut "(l1) rm -rf \"\${HOME:?}\"/* → VETO" 2 "${_DM}" 'rm -rf "${HOME:?}"/*' \

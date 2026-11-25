@@ -59,7 +59,7 @@ nodes:
     impact: 4
     confidence: 0.9
     verified_at: "2026-11-25"
-    verified_against: "LC_ALL=C lint-selftest.sh --families deny_mirror: as duas polaridades e 13 mutantes (eval literal na lib, inanalisável com força no protect-main e só no segmento do push, emissão do rm na lib, .git no juiz, .git do projeto, cd não seguido sem a string criar a pasta, xargs com stdin literal, normalização da home, relevant_mirror no eval dinâmico, gh repo delete, subcomando do git, --help)"
+    verified_against: "LC_ALL=C lint-selftest.sh --families deny_mirror: as duas polaridades e 15 mutantes (força depois do 1º push, criação antes do rm, eval literal na lib, inanalisável com força no protect-main e só no segmento do push, emissão do rm na lib, .git no juiz, .git do projeto, cd não seguido sem a string criar a pasta, xargs com stdin literal, normalização da home, relevant_mirror no eval dinâmico, gh repo delete, subcomando do git, --help)"
     label: "a bancada deny_mirror acusa as formas genéricas (direto, bash -c, crase em heredoc sem aspas, $( ), eval literal e com variável) e cala no texto honesto (heredoc com aspas, mensagem de commit e comentário que citam o ato, rm de pasta de trabalho, alvo dinâmico); cada cura tem mutante que morde"
     provenance:
       source: ".claude/validation/lint-selftest.sh"
@@ -100,7 +100,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-25"
     verified_against: "bancada: rm -rf \"$tmp\" → rc 0 (caso honesto); rm -rf \"$HOME\" → rc 2 (nome literal)"
-    label: "teto: rm recursivo com alvo dinâmico (rm -rf \"$D\", inclusive por eval) passa, porque vetá-lo travaria a limpeza honesta de pasta temporária; só o nome literal da raiz e da home cai, e o .git só quando é o do projeto (cwd do hook, CLAUDE_PROJECT_DIR ou o topo git): depois de um cd que a lib não segue (variável, pasta criada na própria string) o rm -rf .git passa"
+    label: "teto: rm recursivo com alvo dinâmico (rm -rf \"$D\", inclusive por eval) passa, porque vetá-lo travaria a limpeza honesta de pasta temporária; só o nome literal da raiz e da home cai, e o .git só quando é o do projeto (cwd do hook, CLAUDE_PROJECT_DIR ou o topo git): depois de um cd que a lib não segue (variável, pasta que ainda não existe) o rm -rf .git é VETADO, como no deny, salvo quando a string cria a pasta antes do rm (mkdir, git init/clone/worktree add, cp -r, tar -x, unzip, rsync); cd \"$wt\" && rm -rf .git é vetado (o deny também veta)"
   - id: T_LEASE_E_RESET_FORA_DE_PROPOSITO_1125
     node_type: claim
     layer: audit

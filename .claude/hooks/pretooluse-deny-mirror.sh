@@ -66,8 +66,12 @@ home = os.environ.get("HOME_DIR", "").rstrip("/")
 # de trabalho num rascunho (`cd $S/fixture && rm -rf .git`, `rm -rf repo/.git`) é rotina honesta (corpus, 2026-11-25)
 ROOTS = {os.path.realpath(r) for r in os.environ.get("ROOTS", "").split("\n") if r.strip()}
 UNKNOWN = "__ONION_UNKNOWN_DIR__"
-CREATES = bool(re.search(r"(^|[\s;&|(])(mkdir|git\s+(-[^\s]+\s+)*(init|clone)|cp\s+-[A-Za-z]*[rRa]|tar\s+-?[A-Za-z]*x|unzip|rsync)\b",
-                         os.environ.get("RAW_CMD", "")))
+# a criação conta só se vem ANTES do 1º `rm` e fora de comentário, como palavra de comando (2º refutador isolado: `# mkdir`
+# no fim, ou `mkdir` depois do rm, reabriam o veto)
+_raw = re.sub(r"(^|\s)#[^\n]*", " ", os.environ.get("RAW_CMD", ""))
+_rm = re.search(r"(^|[\s;&|(])rm\s", _raw)
+_raw = _raw[:_rm.start()] if _rm else _raw
+CREATES = bool(re.search(r"(^|[;&|(\n]\s*|&&\s*)(mkdir|git\s+(-[^\s]+\s+)*(init|clone|worktree\s+add)|cp\s+-[A-Za-z]*[rRa]|tar\s+-?[A-Za-z]*x|unzip|rsync)\s", _raw))
 DANGER = {"/", "/*", "~", "~/", "~/*", "$HOME", "${HOME}", "$HOME/", "${HOME}/", "$HOME/*", "${HOME}/*"}
 def norm(t):
     """`${HOME:?…}`/`${HOME:-…}` são $HOME; `~user` e `~` expandem; `//x//y`, `/./`, `..` normalizam (refutador, L1)."""
