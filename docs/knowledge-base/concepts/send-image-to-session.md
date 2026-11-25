@@ -83,8 +83,10 @@ imagem por esse caminho.
 
 - **Chave do Gokapi.** O caminho 2 usa a mesma entrada do pass do upload, `onion/vps-gokapi/api-upload`. O nome diz
   «upload», mas a chave tem todas as permissões (maestro, 2026-11-25). A variável `GOKAPI_FETCH_PASS_ENTRY` troca a
-  entrada. O `ops/gokapi-fetch.sh --check` (core-only) faz uma chamada só de leitura e diz se a permissão de download está lá; a
-  primeira medida contra o servidor real fica para depois do merge.
+  entrada. O `ops/gokapi-fetch.sh --check` (core-only) faz uma chamada só de leitura e diz se a permissão de download está lá. Essa leitura é **inferência** até a
+  primeira medida real: ela supõe que o Gokapi confere a permissão antes de procurar o arquivo (resposta diferente sai
+  «inconclusivo», rc 5). A primeira medida contra o
+  servidor real fica para depois do merge.
 - **Primeiro uso no Windows.** O script do Windows foi escrito e revisado, mas não rodou num Windows ainda: a VPS não tem
   PowerShell. O primeiro uso do maestro é a medição.
 
