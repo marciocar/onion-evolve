@@ -2,7 +2,8 @@
 branch: fix/vendored-broken-links
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3ba65f2e3e13b12341b6a16464bdea1128d2466b981bb705dd70f7bba63a96ad
+reviewed_code_sha256: c4be557438d335059bdf29bd13853b8c65124366673b53e5cc54491d53f765a6
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
