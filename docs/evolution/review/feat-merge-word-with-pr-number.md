@@ -2,18 +2,17 @@
 branch: feat/merge-word-with-pr-number
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: aefdeb877c7ee6fe6ed117a07866d327be0eb57204f0117d8b1f163b6f51014b
-reviewed_code_sha256: 10ef987bce62fe85f88d6479bae566113def32d48662faaf3c13dbac065edeea
-findings_total: 5
-findings_real: 5
+reviewed_diff_sha256: pendente
+findings_total: 8
+findings_real: 8
 findings_blocking: 0
 tokens: 0
 duration_min: 0
-findings_fixed: 5
+findings_fixed: 8
 verdict: FIXED
 elenxo: true
 elenxo_isolado: false
-reviewer: "Revisor isolado merge-word-reviewer (opus), encomendado pelo core em 2026-11-25: FIXES_NEEDED sem bloqueio. Confirmou que o atalho OT_LIVE no _guard_pr_gate existe (o ajuste declarado é verdadeiro) e pediu A (important: a palavra com número amarra um head que o maestro não viu e valia até no PR da catraca), B (1,763 virava #1 e #763), C (palavra vencida ou gasta sombreando o pedido vivo), D (casos faltantes) e a doc do fallback de guarda. Os cinco curados neste commit, cada um com caso e mutante. elenxo_isolado fica false até o core pedir ao revisor a passada do delta."
+reviewer: "Revisor isolado merge-word-reviewer (opus), encomendado pelo core em 2026-11-25: FIXES_NEEDED sem bloqueio. Confirmou que o atalho OT_LIVE no _guard_pr_gate existe (o ajuste declarado é verdadeiro) e pediu A (important: a palavra com número amarra um head que o maestro não viu e valia até no PR da catraca), B (1,763 virava #1 e #763), C (palavra vencida ou gasta sombreando o pedido vivo), D (casos faltantes) e a doc do fallback de guarda. Os cinco curados neste commit, cada um com caso e mutante. elenxo_isolado fica false até o core pedir ao revisor a passada do delta. Rodada 2 (mesmo revisor, sobre 46bfb6126): APPROVE com três nits (previous_filename/paginação no hook, regex da catraca em dois lugares, idade do head pela committer.date forjável), curados no lote seguinte com a decisão do core (carimbo do servidor pelo check-suite)."
 nota: "tokens e duration_min = 0: não medidos aqui (a rodada do revisor é do core). PR de GUARDA que toca a própria catraca (ops/pr-merge-verified.sh): o merge segue do maestro."
 ---
 
@@ -60,6 +59,15 @@ Rodada 1, revisor isolado `merge-word-reviewer` (opus), encomendado pelo core: *
 | D | casos faltantes | moldura pelo hook, TTL de 10 min e folga de 60 s no caminho numerado, timeout do gh, zero à esquerda, `1,763` | otn11, otn12, otn13/13b, otn14, otn15, otn16 (todos com mutante) |
 | doc | README, grafo e resíduo diziam que a palavra substitui o `--maestro` sem ressalva | ressalva escrita: PR da catraca não sai por palavra com número, e com o revisor do CI em fallback (ou PR que muda a maquinaria do revisor) o resíduo isolado segue exigido pelo gate de fallback de guarda | — |
 
+Rodada 2, mesmo revisor, sobre o rebase `46bfb6126` (range-diff idêntico): **APPROVE**, com três nits, curados no
+lote seguinte junto com a decisão de desenho do core:
+
+| id | achado | cura | caso / mutante |
+|---|---|---|---|
+| nit 1 | o hook lia só o nome novo da renomeação, e o core pediu também a paginação | `previous_filename` e `--paginate` com `per_page=100`, o mesmo jq do executor | otn20 e otn20-MUT; otn21 e otn21-MUT |
+| nit 2 | a regex da catraca mora em dois lugares (motor e executor) | a bancada compara as duas byte a byte | otn22 e otn22-MUT |
+| nit 3 / decisão do core | a idade do head vinha da `committer.date`, que quem commita escreve | carimbo do servidor: `created_at` mais antigo dos check-suites do sha; sem check-suite, recusa | otn18 e otn18-MUT (data forjada); otn19 e otn19-MUT |
+
 **Este PR é um desses**: muda a catraca e a maquinaria de guarda, então o merge exige o resíduo isolado; `elenxo_isolado: true` só depois da passada do delta.
 
 ## Mutantes
@@ -75,7 +83,7 @@ origem, mergearia); repo errado recusa (mutante: sem conferir o repo, mergearia)
 
 ## Limites declarados
 
-- Bancada: família `pr_merge_verified`, 384 ✓ e 0 ✗ (rodada 1 curada; antes 363) (`LC_ALL=C`, `--families pr_merge_verified`). Cinco
+- Bancada: família `pr_merge_verified`, 394 ✓ e 0 ✗ (rodadas 1 e 2 curadas; antes 363 e 384) (`LC_ALL=C`, `--families pr_merge_verified`). Cinco
   mutantes antigos (ot12, ot19, ot20, ot23, ot26) tiveram a âncora atualizada porque as linhas do motor mudaram; o
   sentido de cada um ficou o mesmo.
 - Sem refutador neste PR: o brief pediu sem subagentes (cota alta); a revisão isolada é do core.
