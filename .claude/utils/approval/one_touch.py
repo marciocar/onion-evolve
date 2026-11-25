@@ -70,10 +70,15 @@ WORD_MAX_PRS = 5
 WORD_SKEW_S = 60              # a palavra com número cria o pedido no hook: a entrada do transcript nasce perto dele
 HOOK_BUDGET_S = 8             # o hook tem 10 s no settings; cada PR custa uma leitura no forge (medido: ~0,5 s)
 _NUM = r"#?[1-9][0-9]{0,6}"
-_SEP = r"(?: ?, ?| e | and | \+ | ?& ?| )"
+# vírgula SÓ com espaço depois (revisão isolada de 2026-11-25, B): «1,763» é um número com milhar, não #1 e #763
+_SEP = r"(?: ?, | e | and | \+ | & | )"
 _WORD_PR_RE = re.compile(r"(?:%s)(?: (?:do|da|o|no))?(?: pr)? (%s(?:%s(?:pr )?%s)*)"
                          % ("|".join(re.escape(v) for v in WORD_VERBS), _NUM, _SEP, _NUM))
 _WORD_LOOSE_RE = re.compile(r"\b(?:%s)\b.*#?[0-9]" % "|".join(re.escape(v) for v in WORD_VERBS))
+HEAD_MIN_AGE_S = 120         # o head mais novo que isto o maestro não viu: «o PR acabou de mudar; repita a frase»
+# os arquivos que SÃO a catraca (a mesma lista do _catraca_hits do executor): PR que toca um deles não sai por palavra
+# com número, porque ela amarra um head que o maestro não viu; ali segue o pedido com o sha na tela (revisão de 25/11, A)
+RATCHET_RE = re.compile(r"docs/evolution/federation/members\.yaml|ops/pr-merge-verified\.sh|ops/moat-targets\.tsv|\.claude/hooks/pretooluse-moat-gate\.sh|\.claude/hooks/lib/moat-judge\.py|\.claude/hooks/lib/invocation-lines\.sh|\.claude/settings(\.local)?\.json")  # (core-only)
 ENGINE_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 # O que a v1 implementa. Ponto de extensão: o canal novo entra aqui com a sua verificação, nunca por fora.
 #   nível 2 → "slack-signed": a ponte de mensageria da família entrega a DM assinada; o portão por identidade da ponte
@@ -331,6 +336,33 @@ def pr_live(slug, n, budget):
     return cols
 
 
+def HOOK_HEAD_MIN_AGE():
+    return HEAD_MIN_AGE_S
+
+
+def gh_lines(args, budget, what):
+    """Uma leitura no forge pelo gh: as linhas da saída, ou LookupError com o porquê (falha fechada)."""
+    import subprocess
+    try:
+        r = subprocess.run(["gh"] + args, capture_output=True, text=True, timeout=max(1.0, min(5.0, budget)))
+    except subprocess.TimeoutExpired:
+        raise LookupError("o forge não respondeu a tempo (%s)" % what)
+    except OSError:
+        raise LookupError("sem o gh não leio %s" % what)
+    if r.returncode != 0:
+        raise LookupError("não li %s no forge" % what)
+    return [x for x in r.stdout.splitlines() if x.strip()]
+
+
+def head_age_s(slug, sha, budget):
+    """Segundos desde o commit do head (committer.date, que o rebase e o amend renovam)."""
+    out = gh_lines(["api", "repos/%s/commits/%s" % (slug, sha), "--jq", ".commit.committer.date"], budget, "a data do head")
+    try:
+        return time.time() - parse_utc(out[0].strip()[:19] + "Z")
+    except (ValueError, IndexError):
+        raise LookupError("data do head ilegível no forge")
+
+
 def hook_numbered(payload, sid, prs, prompt):
     """A PALAVRA COM NÚMERO: sem pedido prévio, uma aprovação por PR, com o head lido no forge na hora da palavra."""
     t0 = time.time()
@@ -362,6 +394,14 @@ def hook_numbered(payload, sid, prs, prompt):
                 raise LookupError("o PR está %s" % ("mergeado" if merged == "true" else "fechado"))
             if not re.fullmatch(r"[0-9a-f]{40}", sha) or not re.fullmatch(r"[A-Za-z0-9._/-]+", ref):
                 raise LookupError("head ilegível no forge")
+            files = gh_lines(["api", "repos/%s/pulls/%d/files" % (slug, n), "--paginate", "--jq", ".[].filename"],
+                             HOOK_BUDGET_S - (time.time() - t0), "os arquivos do PR")
+            hit = [f for f in files if RATCHET_RE.fullmatch(f.strip())]
+            if hit:
+                raise LookupError("este PR muda a catraca (%s): peço o pedido com o sha na tela e você responde «pode rodar»" % ", ".join(hit[:3]))
+            age = head_age_s(slug, sha, HOOK_BUDGET_S - (time.time() - t0))
+            if age < HOOK_HEAD_MIN_AGE():
+                raise LookupError("o PR acabou de mudar (head @%s há %ds); repita a frase" % (sha[:7], max(0, int(age))))
         except LookupError as e:
             refused.append("#%d: %s" % (n, e))
             act_log("grant", ["palavra com número", "alvo %s#%d" % (slug, n), "recusa: %s" % e], False, "recusado · %s#%d" % (slug, n))
@@ -485,11 +525,32 @@ def cmd_hook(_argv):
 
 
 # ── verify / consume (o EXECUTOR) ───────────────────────────────────────────────────────────────────────────────
+def numbered_dead(path):
+    """'' se a aprovação por número ainda pode valer; senão o porquê (venceu, já foi usada, ilegível)."""
+    try:
+        appr = read_json(path)
+        if time.time() > parse_utc(appr["expires_at"]):
+            return "venceu (10 min)"
+        with open(ledger_path(), encoding="utf-8") as f:
+            if any(line.split("\t", 1)[0] == appr.get("hash") for line in f):
+                return "já foi usada"
+    except FileNotFoundError:
+        return ""
+    except (OSError, ValueError, KeyError, TypeError):
+        return "está ilegível"
+    return ""
+
+
 def load_live(sid, pr=None):
     """A aprovação viva: a da palavra com número deste PR, se houver; senão a do pedido da sessão."""
     path = approval_path(sid)
     if pr and re.fullmatch(r"[1-9][0-9]{0,6}", str(pr)) and os.path.isfile(approval_path(sid, pr)):
-        path = approval_path(sid, pr)
+        dead = numbered_dead(approval_path(sid, pr))
+        if not dead:
+            path = approval_path(sid, pr)
+        elif not os.path.isfile(path):
+            # (revisão de 25/11, C) a palavra com número vencida ou gasta não sombreia o pedido vivo; sem ele, diz qual
+            raise LookupError("a palavra com número para o PR #%s %s: diga de novo «pode rodar %s»" % (pr, dead, pr))
     if not os.path.isfile(path):
         raise LookupError("não há autorização viva desta sessão: prepare o ato e peça «pode rodar» ao maestro")
     appr = read_json(path)
@@ -689,8 +750,11 @@ def cmd_verify(argv):
     except (LookupError, ValueError, KeyError, TypeError, OSError) as e:
         print("✗ %s." % e)
         return 1
-    print("✓ autorização viva (nível 1, canal prompt, humano no transcript): %s %s, vence %s UTC" % (req["act"], short_target(req), appr["expires_at"][11:19]))
-    return 0
+    numbered = (appr.get("evidence") or {}).get("pr") is not None
+    print("✓ autorização viva (nível 1, canal prompt, humano no transcript%s): %s %s, vence %s UTC"
+          % (", palavra com número" if numbered else "", req["act"], short_target(req), appr["expires_at"][11:19]))
+    # rc 4 = viva e é a palavra com número: o executor não a aceita no PR que muda a catraca (revisão de 25/11, A)
+    return 4 if numbered else 0
 
 
 def cmd_consume(argv):

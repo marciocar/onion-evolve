@@ -37,9 +37,18 @@ estou falando, execute se ok». A frase que **nomeia o PR** pula o passo 1:
   aprovação daquele PR, o repo, o head (andou depois da palavra: recusa e gasta), a frase humana no transcript que
   **nomeia aquele número** e o livro. O id da palavra no livro leva o número (`prompt_id#1763`), então dois números
   na mesma mensagem são dois usos.
-- **Mesmo poder da palavra com pedido**: no PR de guarda ela substitui o `--maestro`, como a palavra solta já
-  substituía. Não se exige resíduo isolado por cima: é a palavra do maestro, e o `--maestro` no terminal dele também
-  não o exige.
+- **No PR de guarda** ela substitui o `--maestro` no gate de guarda, como a palavra solta já substituía, **com duas
+  exceções**: (1) PR que muda a **própria catraca** (o executor do merge verificado, o tsv de alvos do MOAT, o hook e o
+  juiz do MOAT, o tokenizador, o `members.yaml`, o `settings`): a palavra com número **não basta**, porque ela amarra o
+  head lido na hora do hook, que o maestro não viu; o hook não registra e o executor recusa (código 4 do `verify`);
+  ali segue o pedido com o sha na tela e o «pode rodar» solto; (2) com o revisor do CI em fallback, ou em PR que muda a
+  maquinaria do revisor, o resíduo isolado (`elenxo_isolado: true`) segue exigido pelo gate de fallback de guarda,
+  com palavra ou sem ela.
+- **Head recém-empurrado**: o hook recusa se o head do PR tem menos de 120 s (data do commit do head no forge) e pede a
+  frase de novo: o maestro digitou olhando um PR que acabou de mudar.
+- **Vírgula**: só com espaço depois (`1763, 1765`); `1,763` não vira `#1` e `#763`.
+- **Palavra vencida ou gasta** não sombreia o pedido vivo do mesmo PR: o executor a ignora e usa o pedido; sem pedido,
+  diz «a palavra com número para o PR #n venceu/já foi usada: diga de novo».
 - **«pode rodar» solto** segue igual: vale para o pedido vivo da sessão.
 
 ## Quem autoriza: medido, não suposto (18/11/2026)
