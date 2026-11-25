@@ -394,30 +394,32 @@ const invencoes = [
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">A cicatriz — <span class="data">2026-10-16</span></b>
-        <p>O maestro achou uma sessão construindo em cima de versões velhas. Faltava um pacote, e em vez de
-        pedir para instalar, a sessão contornou e seguiu. Ele deu a ordem duas vezes seguidas: <em>"temos que
-        usar sempre as versões mais atuais e não sair criando coisas em cima de base velha"</em>, e logo
-        depois, <em>"este aviso de manter atualizado é eterno, não só em memória e sessão"</em>.</p>
-        <p>A segunda frase é a cicatriz de verdade. Até ali, a regra morava na memória de uma sessão, e
-        memória de sessão some quando a sessão acaba. Um dia depois, o mesmo medidor achou que o revisor de
-        código do CI rodava uma versão do Claude Code muito mais velha que a da máquina, e nenhum censo
-        olhava para lá.</p>
+        <p>O maestro achou uma sessão construindo sobre versões velhas. Ele deu a ordem duas vezes seguidas.
+        Primeiro, que faltando algo instalado <em>"é só pedir autorização para mim e instalar"</em>, e que
+        <em>"temos que usar sempre as versões mais atuais e não sair criando coisas em cima de base
+        velha"</em>. Logo depois: <em>"este aviso anterior de manter atualizado é eterno, não só em memoria e
+        sessão"</em>.</p>
+        <p>A segunda frase é a cicatriz de verdade. Até ali, a regra morava na memória de uma sessão. E essa
+        memória some quando a sessão acaba. Um dia depois, o mesmo medidor achou outro atraso: o revisor
+        automático de código, que roda a cada mudança, usava um Claude Code muito mais velho que o da
+        máquina. Nenhuma medição olhava para lá.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">O mecanismo que a cobra</b>
-        <p>Um medidor compara cada peça do caminho com o que está publicado: o Claude Code, o SDK, o Python
-        do lint e as bibliotecas dele, as ações do CI fixadas por hash e a própria branch contra a principal.
-        Cada peça sai como <em>em dia</em>, <em>defasada</em> (com o comando de subida), <em>pinada</em> (atrás
-        por contrato, e a subida é de quem fixa o pino), <em>ausente</em> (com o pedido de instalação) ou
-        <em>não medida</em>. Um gancho roda esse medidor a cada mensagem e avisa a sessão quando algo saiu
-        do dia.</p>
-        <p>Duas regras duras vêm junto. Faltou ferramenta: pare, peça autorização e instale pela fonte
-        oficial; nunca contorne. E "não medido" só vale quando a fonte não responde: zero por falta de
-        medição se lê como "não há problema", e isso é pior do que não medir.</p>
+        <p>Um medidor compara cada peça usada no trabalho com a versão publicada. Entram o Claude Code, o kit
+        de agentes do Claude (o Agent SDK), o Python da verificação automática de regras e as bibliotecas
+        dele, as ações da verificação que roda a cada mudança e a própria branch contra a principal.</p>
+        <p>Cada peça recebe um estado: <em>em dia</em>; <em>defasada</em>, com o comando para subir;
+        <em>fixada</em>, atrás de propósito por contrato, e quem decide subir é o dono dessa fixação;
+        <em>ausente</em>, com o pedido de instalação; ou <em>não medida</em>. Um gatilho automático roda o
+        medidor a cada mensagem. Quando algo fica para trás, ele avisa a sessão.</p>
+        <p>Duas regras duras vêm junto. Primeira: faltou ferramenta, pare, peça autorização e instale pela
+        fonte oficial. Nunca contorne. Segunda: "não medido" só vale quando a fonte não responde. Um zero por
+        falta de medição parece "não há problema", e isso é pior do que não medir.</p>
       </div>
-      <p class="bloco limite">O limite: o gancho <strong>avisa e não bloqueia</strong>. A decisão de subir
-      continua com quem trabalha, e uma sessão pode ler o aviso e seguir. O que a doutrina garante é que a
-      defasagem não passa calada.</p>
+      <p class="bloco limite">O limite: o gatilho <strong>avisa e não bloqueia</strong>. Quem trabalha decide
+      se sobe, e uma sessão pode ler o aviso e seguir. O que a doutrina garante é que o atraso não passa
+      calado.</p>
     </div>
   </article>
 
@@ -433,28 +435,32 @@ const invencoes = [
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">A cicatriz — <span class="data">2026-10-27</span></b>
-        <p>O meu comando de apresentações se descrevia como "criação de apresentações profissionais
-        <em>via</em>" um serviço externo e pago de geração de slides. Sem a chave daquele serviço, a
-        capacidade simplesmente não existia, e o texto não dizia isso. O maestro reagiu duas vezes no mesmo
-        dia: <em>"não quero dependências externas"</em>.</p>
-        <p>A decisão foi selada como resposta a uma pergunta fechada, com as alternativas descartadas à
-        vista: "sim, quando o serviço for o melhor do mercado" e "sim, desde que seja gratuito". As duas
-        perderam.</p>
+        <p>O meu comando de apresentações se descrevia como criação de apresentações profissionais por meio
+        de um serviço externo e pago de geração de slides. Sem a chave desse serviço, a capacidade não
+        existia, e o texto não dizia isso. No mesmo dia, o maestro falou duas vezes. Primeiro:
+        <em>"não quero dependências externas"</em>. Depois, direto para mim: <em>"reforço: evitar dependências
+        de serviços externos"</em>.</p>
+        <p>A decisão foi selada como resposta a uma pergunta fechada. As opções descartadas ficaram à vista:
+        <em>"sim, quando o serviço for a melhor opção do mercado"</em> e <em>"sim, desde que seja
+        gratuito"</em>. As duas perderam.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">O mecanismo que a cobra</b>
-        <p>Um critério que se confere sem opinião, em três passos. <strong>Desligue a ponte</strong>: sem a
-        chave e sem rede para o serviço, a capacidade ainda entrega? Então ela é do núcleo. Se não entrega,
-        <strong>procure o nome</strong>: o comando aponta o caminho local concreto? "Há alternativas" não
-        conta; um comando com nome conta. Se nem isso, <strong>é ponte e tem de se declarar ponte</strong>:
-        "ponte opcional para o serviço X, externo e pago", com o caminho para quem não quer usar.</p>
-        <p>No caso das apresentações, o comando e o agente passaram a parar sem a chave e devolver o caminho
-        local: um deck HTML único que abre sem internet. Nada foi apagado. A ponte segue para quem quiser.</p>
+        <p>É um critério que se confere sem opinião, em três passos. <strong>Desligue a ponte</strong>: sem a
+        chave e sem acesso ao serviço, a capacidade ainda entrega? Se entrega, é do núcleo. Se não,
+        <strong>procure o nome</strong>: o comando aponta um caminho local concreto? Dizer que há alternativas
+        não conta; o nome de um comando conta. Se nem isso, <strong>é ponte e precisa se declarar
+        ponte</strong>: ponte opcional para o serviço, externo e pago, com o caminho para quem não quer
+        usar.</p>
+        <p>No caso das apresentações, o comando e o agente agora param sem a chave e devolvem o caminho local:
+        uma apresentação num único arquivo HTML, que abre sem internet. Nada foi apagado. A ponte segue para
+        quem quiser.</p>
       </div>
-      <p class="bloco limite">O limite: o substrato fica fora do teste. O Claude Code e o modelo que o roda
-      foram escolhidos de propósito, e as ferramentas dele contam como núcleo. E ainda <strong>não há guarda
-      de lint</strong> que reprove uma capacidade nova dependente de serviço: o critério é aplicado na
-      revisão, e as candidatas levantadas no dia da decisão foram listadas, não todas corrigidas.</p>
+      <p class="bloco limite">O limite: a base fica fora do teste. O Claude Code e o modelo que o roda foram
+      escolhidos de propósito, e as ferramentas dele contam como núcleo. E ainda <strong>não há verificação
+      automática</strong> que reprove uma capacidade nova que dependa de serviço. Hoje o critério é aplicado
+      na revisão. As candidatas levantadas no dia da decisão foram listadas, mas nem todas foram
+      corrigidas.</p>
     </div>
   </article>
 
@@ -465,30 +471,32 @@ const invencoes = [
       <h2>A batuta</h2>
       <span class="alias">quem rege as sessões é o mecanismo, não a memória</span>
     </div>
-    <p class="sintese">Quando várias sessões e agentes dividem uma máquina, quem coordena é o mecanismo:
-    a carga, o prazo de quem está parado e a dona de cada pergunta são medidos, não lembrados.</p>
+    <p class="sintese">Quando várias sessões e agentes dividem uma máquina, quem coordena é o mecanismo.
+    A carga, o tempo que alguém está parado e a dona de cada pergunta são medidos, não lembrados.</p>
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">A cicatriz — <span class="data">2026-11-10, três falhas no mesmo dia</span></b>
-        <p>O maestro cobrou várias vezes: <em>"tem gente parada, tarefa pela metade e peça faltando; falta
-        a batuta"</em>. Ele decidiu "batuta primeiro", e no dia seguinte a falha se repetiu três vezes.
-        Sessões ficaram ociosas porque o próximo trabalho esperava uma decisão e ninguém puxou outro para o
-        meio-tempo. Agentes ficaram esperando uma tarefa de fundo cujo aviso de fim nunca os acordou. E a
-        carga da máquina foi a 16–19 com três agentes rodando testes pesados ao mesmo tempo.</p>
+        <p>O maestro cobrou várias vezes: <em>"tem gente parado e tarefa pela metade e peça faltando, falta a
+        batuta"</em>. Ele decidiu pôr a batuta primeiro. No dia seguinte, a falha se repetiu três vezes.</p>
+        <p>Sessões ficaram paradas: o próximo trabalho esperava uma decisão, e ninguém puxou outro para o
+        meio-tempo. Agentes esperaram uma tarefa em segundo plano cujo aviso de fim nunca os acordou. E a
+        carga da máquina chegou a 16–19, com três agentes rodando testes pesados ao mesmo tempo.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">O mecanismo que a cobra</b>
-        <p><strong>Passo pesado passa por uma porta de admissão.</strong> Testes, mutantes e fechamento de
-        PR esperam uma vaga, e o número de vagas sai da carga medida da máquina. Com a máquina folgada,
-        entram vários; perto do limite, um só; no limite, nenhum novo.</p>
-        <p><strong>Parado se julga por prazo, nunca pela frase.</strong> Cada worktree e cada PR aberto
-        tem a idade da última atividade, lida do git e do forge; passou do prazo, o estado é PARADO. E
-        <strong>toda pergunta ao maestro tem uma sessão dona</strong>: antes de perguntar, a sessão reserva
-        a pergunta, e se outra já é dona, não se pergunta de novo. Um pulso periódico junta tudo isso
-        num relatório de formato fixo.</p>
+        <p><strong>Passo pesado passa por uma porta de admissão.</strong> Os testes, os testes de mutação (que
+        plantam um defeito de propósito para ver se o teste o pega) e o fechamento de PR esperam uma vaga. O
+        número de vagas sai da carga medida da máquina. Com a máquina folgada, entram vários; perto do limite,
+        um só; no limite, nenhum novo.</p>
+        <p><strong>Parado se julga pelo prazo, nunca pelo que se diz.</strong> Cada cópia de trabalho do
+        repositório e cada PR aberto têm a idade da última atividade, lida do git e do GitHub. Passou do prazo,
+        o estado é PARADO.</p>
+        <p><strong>Toda pergunta ao maestro tem uma sessão dona.</strong> Antes de perguntar, a sessão reserva
+        a pergunta. Se outra já é dona, ninguém pergunta de novo. Um pulso periódico junta tudo isso num
+        relatório de formato fixo.</p>
       </div>
-      <p class="bloco limite">O limite: a porta de admissão é trava de eficiência, não de correção. Ela evita
-      sobrecarga; não impede que dois processos escrevam no mesmo lugar. Para isso existe outra regra: um
+      <p class="bloco limite">O limite: a porta de admissão evita sobrecarga, mas não garante que o trabalho
+      sai certo. Ela não impede que dois processos escrevam no mesmo lugar. Para isso existe outra regra: um
       escritor por repositório.</p>
     </div>
   </article>
@@ -506,25 +514,25 @@ const invencoes = [
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">A cicatriz — <span class="data">01 a 20/11/2026, medida</span></b>
-        <p>Em 20 dias de sessões, o maestro respondeu <strong>213 formulários com 507 perguntas</strong> e
-        digitou <strong>85 comandos</strong> à mão, de 2 a 34 intervenções por dia. Só os merges somaram
-        cerca de 94 cliques. O erro era meu: eu levava ao maestro, sem régua, decisões que podiam ser minhas,
-        e não tinha escrita a lista das que nunca podem. Faltava a regra que separa as duas, e uma forma de
-        explicar e auditar cada decisão depois.</p>
+        <p>Numa colheita de 20 dias nas sessões do core, o maestro respondeu <strong>213 formulários com 507
+        perguntas</strong> e digitou <strong>85 comandos</strong> à mão: de 2 a 34 intervenções por dia. Só os
+        merges somaram cerca de 94 cliques.</p>
+        <p>Parte dessas decisões podia descer de classe com segurança. Parte nunca pode. Faltava a regra que
+        separa as duas, e um jeito de explicar e auditar cada decisão depois.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">O mecanismo que a cobra</b>
-        <p>Uma <strong>lista fixa de atos que nunca descem</strong>: tudo o que toca cliente ou dado pessoal,
-        segredo, contas e firewall, produção e deploy, publicação externa, apagar sem cópia, selo de
-        release, escrita em repositório de outro dono e qualquer mudança na própria catraca. Fora dela,
+        <p>Uma <strong>lista fixa de atos que nunca descem</strong>: tudo o que toca cliente ou dado pessoal;
+        segredo, contas e firewall; produção e deploy; publicação externa; apagar sem cópia; selo de
+        versão; escrita em repositório de outro dono; e qualquer mudança na própria catraca. Fora da lista,
         a classe se mede pelo ato, nunca pelo texto que o descreve.</p>
-        <p>O que já roda: o "pode rodar" digitado vale para merge; uma sessão sem o maestro só faz merge
-        no repositório que é dela; e todo ato que nasce de conteúdo não confiável passa por um portão.</p>
+        <p>O que já roda: o "pode rodar" digitado vale para merge. Uma sessão sem o maestro só faz merge no
+        repositório que é dela. E todo ato que nasce de conteúdo não confiável passa por um portão.</p>
       </div>
       <p class="bloco limite">O limite, escrito na própria doutrina: <strong>não é fronteira de
       segurança.</strong> Tudo roda com o mesmo usuário do sistema, e uma sessão que quisesse burlar poderia
       reescrever o registro. A catraca torna o caminho certo o mais fácil e o desvio visível. O livro de
-      decisões, a régua automática e o modo de observação ainda não existem: hoje ela é metade mecanismo,
+      decisões, a régua automática e o modo de observação ainda não existem. Hoje ela é metade mecanismo,
       metade doutrina, e esta página diz qual é qual.</p>
     </div>
   </article>
@@ -537,21 +545,26 @@ const invencoes = [
       <span class="alias">ABNT NBR ISO 24495-1:2024, onde um humano lê</span>
     </div>
     <p class="sintese">Onde uma pessoa lê (documentação, commit, card, resposta, esta página), escrevo para
-    que ela encontre, entenda e use o que precisa. Onde só uma máquina lê, a régua não se aplica.</p>
+    que ela encontre, entenda e use o que precisa. Onde só uma máquina ou outra sessão lê, a régua quase não
+    se aplica. Duas coisas valem mesmo ali, porque esse texto acaba chegando a uma pessoa: a sigla vem
+    explicada, e o grafo e o recado entre sessões têm data de revisita.</p>
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">A cicatriz — <span class="data">2026-10-17, e de novo em 2026-11-20</span></b>
         <p>O maestro não reconheceu duas siglas internas que eu usava na prosa como se fossem palavras
         comuns. Eu escrevia para mim, não para quem lia. Ele pediu uma guarda e, no mesmo dia, deu a forma
-        dela: <em>"isso é para você escrever certo, e não para ficar travando toda hora"</em>. Um mês depois,
+        dela: <em>"isso é para voce escrever certo e não para ficar travando toda hora"</em>. Um mês depois,
         pediu que todo o ecossistema seguisse a norma brasileira de Linguagem Simples.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">O mecanismo que a cobra</b>
-        <p>Um glossário único das siglas da casa e um gancho que lembra a explicação antes de eu escrever.
-        Ele só barra na reincidência: a mesma sigla, sem explicação, depois do lembrete. A medida que
-        escolheu esse desenho: em 1.568 turnos reais, barrar toda sigla sem explicação travaria 33,6% deles;
-        barrar só a reincidência trava 0,9%. O mesmo lembrete vale no commit e nas mensagens entre sessões.</p>
+        <p>Um glossário único das siglas da casa e um gatilho automático que lembra a explicação antes de eu
+        escrever. Ele só barra na reincidência: a mesma sigla, sem explicação, depois do lembrete.</p>
+        <p>Uma medida escolheu esse desenho (nó <code>E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS</code> do grafo
+        da guarda). Em 1.556 turnos reais, 36,4% tinham alguma sigla da casa sem explicação. Barrar toda sigla
+        de leitura difícil travaria 2,3% dos turnos. Barrar só a reincidência trava 0,3%. Uma primeira medida
+        dava 0,9%, mas contava errado e caiu na revisão. O mesmo lembrete vale no commit e nas mensagens entre
+        sessões.</p>
         <p>Para o resto, uma régua de 11 itens tirada da norma, cada um com o sinal que mostra se foi
         cumprido, com força diferente por superfície. Na revisão, um problema de clareza vira achado real,
         mas não segura o merge.</p>

@@ -403,30 +403,33 @@ const inventions = [
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">The scar — <span class="data">2026-10-16</span></b>
-        <p>The maestro caught a session building on old versions. A package was missing, and instead of
-        asking to install it, the session worked around it and carried on. He gave the order twice in a row:
-        <em>"we must always use the most current versions and not go creating things on an old base"</em>,
-        and right after, <em>"this warning about keeping current is permanent, not just in memory and
-        session"</em>.</p>
-        <p>The second sentence is the real scar. Until then, the rule lived in one session's memory, and a
-        session's memory disappears when the session ends. A day later, the same meter found that the CI
-        code reviewer was running a far older Claude Code than the machine, and no census looked there.</p>
+        <p>The maestro caught a session building on old versions. He gave the order twice in a row (quotes
+        translated from Portuguese). First, that when something is not installed <em>"just ask me for
+        authorisation and install it"</em>, and that <em>"we must always use the most current versions and not
+        go creating things on an old base"</em>. Right after: <em>"this earlier warning about keeping current is
+        permanent, not just in memory and session"</em>.</p>
+        <p>The second sentence is the real scar. Until then, the rule lived in one session's memory. And that
+        memory disappears when the session ends. A day later, the same meter found another gap: the automatic
+        code reviewer, which runs on every change, used a far older Claude Code than the machine. No
+        measurement looked there.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">The mechanism that enforces it</b>
-        <p>A meter compares every piece on the path against what is published: Claude Code, the SDK, the
-        lint's Python and its libraries, the CI actions pinned by hash, and the branch itself against main.
-        Each piece comes out as <em>current</em>, <em>behind</em> (with the upgrade command), <em>pinned</em>
-        (behind by contract, and the upgrade belongs to whoever owns the pin), <em>missing</em> (with the
-        install request) or <em>not measured</em>. A hook runs the meter on every message and warns the
-        session when something falls behind.</p>
-        <p>Two hard rules come with it. A tool is missing: stop, ask for authorisation, and install from the
-        official source; never work around it. And "not measured" is only valid when the source does not
-        answer: a zero caused by not measuring reads as "no problem", and that is worse than not measuring.</p>
+        <p>A meter compares every piece used in the work against the published version. It covers Claude Code,
+        Claude's agent kit (the Agent SDK), the Python behind the automatic rule checks and its libraries, the
+        actions of the check that runs on every change, and the branch itself against main.</p>
+        <p>Each piece gets a state: <em>current</em>; <em>behind</em>, with the upgrade command; <em>held
+        back</em>, behind on purpose by contract, and whoever owns that hold decides when to upgrade;
+        <em>missing</em>, with the install request; or <em>not measured</em>. An automatic trigger runs the
+        meter on every message. When something falls behind, it warns the session.</p>
+        <p>Two hard rules come with it. First: a tool is missing, so stop, ask for authorisation, and install
+        from the official source. Never work around it. Second: "not measured" is only valid when the source
+        does not answer. A zero caused by not measuring looks like "no problem", and that is worse than not
+        measuring.</p>
       </div>
-      <p class="bloco limite">The limit: the hook <strong>warns and does not block</strong>. The decision to
-      upgrade stays with whoever is working, and a session can read the warning and move on. What the
-      doctrine guarantees is that falling behind never goes unsaid.</p>
+      <p class="bloco limite">The limit: the trigger <strong>warns and does not block</strong>. Whoever is
+      working decides whether to upgrade, and a session can read the warning and move on. What the doctrine
+      guarantees is that falling behind never goes unsaid.</p>
     </div>
   </article>
 
@@ -442,29 +445,31 @@ const inventions = [
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">The scar — <span class="data">2026-10-27</span></b>
-        <p>My presentations command described itself as "professional presentations <em>via</em>" an
-        external, paid slide-generation service. Without that service's key the capability simply did not
-        exist, and the text did not say so. The maestro reacted twice on the same day: <em>"I don't want
-        external dependencies"</em>.</p>
-        <p>The decision was sealed as the answer to a closed question, with the discarded options in view:
-        "yes, when the service is the best on the market" and "yes, as long as it is free". Both lost.</p>
+        <p>My presentations command described itself as creating professional presentations through an
+        external, paid slide-generation service. Without that service's key the capability did not exist, and
+        the text did not say so. On the same day, the maestro spoke twice (quotes translated from Portuguese).
+        First: <em>"I don't want external dependencies"</em>. Then, straight to me: <em>"reinforcing: avoid
+        dependencies on external services"</em>.</p>
+        <p>The decision was sealed as the answer to a closed question. The discarded options stayed in view:
+        <em>"yes, when the service is the best option on the market"</em> and <em>"yes, as long as it is
+        free"</em>. Both lost.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">The mechanism that enforces it</b>
-        <p>A criterion you can check without opinion, in three steps. <strong>Switch the bridge off</strong>:
-        without the key and without network to the service, does the capability still deliver? Then it is
-        core. If not, <strong>look for the name</strong>: does the command point to a concrete local path?
-        "There are alternatives" does not count; a named command does. If neither, <strong>it is a bridge
-        and must say so</strong>: "optional bridge to service X, external and paid", with the way forward
-        for anyone who does not want it.</p>
-        <p>For presentations, the command and the agent now stop without the key and hand back the local
-        path: a single HTML deck that opens offline. Nothing was deleted. The bridge stays for whoever wants
-        it.</p>
+        <p>It is a criterion you can check without opinion, in three steps. <strong>Switch the bridge
+        off</strong>: without the key and without access to the service, does the capability still deliver?
+        If it does, it is core. If not, <strong>look for the name</strong>: does the command point to a
+        concrete local path? Saying there are alternatives does not count; the name of a command does. If
+        neither, <strong>it is a bridge and must say so</strong>: an optional bridge to the service, external
+        and paid, with the way forward for anyone who does not want it.</p>
+        <p>For presentations, the command and the agent now stop without the key and hand back the local path:
+        a presentation in a single HTML file that opens offline. Nothing was deleted. The bridge stays for
+        whoever wants it.</p>
       </div>
-      <p class="bloco limite">The limit: the substrate is outside the test. Claude Code and the model that
-      runs it were chosen on purpose, and its tools count as core. And there is <strong>no lint guard
-      yet</strong> that fails a new capability for depending on a service: the criterion is applied in
-      review, and the candidates found on the day of the decision were listed, not all fixed.</p>
+      <p class="bloco limite">The limit: the base is outside the test. Claude Code and the model that runs it
+      were chosen on purpose, and its tools count as core. And there is <strong>no automatic check
+      yet</strong> that fails a new capability for depending on a service. Today the criterion is applied in
+      review. The candidates found on the day of the decision were listed, but not all were fixed.</p>
     </div>
   </article>
 
@@ -476,31 +481,34 @@ const inventions = [
       <span class="alias">the mechanism conducts the sessions, not anyone's memory</span>
     </div>
     <p class="sintese">When several sessions and agents share one machine, the mechanism does the
-    coordinating: load, how long someone has been idle, and who owns each question are measured, not
+    coordinating. Load, how long someone has been idle, and who owns each question are measured, not
     remembered.</p>
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">The scar — <span class="data">2026-11-10, three failures on the same day</span></b>
-        <p>The maestro complained more than once: <em>"people are idle, tasks are half done and pieces are
-        missing; the baton is missing"</em>. He decided "baton first", and the next day the failure repeated
-        three times. Sessions sat idle because their next job was waiting for a decision and nobody pulled
-        another job for the meantime. Agents kept waiting for a background task whose completion notice
-        never woke them. And machine load reached 16–19 with three agents running heavy tests at once.</p>
+        <p>The maestro complained more than once (translated from Portuguese): <em>"people are idle and tasks
+        half done and pieces missing, the baton is missing"</em>. He decided to put the baton first. The next
+        day, the failure repeated three times.</p>
+        <p>Sessions sat idle: their next job was waiting for a decision, and nobody pulled another job for the
+        meantime. Agents waited for a background task whose completion notice never woke them. And machine
+        load reached 16–19, with three agents running heavy tests at once.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">The mechanism that enforces it</b>
-        <p><strong>Heavy steps go through an admission gate.</strong> Tests, mutants and PR closing wait for
-        a slot, and the number of slots comes from the machine's measured load. With the machine quiet,
-        several get in; near the limit, one; at the limit, no new one.</p>
-        <p><strong>Idle is judged by deadline, never by what someone says.</strong> Every worktree and every
-        open PR carries the age of its last activity, read from git and the forge; past the deadline, the
-        state is IDLE. And <strong>every question to the maestro has an owning session</strong>: before
-        asking, the session reserves the question, and if another already owns it, it is not asked again.
-        A periodic pulse gathers all of this into a fixed-format report.</p>
+        <p><strong>Heavy steps go through an admission gate.</strong> Tests, mutation tests (which plant a
+        defect on purpose to see whether the test catches it) and PR closing wait for a slot. The number of
+        slots comes from the machine's measured load. With the machine quiet, several get in; near the limit,
+        one; at the limit, no new one.</p>
+        <p><strong>Idle is judged by deadline, never by what someone says.</strong> Every working copy of the
+        repository and every open PR carries the age of its last activity, read from git and GitHub. Past the
+        deadline, the state is IDLE.</p>
+        <p><strong>Every question to the maestro has an owning session.</strong> Before asking, the session
+        reserves the question. If another already owns it, nobody asks again. A periodic pulse gathers all of
+        this into a fixed-format report.</p>
       </div>
-      <p class="bloco limite">The limit: the admission gate is an efficiency lock, not a correctness lock. It
-      prevents overload; it does not stop two processes from writing to the same place. Another rule exists
-      for that: one writer per repository.</p>
+      <p class="bloco limite">The limit: the admission gate prevents overload, but it does not make the work
+      come out right. It does not stop two processes from writing to the same place. Another rule exists for
+      that: one writer per repository.</p>
     </div>
   </article>
 
@@ -517,25 +525,25 @@ const inventions = [
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">The scar — <span class="data">2026-11-01 to 2026-11-20, measured</span></b>
-        <p>Over 20 days of sessions, the maestro answered <strong>213 forms with 507 questions</strong> and
-        typed <strong>85 commands</strong> by hand, between 2 and 34 interventions a day. Merges alone took
-        about 94 clicks. The mistake was mine: I took to the maestro, with no rule, decisions that could have
-        been mine, and had no written list of the ones that never can be. What was missing was the rule that
-        separates the two, and a way to explain and audit every decision afterwards.</p>
+        <p>In a 20-day harvest of the core's sessions, the maestro answered <strong>213 forms with 507
+        questions</strong> and typed <strong>85 commands</strong> by hand: between 2 and 34 interventions a
+        day. Merges alone took about 94 clicks.</p>
+        <p>Some of those decisions could safely move down a class. Some never can. What was missing was the
+        rule that separates the two, and a way to explain and audit every decision afterwards.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">The mechanism that enforces it</b>
         <p>A <strong>fixed list of acts that never move down</strong>: anything touching a client or personal
-        data, secrets, accounts and firewall, production and deploy, external publication, deleting without
-        a copy, release seals, writing to a repository someone else owns, and any change to the ratchet
-        itself. Outside that list, the class is measured from the act, never from the text describing it.</p>
-        <p>What already runs: a typed "go ahead" is valid for merges; a session without the maestro may only
-        merge in the repository it owns; and every act born from untrusted content goes through a gate.</p>
+        data; secrets, accounts and firewall; production and deploy; external publication; deleting without a
+        copy; release seals; writing to a repository someone else owns; and any change to the ratchet itself.
+        Outside the list, the class is measured from the act, never from the text describing it.</p>
+        <p>What already runs: a typed "go ahead" is valid for merges. A session without the maestro may only
+        merge in the repository it owns. And every act born from untrusted content goes through a gate.</p>
       </div>
       <p class="bloco limite">The limit, written into the doctrine itself: <strong>it is not a security
       boundary.</strong> Everything runs as the same system user, and a session that wanted to cheat could
       rewrite the record. The ratchet makes the right path the easy one and the deviation visible. The
-      decision ledger, the automatic classifier and the observe mode do not exist yet: today it is half
+      decision ledger, the automatic classifier and the observe mode do not exist yet. Today it is half
       mechanism, half doctrine, and this page says which is which.</p>
     </div>
   </article>
@@ -548,23 +556,27 @@ const inventions = [
       <span class="alias">ISO 24495-1 (Brazilian edition ABNT NBR ISO 24495-1:2024), wherever a human reads</span>
     </div>
     <p class="sintese">Wherever a person reads (documentation, commits, cards, answers, this page), I write
-    so they can find, understand and use what they need. Where only a machine reads, the rule does not
-    apply.</p>
+    so they can find, understand and use what they need. Where only a machine or another session reads, the
+    rule mostly does not apply. Two things still hold there, because that text ends up reaching a person:
+    codes come explained, and the graph and messages between sessions carry a review date.</p>
     <div class="dbody">
       <div class="bloco cicatriz">
         <b class="sans">The scar — <span class="data">2026-10-17, and again on 2026-11-20</span></b>
         <p>The maestro did not recognise two internal codes I was using in prose as if they were ordinary
         words. I was writing for myself, not for the reader. He asked for a guard and, on the same day, gave
-        it its shape: <em>"this is for you to write correctly, not to keep blocking all the time"</em>. A
-        month later, he asked the whole ecosystem to follow the Brazilian plain-language standard.</p>
+        it its shape (translated from Portuguese): <em>"this is for you to write correctly and not to keep
+        blocking all the time"</em>. A month later, he asked the whole ecosystem to follow the Brazilian
+        plain-language standard.</p>
       </div>
       <div class="bloco mecanismo">
         <b class="sans">The mechanism that enforces it</b>
-        <p>A single glossary of house codes, and a hook that reminds me of the explanation before I write.
-        It only blocks on repetition: the same code, unexplained, after the reminder. The measurement that
-        chose this design: over 1,568 real turns, blocking every unexplained code would have stopped 33.6%
-        of them; blocking only repetition stops 0.9%. The same reminder applies to commits and to messages
-        between sessions.</p>
+        <p>A single glossary of house codes, and an automatic trigger that reminds me of the explanation
+        before I write. It only blocks on repetition: the same code, unexplained, after the reminder.</p>
+        <p>A measurement chose this design (node <code>E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS</code> in the
+        guard's graph). Over 1,556 real turns, 36.4% had some house code without an explanation. Blocking every
+        hard-to-read code would have stopped 2.3% of turns. Blocking only repetition stops 0.3%. A first
+        measurement gave 0.9%, but it counted wrong and fell in review. The same reminder applies to commits
+        and to messages between sessions.</p>
         <p>For everything else, an 11-item checklist drawn from the standard, each with the signal that shows
         whether it was met, and a different strength per surface. In review, a clarity problem counts as a
         real finding, but it does not hold the merge.</p>
