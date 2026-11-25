@@ -10847,7 +10847,7 @@ PY
   _dm_mut "(e1) protect-main: eval literal com force-push fora da main → VETO" 2 "${_PM}" \
     'eval "git push --force origin feat/x"' "${_IL}" '        if txt and not DYNAMIC.search(txt):' '        if False:'
   _dm_mut "(e2) protect-main: eval com variável e -f fora da main → VETO" 2 "${_PM}" \
-    'eval "git push -f origin $B"' "${_PM}" "sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p' | grep -E '\\bpush\\b' \\" "sed -n 's/^__ONION_UNANALYZABLE__ [^:]*:: //p' | grep -E '\\bNOPUSH\\b' \\"
+    'eval "git push -f origin $B"' "${_PM}" "   | sed -n 's/.*\\bpush\\b//p' \\" "   | sed -n 's/.*\\bNOPUSH\\b//p' \\"
   _dm_mut "(r1) rm -rf ~ → VETO" 2 "${_DM}" 'rm -rf ~' "${_IL}" '    elif base == "rm" and MIRROR:' '    elif False:'
   _dm_mut "(r2) crase em heredoc sem aspas com rm -rf .git → VETO" 2 "${_DM}" $'cat <<EOF\n`rm -rf .git`\nEOF' \
     "${_DM}" '        if n == ".git" or n.endswith("/.git"):' '        if False:'
@@ -10862,6 +10862,18 @@ PY
     "${_DM}" '            if os.path.realpath(os.path.dirname(os.path.normpath(full))) in ROOTS:' '            if True:'
   _dm_mut "(c3) git filter-branch --help → passa" 0 "${_DM}" 'git filter-branch --help' \
     "${_DM}" ' and not any(x in ("--help", "-h") for x in w[k + 1:])' ''
+  # ── curas da revisão isolada (B1, B2, B3, L1), cada uma com mutante ──
+  _dm_mut "(b1) cd condicional que a lib não segue e rm -rf .git, sem a string criar a pasta → VETO" 2 "${_DM}" \
+    'ls && cd . && rm -rf .git' "${_DM}" '                if not CREATES:' '                if False:'
+  _dm_mut "(b2) protect-main: eval com variável, push sem força e -f de outro comando → passa" 0 "${_PM}" \
+    'eval "git push origin $1; tail -f /tmp/l"' "${_PM}" "   | sed -n 's/.*\\bpush\\b//p' \\" "   | grep -E '\\bpush\\b' \\"
+  _dm_mut "(b3) stdin literal no xargs rm -rf → VETO" 2 "${_DM}" 'echo / | xargs rm -rf' \
+    "${_IL}" ' or (MIRROR and tb == "rm"))' ')'
+  _dm_mut "(l1) rm -rf \"\${HOME:?}\"/* → VETO" 2 "${_DM}" 'rm -rf "${HOME:?}"/*' \
+    "${_DM}" 'm in ("/", "/*") or (home and m in (home, home + "/*"))' 'False'
+  _dm_case "cd para pasta que existe fora do projeto e rm -rf .git → passa" 0 "${dm}" "mkdir -p ${d}/fx; cd ${d}/fx && rm -rf .git"
+  _dm_case "find | xargs rm -rf (stdin opaco) → passa" 0 "${dm}" 'find . -name x | xargs rm -rf'
+  _dm_case "rm -rf ~/.cache/pip → passa" 0 "${dm}" 'rm -rf ~/.cache/pip'
   # ── acusa (sem mutante próprio: mesma linha de cura dos de cima, outra forma de chegar) ──
   _dm_case "protect-main: crase em heredoc sem aspas com force-push fora da main → VETO" 2 "${pm}" $'cat <<EOF\n`git push --force origin feat/x`\nEOF'
   _dm_case "protect-main: \$( ) em heredoc sem aspas com -f → VETO" 2 "${pm}" $'gh pr comment 1 --body-file - <<EOF\n$(git push -f origin feat/x)\nEOF'

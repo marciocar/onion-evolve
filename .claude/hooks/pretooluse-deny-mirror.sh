@@ -12,8 +12,10 @@
 #
 # ── O QUE VETA ────────────────────────────────────────────────────────────────────────────────────────────
 #  · `git filter-branch` e `git filter-repo` (reescrevem a história inteira), em qualquer pasta;
-#  · `rm` recursivo (`-r`, `-R`, `--recursive`, em qualquer cluster) cujo alvo é `/`, `/*`, `~`, `~/`, `~/*`, `$HOME`,
-#    `${HOME}`, `$HOME/*`, o caminho da home, ou um `.git` (`.git`, `./.git/`, `x/.git`);
+#  · `rm` recursivo (`-r`, `-R`, `--recursive`, em qualquer cluster) cujo alvo é `/`, `/*`, a home (`~`, `$HOME`,
+#    `${HOME:?}`, `~user`, o caminho, normalizado) com ou sem `/*`, ou o `.git` do projeto ou do diretório onde a sessão
+#    está (o cwd do hook, o CLAUDE_PROJECT_DIR, o topo git). Depois de um `cd` que a lib não segue, o `.git` só passa
+#    quando a própria string cria a pasta (mkdir, git init/clone, cp -r, tar -x: a fixture de rascunho);
 #  · `gh repo delete`, `gh release delete` e `gh repo edit … --visibility`;
 #  · o que a lib não prova (`eval` com variável, função opaca) e tem a FORMA de um desses atos com alvo literal.
 # Vale pela linha de invocação da lib (lib/invocation-lines.sh): heredoc sem aspas, crase, `$(…)`, `eval` literal,
@@ -57,14 +59,28 @@ inv=$(ONION_DENY_MIRROR=1 ONION_CWD="$hcwd" onion_invocation_lines "$cmd")
 top=$(git -C "$hcwd" rev-parse --show-toplevel 2>/dev/null || true)
 [ -z "$inv" ] && exit 0
 # o juiz lê as linhas canônicas da lib; o inanalisável é re-partido em comandos e julgado com os alvos LITERAIS que tiver
-if printf '%s\n' "$inv" | HOME_DIR="${HOME:-}" ROOTS="${CLAUDE_PROJECT_DIR:-}"$'\n'"$hcwd"$'\n'"$top" python3 -I -c '
+if printf '%s\n' "$inv" | HOME_DIR="${HOME:-}" RAW_CMD="$cmd" ROOTS="${CLAUDE_PROJECT_DIR:-}"$'\n'"$hcwd"$'\n'"$top" python3 -I -c '
 import os, re, shlex, sys
 home = os.environ.get("HOME_DIR", "").rstrip("/")
 # o .git que o deny guarda é o do PROJETO (raiz do CLAUDE_PROJECT_DIR, cwd do hook e o topo git dele); o .git de uma cópia
 # de trabalho num rascunho (`cd $S/fixture && rm -rf .git`, `rm -rf repo/.git`) é rotina honesta (corpus, 2026-11-25)
 ROOTS = {os.path.realpath(r) for r in os.environ.get("ROOTS", "").split("\n") if r.strip()}
 UNKNOWN = "__ONION_UNKNOWN_DIR__"
+CREATES = bool(re.search(r"(^|[\s;&|(])(mkdir|git\s+(-[^\s]+\s+)*(init|clone)|cp\s+-[A-Za-z]*[rRa]|tar\s+-?[A-Za-z]*x|unzip|rsync)\b",
+                         os.environ.get("RAW_CMD", "")))
 DANGER = {"/", "/*", "~", "~/", "~/*", "$HOME", "${HOME}", "$HOME/", "${HOME}/", "$HOME/*", "${HOME}/*"}
+def norm(t):
+    """`${HOME:?…}`/`${HOME:-…}` são $HOME; `~user` e `~` expandem; `//x//y`, `/./`, `..` normalizam (refutador, L1)."""
+    t = re.sub(r"\$\{HOME:[?=+-][^}]*\}", "$HOME", t)
+    t = re.sub(r"^(\$HOME|\$\{HOME\})(?=/|$)", home or "$HOME", t)
+    if t.startswith("~"):
+        t = os.path.expanduser(t)
+    if t.startswith("/"):
+        star = t.endswith("/*")
+        b = os.path.normpath(t[:-2] if star else t)
+        b = "/" + b.lstrip("/")
+        return (b.rstrip("/") + "/*") if star else b
+    return t
 def rm_bad(w, where=""):
     rec, end, targets = False, False, []
     for t in w[1:]:
@@ -79,12 +95,20 @@ def rm_bad(w, where=""):
         return False
     for t in targets:
         n = t if t in ("/", "/*") else t.rstrip("/") or "/"
-        if t in DANGER or n in DANGER or (home and n in (home, home + "/*")):
+        m = norm(t)
+        if t in DANGER or n in DANGER or m in ("/", "/*") or (home and m in (home, home + "/*")):
             return True
         if n == ".git" or n.endswith("/.git"):
             # `cd` que a lib não segue (variável, pasta criada na própria string: `mkdir -p w && cd w`) ou caminho dinâmico:
             # não se prova que é o .git do projeto, e o corpus mostrou que é a cópia de trabalho de um rascunho. Passa (teto)
-            if where == UNKNOWN or re.search(r"[$`]", n):
+            if re.search(r"[$`]", n):
+                continue
+            if where == UNKNOWN:
+                # `cd` que a lib não segue: só passa se a própria string CRIA a pasta antes (fixture de rascunho:
+                # mkdir, git init/clone, cp -r, tar -x). `ls && cd . && rm -rf .git` vetava pelo deny e escapava aqui
+                # (refutador isolado, B1)
+                if not CREATES:
+                    return True
                 continue
             if not where and not os.path.isabs(n):
                 return True
