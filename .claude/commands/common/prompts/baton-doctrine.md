@@ -69,7 +69,7 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
 
 7. **O pulso da batuta (baton) mede quem está parado com trabalho pronto, e fala só quando muda.** Pedido do maestro
    em 2026-11-12: as sessões ficavam ociosas esperando algo, com trabalho necessário em outra fila. O
-   [`/meta:baton`](../meta/baton.md) roda o medidor `.claude/validation/baton-pulse.sh`, que lista as sessões vivas do
+   [`/meta:baton`](../../meta/baton.md) roda o medidor `.claude/validation/baton-pulse.sh`, que lista as sessões vivas do
    repo e da família (a lista de peers do harness e os faróis) e dá a cada uma uma classe de máquina: `ACTIVE`,
    `IDLE_WITH_QUEUE`, `IDLE_NO_QUEUE`, `PARKED` ou `UNREACHABLE`. Ociosa é idade (20 min sem prova de atividade no
    transcript ou no farol), como na cláusula 2. **A fila vem só de dono declarado:** nó `open` com `owner:`, pergunta
@@ -184,5 +184,5 @@ O estudo e o diário das janelas vivem em `docs/evolution/research/session-orche
 - Medidor (peça 3): `.claude/validation/decide-census.sh`, com as linhas `ask` e `signal` e o estado PARADO
 - Registro de pergunta: `.claude/utils/orchestration/maestro-ask.sh`
 - Bancada (peça 7): `run_load_lease_selftests` (porta de admissão), `run_maestro_ask_selftests`, `run_batuta_census_selftests`, `run_baton_pulse_selftests` (o pulso)
-- Pulso (cláusulas 7 a 9): comando [`/meta:baton`](../meta/baton.md) e medidor `.claude/validation/baton-pulse.sh`
+- Pulso (cláusulas 7 a 9): comando [`/meta:baton`](../../meta/baton.md) e medidor `.claude/validation/baton-pulse.sh`
 - Colheita de mercado (core-only): `docs/evolution/research/session-orchestration-2026-11/data/market-supervision-2026-11-10.md`
