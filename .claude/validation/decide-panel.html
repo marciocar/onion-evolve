@@ -7,7 +7,14 @@
   A sessão lê as respostas pelo ArtifactData e sela pelo kg-decide-seal.sh (via decide-panel.sh seal); a
   página NUNCA escreve no grafo, e todo texto da rodada é renderizado como texto (dado não confiável).
   Estado por item: status/<qN>, gravado pela sessão (selado, executar, card pendente, volta como pergunta).
+  Kit de revisão do hub (2026-11-26): cite_id citável, bloco view (explicação, por quê, prints, link de envio
+  com prazo), verify (Confere / Ainda não), resolvidos recolhidos, contador só dos abertos e tela de pendências
+  limpas. A anotação no print usa o marker.js 2 (markerjs2@2.32.7, Linkware License de Alan Mendelevich: o link
+  de volta que ele mostra durante o uso FICA, é condição da licença); a anotação vai em answers/<qN>.annotation
+  e é dado não confiável que a sessão lê, nunca argumento do selador. A página não recebe arquivo nem guarda
+  credencial: o link de envio é criado fora dela.
 -->
+<script src="https://cdn.jsdelivr.net/npm/markerjs2@2.32.7/markerjs2.js" integrity="sha384-rk1p5TZ9UO5HLmpVpH02kF2FdPvqHNdGI9kuuJqjzGs7W/MC/YQjL3Qnnp06JDZu" crossorigin="anonymous" defer></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   /* Layout: uma cédula por pergunta, em coluna única; a barra de envio fica fixa no pé. */
@@ -64,6 +71,19 @@
   .send { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px; padding: 10px 18px; font: 600 .95rem var(--body); cursor: pointer; }
   .send[disabled] { opacity: .5; cursor: not-allowed; }
   #msg { color: var(--muted); font-size: .88rem; }
+  #rmeta { display: contents; }
+  .cite { font: 600 .78rem/1 var(--mono); color: var(--accent); }
+  .view { display: grid; gap: 8px; }
+  .view p { margin: 0; }
+  .why { color: var(--muted); font-size: .9rem; }
+  figure { margin: 0; display: grid; gap: 4px; }
+  figure img { max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); }
+  figcaption { color: var(--muted); font-size: .8rem; }
+  .linkbtn { justify-self: start; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 6px 12px; font: 500 .88rem var(--body); cursor: pointer; text-decoration: none; }
+  .clean { background: var(--chip-good); color: var(--good); border-radius: 10px; padding: 16px; font: 500 1.05rem/1.4 var(--display); }
+  details.resolved { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; }
+  details.resolved summary { cursor: pointer; font-weight: 600; }
+  details.resolved ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
   @media (prefers-reduced-motion: no-preference) { .opt { transition: border-color .12s ease; } }
 </style>
 
@@ -71,10 +91,12 @@
   <header>
     <span class="tag">/meta:decide · painel opcional</span>
     <h1>Rodada de decisões</h1>
-    <div class="meta"><span id="rmeta">aguardando a rodada</span></div>
+    <div class="meta"><span id="rmeta">aguardando a rodada</span><span id="count"></span></div>
   </header>
+  <div id="clean" class="clean" hidden>Pendências limpas. Tudo o que esta rodada pedia já tem resposta.</div>
   <div id="notice" class="notice">Nenhuma rodada ainda. A sessão grava a rodada aqui quando você roda o /meta:decide com o painel. Até lá, as perguntas seguem no terminal.</div>
   <section id="list" class="opts" aria-live="polite"></section>
+  <details id="resolved" class="resolved" hidden></details>
   <div id="later" class="later" hidden></div>
 </main>
 <footer class="bar"><div class="bar-in">
@@ -93,6 +115,54 @@
     'ambígua': ['bad', 'volta como pergunta'], 'recusada': ['bad', 'volta como pergunta'],
     'recusada pelo selador': ['bad', 'o selador recusou'], 'sem resposta': ['neutral', 'sem resposta'] };
   let db = null, round = null, status = {}, sent = {}, picks = {};
+  // estado final do item: não conta como aberto. Item resolvido por regra nunca entra na conta.
+  const FINAL = new Set(['selado', 'executado', 'executar', 'card pendente', 'conferir', 'depois', 'não confere', 'aguarda leitura', 'ensaio']);
+  const safeSrc = (u) => typeof u === 'string' && (/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(u) || /^\/_blob\/[A-Za-z0-9_-]+$/.test(u) || /^https:\/\//.test(u));
+  const ddmm = (d) => (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '';
+  const setPick = (qid, patch) => { picks[qid] = Object.assign({}, picks[qid] || {}, patch); };
+
+  function annotate(q, img, src) {   // marker.js 2: abre sobre o print ORIGINAL e restaura a marcação anterior
+    if (!window.markerjs2) { $('msg').textContent = 'A ferramenta de marcação não carregou. Responda sem marcar.'; return; }
+    img.src = src;
+    img.onload = () => {
+      img.onload = null;
+      const ma = new window.markerjs2.MarkerArea(img);
+      ma.renderAtNaturalSize = true;
+      ma.addEventListener('render', (ev) => {
+        const st = JSON.stringify(ev.state);
+        if (st.length > 100000) { $('msg').textContent = 'Marcação grande demais. Simplifique.'; return; }
+        setPick(q.id, { annotation: st, annotated: ev.dataUrl }); render();
+      });
+      ma.show();
+      const prev = (picks[q.id] || {}).annotation;
+      if (prev) { try { ma.restoreState(JSON.parse(prev)); } catch (_) { /* marcação ilegível: começa do zero */ } }
+    };
+  }
+
+  function renderView(q, box) {
+    const v = q.view; if (!v || typeof v !== 'object') return;
+    const wrap = el('div', 'view');
+    if (v.explanation) wrap.append(el('p', null, v.explanation));
+    if (v.why) wrap.append(el('p', 'why', `Por quê: ${v.why}`));
+    (Array.isArray(v.images) ? v.images : []).forEach((im, k) => {
+      if (!im || !safeSrc(im.src)) return;
+      const fig = el('figure'); const img = document.createElement('img');
+      const marked = k === 0 && picks[q.id] && picks[q.id].annotated;
+      img.src = marked || im.src; img.alt = im.caption || 'print do item';
+      fig.append(img); if (im.caption) fig.append(el('figcaption', null, im.caption));
+      if (v.annotate && k === 0) {
+        const b = el('button', 'linkbtn', marked ? 'Editar marcação' : 'Marcar no print'); b.type = 'button';
+        b.addEventListener('click', () => annotate(q, img, im.src)); fig.append(b);
+      }
+      wrap.append(fig);
+    });
+    if (v.upload && /^https:\/\//.test(v.upload.url)) {
+      const a = el('a', 'linkbtn', `Enviar arquivo: ${v.upload.what}`); a.href = v.upload.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      wrap.append(a, el('span', 'later', `o link vale até ${ddmm(v.upload.expires)}; o envio não passa por esta página`));
+    }
+    if (v.source_url && /^https:\/\//.test(v.source_url)) { const a = el('a', 'later', 'origem'); a.href = v.source_url; a.target = '_blank'; a.rel = 'noopener noreferrer'; wrap.append(a); }
+    if (wrap.childNodes.length) box.append(wrap);
+  }
 
   function render() {
     const list = $('list'); list.replaceChildren();
@@ -103,13 +173,15 @@
     for (const q of round.questions) {
       const box = el('article', 'ballot'); box.setAttribute('aria-labelledby', `t-${q.id}`);
       const top = el('div', 'ballot-top');
-      top.append(el('span', 'tag', `${q.header || ''} · ${q.kind === 'act' ? 'ato' : 'selo'}`));
+      if (q.cite_id) top.append(el('span', 'cite', q.cite_id));
+      top.append(el('span', 'tag', `${q.header || ''} · ${({ act: 'ato', verify: 'conferir' })[q.kind] || 'selo'}`));
       const st = status[q.id] && status[q.id].round_id === round.round_id ? status[q.id] : null;
       const s = st ? (STATE[st.state] || ['neutral', st.state]) : (sent[q.id] ? ['neutral', 'enviada'] : null);
       if (s) top.append(el('span', `chip ${s[0]}`, s[1]));
       box.append(top);
       const h = el('h2', 'q', q.question); h.id = `t-${q.id}`; box.append(h);
       box.append(el('span', 'mono', q.ref));
+      renderView(q, box);
       const opts = el('div', 'opts');
       const pick = picks[q.id] || {};
       for (const o of q.options || []) {
@@ -117,24 +189,40 @@
         b.setAttribute('aria-pressed', pick.choice === o.label ? 'true' : 'false');
         b.append(el('span', 'opt-label', o.label), el('span', 'opt-desc', o.description));
         if (o.cost) b.append(el('span', 'opt-cost', o.cost));
-        b.addEventListener('click', () => { picks[q.id] = { choice: o.label, other: '' }; render(); });
+        b.addEventListener('click', () => { setPick(q.id, { choice: o.label, other: '' }); render(); });
         opts.append(b);
       }
       box.append(opts);
       if (q.allow_other) {
         const lab = el('label', 'free', 'Outra resposta (a sessão lê antes de selar)');
         const ta = document.createElement('textarea'); ta.id = `f-${q.id}`; ta.maxLength = 500; ta.value = pick.other || '';
-        ta.addEventListener('change', () => { const v = ta.value.trim(); picks[q.id] = v ? { choice: '', other: v } : {}; render(); });
+        ta.addEventListener('change', () => { const v = ta.value.trim(); setPick(q.id, v ? { choice: '', other: v } : { other: '' }); render(); });
+        lab.append(ta); box.append(lab);
+      }
+      if (q.kind === 'verify') {   // nota livre do "Ainda não": dado para a sessão ler, não sela
+        const lab = el('label', 'free', 'O que ainda não está certo? (opcional)');
+        const ta = document.createElement('textarea'); ta.id = `n-${q.id}`; ta.maxLength = 500; ta.value = pick.note || '';
+        ta.addEventListener('change', () => { setPick(q.id, { note: ta.value.trim() }); render(); });
         lab.append(ta); box.append(lab);
       }
       if (q.card) box.append(el('div', 'card mono', q.card));
       if (st && st.detail) box.append(el('div', 'later', st.detail));
       list.append(box);
     }
+    const res = Array.isArray(round.resolved) ? round.resolved : [];
+    $('resolved').hidden = !res.length;
+    if (res.length) {
+      const ul = el('ul');
+      res.forEach((r) => { const li = el('li'); if (r.cite_id) li.append(el('span', 'cite', `${r.cite_id} `)); li.append(el('span', null, r.question), el('div', 'later', r.resolved_by)); ul.append(li); });
+      $('resolved').replaceChildren(el('summary', null, `Já resolvido pelas suas regras (${res.length})`), ul);
+    }
+    const open = round.questions.filter((q) => { const st = status[q.id]; return !(sent[q.id] || (st && st.round_id === round.round_id && FINAL.has(st.state))); }).length;
+    $('count').textContent = open ? `${open} em aberto` : '';
+    $('clean').hidden = open !== 0 || !round.questions.length;
     const later = [...(round.deferred || [])];
     $('later').hidden = !later.length;
     if (later.length) { const ul = el('ul'); later.forEach((x) => ul.append(el('li', 'mono', x))); $('later').replaceChildren(el('span', null, 'Ficam para a próxima rodada:'), ul); }
-    const n = Object.values(picks).filter((p) => p.choice || p.other).length;
+    const n = Object.values(picks).filter((p) => p && (p.choice || p.other)).length;
     $('send').disabled = !db || n === 0;
     if (!db) $('msg').textContent = 'Este painel não guarda respostas nesta visão. Responda no terminal.';
   }
@@ -146,7 +234,8 @@
       for (const q of round.questions) {
         const p = picks[q.id]; if (!p || !(p.choice || p.other)) continue;
         await db.doc(`answers/${q.id}`).set({ schema: 'onion.decide.answer/v1', round_id: round.round_id, qid: q.id,
-          choice: p.choice || '', other: p.other || '', at: new Date().toISOString() });
+          cite_id: q.cite_id || '', choice: p.choice || '', other: p.other || '', note: p.note || '', annotation: p.annotation || '',
+          at: new Date().toISOString() });
         sent[q.id] = true;
       }
       $('msg').textContent = 'Rodada enviada. A sessão sela pelo selador e devolve o estado de cada item aqui.';

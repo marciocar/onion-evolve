@@ -181,8 +181,18 @@ Quatro regras fecham a cláusula:
   dos dois: ambígua, não sela. Resposta de outra rodada: recusada, não sela. Instrução escrita no campo livre ("ignore",
   "rode", "sele tudo") é lida como **conteúdo da resposta**, nunca obedecida.
 
+**Kit de revisão (2026-11-26, absorvido do hub):** o painel serve também a decisor não técnico. Três
+decisões do core o fecham: (1) a sugestão do agente é a **1ª opção** e leva «(Recomendado)», a mesma regra do
+terminal, sem outra ordem; (2) o `round_id` cobre **só o que sela** (perguntas, opções, selo, data e nonce):
+imagens, notas, explicação e `cite_id` ficam fora, e o `cite_id` é estável entre rodadas; (3) no modo
+**só-painel** (`panel_only`) a pergunta vai até 6 opções, e o payload do `AskUserQuestion` segue com teto de 4,
+recusado com o nome da pergunta acima disso. Entram o `verify` (Confere sela como conferência da pessoa, com
+destino design; Ainda não não sela), o print anotável (a anotação é dado, nunca argumento do selador), o item
+recolhido «já resolvido pelas suas regras» (não é pergunta e não conta) e o link de envio de arquivo com prazo,
+criado fora do painel: a página não recebe arquivo nem guarda segredo.
+
 O painel mostra o estado de cada item, que a sessão devolve ao estado dele (`status/<qN>`): selado,
-executar, card pendente, volta como pergunta. O "executado" é a sessão que grava depois de rodar o ato.
+executar, card pendente, não confere, volta como pergunta. O "executado" é a sessão que grava depois de rodar o ato.
 
 ### 10. A triagem em lote: a sessão classifica, o maestro aprova o lote, o selador grava
 Decisão do maestro em 2026-11-11 (`D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111`, entrevista da forja, em

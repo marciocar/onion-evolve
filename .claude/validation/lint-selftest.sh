@@ -58989,7 +58989,9 @@ sys.exit(0 if "X_INJ" not in ids and len(ids) == int(sys.argv[2]) and n["status"
     python3 - "${pnd}/round.json" "$1" "$2" <<'PN_FORGE'
 import sys, json, hashlib
 d = json.load(open(sys.argv[1])); exec(sys.argv[3])
-c = json.dumps({"questions": d["questions"], "today": d.get("today"), "nonce": d.get("nonce")}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+core = [dict({k: q.get(k) for k in ("id", "kind", "ref", "question", "allow_other", "seal")},
+             options=[{k: o.get(k) for k in ("label", "description", "cost")} for o in (q.get("options") or [])]) for q in d["questions"]]
+c = json.dumps({"questions": core, "today": d.get("today"), "nonce": d.get("nonce")}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 d["round_id"] = hashlib.sha256(c.encode("utf-8")).hexdigest()[:16]
 json.dump(d, open(sys.argv[2], "w"), ensure_ascii=False)
 PN_FORGE
@@ -59020,6 +59022,123 @@ PN_FORGE
   if [ -z "${_p4}" ]; then
     record_pass "decide: (pn4) nonce dá outro round_id na reemissão; data trocada, nó-flag e grafo fora da raiz recusados mesmo com hash recalculado; ref repetido recusado; destino ausente ou torto recusado; estado leva o round_id"
   else record_fail "decide: (pn4)" "${_p4}"; fi
+  # (pn5) KIT DE REVISÃO do hub (2026-11-26; decisões do core: recomendada em 1º, round_id só sobre o que sela, só-painel
+  #       até 6 opções e --ask com teto 4 recusado nomeado). Fixture própria (censo por --from-tsv, grafo e PNG mínimos).
+  #       O caso roda o SUT limpo e um MUTANTE por decisão; passa só se o limpo passa E cada mutante reprova.
+  local kd="${pnd}/kit" _k5="" _kc _km _kn
+  mkdir -p "${kd}/repo/docs/k" "${kd}/imgs" "${kd}/mut"
+  python3 -I -B -c '
+import sys, zlib, struct
+def ch(t, d): return struct.pack(">I", len(d)) + t + d + struct.pack(">I", zlib.crc32(t + d) & 0xffffffff)
+png = b"\x89PNG\r\n\x1a\n" + ch(b"IHDR", struct.pack(">IIBBBBB", 2, 2, 8, 2, 0, 0, 0)) + ch(b"IDAT", zlib.compress(b"\x00" + b"\xff\x00\x00" * 2 + b"\x00" + b"\x00\xff\x00" * 2)) + ch(b"IEND", b"")
+open(sys.argv[1], "wb").write(png); open(sys.argv[2], "wb").write(b"nao e imagem")' "${kd}/imgs/t.png" "${kd}/imgs/falsa.png"
+  { _dec_graph k "$(_dec_node Q_K_DEC question open 'decisao do kit')" "$(_dec_node Q_K_FIX question open 'correcao a conferir')" \
+      "$(_dec_node Q_K_RES question open 'resolvido por regra')"; } > "${kd}/repo/docs/k/k.kg.yaml"
+  { printf 'kind\tref\torigin\tlabel\tstate\tvia\toptions\tincoming\tactor\taction\thint\task\n'
+    printf 'seal\tQ_K_DEC\tdocs/k/k.kg.yaml:9\tx\topen\t\t\t\tfaço-eu\t\t\t\n'
+    printf 'seal\tQ_K_FIX\tdocs/k/k.kg.yaml:18\tx\topen\t\t\t\tfaço-eu\t\t\t\n'
+    printf 'seal\tQ_K_RES\tdocs/k/k.kg.yaml:27\tx\topen\t\t\t\tfaço-eu\t\t\t\n'; } > "${kd}/census.tsv"
+  cat > "${kd}/compose.json" <<'PN_KIT'
+{"panel_only": true, "questions": [
+ {"ref": "Q_K_DEC", "cite_id": "KIT-P01", "header": "Nome", "question": "Qual nome fica?", "options": [
+   {"label": "um", "description": "a"}, {"label": "dois", "description": "b"}, {"label": "tres", "description": "c"},
+   {"label": "quatro", "description": "d"}, {"label": "cinco", "description": "e"}, {"label": "seis", "description": "f"}],
+  "recommended": 3, "destination": "design",
+  "view": {"explanation": "explica", "why": "porque", "images": [{"path": "imgs/t.png", "caption": "print"}], "annotate": true,
+           "upload": {"url": "https://upload.example.invalid/r/x", "what": "o svg", "expires": "2026-12-03"}}},
+ {"ref": "Q_K_FIX", "cite_id": "KIT-C01", "kind": "verify", "question": "A correção confere?"},
+ {"ref": "Q_K_RES", "cite_id": "KIT-P02", "question": "Já decidido?", "resolved_by": "regra X do lote anterior"}
+]}
+PN_KIT
+  _kit_round() { bash "$1" round "${kd}/repo" --compose "$2" --from-tsv "${kd}/census.tsv" --today 2026-11-26 "${@:3}"; }
+  _kit_variant() {  # $1=saída  $2=expressão python sobre c (a composição)
+    python3 -I -B -c 'import sys,json; c=json.load(open(sys.argv[1])); exec(sys.argv[3]); json.dump(c,open(sys.argv[2],"w"))' "${kd}/compose.json" "$1" "$2"
+  }
+  _kit_variant "${kd}/c-5.json" 'c["panel_only"]=False; c["questions"][0]["options"].pop(); c["questions"][0]["recommended"]=0'
+  _kit_variant "${kd}/c-7.json" 'c["questions"][0]["options"].append({"label":"sete","description":"g"})'
+  _kit_variant "${kd}/c-draft.json" 'c["questions"][0]["question"]="Qual nome [A CONFIRMAR]?"'
+  _kit_variant "${kd}/c-old.json" 'c["questions"][0]["view"]["upload"]["expires"]="2026-11-25"'
+  _kit_variant "${kd}/c-query.json" 'c["questions"][0]["view"]["upload"]["url"]="https://upload.example.invalid/r/x?token=abc"'
+  _kit_variant "${kd}/c-out.json" 'c["questions"][0]["view"]["images"][0]["path"]="../census.tsv"'
+  _kit_variant "${kd}/c-fake.json" 'c["questions"][0]["view"]["images"][0]["path"]="imgs/falsa.png"'
+  _kit_variant "${kd}/c-vopt.json" 'c["questions"][1]["options"]=[{"label":"sim","description":"x"},{"label":"nao","description":"y"}]'
+  _kit_check() {  # $1=decide-panel.sh (SUT ou mutante) → lista de falhas na stdout (vazia = passou)
+    local p="$1" b="" rc st a
+    if ! _kit_round "${p}" "${kd}/compose.json" > "${kd}/round.json" 2>/dev/null; then echo "round-rc"; return; fi
+    b="$(python3 -I -B -c '
+import sys, json
+d = json.load(open(sys.argv[1])); q = {x["ref"]: x for x in d["questions"]}; bad = []
+dec = q.get("Q_K_DEC") or {"options": []}
+labs = [o["label"] for o in dec["options"]]
+if labs[:1] != ["quatro (Recomendado)"] or sum(l.endswith("(Recomendado)") for l in labs) != 1 or len(labs) != 6: bad.append("recomendada-fora-do-1o")
+if [o["label"] for o in (q.get("Q_K_FIX") or {"options": []})["options"]] != ["Confere", "Ainda não"]: bad.append("verify-opcoes")
+if "Q_K_RES" in q or [r["cite_id"] for r in d.get("resolved", [])] != ["KIT-P02"]: bad.append("resolvido-virou-pergunta")
+if dec.get("cite_id") != "KIT-P01" or not str(((dec.get("view") or {}).get("images") or [{}])[0].get("src", "")).startswith("data:image/png;base64,"): bad.append("view-ou-cite")
+print(" ".join(bad))' "${kd}/round.json" 2>&1)"
+    if _kit_round "${p}" "${kd}/compose.json" --ask >/dev/null 2>"${kd}/ask.err"; then b="${b} ask-6-aceito"; else grep -q 'Q_K_DEC (6)' "${kd}/ask.err" || b="${b} ask-sem-nome"; fi
+    local v; for v in c-5 c-7 c-draft c-old c-query c-out c-fake c-vopt; do
+      if _kit_round "${p}" "${kd}/${v}.json" >/dev/null 2>&1; then rc=0; else rc=$?; fi
+      [ "${rc}" -eq 2 ] || b="${b} ${v}-aceito-rc${rc}"
+    done
+    # round_id: view, cite_id e cabeçalho FORA do hash (troca de print não invalida); opção DENTRO (troca recusa)
+    python3 -I -B -c 'import sys,json; d=json.load(open(sys.argv[1])); q=d["questions"][0]; q["view"]["images"][0]["caption"]="outro print"; q["view"]["explanation"]="outra"; q["cite_id"]="KIT-P09"; q["header"]="Outro"; json.dump(d,open(sys.argv[2],"w"))' "${kd}/round.json" "${kd}/r-view.json"
+    python3 -I -B -c 'import sys,json; d=json.load(open(sys.argv[1])); d["questions"][0]["options"][1]["label"]="outra opcao"; json.dump(d,open(sys.argv[2],"w"))' "${kd}/round.json" "${kd}/r-opt.json"
+    a="$(python3 -I -B -c 'import sys,json; d=json.load(open(sys.argv[1])); i={q["ref"]:q["id"] for q in d["questions"]}; print(json.dumps({"answers":[{"round_id":d["round_id"],"qid":i["Q_K_DEC"],"choice":"dois","other":"","annotation":"{\"m\":1}"},{"round_id":d["round_id"],"qid":i["Q_K_FIX"],"choice":"Ainda não","other":"","note":"falta o rodapé"}]}))' "${kd}/round.json")"
+    printf '%s' "${a}" > "${kd}/ans.json"
+    : > "${pnd}/argv.log"
+    if st="$(DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${p}" seal "${kd}/r-view.json" "${kd}/ans.json" --repo "${kd}/repo" 2>/dev/null)"; then :; else b="${b} troca-de-print-invalidou"; fi
+    [ "$(tr -cd '\n' < "${pnd}/argv.log" | wc -c)" -eq 1 ] || b="${b} chamadas=$(tr -cd '\n' < "${pnd}/argv.log" | wc -c)(ainda-nao-selou?)"
+    python3 -I -B -c '
+import sys, json; it = json.loads(sys.argv[1])["items"]; d = json.load(open(sys.argv[2])); i = {q["ref"]: q["id"] for q in d["questions"]}
+dec, fix = it.get(i["Q_K_DEC"], {}), it.get(i["Q_K_FIX"], {})
+sys.exit(0 if dec.get("annotated") is True and fix.get("state") == "não confere" and fix.get("note") == "falta o rodapé" else 1)' "${st}" "${kd}/round.json" 2>/dev/null || b="${b} estado-verify-ou-anotacao"
+    if DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${p}" seal "${kd}/r-opt.json" "${kd}/ans.json" --repo "${kd}/repo" >/dev/null 2>&1; then b="${b} opcao-trocada-aceita"; fi
+    # Confere sela pelo selador com destino design; verify com nó-flag (hash recalculado como o script) é recusado
+    python3 -I -B -c 'import sys,json; d=json.load(open(sys.argv[1])); i={q["ref"]:q["id"] for q in d["questions"]}; print(json.dumps({"round_id":d["round_id"],"qid":i["Q_K_FIX"],"choice":"Confere","other":""}))' "${kd}/round.json" > "${kd}/ans-ok.json"
+    : > "${pnd}/argv.log"
+    DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${p}" seal "${kd}/round.json" "${kd}/ans-ok.json" --repo "${kd}/repo" >/dev/null 2>&1 || b="${b} confere-rc"
+    grep -qxF 'docs/k/k.kg.yaml|Q_K_FIX|--chosen|Confere|--rejected|Ainda não' <<< "$(tr '\0' '\n' < "${pnd}/argv.log" | head -6 | paste -sd'|' -)" || b="${b} confere-argv"
+    tr '\0' '\n' < "${pnd}/argv.log" | grep -qx 'design' || b="${b} confere-sem-design"
+    python3 -I -B - "${kd}/round.json" "${kd}/r-vflag.json" <<'PN_KF'
+import sys, json, hashlib
+d = json.load(open(sys.argv[1]))
+q = [x for x in d["questions"] if x["kind"] == "verify"][0]; q["seal"]["node"] = "--new"
+core = [dict({k: x.get(k) for k in ("id", "kind", "ref", "question", "allow_other", "seal")},
+             options=[{k: o.get(k) for k in ("label", "description", "cost")} for o in (x.get("options") or [])]) for x in d["questions"]]
+c = json.dumps({"questions": core, "today": d["today"], "nonce": d["nonce"]}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+d["round_id"] = hashlib.sha256(c.encode("utf-8")).hexdigest()[:16]
+json.dump(d, open(sys.argv[2], "w"), ensure_ascii=False)
+PN_KF
+    : > "${pnd}/argv.log"
+    if DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${p}" seal "${kd}/r-vflag.json" "${kd}/ans-ok.json" --repo "${kd}/repo" >/dev/null 2>&1; then rc=0; else rc=$?; fi
+    { [ "${rc}" -eq 2 ] && [ ! -s "${pnd}/argv.log" ]; } || b="${b} verify-no-flag-aceito-rc${rc}"
+    printf '%s' "${b}" | tr -s ' '
+  }
+  _kc="$(_kit_check "${pnl}")"
+  [ -z "${_kc// /}" ] || _k5="${_k5} limpo:[${_kc}]"
+  # um mutante por decisão: a âncora é trocada em TODAS as ocorrências (o round_id é calculado no round e no seal);
+  # âncora que não casa reprova o caso (mutante igual ao SUT não prova nada)
+  _km=0
+  while IFS='§' read -r _kn _ka _kb; do
+    [ -n "${_kn}" ] || continue
+    if ! python3 -I -B -c 'import sys; s=open(sys.argv[1],encoding="utf-8").read(); a=sys.argv[3]; sys.exit(1) if a not in s else open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,sys.argv[4]))' \
+         "${pnl}" "${kd}/mut/${_kn}.sh" "${_ka}" "${_kb}"; then _k5="${_k5} MUT-${_kn}-ancora"; continue; fi
+    _km=$((_km + 1))
+    [ -n "$(_kit_check "${kd}/mut/${_kn}.sh" | tr -d ' ')" ] || _k5="${_k5} MUT-${_kn}-sobreviveu"
+  done <<'PN_MUT'
+hash-com-view§'allow_other', 'seal')}§'allow_other', 'seal', 'view')}
+hash-sem-opcoes§options=[{k: o.get(k) for k in ('label', 'description', 'cost')} for o in (q.get('options') or [])]§options=[]
+recomendada-no-lugar§ol.insert(0, ol.pop(rec)); ol[0]['label'] += ' (Recomendado)'§ol[rec]['label'] += ' (Recomendado)'
+teto-sem-paridade§MAXOPT = 6 if panel_only else 4§MAXOPT = 6
+ask-sem-teto§if len(it['options']) > 4]§if False]
+ainda-nao-sela§if q['kind'] == 'verify' and ch == 'Ainda não':§if False:
+verify-sem-revalidar§if q.get('kind') not in ('seal', 'verify'): continue§if q.get('kind') != 'seal': continue
+verify-com-opcoes§if 'options' in q or 'recommended' in q: die§if False: die
+PN_MUT
+  [ "${_km}" -eq 8 ] || _k5="${_k5} mutantes-rodados=${_km}"
+  if [ -z "${_k5}" ]; then
+    record_pass "decide: (pn5) kit de revisão: só-painel até 6 opções e --ask recusa nomeado; recomendada em 1º; verify fixo (Confere sela com design, Ainda não não sela e leva a nota); resolvido recolhido; view/cite_id fora do round_id e opção dentro; rascunho, link vencido ou com query, imagem fora da pasta ou falsa recusados; (MUT) 8 mutantes reprovam"
+  else record_fail "decide: (pn5)" "${_k5}"; fi
   fi
   fi
   # ── MODO TRIAGEM EM LOTE (cláusula 10, D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111, 2026-11-11) ───────────────

@@ -46,6 +46,24 @@
 #     que a composição não cita sai em `not_asked`, nomeada (o filtro não apaga em silêncio).
 #   - teto do AskUserQuestion: 4 perguntas por rodada; a 5ª em diante vai para `deferred`, nomeada.
 #
+# Kit de revisão do hub (2026-11-26; o hub mediu 111 respostas em duas noites com decisor não técnico). Campos opcionais:
+#   {"panel_only": true, ...}       rodada só-painel: pergunta de selo com 2 a 6 opções. O `--ask` dessa rodada sai
+#                                   rc 2 nomeando cada pergunta com mais de 4 (o teto do AskUserQuestion não muda).
+#   "cite_id": "DEMO-P01"           id citável e estável entre rodadas (PREFIXO-L00[a-z]); fora do round_id.
+#   "kind": "verify"                correção para conferir, sobre linha de SELO do censo: opções fixas "Confere" (sela
+#                                   pelo selador com destination design) / "Ainda não" (não sela: "não confere").
+#   "resolved_by": "<regra ou nó>"  já resolvido pelas regras da pessoa: sai em `resolved` (recolhido), não é pergunta,
+#                                   não conta no teto, não sela.
+#   "view": {explanation, why, images: [{path|src, caption}], annotate, upload: {url, what, expires}, source_url}
+#                                   APRESENTAÇÃO, fora do round_id e nunca argumento do selador. `path` é PNG/JPEG/WebP
+#                                   dentro da pasta da composição, até 96 KiB, embutido; maior vai pelo asset store do
+#                                   Artifact como `src` /_blob/<id>. `upload` é só um link https sem query, com prazo
+#                                   (expires >= hoje), criado fora do painel: a página não recebe arquivo nem credencial.
+#   Texto com "[A CONFIRMAR]" recusa a rodada. O round_id cobre só o que sela: id, tipo, ref, pergunta, opções, texto
+#   livre e o selo, mais data e nonce: trocar um print não invalida a resposta, trocar uma opção invalida.
+#   A resposta pode levar "annotation" (estado do marker.js) e "note" (nota do Ainda não): o estado do item sai com
+#   annotated/note para a sessão LER; nenhum dos dois vira argumento do selador.
+#
 # Resposta (o painel grava em answers/<qN>; dado NÃO CONFIÁVEL, como o structuredContent do Apps SDK):
 #   {"round_id": "...", "qid": "q1", "choice": "<rótulo exato>", "other": "<texto livre>"}
 #   - round_id que não é o da rodada local → recusada (rodada velha ou forjada);
@@ -103,8 +121,16 @@ case "${MODE}" in
       fi
     fi
     PYTHONDONTWRITEBYTECODE=1 python3 -I -B - round "${TMPD}/census.tsv" "${COMPOSE}" "${ASK}" "${TODAY}" "${DECIDE_PANEL_NONCE:-}" <<'PY'
-import sys, json, hashlib, uuid
+import sys, os, json, hashlib, uuid, base64
 _, census, compose, ask, today, nonce = sys.argv[1:7]
+def round_id(qs, today, nonce):
+    # o round_id cobre SÓ o que sela (decisão do core, 2026-11-26): id, tipo, ref, pergunta, opções, texto livre e o
+    # destino do selo, mais a data e o nonce. Cabeçalho, cite_id, view (imagens, explicação, link de envio), origem e
+    # card ficam fora: trocar um print não invalida a resposta já dada.
+    core = [dict({k: q.get(k) for k in ('id', 'kind', 'ref', 'question', 'allow_other', 'seal')},
+                 options=[{k: o.get(k) for k in ('label', 'description', 'cost')} for o in (q.get('options') or [])]) for q in qs]
+    canon = json.dumps({'questions': core, 'today': today, 'nonce': nonce}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
 nonce = nonce or uuid.uuid4().hex
 def die(m): print(f'decide-panel: {m}', file=sys.stderr); sys.exit(2)
 import re
@@ -122,31 +148,110 @@ try:
 except Exception as e: die(f'composição ilegível: {e}')
 qs = comp.get('questions') if isinstance(comp, dict) else None
 if not isinstance(qs, list) or not qs: die('composição sem "questions" (lista não vazia)')
+panel_only = comp.get('panel_only', False)
+if not isinstance(panel_only, bool): die('panel_only é true ou false')
+MAXOPT = 6 if panel_only else 4   # só-painel libera até 6; com paridade de terminal, o teto é o do AskUserQuestion
 BAD = ('«', '»', '|')
-def clean(s, what, n=None):
+DRAFT = re.compile(r'\[\s*a\s+confirmar\s*\]', re.I)
+def clean(s, what, n=None, bad=BAD):
     if not isinstance(s, str) or not s.strip(): die(f'{what} vazio ou não-texto')
     s = ' '.join(s.split())
-    if any(b in s for b in BAD): die(f'{what} com « » ou | (o selador recusaria; o | separa as descartadas): {s[:80]}')
+    if DRAFT.search(s): die(f'{what} com marcador de rascunho [A CONFIRMAR]: rodada não sai com texto por confirmar')
+    if any(b in s for b in bad): die(f'{what} com « » ou | (o selador recusaria; o | separa as descartadas): {s[:80]}')
     if n and len(s) > n: die(f'{what} passa de {n} caracteres: {s}')
     return s
+CITE = re.compile(r'[A-Z][A-Z0-9]{1,9}-[A-Z][0-9]{2,3}[a-z]?')
+cdir = os.path.dirname(os.path.realpath(compose))
+IMG_MAX = 96 * 1024   # embutida no round (o documento do db tem teto de 256 KiB); maior vai pelo asset store
+MAGIC = ((b'\x89PNG\r\n\x1a\n', 'image/png'), (b'\xff\xd8\xff', 'image/jpeg'))
+def view_of(v, ref):
+    # bloco de APRESENTAÇÃO: fica fora do round_id e nunca vira argumento do selador
+    if v is None: return None
+    if not isinstance(v, dict): die(f'{ref}: view não é objeto')
+    extra = set(v) - {'explanation', 'why', 'images', 'annotate', 'upload', 'source_url'}
+    if extra: die(f'{ref}: view com campo desconhecido: {sorted(extra)}')
+    out = {}
+    if 'explanation' in v: out['explanation'] = clean(v['explanation'], f'{ref}: view.explanation', 1200, ())
+    if 'why' in v: out['why'] = clean(v['why'], f'{ref}: view.why', 400, ())
+    if 'source_url' in v:
+        u = v['source_url']
+        if not (isinstance(u, str) and re.fullmatch(r'https://[^\s@/]+/\S*', u)): die(f'{ref}: view.source_url só https://, sem credencial no host')
+        out['source_url'] = u
+    imgs = v.get('images', [])
+    if not isinstance(imgs, list) or len(imgs) > 6: die(f'{ref}: view.images é lista de até 6')
+    ol = []
+    for k, im in enumerate(imgs):
+        if not isinstance(im, dict) or set(im) - {'path', 'src', 'caption'} or ('path' in im) == ('src' in im):
+            die(f'{ref}: imagem {k + 1} leva path OU src (e caption opcional)')
+        cap = clean(im['caption'], f'{ref}: legenda {k + 1}', 160, ()) if 'caption' in im else ''
+        if 'src' in im:
+            s = im['src']
+            if not (isinstance(s, str) and re.fullmatch(r'/_blob/[A-Za-z0-9_-]+|https://[^\s@/]+/\S*', s)):
+                die(f'{ref}: imagem {k + 1}: src só /_blob/<id> (asset store) ou https://')
+            ol.append({'src': s, 'caption': cap}); continue
+        p = os.path.realpath(os.path.join(cdir, str(im['path'])))
+        if not p.startswith(cdir + os.sep) or not os.path.isfile(p): die(f'{ref}: imagem {k + 1} fora da pasta da composição ou inexistente: {im["path"]}')
+        b = open(p, 'rb').read(IMG_MAX + 1)
+        if len(b) > IMG_MAX: die(f'{ref}: imagem {k + 1} passa de {IMG_MAX // 1024} KiB — suba pelo asset store do Artifact e use src /_blob/<id>')
+        mt = next((m for sig, m in MAGIC if b.startswith(sig)), 'image/webp' if b[:4] == b'RIFF' and b[8:12] == b'WEBP' else None)
+        if not mt: die(f'{ref}: imagem {k + 1} não é PNG, JPEG nem WebP (pela assinatura do arquivo)')
+        ol.append({'src': f'data:{mt};base64,' + base64.b64encode(b).decode('ascii'), 'caption': cap or os.path.basename(p)})
+    if ol: out['images'] = ol
+    if 'annotate' in v:
+        if not isinstance(v['annotate'], bool): die(f'{ref}: view.annotate é true ou false')
+        if v['annotate'] and not ol: die(f'{ref}: view.annotate sem imagem')
+        out['annotate'] = v['annotate']
+    if 'upload' in v:
+        u = v['upload']
+        if not isinstance(u, dict) or set(u) != {'url', 'what', 'expires'}: die(f'{ref}: view.upload leva url, what e expires (o link tem prazo)')
+        if not (isinstance(u['url'], str) and re.fullmatch(r'https://[^\s@/?#]+/[^\s?#]*', u['url'])):
+            die(f'{ref}: view.upload.url só https:// sem credencial, sem query e sem fragmento (nada de segredo na página)')
+        if not (isinstance(u['expires'], str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', u['expires'])) or u['expires'] < today:
+            die(f'{ref}: view.upload.expires AAAA-MM-DD, hoje ou depois (link vencido não vai para a página)')
+        out['upload'] = {'url': u['url'], 'what': clean(u['what'], f'{ref}: view.upload.what', 200, ()), 'expires': u['expires']}
+    return out or None
 ACT_OPTS = {
   'faço-eu': [('Eu faço agora (Recomendado)', 'a sessão roda o comando abaixo agora e reporta o rc'), ('Me dê o passo a passo', 'você recebe o card e faz à mão'), ('Depois', 'fica em voo, nomeado no relatório')],
   'maestro-com-!': [('Me dê o passo a passo (Recomendado)', 'o veto barra a sessão: o card traz os comandos com o prefixo de bang'), ('Já fiz, confira', 'a sessão roda a conferência do card e reporta'), ('Depois', 'fica em voo, nomeado no relatório')],
   'maestro-fora': [('Me dê o passo a passo (Recomendado)', 'falta à sessão o que o ato pede: o card diz onde rodar'), ('Já fiz, confira', 'a sessão roda a conferência do card e reporta'), ('Depois', 'fica em voo, nomeado no relatório')],
 }
+# CONFERIR uma correção: opções fixas, como as do ATO (não se compõem); sem recomendada, quem confere é a pessoa
+VERIFY_OPTS = [('Confere', 'a correção está certa: sela o nó como conferido por você'), ('Ainda não', 'volta para a sessão corrigir; não sela')]
 byref = {}
 for r in rows: byref.setdefault(r['ref'], r)
-out, used = [], set()
+out, used, cites, resolved = [], set(), set(), []
 for i, q in enumerate(qs):
     if not isinstance(q, dict): die(f'pergunta {i + 1} não é objeto')
     ref = q.get('ref')
     if not isinstance(ref, str) or ref not in byref: die(f'pergunta {i + 1}: ref {ref!r} não está no censo desta rodada — não se pergunta sobre o que não foi medido')
     if ref in used: die(f'ref repetido na composição: {ref}')
     used.add(ref); r = byref[ref]
+    cite = q.get('cite_id')
+    if cite is not None:
+        if not (isinstance(cite, str) and CITE.fullmatch(cite)): die(f'{ref}: cite_id fora da forma PREFIXO-L00 (ex.: DEMO-P01, DEMO-P01b)')
+        if cite in cites: die(f'cite_id repetido na composição: {cite}')
+        cites.add(cite)
     question = clean(q.get('question'), f'pergunta {i + 1}: question')
-    if r['kind'] == 'seal':
+    view = view_of(q.get('view'), ref)
+    if q.get('resolved_by') is not None:   # já resolvido por regra: recolhido, NÃO é pergunta, não conta, não sela
+        if 'options' in q or q.get('kind') is not None: die(f'{ref}: item resolvido por regra não leva options nem kind (não é pergunta)')
+        resolved.append({'ref': ref, 'cite_id': cite, 'question': question,
+                         'resolved_by': clean(q['resolved_by'], f'{ref}: resolved_by', 400, ()), 'view': view})
+        continue
+    kind = q.get('kind')
+    if kind not in (None, 'verify'): die(f'{ref}: kind só "verify" (selo e ato saem da linha do censo)')
+    if kind == 'verify':
+        if r['kind'] != 'seal': die(f'{ref}: verify só sobre linha de selo do censo (o nó da correção)')
+        if 'options' in q or 'recommended' in q: die(f'{ref}: as opções de verify são fixas (Confere / Ainda não), não se compõem')
+        if q.get('destination', 'design') != 'design' or 'guard' in q: die(f'{ref}: verify sela com destination design, sem guard (é conferência da pessoa)')
+        ol = [{'label': l, 'description': d, 'cost': '', 'recommended': False} for l, d in VERIFY_OPTS]
+        item = {'kind': 'verify', 'ref': ref, 'header': clean(q.get('header') or 'Correção', f'{ref}: header', 12), 'question': question,
+                'options': ol, 'allow_other': False, 'actor': 'faço-eu',
+                'seal': {'graph': r['origin'].rsplit(':', 1)[0], 'node': ref, 'destination': 'design'}, 'origin': r['origin'], 'card': ''}
+    elif r['kind'] == 'seal':
         opts = q.get('options')
-        if not isinstance(opts, list) or not 2 <= len(opts) <= 4: die(f'{ref}: 2 a 4 opções (teto do AskUserQuestion)')
+        if not isinstance(opts, list) or not 2 <= len(opts) <= MAXOPT:
+            die(f'{ref}: 2 a {MAXOPT} opções' + (' (só-painel)' if panel_only else ' (teto do AskUserQuestion; só-painel libera até 6 com "panel_only": true)'))
         ol = []
         for j, o in enumerate(opts):
             if not isinstance(o, dict): die(f'{ref}: opção {j + 1} não é objeto')
@@ -157,7 +262,7 @@ for i, q in enumerate(qs):
         rec = q.get('recommended')
         if rec is not None:
             if not isinstance(rec, int) or isinstance(rec, bool) or not 0 <= rec < len(ol): die(f'{ref}: recommended fora do intervalo')
-            ol.insert(0, ol.pop(rec)); ol[0]['label'] += ' (Recomendado)'
+            ol.insert(0, ol.pop(rec)); ol[0]['label'] += ' (Recomendado)'   # a sugestão do agente é a 1ª opção, sempre
         for o in ol: o['recommended'] = o['label'].endswith(' (Recomendado)')
         if len({o['label'].casefold() for o in ol}) != len(ol): die(f'{ref}: rótulos repetidos')
         g = r['origin'].rsplit(':', 1)[0]
@@ -178,25 +283,32 @@ for i, q in enumerate(qs):
         ol = [{'label': l, 'description': d, 'cost': '', 'recommended': l.endswith(' (Recomendado)')} for l, d in ACT_OPTS[actor]]
         item = {'kind': 'act', 'ref': ref, 'header': header, 'question': question, 'options': ol, 'allow_other': False,
                 'actor': actor, 'seal': None, 'origin': r['origin'], 'card': r.get('action') or ''}
+    item['cite_id'] = cite
+    item['view'] = view
     out.append(item)
 # a ordem é a do CENSO (bloqueio → atenção, cláusula 4), nunca a da composição
 pos = {}
 for k, r in enumerate(rows): pos.setdefault(r['ref'], k)
 out.sort(key=lambda it: pos[it['ref']])
+resolved.sort(key=lambda it: pos[it['ref']])
 rnd, deferred = out[:4], out[4:]
 for k, it in enumerate(rnd): it['id'] = f'q{k + 1}'
-canon = json.dumps({'questions': rnd, 'today': today, 'nonce': nonce}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))   # data e nonce entram no hash
-rid = hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
+rid = round_id(rnd, today, nonce)   # só o que sela entra no hash; cite_id, view e cabeçalho ficam fora
 def ask_desc(o): return o['description'] + (f' · custo: {o["cost"]}' if o['cost'] else '')
 if ask == '1':
+    wide = [f"{it['ref']} ({len(it['options'])})" for it in rnd if len(it['options']) > 4]
+    if wide: die('--ask: o AskUserQuestion aceita até 4 opções; esta rodada só-painel tem mais em: ' + ', '.join(wide) + ' — responda no painel ou recomponha com até 4')
     print(json.dumps({'questions': [{'question': it['question'], 'header': it['header'], 'multiSelect': False,
                                      'options': [{'label': o['label'], 'description': ask_desc(o)} for o in it['options']]} for it in rnd]},
                      ensure_ascii=False, indent=2))
     sys.exit(0)
-panel = {'schema': 'onion.decide.panel/v1', 'round_id': rid, 'today': today, 'nonce': nonce, 'questions': rnd,
-         'deferred': [f"{it['kind']}:{it['ref']}" for it in deferred],
+panel = {'schema': 'onion.decide.panel/v1', 'round_id': rid, 'today': today, 'nonce': nonce, 'panel_only': panel_only, 'questions': rnd,
+         'resolved': resolved,
+         'deferred': [f"{it['kind']}:{it['ref']}" + (f" [{it['cite_id']}]" if it['cite_id'] else '') for it in deferred],
          'not_asked': [f"{r['kind']}:{r['ref']} ({r.get('actor', '')})" for r in rows if r['ref'] not in used]}
-print(json.dumps(panel, ensure_ascii=False, indent=2))
+s = json.dumps(panel, ensure_ascii=False, indent=2)
+if len(s.encode('utf-8')) > 240 * 1024: die(f'round com {len(s.encode("utf-8")) // 1024} KiB passa do teto do documento do db (256 KiB): suba as imagens pelo asset store (src /_blob/<id>)')
+print(s)
 PY
     ;;
   seal)
@@ -218,19 +330,26 @@ PY
     PYTHONDONTWRITEBYTECODE=1 python3 -I -B - seal "${ROUND}" "${ANS}" "${SEAL}" "${OTHERS}" "${DRY}" "${SREPO}" "${ONLY}" <<'PY'
 import sys, os, json, hashlib, subprocess, glob
 _, roundp, ansp, seal, others, dry, srepo, only = sys.argv[1:9]
+def round_id(qs, today, nonce):
+    # o round_id cobre SÓ o que sela (decisão do core, 2026-11-26): id, tipo, ref, pergunta, opções, texto livre e o
+    # destino do selo, mais a data e o nonce. Cabeçalho, cite_id, view (imagens, explicação, link de envio), origem e
+    # card ficam fora: trocar um print não invalida a resposta já dada.
+    core = [dict({k: q.get(k) for k in ('id', 'kind', 'ref', 'question', 'allow_other', 'seal')},
+                 options=[{k: o.get(k) for k in ('label', 'description', 'cost')} for o in (q.get('options') or [])]) for q in qs]
+    canon = json.dumps({'questions': core, 'today': today, 'nonce': nonce}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
 srepo = os.path.realpath(srepo)
 def die(m): print(f'decide-panel: {m}', file=sys.stderr); sys.exit(2)
 try: rd = json.load(open(roundp, encoding='utf-8'))
 except Exception as e: die(f'round ilegível: {e}')
 if not isinstance(rd, dict) or rd.get('schema') != 'onion.decide.panel/v1': die('round não é onion.decide.panel/v1')
 qs = rd.get('questions') or []
-canon = json.dumps({'questions': qs, 'today': rd.get('today'), 'nonce': rd.get('nonce')}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
-if hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16] != rd.get('round_id'): die('round adulterado: o round_id não é o hash das perguntas — recuso selar a partir dele')
+if round_id(qs, rd.get('today'), rd.get('nonce')) != rd.get('round_id'): die('round adulterado: o round_id não é o hash das perguntas — recuso selar a partir dele')
 byq = {q['id']: q for q in qs}
 import re
 if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(rd.get('today'))): die('round sem data AAAA-MM-DD')
 for q in qs:   # defesa em profundidade: o nó é um id (nunca uma flag), e o grafo é relativo, dentro da raiz, e existe
-    if q.get('kind') != 'seal': continue
+    if q.get('kind') not in ('seal', 'verify'): continue   # verify também sela: o nó dele passa pela mesma checagem
     if not re.fullmatch(r'[A-Z][A-Z0-9_]*', str((q.get('seal') or {}).get('node'))): die(f"{q.get('id')}: nó do selo fora de [A-Z][A-Z0-9_]* — recuso (viraria flag do selador)")
     g = (q.get('seal') or {}).get('graph') or ''
     gp = os.path.realpath(os.path.join(srepo, g))
@@ -282,6 +401,8 @@ for q in qs:
             status[qid] = {'state': 'ambígua', 'detail': 'texto livre num ATO: a sessão lê e pergunta de novo'}; continue
         if qid not in allow_other:
             status[qid] = {'state': 'aguarda leitura', 'detail': f'resposta livre: a sessão lê o texto e só sela com --other {qid}', 'other': ot[:500]}; continue
+    if q['kind'] == 'verify' and ch == 'Ainda não':
+        status[qid] = {'state': 'não confere', 'detail': 'a pessoa não deu a correção por certa: volta para a sessão corrigir'}; continue
     if q['kind'] == 'act':
         st = {'Eu faço agora (Recomendado)': 'executar', 'Me dê o passo a passo': 'card pendente',
               'Me dê o passo a passo (Recomendado)': 'card pendente', 'Já fiz, confira': 'conferir', 'Depois': 'depois'}.get(ch, 'ambígua')
@@ -301,6 +422,10 @@ for q in qs:
     tail = ' '.join((r.stderr or r.stdout).split())[-300:]
     status[qid] = ({'state': 'selado', 'detail': f"{q['seal']['node']} em {q['seal']['graph']}"} if r.returncode == 0
                    else {'state': 'recusada pelo selador', 'detail': f'rc {r.returncode}: {tail}'})
+for qid, a in ans.items():   # anotação no print e nota livre: DADO para a sessão ler, nunca argumento do selador
+    if not a or qid not in status: continue
+    if isinstance(a.get('annotation'), str) and a['annotation'].strip(): status[qid]['annotated'] = True
+    if isinstance(a.get('note'), str) and a['note'].strip(): status[qid]['note'] = ' '.join(a['note'].split())[:500]
 for v in status.values(): v['round_id'] = rd['round_id']   # o painel só mostra o estado da rodada dele
 print(json.dumps({'schema': 'onion.decide.status/v1', 'round_id': rd['round_id'], 'items': status}, ensure_ascii=False, indent=2))
 PY
