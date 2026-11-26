@@ -2222,7 +2222,79 @@ nodes:
       locator: "pergunta com opções de 2026-11-26: «Montamos a Persona com esse desenho?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-26"
       locality: "pessoa"
+  - id: T_PERSONA_VSM_S4
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-26"
+    provenance:
+      source: "os nós E_VSM_* deste grafo, ancorados na fonte viable-system-model"
+      locator: "E_VSM_S5_CHOOSES_S4_OPTIONS e E_VSM_S5_BALANCES_NOW_FUTURE"
+      method: "reading: o código e a sua definição lidos nos nós deste grafo"
+      locality: "repo"
+    label: "S4 neste grafo é o Sistema 4 do Viable System Model (Beer): a função que olha o ambiente e o futuro e propõe opções."
+    x_term:
+      pref: "Sistema 4 do VSM"
+      notation: "S4"
+      scheme: vsm
+      lang: pt-BR
+      definition: "Sistema 4 do Viable System Model de Stafford Beer: inteligência, olha o ambiente e o futuro e propõe opções; quem escolhe entre elas é o Sistema 5."
+  - id: T_PERSONA_PERGUNTA_Q2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-26"
+    provenance:
+      source: "Q_ONION_EVOLVE_PERSONA_2026_11 e a objeção da rodada 1 que tem a Pergunta (2) como alvo"
+      locator: "E_LACUNAS_ONION_EVOLVE_PERSONA_1126 e C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126"
+      method: "reading: o código e a sua definição lidos nos nós deste grafo"
+      locality: "repo"
+    label: "Q2 neste grafo é a Pergunta (2) da pesquisa: a autodescoberta de cerca de 30 ciclos antes de a Persona começar."
+    x_term:
+      pref: "Pergunta (2) da pesquisa da Persona"
+      notation: "Q2"
+      scheme: persona-pergunta
+      lang: pt-BR
+      definition: "Pergunta (2) de Q_ONION_EVOLVE_PERSONA_2026_11: a autodescoberta de cerca de 30 ciclos antes de começar; alvo de objeção bloqueante do Elenxo na rodada 1."
+  - id: T_PERSONA_ELENXO_R2_E3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-11-26"
+    provenance:
+      source: "o critério pré-registrado da objeção do Elenxo da rodada 2 sobre o descarte da claim do arXiv"
+      locator: "C_ELENXO_PERSONA_R2_RECOMMENDATION_1126"
+      method: "reading: o código e a sua definição lidos nos nós deste grafo"
+      locality: "repo"
+    label: "E3 neste grafo é o critério pré-registrado E3_DESCARTE_SEM_MEDIDA do Elenxo da rodada 2 da Persona."
+    x_term:
+      pref: "E3 descarte sem medida"
+      notation: "E3"
+      scheme: elenxo-persona-r2
+      lang: pt-BR
+      definition: "Critério pré-registrado do Elenxo da rodada 2 da Persona: uma claim descartada inteira sem medida que justifique o descarte volta como objeção."
 edges:
+  - from: T_PERSONA_VSM_S4
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: T_PERSONA_PERGUNTA_Q2
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: T_PERSONA_ELENXO_R2_E3
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
   - from: E_MJ_USER_PERMISSION_HARD_CEILING
     to: Q_ONION_EVOLVE_PERSONA_2026_11
     edge_type: TRACES_TO
