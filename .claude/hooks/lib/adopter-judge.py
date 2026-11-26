@@ -366,15 +366,12 @@ def _adv_dispatch(words, base, depth, env, args, detail):
                              else _ao.path.normpath(_ao.path.join(prev, _ao.path.expanduser(tgt)))))
         else:
             _ADV_CDS.append((len(CWD), UNKNOWN))
-    if base == "eval":                                # o lib só julga o eval pela forma de merge/push
-        txt = " ".join(args)
-        if DYNAMIC.search(txt):
+    if base == "eval":
+        # o eval LITERAL o lib analisa por si como `sh -c` (SAC-551, 2026-11-25), depois deste juiz, e o inanalisável
+        # cai no except do lib, que chama moat_unanalyzable com a string inteira; re-analisar aqui julgava o texto
+        # duas vezes e deixava a linha do lib sem carga (o mutante d6 sobrevivia). Aqui fica só o texto de runtime.
+        if DYNAMIC.search(" ".join(args)):
             moat_unanalyzable(words, "eval de texto só conhecido em runtime")
-        else:
-            try:
-                scoped(txt, depth + 1)
-            except Unanalyzable:
-                moat_unanalyzable(words, "eval inanalisável")
         return
     if base in RUNNERS:                               # watch/flock/nice… com um escritor depois; su -c com texto
         for j, w in enumerate(args, 1):

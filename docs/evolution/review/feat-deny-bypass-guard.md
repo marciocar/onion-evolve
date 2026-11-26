@@ -2,8 +2,8 @@
 branch: feat/deny-bypass-guard
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: d316b329928380706c7abb3c52f32e01a814017a9ade80e6958d8361e7b226f3
-reviewed_code_sha256: d7cc6dac9a6712338a3c11869c5bfab452ab26dfa56eb87b06cc214ff72a2f0d
+reviewed_diff_sha256: 86c8c903a87a5c57885a1636c14f43c35cb3b3e05e4e8342b0dd9c62aa1c4516
+reviewed_code_sha256: 2bf47c94b6e5621bd21bc85356124fadd91e49385f54f02ab714206cd19da8c9
 findings_total: 17
 findings_real: 17
 findings_blocking: 4
@@ -80,3 +80,17 @@ da home; relevant_mirror no eval dinâmico; gh repo delete; subcomando do git; `
 Camada de conformidade, não fronteira de segurança: análise estática não fecha `eval "$X"` opaco, script em arquivo
 nem outra linguagem. Fora de propósito (guard-doctrine): `reset --hard`, `--force-with-lease` de branch de trabalho,
 `rm -rf` de pasta de trabalho, apagar branch remota de trabalho (apagar a main remota o merge-gate já veta).
+
+## Re-revisão: o CI reprovou duas guardas do selftest (2026-11-25)
+
+1. **`adopter-guard: (m) (d6)` — o mutante sobrevivia.** O juiz do adotante (`lib/adopter-judge.py`) roda em
+   `moat_command`, ANTES do ramo `eval` do lib (`lib/invocation-lines.sh`), e os dois faziam `scoped(txt)` do
+   eval literal. Com o lib analisando o eval por si (esta PR), tirar a análise do juiz não mudava nada: o texto era
+   julgado duas vezes e a linha mutada não carregava o veto. Cura: o juiz deixa o eval literal para o lib e fica só
+   com o texto de runtime (`moat_unanalyzable`); o inanalisável cai no `except` do lib, que já chama
+   `moat_unanalyzable` com a string inteira. O mutante (d6) passou para a linha que agora carrega o comportamento,
+   `if txt and not DYNAMIC.search(txt):` do lib → `if False:`. O caso não foi apagado.
+2. **`veto-onfailure: (c) dispatcher — n=11`.** O caso tira o `onFailure` de todos os vetos PreToolUse e espera a
+   REGRA 101 em cada um; o `pretooluse-deny-mirror.sh` é o 11º veto, e o número fixo era 10. Cura: o caso exige 11
+   e nomeia o deny-mirror, como nomeia os outros.
+

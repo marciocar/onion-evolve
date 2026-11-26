@@ -50498,8 +50498,8 @@ run_veto_onfailure_selftests() {
   #     5 vetos PreToolUse e do PreModelSwitch), emite a REGRA 101 para os 6 — e não para o kg-read-leg (aviso)
   #     (o 6º é o pretooluse-moat-gate.sh, de 2026-10-13; o 7º o pretooluse-memory-write-guard.sh, o 8º o
   #     pretooluse-plugin-write-guard.sh e o 9º o pretooluse-adopter-guard.sh, os três de 2026-11-05, e o 10º o
-  #     pretooluse-subagent-background-wait.sh, de 2026-11-12: o número sobe
-  #     junto com o settings.json)
+  #     pretooluse-subagent-background-wait.sh, de 2026-11-12, e o 11º o pretooluse-deny-mirror.sh, de 2026-11-25
+  #     (SAC-551): o número sobe junto com o settings.json)
   #     nem para o PostModelSwitch, que roda o mesmo script mas não veta nada.
   local sd; sd="$(TMPDIR=/tmp mktemp -d)"
   python3 -I -B -c 'import json,sys; d=json.load(open(sys.argv[1]))
@@ -50509,14 +50509,15 @@ for ev in ("PreToolUse", "PreModelSwitch"):
 json.dump(d, open(sys.argv[2], "w"), indent=2)' "${REPO_ROOT}/.claude/settings.json" "${sd}/settings.json"
   local l; l="$(cd "${REPO_ROOT}" && ONION_SETTINGS_JSON="${sd}/settings.json" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/settings.json" 2>&1 || true)"
   local n; n="$(grep -c 'REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): \[veto-sem-onfailure\]' <<< "${l}" || true)"
-  if [ "${n}" -eq 10 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+  if [ "${n}" -eq 11 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+     && grep -q 'REGRA 101.*PreToolUse/pretooluse-deny-m' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-subagent-b' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-moat-g' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-memory-w' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-plugin' <<< "${l}" \
      && grep -q 'REGRA 101.*PreToolUse/pretooluse-adopter-g' <<< "${l}" \
      && ! grep -q 'REGRA 101.*kg-read-leg' <<< "${l}" && ! grep -q 'REGRA 101.*PostModelSwitch' <<< "${l}"; then
-    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 10 vetos de antes da cura (9 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
+    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 11 vetos de antes da cura (10 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
   else record_fail "veto-onfailure: (c) dispatcher" "n=${n}; $(grep -E 'REGRA 101' <<< "${l}" | head -4 | cut -c1-160 | tr '\n' '|')"; fi
   rm -rf "${sd}"
   # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove
@@ -50847,7 +50848,7 @@ print(json.dumps({"tool_name":t,"cwd":os.environ["C"],"tool_input":({"command":a
 (c3) o redirecionamento volta a não se julgar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    _adv_redirects(raw_words, detail)$(printf '\x1f')    pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')echo x > @CORE@/NOTE.md$(printf '\x1f')
 (c5) o Write volta a não comparar o repo$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')      if [ "\$(_common "\$(realpath -m -- "\$r")")" = "\$c" ]; then$(printf '\x1f')      if false; then$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Write$(printf '\x1f')@CORE@/NOTE.md$(printf '\x1f')
 (d4) o cd condicional volta a deixar o repo desconhecido$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')    if where == UNKNOWN and _adv_last_cd() and "-C" not in gw:$(printf '\x1f')    if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')cd .. && cd @CORE@ && git commit -m x$(printf '\x1f')
-(d6) o eval volta a não se analisar$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')                scoped(txt, depth + 1)$(printf '\x1f')                pass$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')eval "git -C @CORE@ commit -m x"$(printf '\x1f')
+(d6) o eval volta a não se analisar$(printf '\x1f')lib/invocation-lines.sh$(printf '\x1f')        if txt and not DYNAMIC.search(txt):$(printf '\x1f')        if False:$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Bash$(printf '\x1f')eval "git -C @CORE@ commit -m x"$(printf '\x1f')
 (d12) a própria lista volta a ser escrevível$(printf '\x1f')pretooluse-adopter-guard.sh$(printf '\x1f')    [ "\$p" = "\$(realpath -m -- "\$selftsv" 2>/dev/null)" ] && deny_list "\${tool} em \${fpath}"$(printf '\x1f')    :$(printf '\x1f')${A}$(printf '\x1f')2$(printf '\x1f')Write$(printf '\x1f')@R@/.claude/adopter-guard.tsv$(printf '\x1f')
 (e11) o cd dinâmico volta a herdar o cd anterior$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f')            _ADV_CDS.append((len(CWD), UNKNOWN))$(printf '\x1f')            pass$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')cd @CORE@; T=\$(mktemp -d); cd \$T; git init -q .; mkdir -p docs/x$(printf '\x1f')
 (e12) o alvo com | volta a ser arquivo$(printf '\x1f')lib/adopter-judge.py$(printf '\x1f') and not _ar.search(r"[|;&<>()]", tgt):$(printf '\x1f'):$(printf '\x1f')${A}$(printf '\x1f')0$(printf '\x1f')Bash$(printf '\x1f')cd @CORE@; grep -lnE '>>|jsonl|append' f.md$(printf '\x1f')
