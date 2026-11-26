@@ -59116,7 +59116,7 @@ d["round_id"] = hashlib.sha256(c.encode("utf-8")).hexdigest()[:16]; json.dump(d,
     : > "${pnd}/argv.log"
     DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${p}" seal "${kd}/round.json" "${kd}/ans-ok.json" --repo "${kd}/repo" >/dev/null 2>&1 || b="${b} confere-rc"
     grep -qxF 'docs/k/k.kg.yaml|Q_K_FIX|--chosen|Confere|--rejected|Ainda não' <<< "$(tr '\0' '\n' < "${pnd}/argv.log" | head -6 | paste -sd'|' -)" || b="${b} confere-argv"
-    tr '\0' '\n' < "${pnd}/argv.log" | grep -qx 'design' || b="${b} confere-sem-design"
+    grep -qx 'design' <<< "$(tr '\0' '\n' < "${pnd}/argv.log")" || b="${b} confere-sem-design"
     python3 -I -B - "${kd}/round.json" "${kd}/r-vflag.json" <<'PN_KF'
 import sys, json, hashlib
 d = json.load(open(sys.argv[1]))

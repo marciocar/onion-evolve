@@ -68,6 +68,9 @@ do revisor (FINAL antigo, enviado sem estado aberto, estado ignorando o round_id
 marcador do trecho a pn6 reprova. Custo `5` e `0` aceitos, `[A CONFIRMAR]` no custo segue recusado. Nits sem ação:
 custo booleano ou objeto vira texto (o custo nunca vira argumento do selador).
 
+Depois da rodada 3, o pré-voo do `pr-finalize` (família shell_pipefail_robustness) barrou um `tr … | grep -qx` na pn5
+(classe EPIPE sob pipefail); virou here-string. Só a bancada mudou, sem efeito no código revisado.
+
 ## Fora deste PR (declarado)
 
 - `history/<cite_id>` e `feedback/<cite_id>` (respostas e sinal de retreino entre rodadas) — ordem 2 e 3 do mapa
