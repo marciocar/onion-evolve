@@ -59,8 +59,10 @@
 #                                   dentro da pasta da composição, até 96 KiB, embutido; maior vai pelo asset store do
 #                                   Artifact como `src` /_blob/<id>. `upload` é só um link https sem query, com prazo
 #                                   (expires >= hoje), criado fora do painel: a página não recebe arquivo nem credencial.
-#   Texto com "[A CONFIRMAR]" recusa a rodada. O round_id cobre só o que sela: id, tipo, ref, pergunta, opções, texto
-#   livre e o selo, mais data e nonce: trocar um print não invalida a resposta, trocar uma opção invalida.
+#   Texto com "[A CONFIRMAR]" recusa a rodada. O round_id cobre o que sela ou vira ato: id, tipo, ref, pergunta, opções,
+#   texto livre, selo, classe e card do ato e origem, mais data e nonce. Fora fica só a apresentação (cabeçalho,
+#   cite_id, view): trocar um print não invalida a resposta, trocar uma opção ou o card invalida. O seal aceita também
+#   o hash da rodada emitida antes do kit (a pergunta inteira, que cobre mais).
 #   A resposta pode levar "annotation" (estado do marker.js) e "note" (nota do Ainda não): o estado do item sai com
 #   annotated/note para a sessão LER; nenhum dos dois vira argumento do selador.
 #
@@ -122,14 +124,21 @@ case "${MODE}" in
     fi
     PYTHONDONTWRITEBYTECODE=1 python3 -I -B - round "${TMPD}/census.tsv" "${COMPOSE}" "${ASK}" "${TODAY}" "${DECIDE_PANEL_NONCE:-}" <<'PY'
 import sys, os, json, hashlib, uuid, base64
+from datetime import date
 _, census, compose, ask, today, nonce = sys.argv[1:7]
 def round_id(qs, today, nonce):
-    # o round_id cobre SÓ o que sela (decisão do core, 2026-11-26): id, tipo, ref, pergunta, opções, texto livre e o
-    # destino do selo, mais a data e o nonce. Cabeçalho, cite_id, view (imagens, explicação, link de envio), origem e
-    # card ficam fora: trocar um print não invalida a resposta já dada.
-    core = [dict({k: q.get(k) for k in ('id', 'kind', 'ref', 'question', 'allow_other', 'seal')},
+    # o round_id cobre o que sela ou vira ato (decisão do core, 2026-11-26): id, tipo, ref, pergunta, opções, texto
+    # livre, o selo, a classe e o card do ato (o comando que a sessão roda no "executar") e a origem, mais a data e o
+    # nonce. Fica FORA só a apresentação: cabeçalho, cite_id e view (imagens, explicação, link de envio): trocar um
+    # print não invalida a resposta já dada.
+    core = [dict({k: q.get(k) for k in ('id', 'kind', 'ref', 'question', 'allow_other', 'seal', 'actor', 'card', 'origin')},
                  options=[{k: o.get(k) for k in ('label', 'description', 'cost')} for o in (q.get('options') or [])]) for q in qs]
     canon = json.dumps({'questions': core, 'today': today, 'nonce': nonce}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
+def round_id_legacy(qs, today, nonce):
+    # hash da rodada emitida ANTES do kit (a pergunta inteira): cobre mais, então aceitá-lo é seguro; sem ele, a
+    # rodada em voo no merge perderia as respostas já dadas no painel
+    canon = json.dumps({'questions': qs, 'today': today, 'nonce': nonce}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
     return hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
 nonce = nonce or uuid.uuid4().hex
 def die(m): print(f'decide-panel: {m}', file=sys.stderr); sys.exit(2)
@@ -152,10 +161,11 @@ panel_only = comp.get('panel_only', False)
 if not isinstance(panel_only, bool): die('panel_only é true ou false')
 MAXOPT = 6 if panel_only else 4   # só-painel libera até 6; com paridade de terminal, o teto é o do AskUserQuestion
 BAD = ('«', '»', '|')
-DRAFT = re.compile(r'\[\s*a\s+confirmar\s*\]', re.I)
+DRAFT = re.compile(r'\[\s*a[\s_-]*confirmar\s*\]', re.I)
+INVIS = dict.fromkeys(map(ord, '\u200b\u200c\u200d\u2060\ufeff\u00ad'))
 def clean(s, what, n=None, bad=BAD):
     if not isinstance(s, str) or not s.strip(): die(f'{what} vazio ou não-texto')
-    s = ' '.join(s.split())
+    s = ' '.join(s.translate(INVIS).split())
     if DRAFT.search(s): die(f'{what} com marcador de rascunho [A CONFIRMAR]: rodada não sai com texto por confirmar')
     if any(b in s for b in bad): die(f'{what} com « » ou | (o selador recusaria; o | separa as descartadas): {s[:80]}')
     if n and len(s) > n: die(f'{what} passa de {n} caracteres: {s}')
@@ -175,7 +185,7 @@ def view_of(v, ref):
     if 'why' in v: out['why'] = clean(v['why'], f'{ref}: view.why', 400, ())
     if 'source_url' in v:
         u = v['source_url']
-        if not (isinstance(u, str) and re.fullmatch(r'https://[^\s@/]+/\S*', u)): die(f'{ref}: view.source_url só https://, sem credencial no host')
+        if not (isinstance(u, str) and re.fullmatch(r'https://[^\s@/?#]+/[^\s?#]*', u)): die(f'{ref}: view.source_url só https://, sem credencial, sem query e sem fragmento')
         out['source_url'] = u
     imgs = v.get('images', [])
     if not isinstance(imgs, list) or len(imgs) > 6: die(f'{ref}: view.images é lista de até 6')
@@ -200,13 +210,17 @@ def view_of(v, ref):
     if 'annotate' in v:
         if not isinstance(v['annotate'], bool): die(f'{ref}: view.annotate é true ou false')
         if v['annotate'] and not ol: die(f'{ref}: view.annotate sem imagem')
+        if v['annotate'] and ol[0]['src'].startswith('https://'):
+            die(f'{ref}: view.annotate pede a 1ª imagem embutida ou no asset store (/_blob/): imagem de outra origem contamina o canvas da marcação')
         out['annotate'] = v['annotate']
     if 'upload' in v:
         u = v['upload']
         if not isinstance(u, dict) or set(u) != {'url', 'what', 'expires'}: die(f'{ref}: view.upload leva url, what e expires (o link tem prazo)')
         if not (isinstance(u['url'], str) and re.fullmatch(r'https://[^\s@/?#]+/[^\s?#]*', u['url'])):
             die(f'{ref}: view.upload.url só https:// sem credencial, sem query e sem fragmento (nada de segredo na página)')
-        if not (isinstance(u['expires'], str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', u['expires'])) or u['expires'] < today:
+        try: okd = isinstance(u['expires'], str) and re.fullmatch(r'\d{4}-\d{2}-\d{2}', u['expires']) and bool(date.fromisoformat(u['expires']))
+        except ValueError: okd = False
+        if not okd or u['expires'] < today:
             die(f'{ref}: view.upload.expires AAAA-MM-DD, hoje ou depois (link vencido não vai para a página)')
         out['upload'] = {'url': u['url'], 'what': clean(u['what'], f'{ref}: view.upload.what', 200, ()), 'expires': u['expires']}
     return out or None
@@ -232,12 +246,13 @@ for i, q in enumerate(qs):
         if cite in cites: die(f'cite_id repetido na composição: {cite}')
         cites.add(cite)
     question = clean(q.get('question'), f'pergunta {i + 1}: question')
-    view = view_of(q.get('view'), ref)
     if q.get('resolved_by') is not None:   # já resolvido por regra: recolhido, NÃO é pergunta, não conta, não sela
-        if 'options' in q or q.get('kind') is not None: die(f'{ref}: item resolvido por regra não leva options nem kind (não é pergunta)')
-        resolved.append({'ref': ref, 'cite_id': cite, 'question': question,
-                         'resolved_by': clean(q['resolved_by'], f'{ref}: resolved_by', 400, ()), 'view': view})
+        extra = set(q) - {'ref', 'cite_id', 'question', 'resolved_by', 'header'}
+        if extra: die(f'{ref}: item resolvido por regra não é pergunta e não leva {sorted(extra)}')
+        resolved.append({'ref': ref, 'cite_id': cite, 'question': question,   # só texto: a página não mostra view aqui
+                         'resolved_by': clean(q['resolved_by'], f'{ref}: resolved_by', 400, ())})
         continue
+    view = view_of(q.get('view'), ref)
     kind = q.get('kind')
     if kind not in (None, 'verify'): die(f'{ref}: kind só "verify" (selo e ato saem da linha do censo)')
     if kind == 'verify':
@@ -258,7 +273,7 @@ for i, q in enumerate(qs):
             lab = clean(o.get('label'), f'{ref}: rótulo {j + 1}')
             if lab.endswith('(Recomendado)'): die(f'{ref}: a marca (Recomendado) é posta por este script a partir de "recommended", nunca escrita à mão')
             ol.append({'label': lab, 'description': clean(o.get('description'), f'{ref}: descrição {j + 1}'),
-                       'cost': ' '.join(str(o.get('cost') or '').split())})
+                       'cost': clean(o['cost'], f'{ref}: custo {j + 1}', 120, ()) if o.get('cost') else ''})
         rec = q.get('recommended')
         if rec is not None:
             if not isinstance(rec, int) or isinstance(rec, bool) or not 0 <= rec < len(ol): die(f'{ref}: recommended fora do intervalo')
@@ -296,6 +311,7 @@ for k, it in enumerate(rnd): it['id'] = f'q{k + 1}'
 rid = round_id(rnd, today, nonce)   # só o que sela entra no hash; cite_id, view e cabeçalho ficam fora
 def ask_desc(o): return o['description'] + (f' · custo: {o["cost"]}' if o['cost'] else '')
 if ask == '1':
+    if not rnd: die('--ask: a rodada não tem pergunta (só itens resolvidos ou adiados): nada a perguntar no terminal')
     wide = [f"{it['ref']} ({len(it['options'])})" for it in rnd if len(it['options']) > 4]
     if wide: die('--ask: o AskUserQuestion aceita até 4 opções; esta rodada só-painel tem mais em: ' + ', '.join(wide) + ' — responda no painel ou recomponha com até 4')
     print(json.dumps({'questions': [{'question': it['question'], 'header': it['header'], 'multiSelect': False,
@@ -331,12 +347,18 @@ PY
 import sys, os, json, hashlib, subprocess, glob
 _, roundp, ansp, seal, others, dry, srepo, only = sys.argv[1:9]
 def round_id(qs, today, nonce):
-    # o round_id cobre SÓ o que sela (decisão do core, 2026-11-26): id, tipo, ref, pergunta, opções, texto livre e o
-    # destino do selo, mais a data e o nonce. Cabeçalho, cite_id, view (imagens, explicação, link de envio), origem e
-    # card ficam fora: trocar um print não invalida a resposta já dada.
-    core = [dict({k: q.get(k) for k in ('id', 'kind', 'ref', 'question', 'allow_other', 'seal')},
+    # o round_id cobre o que sela ou vira ato (decisão do core, 2026-11-26): id, tipo, ref, pergunta, opções, texto
+    # livre, o selo, a classe e o card do ato (o comando que a sessão roda no "executar") e a origem, mais a data e o
+    # nonce. Fica FORA só a apresentação: cabeçalho, cite_id e view (imagens, explicação, link de envio): trocar um
+    # print não invalida a resposta já dada.
+    core = [dict({k: q.get(k) for k in ('id', 'kind', 'ref', 'question', 'allow_other', 'seal', 'actor', 'card', 'origin')},
                  options=[{k: o.get(k) for k in ('label', 'description', 'cost')} for o in (q.get('options') or [])]) for q in qs]
     canon = json.dumps({'questions': core, 'today': today, 'nonce': nonce}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
+def round_id_legacy(qs, today, nonce):
+    # hash da rodada emitida ANTES do kit (a pergunta inteira): cobre mais, então aceitá-lo é seguro; sem ele, a
+    # rodada em voo no merge perderia as respostas já dadas no painel
+    canon = json.dumps({'questions': qs, 'today': today, 'nonce': nonce}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
     return hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
 srepo = os.path.realpath(srepo)
 def die(m): print(f'decide-panel: {m}', file=sys.stderr); sys.exit(2)
@@ -344,7 +366,7 @@ try: rd = json.load(open(roundp, encoding='utf-8'))
 except Exception as e: die(f'round ilegível: {e}')
 if not isinstance(rd, dict) or rd.get('schema') != 'onion.decide.panel/v1': die('round não é onion.decide.panel/v1')
 qs = rd.get('questions') or []
-if round_id(qs, rd.get('today'), rd.get('nonce')) != rd.get('round_id'): die('round adulterado: o round_id não é o hash das perguntas — recuso selar a partir dele')
+if rd.get('round_id') not in (round_id(qs, rd.get('today'), rd.get('nonce')), round_id_legacy(qs, rd.get('today'), rd.get('nonce'))): die('round adulterado: o round_id não é o hash das perguntas — recuso selar a partir dele')
 byq = {q['id']: q for q in qs}
 import re
 if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(rd.get('today'))): die('round sem data AAAA-MM-DD')

@@ -12,7 +12,9 @@
   limpas. A anotação no print usa o marker.js 2 (markerjs2@2.32.7, Linkware License de Alan Mendelevich: o link
   de volta que ele mostra durante o uso FICA, é condição da licença); a anotação vai em answers/<qN>.annotation
   e é dado não confiável que a sessão lê, nunca argumento do selador. A página não recebe arquivo nem guarda
-  credencial: o link de envio é criado fora dela.
+  credencial: o link de envio é criado fora dela, e quem pode VER o painel vê o link (read: "view").
+  Capabilities: {db: {rules: [{path: "", read: "view", write: "owner"}]}, user: {}}, mais assets: {} quando a rodada
+  usa imagem do asset store (src /_blob/<id>).
 -->
 <script src="https://cdn.jsdelivr.net/npm/markerjs2@2.32.7/markerjs2.js" integrity="sha384-rk1p5TZ9UO5HLmpVpH02kF2FdPvqHNdGI9kuuJqjzGs7W/MC/YQjL3Qnnp06JDZu" crossorigin="anonymous" defer></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -113,10 +115,12 @@
     'card pendente': ['warn', 'card pendente'], 'conferir': ['neutral', 'a sessão confere'], 'depois': ['neutral', 'depois'],
     'aguarda leitura': ['neutral', 'a sessão lê sua resposta'], 'ensaio': ['neutral', 'ensaio'],
     'ambígua': ['bad', 'volta como pergunta'], 'recusada': ['bad', 'volta como pergunta'],
-    'recusada pelo selador': ['bad', 'o selador recusou'], 'sem resposta': ['neutral', 'sem resposta'] };
+    'recusada pelo selador': ['bad', 'o selador recusou'], 'sem resposta': ['neutral', 'sem resposta'],
+    'não confere': ['warn', 'não confere: a sessão corrige'] };
   let db = null, round = null, status = {}, sent = {}, picks = {};
   // estado final do item: não conta como aberto. Item resolvido por regra nunca entra na conta.
-  const FINAL = new Set(['selado', 'executado', 'executar', 'card pendente', 'conferir', 'depois', 'não confere', 'aguarda leitura', 'ensaio']);
+  // "não confere" (a sessão corrige) e "aguarda leitura" (a sessão ainda lê o texto livre) seguem ABERTOS
+  const FINAL = new Set(['selado', 'executado', 'executar', 'card pendente', 'conferir', 'depois', 'ensaio']);
   const safeSrc = (u) => typeof u === 'string' && (/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(u) || /^\/_blob\/[A-Za-z0-9_-]+$/.test(u) || /^https:\/\//.test(u));
   const ddmm = (d) => (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '';
   const setPick = (qid, patch) => { picks[qid] = Object.assign({}, picks[qid] || {}, patch); };
@@ -130,7 +134,7 @@
       ma.renderAtNaturalSize = true;
       ma.addEventListener('render', (ev) => {
         const st = JSON.stringify(ev.state);
-        if (st.length > 100000) { $('msg').textContent = 'Marcação grande demais. Simplifique.'; return; }
+        if (new TextEncoder().encode(st).length > 150000) { $('msg').textContent = 'Marcação grande demais. Simplifique.'; return; }
         setPick(q.id, { annotation: st, annotated: ev.dataUrl }); render();
       });
       ma.show();
@@ -240,7 +244,7 @@
       }
       $('msg').textContent = 'Rodada enviada. A sessão sela pelo selador e devolve o estado de cada item aqui.';
     } catch (e) {
-      $('msg').textContent = e && e.code === 'invalid_argument' ? 'Só o dono deste painel envia respostas.' : 'O envio falhou. Tente de novo em instantes.';
+      $('msg').textContent = e && e.code === 'invalid_argument' ? 'O envio foi recusado: só o dono deste painel envia, e a resposta (com a marcação) tem de caber no limite. Tente marcar menos.' : 'O envio falhou. Tente de novo em instantes.';
     }
     render();
   }
