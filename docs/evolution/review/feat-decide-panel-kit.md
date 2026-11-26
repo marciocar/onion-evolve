@@ -2,7 +2,8 @@
 branch: feat/decide-panel-kit
 pr: pendente
 date: 2026-11-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 480d3ed2e25b63a615a992858fb07fdcb745ff74e4c0095f98d26c45954cb862
+reviewed_code_sha256: fd56279d887b5042dcb232e48f746eee9685bfab0c2177dbbd292426ba330fe4
 findings_total: 10
 findings_real: 10
 findings_blocking: 0
