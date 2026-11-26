@@ -176,8 +176,8 @@ com «(Recomendado)». Com `"panel_only": true` a pergunta de selo vai até 6 op
 recusado nomeando as perguntas acima de 4. A página conta só os abertos e mostra «Pendências limpas» quando zera.
 Imagem acima de 96 KiB vai pelo asset store do Artifact (declare `assets: {}` nas capabilities) como `src`.
 
-O round lido no passo 4 é o arquivo **local**. O `round_id` é o hash do que sela (perguntas, opções, selo), da data e de um nonce
-da emissão (cabeçalho, `cite_id` e `view` ficam fora): resposta de outra rodada é recusada, e edição do round que não recalculou o hash também. O painel nunca escreve no grafo. Decisão sem nó (`--new`) e checkpoint do
+O round lido no passo 4 é o arquivo **local**. O `round_id` é o hash do que sela ou vira ato (perguntas, opções, selo, card do ato), da data e de um
+nonce da emissão (cabeçalho, `cite_id` e `view` ficam fora): resposta de outra rodada é recusada, e edição do round que não recalculou o hash também. O painel nunca escreve no grafo. Decisão sem nó (`--new`) e checkpoint do
 `/meta:drive` ficam no terminal.
 
 ## Modo triagem (opcional, cláusula 10)

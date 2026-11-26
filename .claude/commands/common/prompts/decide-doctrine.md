@@ -183,8 +183,8 @@ Quatro regras fecham a cláusula:
 
 **Kit de revisão (2026-11-26, absorvido do hub):** o painel serve também a decisor não técnico. Três
 decisões do core o fecham: (1) a sugestão do agente é a **1ª opção** e leva «(Recomendado)», a mesma regra do
-terminal, sem outra ordem; (2) o `round_id` cobre **só o que sela** (perguntas, opções, selo, data e nonce):
-imagens, notas, explicação e `cite_id` ficam fora, e o `cite_id` é estável entre rodadas; (3) no modo
+terminal, sem outra ordem; (2) o `round_id` cobre **só o que sela ou vira ato** (perguntas, opções, selo, card do ato, data e
+nonce): imagens, notas, explicação e `cite_id` ficam fora, e o `cite_id` é estável entre rodadas; (3) no modo
 **só-painel** (`panel_only`) a pergunta vai até 6 opções, e o payload do `AskUserQuestion` segue com teto de 4,
 recusado com o nome da pergunta acima disso. Entram o `verify` (Confere sela como conferência da pessoa, com
 destino design; Ainda não não sela), o print anotável (a anotação é dado, nunca argumento do selador), o item
