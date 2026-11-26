@@ -20,7 +20,8 @@ nota: "PR só de pesquisa: as objeções do Elenxo são o conteúdo do grafo (E_
 ## O que muda
 
 Entra o grafo `docs/evolution/research/onion-evolve-persona-2026-11/` com as duas rodadas em fontes primárias sobre a
-Persona do Onion Evolve (125 nós, radar exit 0, contrato rc 0), a `SYNTHESIS.md` e a saída bruta da rodada 1 em `data/`.
+Persona do Onion Evolve (128 nós, radar exit 0, contrato rc 0) e a `SYNTHESIS.md`. A saída bruta da rodada 1 não
+viaja: tinha caminhos de máquina e hashes de repo privado (REGRA 121); fica citada só pelo run_id `wf_ee5183a3-68f`.
 
 ## Achados
 
@@ -30,6 +31,17 @@ independência, e a autodescoberta sem critério de parada. Rodada 2 (7): a cont
 a entrada do medidor não pode ser escrita pela Persona, o "3" sem base de run length, o limiar 0% é o mais caro, a
 paciência lê validação e não treino, o estado da arte não tem juiz de novidade externo, e o arXiv descartado por locator.
 Nenhuma vira correção do diff: são o conteúdo da pesquisa, e a decisão é do maestro.
+
+## Os `confirmed` de maior impacto do grafo (REGRA 87)
+
+Os três do topo são objeções da rodada 2, e nada neste PR os contraria, porque o PR não sela proposta:
+
+- `E_OBJECAO_R2_15_STATE_OF_ART_HAS_NO_EXTERNAL_NOVELTY_JUDGE`: o estado da arte não tem juiz de novidade externo.
+  Fica aberta: `D_PERSONA_MVP_BUILD_1126` pede medidor de outro modelo, mas ele ainda não existe nem foi medido.
+- `E_OBJECAO_R2_11_PATIENCE_SIGNAL_IS_VALIDATION_NOT_TRAINING`: a paciência lê validação, não treino. O selo
+  `D_PERSONA_REFUTER_OTHER_MODEL_1126` cobre o refutador; o medidor de novidade só entra no MVP. Segue aberta.
+- `E_OBJECAO_R2_10_DEFINITION_ONLY_THRESHOLD_MOVES_STOP`: o limiar só por definição move a parada. A superação
+  `C_SUPERACAO_20261126_GUEST_6PLUS2_ACROSS_BASE_SIZES` dá a base de run length; o número final é decisão do maestro.
 
 ## Mutantes
 

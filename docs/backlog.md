@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1259 itens abertos** em 186 grafo(s) com aberto (de 248 no escopo) · 175 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1258 itens abertos** em 186 grafo(s) com aberto (de 248 no escopo) · 175 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -88,15 +88,14 @@
 | 2.4 | `E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DURA DE LOCATOR (tier 5, nao 9): o TST distingue e-mail PESSOAL (provedor proprio, protegido pela inviolabil |
 | 2.4 | `E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): o acordao invoca o principio da PROPORCIONALIDADE para exigir PARCIMONIA na qualificaca |
 
-## onion-evolve-persona-2026-11 — 24 item(ns)
+## onion-evolve-persona-2026-11 — 23 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 102.5 | `Q_ONION_EVOLVE_PERSONA_2026_11` | onion-evolve-persona-2026-11 | Sessão dedicada à Persona do Onion Evolve: qual o termo de mercado/academia em nov/2026, que padrões e casos reais existem, que |
 | 77.5 | `C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | MVP que a evidência sustenta: a persona como S4 (propõe) e o maestro ou um Delphi como S5 (decide); charter no KG-SSOT, wake pel |
 | 60.0 | `Q_ONION_EVOLVE_PERSONA_R2_STOP_CRITERION_1126` | onion-evolve-persona-2026-11 | Rodada 2: qual termo tem uso medido em 2026, o que o Apêndice H do DGM mediu sobre hacking do avaliador, que critério de parada  |
-| 50.0 | `C_ELENXO_PERSONA_R2_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | Rodada 2: 'nada novo no grafo' medido pela própria Persona não vale sozinho; a catraca precisa de medidor externo sobre snapshot |
-| 12.0 | `Q_EXTEND_EXTERNAL_REFUTER_TO_NOVELTY_METER_1126` | onion-evolve-persona-2026-11 | A decisão do maestro de 26/11 (refutador de outro modelo e outro contexto) deve se estender ao medidor de 'nada novo no grafo', c |
+| 52.5 | `C_ELENXO_PERSONA_R2_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | Rodada 2: 'nada novo no grafo' medido pela própria Persona não vale sozinho; a catraca precisa de medidor externo sobre snapshot |
 | 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_AGENTIC_SYSTEMS_UMBRELLA` | onion-evolve-persona-2026-11 | A formulação sustentada pelo texto da Anthropic: 'agentic systems' como guarda-chuva com workflows e agents como os dois tipos,  |
 | 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_AUTONOMY_COST_WARNED` | onion-evolve-persona-2026-11 | A formulação 'adverte/afirma' com a recomendação de sandbox e guardrails, que o mesmo trecho da Anthropic sustenta (custo maio |
 | 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_WHEN_TO_USE_AGENTS` | onion-evolve-persona-2026-11 | A formulação 'indica quando usar' agentes: problemas abertos 'and where you can’t hardcode a fixed path', sustentada pelo mesm |
