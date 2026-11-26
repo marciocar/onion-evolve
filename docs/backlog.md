@@ -92,7 +92,7 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 102.5 | `Q_ONION_EVOLVE_PERSONA_2026_11` | onion-evolve-persona-2026-11 | Sessão dedicada à Persona do Onion Evolve: qual o termo de mercado/academia em nov/2026, que padrões e casos reais existem, que |
+| 110.0 | `Q_ONION_EVOLVE_PERSONA_2026_11` | onion-evolve-persona-2026-11 | Sessão dedicada à Persona do Onion Evolve: qual o termo de mercado/academia em nov/2026, que padrões e casos reais existem, que |
 | 77.5 | `C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | MVP que a evidência sustenta: a persona como S4 (propõe) e o maestro ou um Delphi como S5 (decide); charter no KG-SSOT, wake pel |
 | 60.0 | `Q_ONION_EVOLVE_PERSONA_R2_STOP_CRITERION_1126` | onion-evolve-persona-2026-11 | Rodada 2: qual termo tem uso medido em 2026, o que o Apêndice H do DGM mediu sobre hacking do avaliador, que critério de parada  |
 | 52.5 | `C_ELENXO_PERSONA_R2_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | Rodada 2: 'nada novo no grafo' medido pela própria Persona não vale sozinho; a catraca precisa de medidor externo sobre snapshot |
