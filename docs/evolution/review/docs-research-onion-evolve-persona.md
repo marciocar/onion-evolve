@@ -2,8 +2,7 @@
 branch: docs/research-onion-evolve-persona
 pr: pendente
 date: 2026-11-26
-reviewed_diff_sha256: db598bccd95708e5bbb389f59254d22e036714b1902ecaf773d7ae953fe5e654
-reviewed_code_sha256: a51376ae93e160ef7826dd9cb06528b0651f8d35894adffea0e721eebf6ade3e
+reviewed_diff_sha256: pendente
 findings_total: 44
 findings_real: 44
 findings_blocking: 12
