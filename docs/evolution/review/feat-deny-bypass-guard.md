@@ -2,8 +2,8 @@
 branch: feat/deny-bypass-guard
 pr: pendente
 date: 2026-11-25
-reviewed_diff_sha256: 86c8c903a87a5c57885a1636c14f43c35cb3b3e05e4e8342b0dd9c62aa1c4516
-reviewed_code_sha256: 2bf47c94b6e5621bd21bc85356124fadd91e49385f54f02ab714206cd19da8c9
+reviewed_diff_sha256: 5cc7383979f60d0dd9e2d89686387334e2948a2571cd2f961adeb94058554a39
+reviewed_code_sha256: 028932410c7b9e0f3e22939842cf6c07df62df263a084d2b8cf1007363201c62
 findings_total: 17
 findings_real: 17
 findings_blocking: 4
@@ -93,4 +93,9 @@ nem outra linguagem. Fora de propósito (guard-doctrine): `reset --hard`, `--for
 2. **`veto-onfailure: (c) dispatcher — n=11`.** O caso tira o `onFailure` de todos os vetos PreToolUse e espera a
    REGRA 101 em cada um; o `pretooluse-deny-mirror.sh` é o 11º veto, e o número fixo era 10. Cura: o caso exige 11
    e nomeia o deny-mirror, como nomeia os outros.
+3. **`adopter-guard: (m) (e13)` reprovava no pré-voo local, não no CI.** O caso fazia `S=/tmp/x; cd $S`. Com o
+   diretório existindo, o lib resolve o `cd` por si e a pilha de `cd` do juiz não é consultada, então o mutante
+   sobrevivia; no runner `/tmp/x` não existe. Medido com o juiz e o mutante lado a lado: o mutante só morde com o
+   diretório ausente. Cura: `S=@R@/../e13-ausente`, um caminho dentro da pasta descartável da bancada que ela
+   garante ausente. O caso deixa de depender do disco do host.
 
