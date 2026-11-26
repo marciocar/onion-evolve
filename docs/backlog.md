@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1235 itens abertos** em 185 grafo(s) com aberto (de 247 no escopo) · 174 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1259 itens abertos** em 186 grafo(s) com aberto (de 248 no escopo) · 175 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -87,6 +87,35 @@
 | 3.2 | `E_R3_TST_CIENCIA_PREVIA_AFASTA_EXPECTATIVA` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): a licitude do monitoramento e condicionada a CIENCIA PREVIA do empregado de que a caixa |
 | 2.4 | `E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DURA DE LOCATOR (tier 5, nao 9): o TST distingue e-mail PESSOAL (provedor proprio, protegido pela inviolabil |
 | 2.4 | `E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): o acordao invoca o principio da PROPORCIONALIDADE para exigir PARCIMONIA na qualificaca |
+
+## onion-evolve-persona-2026-11 — 24 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 102.5 | `Q_ONION_EVOLVE_PERSONA_2026_11` | onion-evolve-persona-2026-11 | Sessão dedicada à Persona do Onion Evolve: qual o termo de mercado/academia em nov/2026, que padrões e casos reais existem, que |
+| 77.5 | `C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | MVP que a evidência sustenta: a persona como S4 (propõe) e o maestro ou um Delphi como S5 (decide); charter no KG-SSOT, wake pel |
+| 60.0 | `Q_ONION_EVOLVE_PERSONA_R2_STOP_CRITERION_1126` | onion-evolve-persona-2026-11 | Rodada 2: qual termo tem uso medido em 2026, o que o Apêndice H do DGM mediu sobre hacking do avaliador, que critério de parada  |
+| 50.0 | `C_ELENXO_PERSONA_R2_RECOMMENDATION_1126` | onion-evolve-persona-2026-11 | Rodada 2: 'nada novo no grafo' medido pela própria Persona não vale sozinho; a catraca precisa de medidor externo sobre snapshot |
+| 12.0 | `Q_EXTEND_EXTERNAL_REFUTER_TO_NOVELTY_METER_1126` | onion-evolve-persona-2026-11 | A decisão do maestro de 26/11 (refutador de outro modelo e outro contexto) deve se estender ao medidor de 'nada novo no grafo', c |
+| 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_AGENTIC_SYSTEMS_UMBRELLA` | onion-evolve-persona-2026-11 | A formulação sustentada pelo texto da Anthropic: 'agentic systems' como guarda-chuva com workflows e agents como os dois tipos,  |
+| 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_AUTONOMY_COST_WARNED` | onion-evolve-persona-2026-11 | A formulação 'adverte/afirma' com a recomendação de sandbox e guardrails, que o mesmo trecho da Anthropic sustenta (custo maio |
+| 3.0 | `C_SUPERACAO_20261126_ANTHROPIC_WHEN_TO_USE_AGENTS` | onion-evolve-persona-2026-11 | A formulação 'indica quando usar' agentes: problemas abertos 'and where you can’t hardcode a fixed path', sustentada pelo mesm |
+| 3.0 | `C_SUPERACAO_20261126_APO_IDEMPOTENCE_ONLY_STATE` | onion-evolve-persona-2026-11 | A formulação corrigida: idempotência atribuída só ao estado por PO; o ledger é separado, com linhas próprias. |
+| 3.0 | `C_SUPERACAO_20261126_APO_NEVER_GATEKEEPER` | onion-evolve-persona-2026-11 | A formulação corrigida que o PR 287 sustenta em duas passagens: 'It is never a gatekeeper' e 'a PO note is advice and a DRI neve |
+| 3.0 | `C_SUPERACAO_20261126_ARXIV_AGENT_MANAGER_SORTED_43_OF_50` | onion-evolve-persona-2026-11 | A mesma consulta do arXiv com sortBy=submittedDate&sortOrder=descending entrega 43 de 2026 entre os 50 mais recentes de 'agent man |
+| 3.0 | `C_SUPERACAO_20261126_COSCI_ABLATION_SEARCH_AND_DEBATE` | onion-evolve-persona-2026-11 | A formulação corrigida pelo AI co-scientist (Supplementary Note 3, Fig. 4 e 5): Reflexão sem busca 6,14 contra 2,38 com busca e |
+| 3.0 | `C_SUPERACAO_20261126_DGM_APPXH_HIDDEN_CHECKERS_EDITABLE_MARKER` | onion-evolve-persona-2026-11 | A formulação do próprio Apêndice H: funções de checagem ocultas do agente, marcadores registrados no código editável do ag |
+| 3.0 | `C_SUPERACAO_20261126_DGM_ARCHIVE_STEPPING_STONES` | onion-evolve-persona-2026-11 | A formulação que o paper da DGM sustenta: Sec. 3 (trampolins) mais Sec. 4.4 ('makes subsequent improvements harder to achieve'), |
+| 3.0 | `C_SUPERACAO_20261126_GUEST_6PLUS2_ACROSS_BASE_SIZES` | onion-evolve-persona-2026-11 | A formulação corrigida de Guest et al. 2020 (Results): com run length 2 e limiar ≤5%, saturação em 6+2 entre tamanhos de bas |
+| 3.0 | `C_SUPERACAO_20261126_MJ_COCKPIT_TOOLS_READ_ONLY` | onion-evolve-persona-2026-11 | A formulação do próprio PR 6041 (linha 11): ferramentas de cliente do cockpit são read-only, e as quatro ações não são exp |
+| 3.0 | `C_SUPERACAO_20261126_MJ_OUTSTANDING_DELIMITS_LIVE_VALIDATION` | onion-evolve-persona-2026-11 | A seção Outstanding/Deliverable 3 e a tabela Verification do PR 6041, que delimitam o não validado ao vivo (provedores e postur |
+| 3.0 | `C_SUPERACAO_20261126_PRECHELT_RULE3_PQ_OR_UP` | onion-evolve-persona-2026-11 | As regras de seleção de Prechelt (Seção 2.2) verbatim: para maximizar a qualidade média, critério PQ se a rede sobreajusta m |
+| 3.0 | `C_SUPERACAO_20261126_PRECHELT_TENDS_TO_GAIN_SCOPE` | onion-evolve-persona-2026-11 | O parágrafo final de Prechelt com o escopo certo: nenhuma classe tem grande vantagem 'on average, for the mix of situations consi |
+| 3.0 | `C_SUPERACAO_20261126_TAC_LIMITATIONS_STRAIGHTFORWARD_TASKS` | onion-evolve-persona-2026-11 | O parágrafo de limitações do §8 do TheAgentCompany: os autores admitem tarefas diretas e ausência de tarefas criativas comple |
+| 3.0 | `C_SUPERACAO_20261126_TAC_TABLE4_OWNCLOUD_WORST` | onion-evolve-persona-2026-11 | A Tabela 4 do TheAgentCompany sustenta a formulação corrigida: ownCloud é o pior de forma consistente, RocketChat fica mediano  |
+| 3.0 | `C_SUPERACAO_20261126_TAC_WEB_NAVIGATION_OFTEN_OBSTACLE` | onion-evolve-persona-2026-11 | O trecho da seção 7.3 do TheAgentCompany com o achado hedgeado: navegação web é 'frequentemente' obstáculo (no ownCloud o po |
+| 3.0 | `C_SUPERACAO_20261126_VEND2_HELPFULNESS_SUSPECTED` | onion-evolve-persona-2026-11 | A formulação hedgeada do Project Vend 2: 'We suspect...' seguida da comparação com 'a friend who just wants to be nice'; liga  |
+| 3.0 | `C_SUPERACAO_20261126_VEND2_PROCEDURES_AMONG_MOST_IMPACTFUL` | onion-evolve-persona-2026-11 | A frase do Project Vend 2 ('Among the most impactful changes...') e a passagem 'bureaucracy matters': procedimentos e checklists c |
 
 ## postmerge-projection-writer-2026-10 — 7 item(ns)
 
