@@ -167,8 +167,17 @@ painel no navegador ou no celular. **Sem as ferramentas Artifact e ArtifactData 
    ArtifactData (`batch`). Rode o que é `executar` (passo 6) e grave "executado" quando terminar. Os
    cards entram no relatório (passo 7).
 
-O round lido no passo 4 é o arquivo **local**. O `round_id` é o hash das perguntas, da data e de um nonce
-da emissão: resposta de outra rodada é recusada, e edição do round que não recalculou o hash também. O painel nunca escreve no grafo. Decisão sem nó (`--new`) e checkpoint do
+**Kit de revisão** (absorvido do hub em 2026-11-26, forma no cabeçalho do `decide-panel.sh`): na composição,
+`cite_id` dá a cada item um id citável e estável entre rodadas; `kind: "verify"` pede para conferir uma correção
+(Confere sela com destino design, Ainda não volta para a sessão com a nota); `resolved_by` põe o item no bloco
+recolhido «Já resolvido pelas suas regras», fora da conta; `view` leva explicação, por quê, prints (anotáveis pelo
+marker.js) e o link de envio de arquivo com prazo, criado fora do painel. A sugestão do agente é sempre a 1ª opção,
+com «(Recomendado)». Com `"panel_only": true` a pergunta de selo vai até 6 opções, e o `--ask` dessa rodada é
+recusado nomeando as perguntas acima de 4. A página conta só os abertos e mostra «Pendências limpas» quando zera.
+Imagem acima de 96 KiB vai pelo asset store do Artifact (declare `assets: {}` nas capabilities) como `src`.
+
+O round lido no passo 4 é o arquivo **local**. O `round_id` é o hash do que sela (perguntas, opções, selo), da data e de um nonce
+da emissão (cabeçalho, `cite_id` e `view` ficam fora): resposta de outra rodada é recusada, e edição do round que não recalculou o hash também. O painel nunca escreve no grafo. Decisão sem nó (`--new`) e checkpoint do
 `/meta:drive` ficam no terminal.
 
 ## Modo triagem (opcional, cláusula 10)
