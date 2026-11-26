@@ -2,8 +2,7 @@
 branch: docs/research-onion-evolve-persona
 pr: pendente
 date: 2026-11-26
-reviewed_diff_sha256: 89947a2ab11a971864aae7f817e33a9485c9b3c19afc8f1ad0241fb35932c5b7
-reviewed_code_sha256: c1d07760ac501011e22fce694206410f2707586bda5e32b0d3bdc1d28b0c428b
+reviewed_diff_sha256: pendente
 findings_total: 44
 findings_real: 44
 findings_blocking: 12
@@ -21,7 +20,7 @@ nota: "PR só de pesquisa: as objeções do Elenxo são o conteúdo do grafo (E_
 ## O que muda
 
 Entra o grafo `docs/evolution/research/onion-evolve-persona-2026-11/` com as duas rodadas em fontes primárias sobre a
-Persona do Onion Evolve (128 nós, radar exit 0, contrato rc 0) e a `SYNTHESIS.md`. A saída bruta da rodada 1 não
+Persona do Onion Evolve (131 nós: 125 das rodadas, 3 selos do maestro e 3 termos x_term para os códigos S4, Q2 e E3; radar exit 0, contrato rc 0) e a `SYNTHESIS.md`. A saída bruta da rodada 1 não
 viaja: tinha caminhos de máquina e hashes de repo privado (REGRA 121); fica citada só pelo run_id `wf_ee5183a3-68f`.
 
 ## Achados
