@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1226 itens abertos** em 185 grafo(s) com aberto (de 247 no escopo) · 174 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1238 itens abertos** em 186 grafo(s) com aberto (de 248 no escopo) · 175 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -462,6 +462,23 @@
 | 4.5 | `C_OPCAO_E_NOT_NOW` | maestro-persona-2026-11 | E. Não fazer agora |
 | 3.6 | `C_SUPERACAO_20261105_FT500_TIES_NOT_BEATS` | maestro-persona-2026-11 | Llama-3.1-8B com 500 exemplos MAIS memória hierárquica EMPATOU com Claude-3.5-Sonnet com ICL e memória (25,43±4,48 contra 25,0 |
 | 2.2 | `C_OPCAO_C_EMERGENT_PERSONALITY_SYNC_FOR_MAESTRO` | maestro-persona-2026-11 | C. Personalidade emergente por /meta:personality-sync estendida ao maestro |
+
+## second-brain-company-brain-2026-11 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 57.5 | `Q_SECOND_BRAIN_COMPANY_BRAIN_2026_11` | second-brain-company-brain-2026-11 | Second Brain pessoal × Company Brain interconectáveis como vertical do Onion: o que o mercado faz em nov/2026, que mercados isso |
+| 20.4 | `C_OPCAO_B_SISTER_VERTICAL_FEDERATED` | second-brain-company-brain-2026-11 | OPÇÃO B) Second Brain como vertical irmã do Company Brain, com interconexão federada (A2A, kg-ssot) entre os dois. |
+| 18.0 | `C_OPCAO_C_DECISION_CENTER_FIRST` | second-brain-company-brain-2026-11 | OPÇÃO C) Começar pela central de decisão do company-brain (PR #29 / SAC-554), com o indivíduo como usuário dentro do Company |
+| 13.2 | `C_OPCAO_A_RESUME_ADR003_ONDEVICE` | second-brain-company-brain-2026-11 | OPÇÃO A) Retomar o ADR-003 do Onion Pessoal: KG cifrado no celular, só contexto de-identificado à nuvem. |
+| 12.8 | `E_LACUNAS_SECOND_BRAIN_2026_11` | second-brain-company-brain-2026-11 | Contabilidade: 37 objeções sobreviventes do Elenxo, 37 modeladas (0 não modeladas), 0 recusadas pelo motor; 6 claims refutadas, |
+| 3.2 | `C_OPCAO_D_COMPLEMENTARY_ROUND` | second-brain-company-brain-2026-11 | OPÇÃO D) Rodada complementar antes de decidir: mercados/falhas (GPT Store, Bloomberg, snyk ToxicSkills, Zep wallet fallacy) e ei |
+| 3.0 | `C_SUPERACAO_20261125_C2B_PAYS_PER_USE_OR_OFF_PLATFORM` | second-brain-company-brain-2026-11 | Marketplaces corporativos de IA funcionam como canal de compra (AgentExchange, 04/03/2025, 200+ parceiros); lojas de chatbot não  |
+| 3.0 | `C_SUPERACAO_20261125_CLAUDE_MARKETPLACE_PREVIEW_MARCH` | second-brain-company-brain-2026-11 | O Claude Marketplace abriu em prévia limitada em mar/2026 (seis parceiros, compra pelo gasto comprometido, sem comissão) e virou |
+| 3.0 | `C_SUPERACAO_20261125_GOVERNANCE_NOT_NAMESPACE_SCOPE` | second-brain-company-brain-2026-11 | Memória pessoal e da empresa podem dividir o substrato de armazenamento e recuperação, mas o company brain precisa de governan |
+| 3.0 | `C_SUPERACAO_20261125_MEMORY_LOCKIN_LOSSY_BRIDGES` | second-brain-company-brain-2026-11 | Memória de agente é lock-in: desde mar/2026 só migra por pontes pontuais e com perda (Claude importa de ChatGPT, Gemini, Copilo |
+| 3.0 | `C_SUPERACAO_20261125_RELAY_SHUTDOWN_NOTION_MAIL_AGENTS` | second-brain-company-brain-2026-11 | O Relay.app encerrou (free 15/08/2026, pagas 14/09/2026; equipe foi ao Chrome do Google). O Notion Mail não foi absorção: a Not |
+| 3.0 | `C_SUPERACAO_20261125_STANFORD_HCP_USER_GOVERNED_NOT_EMPLOYER` | second-brain-company-brain-2026-11 | Stanford DEL (03/2026): contexto pessoal é camada governada pelo usuário, compartilhável por papel, consentimento e finalidade; |
 
 ## a2a-backbone-product-2026-11 — 45 item(ns)
 
