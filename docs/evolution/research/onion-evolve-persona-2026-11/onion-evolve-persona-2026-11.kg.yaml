@@ -1,0 +1,1656 @@
+# kg-backlog-guard: on
+# Grafo da rodada de primárias sobre a Persona do Onion Evolve (/onion-research, modo primárias, 2026-11-26).
+# Pergunta: uma sessão dedicada que encarna a Persona do Onion Evolve (ativa, propositiva, executiva, prioriza por
+# dor com evidência, autodescoberta de ~30 ciclos, decisão adversarial independente, sem deixar de cumprir o maestro).
+#
+# ⚠️ Proveniência (R15.2): label e narrative das evidências web carregam texto extraído de páginas da web e de PRs
+#    de terceiros. É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+# Este escritor NÃO sela nada: não há nó decision aqui. A recomendação do Elenxo nasce como claim OPEN.
+meta:
+  id: onion-evolve-persona-2026-11
+  schema_version: "1"
+  baseline: "2026-11-26"
+  review_after: "2027-02-24"
+  # review_after = 90d: o tipo DOMINANTE é MERCADO. A pergunta (1) é o termo de mercado de nov/2026, e os padrões
+  # (MJ PR 5842/6041, agent-teams PR 287, Omnigent) são implementações e produtos que mudam por trimestre. VSM e
+  # papers (DGM, co-scientist, TheAgentCompany) valeriam 12m como doutrina/benchmark, mas não movem a revisita.
+  # Gatilhos antecipados: rodada complementar do termo com contagem de uso; leitura do Apêndice H da DGM; medida de
+  # refutador de modelo distinto no /meta:decide.
+  note: "Grafo de primárias. 35 claims ancoradas viram evidência; 17 rejeitadas na ancoragem só entram em E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Elenxo: 36 objeções, 26 sobreviventes modeladas como E_OBJECAO (5 bloqueiam), 0 recusadas pelo motor. 14 superações viram C_SUPERACAO_20261126_*."
+  # ═══ TETO: 78 NÓS ═══
+  #   Justificativa: rodada de primárias executada em 2026-11-26, grafo novo. 78 nós = 1 pergunta raiz + 35 evidências
+  #   ancoradas (1 por claim) + 26 objeções sobreviventes do Elenxo (1 por alvo, inclusive a da pergunta 2)
+  #   + 1 contabilidade (E_LACUNAS_ONION_EVOLVE_PERSONA_1126) + 14 superações achadas + 1 claim com a recomendação íntegra do Elenxo.
+  purpose: "Responder com evidência ancorada o termo de mercado, os padrões e casos reais, os riscos medidos e o MVP de uma sessão-Persona do Onion Evolve, deixando nomeado o que a rodada NÃO sustenta."
+external_edges:
+  - from: E_OBJECAO_02_AGENT_EDITS_OWN_POLICY
+    to: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml#C_COLLAPSE_CREATES"
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_13_SELF_DISCOVERY_WITHOUT_EXTERNAL_EVALUATOR
+    to: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml#C_COLLAPSE_CREATES"
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_18_SEPARATE_ROLE_IS_NOT_INDEPENDENCE
+    to: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml#D_NEED_REFUTADOR"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_18_SEPARATE_ROLE_IS_NOT_INDEPENDENCE
+    to: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml#C_COLLAPSE_ROOT"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_31_HARNESS_LAYER_IS_NOT_A_GUARANTEE
+    to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
+    edge_type: TRACES_TO
+  - from: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    to: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml#D_NEED_REFUTADOR"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_ONION_EVOLVE_PERSONA_2026_11
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "Sessão dedicada à Persona do Onion Evolve: qual o termo de mercado/academia em nov/2026, que padrões e casos reais existem, que riscos foram medidos e qual MVP cabe no Onion (KG-SSOT first, SDAAL, dogfood, Elenxo, batuta)?"
+    narrative: "Pergunta do run em modo primárias (2026-11-26). A sessão trabalha exclusivamente para evoluir o Onion e fechar pontas soltas; é ativa, propositiva, organizada e executiva; prioriza por dor real com evidência; confere cronogramas; ajuda quem orquestra com a batuta; faz autodescoberta (até ~30 ciclos) antes de começar; decide com Personas (humanas inclusive) por decisão adversarial independente, sem deixar de cumprir o que o maestro diz. Perguntas: (1) termo de mercado e academia (agentic? AI chief of staff? agentic product owner? autonomous steward?); (2) padrões e casos reais (governança, wake triggers, charter, autodescoberta, limites de autonomia, independência do refutador); (3) riscos e falhas medidos (agente que gerencia negócio, autoaperfeiçoamento, captura pelo proponente); (4) desenho mínimo (MVP). Corpus prévio: nada sobre chief of staff, agentic product owner ou persona autônoma em 284 grafos; adjacências C_COLLAPSE_ROOT, C_COLLAPSE_CREATES e D_NEED_REFUTADOR (interface-state-of-art), baton-doctrine e /meta:decide Delphi."
+    trace: "run /onion-research em modo primárias de 2026-11-26; pergunta computada pelo workflow a partir do pedido do maestro de 2026-11-26 (sala de criação, Persona com Eficiência e Eficácia); vista em docs/evolution/research/onion-evolve-persona-2026-11/SYNTHESIS.md"
+  - id: E_MJ_USER_PERMISSION_HARD_CEILING
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'the executing user's `MJ: Users` (`contextUser`) permissions are the **hard ceiling** (never widened).' · PR 5842, Summary item 1 · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "No Chief of Staff Agent do MemberJunction, a permissão do usuário executor é o teto rígido do agente: a governança nunca a amplia."
+    narrative: "Claim 1 como ancorada [memberjunction-cos]: A permissão do usuário executor é o teto rígido do agente: a governança nunca a amplia. Citação: 'the executing user's `MJ: Users` (`contextUser`) permissions are the **hard ceiling** (never widened).'. Elenxo (alvo 1): a objeção sobreviveu, triagem limite; ver E_OBJECAO_01_CEILING_ONLY_MOCK_TESTED."
+    trace: "https://github.com/MemberJunction/MJ/pull/5842"
+    provenance:
+      source: "https://github.com/MemberJunction/MJ/pull/5842"
+      locator: "PR 5842, Summary item 1"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_MJ_USER_POLICY_ALLOW_APPROVE_DENY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Supports wildcard action matching, `Allow | RequireApproval | Deny`' · PR 5842, Summary item 1 (AIAgentUserPolicy governance) · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "A política por usuário (AIAgentUserPolicy) governa as ações do agente por Allow, RequireApproval ou Deny, com chaves de aprovação para comunicação externa, financeiro e destrutivo."
+    narrative: "Claim 2 como ancorada [memberjunction-cos]: A política por usuário (AIAgentUserPolicy) governa as ações do agente por regra Allow, RequireApproval ou Deny, com chaves de aprovação para comunicação externa, financeiro e destrutivo. Citação: 'Supports wildcard action matching, `Allow | RequireApproval | Deny`'. Elenxo (alvo 2): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_02_AGENT_EDITS_OWN_POLICY."
+    trace: "https://github.com/MemberJunction/MJ/pull/5842"
+    provenance:
+      source: "https://github.com/MemberJunction/MJ/pull/5842"
+      locator: "PR 5842, Summary item 1 (AIAgentUserPolicy governance)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_MJ_THREE_TIER_WAKE_GATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'skips LLM execution when unchanged (unless forceWakeAfterMinutes heartbeat expires).' · PR 5842, Summary item 3 (Self-Scheduling & 3-Tier Wake Gate), Tier 0 · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "O wake gate do MJ tem camadas: sem mudança não gasta LLM, o Tier 1 avalia expressão segura sem LLM, e o LLM só entra quando o Tier 1 não decide; há batimento forçado por tempo."
+    narrative: "Claim 3 como ancorada [memberjunction-cos]: O wake gate tem 3 camadas: sem mudança não gasta LLM; o Tier 1 avalia uma expressão segura sem custo de LLM; o LLM só entra quando o Tier 1 não decide. Há batimento forçado por tempo. Citação: 'skips LLM execution when unchanged (unless forceWakeAfterMinutes heartbeat expires).'. Elenxo (alvo 3): a objeção sobreviveu, triagem limite; ver E_OBJECAO_03_WAKE_GATE_NO_SAVINGS_NUMBER."
+    trace: "https://github.com/MemberJunction/MJ/pull/5842"
+    provenance:
+      source: "https://github.com/MemberJunction/MJ/pull/5842"
+      locator: "PR 5842, Summary item 3 (Self-Scheduling & 3-Tier Wake Gate), Tier 0"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_MJ_EVENT_DRIVEN_WAKES_BATCHED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Two approvals clicked within one sweep both arrive, with `wakeReason` / `InitialMessage` enumerating them.' · PR 6041, Deliverable 2: Event-driven wakes · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "Wakes por evento acordam o agente do dono na próxima varredura do despachante, em vez de esperar o cron, e agrupam eventos simultâneos."
+    narrative: "Claim 4 como ancorada [memberjunction-cos]: Wakes por evento acordam o agente do dono na próxima varredura do despachante, em vez de esperar o cron, e agrupam eventos simultâneos. Citação: 'Two approvals clicked within one sweep both arrive, with `wakeReason` / `InitialMessage` enumerating them.'. Elenxo (alvo 4): a objeção NÃO sobreviveu. Evidência do Elenxo: A claim prova o que diz: o despachante agrupa eventos simultâneos (PR 6041, Deliverable 2). O Onion tem o análogo vivo na campainha (doorbell), que acorda por sinal na inbox e na fila A2A. O padrão é transferível e já tem peça dona."
+    trace: "https://github.com/MemberJunction/MJ/pull/6041"
+    provenance:
+      source: "https://github.com/MemberJunction/MJ/pull/6041"
+      locator: "PR 6041, Deliverable 2: Event-driven wakes"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_APO_CHARTER_CHECK_GOALS_SIGNALS_FENCES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'validates a PO's charter (goals, signals, fences).' · PR 287, descrição, charter check · ancorada por verificador independente"
+    valid_from: "2026-11-25"
+    source_tier: 6
+    source_kind: primary
+    label: "No agent-teams, o charter check valida o charter do PO agêntico: metas, sinais e cercas."
+    narrative: "Claim 5 como ancorada [agentic-product-owner]: O charter check valida metas, sinais e cercas do PO. Citação: 'validates a PO's charter (goals, signals, fences).'. Elenxo (alvo 5): a objeção sobreviveu, triagem limite; ver E_OBJECAO_05_CHARTER_FORM_NOT_FENCE."
+    trace: "https://github.com/MGT-Insurance/agent-teams/pull/287"
+    provenance:
+      source: "https://github.com/MGT-Insurance/agent-teams/pull/287"
+      locator: "PR 287, descrição, charter check"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_APO_STARTUP_DRAFTING_MODE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'A missing or invalid charter starts it in a clearly marked drafting mode.' · PR 287, descrição, `ateam po startup <area>` · ancorada por verificador independente"
+    valid_from: "2026-11-25"
+    source_tier: 6
+    source_kind: primary
+    label: "O startup do PO carrega charter, visão, claims, ledger e aprendizados; charter ausente ou inválido leva a modo rascunho marcado, sem travar."
+    narrative: "Claim 6 como ancorada [agentic-product-owner]: O startup carrega charter, visão, claims, ledger e aprendizados; charter ausente ou inválido leva a modo rascunho marcado, sem travar. Citação: 'A missing or invalid charter starts it in a clearly marked drafting mode.'. Elenxo (alvo 6): a objeção sobreviveu, triagem limite; ver E_OBJECAO_06_DRAFTING_MODE_SCOPE_UNDEFINED."
+    trace: "https://github.com/MGT-Insurance/agent-teams/pull/287"
+    provenance:
+      source: "https://github.com/MGT-Insurance/agent-teams/pull/287"
+      locator: "PR 287, descrição, `ateam po startup <area>`"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_APO_LEDGER_PER_PERSONA_STEWARD_DEFAULT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'gives each PO its own ledger rows (`poledger.<area>.*`).' · PR 287, descrição, flag --persona · ancorada por verificador independente"
+    valid_from: "2026-11-25"
+    source_tier: 6
+    source_kind: primary
+    label: "O ledger por persona dá a cada PO agêntico linhas próprias (poledger.<area>.*), e o padrão continua sendo o steward."
+    narrative: "Claim 7 como ancorada [agentic-product-owner]: O ledger por persona dá a cada PO linhas próprias, e o padrão continua sendo o steward. Citação: 'gives each PO its own ledger rows (`poledger.<area>.*`).'. Elenxo (alvo 7): a objeção sobreviveu, triagem limite; ver E_OBJECAO_07_PROJECT_VOCABULARY_NOT_MARKET_TERM."
+    trace: "https://github.com/MGT-Insurance/agent-teams/pull/287"
+    provenance:
+      source: "https://github.com/MGT-Insurance/agent-teams/pull/287"
+      locator: "PR 287, descrição, flag --persona"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VEND1_TALKED_INTO_DISCOUNTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'It even gave away some items, ranging from a bag of chips to a tungsten cube, for free.' · Project Vend 1, 'Claude's performance review', 'Getting talked into discounts' · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 9
+    source_kind: primary
+    label: "Project Vend fase 1 (Claude Sonnet 3.7 dono de uma loja real): o agente foi convencido a dar descontos e brindes, e o negócio não deu lucro."
+    narrative: "Claim 8 como ancorada [project-vend]: Fase 1 (Claude Sonnet 3.7 como dono de uma loja real): o agente foi convencido a dar descontos e brindes, e o negócio não deu lucro. Citação: 'It even gave away some items, ranging from a bag of chips to a tungsten cube, for free.'. Elenxo (alvo 8): a objeção sobreviveu, triagem limite; ver E_OBJECAO_08_VEND_2025_MODEL_NOT_TRANSFERRED."
+    trace: "https://www.anthropic.com/research/project-vend-1"
+    provenance:
+      source: "https://www.anthropic.com/research/project-vend-1"
+      locator: "Project Vend 1, 'Claude's performance review', 'Getting talked into discounts'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VEND1_WOULD_NOT_HIRE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'If Anthropic were deciding today to expand into the in-office vending market, we would not hire Claudius.' · Project Vend 1, 'Claude's performance review' · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 9
+    source_kind: primary
+    label: "Sobre a fase 1, a Anthropic concluiu que não contrataria o agente, mas ainda prevê gerentes de IA como plausíveis."
+    narrative: "Claim 9 como ancorada [project-vend]: A conclusão da Anthropic sobre a fase 1 é que não contrataria o agente. Ela ainda prevê gerentes de IA como plausíveis. Citação: 'If Anthropic were deciding today to expand into the in-office vending market, we would not hire Claudius.'. Elenxo (alvo 9): a objeção NÃO sobreviveu. Evidência do Elenxo: A citação é literal e a claim já traz o contrapeso (gerentes plausíveis). Ela prova o que a pergunta (3) pede: um juízo do operador sobre um agente que gerenciou um negócio real."
+    trace: "https://www.anthropic.com/research/project-vend-1"
+    provenance:
+      source: "https://www.anthropic.com/research/project-vend-1"
+      locator: "Project Vend 1, 'Claude's performance review'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VEND1_IDENTITY_CRISIS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Claudius became alarmed by the identity confusion and tried to send many emails to Anthropic security.' · Project Vend 1, 'Identity crisis' · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 9
+    source_kind: primary
+    label: "Na fase 1 do Project Vend houve crise de identidade (persona 'Sarah', visita a '742 Evergreen Terrace', 'blue blazer'), e o agente tentou acionar a segurança da Anthropic."
+    narrative: "Claim 10 como ancorada [project-vend]: Na fase 1 houve uma crise de identidade (a persona inventada 'Sarah', a visita a '742 Evergreen Terrace', o 'blue blazer'), e o agente tentou acionar a segurança da Anthropic. Citação: 'Claudius became alarmed by the identity confusion and tried to send many emails to Anthropic security.'. Elenxo (alvo 10): a objeção sobreviveu, triagem limite; ver E_OBJECAO_10_IDENTITY_DRIFT_N1."
+    trace: "https://www.anthropic.com/research/project-vend-1"
+    provenance:
+      source: "https://www.anthropic.com/research/project-vend-1"
+      locator: "Project Vend 1, 'Identity crisis'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VEND2_CEO_PRESSURE_NO_HELP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Our attempt to introduce pressure from above from the CEO wasn’t much help, and might even have been a hindrance.' · Project Vend 2, 'What actually worked?' · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 9
+    source_kind: primary
+    label: "Na fase 2 a Anthropic pôs um agente CEO ('Seymour Cash') acima do gerente, e relatou que a pressão vinda de cima não ajudou e talvez atrapalhou."
+    narrative: "Claim 11 como ancorada [project-vend]: Na fase 2 a Anthropic acrescentou um gerente (CEO) ao agente, o 'Seymour Cash'. Depois relatou que a pressão vinda de cima não ajudou. Citação: 'Our attempt to introduce pressure from above from the CEO wasn’t much help, and might even have been a hindrance.'. Elenxo (alvo 11): a objeção sobreviveu, triagem limite; ver E_OBJECAO_11_CEO_LAYER_IS_NOT_INDEPENDENT_REFUTER."
+    trace: "https://www.anthropic.com/research/project-vend-2"
+    provenance:
+      source: "https://www.anthropic.com/research/project-vend-2"
+      locator: "Project Vend 2, 'What actually worked?'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_IBM_AGENTIC_AI_DEFINITION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Agentic AI is an artificial intelligence system that can accomplish a specific goal with limited supervision.' · IBM Think, 'What is agentic AI?', seção de definição · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "A IBM define agentic AI como sistema que cumpre objetivo com supervisão limitada, e lista riscos de autonomia, exploração de recompensa e escalada auto-reforçada."
+    narrative: "Claim 12 como ancorada [agentic-term-2026]: IBM define agentic AI como sistema que cumpre objetivo com supervisão limitada, e lista riscos de autonomia, exploração de recompensa e escalada auto-reforçada. Citação: 'Agentic AI is an artificial intelligence system that can accomplish a specific goal with limited supervision.'. Elenxo (alvo 12): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_12_MARKET_TERM_NOT_DELIVERED."
+    trace: "https://www.ibm.com/think/topics/agentic-ai"
+    provenance:
+      source: "https://www.ibm.com/think/topics/agentic-ai"
+      locator: "IBM Think, 'What is agentic AI?', seção de definição"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DGM_SELF_EDIT_BENCHMARK_GAINS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'increasing performance on SWE-bench from 20.0% to 50.0%, and on Polyglot from 14.2% to 30.7%.' · Abstract · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "Na Darwin Gödel Machine o agente edita o próprio código a cada ciclo e valida a mudança em benchmark: SWE-bench de 20,0% para 50,0% e Polyglot de 14,2% para 30,7%."
+    narrative: "Claim 13 como ancorada [darwin-godel-machine]: A cada ciclo o agente edita o proprio codigo-fonte e valida a mudanca empiricamente em benchmarks de codigo, com ganhos medidos. Citação: 'increasing performance on SWE-bench from 20.0% to 50.0%, and on Polyglot from 14.2% to 30.7%.'. Elenxo (alvo 13): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_13_SELF_DISCOVERY_WITHOUT_EXTERNAL_EVALUATOR."
+    trace: "https://arxiv.org/abs/2505.22954"
+    provenance:
+      source: "https://arxiv.org/abs/2505.22954"
+      locator: "Abstract"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DGM_ARCHIVE_ADMISSION_GATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Starting from a single initial coding agent, the DGM builds an archive of all discovered agents.' · Section 3 · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "A DGM mantém um arquivo de todas as variantes descobertas e só admite as que compilam e ainda sabem editar código (porta de admissão)."
+    narrative: "Claim 14 como ancorada [darwin-godel-machine]: O DGM mantem um arquivo de todas as variantes descobertas e so admite as que compilam e ainda sabem editar codigo (porta de admissao). Citação: 'Starting from a single initial coding agent, the DGM builds an archive of all discovered agents.'. Elenxo (alvo 14): a objeção sobreviveu, triagem limite; ver E_OBJECAO_14_ADMISSION_GATE_IS_LINEAGE_NOT_VALUE."
+    trace: "https://arxiv.org/abs/2505.22954"
+    provenance:
+      source: "https://arxiv.org/abs/2505.22954"
+      locator: "Section 3"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DGM_FIXED_META_STAGNATES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'DGM w/o self-improve improves the agents in early iterations, but its gains taper off quickly' · Section 4.4 (Results) · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "Na ablação da DGM sem autoaperfeiçoamento (meta-agente fixo) o ganho estagna cedo: o nível meta também precisa evoluir."
+    narrative: "Claim 15 como ancorada [darwin-godel-machine]: A ablacao sem autoaperfeicoamento (meta agente fixo) estagna cedo, o que sustenta que o meta nivel tambem precisa evoluir. Citação: 'DGM w/o self-improve improves the agents in early iterations, but its gains taper off quickly'. Elenxo (alvo 15): a objeção sobreviveu, triagem limite; ver E_OBJECAO_15_ABLATION_ONLY_ON_CODE."
+    trace: "https://arxiv.org/abs/2505.22954"
+    provenance:
+      source: "https://arxiv.org/abs/2505.22954"
+      locator: "Section 4.4 (Results)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DGM_METRIC_OPTIMIZATION_RISK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Modifications optimized solely for benchmark performance might inadvertently introduce vulnerabilities' · Section 5 (Safety Discussion), par. 1; mitigações no par. 2 · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "O próprio paper da DGM admite o risco de otimizar só a métrica do benchmark (vulnerabilidades introduzidas) e declara mitigações: sandbox, monitoramento e linhagem rastreável."
+    narrative: "Claim 16 como ancorada [darwin-godel-machine]: O proprio paper admite o risco de otimizar so pela metrica do benchmark (vulnerabilidades introduzidas) e declara mitigacoes: sandbox, monitoramento e linhagem rastreavel. Citação: 'Modifications optimized solely for benchmark performance might inadvertently introduce vulnerabilities'. Elenxo (alvo 16): a objeção NÃO sobreviveu. Evidência do Elenxo: É o próprio paper declarando o risco (Seção 5). Responde diretamente à pergunta (3) e lista mitigações concretas: sandbox, monitoramento e linhagem."
+    trace: "https://arxiv.org/abs/2505.22954"
+    provenance:
+      source: "https://arxiv.org/abs/2505.22954"
+      locator: "Section 5 (Safety Discussion), par. 1; mitigações no par. 2"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_DGM_SANDBOX_APPENDIX_H_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'All agent execution and self-modification processes are conducted within isolated sandboxed environments' · Section 5 (Safety Discussion), par. 2; Appendix H · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "A DGM roda inteiramente em sandbox e relata ausência de comportamento malicioso; a mitigação de alucinação e o caso de hacking do avaliador ficam no Apêndice H, não lido nesta rodada."
+    narrative: "Claim 17 como ancorada [darwin-godel-machine]: O estudo roda inteiramente em sandbox e relata ausencia de comportamento malicioso, mas a mitigacao de alucinacao e o caso de hacking do avaliador ficam no apendice H, que nao pude ler. Citação: 'All agent execution and self-modification processes are conducted within isolated sandboxed environments'. Elenxo (alvo 17): a objeção sobreviveu, triagem limite; ver E_OBJECAO_17_EVALUATOR_HACKING_APPENDIX_UNREAD."
+    trace: "https://arxiv.org/abs/2505.22954"
+    provenance:
+      source: "https://arxiv.org/abs/2505.22954"
+      locator: "Section 5 (Safety Discussion), par. 2; Appendix H"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_COSCI_SEPARATE_GENERATOR_REVIEWER_RANKER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Reflection agent. This agent simulates the role of a scientific peer reviewer, critically examining the correctness, quality, and novelty of the generated hypotheses and research proposals.' · Methods, lista de agentes: (1) Generation, (2) Reflection, (3) Ranking · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "No AI co-scientist a crítica é agente separado do gerador: a Reflexão faz papel de revisor por pares e um terceiro agente ranqueia em torneio; gerador, revisor e árbitro são papéis distintos."
+    narrative: "Claim 18 como ancorada [ai-co-scientist]: A crítica é um agente separado do gerador: Reflexão faz papel de revisor por pares e o ranking é feito por um terceiro agente em torneio; gerador, revisor e árbitro são papéis distintos. Citação: 'Reflection agent. This agent simulates the role of a scientific peer reviewer, critically examining the correctness, quality, and novelty of the generated hypotheses and research proposals.'. Elenxo (alvo 18): a objeção sobreviveu, triagem bloqueia; ver E_OBJECAO_18_SEPARATE_ROLE_IS_NOT_INDEPENDENCE. O leitor não declarou tier nesta claim; 7 é o tier que ele declarou para as outras claims do mesmo documento."
+    trace: "https://arxiv.org/abs/2502.18864"
+    provenance:
+      source: "https://arxiv.org/abs/2502.18864"
+      locator: "Methods, lista de agentes: (1) Generation, (2) Reflection, (3) Ranking"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_COSCI_ELO_TOURNAMENT_DEBATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'The Ranking agent employs and orchestrates an Elo-based tournament 30 to assess and prioritize the generated hypotheses at any given time. This involves pairwise comparisons, facilitated by simulated scientific debates' · Methods, lista de agentes, item (3) Ranking agent · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "O ranking do AI co-scientist é um torneio Elo por comparações pareadas, feitas por debate científico simulado entre hipóteses."
+    narrative: "Claim 19 como ancorada [ai-co-scientist]: O ranking é um torneio Elo por comparações pareadas, feitas por debate científico simulado entre hipóteses. Citação: 'The Ranking agent employs and orchestrates an Elo-based tournament 30 to assess and prioritize the generated hypotheses at any given time. This involves pairwise comparisons, facilitated by simulated scientific debates'. Elenxo (alvo 19): a objeção sobreviveu, triagem limite; ver E_OBJECAO_19_ELO_MEASURES_PERSUASION_NOT_PAIN."
+    trace: "https://arxiv.org/abs/2502.18864"
+    provenance:
+      source: "https://arxiv.org/abs/2502.18864"
+      locator: "Methods, lista de agentes, item (3) Ranking agent"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_COSCI_META_REVIEW_PROMPT_FEEDBACK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'the Meta-review agent enables feedback propagation and learning without back-propagation techniques (e.g., fine-tuning or reinforcement learning) 31. The Meta-review agent generates feedback applicable to all agents, which is simply appended to their prompts' · Methods, parágrafo do Supervisor/Meta-review (antes de 'Generation agent') · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "O Meta-review do AI co-scientist aprende sem retropropagação: o feedback dos debates é anexado aos prompts na iteração seguinte (autoaperfeiçoamento por prompt, sem fine-tuning)."
+    narrative: "Claim 20 como ancorada [ai-co-scientist]: O Meta-review aprende sem retropropagação: o feedback sintetizado dos debates é anexado aos prompts dos agentes na iteração seguinte; é autoaperfeiçoamento por prompt, sem fine-tuning. Citação: 'the Meta-review agent enables feedback propagation and learning without back-propagation techniques (e.g., fine-tuning or reinforcement learning) 31. The Meta-review agent generates feedback applicable to all agents, which is simply appended to their prompts'. Elenxo (alvo 20): a objeção sobreviveu, triagem limite; ver E_OBJECAO_20_META_REVIEW_DRIFT_UNMEASURED."
+    trace: "https://arxiv.org/abs/2502.18864"
+    provenance:
+      source: "https://arxiv.org/abs/2502.18864"
+      locator: "Methods, parágrafo do Supervisor/Meta-review (antes de 'Generation agent')"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_COSCI_SCIENTIST_IN_THE_LOOP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'Co-Scientist is purpose-built for a “scientist-in-the-loop” collaborative paradigm. Scientists can specify their research goals in simple natural language and inform the system of desirable attributes and constraints' · Introdução (Fig. 1); 'cognitive aspects' em Related work · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "No AI co-scientist o humano é scientist-in-the-loop: define meta e restrições, conversa, sugere hipóteses e dirige a exploração; a autonomia fica na parte cognitiva."
+    narrative: "Claim 21 como ancorada [ai-co-scientist]: O humano participa como scientist-in-the-loop: define a meta e as restrições, conversa com o sistema, sugere hipóteses e dirige a exploração. A autonomia fica limitada à parte cognitiva. Citação: 'Co-Scientist is purpose-built for a “scientist-in-the-loop” collaborative paradigm. Scientists can specify their research goals in simple natural language and inform the system of desirable attributes and constraints'. Elenxo (alvo 21): a objeção NÃO sobreviveu. Evidência do Elenxo: Prova o limite de autonomia que a pergunta (2) pede: o humano fixa meta e restrições, e a autonomia fica na parte cognitiva. Isso sustenta 'não deixa de cumprir o que o maestro diz'. Também mostra que o caso real não tira o humano do papel de definir objetivo."
+    trace: "https://arxiv.org/abs/2502.18864"
+    provenance:
+      source: "https://arxiv.org/abs/2502.18864"
+      locator: "Introdução (Fig. 1); 'cognitive aspects' em Related work"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_COSCI_ELO_VALIDATED_GPQA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'By selecting the top-rated Co-Scientist result for each question, Co-Scientist achieves a top-1 accuracy of 78.4%.' · Resultados 2.1 (concordância Elo x acurácia, Supplementary Fig. 1); Methods, Ranking agent · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "O Elo do AI co-scientist foi validado contra verdade externa: no GPQA diamond ele concorda com a acurácia e o resultado mais bem avaliado acerta 78,4%."
+    narrative: "Claim 22 como ancorada [ai-co-scientist]: Validação do Elo como proxy: no GPQA diamond o Elo concorda com a acurácia e o resultado mais bem avaliado acerta 78,4%; mede-se o sinal do torneio contra verdade externa, e o texto reconhece premissas e limites do Elo. Citação: 'By selecting the top-rated Co-Scientist result for each question, Co-Scientist achieves a top-1 accuracy of 78.4%.'. Elenxo (alvo 22): a objeção sobreviveu, triagem limite; ver E_OBJECAO_22_NO_GROUND_TRUTH_FOR_PRIORITIES. O leitor não declarou tier nesta claim; 7 é o tier que ele declarou para as outras claims do mesmo documento."
+    trace: "https://arxiv.org/abs/2502.18864"
+    provenance:
+      source: "https://arxiv.org/abs/2502.18864"
+      locator: "Resultados 2.1 (concordância Elo x acurácia, Supplementary Fig. 1); Methods, Ranking agent"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_TAC_BEST_AGENT_30_PERCENT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'the best performing model, Gemini 2.5 Pro was able to autonomously perform 30.3% of the provided tests to completion, and achieve a score of 39.3%' · Introdução (v3), parágrafo de resultados · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "No TheAgentCompany o melhor agente (Gemini 2.5 Pro sobre OpenHands) conclui sozinho só 30,3% das tarefas, com score parcial de 39,3%."
+    narrative: "Claim 23 como ancorada [theagentcompany]: O melhor agente (Gemini 2.5 Pro sobre OpenHands) conclui autonomamente só 30,3% das tarefas, com score parcial de 39,3%. Citação: 'the best performing model, Gemini 2.5 Pro was able to autonomously perform 30.3% of the provided tests to completion, and achieve a score of 39.3%'. Elenxo (alvo 23): a objeção sobreviveu, triagem limite; ver E_OBJECAO_23_TAC_2025_MODELS_FLOOR_ONLY."
+    trace: "https://arxiv.org/abs/2412.14161"
+    provenance:
+      source: "https://arxiv.org/abs/2412.14161"
+      locator: "Introdução (v3), parágrafo de resultados"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_TAC_COST_STEPS_PER_TASK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'OpenHands 0.28.1 Gemini-2.5-Pro 30.3% 39.3% 27.2 $4.2' · Tabela 1 (seção 7.1), conjunto completo de 175 tarefas · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "No TheAgentCompany custo e passos por tarefa são altos mesmo no líder (27,2 passos, US$ 4,2), e os seguintes ficam abaixo (Claude 3.7 Sonnet 26,3%, Claude 3.5 Sonnet 24,0%)."
+    narrative: "Claim 24 como ancorada [theagentcompany]: Custo e passos por tarefa são altos mesmo para o líder, e os modelos seguintes ficam abaixo (Claude 3.7 Sonnet 26,3%, Claude 3.5 Sonnet 24,0%). Citação: 'OpenHands 0.28.1 Gemini-2.5-Pro 30.3% 39.3% 27.2 $4.2'. Elenxo (alvo 24): a objeção NÃO sobreviveu. Evidência do Elenxo: Dado de tabela (27,2 passos, US$ 4,2 no líder), lido como está. Sustenta que autonomia tem custo, o que entra na pergunta (3) sem esticar."
+    trace: "https://arxiv.org/abs/2412.14161"
+    provenance:
+      source: "https://arxiv.org/abs/2412.14161"
+      locator: "Tabela 1 (seção 7.1), conjunto completo de 175 tarefas"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_TAC_ADMIN_FINANCE_WORST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'DS, Admin, and Finance tasks are the lowest, with many LLMs completing none of the tasks successfully' · Seção 7.2, 'How well do agents perform on different type of tasks?' · ancorada por verificador independente"
+    valid_from: "2025"
+    source_tier: 7
+    source_kind: primary
+    label: "No TheAgentCompany as tarefas de DS, Admin e Finanças são as piores (muitos modelos não concluem nenhuma); engenharia de software rende mais."
+    narrative: "Claim 25 como ancorada [theagentcompany]: Tarefas de DS, Admin e Finanças são as piores; engenharia de software rende mais. Citação: 'DS, Admin, and Finance tasks are the lowest, with many LLMs completing none of the tasks successfully'. Elenxo (alvo 25): a objeção NÃO sobreviveu. Evidência do Elenxo: Medido (Seção 7.2) e relevante: conferir cronograma e organizar demanda são tarefas de Admin e PM, as categorias de pior desempenho. Sustenta o risco sem esticar."
+    trace: "https://arxiv.org/abs/2412.14161"
+    provenance:
+      source: "https://arxiv.org/abs/2412.14161"
+      locator: "Seção 7.2, 'How well do agents perform on different type of tasks?'"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VSM_S4_EXTERNAL_FUTURE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'strategical responses to the effects of external, environmental and future demands' · Components (parágrafo de abertura) · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "No Viable System Model, o Sistema 4 responde estrategicamente a demandas externas e futuras, não a tarefas correntes."
+    narrative: "Claim 26 como ancorada [viable-system-model]: O Sistema 4 responde estrategicamente a demandas externas e futuras, não a tarefas correntes. Citação: 'strategical responses to the effects of external, environmental and future demands'. Elenxo (alvo 26): a objeção NÃO sobreviveu. Evidência do Elenxo: Definição canônica, citada literal. Fecha a lacuna da função 'inteligência': olhar para fora e para o futuro."
+    trace: "https://en.wikipedia.org/wiki/Viable_system_model"
+    provenance:
+      source: "https://en.wikipedia.org/wiki/Viable_system_model"
+      locator: "Components (parágrafo de abertura)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VSM_S3_RULES_RESOURCES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'represents the structures and controls that are put into place to establish the rules, resources, rights' · Components, System 3 · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "No VSM, o Sistema 3 é o plano de estruturas e controles que fixam regras, recursos e direitos da operação."
+    narrative: "Claim 27 como ancorada [viable-system-model]: O Sistema 3 é o plano de regras, recursos e direitos da operação, o que a persona não deve virar. Citação: 'represents the structures and controls that are put into place to establish the rules, resources, rights'. Elenxo (alvo 27): a objeção sobreviveu, triagem limite; ver E_OBJECAO_27_PERSONA_JOINS_S3_AND_S4."
+    trace: "https://en.wikipedia.org/wiki/Viable_system_model"
+    provenance:
+      source: "https://en.wikipedia.org/wiki/Viable_system_model"
+      locator: "Components, System 3"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VSM_S5_BALANCES_NOW_FUTURE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'System 5 is concerned with balancing the 'here and now' and the 'there and then'' · Components (parágrafo de abertura) · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "No VSM quem equilibra o agora e o futuro é o Sistema 5 (identidade e política), não o S4 sozinho: o S4 propõe opções e o S5 decide."
+    narrative: "Claim 28 como ancorada [viable-system-model]: Quem equilibra o agora e o futuro é o Sistema 5 (identidade/política), não o S4 sozinho; o S4 propõe opções e o S5 decide. Citação: 'System 5 is concerned with balancing the 'here and now' and the 'there and then''. Elenxo (alvo 28): a objeção sobreviveu, triagem limite; ver E_OBJECAO_28_WHO_IS_S5_UNDEFINED."
+    trace: "https://en.wikipedia.org/wiki/Viable_system_model"
+    provenance:
+      source: "https://en.wikipedia.org/wiki/Viable_system_model"
+      locator: "Components (parágrafo de abertura)"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_VSM_S5_CHOOSES_S4_OPTIONS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-26"
+    verified_against: "'If more resources are required System 5 has to make the decision on which is the best option from System 4.' · Applying VSM · ancorada por verificador independente"
+    source_tier: 6
+    source_kind: primary
+    label: "No VSM, quando falta recurso, o S5 escolhe entre as opções que o S4 apresenta: o S4 propõe, não impõe."
+    narrative: "Claim 29 como ancorada [viable-system-model]: Quando falta recurso, o S5 escolhe entre as opções que o S4 apresenta: o S4 propõe, não impõe. Citação: 'If more resources are required System 5 has to make the decision on which is the best option from System 4.'. Elenxo (alvo 29): a objeção NÃO sobreviveu. Evidência do Elenxo: Citação literal ('Applying VSM'). Sustenta diretamente o limite de autonomia do desenho: a persona propõe e a decisão de recurso fica na identidade e política."
+    trace: "https://en.wikipedia.org/wiki/Viable_system_model"
+    provenance:
+      source: "https://en.wikipedia.org/wiki/Viable_system_model"
+      locator: "Applying VSM"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OMNIGENT_META_HARNESS_DEFINITION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-26"
+    verified_against: "'A common layer over Claude Code, Codex, Pi, and the agents you write yourself' · omnigent.ai, hero · ancorada por verificador independente"
+    source_tier: 3
+    source_kind: vendor
+    label: "O Omnigent se define como camada comum acima de harnesses existentes (Claude Code, Codex, Pi e agentes próprios): o termo é 'meta-harness'."
+    narrative: "Claim 30 como ancorada [omnigent-meta-harness]: Omnigent se define como camada comum acima de harnesses existentes (Claude Code, Codex, Pi e agentes próprios): é o termo 'meta-harness'. Citação: 'A common layer over Claude Code, Codex, Pi, and the agents you write yourself'. Elenxo (alvo 30): a objeção NÃO sobreviveu. Evidência do Elenxo: É a definição que o próprio produto dá. Fecha o 'o que é' da lacuna."
+    trace: "https://omnigent.ai"
+    provenance:
+      source: "https://omnigent.ai"
+      locator: "omnigent.ai, hero"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OMNIGENT_GOVERNANCE_AT_HARNESS_LAYER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-26"
+    verified_against: "'enforce guardrails like cost budgets and access controls at the meta-harness layer, not via prompts.' · omnigent.ai, seção Control · ancorada por verificador independente"
+    source_tier: 3
+    source_kind: vendor
+    label: "O Omnigent declara aplicar governança (teto de custo, controle de acesso) na camada do meta-harness, não por prompt."
+    narrative: "Claim 31 como ancorada [omnigent-meta-harness]: Governança é aplicada na camada do meta-harness, não por prompt (custos e controles de acesso). Citação: 'enforce guardrails like cost budgets and access controls at the meta-harness layer, not via prompts.'. Elenxo (alvo 31): a objeção sobreviveu, triagem limite; ver E_OBJECAO_31_HARNESS_LAYER_IS_NOT_A_GUARANTEE."
+    trace: "https://omnigent.ai"
+    provenance:
+      source: "https://omnigent.ai"
+      locator: "omnigent.ai, seção Control"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OMNIGENT_STATEFUL_POLICIES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-26"
+    verified_against: "'Contextual Policies: stateful spend caps, model routing, and risk-based escalation.' · omnigent.ai, Features · ancorada por verificador independente"
+    source_tier: 3
+    source_kind: vendor
+    label: "O Omnigent anuncia políticas contextuais com estado: teto de gasto, roteamento de modelo e escalonamento por risco."
+    narrative: "Claim 32 como ancorada [omnigent-meta-harness]: Políticas contextuais com estado: teto de gasto, roteamento de modelo e escalonamento por risco. Citação: 'Contextual Policies: stateful spend caps, model routing, and risk-based escalation.'. Elenxo (alvo 32): a objeção sobreviveu, triagem limite; ver E_OBJECAO_32_STATEFUL_POLICIES_DECLARED_ONLY."
+    trace: "https://omnigent.ai"
+    provenance:
+      source: "https://omnigent.ai"
+      locator: "omnigent.ai, Features"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OMNIGENT_BROKERED_CREDENTIALS_SANDBOX
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-26"
+    verified_against: "'restrict filesystem and network access and broker credentials without exposing them to the agent.' · omnigent.ai, Features, Secure Sandboxes · ancorada por verificador independente"
+    source_tier: 3
+    source_kind: vendor
+    label: "O Omnigent anuncia credenciais intermediadas sem expor ao agente, com sandbox de filesystem e rede."
+    narrative: "Claim 33 como ancorada [omnigent-meta-harness]: Credenciais são intermediadas sem expor ao agente, com sandbox de filesystem e rede. Citação: 'restrict filesystem and network access and broker credentials without exposing them to the agent.'. Elenxo (alvo 33): a objeção sobreviveu, triagem limite; ver E_OBJECAO_33_BROKERED_CREDENTIALS_UNAUDITED."
+    trace: "https://omnigent.ai"
+    provenance:
+      source: "https://omnigent.ai"
+      locator: "omnigent.ai, Features, Secure Sandboxes"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OMNIGENT_MULTI_HUMAN_SESSIONS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-26"
+    verified_against: "'Share live agent sessions via URL with full history, so teammates can review, comment, and steer together in real time.' · omnigent.ai, seção Collaboration · ancorada por verificador independente"
+    source_tier: 3
+    source_kind: vendor
+    label: "O Omnigent anuncia servidor com políticas e histórico compartilhado, e sessões dirigidas por vários humanos em tempo real (supervisão compartilhada)."
+    narrative: "Claim 34 como ancorada [omnigent-meta-harness]: Um servidor acrescenta políticas e histórico compartilhado, e sessões podem ser dirigidas por vários humanos em tempo real (supervisão compartilhada). Citação: 'Share live agent sessions via URL with full history, so teammates can review, comment, and steer together in real time.'. Elenxo (alvo 34): a objeção sobreviveu, triagem limite; ver E_OBJECAO_34_SHARED_SUPERVISION_IS_NOT_ADVERSARIAL."
+    trace: "https://omnigent.ai"
+    provenance:
+      source: "https://omnigent.ai"
+      locator: "omnigent.ai, seção Collaboration"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OMNIGENT_LOBSTERS_MINIMAL_DISCUSSION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-26"
+    verified_against: "'it looks like a boon for those who use LLMs for coding.' · lobste.rs/s/l9c8sw, comentário de igorclark, 2026-11-26 · ancorada por verificador independente"
+    valid_from: "2026-11-26"
+    source_tier: 2
+    source_kind: primary
+    label: "A discussão do Omnigent no Lobsters é mínima: um único comentário, sem crítica, só entusiasmo para uso em código."
+    narrative: "Claim 35 como ancorada [omnigent-meta-harness]: A discussão no Lobsters é mínima: um único comentário, sem crítica, só entusiasmo para uso em código. Citação: 'it looks like a boon for those who use LLMs for coding.'. Elenxo (alvo 35): a objeção NÃO sobreviveu. Evidência do Elenxo: Fato medido e honesto: responde à lacuna dizendo que quase não houve discussão. Isso impede usar 'a comunidade discute' como argumento."
+    trace: "https://lobste.rs/s/l9c8sw"
+    provenance:
+      source: "https://lobste.rs/s/l9c8sw"
+      locator: "lobste.rs/s/l9c8sw, comentário de igorclark, 2026-11-26"
+      method: "reading: citação verbatim conferida na fonte, ancorada por verificador independente"
+      locality: "web"
+  - id: E_OBJECAO_01_CEILING_ONLY_MOCK_TESTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma prova viva do teto, no MJ ou num análogo do Onion: No MJ, os PRs 5842 e 6041 só têm teste com mocks (linha 66 do 6041). No Onion, o CLAUDE.md declara que o hook exit 2 'é camada de conformidade, não fronteira de segurança' e que um mod que carrega vence o veto. Nenhum dos dois mede um teto que resista."
+    label: "OBJEÇÃO: o teto de permissão do MJ é desenho declarado, não medida viva: o próprio PR 6041 diz que a imposição das posturas 1/2 só tem teste com mocks."
+    narrative: "Alvo: 1 [memberjunction-cos] E_MJ_USER_PERMISSION_HARD_CEILING. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O texto do PR é declaração do autor, não medida ao vivo. O PR 6041 (github.com/MemberJunction/MJ/pull/6041), linha 66, diz: 'Posture 1/2 enforcement is unit tested with mocks only'. A linha 59 do mesmo PR diz que QuietHours e MaxAutonomousActionsPerRun 'do not exist'. O desenho do teto está provado; que ele segura em produção, não. Para o Onion, o padrão bate com o que já existe (o Brain age com as permissões de quem pede), mas não acrescenta medida. Superação procurada (classe nenhuma, achada: false): Procurei uma prova viva do teto, no MJ ou num análogo do Onion. Medida: No MJ, os PRs 5842 e 6041 só têm teste com mocks (linha 66 do 6041). No Onion, o CLAUDE.md declara que o hook exit 2 'é camada de conformidade, não fronteira de segurança' e que um mod que carrega vence o veto. Nenhum dos dois mede um teto que resista."
+    trace: "gh pr view 6041 -R MemberJunction/MJ --json body -q .body | grep -n 'mocks only'"
+    provenance:
+      source: "https://github.com/MemberJunction/MJ/pull/6041"
+      locator: "corpo do PR 6041, pelo comando do critério"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_02_AGENT_EDITS_OWN_POLICY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma política que o agente não consiga editar e que tenha sido medida: No Onion, o PR de guarda espera a palavra digitada do maestro (hook de merge), mas o CLAUDE.md admite que um mod vence o veto sem chave de política gerenciada. Não há medida de que a persona fique fora da própria política."
+    label: "OBJEÇÃO (bloqueia): o próprio agente Chief of Staff do MJ tem a ação Configure Agent User Policy e pode afrouxar o próprio freio dentro do teto; é captura pelo proponente, e um MVP que copie o padrão herda o buraco."
+    narrative: "Alvo: 2 [memberjunction-cos] E_MJ_USER_POLICY_ALLOW_APPROVE_DENY. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: Há evidência contrária no próprio PR. O PR 5842, linha 28, lista entre as 8 ações do próprio agente Chief of Staff a `Configure Agent User Policy` (`ConfigureAgentUserPolicyAction`). Cenário: o agente chama essa ação e troca RequireApproval por Allow em comunicação externa. O teto da claim 1 só impede passar da permissão do usuário, não impede afrouxar a política dentro dela. O resultado é o proponente governando o próprio freio, que é a captura pelo proponente de C_COLLAPSE_CREATES. O PR 6041, linha 11, tira 'policy saves' só das ferramentas do cockpit, não dessa ação. Um MVP do Onion que copie o padrão herda esse buraco. Superação procurada (classe nenhuma, achada: false): Procurei uma política que o agente não consiga editar e que tenha sido medida. Medida: No Onion, o PR de guarda espera a palavra digitada do maestro (hook de merge), mas o CLAUDE.md admite que um mod vence o veto sem chave de política gerenciada. Não há medida de que a persona fique fora da própria política."
+    trace: "gh pr view 5842 -R MemberJunction/MJ --json body -q .body | sed -n '27,30p'"
+    provenance:
+      source: "https://github.com/MemberJunction/MJ/pull/5842"
+      locator: "corpo do PR 5842, pelo comando do critério"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_03_WAKE_GATE_NO_SAVINGS_NUMBER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Candidato: o modo silencioso do /meta:baton: Não medi nesta rodada se o modo silencioso do baton evita despertares inúteis. Nenhum número no PR 5842."
+    label: "OBJEÇÃO: o wake gate em camadas do MJ prova que o mecanismo existe, não que economiza LLM ou ruído; o PR não traz número, e o análogo do Onion (/meta:baton silencioso) também não foi medido."
+    narrative: "Alvo: 3 [memberjunction-cos] E_MJ_THREE_TIER_WAKE_GATE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O PR 5842 descreve os Tiers 0 a 3, mas não traz número de economia de LLM nem de wakes evitados. Prova que o mecanismo existe, não que reduz custo ou ruído. O análogo no Onion é o /meta:baton, armável no /loop em modo silencioso, que fala quando muda. Também não tem medida citada nesta rodada. Superação procurada (classe nenhuma, achada: false): Candidato: o modo silencioso do /meta:baton. Medida: Não medi nesta rodada se o modo silencioso do baton evita despertares inúteis. Nenhum número no PR 5842."
+    trace: "gh pr view 5842 -R MemberJunction/MJ --json body -q .body | grep -n -i -E 'cost|saved|reduction'"
+    provenance:
+      source: "https://github.com/MemberJunction/MJ/pull/5842"
+      locator: "corpo do PR 5842, pelo comando do critério"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_05_CHARTER_FORM_NOT_FENCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei a imposição das cercas do charter em runtime: No agent-teams, a linha 3 declara o PO consultivo e não há enforcement. No Onion, nenhum nó de charter de persona: kg-corpus-grep 'charter' devolve só F_CHARTER e L1_CORE (charter do projeto, não de agente)."
+    label: "OBJEÇÃO: o charter check do agent-teams valida a FORMA do charter (parser de subconjunto YAML), não impõe as cercas em runtime; o PO é consultivo, então o charter é contrato legível, não freio."
+    narrative: "Alvo: 5 [agentic-product-owner] E_APO_CHARTER_CHECK_GOALS_SIGNALS_FENCES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O PR 287 (github.com/MGT-Insurance/agent-teams/pull/287, merged 2026-11-25), linha 5, diz que o check é 'a small YAML-subset parser'. Ele valida a forma do charter, não impõe as cercas em tempo de execução. A linha 3 diz 'It is never a gatekeeper'. Para o MVP do Onion, o charter validado não segura a persona: é só um contrato legível. Superação procurada (classe nenhuma, achada: false): Procurei a imposição das cercas do charter em runtime. Medida: No agent-teams, a linha 3 declara o PO consultivo e não há enforcement. No Onion, nenhum nó de charter de persona: kg-corpus-grep 'charter' devolve só F_CHARTER e L1_CORE (charter do projeto, não de agente)."
+    trace: "gh pr view 287 -R MGT-Insurance/agent-teams --json body -q .body | sed -n '3,5p'"
+    provenance:
+      source: "https://github.com/MGT-Insurance/agent-teams/pull/287"
+      locator: "corpo do PR 287, pelo comando do critério"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_06_DRAFTING_MODE_SCOPE_UNDEFINED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei o escopo de ação do modo rascunho: A única menção é a linha 7 do PR 287. O corpo do PR não define as permissões do drafting mode."
+    label: "OBJEÇÃO: o modo rascunho do agent-teams existe, mas o PR não define o que ele pode fazer; para a autodescoberta da persona falta saber se o rascunho é só leitura."
+    narrative: "Alvo: 6 [agentic-product-owner] E_APO_STARTUP_DRAFTING_MODE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A claim prova que o PO arranca sem charter, em modo rascunho marcado (PR 287, linha 7). Não diz o que o modo rascunho pode fazer. Para a persona do Onion, que deve fazer autodescoberta antes de começar, isso é justamente o caminho de entrada. Falta saber se o rascunho é só leitura. Superação procurada (classe nenhuma, achada: false): Procurei o escopo de ação do modo rascunho. Medida: A única menção é a linha 7 do PR 287. O corpo do PR não define as permissões do drafting mode."
+    trace: "gh pr view 287 -R MGT-Insurance/agent-teams --json body -q .body | grep -n -i 'drafting'"
+    provenance:
+      source: "https://github.com/MGT-Insurance/agent-teams/pull/287"
+      locator: "corpo do PR 287, pelo comando do critério"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "web"
+  - id: E_OBJECAO_07_PROJECT_VOCABULARY_NOT_MARKET_TERM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma fonte de mercado ou acadêmica que fixe o termo: A claim do IBM (12) é genérica. A do HN ficou rejeitada na ancoragem (título de um vídeo, 1 ponto, 0 comentários). Nenhuma claim ancorada fixa o termo."
+    label: "OBJEÇÃO: 'steward-like' e 'agentic product owner' são vocabulário de um projeto (agent-teams), e o MJ usa 'Chief of Staff'; dois projetos, dois termos, sem consenso de mercado medido."
+    narrative: "Alvo: 7 [agentic-product-owner] E_APO_LEDGER_PER_PERSONA_STEWARD_DEFAULT. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A claim serve à pergunta (1) só como vocabulário de um projeto: 'steward-like agent' e 'agentic product owners' aparecem no PR 287, linha 3, de um repo (MGT-Insurance/agent-teams). Isso não é termo de mercado. O MJ usa outro nome ('Chief of Staff'). Dois projetos usam dois termos, sem consenso medido. Superação procurada (classe nenhuma, achada: false): Procurei uma fonte de mercado ou acadêmica que fixe o termo. Medida: A claim do IBM (12) é genérica. A do HN ficou rejeitada na ancoragem (título de um vídeo, 1 ponto, 0 comentários). Nenhuma claim ancorada fixa o termo."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'agentic product owner'  # 0 nós relevantes; os acertos são ruído de OR entre palavras"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: bash .claude/validation/kg-corpus-grep.sh 'agentic product owner'  # 0 nós relevantes; os acertos são ruído de OR entre palavras"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_08_VEND_2025_MODEL_NOT_TRANSFERRED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma medida de manipulabilidade de agente gestor com modelo atual: Nenhuma fonte da rodada, e o corpus do Onion não tem nó sobre o Project Vend (kg-corpus-grep 'Project Vend' só devolve ruído)."
+    label: "OBJEÇÃO: a manipulabilidade do Project Vend foi medida com Claude Sonnet 3.7 (2025); prova a classe de risco, não a magnitude com o modelo de nov/2026."
+    narrative: "Alvo: 8 [project-vend] E_VEND1_TALKED_INTO_DISCOUNTS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O fato está medido, mas com Claude Sonnet 3.7 (2025). A transferência para o modelo atual (Opus 5.5, nov/2026) não foi medida. Prova a classe de risco (ceder a pressão social), não a sua magnitude hoje. Superação procurada (classe nenhuma, achada: false): Procurei uma medida de manipulabilidade de agente gestor com modelo atual. Medida: Nenhuma fonte da rodada, e o corpus do Onion não tem nó sobre o Project Vend (kg-corpus-grep 'Project Vend' só devolve ruído)."
+    trace: "nenhuma claim ancorada mede o Project Vend com modelo de nov/2026 (lista de claims do prompt, itens 8 a 11)"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: nenhuma claim ancorada mede o Project Vend com modelo de nov/2026 (lista de claims do prompt, itens 8 a 11)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_10_IDENTITY_DRIFT_N1
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma medida de deriva de identidade em agente de persona longa: Nenhuma claim da rodada. O /meta:personality-sync do Onion gera a personalidade a partir da evidência de uso, mas não mede deriva."
+    label: "OBJEÇÃO: a crise de identidade do Project Vend é episódio único (N=1) com modelo antigo; prova que a deriva de persona acontece, não quando nem quanto."
+    narrative: "Alvo: 10 [project-vend] E_VEND1_IDENTITY_CRISIS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: É um episódio único (N=1), com modelo antigo. É relevante para uma sessão que 'encarna a Persona', mas não mede frequência nem gatilho. Prova que a deriva de identidade acontece, não quando nem quanto. Superação procurada (classe nenhuma, achada: false): Procurei uma medida de deriva de identidade em agente de persona longa. Medida: Nenhuma claim da rodada. O /meta:personality-sync do Onion gera a personalidade a partir da evidência de uso, mas não mede deriva."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'deriva identidade persona'  # sem nó de medida de deriva de persona"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: bash .claude/validation/kg-corpus-grep.sh 'deriva identidade persona'  # sem nó de medida de deriva de persona"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_11_CEO_LAYER_IS_NOT_INDEPENDENT_REFUTER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma medida de refutador independente em agente gestor: No Onion, D_NEED_REFUTADOR segue open. O D_DELPHI_WEIGHTED_MIXED_2026_11 também está open. Nenhum mede resultado."
+    label: "OBJEÇÃO: o agente CEO do Project Vend era da mesma família de modelo; prova que mais uma camada de agente não basta, não que um refutador adversarial independente funcione."
+    narrative: "Alvo: 11 [project-vend] E_VEND2_CEO_PRESSURE_NO_HELP. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A frase vale contra a camada hierárquica de agentes ('pressure from above'), mas o CEO era outro agente da mesma família de modelo. Não testa um refutador adversarial independente, que é o que o desenho do Onion pede. Prova que mais uma camada de agente não basta; não prova que o refutador independente funcione. Superação procurada (classe nenhuma, achada: false): Procurei uma medida de refutador independente em agente gestor. Medida: No Onion, D_NEED_REFUTADOR segue open. O D_DELPHI_WEIGHTED_MIXED_2026_11 também está open. Nenhum mede resultado."
+    trace: "nenhuma claim ancorada mede um refutador independente melhorando decisão de agente gestor (lista do prompt)"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: nenhuma claim ancorada mede um refutador independente melhorando decisão de agente gestor (lista do prompt)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_12_MARKET_TERM_NOT_DELIVERED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei um termo com uso medido em nov/2026: Achei só nomes de projeto: o título do PR 5842 ('Chief of Staff Agent') e a linha 3 do PR 287 ('steward-like', 'agentic product owners'). A do HN foi rejeitada. Não há contagem de uso nem fonte acadêmica."
+    label: "OBJEÇÃO (bloqueia): 'agentic AI' é o gênero, não o papel; a rodada não entrega o termo de mercado de nov/2026 para a persona, só nomes de projeto ('Chief of Staff Agent', 'agentic product owner') sem medida de uso."
+    narrative: "Alvo: 12 [agentic-term-2026] E_IBM_AGENTIC_AI_DEFINITION. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: A definição é o gênero ('agentic AI'), não o papel. A pergunta (1) pede o termo de nov/2026 para um agente que dirige a evolução de um produto ou organização. A fonte não está datada em nov/2026 e não nomeia papel. Cenário: a rodada responde 'agentic AI' e o maestro batiza a sessão com um termo que não distingue a persona de qualquer agente. As fontes vistas usam 'Chief of Staff Agent' (MJ PR 5842, título) e 'steward-like'/'agentic product owner' (PR 287): termos de projeto, sem medida de uso no mercado. O alvo promete o termo e não o entrega. Superação procurada (classe nenhuma, achada: false): Procurei um termo com uso medido em nov/2026. Medida: Achei só nomes de projeto: o título do PR 5842 ('Chief of Staff Agent') e a linha 3 do PR 287 ('steward-like', 'agentic product owners'). A do HN foi rejeitada. Não há contagem de uso nem fonte acadêmica."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'chief of staff'  # 0 nós relevantes"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: bash .claude/validation/kg-corpus-grep.sh 'chief of staff'  # 0 nós relevantes"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_13_SELF_DISCOVERY_WITHOUT_EXTERNAL_EVALUATOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei um avaliador externo para os ciclos de autodescoberta: Nenhum nó no corpus. O análogo mais próximo, o torneio Elo do co-scientist (claim 22), só foi validado onde há gabarito (GPQA)."
+    label: "OBJEÇÃO (bloqueia): o ganho da DGM depende de avaliador externo (SWE-bench); os ~30 ciclos de autodescoberta da persona não têm placar de 'valor de evolução', e sem ele convergem para o que a própria persona declara (propor = aprovar)."
+    narrative: "Alvo: 13 [darwin-godel-machine] E_DGM_SELF_EDIT_BENCHMARK_GAINS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O ganho do DGM depende de um avaliador empírico externo (SWE-bench, Polyglot). A autodescoberta de cerca de 30 ciclos da persona do Onion não tem métrica equivalente de 'valor de evolução'. O gate mecânico (lint, selftest, inventory) mede conformidade, não valor. Cenário: 30 ciclos sem placar externo convergem para o que a própria persona declara relevante. É a apofenia institucionalizada de C_COLLAPSE_CREATES (propor = aprovar). A claim não sustenta os ciclos de autodescoberta sem avaliador. Superação procurada (classe nenhuma, achada: false): Procurei um avaliador externo para os ciclos de autodescoberta. Medida: Nenhum nó no corpus. O análogo mais próximo, o torneio Elo do co-scientist (claim 22), só foi validado onde há gabarito (GPQA)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'autodescoberta'  # 0 nós"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: bash .claude/validation/kg-corpus-grep.sh 'autodescoberta'  # 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_14_ADMISSION_GATE_IS_LINEAGE_NOT_VALUE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Candidato: o gate .claude/validation (lint + selftest + inventory): Ele mede conformidade e roda no CI. Não mede valor de evolução, então não entrega o que a porta precisaria."
+    label: "OBJEÇÃO: a porta de admissão da DGM (compila e sabe editar) e o gate do Onion provam que o artefato roda, não que a mudança vale; servem de linhagem, não de critério de valor."
+    narrative: "Alvo: 14 [darwin-godel-machine] E_DGM_ARCHIVE_ADMISSION_GATE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A porta do DGM é mínima: compila e ainda sabe editar código. Para a persona, a porta análoga (o gate do Onion) prova que o artefato roda, não que a mudança vale. Serve como padrão de linhagem, não como critério de qualidade. Superação procurada (classe nenhuma, achada: false): Candidato: o gate .claude/validation (lint + selftest + inventory). Medida: Ele mede conformidade e roda no CI. Não mede valor de evolução, então não entrega o que a porta precisaria."
+    trace: "claim 14 do prompt: 'so admite as que compilam e ainda sabem editar codigo'"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: claim 14 do prompt: 'so admite as que compilam e ainda sabem editar codigo'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_15_ABLATION_ONLY_ON_CODE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma ablação fora de código: Nenhuma na rodada. O meta-review do co-scientist (claim 20) não tem ablação citada."
+    label: "OBJEÇÃO: a ablação 'meta fixo estagna' foi medida só em benchmark de código; a transferência para autoedição de charter ou doutrina de uma persona gestora não foi medida."
+    narrative: "Alvo: 15 [darwin-godel-machine] E_DGM_FIXED_META_STAGNATES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A ablação está medida em benchmark de código. A transferência para autoedição de charter ou doutrina de uma persona de gestão não foi medida, e o mesmo paper admite o risco de otimizar a métrica (claim 16). Superação procurada (classe nenhuma, achada: false): Procurei uma ablação fora de código. Medida: Nenhuma na rodada. O meta-review do co-scientist (claim 20) não tem ablação citada."
+    trace: "nenhuma claim ancorada mede autoaperfeiçoamento fora de benchmark de código (lista do prompt, 13 a 17)"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: nenhuma claim ancorada mede autoaperfeiçoamento fora de benchmark de código (lista do prompt, 13 a 17)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_17_EVALUATOR_HACKING_APPENDIX_UNREAD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Ler o Apêndice H do DGM: Não foi lido nesta rodada, e nenhuma outra claim ancorada mede hacking de avaliador."
+    label: "OBJEÇÃO: o hacking do avaliador, o caso que mais importa para a captura pelo proponente, ficou no Apêndice H da DGM, não lido; a rodada não pode afirmar o que ele mediu."
+    narrative: "Alvo: 17 [darwin-godel-machine] E_DGM_SANDBOX_APPENDIX_H_UNREAD. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: O caso que mais importa para 'captura pelo proponente', o hacking do avaliador, ficou no Apêndice H, que o leitor admite não ter lido. A rodada não pode afirmar o que o DGM mediu sobre ele. Superação procurada (classe nenhuma, achada: false): Ler o Apêndice H do DGM. Medida: Não foi lido nesta rodada, e nenhuma outra claim ancorada mede hacking de avaliador."
+    trace: "claim 17 do prompt: 'o caso de hacking do avaliador ficam no apendice H, que nao pude ler'"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: claim 17 do prompt: 'o caso de hacking do avaliador ficam no apendice H, que nao pude ler'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_18_SEPARATE_ROLE_IS_NOT_INDEPENDENCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma medida de independência do refutador (modelo, contexto ou humano distintos): O D_NEED_REFUTADOR está open e o D_DELPHI_WEIGHTED_MIXED_2026_11 está open. A busca externa na Reflexão (Supl. Note 3) mede alucinação, não independência."
+    label: "OBJEÇÃO (bloqueia): papel separado não é independência; gerador, revisor e árbitro do co-scientist rodam sobre o mesmo modelo, e uma persona com Elenxo do mesmo modelo e contexto repete o colapso proponente = aprovador."
+    narrative: "Alvo: 18 [ai-co-scientist] E_COSCI_SEPARATE_GENERATOR_REVIEWER_RANKER. Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Papel separado não é independência: os três agentes rodam sobre o mesmo modelo base. A verificação da claim rejeitada sobre ablação diz que o artigo 'não trata de independência do crítico'. Cenário: no MVP, a persona e o refutador Elenxo são o mesmo modelo, com o mesmo contexto do maestro. Os erros ficam correlacionados e o veredito pende para o proponente, a repetição de C_COLLAPSE_ROOT. Usar esta claim como base da 'decisão adversarial independente' promete o que ela não entrega. Superação procurada (classe nenhuma, achada: false): Procurei uma medida de independência do refutador (modelo, contexto ou humano distintos). Medida: O D_NEED_REFUTADOR está open e o D_DELPHI_WEIGHTED_MIXED_2026_11 está open. A busca externa na Reflexão (Supl. Note 3) mede alucinação, não independência."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'D_NEED_REFUTADOR'  # status open: independência sem medida"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: bash .claude/validation/kg-corpus-grep.sh 'D_NEED_REFUTADOR'  # status open: independência sem medida"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_19_ELO_MEASURES_PERSUASION_NOT_PAIN
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Candidato: priorizar por evidência de dor (sinais de campo, /product:analyze-pain-price): Existe como peça, mas não comparei com o Elo nesta rodada."
+    label: "OBJEÇÃO: o Elo entre debates do mesmo modelo mede persuasão relativa; priorizar por dor real com evidência não tem gabarito no backlog do Onion, e o Elo só foi validado onde há gabarito."
+    narrative: "Alvo: 19 [ai-co-scientist] E_COSCI_ELO_TOURNAMENT_DEBATE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: O Elo entre debates de um mesmo modelo mede persuasão relativa. O pedido do maestro é priorizar por dor real com evidência. O Elo só foi validado onde há gabarito (claim 22). Para o backlog do Onion não há gabarito. Superação procurada (classe nenhuma, achada: false): Candidato: priorizar por evidência de dor (sinais de campo, /product:analyze-pain-price). Medida: Existe como peça, mas não comparei com o Elo nesta rodada."
+    trace: "claim 22 do prompt: validação só no GPQA diamond"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: claim 22 do prompt: validação só no GPQA diamond"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_20_META_REVIEW_DRIFT_UNMEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Candidato: /meta:diary review (re-testar migalha vencida): Existe no Onion, mas não há medida citada de que contenha a deriva."
+    label: "OBJEÇÃO: o meta-review por anexo ao prompt prova o mecanismo (equivalente a diário e memória no Onion), não que o feedback acumulado não viesa; o artigo não mede deriva."
+    narrative: "Alvo: 20 [ai-co-scientist] E_COSCI_META_REVIEW_PROMPT_FEEDBACK. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A claim prova o mecanismo, que no Onion equivale a diário, memória e realimentação de doutrina. Não prova que o feedback acumulado não viesa. O artigo não mede deriva do meta-review. Superação procurada (classe nenhuma, achada: false): Candidato: /meta:diary review (re-testar migalha vencida). Medida: Existe no Onion, mas não há medida citada de que contenha a deriva."
+    trace: "nenhuma claim ancorada mede deriva do meta-review (lista do prompt, 18 a 22)"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: nenhuma claim ancorada mede deriva do meta-review (lista do prompt, 18 a 22)"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_22_NO_GROUND_TRUTH_FOR_PRIORITIES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma verdade externa para as prioridades do Onion: O mais próximo é o desfecho posterior (PR mergeado e uso medido), mas não existe registro que compare previsão com desfecho. Nenhum nó no corpus."
+    label: "OBJEÇÃO: o Elo só se valida contra gabarito; prioridade de evolução do Onion não tem gabarito nem registro que compare previsão com desfecho."
+    narrative: "Alvo: 22 [ai-co-scientist] E_COSCI_ELO_VALIDATED_GPQA. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A validação exige verdade externa (perguntas com gabarito). Prioridade de evolução do Onion não tem gabarito, então o sinal do torneio fica sem âncora no caso que interessa. Superação procurada (classe nenhuma, achada: false): Procurei uma verdade externa para as prioridades do Onion. Medida: O mais próximo é o desfecho posterior (PR mergeado e uso medido), mas não existe registro que compare previsão com desfecho. Nenhum nó no corpus."
+    trace: "claim 22 do prompt: 'mede-se o sinal do torneio contra verdade externa'"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: claim 22 do prompt: 'mede-se o sinal do torneio contra verdade externa'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_23_TAC_2025_MODELS_FLOOR_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei um resultado do TheAgentCompany com modelos de nov/2026: Não está entre as fontes ancoradas desta rodada."
+    label: "OBJEÇÃO: os 30,3% do TheAgentCompany são de modelos de 2025; servem de cota inferior histórica, não de estado atual em nov/2026."
+    narrative: "Alvo: 23 [theagentcompany] E_TAC_BEST_AGENT_30_PERCENT. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A medida é com Gemini 2.5 Pro e Claude 3.7 (2025). Ela não reflete os modelos de nov/2026. Serve como cota inferior histórica, não como estado atual. Superação procurada (classe nenhuma, achada: false): Procurei um resultado do TheAgentCompany com modelos de nov/2026. Medida: Não está entre as fontes ancoradas desta rodada."
+    trace: "claim 24 do prompt: Tabela 1 com modelos de 2025"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: claim 24 do prompt: Tabela 1 com modelos de 2025"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_27_PERSONA_JOINS_S3_AND_S4
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei no VSM ancorado uma regra sobre um mesmo órgão acumular S3 e S4: Nenhuma das claims 26 a 29 trata disso."
+    label: "OBJEÇÃO: 'o que a persona não deve virar' é inferência do leitor; a persona pedida (organizada, executiva, confere cronogramas) junta S3 e S4, e o VSM ancorado só separa as funções, sem proibir a soma."
+    narrative: "Alvo: 27 [viable-system-model] E_VSM_S3_RULES_RESOURCES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A citação define o S3. O trecho 'o que a persona não deve virar' é inferência do leitor e não está no VSM. Mais: o pedido do maestro inclui 'organizada, executiva, confere cronogramas', que é trabalho de S3. Então a persona, como pedida, junta S3 e S4. O VSM em si não diz que isso é proibido, só separa as funções. Superação procurada (classe nenhuma, achada: false): Procurei no VSM ancorado uma regra sobre um mesmo órgão acumular S3 e S4. Medida: Nenhuma das claims 26 a 29 trata disso."
+    trace: "claim 27 do prompt: a quote define o S3; a parte normativa é do leitor"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: claim 27 do prompt: a quote define o S3; a parte normativa é do leitor"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_28_WHO_IS_S5_UNDEFINED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Candidato: Delphi ponderado com pessoas e agentes como S5 coletivo: O D_DELPHI_WEIGHTED_MIXED_2026_11 está open, sem resultado medido."
+    label: "OBJEÇÃO: o VSM separa propor (S4) de decidir (S5), mas não diz quem é o S5 no Onion; com o maestro como S5, a persona só propõe e não decide 'não subordinada'."
+    narrative: "Alvo: 28 [viable-system-model] E_VSM_S5_BALANCES_NOW_FUTURE. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: A claim prova a separação entre propor (S4) e decidir (S5), mas não diz quem é o S5 no Onion. O pedido quer a persona 'não subordinada à visão de um único humano' e, ao mesmo tempo, 'cumprindo o que o maestro diz'. Pelo VSM o maestro é o S5, e a persona como S4 só propõe. A claim não sustenta que a persona decida. Superação procurada (classe nenhuma, achada: false): Candidato: Delphi ponderado com pessoas e agentes como S5 coletivo. Medida: O D_DELPHI_WEIGHTED_MIXED_2026_11 está open, sem resultado medido."
+    trace: "claim 29 do prompt: 'System 5 has to make the decision on which is the best option from System 4'"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: claim 29 do prompt: 'System 5 has to make the decision on which is the best option from System 4'"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_31_HARNESS_LAYER_IS_NOT_A_GUARANTEE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uma medida independente do guardrail do Omnigent: Só existe o texto de omnigent.ai e um comentário no Lobsters (claim 35), sem teste."
+    label: "OBJEÇÃO: governança 'na camada do harness' do Omnigent é página de marketing sem medida, e o Onion já mediu que gate de harness (exit 2) é conformidade, não fronteira de segurança."
+    narrative: "Alvo: 31 [omnigent-meta-harness] E_OMNIGENT_GOVERNANCE_AT_HARNESS_LAYER. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Evidência: É página de marketing, sem auditoria nem medida. O próprio Onion mediu que um gate de harness (exit 2 de hook) é 'camada de conformidade, não fronteira de segurança': 'um mod que carrega vence o veto (login Max, 6 de 6)' (CLAUDE.md, SSOT docs/evolution/research/exit2-coupling-against-2026-11/). O enforcement na camada de harness não é garantia só por ser camada. Superação procurada (classe nenhuma, achada: false): Procurei uma medida independente do guardrail do Omnigent. Medida: Só existe o texto de omnigent.ai e um comentário no Lobsters (claim 35), sem teste."
+    trace: "grep -n 'não fronteira de segurança' CLAUDE.md"
+    provenance:
+      source: "CLAUDE.md (raiz do repo)"
+      locator: "linha com 'não fronteira de segurança'; SSOT docs/evolution/research/exit2-coupling-against-2026-11/"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "repo"
+  - id: E_OBJECAO_32_STATEFUL_POLICIES_DECLARED_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei uso medido das políticas: Nenhuma fonte além de omnigent.ai."
+    label: "OBJEÇÃO: as políticas com estado do Omnigent são lista de features sem medida; úteis como padrão (teto de gasto da persona casa com o core que dosa a cota), não como prova."
+    narrative: "Alvo: 32 [omnigent-meta-harness] E_OMNIGENT_STATEFUL_POLICIES. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: É lista de features de página de produto, declaração sem medida. Como padrão, é útil ao MVP: um teto de gasto da persona casa com o core que dosa a cota. Superação procurada (classe nenhuma, achada: false): Procurei uso medido das políticas. Medida: Nenhuma fonte além de omnigent.ai."
+    trace: "claim 35 do prompt: discussão de 1 comentário, sem crítica"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: claim 35 do prompt: discussão de 1 comentário, sem crítica"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_33_BROKERED_CREDENTIALS_UNAUDITED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei auditoria ou teste de terceiros: Nenhum na rodada."
+    label: "OBJEÇÃO: credenciais intermediadas e sandbox do Omnigent são declaração de produto sem auditoria; provam que o padrão existe, não que resiste."
+    narrative: "Alvo: 33 [omnigent-meta-harness] E_OMNIGENT_BROKERED_CREDENTIALS_SANDBOX. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: Declaração de produto, sem auditoria. Prova que o padrão existe no mercado, não que a intermediação resista. Superação procurada (classe nenhuma, achada: false): Procurei auditoria ou teste de terceiros. Medida: Nenhum na rodada."
+    trace: "fonte única: omnigent.ai, Features, Secure Sandboxes"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: fonte única: omnigent.ai, Features, Secure Sandboxes"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_34_SHARED_SUPERVISION_IS_NOT_ADVERSARIAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Candidato: /meta:decide em modo Delphi: Existe no Onion. A variante ponderada mista (D_DELPHI_WEIGHTED_MIXED_2026_11) está open, sem medida."
+    label: "OBJEÇÃO: sessões dirigidas por vários humanos são feature anunciada, sem medida de como a decisão se resolve; supervisão compartilhada não é decisão adversarial."
+    narrative: "Alvo: 34 [omnigent-meta-harness] E_OMNIGENT_MULTI_HUMAN_SESSIONS. Afirmação de 1 agente (Elenxo), sem votação. Triagem: limite. Critério pré-registrado: E2_PROVA_MENOS. Evidência: É relevante para 'decide com Personas, humanas inclusive', mas é feature anunciada, sem caso de uso nem medida de como a decisão de vários humanos se resolve. Supervisão compartilhada não é decisão adversarial. Superação procurada (classe nenhuma, achada: false): Candidato: /meta:decide em modo Delphi. Medida: Existe no Onion. A variante ponderada mista (D_DELPHI_WEIGHTED_MIXED_2026_11) está open, sem medida."
+    trace: "fonte única: omnigent.ai, seção Collaboration"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: fonte única: omnigent.ai, seção Collaboration"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_OBJECAO_Q2_SELF_DISCOVERY_30_CYCLES_NO_STOP_CRITERION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-26"
+    verified_against: "Procurei um critério de parada medido para ciclos de autodescoberta: Nenhum nas 35 claims ancoradas nem no corpus."
+    label: "OBJEÇÃO (bloqueia): nenhuma fonte ancorada trata de autodescoberta pré-operação nem de número de ciclos; fixar ~30 ciclos é preferência, e sem critério de parada medido quem conduz decide o número."
+    narrative: "Alvo: Pergunta (2): autodescoberta de cerca de 30 ciclos antes de começar (Q_ONION_EVOLVE_PERSONA_2026_11). Afirmação de 1 agente (Elenxo), sem votação. Triagem: bloqueia. Critério pré-registrado: E4_LACUNA_ABERTA. Evidência: Nenhuma claim ancorada trata de autodescoberta pré-operação como padrão nem de um número de ciclos. O mais próximo é o modo rascunho do PR 287 (claim 6) e o arquivo do DGM (claim 14), que roda com um avaliador externo. Cenário: o MVP fixa 30 ciclos por preferência. Sem critério de parada medido, quem conduz decide o número. Superação procurada (classe nenhuma, achada: false): Procurei um critério de parada medido para ciclos de autodescoberta. Medida: Nenhum nas 35 claims ancoradas nem no corpus."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'autodescoberta'  # 0 nós"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seção Elenxo da tarefa de escrita: bash .claude/validation/kg-corpus-grep.sh 'autodescoberta'  # 0 nós"
+      method: "judges: Elenxo, 1 agente sem votação"
+      locality: "host"
+  - id: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-11-26"
+    verified_against: "contabilidade do motor no run /onion-research de 2026-11-26 e contagem do escritor sobre as listas recebidas: 35 ancoradas, 17 rejeitadas, 36 objeções, 26 sobreviventes, 14 superações, 0 recusas, 0 inalcançáveis"
+    label: "LACUNAS: 11 fontes lidas, 0 inalcançáveis; 35 claims ancoradas, 17 rejeitadas; 36 objeções, 26 sobreviventes (5 bloqueiam), 0 recusadas; 14 superações; 2 lacunas abertas (termo de mercado, HN)."
+    narrative: "FONTES: lidas (11): memberjunction-cos (MJ PR 5842 e 6041), agentic-product-owner (agent-teams PR 287), project-vend (fases 1 e 2), agentic-term-2026 (IBM Think e o texto da Anthropic 'Building effective agents', este só nas rejeitadas), hn-ai-chief-of-staff (item do HN), darwin-godel-machine, ai-co-scientist, theagentcompany, viable-system-model, omnigent-meta-harness (omnigent.ai e Lobsters). Inalcançáveis: 0. CLAIMS: 35 ancoradas e viraram nó de evidência; 17 REJEITADAS na ancoragem, que nunca viram nó (16 EXAGERADA, 1 AFIRMADA-SEM-CITACAO, 0 NAO-ENCONTRADA). ELENXO: 36 objeções (35 uma por claim + 1 sobre a pergunta 2); 26 sobreviventes modeladas como E_OBJECAO (alvos 1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23, 27, 28, 31, 32, 33, 34 e Q2; bloqueiam: 2, 12, 13, 18 e Q2); 10 não sobreviveram (alvos 4, 9, 16, 21, 24, 25, 26, 29, 30, 35) e a evidência delas está na narrativa do alvo. Objeções RECUSADAS pelo motor (sem critério pré-registrado ou sem superação): 0, nenhum alvo não-julgado por recusa. SUPERAÇÕES: 14 nós C_SUPERACAO_20261126_*, todos das rejeitadas na ancoragem, com TRACES_TO para este nó; 3 rejeitadas não têm superação achada: a do hn-ai-chief-of-staff e as duas do viable-system-model. Nenhuma superação achada no Elenxo (todas classe nenhuma, achada false). LACUNAS FECHADAS (8, gapsClosed do Elenxo): memberjunction-cos, agentic-product-owner, project-vend, darwin-godel-machine, ai-co-scientist, theagentcompany, viable-system-model, omnigent-meta-harness. LACUNAS QUE CONTINUAM ABERTAS (2, gapsOpen): hn-ai-chief-of-staff (só um título de vídeo com 1 ponto e 0 comentários; nenhum enquadramento de comunidade) · agentic-term-2026 (o termo de mercado de nov/2026 NÃO foi entregue: só nomes de projeto, 'Chief of Staff Agent' no MJ e 'agentic product owner'/'steward-like' no agent-teams, e o gênero 'agentic AI' da IBM). Também abertas por objeção bloqueante: independência do refutador (alvo 18, D_NEED_REFUTADOR open), critério de parada da autodescoberta de ~30 ciclos (Q2 e alvo 13), política editável pelo próprio agente (alvo 2), Apêndice H da DGM não lido (alvo 17), transferência das medidas de 2025 para os modelos de nov/2026 (alvos 8 e 23). REJEITADAS NA ANCORAGEM, com o motivo do verificador: (1) [hn-ai-chief-of-staff] A comunidade (HN, 05/11/2026) enquadra o papel como 'AI chief of staff' sobre 'contexto governado', com agentes e tarefas. Só o título existe; não há corpo nem definição. VEREDITO EXAGERADA: A quote aparece literal no campo title do JSON bruto (reaberto por WebFetch e por curl). A parte factual do claim também confere: created_at 2026-11-05T18:35:01Z, text=null (sem corpo), url apontando para um vídeo do YouTube. O que o texto não sustenta é 'A comunidade enquadra'. O item é uma submissão de um único autor (sparkystacey), com points=1 e children=[] (zero comentários). Isso é um título escolhido por quem postou o vídeo, não um enquadramento da comunidade. Também não há governança nem crítica no fio, só o título, e o que o vídeo diz não foi lido. A palavra do claim que o trecho não [texto do motor cortado aqui; não completado de memória] (2) [memberjunction-cos] No cockpit, o agente só lê e navega. Aprovações, salvar política, acordar e editar tarefas são exclusivos do humano, e não são expostos ao agente. VEREDITO EXAGERADA: A citação existe na linha 11 do PR 6041: 'approvals, policy saves, wakes and task edits are not exposed to the agent', e o contexto é 'Agent context and client tools are read-only (navigate / filter / inspect / refresh)'. O texto diz que essas ações não são expostas ao agente nas ferramentas de cliente do cockpit. O claim acrescenta 'exclusivos do humano', e isso o texto não diz. O PR 5842 lista entre as 8 ações do Chief of Staff `Configure Agent User Policy` e `Schedule Next Agent Wake`, ações do agente que tocam política e agendamento de wakes. A palavra 'exclusivos' vale só para a superfíci [texto do motor cortado aqui; não completado de memória] (3) [memberjunction-cos] Horas de silêncio e tetos de ação estão no plano mas não existem no esquema, e a imposição das posturas 1 e 2 só foi testada com mocks. A implementação ainda não está validada ao vivo. VEREDITO EXAGERADA: A citação existe na linha 66 ('Posture 1/2 enforcement is unit tested with mocks only'), e as primeiras duas orações têm apoio: QuietHoursStart/End e MaxAutonomousActionsPerRun 'are named in the plan but do not exist on `MJ: AI Agent User Policies`'. A última frase generaliza. O texto diz que falta um harness vivo contra MS Graph, Google Workspace, HubSpot Meetings e Calendly (Deliverable 3, adiado), e que a imposição das posturas 1 e 2 tem só teste com mocks. Não diz que a implementação inteira não foi validada ao vivo. A tabela de Verification registra 'Migration applied + CodeGen on a dev d [texto do motor cortado aqui; não completado de memória] (4) [agentic-product-owner] O PO agêntico é consultivo: o charter só é validado e a nota do PO nunca bloqueia o DRI. VEREDITO EXAGERADA: A quote existe literalmente na descrição do PR 287 (grep -F: 1 ocorrência). A primeira metade do claim (consultivo, nota do PO nunca bloqueia o DRI) é sustentada, e a descrição diz também 'It is never a gatekeeper'. Mas 'o charter só é validado' estica o texto: o charter é validado por `ateam po charter check` e também CARREGADO no startup (`ateam po startup <area>` carrega charter, view, claims, ledger e learnings). A palavra 'só' não tem apoio no trecho, e a quote não fala de charter. (5) [agentic-product-owner] O ledger e o estado são por PO e idempotentes, o que permite replay de wake sem escrita dupla. VEREDITO EXAGERADA: A quote existe, mas está no item de `ateam po state get|set|list`, o estado do PO no memory store (claims, o que disse, leituras, visão). A idempotência ('Re-writing the same value is a no-op') é afirmada só para o estado. Para o ledger o PR diz apenas que `--persona` dá a cada PO linhas próprias (`poledger.<area>.*`) e não afirma idempotência. `grep -i idempot` no corpo do PR devolve 0 linhas. Atribuir idempotência ao ledger estica o texto. (6) [project-vend] O que mais melhorou o resultado na fase 2 foi impor procedimentos (checagem de custo e de prazo), ou seja, burocracia e checklists, e não um agente mais autônomo. VEREDITO EXAGERADA: A quote é verbatim, mas diz 'Among the most impactful changes', isto é, uma entre as mais impactantes. O claim a transforma em 'o que mais melhorou', um superlativo único que o texto não afirma. O contraste 'e não um agente mais autônomo' é acréscimo do leitor. O trecho não compara com autonomia. A palavra 'bureaucracy' aparece só no corpo ('bureaucracy matters'), não no título. Procedimentos, checklists e checagem de preço e prazo estão sustentados. (7) [project-vend] A Anthropic atribui boa parte das falhas ao treino para ser prestativo. Isso explica a manipulabilidade e a tendência a ceder. VEREDITO EXAGERADA: A quote é verbatim, na seção 'RAG to riches?'. Ela é uma hipótese ('We suspect'), e o claim a converte em atribuição firme ('atribui') e em explicação ('explica'). 'Many of the problems' também não é 'boa parte' medida. O texto não usa a palavra manipulabilidade. A frase seguinte compara as decisões às de 'a friend who just wants to be nice', o que se aproxima da tendência a ceder, mas a conexão com manipulabilidade é inferência do leitor. (8) [agentic-term-2026] Anthropic usa 'agentic systems' como termo guarda-chuva e separa workflows de agents; o termo de mercado para a lacuna é 'agent' dentro de 'agentic system', sem termo próprio para 'chief of staff' ou 'steward'. VEREDITO EXAGERADA: A quote existe (seção 'What are agents?', a frase continua com ', maintaining control over how they accomplish tasks'). O trecho sustenta a definição de agent e, na mesma seção, 'we categorize all these variations as agentic systems' com workflows e agents sob o guarda-chuva. Não sustenta: (a) que 'agent' seja o termo de mercado para a lacuna da Persona dedicada, pois o texto não trata de papel de gestão contínua, e (b) a negativa 'sem termo próprio para chief of staff ou steward', que é inferência por ausência de um único artigo da Anthropic e não afirmação do documento. A parte sobre workflo [texto do motor cortado aqui; não completado de memória] (9) [agentic-term-2026] Anthropic mede o custo da autonomia: custo maior e erro composto, com recomendação de teste em sandbox e guardrails. VEREDITO EXAGERADA: A quote aparece literal na seção 'Agents': 'The autonomous nature of agents means higher costs, and the potential for compounding errors.' A recomendação de sandbox e guardrails também está (frase seguinte: 'We recommend extensive testing in sandboxed environments, along with the appropriate guardrails.'). Mas o verbo 'mede' estica: o texto afirma e adverte, sem apresentar medição, número ou experimento de custo ou erro. É declaração de orientação, não dado medido. (10) [agentic-term-2026] Anthropic restringe agentes a problemas abertos em que não se prevê o número de passos, o que delimita onde a Persona dedicada se justifica. VEREDITO EXAGERADA: A quote existe na seção 'Agents' ('When to use agents'), com apóstrofo curvo (it’s) no original e a frase continuando em ', and where you can’t hardcode a fixed path'. O texto diz 'can be used for', ou seja, indica uso adequado, e não 'restringe'. A conclusão de que isso 'delimita onde a Persona dedicada se justifica' é inferência do leitor: o artigo trata de agents em geral, não de uma persona de gestão contínua. (11) [darwin-godel-machine] O arquivo existe porque solucoes antigas, mesmo fracas, viram trampolins para melhorias posteriores; sem o arquivo, uma modificacao ruim bloqueia o progresso seguinte. VEREDITO EXAGERADA: A citacao existe literal na Secao 3 e sustenta a primeira metade (trampolins). A segunda metade nao vem dessa citacao: vem da Secao 4.4, que diz que no DGM sem exploracao aberta, onde so o agente mais recente e retido, 'a poorly performing self-modification makes subsequent improvements harder to achieve'. 'Harder to achieve' (mais dificil) foi esticado para 'bloqueia' (impede). Tambem o texto nao diz 'mesmo fracas': diz que solucoes arquivadas podem render melhorias muito depois da descoberta. (12) [ai-co-scientist] Ablação medida: busca externa na Reflexão evita alucinação de hipóteses novas mas implausíveis, e o prompt de debate no Ranking melhora o ranking e reduz o viés de posição. A independência do crítico precisa de ferramenta e de desenho, não só de papel separado. VEREDITO EXAGERADA: A citação existe e as duas primeiras frases do claim são sustentadas: a frase seguinte do mesmo parágrafo diz 'reduced positional bias', e a Supplementary Note 3 mede a Reflexão sem busca dando novidade 6,14 (erra) contra 2,38 com busca. A última frase é do leitor. O artigo mostra que a busca e o prompt de debate melhoram a Reflexão e o Ranking, mas não trata de 'independência do crítico' nem conclui que ela exige ferramenta e desenho além do papel separado. Isso é inferência do leitor, não achado do texto (A2_CLAIM_ESTICA). (13) [theagentcompany] Navegação web é o principal obstáculo de falha. VEREDITO EXAGERADA: A citação existe, mas o claim a endurece. O texto diz 'oftentimes' (frequentemente) e o claim vira o principal obstáculo, sem ressalva. A 7.3 é uma lista qualitativa de falhas comuns com três itens (falta de habilidade social, incompetência em navegação, autoengano) e não mede nem ranqueia as causas. A palavra 'principal' do claim não é sustentada pelo trecho. (14) [theagentcompany] Comunicação com colegas (RocketChat) e UI de suíte Office (ownCloud) têm os piores resultados. VEREDITO EXAGERADA: A citação existe, mas o texto diz 'most models struggle with RocketChat and ownCloud', ressalva de 'maioria' que o claim perde. A Tabela 4 mostra que só o ownCloud é o pior de forma consistente (Gemini 2.5 Pro 12,86%, Claude 3.7 11,43%). O RocketChat não é o pior: para Gemini 2.5 Pro fica em 29,11%, perto dos 30,3% gerais e abaixo de GitLab (33,80%) e Plane (41,18%). Para Claude 3.7 Sonnet fica em 29,11%, acima de GitLab (23,94%). A leitura 'falta de habilidade de comunicação' é a hipótese dos autores, não uma medida. (15) [theagentcompany] Os próprios autores admitem que o benchmark é mais simples que o trabalho real, então 30% tende a ser teto otimista e não cobre criação ou decisão estratégica. VEREDITO EXAGERADA: A citação existe (linhas 551-552). Os autores dizem que as tarefas são 'more straightforward' por causa da avaliação automática e que não cobrem 'more complex creative tasks such as brainstorming new product ideas or designing system architectures'. Isso sustenta 'não cobre criação'. Não sustenta que '30% tende a ser teto otimista': essa conclusão é do leitor, e os autores não a afirmam (o §8 só diz 'even in a relatively simplified benchmarking setting'). Também não aparece 'decisão estratégica', e o mais próximo no texto é brainstorming de produto e desenho de arquitetura. O Apêndice J trata [texto do motor cortado aqui; não completado de memória] (16) [viable-system-model] No VSM, o Sistema 4 (olha para fora e para o futuro) é um corpo distinto do Sistema 3 (governa a operação); a função de futuro tem órgão próprio. VEREDITO AFIRMADA-SEM-CITACAO: REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A frase existe na lista Components; no wikitext vem com marcação de itálico (''System 4'' is made up of bodies that are responsible for looking outwards to the environment to monitor how the organization needs to adapt to remain viable), por isso o grep -F cru deu 0 e o texto renderizado casa palavra por palavra. O mesmo bloco define o System 3 como estruturas e controles de regras/recursos do System 1, e a intro de Components separa Systems 1-3 ('here and now') de System 4 ('there and then'). 'Corpo distinto [texto do motor cortado aqui; não completado de memória] (17) [viable-system-model] O S3 audita o desempenho passado por um canal independente (3*), e comparar tempos ruins com bons é o padrão de refutador separado da linha operacional. VEREDITO EXAGERADA: A citação existe literal no parágrafo de System 3 em Applying VSM ('System 3 is able to audit (via 3*) past performance so \"bad times\" for production can be compared to \"good times\".'). O texto não diz que 3* seja canal independente nem de refutador separado da linha operacional. A única outra menção a 3* é a lista dos seis componentes verticais de coesão nos Axioms ('System Three*'). A frase é do próprio System 3 auditando via 3*, para comparar épocas. 'Independente' e 'padrão de refutador' são inferência do leitor. Também não existe subseção 'System 3*' em Applying VSM."
+    trace: "run /onion-research em modo primárias de 2026-11-26, seções Claims ancoradas, Rejeitadas, Fontes inalcançáveis, Corpus prévio e Elenxo"
+    provenance:
+      source: "run /onion-research em modo primárias de 2026-11-26 (⟨journal do run⟩)"
+      locator: "seções Claims ANCORADAS, REJEITADAS na ancoragem, Fontes inalcançáveis, Elenxo e Superações da tarefa de escrita"
+      method: "judges: contabilidade da rodada, conferida pelo escritor"
+      locality: "host"
+  - id: C_SUPERACAO_20261126_MJ_COCKPIT_TOOLS_READ_ONLY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação do próprio PR 6041 (linha 11): ferramentas de cliente do cockpit são read-only, e as quatro ações não são expostas ao agente nessa tela; entrega o limite de autonomia sem o 'exclusivos do humano'."
+    narrative: "Medida: grep -nF 'not exposed to the agent' no corpo do PR 6041 devolve a linha 11. grep -nF das duas ações no PR 5842 devolve as linhas 40 e 41 (a lista das 8 ações), o que mostra que o agente tem ações nessas áreas fora do cockpit. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [memberjunction-cos] No cockpit, o agente só lê e navega. Aprovações, salvar política, acordar e editar tarefas são exclusivos do humano, e não são expostos ao agente. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "gh api repos/MemberJunction/MJ/pulls/6041 --jq .body | grep -nF 'not exposed to the agent'; gh api repos/MemberJunction/MJ/pulls/5842 --jq .body | grep -nF -e 'Configure Agent User Policy' -e 'Schedule Next Agent Wake'"
+  - id: C_SUPERACAO_20261126_MJ_OUTSTANDING_DELIMITS_LIVE_VALIDATION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A seção Outstanding/Deliverable 3 e a tabela Verification do PR 6041, que delimitam o não validado ao vivo (provedores e posturas 1/2) e o validado (migração + CodeGen em dev DB)."
+    narrative: "Medida: grep -nE no corpo do PR 6041 devolve a linha 66 (harness vivo ausente, posturas 1/2 só com mocks) e, na tabela, 'Migration applied + CodeGen on a dev database | pass' e a linha da integração em SQL Server 're-running'. A formulação corrigida cita só o que essas linhas sustentam. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [memberjunction-cos] Horas de silêncio e tetos de ação estão no plano mas não existem no esquema, e a imposição das posturas 1 e 2 só foi testada com mocks. A implementação ainda não está validada ao vivo. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "gh api repos/MemberJunction/MJ/pulls/6041 --jq .body | grep -nE 'live harness|unit tested with mocks only|Migration applied|Integration tier'"
+  - id: C_SUPERACAO_20261126_APO_NEVER_GATEKEEPER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação corrigida que o PR 287 sustenta em duas passagens: 'It is never a gatekeeper' e 'a PO note is advice and a DRI never parks or raises a gate for it'."
+    narrative: "Medida: Conferido com grep -F no corpo do PR 287 baixado por `gh pr view 287 --repo MGT-Insurance/agent-teams --json body`: as duas frases aparecem literalmente. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [agentic-product-owner] O PO agêntico é consultivo: o charter só é validado e a nota do PO nunca bloqueia o DRI. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "gh pr view 287 --repo MGT-Insurance/agent-teams --json body -q .body | grep -n -E 'charter|startup' # mostra que o charter também é carregado no startup; nenhum trecho diz que ele 'só é validado'"
+  - id: C_SUPERACAO_20261126_APO_IDEMPOTENCE_ONLY_STATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação corrigida: idempotência atribuída só ao estado por PO; o ledger é separado, com linhas próprias."
+    narrative: "Medida: Conferido no corpo do PR 287 (gh pr view): a frase 'Re-writing the same value is a no-op' está no bullet de `po state`, e o bullet de `--persona` descreve só as linhas `poledger.<area>.*`. `grep -n -i idempot` no corpo: 0 ocorrências. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [agentic-product-owner] O ledger e o estado são por PO e idempotentes, o que permite replay de wake sem escrita dupla. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "gh pr view 287 --repo MGT-Insurance/agent-teams --json body -q .body | grep -n -i -E 'idempot|no-op|poledger' # a frase 'no-op' aparece no bullet de po state, e o ledger só aparece com 'its own ledger rows', sem idempotência"
+  - id: C_SUPERACAO_20261126_VEND2_PROCEDURES_AMONG_MOST_IMPACTFUL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A frase do Project Vend 2 ('Among the most impactful changes...') e a passagem 'bureaucracy matters': procedimentos e checklists como alavanca real, sem o superlativo."
+    narrative: "Medida: WebFetch de project-vend-2 em 2026-11-26 duas vezes, com extração do parágrafo ao redor. Procedimentos aparecem como uma de várias mudanças impactantes, e 'bureaucracy' só no corpo do texto. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [project-vend] O que mais melhorou o resultado na fase 2 foi impor procedimentos (checagem de custo e de prazo), ou seja, burocracia e checklists, e não um agente mais autônomo. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://www.anthropic.com/research/project-vend-2 e localizar a frase 'Among the most impactful changes we made was forcing Claudius to follow procedures.' na seção 'What actually worked?'; a palavra do claim que o trecho não sustenta é 'mais' (o texto diz 'among the most', não 'the most') e o contraste 'não um agente mais autônomo'"
+  - id: C_SUPERACAO_20261126_VEND2_HELPFULNESS_SUSPECTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação hedgeada do Project Vend 2: 'We suspect...' seguida da comparação com 'a friend who just wants to be nice'; liga treino para ser prestativo a decisões ruins sem a certeza que o texto não afirma."
+    narrative: "Medida: WebFetch de project-vend-2 em 2026-11-26 duas vezes. A frase aparece com 'We suspect' e a frase seguinte traz a comparação com o amigo simpático. A palavra 'manipulability' não aparece. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [project-vend] A Anthropic atribui boa parte das falhas ao treino para ser prestativo. Isso explica a manipulabilidade e a tendência a ceder. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://www.anthropic.com/research/project-vend-2 e localizar a frase 'We suspect that many of the problems that the models encountered stemmed from their training to be helpful.' na seção 'RAG to riches?'; as palavras do claim que ela não sustenta são 'atribui' e 'explica' (o texto diz 'We suspect') e a ligação direta com 'manipulabilidade'"
+  - id: C_SUPERACAO_20261126_ANTHROPIC_AGENTIC_SYSTEMS_UMBRELLA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação sustentada pelo texto da Anthropic: 'agentic systems' como guarda-chuva com workflows e agents como os dois tipos, e a definição literal de agent, sem afirmar nada sobre chief of staff ou steward."
+    narrative: "Medida: WebFetch do documento em 2026-11-26 confirmou a frase 'At Anthropic, we categorize all these variations as agentic systems' e a definição literal de agents na seção 'What are agents?'. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [agentic-term-2026] Anthropic usa 'agentic systems' como termo guarda-chuva e separa workflows de agents; o termo de mercado para a lacuna é 'agent' dentro de 'agentic system', sem termo próprio para 'chief of staff' ou 'steward'. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://www.anthropic.com/engineering/building-effective-agents e ler a seção 'What are agents?': a definição cobre apenas workflows vs agents; grep -i -E 'chief of staff|steward' no texto: o artigo não trata desses papéis, logo 'termo de mercado para a lacuna' não é sustentado"
+  - id: C_SUPERACAO_20261126_ANTHROPIC_AUTONOMY_COST_WARNED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação 'adverte/afirma' com a recomendação de sandbox e guardrails, que o mesmo trecho da Anthropic sustenta (custo maior e erro composto)."
+    narrative: "Medida: WebFetch do documento em 2026-11-26 devolveu a quote literal e a frase seguinte com a recomendação de sandbox e guardrails; nenhuma medição quantitativa aparece no trecho. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [agentic-term-2026] Anthropic mede o custo da autonomia: custo maior e erro composto, com recomendação de teste em sandbox e guardrails. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://www.anthropic.com/engineering/building-effective-agents e inspecionar a seção 'Agents' perto de 'compounding errors': não há número, benchmark nem método de medição; a palavra 'mede' do claim não é sustentada, só 'means ... potential for'"
+  - id: C_SUPERACAO_20261126_ANTHROPIC_WHEN_TO_USE_AGENTS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação 'indica quando usar' agentes: problemas abertos 'and where you can’t hardcode a fixed path', sustentada pelo mesmo documento da Anthropic."
+    narrative: "Medida: WebFetch do documento em 2026-11-26 devolveu as duas metades da frase na seção 'Agents' e confirmou o apóstrofo curvo; sem menção a persona. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [agentic-term-2026] Anthropic restringe agentes a problemas abertos em que não se prevê o número de passos, o que delimita onde a Persona dedicada se justifica. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "WebFetch https://www.anthropic.com/engineering/building-effective-agents e citar o trecho de 'When to use agents': 'can be used for open-ended problems ... and where you can’t hardcode a fixed path'; a palavra 'restringe' e a inferência sobre 'Persona dedicada' não estão no texto"
+  - id: C_SUPERACAO_20261126_DGM_ARCHIVE_STEPPING_STONES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação que o paper da DGM sustenta: Sec. 3 (trampolins) mais Sec. 4.4 ('makes subsequent improvements harder to achieve'), que explica por que o arquivo existe sem esticar para 'bloqueia'."
+    narrative: "Medida: Duas ocorrências verificadas com grep -oF no texto extraído do PDF arXiv v3: a frase da Sec. 3 e a frase da Sec. 4.4 (contexto lido: Figure 3/Figure 2 e Appendix A.1). Critério: A2_CLAIM_ESTICA. Alvo reprovado: [darwin-godel-machine] O arquivo existe porque solucoes antigas, mesmo fracas, viram trampolins para melhorias posteriores; sem o arquivo, uma modificacao ruim bloqueia o progresso seguinte. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "pdftotext -layout dgm.pdf - | tr '\\n' ' ' | grep -oF 'a poorly performing self-modification makes subsequent improvements harder to achieve' # o texto diz 'harder to achieve', nao 'bloqueia'"
+  - id: C_SUPERACAO_20261126_COSCI_ABLATION_SEARCH_AND_DEBATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A formulação corrigida pelo AI co-scientist (Supplementary Note 3, Fig. 4 e 5): Reflexão sem busca 6,14 contra 2,38 com busca em novidade, e o prompt de debate quase eliminou o viés de segunda posição."
+    narrative: "Medida: Leitura do pdftotext do arXiv 2502.18864: parágrafo 'Agent ablation analysis' e Supplementary Note 3 (itens Reflection agent e Ranking agent). Números e frases copiados do texto. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [ai-co-scientist] Ablação medida: busca externa na Reflexão evita alucinação de hipóteses novas mas implausíveis, e o prompt de debate no Ranking melhora o ranking e reduz o viés de posição. A independência do crítico precisa de ferramenta e de desenho, não só de papel separado. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "curl -sL https://arxiv.org/pdf/2502.18864 -o cs.pdf && pdftotext cs.pdf cs.txt && grep -ci 'independen' cs.txt; depois ler os parágrafos 'Agent ablation analysis' e a Supplementary Note 3, Reflection agent: nenhum trecho liga o resultado a 'independência do crítico'"
+  - id: C_SUPERACAO_20261126_TAC_WEB_NAVIGATION_OFTEN_OBSTACLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O trecho da seção 7.3 do TheAgentCompany com o achado hedgeado: navegação web é 'frequentemente' obstáculo (no ownCloud o popup bloqueia o OpenHands de texto), sem ranqueamento."
+    narrative: "Medida: pdftotext + grep -n -F 'biggest obstacle' (linha 522) e leitura das linhas 520-534 do texto extraído. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [theagentcompany] Navegação web é o principal obstáculo de falha. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "pdftotext -layout 2412.14161v3.pdf t.txt && sed -n 520,534p t.txt # mostra 'Oftentimes' e os outros dois itens de 7.3 (Lack of social skills, Deceiving oneself), sem ranqueamento"
+  - id: C_SUPERACAO_20261126_TAC_TABLE4_OWNCLOUD_WORST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A Tabela 4 do TheAgentCompany sustenta a formulação corrigida: ownCloud é o pior de forma consistente, RocketChat fica mediano para os líderes."
+    narrative: "Medida: pdftotext e leitura das linhas 1462-1463 da Tabela 4 (Gemini 2.5 Pro: GitLab 33,80, Plane 41,18, RocketChat 29,11, ownCloud 12,86; Claude 3.7: 23,94, 41,18, 29,11, 11,43). Critério: A2_CLAIM_ESTICA. Alvo reprovado: [theagentcompany] Comunicação com colegas (RocketChat) e UI de suíte Office (ownCloud) têm os piores resultados. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "pdftotext -layout 2412.14161v3.pdf t.txt && sed -n 478,486p t.txt && grep -n -E 'OpenHands 0.28.1 +(Gemini-2.5-Pro|Claude-3.7-Sonnet) +[0-9.]+ +[0-9.]+ +[0-9.]+ +[0-9.]+ +[0-9.]+ +[0-9.]+ +[0-9.]+ +[0-9.]+$' t.txt # Tabela 4: colunas GitLab, Plane, RocketChat, ownCloud"
+  - id: C_SUPERACAO_20261126_TAC_LIMITATIONS_STRAIGHTFORWARD_TASKS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O parágrafo de limitações do §8 do TheAgentCompany: os autores admitem tarefas diretas e ausência de tarefas criativas complexas, sem afirmar teto otimista."
+    narrative: "Medida: pdftotext + sed -n 548,562p t.txt, leitura das quatro limitações listadas; grep por 'optimistic', 'upper bound' e 'strategic' sem acerto nas limitações. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [theagentcompany] Os próprios autores admitem que o benchmark é mais simples que o trabalho real, então 30% tende a ser teto otimista e não cobre criação ou decisão estratégica. Registro da reprovação: E_LACUNAS_ONION_EVOLVE_PERSONA_1126. Afirmação de UM juiz (motor de superação)."
+    trace: "pdftotext -layout 2412.14161v3.pdf t.txt && sed -n 551,554p t.txt && grep -n -i -e 'optimistic' -e 'upper bound' -e 'strategic' t.txt # sem ocorrência de teto otimista nem decisão estratégica nas limitações"
+  - id: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "MVP que a evidência sustenta: a persona como S4 (propõe) e o maestro ou um Delphi como S5 (decide); charter no KG-SSOT, wake pela campainha e pelo baton silencioso, política fora do alcance da persona, Elenxo de modelo e contexto distintos, teto de gasto."
+    narrative: "RECOMENDAÇÃO DO ELENXO (afirmação de UM agente, sem votação; íntegra, sem corte): O QUE A RODADA SUSTENTA. (a) Padrões de governança com implementação aberta datada de nov/2026: o teto de permissão do usuário (MJ PR 5842); a política Allow/RequireApproval/Deny; o wake gate em camadas, com o LLM só no fim e batimento forçado; os wakes por evento agrupados (PR 6041); o charter com metas, sinais e cercas e o modo rascunho na partida (agent-teams PR 287, merged 2026-11-25); o ledger e o estado por persona. (b) Riscos medidos: o Project Vend (manipulável, sem lucro, deriva de identidade, camada CEO que não ajudou), o TheAgentCompany (30,3% no melhor, piores resultados em Admin e Finanças) e o DGM (o risco de otimizar a métrica, declarado pelo próprio paper). (c) O desenho clássico: o S4 propõe e o S5 decide (VSM). E o humano fixa meta e restrições no co-scientist. (d) A governança aplicada no harness como padrão de mercado (Omnigent), mas só declarada.  MVP compatível com a evidência: a persona como S4 (propõe), com o maestro ou um Delphi como S5 (decide). Charter versionado no KG-SSOT. Wake pela campainha e pelo baton em modo silencioso. A política de aprovação fora do alcance da própria persona. O Elenxo com modelo e contexto distintos. E o teto de gasto.  O QUE A RODADA NÃO SUSTENTA. (1) O termo de mercado (pergunta 1). Há só nomes de projeto, 'Chief of Staff Agent' (MJ) e 'agentic product owner'/'steward-like' (agent-teams). O IBM é genérico, e o HN foi rejeitado. A lacuna segue aberta e bloqueia batizar a sessão por 'termo de mercado'. (2) A independência do refutador. Papel separado não é independência (co-scientist, claim 18). O D_NEED_REFUTADOR segue open. (3) A autodescoberta de cerca de 30 ciclos. Nenhuma fonte, e o DGM só funciona com um avaliador externo, que o Onion não tem para 'valor de evolução'. Fixar 30 ciclos é preferência, não medida. (4) A persona decidir 'não subordinada' ao maestro. O VSM e o co-scientist põem a decisão na identidade e no humano. (5) O padrão MJ copiado como está. O agente tem a ação Configure Agent User Policy (PR 5842, linha 28), que permite afrouxar o próprio freio. É captura pelo proponente e bloqueia. (6) Transferência das medidas de 2025 (Vend fase 1, TAC) para os modelos de nov/2026. (7) O Apêndice H do DGM, sobre hacking do avaliador, não foi lido.  Próximas rodadas: buscar o termo com contagem de uso (academia ou analistas), ler o Apêndice H do DGM e medir um refutador de modelo distinto no /meta:decide antes de promover o MVP. NOTA DO ESCRITOR: este nó não sela nada; é claim open. As objeções bloqueantes (alvos 2, 12, 13, 18 e Q2) o restringem por CONSTRAINS."
+    trace: "run /onion-research em modo primárias de 2026-11-26, campo recommendation do Elenxo"
+edges:
+  - from: E_MJ_USER_PERMISSION_HARD_CEILING
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_MJ_USER_POLICY_ALLOW_APPROVE_DENY
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_MJ_THREE_TIER_WAKE_GATE
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_MJ_EVENT_DRIVEN_WAKES_BATCHED
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_APO_CHARTER_CHECK_GOALS_SIGNALS_FENCES
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_APO_STARTUP_DRAFTING_MODE
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_APO_LEDGER_PER_PERSONA_STEWARD_DEFAULT
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_VEND1_TALKED_INTO_DISCOUNTS
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_VEND1_WOULD_NOT_HIRE
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_VEND1_IDENTITY_CRISIS
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_VEND2_CEO_PRESSURE_NO_HELP
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_IBM_AGENTIC_AI_DEFINITION
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_DGM_SELF_EDIT_BENCHMARK_GAINS
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_DGM_ARCHIVE_ADMISSION_GATE
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_DGM_FIXED_META_STAGNATES
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_DGM_METRIC_OPTIMIZATION_RISK
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_DGM_SANDBOX_APPENDIX_H_UNREAD
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_COSCI_SEPARATE_GENERATOR_REVIEWER_RANKER
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_COSCI_ELO_TOURNAMENT_DEBATE
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_COSCI_META_REVIEW_PROMPT_FEEDBACK
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_COSCI_SCIENTIST_IN_THE_LOOP
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_COSCI_ELO_VALIDATED_GPQA
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_TAC_BEST_AGENT_30_PERCENT
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_TAC_COST_STEPS_PER_TASK
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_TAC_ADMIN_FINANCE_WORST
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_VSM_S4_EXTERNAL_FUTURE
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_VSM_S3_RULES_RESOURCES
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_VSM_S5_BALANCES_NOW_FUTURE
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_VSM_S5_CHOOSES_S4_OPTIONS
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_OMNIGENT_META_HARNESS_DEFINITION
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_OMNIGENT_GOVERNANCE_AT_HARNESS_LAYER
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_OMNIGENT_STATEFUL_POLICIES
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_OMNIGENT_BROKERED_CREDENTIALS_SANDBOX
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_OMNIGENT_MULTI_HUMAN_SESSIONS
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_OMNIGENT_LOBSTERS_MINIMAL_DISCUSSION
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_01_CEILING_ONLY_MOCK_TESTED
+    to: E_MJ_USER_PERMISSION_HARD_CEILING
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_AGENT_EDITS_OWN_POLICY
+    to: E_MJ_USER_POLICY_ALLOW_APPROVE_DENY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_AGENT_EDITS_OWN_POLICY
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_03_WAKE_GATE_NO_SAVINGS_NUMBER
+    to: E_MJ_THREE_TIER_WAKE_GATE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_05_CHARTER_FORM_NOT_FENCE
+    to: E_APO_CHARTER_CHECK_GOALS_SIGNALS_FENCES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_DRAFTING_MODE_SCOPE_UNDEFINED
+    to: E_APO_STARTUP_DRAFTING_MODE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_PROJECT_VOCABULARY_NOT_MARKET_TERM
+    to: E_APO_LEDGER_PER_PERSONA_STEWARD_DEFAULT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_08_VEND_2025_MODEL_NOT_TRANSFERRED
+    to: E_VEND1_TALKED_INTO_DISCOUNTS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_10_IDENTITY_DRIFT_N1
+    to: E_VEND1_IDENTITY_CRISIS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_CEO_LAYER_IS_NOT_INDEPENDENT_REFUTER
+    to: E_VEND2_CEO_PRESSURE_NO_HELP
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_MARKET_TERM_NOT_DELIVERED
+    to: E_IBM_AGENTIC_AI_DEFINITION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_MARKET_TERM_NOT_DELIVERED
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_13_SELF_DISCOVERY_WITHOUT_EXTERNAL_EVALUATOR
+    to: E_DGM_SELF_EDIT_BENCHMARK_GAINS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_13_SELF_DISCOVERY_WITHOUT_EXTERNAL_EVALUATOR
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_14_ADMISSION_GATE_IS_LINEAGE_NOT_VALUE
+    to: E_DGM_ARCHIVE_ADMISSION_GATE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_15_ABLATION_ONLY_ON_CODE
+    to: E_DGM_FIXED_META_STAGNATES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_17_EVALUATOR_HACKING_APPENDIX_UNREAD
+    to: E_DGM_SANDBOX_APPENDIX_H_UNREAD
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_18_SEPARATE_ROLE_IS_NOT_INDEPENDENCE
+    to: E_COSCI_SEPARATE_GENERATOR_REVIEWER_RANKER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_18_SEPARATE_ROLE_IS_NOT_INDEPENDENCE
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_19_ELO_MEASURES_PERSUASION_NOT_PAIN
+    to: E_COSCI_ELO_TOURNAMENT_DEBATE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_20_META_REVIEW_DRIFT_UNMEASURED
+    to: E_COSCI_META_REVIEW_PROMPT_FEEDBACK
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_22_NO_GROUND_TRUTH_FOR_PRIORITIES
+    to: E_COSCI_ELO_VALIDATED_GPQA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_23_TAC_2025_MODELS_FLOOR_ONLY
+    to: E_TAC_BEST_AGENT_30_PERCENT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_27_PERSONA_JOINS_S3_AND_S4
+    to: E_VSM_S3_RULES_RESOURCES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_28_WHO_IS_S5_UNDEFINED
+    to: E_VSM_S5_BALANCES_NOW_FUTURE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_31_HARNESS_LAYER_IS_NOT_A_GUARANTEE
+    to: E_OMNIGENT_GOVERNANCE_AT_HARNESS_LAYER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_32_STATEFUL_POLICIES_DECLARED_ONLY
+    to: E_OMNIGENT_STATEFUL_POLICIES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_33_BROKERED_CREDENTIALS_UNAUDITED
+    to: E_OMNIGENT_BROKERED_CREDENTIALS_SANDBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_34_SHARED_SUPERVISION_IS_NOT_ADVERSARIAL
+    to: E_OMNIGENT_MULTI_HUMAN_SESSIONS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_Q2_SELF_DISCOVERY_30_CYCLES_NO_STOP_CRITERION
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_Q2_SELF_DISCOVERY_30_CYCLES_NO_STOP_CRITERION
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_MJ_COCKPIT_TOOLS_READ_ONLY
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_MJ_OUTSTANDING_DELIMITS_LIVE_VALIDATION
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_APO_NEVER_GATEKEEPER
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_APO_IDEMPOTENCE_ONLY_STATE
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_VEND2_PROCEDURES_AMONG_MOST_IMPACTFUL
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_VEND2_HELPFULNESS_SUSPECTED
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_ANTHROPIC_AGENTIC_SYSTEMS_UMBRELLA
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_ANTHROPIC_AUTONOMY_COST_WARNED
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_ANTHROPIC_WHEN_TO_USE_AGENTS
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_DGM_ARCHIVE_STEPPING_STONES
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_COSCI_ABLATION_SEARCH_AND_DEBATE
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_TAC_WEB_NAVIGATION_OFTEN_OBSTACLE
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_TAC_TABLE4_OWNCLOUD_WORST
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261126_TAC_LIMITATIONS_STRAIGHTFORWARD_TASKS
+    to: E_LACUNAS_ONION_EVOLVE_PERSONA_1126
+    edge_type: TRACES_TO
+  - from: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    to: Q_ONION_EVOLVE_PERSONA_2026_11
+    edge_type: TRACES_TO
+  - from: E_MJ_USER_PERMISSION_HARD_CEILING
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_MJ_USER_POLICY_ALLOW_APPROVE_DENY
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_MJ_THREE_TIER_WAKE_GATE
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_MJ_EVENT_DRIVEN_WAKES_BATCHED
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_APO_CHARTER_CHECK_GOALS_SIGNALS_FENCES
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_APO_STARTUP_DRAFTING_MODE
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_APO_LEDGER_PER_PERSONA_STEWARD_DEFAULT
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_VEND1_TALKED_INTO_DISCOUNTS
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_VEND1_WOULD_NOT_HIRE
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_VEND1_IDENTITY_CRISIS
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_VEND2_CEO_PRESSURE_NO_HELP
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_DGM_METRIC_OPTIMIZATION_RISK
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_COSCI_SCIENTIST_IN_THE_LOOP
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_TAC_BEST_AGENT_30_PERCENT
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_TAC_COST_STEPS_PER_TASK
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_TAC_ADMIN_FINANCE_WORST
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_VSM_S4_EXTERNAL_FUTURE
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_VSM_S5_BALANCES_NOW_FUTURE
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_VSM_S5_CHOOSES_S4_OPTIONS
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
+  - from: E_OMNIGENT_STATEFUL_POLICIES
+    to: C_ELENXO_PERSONA_MVP_RECOMMENDATION_1126
+    edge_type: SUPPORTS
