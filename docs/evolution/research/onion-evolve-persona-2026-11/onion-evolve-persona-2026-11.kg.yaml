@@ -19,7 +19,7 @@ meta:
   # Gatilhos antecipados: rodada complementar do termo com contagem de uso; leitura do Apêndice H da DGM; medida de
   # refutador de modelo distinto no /meta:decide.
   note: "Grafo de primárias em duas rodadas (2026-11-26). Rodada 1: 35 claims ancoradas viram evidência; 17 rejeitadas na ancoragem só entram em E_LACUNAS_ONION_EVOLVE_PERSONA_1126; Elenxo com 36 objeções, 26 sobreviventes (5 bloqueiam), 0 recusadas; 14 superações. Rodada 2: 20 ancoradas; 9 rejeitadas só em E_LACUNAS_ONION_EVOLVE_PERSONA_R2_1126; Elenxo com 21 objeções, 18 sobreviventes (7 bloqueiam), 0 recusadas; 5 superações; E_OBJECAO_17 superseded pelo Apêndice H lido."
-  # ═══ TETO: 128 NÓS ═══
+  # ═══ TETO: 131 NÓS ═══
   #   Justificativa: a rodada 2 de primárias foi executada em 2026-11-26 e APENDOU 47 nós aos 78 da rodada 1 (78 + 47 = 125).
   #   Rodada 1 (78): 1 pergunta raiz + 35 evidências ancoradas + 26 objeções sobreviventes + 1 contabilidade + 14 superações
   #   + 1 claim com a recomendação íntegra do Elenxo.
@@ -29,6 +29,8 @@ meta:
   #   Selos do maestro (2): +2 decisões de 26/11 seladas pelo kg-decide-seal (D_PERSONA_REFUTER_OTHER_MODEL_1126, D_PERSONA_PROVISIONAL_NAME_1126) = 127.
   #   +1 selo de 26/11 (D_PERSONA_MVP_BUILD_1126: montar o MVP) = 128; Q_EXTEND_EXTERNAL_REFUTER_TO_NOVELTY_METER_1126 selada no próprio nó.
   #   + 1 pergunta PROPOSTA ao maestro (Q_EXTEND_EXTERNAL_REFUTER_TO_NOVELTY_METER_1126; o escritor não sela).
+  #   +3 termos x_term (T_PERSONA_VSM_S4, T_PERSONA_PERGUNTA_Q2, T_PERSONA_ELENXO_R2_E3) pedidos pelo contrato KG-SSOT de nomes
+  #   (códigos sem termo na prosa; o E3 colidia com o de dois grafos de dissecação) = 131.
   #   review_after segue 90d (2027-02-24): o tipo dominante continua MERCADO (o termo de uso medido segue aberto); os papers
   #   desta rodada (DGM, Prechelt, Guest, Hennink, AI Scientist) são doutrina/benchmark e não movem a revisita.
   purpose: "Responder com evidência ancorada o termo de mercado, os padrões e casos reais, os riscos medidos e o MVP de uma sessão-Persona do Onion Evolve, deixando nomeado o que a rodada NÃO sustenta."
