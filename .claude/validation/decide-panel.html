@@ -123,6 +123,13 @@
   const FINAL = new Set(['selado', 'executado', 'executar', 'card pendente', 'conferir', 'depois', 'ensaio']);
   const safeSrc = (u) => typeof u === 'string' && (/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(u) || /^\/_blob\/[A-Za-z0-9_-]+$/.test(u) || /^https:\/\//.test(u));
   const ddmm = (d) => (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '';
+  // <open-count> (a bancada pn6 roda este trecho no node): o estado da rodada, quando existe, vale ANTES do envio;
+  // sem estado, enviada conta como respondida. "não confere" e "aguarda leitura" seguem abertos mesmo enviados.
+  function openCount(rd, st, snt) {
+    return (rd.questions || []).filter((q) => { const s = st[q.id];
+      return s && s.round_id === rd.round_id ? !FINAL.has(s.state) : !snt[q.id]; }).length;
+  }
+  // </open-count>
   const setPick = (qid, patch) => { picks[qid] = Object.assign({}, picks[qid] || {}, patch); };
 
   function annotate(q, img, src) {   // marker.js 2: abre sobre o print ORIGINAL e restaura a marcação anterior
@@ -220,7 +227,7 @@
       res.forEach((r) => { const li = el('li'); if (r.cite_id) li.append(el('span', 'cite', `${r.cite_id} `)); li.append(el('span', null, r.question), el('div', 'later', r.resolved_by)); ul.append(li); });
       $('resolved').replaceChildren(el('summary', null, `Já resolvido pelas suas regras (${res.length})`), ul);
     }
-    const open = round.questions.filter((q) => { const st = status[q.id]; return !(sent[q.id] || (st && st.round_id === round.round_id && FINAL.has(st.state))); }).length;
+    const open = openCount(round, status, sent);
     $('count').textContent = open ? `${open} em aberto` : '';
     $('clean').hidden = open !== 0 || !round.questions.length;
     const later = [...(round.deferred || [])];
