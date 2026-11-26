@@ -59159,6 +59159,39 @@ PN_MUT
   if [ -z "${_k5}" ]; then
     record_pass "decide: (pn5) kit de revisão: só-painel até 6 opções e --ask recusa nomeado; recomendada em 1º; verify fixo (Confere sela com design, Ainda não não sela e leva a nota); resolvido recolhido e sem campo de pergunta; view/cite_id fora do round_id, opção e card do ato dentro; rodada no hash legado sela; rascunho (também em custo, com invisível ou hífen), link vencido, data impossível ou com query, anotação sobre imagem de outra origem, imagem fora da pasta ou falsa recusados; (MUT) 10 mutantes reprovam"
   else record_fail "decide: (pn5)" "${_k5}"; fi
+  # (pn6) a CONTAGEM de abertos da página (achado do revisor isolado, rodada 2): o trecho <open-count> do HTML roda no
+  #       node; item enviado com estado "não confere" ou "aguarda leitura" segue aberto (sem «Pendências limpas»);
+  #       enviado sem estado e selado contam como fechados. Mutante: o envio decidindo antes do estado.
+  local _p6="" _pg="${REPO_ROOT}/.claude/validation/decide-panel.html"
+  _pn_open() {  # $1=html → "n1 n2 n3" (abertos em 3 cenários) ou erro
+    python3 -I -B -c '
+import sys, re
+s = open(sys.argv[1], encoding="utf-8").read()
+m = re.search(r"// <open-count>.*?\n(.*?)// </open-count>", s, re.S)
+fin = re.search(r"const FINAL = new Set\(\[[^\]]*\]\);", s)
+if not m or not fin: sys.exit("trecho <open-count> ou FINAL ausente")
+print(fin.group(0) + "\n" + m.group(1))' "$1" > "${pnd}/open.js" || return 1
+    command -v node >/dev/null 2>&1 || { echo "sem-node"; return 0; }
+    node -e '
+const src = require("fs").readFileSync(process.argv[1], "utf8"); eval(src);
+const rd = { round_id: "r1", questions: [{ id: "q1" }, { id: "q2" }, { id: "q3" }] };
+const sent = { q1: true, q2: true, q3: true };
+const a = openCount(rd, { q1: { round_id: "r1", state: "selado" }, q2: { round_id: "r1", state: "não confere" }, q3: { round_id: "r1", state: "aguarda leitura" } }, sent);
+const b = openCount(rd, {}, sent);
+const c = openCount(rd, { q1: { round_id: "r0", state: "selado" } }, {});
+console.log(a, b, c);' "${pnd}/open.js"
+  }
+  local _o; _o="$(_pn_open "${_pg}" 2>&1)" || _p6="${_p6} extrair:${_o}"
+  if [ "${_o}" = "sem-node" ]; then record_skip "decide: (pn6) node ausente: a contagem da página não foi exercitada"
+  else
+    [ "${_o}" = "2 0 3" ] || _p6="${_p6} limpo:[${_o}]"
+    python3 -I -B -c 'import sys; s=open(sys.argv[1],encoding="utf-8").read(); a="return s && s.round_id === rd.round_id ? !FINAL.has(s.state) : !snt[q.id];"; sys.exit(1) if s.count(a)!=1 else open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,"return !(snt[q.id] || (s && s.round_id === rd.round_id && FINAL.has(s.state)));"))' "${_pg}" "${pnd}/mut-open.html" \
+      || _p6="${_p6} MUT-ancora"
+    [ "$(_pn_open "${pnd}/mut-open.html" 2>&1)" != "2 0 3" ] || _p6="${_p6} MUT-envio-antes-do-estado-sobreviveu"
+    if [ -z "${_p6}" ]; then
+      record_pass "decide: (pn6) página: enviado com «não confere» ou «aguarda leitura» segue aberto, enviado sem estado e selado fecham, estado de outra rodada não conta; (MUT) envio decidindo antes do estado reprova"
+    else record_fail "decide: (pn6)" "${_p6}"; fi
+  fi
   fi
   fi
   # ── MODO TRIAGEM EM LOTE (cláusula 10, D_FORGE_DECIDE_BATCH_TRIAGE_MODE_1111, 2026-11-11) ───────────────

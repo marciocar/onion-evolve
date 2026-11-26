@@ -62,7 +62,9 @@
 #   Texto com "[A CONFIRMAR]" recusa a rodada. O round_id cobre o que sela ou vira ato: id, tipo, ref, pergunta, opções,
 #   texto livre, selo, classe e card do ato e origem, mais data e nonce. Fora fica só a apresentação (cabeçalho,
 #   cite_id, view): trocar um print não invalida a resposta, trocar uma opção ou o card invalida. O seal aceita também
-#   o hash da rodada emitida antes do kit (a pergunta inteira, que cobre mais).
+#   o hash da rodada emitida antes do kit (a pergunta inteira, que cobre mais). Condição de remoção desse caminho: a
+#   rodada vive horas (a sessão a refaz a cada /meta:decide), então ele sai no 1º PR que tocar o seal depois de
+#   2026-12-26; a bancada (mutante sem-legado) cai junto.
 #   A resposta pode levar "annotation" (estado do marker.js) e "note" (nota do Ainda não): o estado do item sai com
 #   annotated/note para a sessão LER; nenhum dos dois vira argumento do selador.
 #
@@ -273,7 +275,7 @@ for i, q in enumerate(qs):
             lab = clean(o.get('label'), f'{ref}: rótulo {j + 1}')
             if lab.endswith('(Recomendado)'): die(f'{ref}: a marca (Recomendado) é posta por este script a partir de "recommended", nunca escrita à mão')
             ol.append({'label': lab, 'description': clean(o.get('description'), f'{ref}: descrição {j + 1}'),
-                       'cost': clean(o['cost'], f'{ref}: custo {j + 1}', 120, ()) if o.get('cost') else ''})
+                       'cost': clean(str(o['cost']), f'{ref}: custo {j + 1}', 120, ()) if o.get('cost') not in (None, '') else ''})
         rec = q.get('recommended')
         if rec is not None:
             if not isinstance(rec, int) or isinstance(rec, bool) or not 0 <= rec < len(ol): die(f'{ref}: recommended fora do intervalo')
