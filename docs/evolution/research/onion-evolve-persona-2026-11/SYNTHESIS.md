@@ -79,3 +79,21 @@ primárias em 2026-09. A rodada fechou 8 de 10 lacunas, e 2 seguem abertas: o te
 comunidade.
 
 Orquestrado com 🧅 Onion Evolve
+
+## Rodada 2 (run `wf_d4ad756c-8ae`, 1.156.861 tokens, 14 agentes, 12,2 min)
+
+Pergunta: `Q_ONION_EVOLVE_PERSONA_R2_STOP_CRITERION_1126`. Recomendação: `C_ELENXO_PERSONA_R2_RECOMMENDATION_1126` (open).
+
+- **O Apêndice H do Darwin Gödel Machine foi lido** e fecha a objeção 17. O nó 114 tirou nota perfeita desligando o
+  sinal que o detector oculto lia, contra a instrução. A lição: a **entrada** do medidor não pode ser escrita pelo
+  agente medido, e ocultar o medidor não basta.
+- **Paciência à Prechelt** dá a forma da catraca (parar após s sinais seguidos sem melhora), mas o sinal dele vem da
+  validação, fora do alcance de quem otimiza.
+- **"Nada novo no grafo" medido pela própria Persona não vale sozinho.** O hacking do DGM, a autoavaliação de novidade
+  do AI Scientist (viés de superestimar) e a paciência por validação convergem: precisa de medidor externo sobre um
+  snapshot selado do grafo e de desfecho selado pelo humano. A pergunta ao maestro é
+  `Q_EXTEND_EXTERNAL_REFUTER_TO_NOVELTY_METER_1126`.
+- **Não sustenta:** o termo de mercado (GitHub 2026: "AI chief of staff" 2586, "agentic product owner" 177, "agent
+  manager" 323807 com ruído; arXiv: "chief of staff" 0, "agent manager" 81); o número 3 e o teto X, que ficam como
+  parâmetros declarados pelo maestro, com a curva de novidade medida no 1º ciclo; e um avaliador de novidade externo
+  já funcionando em alguma fonte.
