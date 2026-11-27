@@ -14,3 +14,4 @@ vault.caddy	~/onion-vps-vaultwarden	origin/master	caddy/vault.caddy	vault.onione
 waha.caddy	~/onion-vps-waha	origin/master	caddy/waha.caddy	waha.onionevolve.com	127.0.0.1:3999
 gokapi.caddy	~/onion-vps-gokapi	origin/master	caddy/gokapi.caddy	transfer.onionevolve.com	127.0.0.1:3050
 hooks.caddy	~/onion-messaging	origin/main	caddy/hooks.caddy	hooks.onionevolve.com	127.0.0.1:8791
+ticketai.caddy	~/ticket-ai	origin/main	caddy/ticketai.caddy	ticket.onionevolve.com	127.0.0.1:3070
