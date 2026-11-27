@@ -22,6 +22,7 @@
 .claude/commands/common/prompts/client-material-doctrine.md	E_LEVA1_LINK_DA_DOUTRINA_DE_CLIENTE	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/commands/common/prompts/decide-doctrine.md	E_N0_CORPUS_PECAS_VIZINHAS	docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	C_FAMILIES_REGISTRY_V1	.claude/validation/dissect-families.kg.yaml
+.claude/commands/common/prompts/dissect-doctrine.md	C_PATTERN_THRESHOLD_CONTESTED	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	Q_MEDIA_N2_LOCAL_RUN	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_APP	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_ATOR	.claude/validation/dissect-families.kg.yaml
@@ -29,6 +30,7 @@
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_FERRAMENTA	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_IDEIA	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_MIDIA	.claude/validation/dissect-families.kg.yaml
+.claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_PADRAO	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_PRATICA	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/drive-doctrine.md	E_N1_ESCADA_POR_LEITURA	docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml
 .claude/commands/common/prompts/execution-agent-preamble.md	C_TETO_SUBAGENTE_SEM_HOOK	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1263 itens abertos** em 187 grafo(s) com aberto (de 249 no escopo) · 176 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1265 itens abertos** em 187 grafo(s) com aberto (de 249 no escopo) · 176 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1251,6 +1251,22 @@
 | 2.0 | `I_REGISTRY_ASSIGNED_TRUST_TIER` | taco-2026-11 | Tier de confiança atribuído pelo registro por verificação de terceiro, separado das certificações auto-declaradas no card. |
 | 1.2 | `I_WIRE_DIALECT_PARITY` | taco-2026-11 | Bancada que roda o mesmo cenário nos dois dialetos do A2A (0.3 e 1.0), escritos à mão, para provar que o servidor fala os dois. |
 
+## dissect-families — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.6 | `C_FAMILIES_REGISTRY_V1` | dissect-families | O registro v1 tem seis famílias, escolhidas pela ordem de predicados da Etapa 0; família nova entra por PR no core antes do N0 d |
+| 5.4 | `T_FAMILY_MIDIA` | dissect-families | Família midia da dissecação. |
+| 5.4 | `T_FAMILY_PADRAO` | dissect-families | Família padrao da dissecação. |
+| 4.2 | `C_PATTERN_THRESHOLD_CONTESTED` | dissect-families | Os pisos de usos conhecidos da família padrao são contestados: as fontes variam entre 2 e 3 e dizem que não há quantidade exig |
+| 4.2 | `T_FAMILY_APP` | dissect-families | Família app da dissecação. |
+| 4.2 | `T_FAMILY_ATOR` | dissect-families | Família ator da dissecação. |
+| 4.2 | `T_FAMILY_CATEGORIA` | dissect-families | Família categoria da dissecação. |
+| 4.2 | `T_FAMILY_FERRAMENTA` | dissect-families | Família ferramenta da dissecação. |
+| 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
+| 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
+| 3.0 | `Q_MEDIA_N2_LOCAL_RUN` | dissect-families | O nível 2 da família midia roda de verdade aqui? Falta reproduzir localmente o cálculo do alfa de Krippendorff numa implementa |
+
 ## guardas-revisao-2026-08 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1301,20 +1317,6 @@
 | 7.5 | `Q_d2_l1l6_activation` | d5-pricing-2026-07 | GATE D2: a assinatura SOTA vende o mecanismo L1-L6 (classificação-por-inferência + gate-por-propósito + ε-ledger) que segue G |
 | 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
 | 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
-
-## dissect-families — 9 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 19.2 | `C_FAMILIES_REGISTRY_V1` | dissect-families | O registro v1 tem seis famílias, escolhidas pela ordem de predicados da Etapa 0; família nova entra por PR no core antes do N0 d |
-| 5.4 | `T_FAMILY_MIDIA` | dissect-families | Família midia da dissecação. |
-| 4.2 | `T_FAMILY_APP` | dissect-families | Família app da dissecação. |
-| 4.2 | `T_FAMILY_ATOR` | dissect-families | Família ator da dissecação. |
-| 4.2 | `T_FAMILY_CATEGORIA` | dissect-families | Família categoria da dissecação. |
-| 4.2 | `T_FAMILY_FERRAMENTA` | dissect-families | Família ferramenta da dissecação. |
-| 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
-| 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
-| 3.0 | `Q_MEDIA_N2_LOCAL_RUN` | dissect-families | O nível 2 da família midia roda de verdade aqui? Falta reproduzir localmente o cálculo do alfa de Krippendorff numa implementa |
 
 ## websearch-cap-2026-09 — 1 item(ns)
 
