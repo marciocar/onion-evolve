@@ -4511,7 +4511,13 @@ ${_decl}"
   # Exclui: nomes do próprio framework (onion-*), do maestro (marcio*), e da convenção de
   # FIXTURE (selftest-*) — senão a guarda deriva os membros-de-teste do members.yaml de um
   # sandbox e se acusa nas próprias fixtures (achado ao rodar: quebrou os testes do outbox-channel).
-  [ -r "${members}" ] && ids="$(awk '/^[[:space:]]*-[[:space:]]*id:[[:space:]]/{v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]*#.*$/,"",v); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); if (v !~ /^onion-/ && v !~ /^marcio/ && v !~ /^selftest-/ && length(v)>=4) print v}' "${members}" 2>/dev/null || true)"
+  # ALIASES (2026-11-27, D_ECOSYSTEM_NAMING_PATTERN_1127, SAC-567): o membro antigo fora do padrão de nomes ganha
+  # `aliases: [..]` em vez de rename, e o alias é nome registrado como o id. Se a guarda lesse só o id, o alias seria
+  # o ponto cego exato que esta regra existe para fechar. Mesmo filtro do id; a forma em fluxo numa linha só é
+  # cobrada pelo members-validate.sh (REGRA 66), porque este leitor é awk.
+  [ -r "${members}" ] && ids="$(awk 'function keep(v) { return (v !~ /^onion-/ && v !~ /^marcio/ && v !~ /^selftest-/ && length(v)>=4) }
+    /^[[:space:]]*-[[:space:]]*id:[[:space:]]/{v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]*#.*$/,"",v); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); if (keep(v)) print v; next}
+    /^[[:space:]]+aliases:[[:space:]]*\[/{v=$0; sub(/^[^\[]*\[/,"",v); sub(/\].*$/,"",v); n=split(v,A,","); for (i=1;i<=n;i++) { a=A[i]; gsub(/^[[:space:]"\047]+|[[:space:]"\047]+$/,"",a); if (keep(a)) print a } }' "${members}" 2>/dev/null || true)"
   # '|| true': num adotante LIMPO (sem members.yaml nem nome comercial) terms+ids são vazios;
   # grep -v não casa nada → exit 1 → sob 'set -euo pipefail' abortaria o LINT INTEIRO. O core
   # nunca vê isso (sempre tem termos), mas todo adotante greenfield veria — achado ao rodar o
@@ -5630,6 +5636,11 @@ check_members_registry() {
   if [ "${rc}" -ne 0 ]; then
     violation "HARD" "${mf}" "REGRA 66: registro da federação INVÁLIDO (members-validate rc=${rc}): $(printf '%s' "${out}" | tail -2 | tr '\n' ' ' | cut -c1-160)"
   fi
+  # AVISOS do validador (2026-11-27, SAC-567: membro NOVO fora do prefixo do padrão de nomes) saem SOFT, um por linha
+  local _w
+  while IFS= read -r _w; do
+    [ -n "${_w}" ] && violation "SOFT" "${mf}" "REGRA 66: ${_w#*⚠ aviso: }"
+  done < <(printf '%s\n' "${out}" | grep -F '⚠ aviso:' || true)
 }
 
 check_radar_staleness

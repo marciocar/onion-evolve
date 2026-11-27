@@ -34,7 +34,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (60)
+## 🧠 Conceitos Fundamentais (61)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Onboarding do adotante](concepts/adopter-onboarding.md) — a fonte canônica da orientação de adoção (vendorizada); guias por adotante apontam para cá, não duplicam
@@ -47,6 +47,7 @@ docs/knowledge-base/
 - [Consolidated to Tasks Patterns](concepts/consolidated-to-tasks-patterns.md) — transformação de conhecimento consolidado em tasks
 - [Constellation of Studies](concepts/constellation-of-studies.md) — **CANDIDATO** — a constelação de estudos `discuss/*`: mapa macro das N estrelas (fase · next_action · convergência de tags), read-only
 - [Context Window Optimization](concepts/context-window-optimization.md) — otimização de contexto, prompt caching e custo multi-agente
+- [Nomes do ecossistema](concepts/ecosystem-naming.md) — prefixo por tipo (company-brain-, second-brain-, onion-, onion-vps-); peça antiga ganha alias registrado e gatilho de rename, nunca rename no susto; as guardas varrem o alias como o id
 - [Decision Snapshot Retention](concepts/decision-snapshot-retention.md) — rastreabilidade atômica sustentável: payload mínimo (decisão, não universo) + política de retenção
 - [Discussion Worktrees](concepts/discussion-worktrees-pattern.md) — frentes de discussão isoladas (pensa, não entrega); estende parallel-worktrees
 - [Domain Context Lifecycle](concepts/domain-context-lifecycle.md) — contexto de domínio como SSOT viva (CRUD+), não snapshot; fundamenta a regra L0 e o ciclo *Manage*

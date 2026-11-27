@@ -66390,6 +66390,95 @@ inbox_make'
 }
 _family run_image_bridge_selftests
 
+# ecosystem-naming — o padrão de nomes do ecossistema (2026-11-27, D_ECOSYSTEM_NAMING_PATTERN_1127, SAC-567). O membro
+# antigo fora do padrão ganha `aliases:` + `rename_trigger:` em vez de rename, e o alias é nome registrado: o
+# members-validate.sh confere colisão e forma, avisa (SOFT) membro NOVO fora do prefixo, e reprova o mapa core-only
+# que esquece um membro; as guardas que derivam termos do registro (REGRA 36 no lint, REGRA 106 pelo door-leak-scan.sh)
+# varrem o alias como o id. Tudo com nomes INVENTADOS e em sandbox: o core é público. Cada SUT roda intacto e num
+# mutante (a âncora tem de ocorrer uma vez).
+run_ecosystem_naming_selftests() {
+  echo ""
+  echo "▸ ecosystem-naming — alias registrado em vez de rename: colisão, aviso de membro novo, mapa e guardas que enxergam o alias"
+  local mv="${SCRIPT_DIR}/members-validate.sh" fx="${FIX_DIR}/members"
+  python3 -c 'import yaml' >/dev/null 2>&1 || { record_skip "ecosystem-naming: python3+yaml ausente"; return; }
+  local sb rc out; sb="$(TMPDIR=/tmp mktemp -d)"
+  _en_mut() { # $1=SUT $2=destino $3=âncora $4=substituto · rc 3 se a âncora não ocorre exatamente 1 vez
+    python3 -c 'import sys
+s=open(sys.argv[1],encoding="utf-8").read(); a,n=sys.argv[3],sys.argv[4]
+if s.count(a)!=1: sys.exit(3)
+open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,n))' "$1" "$2" "$3" "$4"
+  }
+  # (a) MUTANTE: sem a checagem de colisão, os dois fixtures de colisão passam — a bancada tem de reprovar
+  if _en_mut "${mv}" "${sb}/mv-mut.sh" '            prev = owner.get(a.lower())' '            prev = None'; then
+    local bit=0 f
+    for f in members-bad-alias-collides-id.yaml members-bad-alias-collides-alias.yaml; do
+      rc=0; bash "${sb}/mv-mut.sh" "${fx}/${f}" >/dev/null 2>&1 || rc=$?
+      [ "${rc}" -eq 0 ] && bit=$((bit+1))
+    done
+    rc=0; bash "${sb}/mv-mut.sh" "${fx}/members-good-aliases.yaml" >/dev/null 2>&1 || rc=$?
+    if [ "${bit}" -eq 2 ] && [ "${rc}" -eq 0 ]; then record_pass "ecosystem-naming: (a) MUTANTE sem a checagem de colisão deixa os 2 fixtures de colisão passarem — a checagem é load-bearing"
+    else record_fail "ecosystem-naming: (a) mutante" "colisões aceitas pelo mutante: ${bit}/2; o fixture bom rc=${rc}"; fi
+  else record_fail "ecosystem-naming: (a) mutante não aplicou" "âncora da checagem de colisão ausente ou repetida no members-validate.sh"; fi
+  # (b) aviso de membro NOVO fora do prefixo: SOFT (rc 0), só com registro-base, e calado para o conforme
+  cp "${fx}/members-good-aliases.yaml" "${sb}/base.yaml"
+  { cat "${fx}/members-good-aliases.yaml"; sed -n '/^  - id: onion-peca-ficticia$/,$p' "${fx}/members-good-aliases.yaml" | sed 's/onion-peca-ficticia/projeto-novo-zeta/g'
+    sed -n '/^  - id: onion-peca-ficticia$/,$p' "${fx}/members-good-aliases.yaml" | sed 's/onion-peca-ficticia/onion-svc-ficticio/g'
+    sed -n '/^  - id: onion-peca-ficticia$/,$p' "${fx}/members-good-aliases.yaml" | sed 's/onion-peca-ficticia/onion-vps-ficticio/g'; } > "${sb}/novo.yaml"
+  rc=0; out="$(bash "${mv}" "${sb}/novo.yaml" --base "${sb}/base.yaml" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q "⚠ aviso: membro NOVO 'projeto-novo-zeta' fora dos prefixos" <<< "${out}" \
+     && grep -q "⚠ aviso: membro NOVO 'onion-svc-ficticio': serviço da VPS usa o prefixo onion-vps-" <<< "${out}" \
+     && ! grep -q "onion-vps-ficticio" <<< "${out}" && ! grep -q "cerebro-legado-acme" <<< "${out}"; then
+    record_pass "ecosystem-naming: (b) membro novo fora do prefixo e onion-svc- novo dão AVISO com rc 0; o conforme e o antigo ficam calados"
+  else record_fail "ecosystem-naming: (b) aviso de membro novo" "rc=${rc}: ${out:0:300}"; fi
+  rc=0; out="$(bash "${mv}" "${sb}/novo.yaml" --base none 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q '⚠ aviso' <<< "${out}"; then record_pass "ecosystem-naming: (b2) sem registro-base o aviso não roda (e não reprova)"
+  else record_fail "ecosystem-naming: (b2)" "rc=${rc}: ${out:0:200}"; fi
+  # (c) o MAPA: membro fora dele reprova; mapa completo passa; alias divergente reprova
+  mkdir -p "${sb}/m"; cp "${fx}/members-good-aliases.yaml" "${sb}/m/members.yaml"
+  printf '| id atual | tipo | conforme | alias | gatilho de rename |\n|---|---|---|---|---|\n| `onion-evolve` | fonte | sim | — | — |\n| `cerebro-legado-acme` | company brain | não | `company-brain-acme` | renomear |\n' > "${sb}/m/ecosystem-naming-map.md"
+  rc=0; out="$(bash "${mv}" "${sb}/m/members.yaml" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q "membro 'onion-peca-ficticia' do registro não está no mapa" <<< "${out}"; then record_pass "ecosystem-naming: (c) membro fora do mapa reprova"
+  else record_fail "ecosystem-naming: (c) mapa incompleto" "rc=${rc}: ${out:0:200}"; fi
+  printf '| `onion-peca-ficticia` | peça do Onion | sim | — | — |\n' >> "${sb}/m/ecosystem-naming-map.md"
+  rc=0; bash "${mv}" "${sb}/m/members.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "ecosystem-naming: (c2) mapa completo passa"; else record_fail "ecosystem-naming: (c2) mapa completo" "rc=${rc}"; fi
+  sed -i 's/`company-brain-acme`/`company-brain-outra`/' "${sb}/m/ecosystem-naming-map.md"
+  rc=0; out="$(bash "${mv}" "${sb}/m/members.yaml" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q "aliases de 'cerebro-legado-acme' divergem do registro" <<< "${out}"; then record_pass "ecosystem-naming: (c3) alias do mapa divergente do registro reprova"
+  else record_fail "ecosystem-naming: (c3)" "rc=${rc}: ${out:0:200}"; fi
+  # (d) REGRA 106 (door-leak-scan): o alias entra na família do id, com o kind do dono
+  local dls="${SCRIPT_DIR}/door-leak-scan.sh"
+  printf 'members:\n  - id: legado-zqvx\n    kind: adopter\n    aliases: [company-brain-zqvx, onion-zqvx-novo]\n  - id: porta-zqvx\n    kind: door\n    aliases: [onion-porta-zqvx]\n' > "${sb}/dls.yaml"
+  if [ -f "${dls}" ]; then
+    local sub word; sub="$(bash "${dls}" --members "${sb}/dls.yaml" --emit-sub-ids 2>&1)"; word="$(bash "${dls}" --members "${sb}/dls.yaml" --emit-word-ids 2>&1)"
+    if grep -qx 'company-brain-zqvx' <<< "${sub}" && grep -qx 'onion-zqvx-novo' <<< "${word}" && ! grep -q 'onion-porta-zqvx' <<< "${word}"; then
+      record_pass "ecosystem-naming: (d) door-leak-scan varre o alias como o id (sub e word, com o kind do dono; o alias de porta fica fora)"
+    else record_fail "ecosystem-naming: (d) door-leak-scan" "sub=[${sub}] word=[${word}]"; fi
+    if [ "$(bash "${dls}" --members "${sb}/dls.yaml" --emit-members-tsv | wc -l)" -eq 2 ]; then record_pass "ecosystem-naming: (d2) o alias não vira membro no TSV que o motor lê"
+    else record_fail "ecosystem-naming: (d2)" "o --emit-members-tsv ganhou linha de alias"; fi
+  else record_fail "ecosystem-naming: (d)" "door-leak-scan.sh ausente"; fi
+  # (e) REGRA 36 no lint de um SANDBOX: o alias na superfície vendorizada acusa; MUTANTE sem a leitura do alias, não
+  local lsb="${sb}/lint"
+  _archive_staged "${lsb}" .claude/validation .claude/utils .claude/commands
+  mkdir -p "${lsb}/docs/evolution/federation" "${lsb}/.claude/commands"
+  cp "${sb}/dls.yaml" "${lsb}/docs/evolution/federation/members.yaml"
+  printf 'exemplo citando company-brain-zqvx no texto\n' > "${lsb}/.claude/commands/demo-alias.md"
+  _en_lint() { (cd "${lsb}" && ONION_CLIENT_TERMS_FILE=/dev/null LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${lsb}/.claude/commands/demo-alias.md" 2>&1 || true); }
+  out="$(_en_lint)"
+  if ! grep -q 'Sumário' <<< "${out}"; then record_fail "ecosystem-naming: (e) o lint do sandbox não completou" "${out: -200}"
+  elif grep -q "\[vendor-scrub\] identificador de adotante 'company-brain-zqvx'" <<< "${out}"; then record_pass "ecosystem-naming: (e) REGRA 36 acusa o ALIAS na superfície vendorizada"
+  else record_fail "ecosystem-naming: (e) REGRA 36" "o alias não foi acusado: ${out: -300}"; fi
+  if _en_mut "${lsb}/.claude/validation/lint-artifacts.sh" "${lsb}/.claude/validation/lint-artifacts.sh.mut" \
+       'if (keep(a)) print a }' 'if (0) print a }'; then
+    mv "${lsb}/.claude/validation/lint-artifacts.sh.mut" "${lsb}/.claude/validation/lint-artifacts.sh"
+    out="$(_en_lint)"
+    if grep -q 'Sumário' <<< "${out}" && ! grep -q "company-brain-zqvx" <<< "${out}"; then record_pass "ecosystem-naming: (e-MUT) sem a leitura do alias a REGRA 36 cala — o alias seria ponto cego"
+    else record_fail "ecosystem-naming: (e-MUT)" "o mutante ainda acusou (ou o lint não completou): ${out: -200}"; fi
+  else record_fail "ecosystem-naming: (e-MUT) mutante não aplicou" "âncora da leitura do alias ausente ou repetida na REGRA 36"; fi
+  rm -rf "${sb}"
+}
+_family run_ecosystem_naming_selftests
+
 # ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 
 # ---------------------------------------------------------------------------
