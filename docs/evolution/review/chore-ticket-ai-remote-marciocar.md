@@ -2,7 +2,8 @@
 branch: chore/ticket-ai-remote-marciocar
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5b8b0a921fed784c04e2de12267c5e1c1c671fe900395c2bedfeee15b59c5677
+reviewed_code_sha256: f75fae7eaf41487ac16c95d8f67a4a3e8ef3031a9cf3666abb608b3825abd04e
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
