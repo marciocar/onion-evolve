@@ -289,7 +289,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.5
-    label: "O N2 da família midia roda de verdade aqui? Falta reproduzir localmente o cálculo do alfa de Krippendorff numa implementação aberta e decidir se o checador passa a cobrar o alfa no estudo (como o item 8 faz com o app)."
+    label: "O nível 2 da família midia roda de verdade aqui? Falta reproduzir localmente o cálculo do alfa de Krippendorff numa implementação aberta e decidir se o checador passa a cobrar o alfa no estudo (como o item 8 faz com o app)."
     trace: ".claude/commands/common/prompts/dissect-doctrine.md"
     verified_at: "2026-11-27"
     verified_against: "peça (ii) de curadoria:docs/evolution/research/dissect-object-taxonomy-2026-11/dissect-object-taxonomy-2026-11.kg.yaml#D_DISSECT_OBJECT_TAXONOMY_MAP (um nó question aberto sobre o N2 antes de qualquer veredito) e o limite de E_MEDIA_OPEN_IMPLEMENTATION"
@@ -304,7 +304,7 @@ nodes:
     trace: ".claude/commands/common/prompts/dissect-doctrine.md"
     verified_at: "2026-10-24"
     verified_against: "decisão do maestro de 2026-10-24; a bancada run_dissect_object_selftests cobra a pertença de família e de veredito"
-    narrative: "As seis famílias v1 ficam fora da régua da prova N2 (item 12 do checador, FAMILIES_V1). Família forjada depois traz x_dissect_family_spec.n2_proof, e o lint roda dissect-object-check.sh --registry."
+    narrative: "As seis famílias v1 ficam fora da régua da prova do nível 2 (item 12 do checador, FAMILIES_V1). Família forjada depois traz x_dissect_family_spec.n2_proof, e o lint roda dissect-object-check.sh --registry."
 
 edges:
   - from: T_FAMILY_FERRAMENTA

@@ -2,8 +2,7 @@
 branch: feat/dissect-family-media
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: a76ac21abdb09741d8e93dde5b2177c8074fd68f7dd032994746f92745135a9b
-reviewed_code_sha256: 866fe5b61405c646f60d07359fbc51f149d300658489dd4671b15816b3573b1f
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_blocking: 1
