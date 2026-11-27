@@ -2,7 +2,8 @@
 branch: ops/ticketai-vhost
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ec7ef25f4b7fd2706fb6aa03a2b68a9332114213f859bf5774f46572ff0a3b01
+reviewed_code_sha256: c996004462c7869edc791ff133e316ed20972952c6a706bc8bdab9b32f40d1b6
 findings_total: 0
 findings_real: 0
 findings_blocking: 0
