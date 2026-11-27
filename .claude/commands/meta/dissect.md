@@ -1,11 +1,11 @@
 ---
-description: Disseca um objeto (ferramenta, pratica, ator, app, categoria, ideia ou midia) em niveis selecionaveis, com Etapa 0 pre-registrada e veredito da familia (absorver, costurar, perseguir, parquear ou rejeitar).
+description: Disseca um objeto (ferramenta, pratica, ator, app, categoria, ideia, midia ou padrao) em niveis selecionaveis, com Etapa 0 pre-registrada e veredito da familia (absorver, costurar, perseguir, parquear ou rejeitar).
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch, TodoWrite
 ---
 
 # 🦑 /meta:dissect — dissecar um objeto em níveis selecionáveis
 
-Mapeia um objeto — ferramenta de terceiro, prática, ator, app, categoria de produto, ideia ou mídia (as
+Mapeia um objeto — ferramenta de terceiro, prática, ator, app, categoria de produto, ideia, mídia ou padrão (as
 **famílias** do registro) —, entende **o que ele faz** e decide o que o Onion **absorve**,
 **costura**, **persegue**, **parqueia como técnica a investigar** ou **rejeita com razão escrita**,
 no vocabulário da família. O nome de

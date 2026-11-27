@@ -16,6 +16,7 @@ Saída: uma linha `ok   …` por caso verde e, no fim, `FALHA (n):` com uma linh
 """
 import concurrent.futures
 import copy
+import datetime
 import hashlib
 import os
 import re
@@ -386,7 +387,36 @@ REG_MUTS = {
     # trocar o nome de uma família v1 não herda a isenção: o par id → pref deixa de bater
     "reg-v1-renamed": lambda d: next(n for n in d["nodes"] if n.get("id") == "T_FAMILY_IDEIA")["x_term"].update(pref="nova"),
     "reg-midia-superseded": lambda d: (next(n for n in d["nodes"] if n.get("id") == "T_FAMILY_MIDIA").update(status="superseded"), reg_family(d, "T_FAMILY_MIDIA").pop("n2_proof")),
+    # item 12 sobre a família padrao: a prova N2, a forma da catraca e a contestação do limiar como CONSTRAINS
+    "reg-pattern-no-proof": lambda d: reg_family(d, "T_FAMILY_PADRAO").pop("n2_proof"),
+    "reg-ratchet-bad": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(known_uses_min="três"),
+    "reg-ratchet-derived-above": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(known_uses_min_derived=4),
+    "reg-no-contest": lambda d: d.update(edges=[e for e in d["edges"] if e.get("edge_type") != "CONSTRAINS"]),
+    # item 13: o N sai do registro; com N=4, os 3 usos do estudo deixam de bastar
+    "reg-pattern-n4": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(known_uses_min=4),
+    "reg-ratchet-zero": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(known_uses_min=0),
+    "reg-ratchet-longevity-str": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(longevity="sim"),
+    "reg-ratchet-no-years": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].pop("longevity_min_years"),
+    "reg-contest-ghost": lambda d: d.update(edges=[dict(e, **{"from": "NAO_EXISTE"}) if e.get("edge_type") == "CONSTRAINS" and e.get("to") == "T_FAMILY_PADRAO" else e for e in d["edges"]]),
+    # a porta da longevidade desligada no registro: a longevidade do estudo deixa de bastar
+    "reg-longevity-off": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(longevity=False),
 }
+
+
+def pattern(n=3, same=False):
+    """o estudo da família padrao com n usos conhecidos no N2 (fontes distintas, ou a mesma com same)."""
+    def m(g):
+        g["meta"]["x_dissect_family"] = "padrao"
+        g["external_edges"][0]["to"] = REGISTRY + "#T_FAMILY_PADRAO"
+        for i in range(n):
+            g["nodes"].append({"id": "E_USE_%d" % i, "node_type": "evidence", "plane": "DEV", "status": "open", "impact": 1,
+                               "confidence": 0.5, "label": "uso conhecido %d." % i, "x_dissect_level": 2,
+                               "x_dissect_known_use": {"source": "https://example.org/uso-%d" % (0 if same else i)}})
+    return m
+
+
+def longevity(value):
+    return lambda g: node(g, "E_N2").update(x_dissect_longevity=value)
 CASES += [
     # item 12 — o registro: família forjada depois do v1 só entra com a prova N2 (D_DISSECT_OBJECT_TAXONOMY_MAP, 2026-11-27)
     ("registro real: a família nova traz a prova N2", None, None, "ok", ["--registry"]),
@@ -402,6 +432,33 @@ CASES += [
     ("família v1 renomeada sem a prova N2 (não herda a isenção)", "familia-sem-prova-n2", None, "reg-v1-renamed", ["--registry"]),
     ("família aposentada sem a prova N2 (variante legítima)", None, None, "reg-midia-superseded", ["--registry"]),
     ("estudo da família midia (variante legítima)", None, lambda g: (g["meta"].update(x_dissect_family="midia"), g["external_edges"][0].update(to=REGISTRY + "#T_FAMILY_MIDIA")), "ok", []),
+    # item 12 — a família padrao no registro: tirar a prova N2 reprova, e a catraca tem forma e contestação
+    ("família padrao sem a prova N2", "familia-sem-prova-n2", None, "reg-pattern-no-proof", ["--registry"]),
+    ("catraca com N fora da forma", "catraca-n2-mal-formada", None, "reg-ratchet-bad", ["--registry"]),
+    ("catraca com o N do derivado acima do N", "catraca-n2-mal-formada", None, "reg-ratchet-derived-above", ["--registry"]),
+    ("catraca sem a contestação do limiar como CONSTRAINS", "catraca-sem-contestacao", None, "reg-no-contest", ["--registry"]),
+    # item 13 — a catraca disjuntiva do N2 (Q_PATTERN_SEAL_REVISION, 2026-11-27)
+    ("padrao com 3 usos conhecidos (variante legítima)", None, pattern(3), "ok", []),
+    ("padrao com 2 usos e 20 anos de prática (variante legítima: o caso que a porta única rejeitava)", None, seq(pattern(2), longevity({"since": "2006", "source": "https://example.org/pratica"})), "ok", []),
+    ("padrao derivado com 2 usos (variante legítima)", None, seq(pattern(2), lambda g: g["meta"].update(x_dissect_derived={"from": "https://example.org/pai"})), "ok", []),
+    ("derivado declarado sem o pai", "derivado-mal-formado", seq(pattern(3), lambda g: g["meta"].update(x_dissect_derived=True)), "ok", []),
+    ("padrao com 2 usos e longevidade recente", "longevidade-curta", seq(pattern(3), longevity({"since": str(datetime.date.today().year - 1), "source": "https://example.org/pratica"})), "ok", []),
+    ("padrao com longevidade no futuro", "longevidade-curta", seq(pattern(3), longevity({"since": "2099", "source": "https://example.org/pratica"})), "ok", []),
+    ("padrao com 2 usos e longevidade, porta desligada no registro", "catraca-n2-nao-cumprida", seq(pattern(2), longevity({"since": "2006", "source": "https://example.org/pratica"})), "reg-longevity-off", []),
+    ("padrao com 3 usos da mesma URL com fragmento e barra", "catraca-n2-nao-cumprida", seq(pattern(3), lambda g: [node(g, "E_USE_%d" % i)["x_dissect_known_use"].update(source=u) for i, u in enumerate(("https://Example.org/a", "https://example.org/a/", "https://example.org/a#x"))]), "ok", []),
+    ("padrao com 3 linhas do mesmo arquivo", "catraca-n2-nao-cumprida", seq(pattern(3), lambda g: [node(g, "E_USE_%d" % i)["x_dissect_known_use"].update(source="docs/livro.md:%d" % (i + 1)) for i in range(3)]), "ok", []),
+    ("padrao com os 3 usos refutados", "catraca-n2-nao-cumprida", seq(pattern(3), lambda g: [node(g, "E_USE_%d" % i).update(status="refuted") for i in range(3)]), "ok", []),
+    ("catraca com N zero", "catraca-n2-mal-formada", None, "reg-ratchet-zero", ["--registry"]),
+    ("catraca com a porta da longevidade em texto", "catraca-n2-mal-formada", None, "reg-ratchet-longevity-str", ["--registry"]),
+    ("catraca sem o piso de anos da longevidade", "catraca-n2-mal-formada", None, "reg-ratchet-no-years", ["--registry"]),
+    ("contestação vinda de nó que não existe", "catraca-sem-contestacao", None, "reg-contest-ghost", ["--registry"]),
+    ("padrao no N1 que parqueia sem usos (variante legítima)", None, seq(pattern(0), flatten_to_1), "ok", []),
+    ("padrao com 2 usos, não derivado e sem longevidade", "catraca-n2-nao-cumprida", pattern(2), "ok", []),
+    ("padrao com 3 usos da mesma fonte", "catraca-n2-nao-cumprida", pattern(3, same=True), "ok", []),
+    ("padrao no N1 que costura sem usos", "catraca-n2-nao-cumprida", seq(pattern(0), flatten_to_1, lambda g: (D(g).update(x_dissect_verdict="costurar"), [D(g).pop(k) for k in ("x_dissect_overcoming", "x_dissect_overcoming_search", "x_dissect_trigger")])), "ok", []),
+    ("padrao com 3 usos e N=4 no registro (o N sai do registro)", "catraca-n2-nao-cumprida", pattern(3), "reg-pattern-n4", []),
+    ("uso conhecido sem fonte", "uso-conhecido-mal-formado", seq(pattern(3), lambda g: node(g, "E_USE_0").update(x_dissect_known_use={"source": "o livro do GoF"})), "ok", []),
+    ("longevidade sem data", "longevidade-mal-formada", seq(pattern(3), longevity({"source": "https://example.org/pratica"})), "ok", []),
     ("estudo midia com veredito fora da família", "veredito-fora-da-familia", lambda g: (g["meta"].update(x_dissect_family="midia"), g["external_edges"][0].update(to=REGISTRY + "#T_FAMILY_MIDIA"), D(g).update(x_dissect_verdict="perseguir")), "ok", []),
 ]
 RC3_CASES = [
@@ -410,6 +467,7 @@ RC3_CASES = [
     ("registro sem família viva", "rc3-registry", ["@graph"]),
     ("contexto com registro sem família viva", "rc3-registry", ["--context"]),
     ("--registry com registro sem família viva", "rc3-registry", ["--registry"]),
+    ("estudo padrao com a catraca fora da forma no registro", "rc3-ratchet", ["@graph"]),
 ]
 
 
@@ -674,7 +732,7 @@ def one_case(src, item_of, case):
 
 def one_rc3(src, case):
     name, kind, extra = case
-    t = build(src, None, "ok")
+    t = build(src, pattern(3), "reg-ratchet-bad") if kind == "rc3-ratchet" else build(src, None, "ok")
     try:
         if kind == "rc3-yaml":
             write(t, GRAPH, "meta: [isto não é\n")
