@@ -12,6 +12,7 @@ duration_min: 12
 findings_fixed: 5
 verdict: REJECTED_AND_FIXED
 elenxo: true
+elenxo_isolado: true
 reviewer: "subagente general-purpose isolado (não-fork), mandato REFUTAR, sem o raciocínio de quem escreveu"
 nota: "O refutador reprovou por 1 bloqueante (o ponteiro da prova N2 citava o id do repo privado da curadoria: REGRA 106 HARD, medido no door-leak-scan e no lint) e 4 menores. Os 5 foram curados no mesmo commit, e a bancada subiu de 148 para 154 casos. tokens = só o refutador."
 ---
