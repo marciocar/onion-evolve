@@ -2,7 +2,8 @@
 branch: ops/tmux-claude-tuning
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c7d119fcd338d2028370e84b7661f7f00f8c51b3b5bb54e58ea910f95b2637e1
+reviewed_code_sha256: a714b3fcb6e3d641964ddc1d11c1979db36e5a4c02b2d0f3e0d76354495b2905
 findings_total: 1
 findings_real: 1
 findings_blocking: 1
