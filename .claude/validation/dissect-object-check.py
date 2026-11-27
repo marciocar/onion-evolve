@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """dissect-object-check — o checador de forma da dissecação de QUALQUER objeto (família, Etapa 0, veredito, destino).
 
-Cobra, por comando, os 11 itens (8 da §6, o registro de ideias, a candidata do parque da §1c e a síntese) da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
+Cobra, por comando, os 11 itens do estudo (8 da §6, o registro de ideias, a candidata do parque da §1c e a síntese), e o item 12 sobre o registro, da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
 de UM estudo e o git log. Determinístico, sem LLM e sem rede.
 
   item 1  x_dissect_tool, x_dissect_family e a aresta TRACES_TO para o registro existem e concordam
@@ -33,6 +33,15 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
           CATRACA: Etapa 0 anterior a SYNTHESIS_SINCE e estudo não tocado desde que a régua chegou ao repo saem como
           AVISO (o adotante que confere todos os estudos quando a régua muda; PR #339 da curadoria, 2026-11-18).
 
+  item 12 o REGISTRO (modo --registry): toda família nascida depois do registro v1 traz a prova N2 do mecanismo em
+          x_dissect_family_spec.n2_proof {source, decision, mechanism, limits}: source e decision são ponteiros
+          <repo>:<caminho>#<ID> distintos (a evidência e o selo do maestro, este num nó D_ ou Q_), mechanism diz o que
+          roda no N2 e limits lista o que ficou declarado sem provar (vazia vale, ausente não). O checador confere a
+          FORMA do ponteiro, não resolve o alvo noutro repo. Repo privado entra pelo apelido do papel (curadoria:),
+          nunca pelo id (REGRA 106). As seis famílias v1 (FAMILIES_V1, pelo par id → pref) nasceram antes da régua,
+          pela decisão de 2026-10-24, e ficam fora; o conjunto só encolhe. Nasceu com a família «midia»
+          (D_DISSECT_OBJECT_TAXONOMY_MAP da curadoria, 2026-11-27: forjar só o que tem prova N2).
+
 PEÇAS (achado da curadoria em 2026-10-26): um objeto pode ter peças de vereditos diferentes (costurar uma, parquear
 outra). O meta declara `x_dissect_pieces: [ids]` (2 ou mais), e cada peça tem o SEU `x_dissect_verdict`, o mesmo campo
 do veredito único, para o censo e o --context enxergarem. Aí o item 2 aceita um veredito por peça declarada (veredito
@@ -48,6 +57,7 @@ Modos:
       --allow-uncommitted: quem conduz confere ANTES de commitar; só stage0-nao-commitado e n0-nao-commitado deixam
       de ser achado. O gate do comando roda sem ela.
   dissect-object-check.py --context      projeção para a sessão (peça 3): famílias e estudos
+  dissect-object-check.py --registry     o item 12 sobre o próprio registro; rc 0 · 1 · 3 (o lint o roda)
 
 ORIGEM: protótipo de um adotante de curadoria (o checador e a bancada dele), absorvido no core por
 decisão do maestro de 2026-10-24, com o registro de famílias em .claude/validation/dissect-families.kg.yaml.
@@ -55,7 +65,7 @@ decisão do maestro de 2026-10-24, com o registro de famílias em .claude/valida
 TETO DECLARADO: o checador confere FORMA, PERTENÇA e ORDEM no git. Se a superação de fato entrega o valor, ou se o
 gatilho mede a coisa certa, é trabalho do Elenxo. O que ele não faz é executar texto vindo de um .kg.yaml: o gatilho
 só roda como argumentos de uma lista branca do kg_query, sem shell. E ele só julga quem o chama: o lint não o roda
-sobre o corpus, e o passo de GATE do /meta:dissect é quem o exige.
+sobre o corpus (só o --registry, sobre o registro), e o passo de GATE do /meta:dissect é quem o exige.
 """
 import hashlib
 import json
@@ -87,6 +97,13 @@ DEST_PROJECT = re.compile(r"^projeto:[a-z0-9][a-z0-9-]*$")
 PURSUE = {"estudo", "projeto-novo"}
 SEALED_BY = re.compile(r"^[A-Za-z0-9._-]+:[^\s#]+#[A-Z][A-Z0-9_]*$")
 N2_EVIDENCE_OK = {"artefato-aberto", "uso-observado"}
+# item 12: as famílias do registro v1 (decisão de 2026-10-24) nasceram antes da régua da prova N2 e ficam fora dela;
+# toda família forjada depois traz n2_proof. Conjunto congelado: família nova nunca entra aqui, só sai.
+# A isenção vale pelo PAR id → pref: trocar o nome de uma família v1 não cria família nova isenta (refutador, 2026-11-27).
+FAMILIES_V1 = {"T_FAMILY_FERRAMENTA": "ferramenta", "T_FAMILY_PRATICA": "pratica", "T_FAMILY_ATOR": "ator",
+               "T_FAMILY_APP": "app", "T_FAMILY_CATEGORIA": "categoria", "T_FAMILY_IDEIA": "ideia"}
+# o selo da prova N2 aponta um nó de decisão ou uma pergunta selada (D_ ou Q_)
+SEAL_NODE = re.compile(r"#[DQ]_[A-Z0-9_]+$")
 STAGE0_HEADINGS = re.compile(r"^## ([1-8])\.", re.M)
 UNCOMMITTED_CODES = {"stage0-nao-commitado", "n0-nao-commitado"}
 # a lista branca do gatilho: só flags de seleção do kg_query; nada que leia estado transitório
@@ -766,6 +783,42 @@ def trigger_whitelist(args):
     return ""
 
 
+def registry_check():
+    """item 12: a família forjada depois do registro v1 traz a prova N2 do mecanismo, com a evidência e o selo por
+    ponteiro e os limites declarados. Sem isso a família entrava por prosa, e o N2 dela era o que o texto dissesse."""
+    findings = []
+
+    def add(item, code, detail):
+        findings.append((item, code, detail))
+    registry_families()  # registro sem família viva: rc 3, como no estudo
+    for n in load(REGISTRY).get("nodes") or []:
+        if not isinstance(n, dict) or n.get("status") == "superseded":
+            continue
+        spec = n.get("x_dissect_family_spec")
+        if not isinstance(spec, dict) or not isinstance(n.get("x_term"), dict):
+            continue
+        if FAMILIES_V1.get(n.get("id")) == str(n["x_term"].get("pref")):
+            continue
+        nid, proof = n.get("id"), spec.get("n2_proof")
+        if not isinstance(proof, dict):
+            add(12, "familia-sem-prova-n2", "%s não declara x_dissect_family_spec.n2_proof {source, decision, mechanism, limits}: família nova só entra com o mecanismo do N2 provado" % nid)
+            continue
+        bad = [k for k in ("source", "decision") if not (isinstance(proof.get(k), str) and SEALED_BY.match(proof[k]))]
+        if "decision" not in bad and not SEAL_NODE.search(proof["decision"]):
+            bad.append("decision")
+        if "source" not in bad and "decision" not in bad and proof["source"] == proof["decision"]:
+            bad.append("source=decision")
+        mech = proof.get("mechanism")
+        if not (isinstance(mech, str) and mech.strip()):
+            bad.append("mechanism")
+        lim = proof.get("limits")
+        if not (isinstance(lim, list) and all(isinstance(x, str) and x.strip() for x in lim)):
+            bad.append("limits")
+        if bad:
+            add(12, "prova-n2-mal-formada", "%s: n2_proof com %s fora da forma (source e decision são <repo>:<caminho>#<ID> distintos, a decision num nó D_ ou Q_; mechanism é texto; limits é lista de textos, vazia vale)" % (nid, bad))
+    return findings
+
+
 def context():
     fams, legacy = registry_families()
     print("# famílias da dissecação (registro %s) · %d viva(s)" % (REGISTRY, len(fams)))
@@ -813,6 +866,16 @@ def main(argv):
     if not os.path.isfile(REGISTRY):
         print("dissect-object-check: registro %s ausente; rode na raiz do repo (rc 3)" % REGISTRY, file=sys.stderr)
         return 3
+    if argv[:1] == ["--registry"]:
+        try:
+            findings = registry_check()
+        except (NotMeasured, OSError, ValueError, yaml.YAMLError) as exc:
+            print("dissect-object-check: não medi o registro: %s (rc 3)" % exc, file=sys.stderr)
+            return 3
+        for item, code, detail in findings:
+            print("item %d %s: %s" % (item, code, detail))
+        print("dissect-object-check: %s · registro · %d achado(s)" % (REGISTRY, len(findings)))
+        return 1 if findings else 0
     if argv[:1] == ["--context"]:
         try:
             return context()
@@ -838,7 +901,7 @@ def main(argv):
     except (IndexError, ValueError):
         rest = []
     if opts["stage"] not in ("plan", "final") or len(rest) != 1:
-        print("uso: dissect-object-check.py <grafo> [--stage plan|final] [--allow-uncommitted] [--expect-verdict V] [--max-level N] | --context", file=sys.stderr)
+        print("uso: dissect-object-check.py <grafo> [--stage plan|final] [--allow-uncommitted] [--expect-verdict V] [--max-level N] | --context | --registry", file=sys.stderr)
         return 3
     path = os.path.relpath(os.path.abspath(rest[0]))
     try:

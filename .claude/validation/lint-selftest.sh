@@ -47655,8 +47655,11 @@ _family run_dissect_selftests
 # Esta família a roda e a lê pelo rc e pelas linhas, nunca pela prosa de resumo apenas:
 #   (a) cada `ok   …` vira um pass; rc ≠ 0 vira fail com o bloco FALHA inteiro;
 #   (b) PISO de casos: a bancada que encolhe em silêncio (um CASES apagado, um map vazio) daria rc 0 com
-#       zero casos — o piso reprova menos de 138 casos e menos de 4 de rc 3 (subiu com a catraca do item 11, 2026-11-18);
-#   (c) sem PyYAML o checador sai rc 3 e a bancada reprovaria tudo: o fail declara o motivo, nunca ⊘.
+#       zero casos — o piso reprova menos de 154 casos e menos de 5 de rc 3 (subiu com a catraca do item 11,
+#       2026-11-18, e com o item 12, o registro, 2026-11-27);
+#   (c) sem PyYAML o checador sai rc 3 e a bancada reprovaria tudo: o fail declara o motivo, nunca ⊘;
+#   (d) o REGISTRO REAL passa no item 12 (--registry): família forjada depois do v1 sem a prova N2 do mecanismo
+#       reprova aqui, no lint, e não só quando um estudo a usar (D_DISSECT_OBJECT_TAXONOMY_MAP, 2026-11-27).
 run_dissect_object_selftests() {
   local bench="${REPO_ROOT}/.claude/validation/dissect-object-bench.py"
   local sut="${REPO_ROOT}/.claude/validation/dissect-object-check.py"
@@ -47674,10 +47677,17 @@ run_dissect_object_selftests() {
   fi
   n_cases="$(sed -nE 's/^dissect-object-bench: ([0-9]+) caso\(s\) \+ ([0-9]+) de rc 3 verdes.*/\1/p' <<< "${out}")"
   n_rc3="$(sed -nE 's/^dissect-object-bench: ([0-9]+) caso\(s\) \+ ([0-9]+) de rc 3 verdes.*/\2/p' <<< "${out}")"
-  if [ -n "${n_cases}" ] && [ "${n_cases}" -ge 138 ] && [ -n "${n_rc3}" ] && [ "${n_rc3}" -ge 4 ] && [ "${n_ok}" -ge $((n_cases + n_rc3)) ]; then
+  if [ -n "${n_cases}" ] && [ "${n_cases}" -ge 154 ] && [ -n "${n_rc3}" ] && [ "${n_rc3}" -ge 5 ] && [ "${n_ok}" -ge $((n_cases + n_rc3)) ]; then
     record_pass "dissect-object: (b) piso — ${n_cases} casos + ${n_rc3} de rc 3, ${n_ok} linhas ok (a bancada não encolheu)"
   else
-    record_fail "dissect-object: (b)" "piso violado ou resumo ilegível: casos='${n_cases}' rc3='${n_rc3}' ok=${n_ok} (piso 138 + 4)"
+    record_fail "dissect-object: (b)" "piso violado ou resumo ilegível: casos='${n_cases}' rc3='${n_rc3}' ok=${n_ok} (piso 154 + 5)"
+  fi
+  local reg_out reg_rc=0
+  reg_out="$(cd "${REPO_ROOT}" && bash .claude/validation/dissect-object-check.sh --registry 2>&1)" || reg_rc=$?
+  if [ "${reg_rc}" = "0" ]; then
+    record_pass "dissect-object: (d) o registro real passa no item 12 (família nova com a prova N2)"
+  else
+    record_fail "dissect-object: (d)" "registro rc=${reg_rc}: $(_emit "${reg_out}" | head -c 800)"
   fi
 }
 
