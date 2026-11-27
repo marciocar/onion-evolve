@@ -44,11 +44,13 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
   item 13 os NÍVEIS DE MATURIDADE do N2 (família com n2_ratchet no registro: padrao, decisão do maestro de 2026-11-27,
           Q_PATTERN_MATURITY_LEVELS da curadoria). O estudo que chega ao N2, ou que absorve ou costura, declara
           meta.x_dissect_maturity (proto | estabelecido | classico) e o checador confere: a ENTRADA é proto, com
-          proto_min (2, o piso do GoF) usos conhecidos de fontes distintas (x_dissect_known_use {source}, fonte
-          normalizada); estabelecido pede established_min (3) ou, com meta.x_dissect_derived: {from: <pai>},
+          proto_min (2, o piso do GoF) usos conhecidos de fontes distintas no N2 (x_dissect_known_use {source},
+          fonte normalizada; o pai do derivado não conta); estabelecido pede established_min (3) ou, com meta.x_dissect_derived: {from: <pai>},
           established_min_derived (2); clássico é estabelecido PROMOVIDO por longevidade (x_dissect_longevity
           {since, source}, data não futura), que nunca é porta de entrada. Os pisos vêm do REGISTRO. Nó refuted ou
-          superseded não conta. Padrão de agente em construção entra como proto, declarado.
+          superseded não conta. Absorver e costurar exigem a maturidade; parquear ou rejeitar só a conferem se a
+          declaram. Padrão de agente em construção entra como proto, declarado. A família de RATCHET_FAMILIES sem
+          n2_ratchet reprova no item 12.
 
 PEÇAS (achado da curadoria em 2026-10-26): um objeto pode ter peças de vereditos diferentes (costurar uma, parquear
 outra). O meta declara `x_dissect_pieces: [ids]` (2 ou mais), e cada peça tem o SEU `x_dissect_verdict`, o mesmo campo
@@ -391,6 +393,9 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
 
 
 MATURITY = ("proto", "estabelecido", "classico")
+# as famílias cuja catraca do N2 é obrigatória, pelo par id → pref: apagar o n2_ratchet do registro desligava o item 13
+# inteiro com tudo verde (refutador, 2026-11-27). Conjunto que só cresce.
+RATCHET_FAMILIES = {"T_FAMILY_PADRAO": "padrao"}
 
 
 def ratchet_ok(r):
@@ -404,18 +409,25 @@ def ratchet_ok(r):
 
 
 def source_key(src):
-    # a fonte normalizada: URL sem fragmento, query nem barra final e com o host em minúsculas; arquivo:linha vira
-    # o arquivo. Três linhas do mesmo arquivo, ou a mesma URL com #x, são UMA fonte (refutador, 2026-11-27).
+    # a fonte normalizada: URL sem esquema, sem www., host em minúsculas, sem fragmento nem barra final, COM a query
+    # (dois item?id= do HN são threads distintas); arquivo:linha vira o arquivo normalizado. Três linhas do mesmo
+    # arquivo, ou a mesma URL por http/https, www ou #x, são UMA fonte (refutador, 2026-11-27).
     src = src.strip()
-    m = re.match(r"^(https?)://([^/?#]+)([^?#]*)", src)
+    m = re.match(r"^https?://(?:www\.)?([^/?#]+)([^#]*)", src, re.I)
     if m:
-        return "%s://%s%s" % (m.group(1).lower(), m.group(2).lower(), m.group(3).rstrip("/"))
-    return re.sub(r":\d+(-\d+)?$", "", src)
+        path, _, q = m.group(2).partition("?")
+        return m.group(1).lower() + path.rstrip("/") + ("?" + q if q else "")
+    return os.path.normpath(re.sub(r":\d+(-\d+)?$", "", src))
 
 
-def in_future(since, today):
-    parts = [int(x) for x in since.split("-")] + [1, 1]
-    return (parts[0], parts[1], parts[2]) > (today.year, today.month, today.day)
+def since_date(since):
+    """AAAA[-MM[-DD]] como data real (o 1º dia que falta), ou None para data inválida (13º mês, ano 0000)."""
+    import datetime
+    try:
+        parts = [int(x) for x in since.split("-")] + [1, 1]
+        return datetime.date(parts[0], parts[1], parts[2])
+    except ValueError:
+        return None
 
 
 def ratchet_check(add, meta, nodes, levels, verdicts, ratchet):
@@ -433,25 +445,31 @@ def ratchet_check(add, meta, nodes, levels, verdicts, ratchet):
         ku = n.get("x_dissect_known_use")
         if ku is not None:
             if isinstance(ku, dict) and isinstance(ku.get("source"), str) and IDEA_SOURCE.match(ku["source"].strip()):
-                uses.add(source_key(ku["source"]))
+                lv = level_of(n)
+                if isinstance(lv, int) and lv >= 2:  # o uso conta no N2, onde a recorrência é conferida
+                    uses.add(source_key(ku["source"]))
             else:
                 add(13, "uso-conhecido-mal-formado", "%s: x_dissect_known_use exige {source} com URL ou arquivo:linha; achado %r" % (n.get("id"), ku))
         lg = n.get("x_dissect_longevity")
         if lg is not None:
-            if (isinstance(lg, dict) and SINCE.match(str(lg.get("since") or "")) and isinstance(lg.get("source"), str)
-                    and IDEA_SOURCE.match(lg["source"].strip()) and not in_future(str(lg["since"]), today)):
+            when = since_date(str(lg.get("since"))) if isinstance(lg, dict) and SINCE.match(str(lg.get("since") or "")) else None
+            if (when is not None and when <= today and isinstance(lg.get("source"), str)
+                    and IDEA_SOURCE.match(lg["source"].strip())):
                 long_ok = True
             else:
-                add(13, "longevidade-mal-formada", "%s: x_dissect_longevity exige {since: AAAA[-MM[-DD]] não futura, source: URL ou arquivo:linha}; achado %r" % (n.get("id"), lg))
+                add(13, "longevidade-mal-formada", "%s: x_dissect_longevity exige {since: AAAA[-MM[-DD]] válida e não futura, source: URL ou arquivo:linha}; achado %r" % (n.get("id"), lg))
     der = meta.get("x_dissect_derived")
     derived = isinstance(der, dict) and isinstance(der.get("from"), str) and bool(IDEA_SOURCE.match(der["from"].strip()))
     if der is not None and not derived:
         add(13, "derivado-mal-formado", "meta.x_dissect_derived exige {from: URL ou arquivo:linha do padrão-pai}; achado %r" % (der,))
-    if not (any(lv >= 2 for lv in levels) or any(v in ("absorver", "costurar") for v in verdicts)):
-        return  # o estudo que para no N1 e parqueia ainda não alegou a recorrência
+    if derived:
+        uses.discard(source_key(der["from"]))  # o pai não é uso do derivado
+    positive = any(v in ("absorver", "costurar") for v in verdicts)
     mat = meta.get("x_dissect_maturity")
-    if mat not in MATURITY:
-        add(13, "maturidade-ausente", "meta.x_dissect_maturity exige um de %s (o nível é declarado e conferido); achado %r" % ("|".join(MATURITY), mat))
+    if (mat is not None or positive) and mat not in MATURITY:
+        add(13, "maturidade-ausente", "meta.x_dissect_maturity exige um de %s (o nível é declarado e conferido; absorver e costurar o exigem); achado %r" % ("|".join(MATURITY), mat))
+    if not positive and mat is None:
+        return  # parquear ou rejeitar sem alegar maturidade: o N2 que refuta a recorrência fica registrado no N2
     if len(uses) < ratchet["proto_min"]:
         add(13, "catraca-n2-nao-cumprida", "%d uso(s) conhecido(s) de fontes distintas, abaixo da entrada proto (%d); a longevidade não substitui uso, e padrão sem recorrência fica no N1" % (len(uses), ratchet["proto_min"]))
         return
@@ -888,6 +906,8 @@ def registry_check():
         if not isinstance(spec, dict) or not isinstance(n.get("x_term"), dict):
             continue
         nid = n.get("id")
+        if RATCHET_FAMILIES.get(nid) == str(n["x_term"].get("pref")) and "n2_ratchet" not in spec:
+            add(12, "catraca-n2-ausente", "%s é família com catraca obrigatória (RATCHET_FAMILIES) e não declara n2_ratchet: sem ela o item 13 se desliga" % nid)
         if "n2_ratchet" in spec:  # a catraca do item 13: forma checável e a contestação do limiar no grafo
             if not ratchet_ok(spec["n2_ratchet"]):
                 add(12, "catraca-n2-mal-formada", "%s: n2_ratchet exige {proto_min ≤ established_min_derived ≤ established_min, todos inteiros ≥ 1, classic_by_longevity: bool}; achado %r" % (nid, spec["n2_ratchet"]))

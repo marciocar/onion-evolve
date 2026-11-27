@@ -346,7 +346,8 @@ nodes:
           - "as contagens exatas (proto 2, estabelecido 3, derivado 2) não foram medidas: as fontes variam entre 2 e 3 e dizem «no required quantity» (E_PLOP_KNOWN_USES_NO_QUANTITY, E_COPLIEN_GOF_TWO_DOMAINS)"
           - "o proto está ancorado no único piso documentado, os 2 domínios distintos do GoF (E_GOF_TWO_DOMAINS_FLOOR); o nível proto é formalização de desenho, não status de comunidade (E_PLOP_CANDIDATE_INFORMAL)"
           - "a longevidade como promoção a clássico não tem âncora positiva direta: os asteriscos de Alexander ficaram inalcançáveis e o «long-proven» de Coplien é ambíguo (E_COPLIEN_LONG_PROVEN)"
-          - "fontes distintas são medidas pelo texto normalizado (URL sem fragmento e barra final; arquivo sem a linha), não pela independência real dos usos, que é trabalho do Elenxo"
+          - "fontes distintas são medidas pelo texto normalizado (URL sem esquema, www, fragmento e barra final, com a query; arquivo normalizado sem a linha), não pela independência real dos usos, que é trabalho do Elenxo"
+          - "a longevidade que promove a clássico é conferida na forma (data válida e não futura), não na idade: nenhuma fonte dá idade mínima"
 
   - id: C_PATTERN_THRESHOLD_CONTESTED
     node_type: claim
