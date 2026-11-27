@@ -1061,7 +1061,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-27"
     verified_against: "decisão do maestro em 2026-11-27, por pergunta com opções (/meta:decide): escolhida «Tem como fazer em 3 etapas? manter o brain-granaai da vps como esta no mvp, depois a opção 2 (ai já podemos isolar depois) e depois na AWS?»"
-    label: "O isolamento da brain do hub vem em 3 etapas: no MVP ela segue como está na VPS (usuário marcio, limite contido pela catraca); depois ganha conta de serviço própria na VPS; depois vai para a AWS já com conta própria."
+    label: "O isolamento da brain do hub segue as 3 etapas que o maestro pediu: no MVP a brain da VPS fica como está; depois vem a opção 2 oferecida («Já na VPS»: conta de serviço própria na VPS, que isola); depois a AWS."
     narrative: "Selado por /meta:decide em 2026-11-27: escolhida «Tem como fazer em 3 etapas? manter o brain-granaai da vps como esta no mvp, depois a opção 2 (ai já podemos isolar depois) e depois na AWS?» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Só na AWS» · «Já na VPS». Destino: desenho (fica como texto, sem guarda a cobrar)."
     x_destination: design
     provenance:
@@ -1078,7 +1078,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-27"
     verified_against: "decisão do maestro em 2026-11-27, por pergunta com opções (/meta:decide): escolhida «Quero a opção 3, mas se voce achar melhor comece pela opção 1»"
-    label: "O 1º convite do canal sessão↔sessão com a brain do hub abre para os 4 devs e o PO, começando por 1 dev piloto que mede a ida e a volta antes de abrir aos demais."
+    label: "O 1º convite do canal sessão↔sessão com a brain do hub é a opção 3 (4 devs e o PO); o maestro delegou ao core começar pela opção 1 (1 dev piloto) se achasse melhor, e o core recomendou começar por ela."
     narrative: "Selado por /meta:decide em 2026-11-27: escolhida «Quero a opção 3, mas se voce achar melhor comece pela opção 1» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Só os 4 devs». Destino: desenho (fica como texto, sem guarda a cobrar)."
     x_destination: design
     provenance:
@@ -1095,7 +1095,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-27"
     verified_against: "decisão do maestro em 2026-11-27, por pergunta com opções (/meta:decide): escolhida «Incluir ações aprovadas»"
-    label: "No MVP os devs pedem à brain do hub leitura, diagnóstico e também ações aprovadas pelo maestro uma a uma, com trilha de auditoria já no MVP."
+    label: "No MVP os devs podem pedir à brain do hub também ações: a opção «Incluir ações aprovadas», oferecida como ações executadas depois de o maestro aprovar cada uma, com trilha de auditoria já no MVP."
     narrative: "Selado por /meta:decide em 2026-11-27: escolhida «Incluir ações aprovadas»; descartadas: «Leitura e diagnóstico». Destino: desenho (fica como texto, sem guarda a cobrar)."
     x_destination: design
     provenance:
