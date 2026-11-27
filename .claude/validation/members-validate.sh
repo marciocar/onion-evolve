@@ -52,12 +52,16 @@
 # NOMES (desde 2026-11-27, D_ECOSYSTEM_NAMING_PATTERN_1127, SAC-567): o id é TERMO DE VARREDURA das guardas
 #             (REGRA 36, 106 e 119 derivam termos dele), então renomear custa caro. O padrão novo é prefixo por
 #             tipo (company-brain-<empresa>, second-brain-<pessoa>, onion-<peça>, onion-vps-<serviço>; a Persona
-#             brain-onion-evolve é categoria à parte), e o membro ANTIGO não se renomeia: ganha `aliases:` e
+#             do Onion Evolve é categoria à parte), e o membro ANTIGO não se renomeia: ganha `aliases:` e
 #             `rename_trigger:`. Doutrina: docs/knowledge-base/concepts/ecosystem-naming.md.
 #             · `aliases:` é lista de nomes na forma do id, escrita em FLUXO numa linha só (`aliases: [a, b]`),
 #               porque os leitores das guardas são awk e só leem essa forma;
 #             · um alias não colide com NENHUM id nem com outro alias (sem caixa: as guardas comparam em
-#               minúsculas), não repete o próprio id e não é um prefixo nu do padrão;
+#               minúsculas), não repete o próprio id, termina em letra ou dígito e não é um prefixo nu do padrão;
+#             · UM LEITOR SÓ NA PRÁTICA: o conjunto de aliases que o PyYAML lê tem de ser IGUAL ao que o awk das
+#               guardas extrai das linhas `aliases: [..]`. Chave entre aspas, `- aliases:` como 1ª chave, tag
+#               `!!str`, escape e `aliases:` aninhado fora do membro divergem (achados do refutador de 2026-11-27)
+#               e reprovam aqui: alias que o validador aprova e a guarda não lê é ponto cego;
 #             · `aliases:` não vazio exige `rename_trigger:` (o evento nomeado em que o rename acontece), e
 #               `rename_trigger:` sem alias é erro (o par vem junto);
 #             · AVISO (não reprova): membro NOVO (id ausente no registro-base) fora dos prefixos do padrão.
@@ -65,9 +69,10 @@
 #               canônico; sem base, o aviso não roda (teto: a bancada passa --base). SOFT porque o tipo da peça
 #               não é campo do registro: projeto de cliente (kind adopter comum) não tem prefixo no padrão, e um
 #               HARD acusaria todo adotante novo legítimo;
-#             · o MAPA (`ecosystem-naming-map.md` ao lado do registro, core-only), quando existe, lista TODO
-#               membro uma vez, com os mesmos aliases: membro fora do mapa, linha órfã ou alias divergente
-#               reprova (é a catraca da projeção à mão).
+#             · o MAPA (`ecosystem-naming-map.md` ao lado do registro, core-only) lista TODO membro uma vez, com
+#               os mesmos aliases e o mesmo gatilho: membro fora do mapa, linha órfã, alias ou gatilho divergente
+#               reprova (é a catraca da projeção à mão). Na FONTE (caminho canônico, sem .claude/.onion-version)
+#               o mapa é obrigatório: apagá-lo não desliga a catraca.
 #
 # Uso       : bash .claude/validation/members-validate.sh [<path-do-members.yaml>] [--json] [--jwks <dir>] [--base <yaml>|none]
 #               <path> : caminho PASSADO COMO ARGUMENTO; default = o members.yaml
@@ -471,14 +476,15 @@ if isinstance(doc, dict):
         if al is None:
             al = []
         if not isinstance(al, list):
-            err(f"{tag}: 'aliases' tem de ser lista"); al = []
+            err(f"{tag}: 'aliases' tem de ser lista (veio {type(al).__name__})")
+            continue
         if al and (not isinstance(trig, str) or not trig.strip()):
             err(f"{tag}: 'aliases' exige 'rename_trigger' (o evento nomeado em que o rename acontece, ex.: «renomear na migração para a AWS»)")
         if not al and "rename_trigger" in m:
             err(f"{tag}: 'rename_trigger' sem 'aliases' — o par vem junto (alias registrado + gatilho nomeado)")
         for a in al:
-            if not isinstance(a, str) or not re.fullmatch(ID_RE, a):
-                err(f"{tag}: alias '{a}' fora da forma do id ([A-Za-z0-9._-], 1º caractere letra ou dígito)")
+            if not isinstance(a, str) or not re.fullmatch(ID_RE, a) or not re.search(r"[A-Za-z0-9]$", a):
+                err(f"{tag}: alias '{a}' fora da forma do id ([A-Za-z0-9._-], começa e termina em letra ou dígito)")
                 continue
             if a.lower() in BARE_PREFIXES:
                 err(f"{tag}: alias '{a}' é um prefixo nu do padrão (colide com o nome de vertical ou família do framework)")
@@ -493,6 +499,20 @@ if isinstance(doc, dict):
                     err(f"{tag}: alias '{a}' colide com um alias de '{prev[0]}'")
                 continue
             owner[a.lower()] = (mid, "alias")
+
+    # UM LEITOR SÓ NA PRÁTICA: o que o awk das guardas extrai == o que o PyYAML lê (multiconjunto, em minúsculas)
+    awk_al = []
+    for ln in raw.splitlines():
+        if re.match(r"^[ \t]+aliases:[ \t]*\[", ln):
+            v = re.sub(r"^[^\[]*\[", "", ln, count=1); v = re.sub(r"\].*$", "", v)
+            for a in v.split(","):
+                a = a.strip(" \t\"'")
+                if a:
+                    awk_al.append(a.lower())
+    yaml_al = [a.lower() for m in members if isinstance(m, dict) and isinstance(m.get("aliases"), list)
+               for a in m["aliases"] if isinstance(a, str)]
+    if sorted(awk_al) != sorted(yaml_al):
+        err(f"registro: os leitores awk das guardas (REGRA 36, 106) leem os aliases {sorted(awk_al)} e o yaml lê {sorted(yaml_al)} — escreva `aliases: [a, b]` como chave simples do membro, sem aspas na chave, sem tag, sem escape e sem aninhar")
 
     # AVISO de membro NOVO fora do prefixo do tipo (SOFT, ver o cabeçalho)
     if base_file:
@@ -509,13 +529,18 @@ if isinstance(doc, dict):
                 nid = m["id"]
                 if nid.startswith("onion-svc-"):
                     warn(f"membro NOVO '{nid}': serviço da VPS usa o prefixo onion-vps-<serviço> (D_ECOSYSTEM_NAMING_PATTERN_1127)")
-                elif not (nid.startswith(("company-brain-", "second-brain-", "onion-")) or nid == "brain-onion-evolve"):
-                    warn(f"membro NOVO '{nid}' fora dos prefixos do padrão (company-brain-, second-brain-, onion-, onion-vps-): se é peça do ecossistema, use o prefixo do tipo; se é projeto de adotante comum, o padrão não se aplica e o aviso pode ser ignorado")
+                elif not nid.startswith(("company-brain-", "second-brain-", "onion-")):
+                    warn(f"membro NOVO '{nid}' fora dos prefixos do padrão (company-brain-, second-brain-, onion-, onion-vps-): se é peça do ecossistema, use o prefixo do tipo; se é projeto de adotante comum ou a Persona do Onion Evolve (categoria à parte), o padrão não se aplica e o aviso pode ser ignorado")
 
     # MAPA (catraca da projeção à mão): todo membro uma vez, com os mesmos aliases
     map_path = os.path.join(os.path.dirname(os.path.abspath(path)), "ecosystem-naming-map.md")
+    _abs = os.path.abspath(path)
+    _canon = _abs.endswith(os.path.join("docs", "evolution", "federation", "members.yaml"))
+    _root = _abs[: -len(os.path.join("docs", "evolution", "federation", "members.yaml"))] if _canon else ""
+    if _canon and not os.path.isfile(os.path.join(_root, ".claude", ".onion-version")) and not os.path.isfile(map_path):
+        err(f"mapa {os.path.basename(map_path)} AUSENTE ao lado do registro da fonte — apagá-lo desligaria a catraca dos nomes (D_ECOSYSTEM_NAMING_PATTERN_1127)")
     if os.path.isfile(map_path):
-        rows = {}
+        rows = {}; trig_rows = {}
         for n, ln in enumerate(open(map_path, encoding="utf-8").read().splitlines(), 1):
             mm = re.match(r"^\|\s*`([^`]+)`\s*\|(.*)$", ln)
             if not mm:
@@ -527,14 +552,21 @@ if isinstance(doc, dict):
             if mm.group(1) in rows:
                 err(f"mapa {os.path.basename(map_path)} linha {n}: '{mm.group(1)}' aparece duas vezes")
             rows[mm.group(1)] = al_map
-        reg = {m.get("id"): sorted(m.get("aliases") or []) for m in members if isinstance(m, dict) and isinstance(m.get("id"), str)}
+            trig_rows[mm.group(1)] = cells[3] if len(cells) > 3 else ""
+        def _als(m):
+            v = m.get("aliases")
+            return sorted(a for a in v if isinstance(a, str)) if isinstance(v, list) else []
+        reg = {m.get("id"): _als(m) for m in members if isinstance(m, dict) and isinstance(m.get("id"), str)}
+        reg_trig = {m.get("id"): m.get("rename_trigger") for m in members if isinstance(m, dict) and isinstance(m.get("id"), str)}
         for i2 in sorted(set(reg) - set(rows)):
             err(f"mapa {os.path.basename(map_path)}: membro '{i2}' do registro não está no mapa (todo membro entra no mapa: id · tipo · conforme · alias · gatilho)")
         for i2 in sorted(set(rows) - set(reg)):
             err(f"mapa {os.path.basename(map_path)}: linha '{i2}' não é membro do registro")
         for i2 in sorted(set(rows) & set(reg)):
-            if rows[i2] != [a for a in reg[i2] if isinstance(a, str)]:
+            if rows[i2] != reg[i2]:
                 err(f"mapa {os.path.basename(map_path)}: aliases de '{i2}' divergem do registro (mapa {rows[i2]} × registro {reg[i2]})")
+            elif reg[i2] and isinstance(reg_trig[i2], str) and trig_rows.get(i2, "").strip() != reg_trig[i2].strip():
+                err(f"mapa {os.path.basename(map_path)}: gatilho de rename de '{i2}' diverge do registro (mapa «{trig_rows.get(i2, '')}» × registro «{reg_trig[i2]}»)")
 elif doc is not None:
     err("documento raiz não é um mapa (esperado: chaves version/trust_policy_version/members)")
 

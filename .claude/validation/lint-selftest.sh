@@ -66419,6 +66419,16 @@ open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,n))' "$1" "$2" "$3" "$4
     if [ "${bit}" -eq 2 ] && [ "${rc}" -eq 0 ]; then record_pass "ecosystem-naming: (a) MUTANTE sem a checagem de colisão deixa os 2 fixtures de colisão passarem — a checagem é load-bearing"
     else record_fail "ecosystem-naming: (a) mutante" "colisões aceitas pelo mutante: ${bit}/2; o fixture bom rc=${rc}"; fi
   else record_fail "ecosystem-naming: (a) mutante não aplicou" "âncora da checagem de colisão ausente ou repetida no members-validate.sh"; fi
+  # (a2) MUTANTE: sem a comparação awk × yaml, a chave entre aspas e o alias aninhado passam — o ponto cego volta
+  if _en_mut "${mv}" "${sb}/mv-mut2.sh" '    if sorted(awk_al) != sorted(yaml_al):' '    if False:'; then
+    local bit2=0 f2
+    for f2 in members-bad-alias-quoted-key.yaml members-bad-alias-nested.yaml; do
+      rc=0; bash "${sb}/mv-mut2.sh" "${fx}/${f2}" >/dev/null 2>&1 || rc=$?
+      [ "${rc}" -eq 0 ] && bit2=$((bit2+1))
+    done
+    if [ "${bit2}" -eq 2 ]; then record_pass "ecosystem-naming: (a2) MUTANTE sem a comparação awk × yaml deixa a chave entre aspas e o alias aninhado passarem — a comparação é load-bearing"
+    else record_fail "ecosystem-naming: (a2) mutante" "pontos cegos aceitos pelo mutante: ${bit2}/2"; fi
+  else record_fail "ecosystem-naming: (a2) mutante não aplicou" "âncora da comparação awk × yaml ausente ou repetida no members-validate.sh"; fi
   # (b) aviso de membro NOVO fora do prefixo: SOFT (rc 0), só com registro-base, e calado para o conforme
   cp "${fx}/members-good-aliases.yaml" "${sb}/base.yaml"
   { cat "${fx}/members-good-aliases.yaml"; sed -n '/^  - id: onion-peca-ficticia$/,$p' "${fx}/members-good-aliases.yaml" | sed 's/onion-peca-ficticia/projeto-novo-zeta/g'
@@ -66435,7 +66445,7 @@ open(sys.argv[2],"w",encoding="utf-8").write(s.replace(a,n))' "$1" "$2" "$3" "$4
   else record_fail "ecosystem-naming: (b2)" "rc=${rc}: ${out:0:200}"; fi
   # (c) o MAPA: membro fora dele reprova; mapa completo passa; alias divergente reprova
   mkdir -p "${sb}/m"; cp "${fx}/members-good-aliases.yaml" "${sb}/m/members.yaml"
-  printf '| id atual | tipo | conforme | alias | gatilho de rename |\n|---|---|---|---|---|\n| `onion-evolve` | fonte | sim | — | — |\n| `cerebro-legado-acme` | company brain | não | `company-brain-acme` | renomear |\n' > "${sb}/m/ecosystem-naming-map.md"
+  printf '| id atual | tipo | conforme | alias | gatilho de rename |\n|---|---|---|---|---|\n| `onion-evolve` | fonte | sim | — | — |\n| `cerebro-legado-acme` | company brain | não | `company-brain-acme` | renomear na migração fictícia |\n' > "${sb}/m/ecosystem-naming-map.md"
   rc=0; out="$(bash "${mv}" "${sb}/m/members.yaml" 2>&1)" || rc=$?
   if [ "${rc}" -eq 1 ] && grep -q "membro 'onion-peca-ficticia' do registro não está no mapa" <<< "${out}"; then record_pass "ecosystem-naming: (c) membro fora do mapa reprova"
   else record_fail "ecosystem-naming: (c) mapa incompleto" "rc=${rc}: ${out:0:200}"; fi

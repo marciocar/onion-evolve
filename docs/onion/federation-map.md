@@ -47,6 +47,7 @@ flowchart TD
   onion_svc_vaultwarden["onion-svc-vaultwarden<br/>standalone · greenfield"]:::standalone
   onion_messaging["onion-messaging<br/>standalone · greenfield"]:::standalone
   consultoria_analise_de_caso["consultoria-analise-de-caso<br/>standalone · greenfield"]:::standalone
+  brain_onion_evolve["brain-onion-evolve<br/>standalone · greenfield"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
@@ -90,6 +91,7 @@ flowchart TD
   onion_svc_vaultwarden -->|adopts| onion_evolve
   onion_messaging -->|adopts| onion_evolve
   consultoria_analise_de_caso -->|adopts| onion_evolve
+  brain_onion_evolve -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
   classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;
@@ -141,3 +143,4 @@ flowchart TD
 | onion-svc-vaultwarden | standalone | greenfield | servico-vps | `n/a` |
 | onion-messaging | standalone | greenfield | mensageria, channels-mcp, a2a | `e4c954ebad47` |
 | consultoria-analise-de-caso | standalone | greenfield | consultoria, extract-meeting, pain-price | `e4c954ebad47` |
+| brain-onion-evolve | standalone | greenfield | persona, ecosystem-brain | `n/a` |

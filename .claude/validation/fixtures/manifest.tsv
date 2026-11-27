@@ -46,6 +46,12 @@ members	members/members-bad-alias-collides-id.yaml	-	fail
 members	members/members-bad-alias-collides-alias.yaml	-	fail	
 members	members/members-bad-alias-no-trigger.yaml	-	fail	
 members	members/members-bad-alias-block-form.yaml	-	fail	
+members	members/members-bad-alias-quoted-key.yaml	-	fail	
+members	members/members-bad-alias-nested.yaml	-	fail	
+members	members/members-bad-alias-trailing-hyphen.yaml	-	fail	
+members	members/members-bad-alias-own-id.yaml	-	fail	
+members	members/members-bad-trigger-without-alias.yaml	-	fail	
+members	members/members-bad-alias-not-list.yaml	-	fail	
 members	members/members-bad-superseded-unknown.yaml	-	fail	
 members	members/members-bad-source-door-no-pin.yaml	-	fail	
 members	members/members-bad-mini-na.yaml	-	fail	

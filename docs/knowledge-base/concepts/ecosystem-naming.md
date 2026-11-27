@@ -65,8 +65,11 @@ O alias é um nome registrado de verdade:
 
 - as guardas procuram o alias do mesmo jeito que procuram o id;
 - um alias não pode ser igual a nenhum id nem a outro alias, sem diferença de maiúscula e minúscula;
-- um alias não pode ser só o prefixo (`company-brain`, `second-brain`, `onion`, `onion-vps`), porque isso
-  colide com nomes do próprio framework (o Company Brain também é nome de vertical);
+- um alias começa e termina em letra ou dígito, e não pode ser só o prefixo (`company-brain`, `second-brain`,
+  `onion`, `onion-vps`, `brain`), porque isso colide com nomes do próprio framework (o Company Brain também é
+  nome de vertical);
+- o alias precisa ser lido igual pelo validador e pelos leitores awk das guardas. Por isso a chave fica
+  simples (`aliases:`, sem aspas, sem tag, sem escape) e direto no membro, nunca aninhada noutro bloco;
 - alias sem gatilho é erro, e gatilho sem alias também.
 
 Quando o gatilho chega, o rename é um ato próprio: o id passa a ser o alias, e todas as referências
@@ -79,9 +82,9 @@ validado no gate) o roda no lint.
 
 | O que ele confere | Efeito |
 |---|---|
-| Forma do alias, colisão com id ou alias, prefixo nu, alias sem gatilho | **reprova** |
+| Forma do alias, colisão com id ou alias, prefixo nu, alias sem gatilho, leitura divergente entre o validador e as guardas | **reprova** |
 | Membro **novo** fora dos prefixos do padrão | **aviso** (não reprova) |
-| No core, o mapa de nomes ao lado do registro: todo membro uma vez, com os mesmos aliases | **reprova** |
+| No core, o mapa de nomes ao lado do registro (obrigatório): todo membro uma vez, com os mesmos aliases e o mesmo gatilho | **reprova** |
 
 O aviso de membro novo não reprova por uma razão concreta. O registro não tem um campo com o tipo da
 peça, e o projeto comum de um adotante não tem prefixo no padrão. Um erro que reprovasse acusaria todo

@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **117 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **60** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **17** em `decisions/` (+ 1 README de categoria)
+- **118 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **61** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **17** em `decisions/` (+ 1 README de categoria)
 
 ---
 
@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 60 — Conceitos fundamentais
+├── concepts/            # 61 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 7  — Ferramentas e recursos
 ├── platforms/           # 5  — Plataformas e tecnologias

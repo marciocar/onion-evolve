@@ -27,7 +27,7 @@ ou decidir outra forma.
 | `metagamify` | projeto adotante | n/a | — | — |
 | `pulse-mais` | projeto adotante (organização externa) | n/a | — | — |
 | `granaai` | projeto adotante | n/a | — | — |
-| `ticket-ai` | projeto adotante (sob o hub da Grana.Ai) | n/a | — | — |
+| `ticket-ai` | projeto adotante (T2, sob um hub) | n/a | — | — |
 | `gustavo-pulga` | projeto adotante | n/a | — | — |
 | `onion-mini` | porta | sim | — | — |
 | `onion-standalone` | porta | sim | — | — |

@@ -5634,7 +5634,7 @@ check_members_registry() {
   local out rc=0
   out=$(bash "${mv}" "${mf}" 2>&1) || rc=$?
   if [ "${rc}" -ne 0 ]; then
-    violation "HARD" "${mf}" "REGRA 66: registro da federação INVÁLIDO (members-validate rc=${rc}): $(printf '%s' "${out}" | tail -2 | tr '\n' ' ' | cut -c1-160)"
+    violation "HARD" "${mf}" "REGRA 66: registro da federação INVÁLIDO (members-validate rc=${rc}): $(printf '%s\n' "${out}" | grep -vF '⚠ aviso:' | tail -2 | tr '\n' ' ' | cut -c1-160)"
   fi
   # AVISOS do validador (2026-11-27, SAC-567: membro NOVO fora do prefixo do padrão de nomes) saem SOFT, um por linha
   local _w
