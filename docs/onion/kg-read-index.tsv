@@ -22,6 +22,7 @@
 .claude/commands/common/prompts/client-material-doctrine.md	E_LEVA1_LINK_DA_DOUTRINA_DE_CLIENTE	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/commands/common/prompts/decide-doctrine.md	E_N0_CORPUS_PECAS_VIZINHAS	docs/evolution/dissect/problem-formula-2026-11/problem-formula-2026-11.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	C_FAMILIES_REGISTRY_V1	.claude/validation/dissect-families.kg.yaml
+.claude/commands/common/prompts/dissect-doctrine.md	Q_MEDIA_N2_LOCAL_RUN	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_APP	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_ATOR	.claude/validation/dissect-families.kg.yaml
 .claude/commands/common/prompts/dissect-doctrine.md	T_FAMILY_CATEGORIA	.claude/validation/dissect-families.kg.yaml
