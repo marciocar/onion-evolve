@@ -2,7 +2,8 @@
 branch: docs/a2a-dev-channel-seals
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9c12288951e2f900a177921d0355dd9dfaef9992ab1b89ac7dfbc82c1f0d2721
+reviewed_code_sha256: 0ec70a06c591bc5e0944b81729b1a3bd2ebafb5f180d501f18d8587f9f2bf003
 findings_total: 3
 findings_real: 3
 findings_blocking: 3
