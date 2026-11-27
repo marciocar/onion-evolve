@@ -397,6 +397,9 @@ REG_MUTS = {
     "reg-contest-ghost": lambda d: d.update(edges=[dict(e, **{"from": "NAO_EXISTE"}) if e.get("edge_type") == "CONSTRAINS" and e.get("to") == "T_FAMILY_PADRAO" else e for e in d["edges"]]),
     # item 13: os pisos saem do registro; com o proto em 3 (e o derivado junto), 2 usos deixam de entrar
     "reg-proto-3": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(proto_min=3, established_min_derived=3),
+    "reg-pattern-no-ratchet": lambda d: reg_family(d, "T_FAMILY_PADRAO").pop("n2_ratchet"),
+    "reg-ratchet-bool": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(proto_min=True),
+    "reg-contest-refuted": lambda d: next(n for n in d["nodes"] if n.get("id") == "C_PATTERN_THRESHOLD_CONTESTED").update(status="refuted"),
     "reg-classic-off": lambda d: reg_family(d, "T_FAMILY_PADRAO")["n2_ratchet"].update(classic_by_longevity=False),
 }
 
@@ -414,6 +417,16 @@ def pattern(n=3, same=False, maturity="estabelecido"):
                                "confidence": 0.5, "label": "uso conhecido %d." % i, "x_dissect_level": 2,
                                "x_dissect_known_use": {"source": "https://example.org/uso-%d" % (0 if same else i)}})
     return m
+
+
+def costurar(g):
+    D(g).update(x_dissect_verdict="costurar")
+    for k in ("x_dissect_overcoming", "x_dissect_overcoming_search", "x_dissect_trigger"):
+        D(g).pop(k)
+
+
+def uses_from(*srcs):
+    return lambda g: [node(g, "E_USE_%d" % i)["x_dissect_known_use"].update(source=u) for i, u in enumerate(srcs)]
 
 
 def longevity(value):
@@ -455,7 +468,17 @@ CASES += [
     ("padrao com os 3 usos refutados", "catraca-n2-nao-cumprida", seq(pattern(3, maturity="proto"), lambda g: [node(g, "E_USE_%d" % i).update(status="refuted") for i in range(3)]), "ok", []),
     ("padrao no N1 que costura sem usos", "catraca-n2-nao-cumprida", seq(pattern(0, maturity="proto"), flatten_to_1, lambda g: (D(g).update(x_dissect_verdict="costurar"), [D(g).pop(k) for k in ("x_dissect_overcoming", "x_dissect_overcoming_search", "x_dissect_trigger")])), "ok", []),
     ("proto com 2 usos e o piso proto em 3 no registro (o piso sai do registro)", "catraca-n2-nao-cumprida", pattern(2, maturity="proto"), "reg-proto-3", []),
-    ("padrao sem a maturidade declarada", "maturidade-ausente", pattern(3, maturity=None), "ok", []),
+    ("padrao que costura sem a maturidade declarada", "maturidade-ausente", seq(pattern(3, maturity=None), costurar), "ok", []),
+    ("padrao que rejeita no N2 com 1 uso, sem alegar maturidade (variante legítima)", None, seq(pattern(1, maturity=None), lambda g: D(g).update(x_dissect_verdict="rejeitar", x_dissect_criterion="E1: recorrência não sustentada")), "ok", []),
+    ("padrao com dois item?id= distintos do HN (variante legítima: a query distingue)", None, seq(pattern(2, maturity="proto"), uses_from("https://news.ycombinator.com/item?id=1", "https://news.ycombinator.com/item?id=2")), "ok", []),
+    ("padrao com a mesma URL por http, https e www", "catraca-n2-nao-cumprida", seq(pattern(3, maturity="proto"), uses_from("http://example.org/a", "https://example.org/a", "https://www.example.org/a")), "ok", []),
+    ("padrao com o mesmo arquivo por ./ e sem", "catraca-n2-nao-cumprida", seq(pattern(2, maturity="proto"), uses_from("./docs/a.md:1", "docs/a.md:2")), "ok", []),
+    ("padrao que costura com os usos no N1", "catraca-n2-nao-cumprida", seq(pattern(3, maturity="proto"), flatten_to_1, costurar), "ok", []),
+    ("derivado com o pai contado como uso (sobra 1 uso próprio)", "catraca-n2-nao-cumprida", seq(pattern(2), uses_from("https://example.org/pai", "https://example.org/uso-1"), lambda g: g["meta"].update(x_dissect_derived={"from": "https://example.org/pai"})), "ok", []),
+    ("longevidade com data inválida", "longevidade-mal-formada", seq(pattern(3), longevity({"since": "2006-13-45", "source": "https://example.org/pratica"})), "ok", []),
+    ("família padrao sem o n2_ratchet", "catraca-n2-ausente", None, "reg-pattern-no-ratchet", ["--registry"]),
+    ("catraca com o piso proto booleano", "catraca-n2-mal-formada", None, "reg-ratchet-bool", ["--registry"]),
+    ("contestação vinda de claim refutado", "catraca-sem-contestacao", None, "reg-contest-refuted", ["--registry"]),
     ("padrao com maturidade fora do enum", "maturidade-ausente", pattern(3, maturity="maduro"), "ok", []),
     ("estabelecido com 2 usos, não derivado", "maturidade-acima-da-prova", pattern(2), "ok", []),
     ("clássico sem longevidade", "classico-sem-longevidade", pattern(3, maturity="classico"), "ok", []),

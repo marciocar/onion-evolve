@@ -335,13 +335,15 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
   2026-11-27, `Q_PATTERN_MATURITY_LEVELS` da curadoria, que revê a catraca disjuntiva de `Q_PATTERN_SEAL_REVISION`).
   O estudo que chega ao N2, ou que absorve ou costura, declara `meta.x_dissect_maturity` e o checador confere:
   **proto** é a entrada, com `proto_min` (2, o piso de 2 domínios do GoF) `x_dissect_known_use: {source}` de fontes
-  distintas; **estabelecido** pede `established_min` (3) ou, com `meta.x_dissect_derived: {from: <fonte do pai>}`,
+  distintas em nós do N2 (o pai do derivado não conta); **estabelecido** pede `established_min` (3) ou, com `meta.x_dissect_derived: {from: <fonte do pai>}`,
   `established_min_derived` (2); **clássico** é estabelecido promovido por `x_dissect_longevity: {since, source}`
-  (data não futura). A longevidade **só promove**: não há piso de anos e ela nunca substitui uso, porque nenhuma
+  (data válida e não futura; a idade mínima não é conferida). A longevidade **só promove**: não há piso de anos e ela nunca substitui uso, porque nenhuma
   fonte primária exige idade para entrar e um piso de anos barraria os padrões de agente em construção, que entram
-  como proto, declarados. Fontes contam distintas pelo texto normalizado (URL sem fragmento nem barra final; o
-  arquivo, não a linha), e nó `refuted`/`superseded` não conta. **Padrão sem recorrência fica no N1** e parqueia
-  ou rejeita dali. As contagens são contestadas e não medidas (as fontes variam entre 2 e 3), e a contestação fica
+  como proto, declarados. Fontes contam distintas pelo texto normalizado (URL sem esquema, `www.`, fragmento
+  nem barra final, mas com a query; o arquivo normalizado, não a linha), e nó `refuted`/`superseded` não conta.
+  Absorver e costurar exigem a maturidade declarada; parquear ou rejeitar só a conferem se a declaram, para o N2
+  que refuta a recorrência ficar registrado no N2. O `padrao` está em `RATCHET_FAMILIES`: sem `n2_ratchet` no
+  registro, o item 12 reprova. As contagens são contestadas e não medidas (as fontes variam entre 2 e 3), e a contestação fica
   no registro como `CONSTRAINS` (`C_PATTERN_THRESHOLD_CONTESTED`); o `--registry` cobra a forma dos pisos e a aresta.
 - `midia` estuda **o que o conteúdo diz**; quem publica é estudo de `ator`, e a ferramenta citada, de `ferramenta`.
 - **Família forjada depois do registro v1 traz a prova N2** (item 12 do checador, decisão do maestro de

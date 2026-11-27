@@ -47655,7 +47655,7 @@ _family run_dissect_selftests
 # Esta família a roda e a lê pelo rc e pelas linhas, nunca pela prosa de resumo apenas:
 #   (a) cada `ok   …` vira um pass; rc ≠ 0 vira fail com o bloco FALHA inteiro;
 #   (b) PISO de casos: a bancada que encolhe em silêncio (um CASES apagado, um map vazio) daria rc 0 com
-#       zero casos — o piso reprova menos de 183 casos e menos de 6 de rc 3 (subiu com a catraca do item 11,
+#       zero casos — o piso reprova menos de 193 casos e menos de 6 de rc 3 (subiu com a catraca do item 11,
 #       2026-11-18, com o item 12, o registro, e com o item 13, os níveis de maturidade do padrao, 2026-11-27);
 #   (c) sem PyYAML o checador sai rc 3 e a bancada reprovaria tudo: o fail declara o motivo, nunca ⊘;
 #   (d) o REGISTRO REAL passa no item 12 (--registry): família forjada depois do v1 sem a prova N2 do mecanismo
@@ -47677,10 +47677,10 @@ run_dissect_object_selftests() {
   fi
   n_cases="$(sed -nE 's/^dissect-object-bench: ([0-9]+) caso\(s\) \+ ([0-9]+) de rc 3 verdes.*/\1/p' <<< "${out}")"
   n_rc3="$(sed -nE 's/^dissect-object-bench: ([0-9]+) caso\(s\) \+ ([0-9]+) de rc 3 verdes.*/\2/p' <<< "${out}")"
-  if [ -n "${n_cases}" ] && [ "${n_cases}" -ge 183 ] && [ -n "${n_rc3}" ] && [ "${n_rc3}" -ge 6 ] && [ "${n_ok}" -ge $((n_cases + n_rc3)) ]; then
+  if [ -n "${n_cases}" ] && [ "${n_cases}" -ge 193 ] && [ -n "${n_rc3}" ] && [ "${n_rc3}" -ge 6 ] && [ "${n_ok}" -ge $((n_cases + n_rc3)) ]; then
     record_pass "dissect-object: (b) piso — ${n_cases} casos + ${n_rc3} de rc 3, ${n_ok} linhas ok (a bancada não encolheu)"
   else
-    record_fail "dissect-object: (b)" "piso violado ou resumo ilegível: casos='${n_cases}' rc3='${n_rc3}' ok=${n_ok} (piso 183 + 6)"
+    record_fail "dissect-object: (b)" "piso violado ou resumo ilegível: casos='${n_cases}' rc3='${n_rc3}' ok=${n_ok} (piso 193 + 6)"
   fi
   local reg_out reg_rc=0
   reg_out="$(cd "${REPO_ROOT}" && bash .claude/validation/dissect-object-check.sh --registry 2>&1)" || reg_rc=$?
