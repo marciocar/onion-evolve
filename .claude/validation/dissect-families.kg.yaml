@@ -303,7 +303,7 @@ nodes:
     label: "Família padrao da dissecação."
     trace: ".claude/commands/common/prompts/dissect-doctrine.md"
     verified_at: "2026-11-27"
-    verified_against: "decisão do maestro de 2026-11-27 (Q_PATTERN_SEAL_REVISION da curadoria: catraca disjuntiva, N declarado), sobre a prova N2 de C_PATTERN_MECHANISM_GATED; a família se prova no 1º estudo que a usa"
+    verified_against: "decisão do maestro de 2026-11-27 (Q_PATTERN_MATURITY_LEVELS da curadoria, opção A com o proto em 2: níveis de maturidade, sem piso de anos), que revê Q_PATTERN_SEAL_REVISION; a família se prova no 1º estudo que a usa"
     x_term:
       pref: "padrao"
       lang: pt-BR
@@ -328,24 +328,24 @@ nodes:
       levels:
         N0: "a forma do padrão, datada na fonte que o nomeia: nome, problema, contexto e solução"
         N1: "os usos conhecidos alegados, cada um com a sua fonte"
-        N2: "catraca disjuntiva (n2_ratchet): N ou mais usos conhecidos independentes, com fonte cada um (N = 3, ou 2 para padrão derivado de um pai citado), OU longevidade provada com fonte datada de pelo menos longevity_min_years anos; padrão sem recorrência fica no N1"
+        N2: "níveis de maturidade declarados e conferidos: proto (entrada) com 2 ou mais usos conhecidos de fontes distintas; estabelecido com 3 ou mais (2 para derivado que cite o pai); clássico é estabelecido promovido por longevidade provada, nunca porta de entrada; padrão sem recorrência fica no N1"
         N3: "régua de transferência ao Onion, com a evidência da recorrência"
         N4: "plano x_absorb_*"
       verdicts: ["absorver", "costurar", "parquear", "rejeitar"]
       default_destination: "core"
       n2_ratchet:
-        known_uses_min: 3
-        known_uses_min_derived: 2
-        longevity: true
-        longevity_min_years: 10
+        proto_min: 2
+        established_min: 3
+        established_min_derived: 2
+        classic_by_longevity: true
       n2_proof:
-        source: "curadoria:docs/evolution/research/dissect-families-n2-evidence-2026-11/dissect-families-n2-evidence-2026-11.kg.yaml#C_PATTERN_MECHANISM_GATED"
-        decision: "curadoria:docs/evolution/research/dissect-families-n2-evidence-2026-11/dissect-families-n2-evidence-2026-11.kg.yaml#Q_PATTERN_SEAL_REVISION"
-        mechanism: "recorrência provada por um de dois caminhos: contagem de usos conhecidos independentes (a regra de três da comunidade) OU prática comprovada por longevidade (o teste Proven Practice, disjuntivo)"
+        source: "curadoria:docs/evolution/research/dissect-families-n2-evidence-2026-11/dissect-families-n2-evidence-2026-11.kg.yaml#C_OPTION_A_MATURITY_LEVELS"
+        decision: "curadoria:docs/evolution/research/dissect-families-n2-evidence-2026-11/dissect-families-n2-evidence-2026-11.kg.yaml#Q_PATTERN_MATURITY_LEVELS"
+        mechanism: "recorrência provada por níveis de maturidade: a entrada é o uso recorrente com o piso de 2 domínios distintos do GoF; a contagem e a longevidade graduam a maturidade, sem piso de anos (nenhuma fonte primária exige idade para entrar)"
         limits:
-          - "o limiar de usos é contestado e não universal (rule of 2, objeção de 15+ anos): N é parâmetro declarado, não lei (E_PATTERN_NOT_UNIVERSAL)"
-          - "a leitura primária direta de GoF e de Alexander não foi feita; Alexander define o padrão por recorrência qualitativa, não por contagem (E_PATTERN_ALEXANDER_RECURRENCE)"
-          - "o piso de 10 anos da longevidade é parâmetro do core, não da fonte: a fonte diz «sucesso de longo prazo» sem número, e o caso que motivou a disjunção tem 20 anos"
+          - "as contagens exatas (proto 2, estabelecido 3, derivado 2) não foram medidas: as fontes variam entre 2 e 3 e dizem «no required quantity» (E_PLOP_KNOWN_USES_NO_QUANTITY, E_COPLIEN_GOF_TWO_DOMAINS)"
+          - "o proto está ancorado no único piso documentado, os 2 domínios distintos do GoF (E_GOF_TWO_DOMAINS_FLOOR); o nível proto é formalização de desenho, não status de comunidade (E_PLOP_CANDIDATE_INFORMAL)"
+          - "a longevidade como promoção a clássico não tem âncora positiva direta: os asteriscos de Alexander ficaram inalcançáveis e o «long-proven» de Coplien é ambíguo (E_COPLIEN_LONG_PROVEN)"
           - "fontes distintas são medidas pelo texto normalizado (URL sem fragmento e barra final; arquivo sem a linha), não pela independência real dos usos, que é trabalho do Elenxo"
 
   - id: C_PATTERN_THRESHOLD_CONTESTED
@@ -354,10 +354,10 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    label: "O limiar de usos conhecidos da família padrao é contestado: a regra de três é critério de comunidade, há a rule of 2 para derivados e objeção de 15+ anos, e o primário define o padrão por recorrência, não por contagem."
+    label: "Os pisos de usos conhecidos da família padrao são contestados: as fontes variam entre 2 e 3 e dizem que não há quantidade exigida, e a longevidade como promoção não tem âncora positiva direta."
     trace: ".claude/commands/common/prompts/dissect-doctrine.md"
     verified_at: "2026-11-27"
-    verified_against: "curadoria:docs/evolution/research/dissect-families-n2-evidence-2026-11/dissect-families-n2-evidence-2026-11.kg.yaml#E_PATTERN_NOT_UNIVERSAL e #E_PATTERN_ALEXANDER_RECURRENCE; registrada como CONSTRAINS por decisão do maestro de 2026-11-27 (Q_PATTERN_SEAL_REVISION)"
+    verified_against: "curadoria:docs/evolution/research/dissect-families-n2-evidence-2026-11/dissect-families-n2-evidence-2026-11.kg.yaml#C_OPTION_A_MATURITY_LEVELS (as 3 CONSTRAINS sobreviventes) e #E_PATTERN_NOT_UNIVERSAL; registrada como CONSTRAINS por decisão do maestro de 2026-11-27 (Q_PATTERN_MATURITY_LEVELS)"
 
   - id: C_FAMILIES_REGISTRY_V1
     node_type: claim

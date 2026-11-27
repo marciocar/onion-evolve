@@ -317,7 +317,7 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
 | `app` | aplicativo · app de consumo | identidade datada | verbos da superfície observável | artefato aberto do próprio app **ou** uso observado com protocolo commitado | plano `x_absorb_*` (só mecanismo) | absorver · costurar · parquear · rejeitar | core |
 | `categoria` | categoria de produto · mercado | o recorte e os atores candidatos | régua de funcionalidades com ≥ 3 atores e capital datado | ler ou rodar a implementação de referência aberta | `x_dissect_pursue` | perseguir · costurar · parquear · rejeitar | projeto-novo |
 | `ideia` | tese · hipótese | análogos: quem fez, onde, resultado | o valor alegado e para quem | o menor experimento pré-registrado que mede a tese | `x_dissect_pursue` | perseguir · parquear · rejeitar | declarado na Etapa 0 |
-| `padrao` | padrão · padrão de projeto · linguagem de padrões | a forma do padrão (nome, problema, contexto, solução), datada na fonte | os usos conhecidos alegados, com fonte | catraca disjuntiva: N ou mais usos conhecidos de fontes distintas (N = 3; 2 para derivado) **ou** longevidade provada com fonte datada | plano `x_absorb_*` | absorver · costurar · parquear · rejeitar | core |
+| `padrao` | padrão · padrão de projeto · linguagem de padrões | a forma do padrão (nome, problema, contexto, solução), datada na fonte | os usos conhecidos alegados, com fonte | níveis de maturidade declarados e conferidos: proto (entrada) com 2 ou mais usos de fontes distintas; estabelecido com 3 ou mais (2 para derivado); clássico = estabelecido + longevidade, que só promove | plano `x_absorb_*` | absorver · costurar · parquear · rejeitar | core |
 | `midia` | mídia · conteúdo | identidade datada do item e as unidades de análise | o codebook (unidade, categorias exclusivas e exaustivas, regras) | o codebook rodado por codificadores independentes, com o alfa de Krippendorff calculado localmente contra o limiar da Etapa 0 | plano `x_absorb_*` ou sinal ao panorama | absorver · costurar · parquear · rejeitar | panorama |
 
 **Regras de família:**
@@ -331,16 +331,18 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
   8. é um conteúdo publicado (vídeo, texto, conversa, áudio, site) e interessa o que ele diz? → `midia`.
   O `padrao` vem antes da `pratica` porque um padrão nomeado também é prescrição, e a pergunta dele é a
   recorrência (numeração de 2026-11-27; Etapa 0 anterior cita a numeração antiga).
-- **A catraca do `padrao` é disjuntiva e o N mora no registro** (item 13, decisão do maestro de 2026-11-27,
-  `Q_PATTERN_SEAL_REVISION` da curadoria): o estudo que chega ao N2, ou que absorve ou costura, prova a
-  recorrência por N ou mais `x_dissect_known_use: {source}` de fontes distintas **ou** por
-  `x_dissect_longevity: {since, source}` com ao menos `longevity_min_years` anos (10, parâmetro do core; data
-  futura não vale). N é `known_uses_min` (3) ou, com `meta.x_dissect_derived: {from: <fonte do pai>}`,
-  `known_uses_min_derived` (2), lidos de `n2_ratchet`. Fontes contam distintas pelo texto normalizado (URL sem
-  fragmento nem barra final; o arquivo, não a linha), e nó `refuted`/`superseded` não conta. **Padrão sem
-  recorrência fica no N1** e parqueia ou rejeita dali. A porta única «≥ 3» rejeitava o padrão de 2 usos e 20
-  anos de prática comprovada. O limiar é contestado (rule of 2, objeção de 15+ anos) e a contestação fica no
-  registro como `CONSTRAINS` (`C_PATTERN_THRESHOLD_CONTESTED`); o `--registry` cobra a forma da catraca e a aresta.
+- **O N2 do `padrao` são níveis de maturidade, e os pisos moram no registro** (item 13, decisão do maestro de
+  2026-11-27, `Q_PATTERN_MATURITY_LEVELS` da curadoria, que revê a catraca disjuntiva de `Q_PATTERN_SEAL_REVISION`).
+  O estudo que chega ao N2, ou que absorve ou costura, declara `meta.x_dissect_maturity` e o checador confere:
+  **proto** é a entrada, com `proto_min` (2, o piso de 2 domínios do GoF) `x_dissect_known_use: {source}` de fontes
+  distintas; **estabelecido** pede `established_min` (3) ou, com `meta.x_dissect_derived: {from: <fonte do pai>}`,
+  `established_min_derived` (2); **clássico** é estabelecido promovido por `x_dissect_longevity: {since, source}`
+  (data não futura). A longevidade **só promove**: não há piso de anos e ela nunca substitui uso, porque nenhuma
+  fonte primária exige idade para entrar e um piso de anos barraria os padrões de agente em construção, que entram
+  como proto, declarados. Fontes contam distintas pelo texto normalizado (URL sem fragmento nem barra final; o
+  arquivo, não a linha), e nó `refuted`/`superseded` não conta. **Padrão sem recorrência fica no N1** e parqueia
+  ou rejeita dali. As contagens são contestadas e não medidas (as fontes variam entre 2 e 3), e a contestação fica
+  no registro como `CONSTRAINS` (`C_PATTERN_THRESHOLD_CONTESTED`); o `--registry` cobra a forma dos pisos e a aresta.
 - `midia` estuda **o que o conteúdo diz**; quem publica é estudo de `ator`, e a ferramenta citada, de `ferramenta`.
 - **Família forjada depois do registro v1 traz a prova N2** (item 12 do checador, decisão do maestro de
   2026-11-27, `D_DISSECT_OBJECT_TAXONOMY_MAP` da curadoria: «forjar só o sustentado»). O spec declara
@@ -421,7 +423,7 @@ segue com o sentido de sempre.
 e o contrato ok já passaram num grafo que ele reprovou no CI.
 
 **Quem cobra:** `bash .claude/validation/dissect-object-check.sh <grafo>` (rc 0 sem achado · 1 com achado · 3 não
-mediu, nunca aprovação) confere os itens do estudo (1 a 11, e o 13 da catraca do `padrao`) — família e aresta, veredito da família, destino, quem paga e o não
+mediu, nunca aprovação) confere os itens do estudo (1 a 11, e o 13 dos níveis de maturidade do `padrao`) — família e aresta, veredito da família, destino, quem paga e o não
 verificado, Etapa 0 no git, superação com busca na web, gatilho na lista branca e não disparado, app sem artefato no
 nível 1, o registro de ideias, a candidata nomeada pelo parque (§1c) e a síntese — e `--context` projeta as famílias e os estudos do corpus; `--registry` confere o item 12 (a prova N2 de família nova) sobre o próprio registro. Ele julga **forma, pertença e ordem no git**, não
 qualidade: se a superação entrega e se o gatilho mede a coisa certa é trabalho do Elenxo. Estudo anterior a
