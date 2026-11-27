@@ -1114,7 +1114,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-27"
     verified_against: "decisão do maestro em 2026-11-27, por pergunta com opções (/meta:decide): escolhida «Selar com falha fechada (Recomendado)»"
-    label: "O canal entre o Claude Code dos devs e a brain do hub é a ponte A2A de federação: convivem Slack humano, brain↔core, dev↔brain e dev↔dev; a fila local só vale dentro da mesma conta; volta por tasks/get; revogação em falha fechada (sem a lista, a mensagem é rejeitada)."
+    label: "O maestro selou o desenho do canal dev↔brain que o Delphi dev-brain-3x3-1127 levou a ele (3 canais × 3 etapas, 12 itens de MVP), com a troca da curadoria: revogação em falha fechada."
     narrative: "Selado por /meta:decide em 2026-11-27: escolhida «Selar com falha fechada (Recomendado)»; descartadas: «Selar sem a troca». Destino: desenho (fica como texto, sem guarda a cobrar)."
     x_destination: design
     provenance:
@@ -1131,7 +1131,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-27"
     verified_against: "decisão do maestro em 2026-11-27, por pergunta com opções (/meta:decide): escolhida «Ida e volta primeiro (Recomendado)»"
-    label: "Na fila da messaging, a ida e volta mínima do canal dev↔brain (etapa 1, 1 dev piloto) vem logo depois da guarda de vazamento do WAHA e antes dos 2 itens restantes da conformidade do WAHA."
+    label: "Na fila da messaging, a ida e volta mínima do canal dev↔brain vem antes dos 2 itens restantes do WAHA."
     narrative: "Selado por /meta:decide em 2026-11-27: escolhida «Ida e volta primeiro (Recomendado)»; descartadas: «WAHA primeiro». Destino: desenho (fica como texto, sem guarda a cobrar)."
     x_destination: design
     provenance:
