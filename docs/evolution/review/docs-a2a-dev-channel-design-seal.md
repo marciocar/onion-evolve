@@ -2,7 +2,8 @@
 branch: docs/a2a-dev-channel-design-seal
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e02792500d54170b2ee3a5c54b7d9ee83e803c82def5099ae07db0c7b19d607a
+reviewed_code_sha256: 68198cfe2aa9df8f8d0191672f726931b10d2f92251cedeb4a353500f8dbecea
 findings_total: 3
 findings_real: 3
 findings_blocking: 2
