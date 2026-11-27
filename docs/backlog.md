@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1262 itens abertos** em 187 grafo(s) com aberto (de 249 no escopo) · 176 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1263 itens abertos** em 187 grafo(s) com aberto (de 249 no escopo) · 176 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1302,18 +1302,19 @@
 | 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
 | 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
 
-## dissect-families — 8 item(ns)
+## dissect-families — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 19.2 | `C_FAMILIES_REGISTRY_V1` | dissect-families | O registro v1 tem seis famílias, escolhidas pela ordem de predicados da Etapa 0; família nova entra por PR no core antes do N0 d |
+| 5.4 | `T_FAMILY_MIDIA` | dissect-families | Família midia da dissecação. |
 | 4.2 | `T_FAMILY_APP` | dissect-families | Família app da dissecação. |
 | 4.2 | `T_FAMILY_ATOR` | dissect-families | Família ator da dissecação. |
 | 4.2 | `T_FAMILY_CATEGORIA` | dissect-families | Família categoria da dissecação. |
 | 4.2 | `T_FAMILY_FERRAMENTA` | dissect-families | Família ferramenta da dissecação. |
 | 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
 | 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
-| 3.6 | `T_FAMILY_MIDIA` | dissect-families | Família midia da dissecação. |
+| 3.0 | `Q_MEDIA_N2_LOCAL_RUN` | dissect-families | O N2 da família midia roda de verdade aqui? Falta reproduzir localmente o cálculo do alfa de Krippendorff numa implementação a |
 
 ## websearch-cap-2026-09 — 1 item(ns)
 
