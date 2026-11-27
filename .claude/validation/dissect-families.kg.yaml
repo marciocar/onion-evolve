@@ -240,6 +240,60 @@ nodes:
       verdicts: ["perseguir", "parquear", "rejeitar"]
       default_destination: "declarado na Etapa 0"
 
+  - id: T_FAMILY_MIDIA
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Família midia da dissecação."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-11-27"
+    verified_against: "decisão do maestro de 2026-11-27 (D_DISSECT_OBJECT_TAXONOMY_MAP da curadoria, «forjar só o sustentado»), sobre a prova N2 de C_MEDIA_MECHANISM_FORGEABLE; a família se prova no 1º estudo que a usa"
+    x_term:
+      pref: "midia"
+      lang: pt-BR
+      definition: "Conteúdo publicado (vídeo, texto, conversa, áudio, site), estudado pelo que diz, por um codebook reprodutível; quem publica é estudo de ator, e a ferramenta citada, de ferramenta."
+      labels:
+        - literal: "mídia"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-11-27"
+        - literal: "conteúdo"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-11-27"
+    x_dissect_family_spec:
+      levels:
+        N0: "identidade datada do item: quem publica, canal, data e as unidades de análise"
+        N1: "o codebook: unidade de análise, categorias exclusivas e exaustivas, regras de codificação"
+        N2: "rodar o codebook sobre o item com codificadores independentes e calcular localmente o alfa de Krippendorff contra o limiar declarado na Etapa 0, com o protocolo de coleta (unidades independentes, instruções comuns, amostra); declaração de fornecedor não comprova"
+        N3: "régua de transferência do que a codificação mostrou, com a evidência dela"
+        N4: "plano x_absorb_* ou sinal ao panorama"
+      verdicts: ["absorver", "costurar", "parquear", "rejeitar"]
+      default_destination: "panorama"
+      n2_proof:
+        source: "curadoria:docs/evolution/research/dissect-families-n2-evidence-2026-11/dissect-families-n2-evidence-2026-11.kg.yaml#C_MEDIA_MECHANISM_FORGEABLE"
+        decision: "curadoria:docs/evolution/research/dissect-object-taxonomy-2026-11/dissect-object-taxonomy-2026-11.kg.yaml#D_DISSECT_OBJECT_TAXONOMY_MAP"
+        mechanism: "codebook de análise de conteúdo e confiabilidade entre codificadores pelo alfa de Krippendorff (Hayes e Krippendorff, 2007; macro KALPHA aberta)"
+        limits:
+          - "a partição em 5 tipos (escrito, oral, icônico, audiovisual, hipertexto) não vem da fonte: é desenho nosso, a provar (E_MEDIA_MECHANISM_MULTIMODAL)"
+          - "o cálculo local do alfa ainda não foi reproduzido por nós; a fonte mostra o run dos autores (E_MEDIA_OPEN_IMPLEMENTATION). O N2 está LIDO, não VERIFICADO: a pergunta aberta é Q_MEDIA_N2_LOCAL_RUN, e o checador ainda não cobra o alfa no estudo"
+          - "vereditos e destino cortados da decisão: perseguir e projeto-novo ficaram fora porque o objeto da família é conteúdo já publicado; tese nova a partir de mídia é estudo da família ideia"
+
+  - id: Q_MEDIA_N2_LOCAL_RUN
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O N2 da família midia roda de verdade aqui? Falta reproduzir localmente o cálculo do alfa de Krippendorff numa implementação aberta e decidir se o checador passa a cobrar o alfa no estudo (como o item 8 faz com o app)."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-11-27"
+    verified_against: "peça (ii) de curadoria:docs/evolution/research/dissect-object-taxonomy-2026-11/dissect-object-taxonomy-2026-11.kg.yaml#D_DISSECT_OBJECT_TAXONOMY_MAP (um nó question aberto sobre o N2 antes de qualquer veredito) e o limite de E_MEDIA_OPEN_IMPLEMENTATION"
+
   - id: C_FAMILIES_REGISTRY_V1
     node_type: claim
     plane: DEV
@@ -250,6 +304,7 @@ nodes:
     trace: ".claude/commands/common/prompts/dissect-doctrine.md"
     verified_at: "2026-10-24"
     verified_against: "decisão do maestro de 2026-10-24; a bancada run_dissect_object_selftests cobra a pertença de família e de veredito"
+    narrative: "As seis famílias v1 ficam fora da régua da prova N2 (item 12 do checador, FAMILIES_V1). Família forjada depois traz x_dissect_family_spec.n2_proof, e o lint roda dissect-object-check.sh --registry."
 
 edges:
   - from: T_FAMILY_FERRAMENTA
@@ -270,3 +325,9 @@ edges:
   - from: T_FAMILY_IDEIA
     to: C_FAMILIES_REGISTRY_V1
     edge_type: TRACES_TO
+  - from: T_FAMILY_MIDIA
+    to: C_FAMILIES_REGISTRY_V1
+    edge_type: TRACES_TO
+  - from: Q_MEDIA_N2_LOCAL_RUN
+    to: T_FAMILY_MIDIA
+    edge_type: CONSTRAINS

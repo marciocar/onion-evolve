@@ -317,6 +317,7 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
 | `app` | aplicativo · app de consumo | identidade datada | verbos da superfície observável | artefato aberto do próprio app **ou** uso observado com protocolo commitado | plano `x_absorb_*` (só mecanismo) | absorver · costurar · parquear · rejeitar | core |
 | `categoria` | categoria de produto · mercado | o recorte e os atores candidatos | régua de funcionalidades com ≥ 3 atores e capital datado | ler ou rodar a implementação de referência aberta | `x_dissect_pursue` | perseguir · costurar · parquear · rejeitar | projeto-novo |
 | `ideia` | tese · hipótese | análogos: quem fez, onde, resultado | o valor alegado e para quem | o menor experimento pré-registrado que mede a tese | `x_dissect_pursue` | perseguir · parquear · rejeitar | declarado na Etapa 0 |
+| `midia` | mídia · conteúdo | identidade datada do item e as unidades de análise | o codebook (unidade, categorias exclusivas e exaustivas, regras) | o codebook rodado por codificadores independentes, com o alfa de Krippendorff calculado localmente contra o limiar da Etapa 0 | plano `x_absorb_*` ou sinal ao panorama | absorver · costurar · parquear · rejeitar | panorama |
 
 **Regras de família:**
 
@@ -324,7 +325,20 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
   respostas até ela): 1. tem superfície executável aberta (código, CLI, API, schema)? → `ferramenta` · 2. é uma
   prescrição de trabalho para adotar? → `pratica` · 3. interessa o mecanismo de um produto fechado? → `app` ·
   4. interessa o dinheiro ou o lugar no mercado de uma empresa? → `ator` · 5. o estudo pede três ou mais atores de
-  um mesmo mercado? → `categoria` · 6. o objeto ainda não existe e é uma tese? → `ideia`.
+  um mesmo mercado? → `categoria` · 6. o objeto ainda não existe e é uma tese? → `ideia` · 7. é um conteúdo
+  publicado (vídeo, texto, conversa, áudio, site) e interessa o que ele diz? → `midia`.
+- `midia` estuda **o que o conteúdo diz**; quem publica é estudo de `ator`, e a ferramenta citada, de `ferramenta`.
+- **Família forjada depois do registro v1 traz a prova N2** (item 12 do checador, decisão do maestro de
+  2026-11-27, `D_DISSECT_OBJECT_TAXONOMY_MAP` da curadoria: «forjar só o sustentado»). O spec declara
+  `n2_proof: {source, decision, mechanism, limits}`: `source` e `decision` são ponteiros `<repo>:<caminho>#<ID>`
+  distintos (a evidência do mecanismo e o selo do maestro, este num nó `D_` ou `Q_`), `mechanism` diz o que roda
+  no N2 e `limits` lista, em texto, o que ficou declarado sem provar (vazia vale, ausente não). O checador confere
+  a forma do ponteiro e não resolve o alvo noutro repo. Repo privado entra pelo apelido do papel (`curadoria:`),
+  nunca pelo id, porque o registro viaja às portas públicas (REGRA 106). As seis famílias v1 nasceram antes da
+  régua e ficam fora dela, pelo par id → nome: renomear uma delas não herda a isenção.
+- O N2 da `midia` está **lido, não verificado**: o cálculo local do alfa ainda não foi reproduzido, e o checador
+  ainda não cobra o alfa no estudo. A pergunta aberta é `Q_MEDIA_N2_LOCAL_RUN`, no registro.
+  A família `run_dissect_object_selftests` do lint roda `dissect-object-check.sh --registry` sobre o registro real.
 - `app` cobre **só o mecanismo**; o negócio de um app é outro estudo, da família `ator`, porque ator **não absorve**.
 - No `app`, N2 sem artefato aberto nem uso observado com protocolo deixa o estudo **no nível 1**, e o veredito fica
   limitado a `parquear`. A lacuna não promove o estudo.
@@ -393,9 +407,9 @@ segue com o sentido de sempre.
 e o contrato ok já passaram num grafo que ele reprovou no CI.
 
 **Quem cobra:** `bash .claude/validation/dissect-object-check.sh <grafo>` (rc 0 sem achado · 1 com achado · 3 não
-mediu, nunca aprovação) confere os 11 itens — família e aresta, veredito da família, destino, quem paga e o não
+mediu, nunca aprovação) confere os 11 itens do estudo — família e aresta, veredito da família, destino, quem paga e o não
 verificado, Etapa 0 no git, superação com busca na web, gatilho na lista branca e não disparado, app sem artefato no
-nível 1, o registro de ideias, a candidata nomeada pelo parque (§1c) e a síntese — e `--context` projeta as famílias e os estudos do corpus. Ele julga **forma, pertença e ordem no git**, não
+nível 1, o registro de ideias, a candidata nomeada pelo parque (§1c) e a síntese — e `--context` projeta as famílias e os estudos do corpus; `--registry` confere o item 12 (a prova N2 de família nova) sobre o próprio registro. Ele julga **forma, pertença e ordem no git**, não
 qualidade: se a superação entrega e se o gatilho mede a coisa certa é trabalho do Elenxo. Estudo anterior a
 2026-10-24 (sem `x_study_destination`) fica fora por desenho; rodar o checador direto sobre ele lista o que falta
 para migrar. Bancada: `run_dissect_object_selftests`.

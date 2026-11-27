@@ -366,11 +366,50 @@ CASES = [
     ("estudo não tocado que piorou noutro item: reprova (a catraca só cobre o item 11)", "sem-x_who_pays", lambda g: g["meta"].pop("x_who_pays"), "synth-legacy", []),
 ]
 CAND_GRAPH = "docs/evolution/dissect/fixture-cand-2026-11/fixture-cand-2026-11.kg.yaml"
+
+
+def reg_family(doc, fid):
+    return next(n for n in doc["nodes"] if n.get("id") == fid)["x_dissect_family_spec"]
+
+
+# item 12: a mutação do REGISTRO (não do estudo), aplicada pelo build quando a ordem começa com "reg-"
+REG_MUTS = {
+    "reg-no-proof": lambda d: reg_family(d, "T_FAMILY_MIDIA").pop("n2_proof"),
+    "reg-bad-source": lambda d: reg_family(d, "T_FAMILY_MIDIA")["n2_proof"].update(source="a pesquisa da curadoria"),
+    "reg-no-decision": lambda d: reg_family(d, "T_FAMILY_MIDIA")["n2_proof"].pop("decision"),
+    "reg-no-limits": lambda d: reg_family(d, "T_FAMILY_MIDIA")["n2_proof"].pop("limits"),
+    "reg-empty-mechanism": lambda d: reg_family(d, "T_FAMILY_MIDIA")["n2_proof"].update(mechanism="  "),
+    "reg-list-mechanism": lambda d: reg_family(d, "T_FAMILY_MIDIA")["n2_proof"].update(mechanism=["  "]),
+    "reg-junk-limits": lambda d: reg_family(d, "T_FAMILY_MIDIA")["n2_proof"].update(limits=[None, "", {"a": 1}]),
+    "reg-same-pointer": lambda d: reg_family(d, "T_FAMILY_MIDIA")["n2_proof"].update(decision=reg_family(d, "T_FAMILY_MIDIA")["n2_proof"]["source"]),
+    "reg-decision-not-seal": lambda d: reg_family(d, "T_FAMILY_MIDIA")["n2_proof"].update(decision="curadoria:docs/x.kg.yaml#E_ALGO"),
+    # trocar o nome de uma família v1 não herda a isenção: o par id → pref deixa de bater
+    "reg-v1-renamed": lambda d: next(n for n in d["nodes"] if n.get("id") == "T_FAMILY_IDEIA")["x_term"].update(pref="nova"),
+    "reg-midia-superseded": lambda d: (next(n for n in d["nodes"] if n.get("id") == "T_FAMILY_MIDIA").update(status="superseded"), reg_family(d, "T_FAMILY_MIDIA").pop("n2_proof")),
+}
+CASES += [
+    # item 12 — o registro: família forjada depois do v1 só entra com a prova N2 (D_DISSECT_OBJECT_TAXONOMY_MAP, 2026-11-27)
+    ("registro real: a família nova traz a prova N2", None, None, "ok", ["--registry"]),
+    ("família nova sem a prova N2", "familia-sem-prova-n2", None, "reg-no-proof", ["--registry"]),
+    ("prova N2 com a fonte em texto solto", "prova-n2-mal-formada", None, "reg-bad-source", ["--registry"]),
+    ("prova N2 sem o selo do maestro", "prova-n2-mal-formada", None, "reg-no-decision", ["--registry"]),
+    ("prova N2 sem os limites declarados", "prova-n2-mal-formada", None, "reg-no-limits", ["--registry"]),
+    ("prova N2 com o mecanismo em branco", "prova-n2-mal-formada", None, "reg-empty-mechanism", ["--registry"]),
+    ("prova N2 com o mecanismo numa lista", "prova-n2-mal-formada", None, "reg-list-mechanism", ["--registry"]),
+    ("prova N2 com limites que não são texto", "prova-n2-mal-formada", None, "reg-junk-limits", ["--registry"]),
+    ("prova N2 com a mesma fonte e selo", "prova-n2-mal-formada", None, "reg-same-pointer", ["--registry"]),
+    ("prova N2 com o selo fora de nó D_ ou Q_", "prova-n2-mal-formada", None, "reg-decision-not-seal", ["--registry"]),
+    ("família v1 renomeada sem a prova N2 (não herda a isenção)", "familia-sem-prova-n2", None, "reg-v1-renamed", ["--registry"]),
+    ("família aposentada sem a prova N2 (variante legítima)", None, None, "reg-midia-superseded", ["--registry"]),
+    ("estudo da família midia (variante legítima)", None, lambda g: (g["meta"].update(x_dissect_family="midia"), g["external_edges"][0].update(to=REGISTRY + "#T_FAMILY_MIDIA")), "ok", []),
+    ("estudo midia com veredito fora da família", "veredito-fora-da-familia", lambda g: (g["meta"].update(x_dissect_family="midia"), g["external_edges"][0].update(to=REGISTRY + "#T_FAMILY_MIDIA"), D(g).update(x_dissect_verdict="perseguir")), "ok", []),
+]
 RC3_CASES = [
     ("grafo ilegível", "rc3-yaml", ["@graph"]),
     ("argumento inválido", "rc3-args", ["@graph", "--stage", "meio"]),
     ("registro sem família viva", "rc3-registry", ["@graph"]),
     ("contexto com registro sem família viva", "rc3-registry", ["--context"]),
+    ("--registry com registro sem família viva", "rc3-registry", ["--registry"]),
 ]
 
 
@@ -408,6 +447,11 @@ def build(checker_src, mut, order):
     setup(tmp, checker_src)
     text = STAGE0_TEXT if order != "short" else "# Etapa 0 curta\n\n## 1. só um\n"
     g = good_graph(hashlib.sha256(text.encode()).hexdigest())
+    if order in REG_MUTS:
+        with open(os.path.join(tmp, REGISTRY), encoding="utf-8") as fh:
+            reg = yaml.safe_load(fh)
+        REG_MUTS[order](reg)
+        write_yaml(tmp, REGISTRY, reg)
     if mut:
         mut(g)
     plan = lambda: write(tmp, STAGE0, text)
@@ -511,8 +555,8 @@ def build(checker_src, mut, order):
 def run(tmp, extra):
     target = GRAPH
     args = []
-    if extra[:1] == ["--context"]:
-        r = sh(tmp, "bash", CHECK_SH, "--context")
+    if extra[:1] in (["--context"], ["--registry"]):
+        r = sh(tmp, "bash", CHECK_SH, extra[0])
         return r.returncode, r.stdout + r.stderr
     for a in extra:
         if a == "@abs":

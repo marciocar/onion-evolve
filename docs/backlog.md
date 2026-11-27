@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**1261 itens abertos** em 187 grafo(s) com aberto (de 249 no escopo) · 176 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**1262 itens abertos** em 187 grafo(s) com aberto (de 249 no escopo) · 176 grupo(s), agrupados por `owner:` (82 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## agent-requester-privilege-2026-11 — 20 item(ns)
 
@@ -1302,6 +1302,19 @@
 | 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
 | 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
 
+## dissect-families — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.2 | `C_FAMILIES_REGISTRY_V1` | dissect-families | O registro v1 tem seis famílias, escolhidas pela ordem de predicados da Etapa 0; família nova entra por PR no core antes do N0 d |
+| 4.2 | `T_FAMILY_APP` | dissect-families | Família app da dissecação. |
+| 4.2 | `T_FAMILY_ATOR` | dissect-families | Família ator da dissecação. |
+| 4.2 | `T_FAMILY_CATEGORIA` | dissect-families | Família categoria da dissecação. |
+| 4.2 | `T_FAMILY_FERRAMENTA` | dissect-families | Família ferramenta da dissecação. |
+| 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
+| 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
+| 3.6 | `T_FAMILY_MIDIA` | dissect-families | Família midia da dissecação. |
+
 ## websearch-cap-2026-09 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1396,18 +1409,6 @@
 | 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
 | 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
 | 3.6 | `C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP` | projection-ids-2026-10 | TETO declarado: o papel vem do stamp, que é dado editável. Stamp falso de adotante no core desliga o default local (o CI segue p |
-
-## dissect-families — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 16.8 | `C_FAMILIES_REGISTRY_V1` | dissect-families | O registro v1 tem seis famílias, escolhidas pela ordem de predicados da Etapa 0; família nova entra por PR no core antes do N0 d |
-| 4.2 | `T_FAMILY_APP` | dissect-families | Família app da dissecação. |
-| 4.2 | `T_FAMILY_ATOR` | dissect-families | Família ator da dissecação. |
-| 4.2 | `T_FAMILY_CATEGORIA` | dissect-families | Família categoria da dissecação. |
-| 4.2 | `T_FAMILY_FERRAMENTA` | dissect-families | Família ferramenta da dissecação. |
-| 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
-| 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
 
 ## private-repo-cite-2026-11 — 2 item(ns)
 
