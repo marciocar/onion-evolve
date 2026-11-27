@@ -317,16 +317,30 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
 | `app` | aplicativo · app de consumo | identidade datada | verbos da superfície observável | artefato aberto do próprio app **ou** uso observado com protocolo commitado | plano `x_absorb_*` (só mecanismo) | absorver · costurar · parquear · rejeitar | core |
 | `categoria` | categoria de produto · mercado | o recorte e os atores candidatos | régua de funcionalidades com ≥ 3 atores e capital datado | ler ou rodar a implementação de referência aberta | `x_dissect_pursue` | perseguir · costurar · parquear · rejeitar | projeto-novo |
 | `ideia` | tese · hipótese | análogos: quem fez, onde, resultado | o valor alegado e para quem | o menor experimento pré-registrado que mede a tese | `x_dissect_pursue` | perseguir · parquear · rejeitar | declarado na Etapa 0 |
+| `padrao` | padrão · padrão de projeto · linguagem de padrões | a forma do padrão (nome, problema, contexto, solução), datada na fonte | os usos conhecidos alegados, com fonte | catraca disjuntiva: N ou mais usos conhecidos de fontes distintas (N = 3; 2 para derivado) **ou** longevidade provada com fonte datada | plano `x_absorb_*` | absorver · costurar · parquear · rejeitar | core |
 | `midia` | mídia · conteúdo | identidade datada do item e as unidades de análise | o codebook (unidade, categorias exclusivas e exaustivas, regras) | o codebook rodado por codificadores independentes, com o alfa de Krippendorff calculado localmente contra o limiar da Etapa 0 | plano `x_absorb_*` ou sinal ao panorama | absorver · costurar · parquear · rejeitar | panorama |
 
 **Regras de família:**
 
 - **Como escolher** (ordem de predicados; a 1ª pergunta que responder "sim" decide, e a Etapa 0 registra as
   respostas até ela): 1. tem superfície executável aberta (código, CLI, API, schema)? → `ferramenta` · 2. é uma
-  prescrição de trabalho para adotar? → `pratica` · 3. interessa o mecanismo de um produto fechado? → `app` ·
-  4. interessa o dinheiro ou o lugar no mercado de uma empresa? → `ator` · 5. o estudo pede três ou mais atores de
-  um mesmo mercado? → `categoria` · 6. o objeto ainda não existe e é uma tese? → `ideia` · 7. é um conteúdo
-  publicado (vídeo, texto, conversa, áudio, site) e interessa o que ele diz? → `midia`.
+  solução recorrente nomeada (padrão de projeto, linguagem de padrões) e a pergunta é se ela se sustenta? →
+  `padrao` · 3. é uma prescrição de trabalho para adotar? → `pratica` · 4. interessa o mecanismo de um produto
+  fechado? → `app` · 5. interessa o dinheiro ou o lugar no mercado de uma empresa? → `ator` · 6. o estudo pede
+  três ou mais atores de um mesmo mercado? → `categoria` · 7. o objeto ainda não existe e é uma tese? → `ideia` ·
+  8. é um conteúdo publicado (vídeo, texto, conversa, áudio, site) e interessa o que ele diz? → `midia`.
+  O `padrao` vem antes da `pratica` porque um padrão nomeado também é prescrição, e a pergunta dele é a
+  recorrência (numeração de 2026-11-27; Etapa 0 anterior cita a numeração antiga).
+- **A catraca do `padrao` é disjuntiva e o N mora no registro** (item 13, decisão do maestro de 2026-11-27,
+  `Q_PATTERN_SEAL_REVISION` da curadoria): o estudo que chega ao N2, ou que absorve ou costura, prova a
+  recorrência por N ou mais `x_dissect_known_use: {source}` de fontes distintas **ou** por
+  `x_dissect_longevity: {since, source}` com ao menos `longevity_min_years` anos (10, parâmetro do core; data
+  futura não vale). N é `known_uses_min` (3) ou, com `meta.x_dissect_derived: {from: <fonte do pai>}`,
+  `known_uses_min_derived` (2), lidos de `n2_ratchet`. Fontes contam distintas pelo texto normalizado (URL sem
+  fragmento nem barra final; o arquivo, não a linha), e nó `refuted`/`superseded` não conta. **Padrão sem
+  recorrência fica no N1** e parqueia ou rejeita dali. A porta única «≥ 3» rejeitava o padrão de 2 usos e 20
+  anos de prática comprovada. O limiar é contestado (rule of 2, objeção de 15+ anos) e a contestação fica no
+  registro como `CONSTRAINS` (`C_PATTERN_THRESHOLD_CONTESTED`); o `--registry` cobra a forma da catraca e a aresta.
 - `midia` estuda **o que o conteúdo diz**; quem publica é estudo de `ator`, e a ferramenta citada, de `ferramenta`.
 - **Família forjada depois do registro v1 traz a prova N2** (item 12 do checador, decisão do maestro de
   2026-11-27, `D_DISSECT_OBJECT_TAXONOMY_MAP` da curadoria: «forjar só o sustentado»). O spec declara
@@ -407,7 +421,7 @@ segue com o sentido de sempre.
 e o contrato ok já passaram num grafo que ele reprovou no CI.
 
 **Quem cobra:** `bash .claude/validation/dissect-object-check.sh <grafo>` (rc 0 sem achado · 1 com achado · 3 não
-mediu, nunca aprovação) confere os 11 itens do estudo — família e aresta, veredito da família, destino, quem paga e o não
+mediu, nunca aprovação) confere os itens do estudo (1 a 11, e o 13 da catraca do `padrao`) — família e aresta, veredito da família, destino, quem paga e o não
 verificado, Etapa 0 no git, superação com busca na web, gatilho na lista branca e não disparado, app sem artefato no
 nível 1, o registro de ideias, a candidata nomeada pelo parque (§1c) e a síntese — e `--context` projeta as famílias e os estudos do corpus; `--registry` confere o item 12 (a prova N2 de família nova) sobre o próprio registro. Ele julga **forma, pertença e ordem no git**, não
 qualidade: se a superação entrega e se o gatilho mede a coisa certa é trabalho do Elenxo. Estudo anterior a

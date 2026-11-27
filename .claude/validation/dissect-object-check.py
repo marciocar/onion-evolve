@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """dissect-object-check — o checador de forma da dissecação de QUALQUER objeto (família, Etapa 0, veredito, destino).
 
-Cobra, por comando, os 11 itens do estudo (8 da §6, o registro de ideias, a candidata do parque da §1c e a síntese), e o item 12 sobre o registro, da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
+Cobra, por comando, os itens do estudo (8 da §6, o registro de ideias, a candidata do parque da §1c, a síntese e a catraca disjuntiva do N2), e o item 12 sobre o registro, da doutrina (.claude/commands/common/prompts/dissect-doctrine.md) sobre o grafo
 de UM estudo e o git log. Determinístico, sem LLM e sem rede.
 
   item 1  x_dissect_tool, x_dissect_family e a aresta TRACES_TO para o registro existem e concordam
@@ -41,6 +41,13 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
           nunca pelo id (REGRA 106). As seis famílias v1 (FAMILIES_V1, pelo par id → pref) nasceram antes da régua,
           pela decisão de 2026-10-24, e ficam fora; o conjunto só encolhe. Nasceu com a família «midia»
           (D_DISSECT_OBJECT_TAXONOMY_MAP da curadoria, 2026-11-27: forjar só o que tem prova N2).
+  item 13 a CATRACA DISJUNTIVA do N2 (família com n2_ratchet no registro: padrao, decisão do maestro de 2026-11-27,
+          Q_PATTERN_SEAL_REVISION da curadoria): o estudo que chega ao N2, ou que absorve ou costura, prova a
+          recorrência por N ou mais usos conhecidos de fontes distintas (x_dissect_known_use {source}, fonte
+          normalizada) OU por longevidade provada (x_dissect_longevity {since, source}, com ao menos
+          longevity_min_years anos, nunca data futura). N vem do REGISTRO, nunca do código: known_uses_min (3) ou, com
+          meta.x_dissect_derived: {from: <fonte do pai>}, known_uses_min_derived (2). Nó refuted ou superseded não conta. A porta única «≥3» rejeitava o padrão
+          de 2 usos e 20 anos de prática comprovada; a contestação do limiar fica no registro como CONSTRAINS.
 
 PEÇAS (achado da curadoria em 2026-10-26): um objeto pode ter peças de vereditos diferentes (costurar uma, parquear
 outra). O meta declara `x_dissect_pieces: [ids]` (2 ou mais), e cada peça tem o SEU `x_dissect_verdict`, o mesmo campo
@@ -97,6 +104,7 @@ DEST_PROJECT = re.compile(r"^projeto:[a-z0-9][a-z0-9-]*$")
 PURSUE = {"estudo", "projeto-novo"}
 SEALED_BY = re.compile(r"^[A-Za-z0-9._-]+:[^\s#]+#[A-Z][A-Z0-9_]*$")
 N2_EVIDENCE_OK = {"artefato-aberto", "uso-observado"}
+SINCE = re.compile(r"^\d{4}(-\d{2}(-\d{2})?)?$")  # item 13: a longevidade se data por ano, mês ou dia
 # item 12: as famílias do registro v1 (decisão de 2026-10-24) nasceram antes da régua da prova N2 e ficam fora dela;
 # toda família forjada depois traz n2_proof. Conjunto congelado: família nova nunca entra aqui, só sai.
 # A isenção vale pelo PAR id → pref: trocar o nome de uma família v1 não cria família nova isenta (refutador, 2026-11-27).
@@ -374,7 +382,78 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
                 add(8, "app-acima-do-nivel-1", "N2 sem artefato aberto nem uso observado; nós nos níveis %s" % deep)
             if any(v != "parquear" for v in verdicts):
                 add(8, "app-sem-artefato-veredito", "N2 sem artefato limita o veredito a parquear; achado %s" % verdicts)
+
+    # item 13 — a catraca disjuntiva do N2, para a família que a declara no registro
+    if isinstance(spec, dict) and "n2_ratchet" in spec:
+        ratchet_check(add, meta, nodes, levels, verdicts, spec["n2_ratchet"])
     return findings
+
+
+def ratchet_ok(r):
+    """a forma do n2_ratchet: N inteiro ≥ 1, o N do derivado entre 1 e N, e a porta da longevidade como booleano."""
+    if not isinstance(r, dict):
+        return False
+    n, nd = r.get("known_uses_min"), r.get("known_uses_min_derived")
+    ints = all(isinstance(x, int) and not isinstance(x, bool) and x >= 1 for x in (n, nd, r.get("longevity_min_years")))
+    return ints and nd <= n and isinstance(r.get("longevity"), bool)
+
+
+def source_key(src):
+    # a fonte normalizada: URL sem fragmento, query nem barra final e com o host em minúsculas; arquivo:linha vira
+    # o arquivo. Três linhas do mesmo arquivo, ou a mesma URL com #x, são UMA fonte (refutador, 2026-11-27).
+    src = src.strip()
+    m = re.match(r"^(https?)://([^/?#]+)([^?#]*)", src)
+    if m:
+        return "%s://%s%s" % (m.group(1).lower(), m.group(2).lower(), m.group(3).rstrip("/"))
+    return re.sub(r":\d+(-\d+)?$", "", src)
+
+
+def years_since(since, today):
+    # anos inteiros completos de AAAA[-MM[-DD]] até hoje; None para data futura.
+    parts = [int(x) for x in since.split("-")] + [1, 1]
+    y, mo, d = parts[0], parts[1], parts[2]
+    if (y, mo, d) > (today.year, today.month, today.day):
+        return None
+    return today.year - y - (1 if (today.month, today.day) < (mo, d) else 0)
+
+
+def ratchet_check(add, meta, nodes, levels, verdicts, ratchet):
+    """item 13: N ou mais usos conhecidos de fontes distintas OU longevidade provada; N lido do registro."""
+    if not ratchet_ok(ratchet):
+        raise NotMeasured("n2_ratchet fora da forma no registro (rode dissect-object-check.sh --registry)")
+    import datetime
+    today = datetime.date.today()
+    uses, long_ok = set(), False
+    for n in nodes:
+        if n.get("status") in ("refuted", "superseded"):
+            continue  # uso ou longevidade refutados não contam
+        ku = n.get("x_dissect_known_use")
+        if ku is not None:
+            if isinstance(ku, dict) and isinstance(ku.get("source"), str) and IDEA_SOURCE.match(ku["source"].strip()):
+                uses.add(source_key(ku["source"]))
+            else:
+                add(13, "uso-conhecido-mal-formado", "%s: x_dissect_known_use exige {source} com URL ou arquivo:linha; achado %r" % (n.get("id"), ku))
+        lg = n.get("x_dissect_longevity")
+        if lg is not None:
+            if (isinstance(lg, dict) and SINCE.match(str(lg.get("since") or "")) and isinstance(lg.get("source"), str)
+                    and IDEA_SOURCE.match(lg["source"].strip())):
+                age = years_since(str(lg["since"]), today)
+                if age is None or age < ratchet["longevity_min_years"]:
+                    add(13, "longevidade-curta", "%s: since %s dá %s ano(s); a longevidade exige ao menos %d (n2_ratchet.longevity_min_years), e data futura não vale" % (n.get("id"), lg["since"], "data futura" if age is None else age, ratchet["longevity_min_years"]))
+                else:
+                    long_ok = True
+            else:
+                add(13, "longevidade-mal-formada", "%s: x_dissect_longevity exige {since: AAAA[-MM[-DD]], source: URL ou arquivo:linha}; achado %r" % (n.get("id"), lg))
+    der = meta.get("x_dissect_derived")
+    derived = isinstance(der, dict) and isinstance(der.get("from"), str) and bool(IDEA_SOURCE.match(der["from"].strip()))
+    if der is not None and not derived:
+        add(13, "derivado-mal-formado", "meta.x_dissect_derived exige {from: URL ou arquivo:linha do padrão-pai}; achado %r" % (der,))
+    if not (any(lv >= 2 for lv in levels) or any(v in ("absorver", "costurar") for v in verdicts)):
+        return  # o estudo que para no N1 e parqueia ainda não alegou a recorrência
+    need = ratchet["known_uses_min_derived"] if derived else ratchet["known_uses_min"]
+    if len(uses) < need and not (long_ok and ratchet["longevity"]):
+        why = "a porta da longevidade está desligada no registro" if long_ok else "sem longevidade provada (x_dissect_longevity)"
+        add(13, "catraca-n2-nao-cumprida", "%d uso(s) conhecido(s) de fontes distintas, abaixo de N=%d%s, e %s; padrão sem recorrência fica no N1" % (len(uses), need, " (derivado)" if derived else "", why))
 
 
 def synthesis_check(add, path, study_dir):
@@ -791,15 +870,24 @@ def registry_check():
     def add(item, code, detail):
         findings.append((item, code, detail))
     registry_families()  # registro sem família viva: rc 3, como no estudo
-    for n in load(REGISTRY).get("nodes") or []:
+    doc = load(REGISTRY)
+    edges = [e for e in (doc.get("edges") or []) if isinstance(e, dict)]
+    live = {m.get("id"): m.get("node_type") for m in (doc.get("nodes") or []) if isinstance(m, dict) and m.get("status") not in ("superseded", "refuted")}
+    for n in doc.get("nodes") or []:
         if not isinstance(n, dict) or n.get("status") == "superseded":
             continue
         spec = n.get("x_dissect_family_spec")
         if not isinstance(spec, dict) or not isinstance(n.get("x_term"), dict):
             continue
-        if FAMILIES_V1.get(n.get("id")) == str(n["x_term"].get("pref")):
+        nid = n.get("id")
+        if "n2_ratchet" in spec:  # a catraca do item 13: forma checável e a contestação do limiar no grafo
+            if not ratchet_ok(spec["n2_ratchet"]):
+                add(12, "catraca-n2-mal-formada", "%s: n2_ratchet exige {known_uses_min: N ≥ 1, known_uses_min_derived: 1..N, longevity: bool, longevity_min_years: ≥ 1}; achado %r" % (nid, spec["n2_ratchet"]))
+            if not any(e.get("edge_type") == "CONSTRAINS" and e.get("to") == nid and live.get(e.get("from")) in ("claim", "question") for e in edges):
+                add(12, "catraca-sem-contestacao", "%s declara n2_ratchet sem aresta CONSTRAINS vinda de um claim ou question vivo do registro: a contestação do limiar fica registrada no grafo" % nid)
+        if FAMILIES_V1.get(nid) == str(n["x_term"].get("pref")):
             continue
-        nid, proof = n.get("id"), spec.get("n2_proof")
+        proof = spec.get("n2_proof")
         if not isinstance(proof, dict):
             add(12, "familia-sem-prova-n2", "%s não declara x_dissect_family_spec.n2_proof {source, decision, mechanism, limits}: família nova só entra com o mecanismo do N2 provado" % nid)
             continue
