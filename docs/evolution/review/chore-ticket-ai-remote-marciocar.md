@@ -11,8 +11,9 @@ tokens: 85009
 duration_min: 1
 findings_fixed: 0
 verdict: NO_FINDINGS
-elenxo: false
-reviewer: "subagente general-purpose isolado (sonnet), só leitura, sem o contexto da conversa, com mandato de refutar"
+elenxo: true
+elenxo_isolado: true
+reviewer: "refutador isolado (subagente general-purpose sonnet, sem o contexto nem o raciocínio do autor, mandato de refutar), que reabriu o gh, o members-validate e o casamento no pr-merge-verified"
 nota: "Uma linha do members.yaml: o remote do ticket-ai segue a transferência do repo para marciocar, decidida pelo maestro em 27/11."
 ---
 
