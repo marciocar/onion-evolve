@@ -1314,7 +1314,7 @@
 | 4.2 | `T_FAMILY_FERRAMENTA` | dissect-families | Família ferramenta da dissecação. |
 | 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
 | 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
-| 3.0 | `Q_MEDIA_N2_LOCAL_RUN` | dissect-families | O N2 da família midia roda de verdade aqui? Falta reproduzir localmente o cálculo do alfa de Krippendorff numa implementação a |
+| 3.0 | `Q_MEDIA_N2_LOCAL_RUN` | dissect-families | O nível 2 da família midia roda de verdade aqui? Falta reproduzir localmente o cálculo do alfa de Krippendorff numa implementa |
 
 ## websearch-cap-2026-09 — 1 item(ns)
 
