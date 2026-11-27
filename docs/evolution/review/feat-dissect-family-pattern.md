@@ -2,7 +2,8 @@
 branch: feat/dissect-family-pattern
 pr: 1781
 date: 2026-11-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3c3148842498c13b573c0696ef5e4f1bf7773e7280a0fa8b09a23f42648dae94
+reviewed_code_sha256: 2bab0e88b9f1a4f6304a9a9bd6f293a8f5058547c608ed9391062a98d030dadb
 findings_total: 8
 findings_real: 8
 findings_blocking: 0
