@@ -2,7 +2,8 @@
 branch: feat/ecosystem-naming-pattern
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d64d65338ba9810558ecc3d352a92ff1d69370f3fd06cc3d4b03db3ed3c3f85c
+reviewed_code_sha256: c2516015378dcedf9a66633f645791e5a5ac9198e480ee348873480847686717
 findings_total: 14
 findings_real: 14
 findings_blocking: 3
