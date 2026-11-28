@@ -40991,7 +40991,9 @@ run_members_registry_selftests() {
   # REGRA 66 — sem depender do estado do vivo além do caso (a), que é o canário da fixture
   local rc out
   rc=0; out="$(bash "${lint}" --only=docs/evolution/federation/members.yaml 2>&1)" || rc=$?
-  if grep -q 'REGRA 66' <<< "${out}"; then
+  # só o HARD da 66 reprova o vivo: desde 2026-11-27 (SAC-567) a 66 também emite SOFT para os AVISOS do validador (membro
+  # novo fora do prefixo do padrão de nomes), e o PR que registra um membro assim leva o aviso sem estar inválido
+  if grep -qF 'registro da federação INVÁLIDO' <<< "${out}"; then
     record_fail "members-registry: (a)" "o registro VIVO reprova no gate: ${out}"
   else record_pass "members-registry: (a) o members.yaml vivo passa no gate"; fi
 

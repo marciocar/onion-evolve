@@ -71,8 +71,9 @@
 #               HARD acusaria todo adotante novo legítimo;
 #             · o MAPA (`ecosystem-naming-map.md` ao lado do registro, core-only) lista TODO membro uma vez, com
 #               os mesmos aliases e o mesmo gatilho: membro fora do mapa, linha órfã, alias ou gatilho divergente
-#               reprova (é a catraca da projeção à mão). Na FONTE (caminho canônico, sem .claude/.onion-version)
-#               o mapa é obrigatório: apagá-lo não desliga a catraca.
+#               reprova (é a catraca da projeção à mão). No checkout do CORE (caminho canônico, sem
+#               .claude/.onion-version, marcador do registro real e origin no core) o mapa é obrigatório: apagá-lo
+#               não desliga a catraca; registro sintético de bancada fica fora.
 #
 # Uso       : bash .claude/validation/members-validate.sh [<path-do-members.yaml>] [--json] [--jwks <dir>] [--base <yaml>|none]
 #               <path> : caminho PASSADO COMO ARGUMENTO; default = o members.yaml
@@ -541,7 +542,20 @@ if isinstance(doc, dict):
     _abs = os.path.abspath(path)
     _canon = _abs.endswith(os.path.join("docs", "evolution", "federation", "members.yaml"))
     _root = _abs[: -len(os.path.join("docs", "evolution", "federation", "members.yaml"))] if _canon else ""
-    if _canon and not os.path.isfile(os.path.join(_root, ".claude", ".onion-version")) and not os.path.isfile(map_path):
+    # "a fonte" = o checkout do CORE: caminho canônico, sem carimbo de adotante, o marcador do registro real na 1ª linha e a
+    # origin do repo no core. Sem as duas últimas, os registros SINTÉTICOS das bancadas (que montam o caminho canônico num
+    # sandbox) reprovavam por falta de mapa (medido no CI do #1783, família federation_a2a).
+    def _is_core_checkout():
+        first = raw.splitlines()[0] if raw else ""
+        if "Registro de membros da co-evolução" not in first:
+            return False
+        try:
+            o = subprocess.run(["git", "-C", _root, "remote", "get-url", "origin"], capture_output=True, text=True, timeout=10,
+                               env={k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}).stdout.strip()
+        except Exception:
+            return False
+        return re.search(r"[:/]marciocar/onion-evolve(\.git)?$", o) is not None
+    if _canon and not os.path.isfile(os.path.join(_root, ".claude", ".onion-version")) and not os.path.isfile(map_path) and _is_core_checkout():
         err(f"mapa {os.path.basename(map_path)} AUSENTE ao lado do registro da fonte — apagá-lo desligaria a catraca dos nomes (D_ECOSYSTEM_NAMING_PATTERN_1127)")
     if os.path.isfile(map_path):
         rows = {}; trig_rows = {}

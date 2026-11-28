@@ -2,8 +2,7 @@
 branch: feat/ecosystem-naming-pattern
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: d64d65338ba9810558ecc3d352a92ff1d69370f3fd06cc3d4b03db3ed3c3f85c
-reviewed_code_sha256: c2516015378dcedf9a66633f645791e5a5ac9198e480ee348873480847686717
+reviewed_diff_sha256: pendente
 findings_total: 14
 findings_real: 14
 findings_blocking: 3
@@ -73,3 +72,13 @@ e deu APROVA COM RESSALVAS, com 4 achados:
 | 14 | menor, anterior | `piece: "true"` ou `piece: sim` passavam no validador e tiravam a peça do pulso calada | o validador exige booleano; fixture `members-bad-piece-not-bool.yaml` |
 
 A bancada da rodada 2 rodou `ecosystem_naming` (11/11); a família `fixtures` inteira fica com o pr-finalize.
+
+## O CI pegou dois defeitos meus depois da rodada 2
+
+- O «mapa obrigatório na fonte» disparava nos registros SINTÉTICOS da família `federation_a2a`, que montam o
+  caminho canônico num sandbox. Cura: só o checkout do CORE exige o mapa (marcador do registro real na 1ª linha e
+  origin no core).
+- O caso (a) da família `members_registry` reprovava qualquer menção à REGRA 66, e a 66 passou a emitir SOFT para
+  o aviso de membro novo. Cura: o caso cobra só o HARD («registro da federação INVÁLIDO»).
+
+Medido local: `federation_a2a,members_registry,ecosystem_naming` deu 138 de 138.
