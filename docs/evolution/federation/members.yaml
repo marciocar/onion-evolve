@@ -1201,19 +1201,21 @@ members:
 
   - id: brain-onion-evolve
     # A PERSONA do Onion Evolve (D_ECOSYSTEM_NAMING_PATTERN_1127): o cérebro do próprio Onion Evolve. Categoria à parte no
-    # padrão de nomes: não é company brain (empresa) nem second brain (pessoa). Registro ANTECIPADO por decisão do maestro
-    # (SAC-567): o repo ainda NÃO existe; o maestro o cria (privado). Molde: os membros sem vendor (kind method, como o
-    # watcher-onion-evolve) e o owner_session sem `piece:` do onion-slm (peça estratégica é outra decisão).
+    # padrão de nomes: não é company brain (empresa) nem second brain (pessoa). Registro por decisão do maestro (SAC-567); o
+    # repo foi criado por ele em 2026-11-27, privado e ainda vazio. Molde: os membros sem vendor (kind method, como o
+    # watcher-onion-evolve) e a PEÇA com sessão dona (piece + owner_session, como o onion-kg-ssot): o maestro decidiu em
+    # 2026-11-28 marcá-la como peça e NÃO isentá-la da REGRA 36 (o nome dela é varrido como qualquer id).
     name: brain-onion-evolve (a Persona do Onion Evolve)
     role: standalone            # tier 3: fala só com o core
-    kind: method                # provisório: o repo ainda não existe e não há pin a conferir; vira adopter se vendorizar o framework
-    owner_session: brain-onion-evolve   # a sessão dona merja o PR próprio pelo caminho verificado (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)
+    kind: method                # provisório: o repo está vazio e não há pin a conferir; vira adopter se vendorizar o framework
+    piece: true                 # PEÇA estratégica com sessão dona (D_BACKBONE_OWNER_1112); decisão do maestro de 2026-11-28
+    owner_session: brain-onion-evolve   # o NOME da sessão que a defende; merja o PR próprio pelo caminho verificado (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)
     parent: onion-evolve
-    remote: github.com/marciocar/brain-onion-evolve   # PRIVADO; ⚠️ AINDA NÃO CRIADO — o maestro cria o repo; até lá o endereço é só declarado
-    onion_version: n/a          # sem vendor até o repo existir
+    remote: github.com/marciocar/brain-onion-evolve   # PRIVADO; criado pelo maestro em 2026-11-27 (medido: gh repo view, vazio)
+    onion_version: n/a          # sem vendor enquanto o repo não vendorizar o framework
     adopted_at: 2026-11-27
     mode: greenfield
-    personality_summary: "A Persona do Onion Evolve: o cérebro do próprio ecossistema, que fala por ele e aprende com ele. Registrada antes do repo existir, para o nome entrar no padrão e nas guardas desde o primeiro dia."
+    personality_summary: "A Persona do Onion Evolve: o cérebro do próprio ecossistema, que fala por ele e aprende com ele. Registrada com o repo ainda vazio, para o nome entrar no padrão e nas guardas desde o primeiro dia."
     specializations: [persona, ecosystem-brain]
     personality_last_sync: 2026-11-27
     trust:
