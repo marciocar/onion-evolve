@@ -1,0 +1,48 @@
+# FIXTURE (fail — rename_trigger sem aliases: o par vem junto).
+# Dados fictícios (2026-11-27, padrão de nomes do ecossistema, SAC-567; achados do refutador).
+version: 2
+trust_policy_version: 1
+members:
+  - id: onion-evolve
+    name: onion-evolve
+    role: source
+    kind: source
+    path: "."
+    personality_summary: "A fonte (T0)."
+    specializations: [framework-template]
+    personality_last_sync: 2026-01-01
+  - id: cerebro-legado-acme
+    name: cerebro-legado-acme
+    rename_trigger: "renomear na migração fictícia"
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    onion_version: abcdef123456
+    adopted_at: 2026-01-02
+    mode: greenfield
+    personality_summary: "Fictício."
+    specializations: [example]
+    personality_last_sync: 2026-01-02
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      exposes_downstream: []
+  - id: onion-peca-ficticia
+    name: onion-peca-ficticia
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    onion_version: abcdef123456
+    adopted_at: 2026-01-02
+    mode: greenfield
+    personality_summary: "Fictício."
+    specializations: [example]
+    personality_last_sync: 2026-01-02
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      exposes_downstream: []

@@ -49,13 +49,41 @@
 #             · consumer com a2a.sends_to manda para o PRÓPRIO hub ou para a fonte (é o que o
 #               trust-check autoriza: consumer→outro hub é BLOQUEADO lá).
 #
-# Uso       : bash .claude/validation/members-validate.sh [<path-do-members.yaml>] [--json] [--jwks <dir>]
+# NOMES (desde 2026-11-27, D_ECOSYSTEM_NAMING_PATTERN_1127, SAC-567): o id é TERMO DE VARREDURA das guardas
+#             (REGRA 36, 106 e 119 derivam termos dele), então renomear custa caro. O padrão novo é prefixo por
+#             tipo (company-brain-<empresa>, second-brain-<pessoa>, onion-<peça>, onion-vps-<serviço>; a Persona
+#             do Onion Evolve é categoria à parte), e o membro ANTIGO não se renomeia: ganha `aliases:` e
+#             `rename_trigger:`. Doutrina: docs/knowledge-base/concepts/ecosystem-naming.md.
+#             · `aliases:` é lista de nomes na forma do id, escrita em FLUXO numa linha só (`aliases: [a, b]`),
+#               porque os leitores das guardas são awk e só leem essa forma;
+#             · um alias não colide com NENHUM id nem com outro alias (sem caixa: as guardas comparam em
+#               minúsculas), não repete o próprio id, termina em letra ou dígito e não é um prefixo nu do padrão;
+#             · UM LEITOR SÓ NA PRÁTICA: o conjunto de aliases que o PyYAML lê tem de ser IGUAL ao que o awk das
+#               guardas extrai das linhas `aliases: [..]`. Chave entre aspas, `- aliases:` como 1ª chave, tag
+#               `!!str`, escape e `aliases:` aninhado fora do membro divergem (achados do refutador de 2026-11-27)
+#               e reprovam aqui: alias que o validador aprova e a guarda não lê é ponto cego;
+#             · `aliases:` não vazio exige `rename_trigger:` (o evento nomeado em que o rename acontece), e
+#               `rename_trigger:` sem alias é erro (o par vem junto);
+#             · AVISO (não reprova): membro NOVO (id ausente no registro-base) fora dos prefixos do padrão.
+#               Registro-base = --base <arquivo>, senão `git show origin/main:<caminho>` quando o caminho é o
+#               canônico; sem base, o aviso não roda (teto: a bancada passa --base). SOFT porque o tipo da peça
+#               não é campo do registro: projeto de cliente (kind adopter comum) não tem prefixo no padrão, e um
+#               HARD acusaria todo adotante novo legítimo;
+#             · o MAPA (`ecosystem-naming-map.md` ao lado do registro, core-only) lista TODO membro uma vez, com
+#               os mesmos aliases e o mesmo gatilho: membro fora do mapa, linha órfã, alias ou gatilho divergente
+#               reprova (é a catraca da projeção à mão). No checkout do CORE (caminho canônico, sem
+#               .claude/.onion-version, marcador do registro real e origin no core) o mapa é obrigatório: apagá-lo
+#               não desliga a catraca; registro sintético de bancada fica fora.
+#
+# Uso       : bash .claude/validation/members-validate.sh [<path-do-members.yaml>] [--json] [--jwks <dir>] [--base <yaml>|none]
 #               <path> : caminho PASSADO COMO ARGUMENTO; default = o members.yaml
 #                        do próprio repo (resolvido por BASH_SOURCE, nunca embutido).
 #               --json : saída JSON {valid, path, errors[]} para o comando consumir.
 #               --jwks : diretório das públicas pinadas (default acima).
 #
-# Saída     : exit 0 = válido · 1 = inválido (erros listados) · 2 = uso incorreto
+#               --base : registro-base para o aviso de membro novo ('none' desliga).
+#
+# Saída     : exit 0 = válido (avisos em linhas "   ⚠ aviso:") · 1 = inválido (erros listados) · 2 = uso incorreto
 #             · 3 = python3+yaml ausente (degrada gracioso, não reprova)
 #
 # Determinístico, sem LLM. É a peça de validação do par
@@ -73,11 +101,14 @@ ROOT="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "${HERE}" rev-parse --show-toplev
 JSON=0
 MEMBERS=""
 JWKS=""
+BASE=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --json) JSON=1; shift ;;
     --jwks) [[ -n "${2:-}" ]] || { echo "uso: $0 [<path-do-members.yaml>] [--json] [--jwks <dir>]" >&2; exit 2; }
             JWKS="$2"; shift 2 ;;
+    --base) [[ -n "${2:-}" ]] || { echo "uso: $0 [<path-do-members.yaml>] [--base <yaml>|none]" >&2; exit 2; }
+            BASE="$2"; shift 2 ;;
     -*) echo "uso: $0 [<path-do-members.yaml>] [--json] [--jwks <dir>]" >&2; exit 2 ;;
     *) MEMBERS="$1"; shift ;;
   esac
@@ -93,6 +124,25 @@ if [[ -z "$JWKS" ]]; then
   esac
 fi
 
+# REGISTRO-BASE do aviso de membro novo: explícito, ou a origin/main do repo do registro quando o caminho é o canônico.
+BASE_FILE=""
+if [[ "$BASE" == "none" ]]; then
+  :
+elif [[ -n "$BASE" ]]; then
+  [[ -f "$BASE" ]] || { echo "uso: --base: arquivo não encontrado: $BASE" >&2; exit 2; }
+  BASE_FILE="$BASE"
+else
+  _mabs2="$(cd "$(dirname "$MEMBERS")" 2>/dev/null && pwd)/$(basename "$MEMBERS")"
+  case "${_mabs2}" in
+    */docs/evolution/federation/members.yaml)
+      _mroot="${_mabs2%/docs/evolution/federation/members.yaml}"
+      _btmp="$(mktemp)"; trap 'rm -f "${_btmp}"' EXIT
+      if env -u GIT_DIR -u GIT_WORK_TREE git -C "${_mroot}" show origin/main:docs/evolution/federation/members.yaml > "${_btmp}" 2>/dev/null; then
+        BASE_FILE="${_btmp}"
+      fi ;;
+  esac
+fi
+
 if [[ ! -f "$MEMBERS" ]]; then
   echo "uso: $0 [<path-do-members.yaml>] [--json]  — arquivo não encontrado: $MEMBERS" >&2
   exit 2
@@ -101,14 +151,18 @@ fi
 command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
   || { echo "members-validate: python3+yaml ausente (exit 3, gracioso)." >&2; exit 3; }
 
-python3 - "$MEMBERS" "$JSON" "$JWKS" <<'PY'
+python3 - "$MEMBERS" "$JSON" "$JWKS" "$BASE_FILE" <<'PY'
 import sys, json, re, os, subprocess, shutil
 
-path, json_mode, jwks_dir = sys.argv[1], sys.argv[2] == "1", sys.argv[3]
+path, json_mode, jwks_dir, base_file = sys.argv[1], sys.argv[2] == "1", sys.argv[3], sys.argv[4]
 errors = []
+warnings = []
 
 def err(msg):
     errors.append(msg)
+
+def warn(msg):
+    warnings.append(msg)
 
 # UM LEITOR SÓ NA PRÁTICA (F3, achado do refutador): o trust-topology-check.sh lê o registro por awk, e o
 # resto (este validador, o gate, o bridge, o motor de convite) por PyYAML. Os dois divergem em três formas,
@@ -211,6 +265,10 @@ if isinstance(doc, dict):
 
         if not m.get("name"):
             err(f"{tag}: 'name' ausente")
+        # `piece` é booleano: o baton-pulse lê `is True`, e um `piece: "true"` ou `piece: sim` tiraria a peça do pulso
+        # calado (achado do refutador de 2026-11-28, SAC-567)
+        if "piece" in m and not isinstance(m.get("piece"), bool):
+            err(f"{tag}: 'piece' tem de ser booleano (true|false), veio {m.get('piece')!r} — o pulso da batuta lê só o booleano e a peça sumiria dele")
 
         role = m.get("role")
         if role not in ROLES:
@@ -403,12 +461,136 @@ if isinstance(doc, dict):
         st = a.get("sends_to") if isinstance(a, dict) else None
         if role == "consumer" and isinstance(st, str) and st and st != par and (by_id.get(st) or {}).get("kind") != "source":
             err(f"{tag}: consumer manda sinais para o próprio hub ('{par}') ou para a fonte; a2a.sends_to aponta '{st}' (a topologia bloqueia consumer→outro hub)")
+    # NOMES (D_ECOSYSTEM_NAMING_PATTERN_1127, SAC-567) — ver o cabeçalho.
+    ID_RE = r"[A-Za-z0-9][A-Za-z0-9._-]*"
+    BARE_PREFIXES = {"company-brain", "second-brain", "onion", "onion-vps", "brain"}
+    # a forma da linha: os leitores awk das guardas só leem o alias em FLUXO numa linha
+    for n, ln in enumerate(raw.splitlines(), 1):
+        if re.match(r"^\s+aliases:", ln) and not re.match(r"^\s+aliases:\s*\[[^\]#]*\]\s*(#.*)?$", ln):
+            err(f"linha {n}: 'aliases:' tem de vir em fluxo numa linha só (aliases: [a, b]) — os leitores awk das guardas (REGRA 36, 106) não leem a forma em bloco")
+    owner = {}   # nome em minúsculas -> (dono, 'id'|'alias')
+    for m in members:
+        if isinstance(m, dict) and isinstance(m.get("id"), str):
+            owner.setdefault(m["id"].lower(), (m["id"], "id"))
+    for m in members:
+        if not isinstance(m, dict):
+            continue
+        mid = m.get("id"); tag = f"membro '{mid}'"
+        al = m.get("aliases")
+        trig = m.get("rename_trigger")
+        if al is None:
+            al = []
+        if not isinstance(al, list):
+            err(f"{tag}: 'aliases' tem de ser lista (veio {type(al).__name__})")
+            continue
+        if al and (not isinstance(trig, str) or not trig.strip()):
+            err(f"{tag}: 'aliases' exige 'rename_trigger' (o evento nomeado em que o rename acontece, ex.: «renomear na migração para a AWS»)")
+        if not al and "rename_trigger" in m:
+            err(f"{tag}: 'rename_trigger' sem 'aliases' — o par vem junto (alias registrado + gatilho nomeado)")
+        for a in al:
+            if not isinstance(a, str) or not re.fullmatch(ID_RE, a) or not re.search(r"[A-Za-z0-9]$", a):
+                err(f"{tag}: alias '{a}' fora da forma do id ([A-Za-z0-9._-], começa e termina em letra ou dígito)")
+                continue
+            if a.lower() in BARE_PREFIXES:
+                err(f"{tag}: alias '{a}' é um prefixo nu do padrão (colide com o nome de vertical ou família do framework)")
+                continue
+            prev = owner.get(a.lower())
+            if prev is not None:
+                if prev[0] == mid and prev[1] == "id":
+                    err(f"{tag}: alias '{a}' repete o próprio id")
+                elif prev[1] == "id":
+                    err(f"{tag}: alias '{a}' colide com o id do membro '{prev[0]}' (as guardas varrem ids e aliases como um espaço de nomes só)")
+                else:
+                    err(f"{tag}: alias '{a}' colide com um alias de '{prev[0]}'")
+                continue
+            owner[a.lower()] = (mid, "alias")
+
+    # UM LEITOR SÓ NA PRÁTICA: o que o awk das guardas extrai == o que o PyYAML lê (multiconjunto, em minúsculas)
+    awk_al = []
+    for ln in raw.splitlines():
+        if re.match(r"^[ \t]+aliases:[ \t]*\[", ln):
+            v = re.sub(r"^[^\[]*\[", "", ln, count=1); v = re.sub(r"\].*$", "", v)
+            for a in v.split(","):
+                a = a.strip(" \t\"'")
+                if a:
+                    awk_al.append(a.lower())
+    yaml_al = [a.lower() for m in members if isinstance(m, dict) and isinstance(m.get("aliases"), list)
+               for a in m["aliases"] if isinstance(a, str)]
+    if sorted(awk_al) != sorted(yaml_al):
+        err(f"registro: os leitores awk das guardas (REGRA 36, 106) leem os aliases {sorted(awk_al)} e o yaml lê {sorted(yaml_al)} — escreva `aliases: [a, b]` como chave simples do membro, sem aspas na chave, sem tag, sem escape e sem aninhar")
+
+    # AVISO de membro NOVO fora do prefixo do tipo (SOFT, ver o cabeçalho)
+    if base_file:
+        try:
+            bdoc = yaml.safe_load(open(base_file, encoding="utf-8")) or {}
+            base_ids = {x.get("id") for x in (bdoc.get("members") or []) if isinstance(x, dict)}
+        except Exception as e:
+            base_ids = None
+            warn(f"registro-base ilegível ({type(e).__name__}): o aviso de membro novo NÃO rodou")
+        if base_ids is not None:
+            for m in members:
+                if not isinstance(m, dict) or not isinstance(m.get("id"), str) or m["id"] in base_ids:
+                    continue
+                nid = m["id"]
+                if nid.startswith("onion-svc-"):
+                    warn(f"membro NOVO '{nid}': serviço da VPS usa o prefixo onion-vps-<serviço> (D_ECOSYSTEM_NAMING_PATTERN_1127)")
+                elif not nid.startswith(("company-brain-", "second-brain-", "onion-")):
+                    warn(f"membro NOVO '{nid}' fora dos prefixos do padrão (company-brain-, second-brain-, onion-, onion-vps-): se é peça do ecossistema, use o prefixo do tipo; se é projeto de adotante comum ou a Persona do Onion Evolve (categoria à parte), o padrão não se aplica e o aviso pode ser ignorado")
+
+    # MAPA (catraca da projeção à mão): todo membro uma vez, com os mesmos aliases
+    map_path = os.path.join(os.path.dirname(os.path.abspath(path)), "ecosystem-naming-map.md")
+    _abs = os.path.abspath(path)
+    _canon = _abs.endswith(os.path.join("docs", "evolution", "federation", "members.yaml"))
+    _root = _abs[: -len(os.path.join("docs", "evolution", "federation", "members.yaml"))] if _canon else ""
+    # "a fonte" = o checkout do CORE: caminho canônico, sem carimbo de adotante, o marcador do registro real na 1ª linha e a
+    # origin do repo no core. Sem as duas últimas, os registros SINTÉTICOS das bancadas (que montam o caminho canônico num
+    # sandbox) reprovavam por falta de mapa (medido no CI do #1783, família federation_a2a).
+    def _is_core_checkout():
+        first = raw.splitlines()[0] if raw else ""
+        if "Registro de membros da co-evolução" not in first:
+            return False
+        try:
+            o = subprocess.run(["git", "-C", _root, "remote", "get-url", "origin"], capture_output=True, text=True, timeout=10,
+                               env={k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}).stdout.strip()
+        except Exception:
+            return False
+        return re.search(r"[:/]marciocar/onion-evolve(\.git)?$", o) is not None
+    if _canon and not os.path.isfile(os.path.join(_root, ".claude", ".onion-version")) and not os.path.isfile(map_path) and _is_core_checkout():
+        err(f"mapa {os.path.basename(map_path)} AUSENTE ao lado do registro da fonte — apagá-lo desligaria a catraca dos nomes (D_ECOSYSTEM_NAMING_PATTERN_1127)")
+    if os.path.isfile(map_path):
+        rows = {}; trig_rows = {}
+        for n, ln in enumerate(open(map_path, encoding="utf-8").read().splitlines(), 1):
+            mm = re.match(r"^\|\s*`([^`]+)`\s*\|(.*)$", ln)
+            if not mm:
+                continue
+            cells = [c.strip() for c in mm.group(2).split("|")]
+            # colunas: id atual | tipo | conforme | alias | gatilho de rename
+            alias_cell = cells[2] if len(cells) > 2 else ""
+            al_map = sorted(re.findall(r"`([^`]+)`", alias_cell))
+            if mm.group(1) in rows:
+                err(f"mapa {os.path.basename(map_path)} linha {n}: '{mm.group(1)}' aparece duas vezes")
+            rows[mm.group(1)] = al_map
+            trig_rows[mm.group(1)] = cells[3] if len(cells) > 3 else ""
+        def _als(m):
+            v = m.get("aliases")
+            return sorted(a for a in v if isinstance(a, str)) if isinstance(v, list) else []
+        reg = {m.get("id"): _als(m) for m in members if isinstance(m, dict) and isinstance(m.get("id"), str)}
+        reg_trig = {m.get("id"): m.get("rename_trigger") for m in members if isinstance(m, dict) and isinstance(m.get("id"), str)}
+        for i2 in sorted(set(reg) - set(rows)):
+            err(f"mapa {os.path.basename(map_path)}: membro '{i2}' do registro não está no mapa (todo membro entra no mapa: id · tipo · conforme · alias · gatilho)")
+        for i2 in sorted(set(rows) - set(reg)):
+            err(f"mapa {os.path.basename(map_path)}: linha '{i2}' não é membro do registro")
+        for i2 in sorted(set(rows) & set(reg)):
+            if rows[i2] != reg[i2]:
+                err(f"mapa {os.path.basename(map_path)}: aliases de '{i2}' divergem do registro (mapa {rows[i2]} × registro {reg[i2]})")
+            elif reg[i2] and isinstance(reg_trig[i2], str) and trig_rows.get(i2, "").strip() != reg_trig[i2].strip():
+                err(f"mapa {os.path.basename(map_path)}: gatilho de rename de '{i2}' diverge do registro (mapa «{trig_rows.get(i2, '')}» × registro «{reg_trig[i2]}»)")
 elif doc is not None:
     err("documento raiz não é um mapa (esperado: chaves version/trust_policy_version/members)")
 
 valid = len(errors) == 0
 if json_mode:
-    print(json.dumps({"valid": valid, "path": path, "errors": errors}, ensure_ascii=False))
+    print(json.dumps({"valid": valid, "path": path, "errors": errors, "warnings": warnings}, ensure_ascii=False))
 else:
     if valid:
         print(f"✅ members.yaml válido: {path} ({len(doc.get('members', [])) if isinstance(doc, dict) else 0} membros)")
@@ -416,6 +598,8 @@ else:
         print(f"❌ members.yaml inválido: {path}")
         for e in errors:
             print(f"   ∟ {e}")
+    for w in warnings:
+        print(f"   ⚠ aviso: {w}")
 
 sys.exit(0 if valid else 1)
 PY

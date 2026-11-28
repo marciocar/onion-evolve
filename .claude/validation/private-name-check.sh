@@ -14,7 +14,7 @@
 #   candidatos = basename de cada diretório IRMÃO do checkout principal do core que é clone git com
 #                carimbo do Onion (`.claude/.onion-version`), mais o basename da origin dele;
 #              + basename de cada caminho do mapa local de membros (member-paths.tsv), mais a origin dele;
-#   federados  = os ids, os basenames de `remote` e de `local_path` do members.yaml (que já é público);
+#   federados  = os ids, os aliases, os basenames de `remote` e de `local_path` do members.yaml (que já é público);
 #   proibidos  = (candidatos − federados, com 4 caracteres ou mais) ∪ os termos da fonte privada de
 #                clientes (a mesma do projection-safety.sh: ONION_CLIENT_TERMS_FILE ou o default da fonte).
 # NO CI a máquina não existe (nenhum irmão carimbado, nenhum mapa): a guarda cai para a lista de termos
@@ -95,6 +95,9 @@ try:
             for k in ("id", "remote", "local_path"):
                 b = base(str(m.get(k) or "")) if k != "id" else str(m.get("id") or "").strip()
                 if b: fed.add(b.lower())
+            # o alias do padrão de nomes (2026-11-27, SAC-567) é nome REGISTRADO como o id: federado também
+            for a in (m.get("aliases") or []) if isinstance(m.get("aliases"), list) else []:
+                if isinstance(a, str) and a.strip(): fed.add(a.strip().lower())
 except FileNotFoundError:
     pass
 except Exception as e:
@@ -252,13 +255,14 @@ _selftest() {
   mkdir -p "${t}/maq"
   _mkclone "${t}/maq/cliente-ficticio-alfa" "git@forja.invalid:dono/repo-ficticio-beta.git"
   _mkclone "${t}/maq/membro-publico"
+  _mkclone "${t}/maq/apelido-ficticio-zeta"   # clone carimbado cujo nome é o ALIAS registrado de um membro (SAC-567)
   _mkclone "${t}/fora/clone-do-mapa"
   mkdir -p "${t}/maq/sem-carimbo-gama" && git -C "${t}/maq/sem-carimbo-gama" init -q >/dev/null 2>&1
   printf 'membro-x\t%s\n' "${t}/fora/clone-do-mapa" > "${t}/map.tsv"
   printf 'termo-declarado-delta\nMembro.Publico\n' > "${t}/ct.txt"
   local core="${t}/maq/core"
   mkdir -p "${core}/docs/evolution/federation" && git -C "${core}" init -q -b main >/dev/null 2>&1
-  printf 'members:\n  - id: membro-publico\n  - id: poc-cliente-ficticio-alfa\n    remote: github.com/dono/membro-publico\n    local_path: n/a\n' > "${core}/docs/evolution/federation/members.yaml"
+  printf 'members:\n  - id: membro-publico\n    aliases: [apelido-ficticio-zeta]\n  - id: poc-cliente-ficticio-alfa\n    remote: github.com/dono/membro-publico\n    local_path: n/a\n' > "${core}/docs/evolution/federation/members.yaml"
   printf 'base\n' > "${core}/a.md"
   git -C "${core}" add -A && git -C "${core}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
   git -C "${core}" update-ref refs/remotes/origin/main HEAD
@@ -280,6 +284,7 @@ _selftest() {
   _case "acusa: nome no CAMINHO do arquivo acrescentado" "nada" HARD "docs/cliente-ficticio-alfa-notas.md"
   # ── cala ──
   _case "cala: nome federado (id do members.yaml)" "o membro-publico recebeu" LIMPO
+  _case "cala: alias registrado é federado como o id (padrão de nomes, SAC-567)" "o apelido-ficticio-zeta recebeu" LIMPO
   _case "cala: termo dentro de token federado inteiro" "o poc-cliente-ficticio-alfa é público" LIMPO
   _case "cala: diretório irmão SEM carimbo não é candidato" "o sem-carimbo-gama fica" LIMPO
   _case "cala: pedaço de palavra não casa" "xcliente-ficticio-alfax" LIMPO

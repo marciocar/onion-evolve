@@ -36,6 +36,13 @@
 # em ~/.config/onion/private-owner-sessions.tsv (ou $ONION_PRIVATE_OWNERS_FILE), modo 600, uma linha
 # `member_id<TAB>dono/repo<TAB>owner_session`. A catraca a lê só quando o alvo não casa nenhum `remote:` daqui, e só vale
 # para o membro que existe aqui com `kind: adopter` e `remote: n/a`; dono do slug igual ao do core; no CI ela não é lida.
+# NOMES (2026-11-27, D_ECOSYSTEM_NAMING_PATTERN_1127, SAC-567): o id é TERMO DE VARREDURA das guardas (REGRA 36, 106 e
+# 119 derivam termos dele), então renomear custa caro. Membro NOVO leva prefixo pelo tipo: company-brain-<empresa>,
+# second-brain-<pessoa>, onion-<peça>, onion-vps-<serviço>; a Persona brain-onion-evolve é categoria à parte. Membro
+# ANTIGO não se renomeia: ganha `aliases: [..]` (em fluxo numa linha só, porque os leitores das guardas são awk) e
+# `rename_trigger:` (o evento nomeado em que o rename acontece). Alias não colide com id nem com outro alias, e as
+# guardas varrem o alias como varrem o id. O MAPA de todas as peças é ecosystem-naming-map.md, ao lado deste arquivo
+# (core-only; o members-validate.sh reprova membro fora dele). Doutrina: docs/knowledge-base/concepts/ecosystem-naming.md.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1
@@ -321,6 +328,8 @@ members:
   - id: brain-granaai
     # Registro (2026-10-02, atrasado) e promoção a hub: grafo door-role-parity-2026-09 (E_REGISTRO_HONESTO_F15).
     name: brain-granaai (adotante de campo — base de conhecimento da Grana.Ai, a redocumentar como Company Brain)
+    aliases: [company-brain-granaai]   # padrão de nomes de 2026-11-27: o id fica (é termo de varredura), o alias registra o nome do padrão
+    rename_trigger: "renomear na migração para a AWS"   # o evento em que o id passa a ser o alias (D_ECOSYSTEM_NAMING_PATTERN_1127)
     role: hub                   # TIER 2 — adota o core E adota/atualiza os projetos dele (Camada 2); carimbo também diz `hub`
     kind: adopter
     parent: onion-evolve
@@ -459,6 +468,8 @@ members:
   # segue north-star: prova o MÉTODO, não o MERCADO (Q_COLD_ADOPTER aberto; Marcio = centro da órbita).
   - id: marcio-pessoal
     name: Onion pessoal do Marcio (cérebro reconciliado N=1 — BRAÇO DE PESQUISA, não prova de mercado)
+    aliases: [second-brain-marcio]   # o Second Brain é a evolução do Onion Pessoal e roda no notebook do maestro (padrão de nomes de 2026-11-27)
+    rename_trigger: "renomear quando o Second Brain ganhar repo próprio no notebook e entrar na rede A2A"   # gatilho nomeado (D_ECOSYSTEM_NAMING_PATTERN_1127)
     # Isenta da invariante "trecho projetado == slug" (projection-safety P6): o rótulo é prosa em
     # pt-BR e não nomeia TERCEIRO — é a instância pessoal do próprio maestro. A isenção mora aqui,
     # no dado, e não numa allowlist dentro do script vendorizado (que seria vazamento cross-tenant).
@@ -1188,8 +1199,37 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: brain-onion-evolve
+    # A PERSONA do Onion Evolve (D_ECOSYSTEM_NAMING_PATTERN_1127): o cérebro do próprio Onion Evolve. Categoria à parte no
+    # padrão de nomes: não é company brain (empresa) nem second brain (pessoa). Registro por decisão do maestro (SAC-567); o
+    # repo foi criado por ele em 2026-11-27, privado e ainda vazio. Molde: os membros sem vendor (kind method, como o
+    # watcher-onion-evolve) e a PEÇA com sessão dona (piece + owner_session, como o onion-kg-ssot): o maestro decidiu em
+    # 2026-11-28 marcá-la como peça e NÃO isentá-la da REGRA 36 (o nome dela é varrido como qualquer id).
+    name: brain-onion-evolve (a Persona do Onion Evolve)
+    role: standalone            # tier 3: fala só com o core
+    kind: method                # provisório: o repo está vazio e não há pin a conferir; vira adopter se vendorizar o framework
+    piece: true                 # PEÇA estratégica com sessão dona (D_BACKBONE_OWNER_1112); decisão do maestro de 2026-11-28
+    owner_session: brain-onion-evolve   # o NOME da sessão que a defende; merja o PR próprio pelo caminho verificado (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)
+    sponsor: maestro            # patrocinador humano da peça (D_BACKBONE_OWNER_1112)
+    parent: onion-evolve
+    remote: github.com/marciocar/brain-onion-evolve   # PRIVADO; criado pelo maestro em 2026-11-27 (medido: gh repo view, vazio)
+    local_path: "/home/marcio/brain-onion-evolve"   # clone vazio nesta máquina, origin = o remote (medido 2026-11-28); o pulso e o session-open abrem a sessão aqui
+    onion_version: n/a          # sem vendor enquanto o repo não vendorizar o framework
+    adopted_at: 2026-11-27
+    mode: greenfield
+    personality_summary: "A Persona do Onion Evolve: o cérebro do próprio ecossistema, que fala por ele e aprende com ele. Registrada com o repo ainda vazio, para o nome entrar no padrão e nas guardas desde o primeiro dia."
+    specializations: [persona, ecosystem-brain]
+    personality_last_sync: 2026-11-27
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
-#  - id: <slug-do-projeto>
+#  - id: <slug-do-projeto>   # peça do ecossistema: company-brain-<empresa> | second-brain-<pessoa> | onion-<peça> | onion-vps-<serviço>
 #    name: <nome>
 #    role: hub | standalone | consumer | plugins | mini   # hub = terá sub-adotados; standalone = adota core direto sem sub-adotados; consumer = T2, adota um HUB (não o core); plugins|mini = papel de PORTA (só com kind: door)
 #    kind: adopter | distillation | door | method | port   # NATUREZA (≠ tier). Só `adopter` vira Organization no Logto.
@@ -1198,6 +1238,8 @@ members:
 #                              # T2 onboarda VIA CORE (source-driven; RFC-0003 §5, decisão 2026-07-02) —
 #                              # o hub NÃO roda adopt; hub-driven adoption é gatilho futuro (1º T2 real)
 #    remote: github.com/<org>/<repo>
+#    aliases: [<nome-do-padrao>]     # SÓ membro antigo fora do padrão de nomes; exige rename_trigger
+#    rename_trigger: "<evento nomeado>"
 #    local_path: "<path-absoluto-no-filesystem-do-maestro>"
 #    onion_version: <commit-curto>   # = .claude/.onion-version do projeto após /meta:adopt
 #    adopted_at: <AAAA-MM-DD>

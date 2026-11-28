@@ -95,11 +95,30 @@ dls_members_tsv() {
     END { flush() }
   ' "${MEMBERS}"
 }
+# ALIASES (2026-11-27, D_ECOSYSTEM_NAMING_PATTERN_1127, SAC-567): o membro antigo fora do padrão de nomes ganha
+# `aliases: [..]` (em fluxo numa linha só, cobrado pelo members-validate.sh) em vez de rename. O alias é nome
+# registrado e entra nas famílias como o id, com o kind do dono: lido só o id, o alias viraria ponto cego.
+# Saída: `nome\037kind`, uma linha por id e por alias. NÃO entra no --emit-members-tsv: o motor lê aquele TSV
+# por membro, e uma linha de alias seria um membro inventado.
+dls_names() {
+  [ -n "${MEMBERS}" ] || return 0
+  awk '
+    function clean(s) { sub(/^[^:]*:[[:space:]]*/,"",s); sub(/[[:space:]]+#.*$/,"",s)
+                        gsub(/"/,"",s); gsub(/\047/,"",s); sub(/[[:space:]].*$/,"",s); return s }
+    function flush(   i) { if (id != "") { printf "%s\037%s\n", id, kind; for (i=1;i<=na;i++) printf "%s\037%s\n", al[i], kind } }
+    /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { flush(); id=clean($0); kind=""; na=0; next }
+    id != "" { l=$0; gsub(/^[[:space:]]+/,"",l)
+      if (l ~ /^kind:/ && kind=="") kind=clean(l)
+      else if (l ~ /^aliases:[[:space:]]*\[/) { v=l; sub(/^[^\[]*\[/,"",v); sub(/\].*$/,"",v); n=split(v,A,",")
+        for (j=1;j<=n;j++) { a=A[j]; gsub(/^[[:space:]"\047]+|[[:space:]"\047]+$/,"",a); if (a != "") al[++na]=a } } }
+    END { flush() }
+  ' "${MEMBERS}"
+}
 dls_sub_ids() {
-  dls_members_tsv | awk -F'\037' '($2=="adopter"||$2=="method") && $1 !~ /^onion-/ && $1 !~ /^marcio/ && $1 !~ /^selftest-/ && length($1)>=4 {print $1}' | sort -u
+  dls_names | awk -F'\037' '($2=="adopter"||$2=="method") && $1 !~ /^onion-/ && $1 !~ /^marcio/ && $1 !~ /^selftest-/ && length($1)>=4 {print $1}' | sort -u
 }
 dls_word_ids() {
-  dls_members_tsv | awk -F'\037' '($2=="adopter"||$2=="method") && $1 ~ /^onion-/ {print $1}' | sort -u
+  dls_names | awk -F'\037' '($2=="adopter"||$2=="method") && $1 ~ /^onion-/ {print $1}' | sort -u
 }
 dls_accounts() {
   { dls_members_tsv | awk -F'\037' '{print $6}' | sed -n 's#^/home/\([a-z_][a-z0-9_-]*\)/.*#\1#p'

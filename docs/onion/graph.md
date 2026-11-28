@@ -314,6 +314,13 @@ brain-granaai	specialization	pesquisa-primaria
 brain-granaai	tier	hub	
 brain-granaai	trust-advises	onion-evolve	
 brain-granaai	trust-corrects	onion-evolve	
+brain-onion-evolve	adopts	onion-evolve	
+brain-onion-evolve	mode	greenfield	
+brain-onion-evolve	pin	n/a	
+brain-onion-evolve	specialization	ecosystem-brain	
+brain-onion-evolve	specialization	persona	
+brain-onion-evolve	tier	standalone	
+brain-onion-evolve	trust-advises	onion-evolve	
 branch-code-reviewer	related	/engineer/pre-pr	
 branch-code-reviewer	related	branch-test-planner	
 branch-code-reviewer	related	code-reviewer	

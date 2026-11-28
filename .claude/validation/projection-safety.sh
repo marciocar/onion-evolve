@@ -323,6 +323,12 @@ derive_terms() {
       gsub(/^[[:space:]]+|[[:space:]]+$/, "", v); if (v != "") ids[tolower(v)] = 1
       next
     }
+    # o alias do padrão de nomes (2026-11-27, SAC-567) é id público como o id (P2)
+    /^[[:space:]]+aliases:[[:space:]]*\[/ {
+      v = $0; sub(/^[^\[]*\[/, "", v); sub(/\].*$/, "", v); na = split(v, AL, ",")
+      for (k = 1; k <= na; k++) { a = AL[k]; gsub(/^[[:space:]"\047]+|[[:space:]"\047]+$/, "", a); if (a != "") ids[tolower(a)] = 1 }
+      next
+    }
     /^[[:space:]]*name:[[:space:]]/ {
       line = $0; sub(/[[:space:]]*#.*$/, "", line)
       # só interessa a anotação entre parênteses
@@ -359,7 +365,8 @@ derive_terms() {
 # com o mesmo filtro de P2 (token igual a id público não é nome) e o mesmo piso de comprimento.
 derive_owned() {
   local _ids
-  _ids="$(awk '/^[[:space:]]*-?[[:space:]]*id:[[:space:]]/{v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]*#.*$/,"",v); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); if (v!="") print tolower(v)}' "${MEMBERS}" 2>/dev/null || true)"
+  _ids="$(awk '/^[[:space:]]*-?[[:space:]]*id:[[:space:]]/{v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]*#.*$/,"",v); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); if (v!="") print tolower(v)}
+    /^[[:space:]]+aliases:[[:space:]]*\[/{v=$0; sub(/^[^\[]*\[/,"",v); sub(/\].*$/,"",v); n=split(v,A,","); for (i=1;i<=n;i++) { a=A[i]; gsub(/^[[:space:]"\047]+|[[:space:]"\047]+$/,"",a); if (a!="") print tolower(a) } }' "${MEMBERS}" 2>/dev/null || true)"
   ct_owned | awk -F'\t' -v ids="${_ids}" 'BEGIN{n=split(ids,I,"\n"); for(i=1;i<=n;i++) if(I[i]!="") pub[I[i]]=1}
     { t=$2; if (length(t)<4) next; if (tolower(t) in pub) next; print t }'
 }
