@@ -1210,8 +1210,10 @@ members:
     kind: method                # provisório: o repo está vazio e não há pin a conferir; vira adopter se vendorizar o framework
     piece: true                 # PEÇA estratégica com sessão dona (D_BACKBONE_OWNER_1112); decisão do maestro de 2026-11-28
     owner_session: brain-onion-evolve   # o NOME da sessão que a defende; merja o PR próprio pelo caminho verificado (D_SESSIONS_MERGE_OWN_PRS_INCL_GUARD_1118)
+    sponsor: maestro            # patrocinador humano da peça (D_BACKBONE_OWNER_1112)
     parent: onion-evolve
     remote: github.com/marciocar/brain-onion-evolve   # PRIVADO; criado pelo maestro em 2026-11-27 (medido: gh repo view, vazio)
+    local_path: "/home/marcio/brain-onion-evolve"   # clone vazio nesta máquina, origin = o remote (medido 2026-11-28); o pulso e o session-open abrem a sessão aqui
     onion_version: n/a          # sem vendor enquanto o repo não vendorizar o framework
     adopted_at: 2026-11-27
     mode: greenfield

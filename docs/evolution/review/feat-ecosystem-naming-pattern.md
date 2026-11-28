@@ -2,14 +2,13 @@
 branch: feat/ecosystem-naming-pattern
 pr: pendente
 date: 2026-11-27
-reviewed_diff_sha256: 955a5eacd808631740d86a4aab7161fe2dbb44104a0db5d4f0adb6d56df0ce2d
-reviewed_code_sha256: 8f4a03428ad3bc86c0737545aac68d6b6d8cf8b851c5ce64d2dcc7fba85985ff
-findings_total: 10
-findings_real: 10
+reviewed_diff_sha256: pendente
+findings_total: 14
+findings_real: 14
 findings_blocking: 3
-tokens: 161040
-duration_min: 18
-findings_fixed: 9
+tokens: 296612
+duration_min: 44
+findings_fixed: 13
 verdict: REJECTED_AND_FIXED
 elenxo: true
 elenxo_isolado: true
@@ -54,7 +53,22 @@ registro real e o mapa, o TSV do motor sem linha de alias, e o aviso que nunca m
 - A emissão SOFT da REGRA 66 no lint e o alias no P2 do `projection-safety.sh` não têm caso de bancada
   próprio: a 66 só roda com o marcador do registro real e o registro-base vem do git, que o sandbox não tem.
 - O aviso de membro novo cala sem `origin/main` (checkout raso). É só aviso, então calar não reprova nada.
-- Os cinco `onion-svc-*` e o `watcher-onion-evolve` ficam sem alias: o alias natural dos serviços
-  (`onion-vps-<serviço>`) já aparece em arquivos que viajam, e a REGRA 106 o acusaria. Decisão do maestro.
-- A Persona é varrida pela REGRA 36 como qualquer id fora de `onion-*`: escrever o nome dela no que viaja
-  reprova. Se isso atrapalhar o MVP dela, a isenção vai no dado, por decisão do maestro.
+- Os cinco `onion-svc-*` e o `watcher-onion-evolve` ficam sem alias neste PR. O maestro decidiu em
+  2026-11-28 que eles entram num 2º PR, pela superação «chave + nome + classe» (`class: client|internal`).
+- A Persona é varrida pela REGRA 36 como qualquer id fora de `onion-*`. O maestro decidiu em 2026-11-28
+  não isentá-la.
+
+## Rodada 2 (delta de 2026-11-28)
+
+Decisões do maestro aplicadas: a Persona ganha `piece: true`, e o comentário do remote passa a dizer o
+medido (repo criado em 2026-11-27, privado e vazio). Um 2º refutador isolado, novo, revisou só esse delta
+e deu APROVA COM RESSALVAS, com 4 achados:
+
+| # | Severidade | Achado | Cura |
+|---|---|---|---|
+| 11 | importante | a peça entrou sem `local_path`, e o pulso da batuta entregava `cd <local_path>` como arranque | `local_path: /home/marcio/brain-onion-evolve` (clone vazio medido, origin = o remote); `ownership.sh who` agora devolve a pasta |
+| 12 | importante | a peça entrou sem `sponsor`, que o cabeçalho do registro pede para peça | `sponsor: maestro`, como as outras peças |
+| 13 | menor | a KB dizia «peça do Onion → `onion-<peça>`» e a Persona é peça sem o prefixo; a decisão de 11-28 só estava no comentário do YAML | a KB diz que ela é a única peça sem o prefixo e sem isenção; a decisão foi para a narrativa do nó `D_ECOSYSTEM_NAMING_PATTERN_1127` |
+| 14 | menor, anterior | `piece: "true"` ou `piece: sim` passavam no validador e tiravam a peça do pulso calada | o validador exige booleano; fixture `members-bad-piece-not-bool.yaml` |
+
+A bancada da rodada 2 rodou `ecosystem_naming` (11/11); a família `fixtures` inteira fica com o pr-finalize.

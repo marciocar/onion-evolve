@@ -1545,7 +1545,7 @@ nodes:
     verified_at: "2026-11-27"
     verified_against: "decisão do maestro em 2026-11-27, por pergunta com opções (/meta:decide): escolhida «Selar assim (Recomendado)»"
     label: "Padrão de nomes do ecossistema: prefixo por tipo (company-brain-<empresa>, second-brain-<pessoa>, onion-<peça>, onion-vps-<serviço>); o existente ganha alias registrado, não rename; marcio-pessoal ganha o alias second-brain-marcio; a Persona é brain-onion-evolve."
-    narrative: "Selado por /meta:decide em 2026-11-27: escolhida «Selar assim (Recomendado)»; descartadas: «Selar e renomear já» · «Pesquisar o mercado antes». Destino: mecanismo (vira guarda; a guarda a construir está no campo x_guard)."
+    narrative: "Selado por /meta:decide em 2026-11-27: escolhida «Selar assim (Recomendado)»; descartadas: «Selar e renomear já» · «Pesquisar o mercado antes». Destino: mecanismo (vira guarda; a guarda a construir está no campo x_guard). Em 2026-11-28 o maestro decidiu as pendências do PR #1783: a Persona é peça (piece: true) e não ganha isenção na REGRA 36; os aliases dos serviços da VPS e do vigia vão num 2º PR, pela superação «chave + nome + classe» (class: client|internal, a varredura protege só o client)."
     x_destination: mechanism
     x_guard: "SAC-567"
     provenance:

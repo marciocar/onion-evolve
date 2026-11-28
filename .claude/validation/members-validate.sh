@@ -264,6 +264,10 @@ if isinstance(doc, dict):
 
         if not m.get("name"):
             err(f"{tag}: 'name' ausente")
+        # `piece` é booleano: o baton-pulse lê `is True`, e um `piece: "true"` ou `piece: sim` tiraria a peça do pulso
+        # calado (achado do refutador de 2026-11-28, SAC-567)
+        if "piece" in m and not isinstance(m.get("piece"), bool):
+            err(f"{tag}: 'piece' tem de ser booleano (true|false), veio {m.get('piece')!r} — o pulso da batuta lê só o booleano e a peça sumiria dele")
 
         role = m.get("role")
         if role not in ROLES:

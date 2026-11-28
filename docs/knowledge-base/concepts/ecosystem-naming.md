@@ -32,7 +32,9 @@ Cada peça nova leva no nome um prefixo que diz o tipo dela:
 | Serviço da VPS | `onion-vps-<serviço>` | `onion-vps-<serviço>` |
 
 A **Persona do Onion Evolve** é uma categoria à parte. Ela é o cérebro do próprio Onion Evolve, que não
-é company brain nem second brain. O nome dela é fixo e está no registro da federação.
+é company brain nem second brain. Ela é uma peça (`piece: true`), mas é a única peça cujo nome não leva o
+prefixo `onion-`: o nome dela é fixo e está no registro da federação. Ela não tem isenção nas guardas: o
+nome é varrido como qualquer id.
 
 O projeto comum de um adotante (o produto de um cliente, um site, um experimento) **não** entra no
 padrão. Ele não é peça do ecossistema, então o nome dele segue sendo o slug do projeto.
